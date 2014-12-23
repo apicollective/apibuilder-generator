@@ -312,7 +312,7 @@ case class RubyClientGenerator(form: InvocationForm) {
         val paramBuilder = ListBuffer[String]()
 
         queryParams.foreach { param =>
-          paramBuilder.append(s":${param.name} => ${parseArgument(param.name, param.`type`, param.required, param.default)}")
+          paramBuilder.append(s":${param.name} => ${parseArgument(param.name, param.`type`, param.required.getOrElse(true), param.default)}")
         }
 
         sb.append("        opts = HttpClient::Helper.symbolize_keys(incoming)")
@@ -338,43 +338,50 @@ case class RubyClientGenerator(form: InvocationForm) {
             val ti = parseType(body)
             sb.append("        " + ti.assertMethod)
 
-            body match {
-              case TypeInstance(_, Type(TypeKind.Primitive, name)) => {
+            ti.datatype match {
+
+              case Datatype.Singleton(Type(TypeKind.Primitive, _) :: Nil) | Datatype.Option(Type(TypeKind.Primitive, _) :: Nil) => {
                 requestBuilder.append(s".with_body(${ti.varName})")
               }
 
-              case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => {
+              case Datatype.Singleton(Type(TypeKind.Model, _) :: Nil) | Datatype.Option(Type(TypeKind.Model, _) :: Nil) => {
                 requestBuilder.append(s".with_json(${ti.varName}.to_json)")
               }
-              case TypeInstance(Container.List, Type(TypeKind.Model, name)) => {
+
+              case Datatype.Singleton(Type(TypeKind.Enum, _) :: Nil) | Datatype.Option(Type(TypeKind.Enum, _) :: Nil) => {
+                requestBuilder.append(s".with_json(${ti.varName}.to_json)")
+              }
+
+              case Datatype.List(Type(TypeKind.Primitive, _) :: Nil) => {
+                requestBuilder.append(s".with_json(${ti.varName}")
+              }
+
+              case Datatype.List(Type(TypeKind.Model, _) :: Nil) => {
                 requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_hash }.to_json)")
               }
-              case TypeInstance(Container.Map, Type(TypeKind.Model, name)) => {
-                requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
-              }
 
-              case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => {
-                requestBuilder.append(s".with_json(${ti.varName}.to_json)")
-              }
-              case TypeInstance(Container.List, Type(TypeKind.Enum, name)) => {
+              case Datatype.List(Type(TypeKind.Enum, _) :: Nil) => {
                 requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_json })")
               }
-              case TypeInstance(Container.Map, Type(TypeKind.Enum, name)) => {
+
+              case Datatype.Map(Type(TypeKind.Primitive, _) :: Nil) => {
+                requestBuilder.append(s".with_json(${ti.varName}")
+              }
+
+              case Datatype.Map(Type(TypeKind.Model, _) :: Nil) => {
                 requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
               }
 
-              case TypeInstance(Container.UNDEFINED(container), _) => {
-                sys.error(s"Unsupported container[$container]")
+              case Datatype.Map(Type(TypeKind.Enum, _) :: Nil) => {
+                requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
               }
-              case TypeInstance(_, Type(TypeKind.UNDEFINED(kind), name)) => {
-                sys.error(s"Unsupported typeKind[$kind] w/ name[$name]")
-              }
+
             }
           }
           case _ => sys.error(s"Invalid body [${op.body}]")
         }
       }
-      requestBuilder.append(s".${op.method.toLowerCase}")
+      requestBuilder.append(s".${op.method.toString.toLowerCase}")
 
       val response = generateResponses(op)
 
@@ -403,7 +410,7 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
 
     model.fields.map { field =>
-      sb.append(s"    @${field.name} = ${parseArgument(field.name, field.`type`, field.required, field.default)}")
+      sb.append(s"    @${field.name} = ${parseArgument(field.name, field.`type`, field.required.getOrElse(true), field.default)}")
     }
 
     sb.append("  end\n")
@@ -550,57 +557,82 @@ case class RubyClientGenerator(form: InvocationForm) {
       sys.error("Invalid type[" + `type` + "]")
     }
 
-    ti match {
-      case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, name)) => {
-        parseArgumentPrimitive(fieldName, s"opts.delete(:$fieldName)", name, required, default)
+    dt match {
+      case Datatype.Singleton(single :: Nil) | Datatype.Option(single :: Nil) => {
+        case Type(TypeKind.Primitive, name) => {
+          parseArgumentPrimitive(fieldName, single.name, s"opts.delete(:$fieldName)", required, default)
+        }
+        case Type(TypeKind.Model, name) => {
+          val klass = qualifiedClassName(name)
+          wrapWithAssertion(
+            fieldName,
+            klass,
+            required,
+            s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
+          )
+        }
+        case Type(TypeKind.Enum, name) => {
+          val klass = qualifiedClassName(name)
+          wrapWithAssertion(
+            fieldName,
+            klass,
+            required,
+            s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
+          )
+        }
       }
 
-      case TypeInstance(Container.List, Type(TypeKind.Primitive, name)) => {
-        withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |v| " + parseArgumentPrimitive(fieldName, "v", name, required, default) + "}"
+      case Datatype.Singleton(multiple) | Datatype.Option(multiple) => {
+        sys.error("TODO: UNION TYPE")
       }
 
-      case TypeInstance(Container.Map, Type(TypeKind.Primitive, name)) => {
-        withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, required, default) + "; h }"
+      case Datatype.Singleton(multiple) => {
+        sys.error("TODO: UNION TYPE")
       }
 
-      case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => {
-        val klass = qualifiedClassName(name)
-        wrapWithAssertion(
-          fieldName,
-          klass,
-          required,
-          s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
-        )
+      case Datatype.List(single :: Nil) => {
+        single match {
+          case Type(TypeKind.Primitive, name) => {
+            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |v| " + parseArgumentPrimitive(fieldName, "v", name, required, default) + "}"
+          }
+          case Type(TypeKind.Model, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }"
+          }
+          case Type(TypeKind.Enum, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + s".map { |el| el.nil? ? nil : (el.is_a?($klass) ? el : $klass.apply(el)) }"
+          }
+        }
       }
 
-      case TypeInstance(Container.List, Type(TypeKind.Model, name)) => {
-        val klass = qualifiedClassName(name)
-        withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }"
+      case Datatype.List(multiple) => {
+        sys.error("TODO: UNION TYPE")
       }
 
-      case TypeInstance(Container.Map, Type(TypeKind.Model, name)) => {
-        val klass = qualifiedClassName(name)
-        withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}"
+      case Datatype.Map(single :: Nil) => {
+        single match {
+          case Type(TypeKind.Primitive, name) => {
+            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, required, default) + "; h }"
+          }
+          case Type(TypeKind.Model, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}"
+          }
+          case Type(TypeKind.Enum, name) => {
+            val klass = qualifiedClassName(name)
+            wrapWithAssertion(
+              fieldName,
+              klass,
+              required,
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
+            )
+          }
+        }
       }
 
-      case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => {
-        val klass = qualifiedClassName(name)
-        wrapWithAssertion(
-          fieldName,
-          klass,
-          required,
-          s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
-        )
-      }
-
-      case TypeInstance(Container.List, Type(TypeKind.Enum, name)) => {
-        val klass = qualifiedClassName(name)
-        withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + s".map { |el| el.nil? ? nil : (el.is_a?($klass) ? el : $klass.apply(el)) }"
-      }
-
-      case TypeInstance(Container.Map, Type(TypeKind.Enum, name)) => {
-        val klass = qualifiedClassName(name)
-        withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + s".inject({}) { |h, el| h[el[0]] = el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.apply(el[1]); h }"
+      case Datatype.Map(multiple) => {
+        sys.error("TODO: UNION TYPE")
       }
     }
   }
@@ -667,7 +699,8 @@ case class RubyClientGenerator(form: InvocationForm) {
   case class RubyTypeInfo(
     varName: String,
     klass: String,
-    assertMethod: String
+    assertMethod: String,
+    datatype: Datatype
   )
 
   private def parseType(
@@ -724,7 +757,8 @@ case class RubyClientGenerator(form: InvocationForm) {
     RubyTypeInfo(
       varName = varName,
       klass = klass,
-      assertMethod = s"HttpClient::Preconditions.$assertStub('$varName', $varName, $klass)"
+      assertMethod = s"HttpClient::Preconditions.$assertStub('$varName', $varName, $klass)",
+      datatype = dt
     )
   }
 
