@@ -1,7 +1,7 @@
 package controllers
 
-import com.gilt.apidocspec.models.json._
-import com.gilt.apidocspec.models.{Invocation, Generator, Service}
+import com.gilt.apidocgenerator.models.json._
+import com.gilt.apidocgenerator.models.{Invocation, Generator, Service}
 import generator.{CodeGenTarget, CodeGenerator}
 import lib.Validation
 import play.api.libs.json._

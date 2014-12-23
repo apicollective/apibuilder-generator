@@ -1,7 +1,7 @@
 package generator
 
 import models.ApidocHeaders
-import com.gilt.apidocspec.models.Service
+import com.gilt.apidocgenerator.models.Service
 import core._
 import lib.Text._
 

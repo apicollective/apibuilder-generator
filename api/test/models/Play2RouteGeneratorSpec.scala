@@ -1,7 +1,7 @@
 package models
 
 import lib.Primitives
-import com.gilt.apidocspec.models.{Container, Operation, Resource, Service, Type, TypeKind, TypeInstance}
+import com.gilt.apidocgenerator.models.{Container, Operation, Resource, Service, Type, TypeKind, TypeInstance}
 import generator.ScalaService
 import org.scalatest.{ ShouldMatchers, FunSpec }
 

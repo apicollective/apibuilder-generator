@@ -1,7 +1,7 @@
 package models
 
 import java.io.File
-import com.gilt.apidocspec.models.{Enum, EnumValue}
+import com.gilt.apidocgenerator.models.{Enum, EnumValue}
 import core._
 
 import org.scalatest.{ FunSpec, Matchers }

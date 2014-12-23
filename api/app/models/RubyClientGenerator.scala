@@ -1,7 +1,6 @@
 package models
 
-import com.gilt.apidocspec.models._
-import core._
+import com.gilt.apidocgenerator.models._
 import lib.{Methods, Primitives}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}

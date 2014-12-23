@@ -1,6 +1,6 @@
 package models
 
-import com.gilt.apidocspec.models.Service
+import com.gilt.apidocgenerator.models.Service
 import generator.ScalaService
 import core.{ServiceBuilder}
 import org.scalatest.{ ShouldMatchers, FunSpec }

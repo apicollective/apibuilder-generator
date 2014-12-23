@@ -1,6 +1,6 @@
 package models
 
-import com.gilt.apidocspec.models.Service
+import com.gilt.apidocgenerator.models.Service
 import core._
 import lib.Text._
 import generator.{ScalaEnums, ScalaCaseClasses, ScalaService, CodeGenerator}

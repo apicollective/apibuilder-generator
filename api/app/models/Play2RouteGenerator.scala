@@ -1,7 +1,7 @@
 package models
 
 import lib.Primitives
-import com.gilt.apidocspec.models._
+import com.gilt.apidocgenerator.models._
 import core._
 import generator.{ScalaDataType, GeneratorUtil, ScalaService, ScalaUtil, CodeGenerator}
 

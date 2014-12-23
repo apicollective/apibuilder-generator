@@ -1,7 +1,7 @@
 package models
 
 import lib.Primitives
-import com.gilt.apidocspec.models._
+import com.gilt.apidocgenerator.models._
 import core.ServiceBuilder
 import org.scalatest.{ ShouldMatchers, FunSpec }
 

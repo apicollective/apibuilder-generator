@@ -1,7 +1,7 @@
 package generator
 
 import lib.{Methods, Primitives}
-import com.gilt.apidocspec.models._
+import com.gilt.apidocgenerator.models._
 import core._
 import lib.Text._
 

@@ -1,7 +1,6 @@
 package models.ning
 
-import com.gilt.apidocspec.models.Service
-import core._
+import com.gilt.apidocgenerator.models.Service
 import generator._
 import models._
 import lib.Text._
