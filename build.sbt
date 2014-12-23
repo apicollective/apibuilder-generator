@@ -6,8 +6,14 @@ organization := "com.gilt.apidoc.generator"
 
 scalaVersion in ThisBuild := "2.11.4"
 
-// required because of issue between scoverage & sbt
-parallelExecution in Test in ThisBuild := true
+// TODO: lib will eventually be published as a jar
+lazy val lib = project
+  .in(file("lib"))
+  .settings(
+    libraryDependencies ++= Seq(
+     "org.atteo" % "evo-inflector" % "1.2.1"
+    )
+  )
 
 lazy val generated = project
   .in(file("generated"))
@@ -20,8 +26,8 @@ lazy val generated = project
 
 lazy val api = project
   .in(file("api"))
-  .dependsOn(generated)
-  .aggregate(generated)
+  .dependsOn(lib, generated)
+  .aggregate(lib, generated)
   .enablePlugins(PlayScala)
   .settings(
     routesImport += "com.gilt.apidocgenerator.Bindables._",
