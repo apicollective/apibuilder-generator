@@ -64,6 +64,11 @@ package com.gilt.apidocgenerator.models {
     source: String
   )
 
+  case class InvocationForm(
+    service: com.gilt.apidocgenerator.models.Service,
+    userAgent: scala.Option[String] = None
+  )
+
   case class Model(
     plural: scala.Option[String] = None,
     description: scala.Option[String] = None,
@@ -364,6 +369,20 @@ package com.gilt.apidocgenerator.models {
       )
     }
 
+    implicit def jsonReadsApidocGeneratorInvocationForm: play.api.libs.json.Reads[InvocationForm] = {
+      (
+        (__ \ "service").read[com.gilt.apidocgenerator.models.Service] and
+        (__ \ "user_agent").readNullable[String]
+      )(InvocationForm.apply _)
+    }
+
+    implicit def jsonWritesApidocGeneratorInvocationForm: play.api.libs.json.Writes[InvocationForm] = {
+      (
+        (__ \ "service").write[com.gilt.apidocgenerator.models.Service] and
+        (__ \ "user_agent").write[scala.Option[String]]
+      )(unlift(InvocationForm.unapply _))
+    }
+
     implicit def jsonReadsApidocGeneratorModel: play.api.libs.json.Reads[Model] = {
       (
         (__ \ "plural").readNullable[String] and
@@ -538,10 +557,10 @@ package com.gilt.apidocgenerator {
     }
 
     object Invocations extends Invocations {
-      override def postByKey(service: com.gilt.apidocgenerator.models.Service,
+      override def postByKey(invocationForm: com.gilt.apidocgenerator.models.InvocationForm,
         key: String
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidocgenerator.models.Invocation] = {
-        val payload = play.api.libs.json.Json.toJson(service)
+        val payload = play.api.libs.json.Json.toJson(invocationForm)
 
         _executeRequest("POST", s"/invocations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", body = Some(payload)).map {
           case r if r.status == 200 => r.json.as[com.gilt.apidocgenerator.models.Invocation]
@@ -635,7 +654,7 @@ package com.gilt.apidocgenerator {
     /**
      * Invoke a generator
      */
-    def postByKey(service: com.gilt.apidocgenerator.models.Service,
+    def postByKey(invocationForm: com.gilt.apidocgenerator.models.InvocationForm,
       key: String
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidocgenerator.models.Invocation]
   }
@@ -708,4 +727,3 @@ package com.gilt.apidocgenerator {
   }
 
 }
-

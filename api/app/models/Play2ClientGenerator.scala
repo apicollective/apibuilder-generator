@@ -1,7 +1,6 @@
 package models
 
-import com.gilt.apidocgenerator.models.Service
-import core._
+import com.gilt.apidocgenerator.models.{InvocationForm, Service}
 import lib.Text._
 import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientMethodConfigs, ScalaClientMethodConfig}
 
@@ -33,36 +32,39 @@ object PlayFrameworkVersions {
 }
 
 object Play22ClientGenerator extends CodeGenerator {
-  override def generate(sd: Service): String = {
-    Play2ClientGenerator.generate(PlayFrameworkVersions.V2_2_x, sd)
+  override def invoke(form: InvocationForm): String = {
+    Play2ClientGenerator.invoke(PlayFrameworkVersions.V2_2_x, form)
   }
 }
 
 object Play23ClientGenerator extends CodeGenerator {
-  override def generate(sd: Service): String = {
-    Play2ClientGenerator.generate(PlayFrameworkVersions.V2_3_x, sd)
+  override def invoke(form: InvocationForm): String = {
+    Play2ClientGenerator.invoke(PlayFrameworkVersions.V2_3_x, form)
   }
 }
 
 object Play2ClientGenerator {
 
-  def generate(version: PlayFrameworkVersion, sd: Service): String = {
-    val ssd = new ScalaService(sd)
-    generate(version, ssd)
-  }
-
-  def generate(version: PlayFrameworkVersion, ssd: ScalaService): String = {
-    Play2ClientGenerator(version, ssd).generate()
+  def invoke(
+    version: PlayFrameworkVersion,
+    form: InvocationForm
+  ): String = {
+    Play2ClientGenerator(version, form).invoke()
   }
 
 }
 
-case class Play2ClientGenerator(version: PlayFrameworkVersion, ssd: ScalaService) {
+case class Play2ClientGenerator(
+  version: PlayFrameworkVersion,
+  form: InvocationForm
+) {
 
-  def generate(): String = {
-    ApidocHeaders(ssd.serviceDescription.userAgent).toJavaString + "\n" +
+  private val ssd = new ScalaService(form.service)
+
+  def invoke(): String = {
+    ApidocHeaders(form.userAgent).toJavaString + "\n" +
     Seq(
-      Play2Models(ssd, addHeader = false),
+      Play2Models(form, addHeader = false),
       client()
     ).mkString("\n\n")
   }
@@ -88,7 +90,7 @@ case class Play2ClientGenerator(version: PlayFrameworkVersion, ssd: ScalaService
   class Client(apiUrl: String, apiToken: scala.Option[String] = None) {
     import ${ssd.modelPackageName}.json._
 
-    private val UserAgent = "${ssd.serviceDescription.userAgent.getOrElse("unknown")}"
+    private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
     private val logger = play.api.Logger("${ssd.packageName}.client")
 
     logger.info(s"Initializing ${ssd.packageName}.client for url $$apiUrl")

@@ -2,7 +2,6 @@ package generator
 
 import models.ApidocHeaders
 import com.gilt.apidocgenerator.models.Service
-import core._
 import lib.Text._
 
 object ScalaCaseClasses extends CodeGenerator {

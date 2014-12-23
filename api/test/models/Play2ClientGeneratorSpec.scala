@@ -1,6 +1,6 @@
 package models
 
-import generator.{ScalaDataType, ScalaService, ScalaClientMethodGenerator, ScalaClientMethodConfigs}
+import generator.{ScalaDatatype, ScalaService, ScalaClientMethodGenerator, ScalaClientMethodConfigs}
 import core._
 import org.scalatest.{ShouldMatchers, FunSpec}
 
@@ -17,7 +17,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     val operation = resource.operations.find(_.method == "POST").get
     val errorResponse = operation.responses.find(_.code == 409).get
     errorResponse.errorClassName should be("ErrorsResponse")
-    errorResponse.datatype should be(ScalaDataType.ScalaListType(ScalaDataType.ScalaModelType("apidoc.models", "error")))
+    errorResponse.datatype should be(ScalaDatatype.ScalaListType(ScalaDatatype.ScalaModelType("apidoc.models", "error")))
 
     val contents = ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
     TestHelper.assertEqualsFile("test/resources/generators/play2-client-generator-spec-errors-package.txt", contents)

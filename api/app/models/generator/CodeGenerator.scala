@@ -1,7 +1,9 @@
 package generator
 
-import com.gilt.apidocgenerator.models.Service
+import com.gilt.apidocgenerator.models.InvocationForm
 
 trait CodeGenerator {
-  def generate(sd: Service): String
+
+  def invoke(form: InvocationForm): String
+
 }

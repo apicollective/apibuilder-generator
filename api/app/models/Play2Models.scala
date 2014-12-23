@@ -1,32 +1,29 @@
 package models
 
-import com.gilt.apidocgenerator.models.Service
-import core._
+import com.gilt.apidocgenerator.models.{InvocationForm, Service}
 import lib.Text._
 import generator.{ScalaEnums, ScalaCaseClasses, ScalaService, CodeGenerator}
 
 object Play2Models extends CodeGenerator {
 
-  override def generate(sd: Service): String = {
-    apply(sd)
-  }
-
-  def apply(sd: Service): String = {
-    apply(new ScalaService(sd))
+  override def generate(form: InvocationForm): String = {
+    apply(form)
   }
 
   def apply(
-    ssd: ScalaService,
+    form: InvocationForm,
     addHeader: Boolean = true
   ): String = {
+    val ssd = ScalaService(form.service)
+
     val caseClasses = ScalaCaseClasses.generate(ssd, addHeader = false)
     val prefix = underscoreAndDashToInitCap(ssd.name)
-    val enumJson: String = ssd.enums.map { enum => ScalaEnums.buildJson(ssd.name, enum) }.mkString("\n\n")
-    val modelJson: String = ssd.models.map { model => Play2Json(ssd.name).generate(model) }.mkString("\n\n")
+    val enumJson: String = ssd.enums.values.map { enum => ScalaEnums.buildJson(ssd.name, enum) }.mkString("\n\n")
+    val modelJson: String = ssd.models.values.map { model => Play2Json(ssd.name).generate(model) }.mkString("\n\n")
 
     val header = addHeader match {
       case false => ""
-      case true => ApidocHeaders(ssd.serviceDescription.userAgent).toJavaString() + "\n"
+      case true => ApidocHeaders(form.userAgent).toJavaString() + "\n"
     }
 
 s"""$header$caseClasses

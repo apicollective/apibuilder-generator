@@ -6,7 +6,9 @@ organization := "com.gilt.apidoc.generator"
 
 scalaVersion in ThisBuild := "2.11.4"
 
-// TODO: lib will eventually be published as a jar
+// TODO: lib will eventually be published as a jar if it turns out
+// that we need it. For now it is here mostly for reference - hoping
+// we end up not needing it.
 lazy val lib = project
   .in(file("lib"))
   .settings(
@@ -26,8 +28,8 @@ lazy val generated = project
 
 lazy val api = project
   .in(file("api"))
-  .dependsOn(lib, generated)
-  .aggregate(lib, generated)
+  .dependsOn(generated, lib)
+  .aggregate(generated, lib)
   .enablePlugins(PlayScala)
   .settings(
     routesImport += "com.gilt.apidocgenerator.Bindables._",

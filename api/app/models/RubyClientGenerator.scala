@@ -46,8 +46,8 @@ object RubyUtil {
 
 object RubyClientGenerator extends CodeGenerator {
 
-  override def generate(sd: Service): String = {
-    new RubyClientGenerator(sd).generate
+  override def invoke(form: InvocationForm): String = {
+    new RubyClientGenerator(form).generate
   }
 
   def generateEnum(enum: Enum): String = {
@@ -109,19 +109,19 @@ object RubyClientGenerator extends CodeGenerator {
     }
   }
 
-  def apply(sd: Service, userAgent: String): RubyClientGenerator = RubyClientGenerator(sd)
-
 }
 
 /**
  * Generates a Ruby Client file based on the service description
  * from api.json
  */
-case class RubyClientGenerator(service: Service) {
+case class RubyClientGenerator(form: InvocationForm) {
+  private val service = form.service
+
   private val moduleName = RubyUtil.toClassName(service.name)
 
-  def generate(): String = {
-    ApidocHeaders(service.userAgent).toRubyString() +
+  def invoke(): String = {
+    ApidocHeaders(form.userAgent).toRubyString() +
     "\n\n" +
     RubyHttpClient.require +
     "\n\n" +

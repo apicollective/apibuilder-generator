@@ -148,6 +148,13 @@
           ]
         },
 
+        "invocation_form": {
+          "fields": [
+            { "name": "service", "type": "service" },
+            { "name": "user_agent", "type": "string", "required": false }
+          ]
+        },
+
 	"healthcheck": {
 	    "fields": [
                 { "name": "status", "type": "string", "example": "healthy" }
@@ -208,7 +215,7 @@
                     "method": "POST",
                     "path": "/:key",
                     "description": "Invoke a generator",
-                    "body": { "type": "service" },
+                    "body": { "type": "invocation_form" },
                     "responses": {
                         "200": { "type": "invocation" },
                         "409": { "type": "[error]" }

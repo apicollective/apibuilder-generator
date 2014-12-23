@@ -1,6 +1,6 @@
 package generator
 
-import com.gilt.apidocgenerator.models.{Container, Type, TypeInstance, TypeKind}
+import com.gilt.apidocgenerator.models.{Method}
 import lib.Primitives
 import lib.Text._
 
@@ -12,7 +12,7 @@ object GeneratorUtil {
   def urlToMethodName(
     resourcePlural: String,
     resourcePath: String,
-    httpMethod: String,
+    method: Method,
     url: String
   ): String = {
     val pieces = (if (resourcePath.startsWith("/:")) {
@@ -28,16 +28,16 @@ object GeneratorUtil {
       map( name =>lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name))) )
 
     if (named.isEmpty && notNamed.isEmpty) {
-      httpMethod.toLowerCase
+      method.toString.toLowerCase
 
     } else if (named.isEmpty) {
-      httpMethod.toLowerCase + notNamed.mkString("And")
+      method.toString.toLowerCase + notNamed.mkString("And")
 
     } else if (notNamed.isEmpty) {
-      httpMethod.toLowerCase + "By" + named.mkString("And")
+      method.toString.toLowerCase + "By" + named.mkString("And")
 
     } else {
-      httpMethod.toLowerCase + notNamed.mkString("And") + "By" + named.mkString("And")
+      method.toString.toLowerCase + notNamed.mkString("And") + "By" + named.mkString("And")
     }
   }
 
@@ -79,8 +79,6 @@ object GeneratorUtil {
 }
 
 case class GeneratorUtil(config: ScalaClientMethodConfig) {
-  import ScalaDataType._
-
   def params(
     fieldName: String,
     params: Seq[ScalaParameter]
@@ -88,65 +86,56 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     if (params.isEmpty) {
       None
     } else {
-      val listParams = params.filter(_.`type`.container == Container.List) match {
-        case Nil => Seq.empty
-        case params => {
-          params.map { p =>
-            p.datatype match {
-              case ScalaListType(inner) => {
-                s"""  ${p.name}.map("${p.originalName}" -> ${ScalaDataType.asString("_", inner)})"""
-              }
-              case other => {
-                sys.error(s"Unexpected scala type[$other]")
-              }
-            }
+      val listParams = params.map { p =>
+        p.datatype match {
+          case ScalaDatatype.List(inner) => {
+            Some(s"""  ${p.name}.map("${p.originalName}" -> ${inner.asString("_")})""")
+          }
+          case other => {
+            None
           }
         }
-      }
+      }.flatten
+
       val arrayParamString = listParams.mkString(" ++\n")
 
-      val mapParams = params.filter(_.`type`.container == Container.Map) match {
-        case Nil => Seq.empty
-        case params => {
-          params.map { p =>
-            p.datatype match {
-              case ScalaMapType(inner) => {
-                sys.error("TODO: Finish map")
-              }
-              case other => {
-                sys.error(s"Unexpected scala type[$other]")
-              }
-            }
+      val mapParams = params.map { p =>
+        p.datatype match {
+          case ScalaDatatype.Map(inner) => {
+            sys.error("TODO: Finish map")
+          }
+          case other => {
+            None
           }
         }
       }
+
       // TODO: Finish map val mapParamString = listParams.mkString(" ++\n")
 
-      val singleParams = params.filter(_.isSingleton) match {
-        case Nil => Seq.empty
+      val singleParams = params.map { p =>
+        if (p.isOption) {
+          s"""  ${p.name}.map("${p.originalName}" -> ${ScalaDatatype.asString("_", p.datatype)})"""
+        } else {
+          s"""  Some("${p.originalName}" -> ${ScalaDatatype.asString(p.name, p.datatype)})"""
+        }
+      }.flatten match {
+        case Nil => None
         case params => {
           Seq(
             s"val $fieldName = Seq(",
-            params.map { p =>
-              if (p.isOption) {
-                s"""  ${p.name}.map("${p.originalName}" -> ${ScalaDataType.asString("_", p.datatype)})"""
-              } else {
-                s"""  Some("${p.originalName}" -> ${ScalaDataType.asString(p.name, p.datatype)})"""
-              }
-            }.mkString(",\n"),
+            params.mkString(",\n"),
             ").flatten"
-          )
+          ).mkString("\n")
         }
       }
-      val singleParamString = singleParams.mkString("\n")
 
       Some(
         if (singleParams.isEmpty) {
           s"val $fieldName = " + arrayParamString.trim
         } else if (listParams.isEmpty) {
-          singleParamString
+          singleParams
         } else {
-          singleParamString + " ++\n" + arrayParamString
+          singleParams + " ++\n" + arrayParamString
         }
       )
     }
@@ -154,7 +143,6 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
   def pathParams(op: ScalaOperation): String = {
     val pairs = op.pathParameters.map { p =>
-      require(p.isSingleton, "Only singletons can be path parameters.")
       p.originalName -> PathParamHelper.urlEncode(p.name, p.datatype)
     }
     val tmp: String = pairs.foldLeft(op.path) {
@@ -179,7 +167,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
       val payload = bodyType match {
         case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, pt)) => {
-          ScalaDataType.asString(ScalaUtil.toDefaultVariable(), op.ssd.scalaDataType(bodyType))
+          ScalaDatatype.asString(ScalaUtil.toDefaultVariable(), op.ssd.scalaDatatype(bodyType))
         }
         case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => {
           ScalaUtil.toVariable(name)
@@ -189,7 +177,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
         }
 
         case TypeInstance(Container.List | Container.Map, Type(TypeKind.Primitive, pt)) => {
-          ScalaDataType.asString(ScalaUtil.toDefaultVariable(multiple = true), op.ssd.scalaDataType(bodyType))
+          ScalaDatatype.asString(ScalaUtil.toDefaultVariable(multiple = true), op.ssd.scalaDatatype(bodyType))
         }
         case TypeInstance(Container.List | Container.Map, Type(TypeKind.Model, name)) => {
           ScalaUtil.toVariable(name, true)
@@ -219,7 +207,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
   private object PathParamHelper {
     def urlEncode(
       name: String,
-      d: ScalaDataType
+      d: ScalaDatatype
     ): String = {
       d match {
         case ScalaStringType => s"""${config.pathEncodingMethod}($name, "UTF-8")"""

@@ -20,7 +20,7 @@ object Play2Bindables {
       "",
       buildDefaults().indent(2),
       "",
-      ssd.enums.map( buildImplicit(_) ).mkString("\n\n").indent(2),
+      ssd.enums.keys.map( buildImplicit(_) ).mkString("\n\n").indent(2),
       "",
       "}"
     ).mkString("\n")
@@ -49,18 +49,18 @@ implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsin
   }
 
   private[models] def buildImplicit(
-    enum: ScalaEnum
+    enumName: String
   ): String = {
-    s"// Enum: ${enum.name}\n" +
-    """private val enum%sNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${%s.all.mkString(", ")}"""".format(enum.name, enum.name) +
+    s"// Enum: $enumName\n" +
+    """private val enum%sNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${%s.all.mkString(", ")}"""".format(enumName, enumName) +
     s"""
 
-implicit val pathBindableEnum${enum.name} = new PathBindable.Parsing[${enum.name}] (
-  ${enum.name}.fromString(_).get, _.toString, enum${enum.name}NotFound
+implicit val pathBindableEnum$enumName = new PathBindable.Parsing[$enumName] (
+  $enumName.fromString(_).get, _.toString, enum${enumName}NotFound
 )
 
-implicit val queryStringBindableEnum${enum.name} = new QueryStringBindable.Parsing[${enum.name}](
-  ${enum.name}.fromString(_).get, _.toString, enum${enum.name}NotFound
+implicit val queryStringBindableEnum$enumName = new QueryStringBindable.Parsing[$enumName](
+  $enumName.fromString(_).get, _.toString, enum${enumName}NotFound
 )"""
   }
 
