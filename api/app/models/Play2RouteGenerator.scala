@@ -1,6 +1,6 @@
 package models
 
-import lib.Primitives
+import lib.{Primitives, Text}
 import com.gilt.apidocgenerator.models._
 import generator.{ScalaDatatype, ScalaPrimitive, GeneratorUtil, ScalaOperation, ScalaParameter, ScalaResource, ScalaService, ScalaUtil, CodeGenerator}
 
@@ -115,9 +115,10 @@ private[models] case class Play2Route(
     }
   }
 
+  private val modelPlural = model.plural.getOrElse(Text.pluralize(modelName))
   val method = "%s.%s".format(
-    "controllers." + lib.Text.underscoreAndDashToInitCap(model.plural.getOrElse(modelName)),
-    GeneratorUtil.urlToMethodName(model.plural.getOrElse(modelName), resource.path.getOrElse(""), op.method, url)
+    "controllers." + lib.Text.underscoreAndDashToInitCap(modelPlural),
+    GeneratorUtil.urlToMethodName(modelPlural, resource.path.getOrElse(""), op.method, url)
   )
 
   private def parametersWithTypesAndDefaults(params: Iterable[ScalaParameter]): Iterable[String] = {

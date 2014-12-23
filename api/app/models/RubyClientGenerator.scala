@@ -1,7 +1,7 @@
 package models
 
 import com.gilt.apidocgenerator.models._
-import lib.{Methods, Primitives}
+import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
 import scala.collection.mutable.ListBuffer
@@ -47,11 +47,11 @@ object RubyUtil {
 object RubyClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): String = {
-    new RubyClientGenerator(form).generate
+    new RubyClientGenerator(form).invoke
   }
 
-  def generateEnum(enum: Enum): String = {
-    val className = RubyUtil.toClassName(enum.name)
+  def generateEnum(name: String, enum: Enum): String = {
+    val className = RubyUtil.toClassName(name)
     val lines = ListBuffer[String]()
     lines.append(s"class $className")
 
@@ -120,6 +120,11 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private val moduleName = RubyUtil.toClassName(service.name)
 
+  private val datatypeResolver = DatatypeResolver(
+    enumNames = service.enums.keys.toSet,
+    modelNames = service.models.keys.toSet
+  )
+
   def invoke(): String = {
     ApidocHeaders(form.userAgent).toRubyString() +
     "\n\n" +
@@ -129,11 +134,11 @@ case class RubyClientGenerator(form: InvocationForm) {
     s"module ${moduleName}\n" +
     generateClient() +
     "\n\n  module Clients\n\n" +
-    service.resources.map { res => generateClientForResource(res) }.mkString("\n\n") +
+    service.resources.map { case (modelName, resource) => generateClientForResource(modelName, resource) }.mkString("\n\n") +
     "\n\n  end" +
     "\n\n  module Models\n" +
-    service.enums.map { RubyClientGenerator.generateEnum(_) }.mkString("\n\n").indent(4) + "\n\n" +
-    service.models.map { generateModel(_) }.mkString("\n\n").indent(4) + "\n\n" +
+    service.enums.map { case (name, enum) => RubyClientGenerator.generateEnum(name, enum) }.mkString("\n\n").indent(4) + "\n\n" +
+    service.models.map { case (name, model) => generateModel(name, model) }.mkString("\n\n").indent(4) + "\n\n" +
     "  end\n\n  # ===== END OF SERVICE DEFINITION =====\n  " +
     RubyHttpClient.contents +
     "\nend"
@@ -158,7 +163,7 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.append(s"""
   class Client
 
-    USER_AGENT = '${service.userAgent.getOrElse("unknown")}' unless defined?(USER_AGENT)
+    USER_AGENT = '${form.userAgent.getOrElse("apidoc:ruby_client:unknown")}' unless defined?(USER_AGENT)
 
     def initialize(url, opts={})
       @url = HttpClient::Preconditions.assert_class('url', url, String)
@@ -179,8 +184,8 @@ case class RubyClientGenerator(form: InvocationForm) {
     end
 """)
 
-    sb.append(service.resources.map { resource =>
-      val modelPlural = resource.model.plural
+    sb.append(service.resources.map { case (modelName, resource) =>
+      val modelPlural = service.models(modelName).plural.getOrElse(Text.pluralize(modelName))
       val className = RubyUtil.toClassName(modelPlural)
 
       s"    def ${modelPlural}\n" +
@@ -193,8 +198,9 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.mkString("\n")
   }
 
-  def generateClientForResource(resource: Resource): String = {
-    val className = RubyUtil.toClassName(resource.model.plural)
+  def generateClientForResource(modelName: String, resource: Resource): String = {
+    val modelPlural = service.models(modelName).plural.getOrElse(Text.pluralize(modelName))
+    val className = RubyUtil.toClassName(modelPlural)
 
     val sb = ListBuffer[String]()
     sb.append(s"    class ${className}")
@@ -208,25 +214,43 @@ case class RubyClientGenerator(form: InvocationForm) {
       val queryParams = op.parameters.filter { p => p.location == ParameterLocation.Query }
       val formParams = op.parameters.filter { p => p.location == ParameterLocation.Form }
 
-      val rubyPath = op.path.split("/").map { name =>
+      val rubyPath = op.path.getOrElse("").split("/").map { name =>
         if (name.startsWith(":")) {
           val varName = name.slice(1, name.length)
           val param = pathParams.find(_.name == varName).getOrElse {
             sys.error(s"Could not find path parameter named[$varName]")
           }
-          param.`type` match {
-            case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, name)) => {
-              val code = asString(RubyUtil.toVariable(varName), name, escape = true)
-              s"#{$code}"
+          val dt = datatypeResolver.parse(param.`type`).getOrElse {
+            sys.error(s"Invalid type[${param.`type`}]")
+          }
+          dt match {
+            case Datatype.Singleton(_) | Datatype.Option(_) => {
+              dt.types match {
+                case single :: Nil =>
+                  single match {
+                    case Type(TypeKind.Primitive, name) => {
+                      val code = asString(RubyUtil.toVariable(varName), name, escape = true)
+                      s"#{$code}"
+                    }
+                    case Type(TypeKind.Model, name) => {
+                      sys.error("Models cannot be in the path")
+                    }
+                    case Type(TypeKind.Enum, name) => {
+                      val code = RubyUtil.toVariable(varName)
+                      s"#{$code.value}"
+                    }
+                  }
+                case multiple => {
+                  sys.error("TODO: UNION TYPES")
+                }
+              }
             }
-            case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => sys.error("Models cannot be in the path")
-            case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => {
-              val code = RubyUtil.toVariable(varName)
-              s"#{$code.value}"
+            case Datatype.List(_) => {
+              sys.error("Cannot have lists in the path")
             }
-            case TypeInstance(Container.List, _) => sys.error("Cannot have lists in the path")
-            case TypeInstance(Container.Map, _) => sys.error("Cannot have maps in the path")
-            case TypeInstance(Container.UNDEFINED(container), _) => sys.error(s"Cannot have container[$container] in the path")
+            case Datatype.Map(_) => {
+              sys.error("Cannot have maps in the path")
+            }
           }
         } else {
           name
@@ -235,28 +259,35 @@ case class RubyClientGenerator(form: InvocationForm) {
 
       val methodName =lib.Text.camelCaseToUnderscore(
         GeneratorUtil.urlToMethodName(
-          resource.model.plural, resource.path, op.method, op.path
+          modelPlural, resource.path.getOrElse(""), op.method, op.path.getOrElse("")
         )
       ).toLowerCase
 
       val paramStrings = ListBuffer[String]()
       pathParams.map(_.name).foreach { n => paramStrings.append(RubyUtil.toVariable(n)) }
 
-      if (Methods.isJsonDocumentMethod(op.method)) {
-        op.body.map(_.`type`) match {
+      if (Methods.isJsonDocumentMethod(op.method.toString)) {
+        op.body.flatMap(body => datatypeResolver.parse(body.`type`)) match {
           case None => paramStrings.append("hash")
+          case Some(dt) => {
+            val multiple = dt match {
+              case Datatype.Singleton(_) | Datatype.Option(_) => false
+              case Datatype.List(_) | Datatype.Map(_) => true
+            }
 
-          case Some(TypeInstance(Container.Singleton, Type(TypeKind.Primitive, name))) => paramStrings.append(RubyUtil.toDefaultVariable(multiple = false))
-          case Some(TypeInstance(Container.List | Container.Map, Type(TypeKind.Primitive, name))) => paramStrings.append(RubyUtil.toDefaultVariable(multiple = true))
-
-          case Some(TypeInstance(Container.Singleton, Type(TypeKind.Model, name))) => paramStrings.append(RubyUtil.toVariable(name, multiple = false))
-          case Some(TypeInstance(Container.List | Container.Map, Type(TypeKind.Model, name))) => paramStrings.append(RubyUtil.toVariable(name, multiple = true))
-
-          case Some(TypeInstance(Container.Singleton, Type(TypeKind.Enum, name))) => paramStrings.append(RubyUtil.toVariable(name, multiple = false))
-          case Some(TypeInstance(Container.List | Container.Map, Type(TypeKind.Enum, name))) => paramStrings.append(RubyUtil.toVariable(name, multiple = true))
-
-          case Some(TypeInstance(Container.UNDEFINED(container), _)) => sys.error(s"Unsupported container[$container]")
-          case Some(TypeInstance(_, Type(kind, name))) => sys.error(s"Unsupported typeKind[$kind]")
+            dt.types match {
+              case single :: Nil => {
+                single match {
+                  case Type(TypeKind.Primitive, _) => paramStrings.append(RubyUtil.toDefaultVariable(multiple = multiple))
+                  case Type(TypeKind.Model, name) => paramStrings.append(RubyUtil.toVariable(name, multiple = multiple))
+                  case Type(TypeKind.Enum, name) => paramStrings.append(RubyUtil.toVariable(name, multiple = multiple))
+                }
+              }
+              case multiple => {
+                sys.error("TODO: UNION TYPE")
+              }
+            }
+          }
         }
       }
 
@@ -273,7 +304,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       sb.append(s"      def ${methodName}$paramCall")
 
       pathParams.foreach { param =>
-        val ti = parseTypeInstance(param.`type`, fieldName = Some(param.name))
+        val ti = parseType(param.`type`, fieldName = Some(param.name))
         sb.append(s"        " + ti.assertMethod)
       }
 
@@ -297,14 +328,14 @@ case class RubyClientGenerator(form: InvocationForm) {
         requestBuilder.append(".with_query(query)")
       }
 
-      if (Methods.isJsonDocumentMethod(op.method)) {
+      if (Methods.isJsonDocumentMethod(op.method.toString)) {
         op.body.map(_.`type`) match {
           case None => {
             sb.append("        HttpClient::Preconditions.assert_class('hash', hash, Hash)")
             requestBuilder.append(".with_json(hash.to_json)")
           }
           case Some(body) => {
-            val ti = parseTypeInstance(body)
+            val ti = parseType(body)
             sb.append("        " + ti.assertMethod)
 
             body match {
@@ -357,8 +388,8 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.mkString("\n")
   }
 
-  def generateModel(model: Model): String = {
-    val className = RubyUtil.toClassName(model.name)
+  def generateModel(name: String, model: Model): String = {
+    val className = RubyUtil.toClassName(name)
 
     val sb = ListBuffer[String]()
 
@@ -511,10 +542,14 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private def parseArgument(
     fieldName: String,
-    ti: TypeInstance,
+    `type`: String,
     required: Boolean,
     default: Option[String]
   ): String = {
+    val dt = datatypeResolver.parse(`type`).getOrElse {
+      sys.error("Invalid type[" + `type` + "]")
+    }
+
     ti match {
       case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, name)) => {
         parseArgumentPrimitive(fieldName, s"opts.delete(:$fieldName)", name, required, default)
@@ -635,52 +670,55 @@ case class RubyClientGenerator(form: InvocationForm) {
     assertMethod: String
   )
 
-  private def parseTypeInstance(
-    instance: TypeInstance,
+  private def parseType(
+    `type`: String,
     fieldName: Option[String] = None
   ): RubyTypeInfo = {
-    val klass = instance.`type` match {
+    val dt = datatypeResolver.parse(`type`).getOrElse {
+      sys.error("Invalid type[" + `type` + "]")
+    }
+
+    val single = dt.types match {
+      case one :: Nil => one
+      case multiple => {
+        sys.error("TODO: UNION TYPES")
+      }
+    }
+
+    val klass = single match {
       case Type(TypeKind.Primitive, ptName) => Primitives(ptName) match {
         case None => sys.error(s"Unsupported primitive[$ptName] for instance[$instance]")
         case Some(pt) => rubyClass(pt)
       }
       case Type(TypeKind.Model, name) => qualifiedClassName(name)
       case Type(TypeKind.Enum, name) => qualifiedClassName(name)
-      case Type(TypeKind.UNDEFINED(kind), name) => sys.error(s"Unsupported typeKind[$kind] for var[$name]")
     }
 
-    val varName = instance match {
-      case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, name)) => {
-        fieldName match {
-          case Some(n) => RubyUtil.toVariable(n, multiple = false)
-          case None => RubyUtil.toDefaultVariable(multiple = false)
-        }
-      }
-      case TypeInstance(Container.List | Container.Map, Type(TypeKind.Primitive, name)) => {
-        fieldName match {
-          case Some(name) => RubyUtil.toVariable(name, multiple = true)
-          case None => RubyUtil.toDefaultVariable(multiple = true)
-        }
-      }
-
-      case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => RubyUtil.toVariable(fieldName.getOrElse(name), multiple = false)
-      case TypeInstance(Container.List | Container.Map, Type(TypeKind.Model, name)) => RubyUtil.toVariable(fieldName.getOrElse(name), multiple = true)
-
-      case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => RubyUtil.toVariable(fieldName.getOrElse(name), multiple = false)
-      case TypeInstance(Container.List | Container.Map, Type(TypeKind.Enum, name)) => RubyUtil.toVariable(fieldName.getOrElse(name), multiple = true)
+    val multiple = dt match {
+      case Datatype.Singleton(_) | Datatype.Option(_) => false
+      case Datatype.List(_) | Datatype.Map(_) => true
     }
 
-    val assertStub = instance.container match {
-      case Container.Singleton => "assert_class"
-      case Container.Option => "assert_class_or_nil"
-      case Container.List => "assert_collection_of_class"
-      case Container.Map => "assert_hash_of_class"
-      case Container.Union => {
-        sys.error("TODO: union type not yet supported in ruby clients")
+    val varName = single match {
+      case Type(TypeKind.Primitive, name) => {
+        fieldName match {
+          case Some(n) => RubyUtil.toVariable(n, multiple = multiple)
+          case None => RubyUtil.toDefaultVariable(multiple = multiple)
+        }
       }
-      case Container.UNDEFINED(container) => {
-        sys.error(s"Invalid container[$container]")
+      case Type(TypeKind.Model, name) => {
+        RubyUtil.toVariable(fieldName.getOrElse(name), multiple = multiple)
       }
+      case Type(TypeKind.Enum, name) => {
+        RubyUtil.toVariable(fieldName.getOrElse(name), multiple = multiple)
+      }
+    }
+
+    val assertStub = dt match {
+      case Datatype.Singleton(_) => "assert_class"
+      case Datatype.Option(_) => "assert_class_or_nil"
+      case Datatype.List(_) => "assert_collection_of_class"
+      case Datatype.Map(_) => "assert_hash_of_class"
     }
 
     RubyTypeInfo(
