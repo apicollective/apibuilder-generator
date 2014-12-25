@@ -8,6 +8,19 @@ case class ScalaService(
   service: Service,
   orgPackageName: Option[String] = None
 ) {
+  val packageName: String = orgPackageName match {
+    case None => ScalaUtil.packageName(service.name)
+    case Some(name) => name + "." + ScalaUtil.packageName(service.name)
+  }
+
+  val modelPackageName = s"$packageName.models"
+  val enumPackageName = modelPackageName
+
+  private val scalaTypeResolver = ScalaTypeResolver(
+    modelPackageName = modelPackageName,
+    enumPackageName = enumPackageName
+  )
+
 
   val datatypeResolver = DatatypeResolver(
     enumNames = service.enums.keys.toSet,
@@ -15,16 +28,7 @@ case class ScalaService(
   )
 
   val name = ScalaUtil.toClassName(service.name)
-
-  val packageName: String = orgPackageName match {
-    case None => ScalaUtil.packageName(service.name)
-    case Some(name) => name + "." + ScalaUtil.packageName(service.name)
-  }
-
-  // TODO: Make these private and use scalaTypeResolver
-  val modelPackageName = s"$packageName.models"
-  val enumPackageName = modelPackageName
-
+ 
   def modelClassName(name: String) = modelPackageName + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String) = enumPackageName + "." + ScalaUtil.toClassName(name)
   // TODO: End make these private
@@ -43,14 +47,11 @@ case class ScalaService(
     (modelName -> new ScalaResource(this, models(modelName), resource))
   }
 
-  private val scalaTypeResolver = ScalaTypeResolver(
-    modelPackageName = modelPackageName,
-    enumPackageName = enumPackageName
-  )
-
   def scalaDatatype(
     t: Datatype
   ): ScalaDatatype = {
+    println("T: " + t)
+    println("scalaTypeResolver: " + scalaTypeResolver)
     scalaTypeResolver.scalaDatatype(t)
   }
 
@@ -88,7 +89,7 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
     case Datatype.List(_) | Datatype.Map(_) => true
   }
 
-  val name: String = `type`.types match {
+  val name: String = `type`.types.toList match {
     case (single :: Nil) => {
       single match {
         case Type(TypeKind.Primitive, _) => {

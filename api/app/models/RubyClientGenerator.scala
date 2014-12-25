@@ -23,7 +23,7 @@ object RubyUtil {
 
   def toVariable(datatype: Datatype): String = {
     val multiple = Container(datatype).multiple
-    datatype.types match {
+    datatype.types.toList match {
       case single :: Nil => {
         single match {
           case Type(TypeKind.Primitive, _) => RubyUtil.toDefaultVariable(multiple = multiple)
@@ -241,7 +241,7 @@ case class RubyClientGenerator(form: InvocationForm) {
           }
           dt match {
             case Datatype.Singleton(_) | Datatype.Option(_) => {
-              dt.types match {
+              dt.types.toList match {
                 case single :: Nil =>
                   single match {
                     case Type(TypeKind.Primitive, name) => {
@@ -770,7 +770,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       sys.error("Invalid type[" + `type` + "]")
     }
 
-    val single = dt.types match {
+    val single = dt.types.toList match {
       case one :: Nil => one
       case multiple => {
         sys.error("TODO: UNION TYPES")
@@ -831,7 +831,7 @@ case class RubyClientGenerator(form: InvocationForm) {
   def generateResponse(response: Response): Option[String] = {
     val dt = parseType(response.`type`).datatype
 
-    dt.types match {
+    dt.types.toList match {
       case (single :: Nil) => {
         single match {
           case Type(TypeKind.Primitive, name) => {

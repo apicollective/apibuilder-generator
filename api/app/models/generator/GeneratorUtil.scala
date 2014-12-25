@@ -116,7 +116,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       // TODO: Finish map val mapParamString = listParams.mkString(" ++\n")
 
       val singleParams: Option[String] = params.map { p =>
-        p.datatype.types match {
+        p.datatype.types.toList match {
           case (single :: Nil) => {
             if (p.isOption) {
               s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})"""
@@ -182,7 +182,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       val body = op.body.get
       val name = op.body.get.name
 
-      val payload = body.datatype.types match {
+      val payload = body.datatype.types.toList match {
         case (single :: Nil) => {
           single.asString(ScalaUtil.toVariable(body.`type`))
         }
@@ -213,7 +213,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       name: String,
       d: ScalaDatatype
     ): String = {
-      d.types match {
+      d.types.toList match {
         case (single :: Nil) => {
           single match {
             case ScalaPrimitive.String => s"""${config.pathEncodingMethod}($name, "UTF-8")"""

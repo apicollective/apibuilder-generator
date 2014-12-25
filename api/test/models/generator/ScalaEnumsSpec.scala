@@ -38,7 +38,7 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
     }
     """
 
-    val ssd = TestHelper.scalaService(json)
+    lazy val ssd = TestHelper.scalaService(json)
 
     it("generates valid models") {
       val enums = ssd.enums.map { case (name, enum) => ScalaEnums(name, enum).build() }.mkString("\n\n")

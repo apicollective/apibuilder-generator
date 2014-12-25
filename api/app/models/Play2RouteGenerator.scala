@@ -136,7 +136,7 @@ private[models] case class Play2Route(
               sys.error("Cannot set defaults for maps")
             }
             case ScalaDatatype.Singleton(types) => {
-              types match {
+              types.toList match {
                 case single :: Nil => {
                   "?= " + defaultForPrimitive(single, d)
                 }
@@ -146,7 +146,7 @@ private[models] case class Play2Route(
               }
             }
             case ScalaDatatype.Option(types) => {
-              types match {
+              types.toList match {
                 case single :: Nil => {
                   "?= Some(" + defaultForPrimitive(single, d) + ")"
                 }

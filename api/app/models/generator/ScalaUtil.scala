@@ -69,7 +69,7 @@ object ScalaUtil {
 
   def toVariable(dt: Datatype): String = {
     val multiple = Container(dt).multiple
-    dt.types match {
+    dt.types.toList match {
       case single :: Nil => {
         single match {
           case Type(TypeKind.Primitive, _) => ScalaUtil.toDefaultVariable(multiple = multiple)
