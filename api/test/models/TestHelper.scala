@@ -34,9 +34,9 @@ object TestHelper {
   }
 
   def service(json: String): Service = {
-    Json.parse(json).asOpt[Service] match {
-      case None => sys.error("Failed to parse json: " + json)
-      case Some(s) => s
+    Json.parse(json).validate[Service] match {
+      case e: JsError => sys.error("Failed to parse json: " + e)
+      case s: JsSuccess[Service] => s.get
     }
   }
 
