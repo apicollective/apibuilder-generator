@@ -19,59 +19,66 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   it("models as a parameter in the body should use capitalize") {
     val body = com.gilt.apidocgenerator.models.Body("model")
     val model = new Model(Some("models"), None, Nil)
-    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Map.empty)
-    val resource = new Resource(model, "models", Seq(operation))
+    val operation = new Operation(Method.Get, Some("models"), None, Some(body), Seq(q1), Map.empty)
+    val resource = new Resource(None, Some("models"), Seq(operation))
+    val scalaModel = new ScalaModel(ssd, "model", model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      new ScalaModel(ssd, model),
+      scalaModel,
       operation,
-      new ScalaResource(ssd, resource))
+      new ScalaResource(ssd, scalaModel, resource)
+    )
 
     scalaOperation.argList shouldEqual Some("model: apidocreferenceapi.models.Model,\n  q1: scala.Option[Double] = None\n")
   }
 
   it("array of models as a parameter in the body should use capitalize") {
     val body = com.gilt.apidocgenerator.models.Body("model", None)
-    val model = new Model("model", "models", None, Nil)
-    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model, "models", Seq(operation))
+    val model = new Model(Some("models"), None, Nil)
+    val operation = new Operation(Method.Get, Some("models"), None, Some(body), Seq(q1), Map.empty)
+    val resource = new Resource(None, Some("models"), Seq(operation))
+    val scalaModel = new ScalaModel(ssd, "model", model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      new ScalaModel(ssd, model),
+      scalaModel,
       operation,
-      new ScalaResource(ssd, resource))
+      new ScalaResource(ssd, scalaModel, resource)
+    )
 
     scalaOperation.argList shouldEqual Some("models: Seq[apidocreferenceapi.models.Model],\n  q1: scala.Option[Double] = None\n")
   }
 
   it("primitive type as a parameter in the body should not use capitalize") {
     val body = com.gilt.apidocgenerator.models.Body("integer", None)
-    val model = new Model("model", "models", None, Nil)
-    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model, "models", Seq(operation))
+    val model = new Model(Some("models"), None, Nil)
+    val operation = new Operation(Method.Get, Some("models"), None, Some(body), Seq(q1), Map.empty)
+    val resource = new Resource(None, Some("models"), Seq(operation))
+    val scalaModel = new ScalaModel(ssd, "model", model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      new ScalaModel(ssd, model),
+      scalaModel,
       operation,
-      new ScalaResource(ssd, resource))
+      new ScalaResource(ssd, scalaModel, resource)
+    )
 
     scalaOperation.argList shouldEqual Some("value: Int,\n  q1: scala.Option[Double] = None\n")
   }
 
   it("array of primitive types as a parameter in the body should not use capitalize") {
     val body = com.gilt.apidocgenerator.models.Body("integer", None)
-    val model = new Model("model", "models", None, Nil)
-    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model, "models", Seq(operation))
+    val model = new Model(Some("models"), None, Nil)
+    val operation = new Operation(Method.Get, Some("models"), None, Some(body), Seq(q1), Map.empty)
+    val resource = new Resource(None, Some("models"), Seq(operation))
+    val scalaModel = new ScalaModel(ssd, "model", model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      new ScalaModel(ssd, model),
+      scalaModel,
       operation,
-      new ScalaResource(ssd, resource)
+      new ScalaResource(ssd, scalaModel, resource)
     )
 
     scalaOperation.argList shouldEqual Some("values: Seq[Int],\n  q1: scala.Option[Double] = None\n")

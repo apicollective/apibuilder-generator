@@ -24,8 +24,12 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
     """
 
+    def service(typeString: String): Service = {
+      TestHelper.service(baseJson.format(typeString))
+    }
+
     def ssd(typeString: String): ScalaService = {
-      TestHelper.scalaService(baseJson.format(typeString))
+      ScalaService(service(typeString))
     }
 
     def dataField(typeString: String): ScalaField = {
@@ -47,17 +51,17 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     describe("generates valid case classes") {
 
       it("singleton") {
-        val code = ScalaCaseClasses.invoke(InvocationForm(ssd("object")), addHeader = false)
+        val code = ScalaCaseClasses.invoke(InvocationForm(service("object")), addHeader = false)
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-singleton.txt", code)
       }
 
       it("list") {
-        val code = ScalaCaseClasses.invoke(InvocationForm(ssd("[object]")), addHeader = false)
+        val code = ScalaCaseClasses.invoke(InvocationForm(service("[object]")), addHeader = false)
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-list.txt", code)
       }
 
       it("map") {
-        val code = ScalaCaseClasses.invoke(InvocationForm(ssd("map[object]")), addHeader = false)
+        val code = ScalaCaseClasses.invoke(InvocationForm(service("map[object]")), addHeader = false)
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-map.txt", code)
       }
 
@@ -97,12 +101,16 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
     """
 
+    def service(typeString: String): Service = {
+      TestHelper.service(baseJson.format(typeString))
+    }
+
     def ssd(typeString: String): ScalaService = {
-      new ScalaService(ServiceBuilder(baseJson.format(typeString)))
+      ScalaService(service(typeString))
     }
 
     def operation(typeString: String): ScalaOperation = {
-      ssd(typeString).resources.head.operations.head
+      ssd(typeString).resources.values.head.operations.head
     }
 
     def response(typeString: String): ScalaResponse = {
