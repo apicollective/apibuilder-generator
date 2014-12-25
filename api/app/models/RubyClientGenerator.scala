@@ -427,33 +427,77 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.append("    {")
     sb.append(
       model.fields.map { field =>
-        val value = field.`type` match {
-          case TypeInstance(_, Type(TypeKind.Primitive, name)) => {
-            Primitives(name) match {
-              case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
-              case _ => asString(field.name, name, escape = false)
+        val datatype = parseType(field.`type`).datatype
+        val value = datatype match {
+          case Datatype.Singleton(_ :: Nil) | Datatype.Option(_ :: Nil) => {
+            datatype.types.head match {
+
+              case Type(TypeKind.Primitive, name) => {
+                Primitives(name) match {
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
+                  case _ => asString(field.name, name, escape = false)
+                }
+              }
+
+              case Type(TypeKind.Model, name) => {
+                s"${field.name}.nil? ? nil : ${field.name}.to_hash"
+              }
+
+              case Type(TypeKind.Enum, name) => {
+                s"${field.name}.nil? ? nil : ${field.name}.value"
+              }
+            }
+          }
+          case Datatype.Singleton(_) | Datatype.option(_) => {
+            sys.error("TODO: UNION TYPE")
+          }
+
+          case Datatype.List(single :: nil) => {
+            single match {
+              case Type(TypeKind.Primitive, name) => {
+                Primitives(name) match {
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
+                  case _ => asString(field.name, name, escape = false)
+                }
+              }
+
+              case Type(TypeKind.Model, name) => {
+                s"(${field.name} || []).map(&:to_hash)"
+              }
+
+              case Type(TypeKind.Enum, name) => {
+                s"(${field.name} || []).map(&:value)"
+              }
             }
           }
 
-          case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => {
-            s"${field.name}.nil? ? nil : ${field.name}.to_hash"
-          }
-          case TypeInstance(Container.List, Type(TypeKind.Model, name)) => {
-            s"(${field.name} || []).map(&:to_hash)"
-          }
-          case TypeInstance(Container.Map, Type(TypeKind.Model, name)) => {
-            s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
+          case Datatype.List(types) => {
+            sys.error("TODO: UNION TYPE")
           }
 
-          case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => {
-            s"${field.name}.nil? ? nil : ${field.name}.value"
+          case Datatype.Map(single :: nil) => {
+            single match {
+              case Type(TypeKind.Primitive, name) => {
+                Primitives(name) match {
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
+                  case _ => asString(field.name, name, escape = false)
+                }
+              }
+
+              case Type(TypeKind.Model, name) => {
+                s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
+              }
+
+              case Type(TypeKind.Enum, name) => {
+                s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
+              }
+            }
           }
-          case TypeInstance(Container.List, Type(TypeKind.Enum, name)) => {
-            s"(${field.name} || []).map(&:value)"
+
+          case Datatype.Map(types) => {
+            sys.error("TODO: UNION TYPE")
           }
-          case TypeInstance(Container.Map, Type(TypeKind.Enum, name)) => {
-            s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
-          }
+
         }
 
         s":${field.name} => ${value}"
