@@ -1,29 +1,27 @@
 package generator
 
 import models.ApidocHeaders
-import com.gilt.apidocgenerator.models.Service
+import com.gilt.apidocgenerator.models.{InvocationForm, Service}
 import lib.Text._
 
 object ScalaCaseClasses extends CodeGenerator {
 
-  def generate(sd: Service): String = {
-    generate(new ScalaService(sd))
-  }
-
-  def generate(
-    ssd: ScalaService,
-    genEnums: Seq[ScalaEnum] => String = generatePlayEnums,
+  override def invoke(
+    form: InvocationForm,
+    genEnums: Seq[(String, ScalaEnum)] => String = generatePlayEnums,
     addHeader: Boolean = true
   ): String = {
+    val ssd = new ScalaService(form.service)
+
     val header = addHeader match {
       case false => ""
-      case true => ApidocHeaders(ssd.serviceDescription.userAgent).toJavaString() + "\n"
+      case true => ApidocHeaders(form.userAgent).toJavaString() + "\n"
     }
 
     s"${header}package ${ssd.modelPackageName} {\n\n  " +
     Seq(
-      ssd.models.map { model =>
-        generateCaseClass(model)
+      ssd.models.map { case (name, model) =>
+        generateCaseClass(name, model)
       }.mkString("\n\n").indent(2),
       "",
       genEnums(ssd.enums).indent(2)
@@ -31,14 +29,14 @@ object ScalaCaseClasses extends CodeGenerator {
     s"\n\n}"
   }
 
-  def generateCaseClass(model: ScalaModel): String = {
+  def generateCaseClass(name: String, model: ScalaModel): String = {
     model.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-    s"case class ${model.name}(${model.argList.getOrElse("")})"
+    s"case class $name(${model.argList.getOrElse("")})"
   }
 
-  private def generatePlayEnums(enums: Seq[ScalaEnum]): String = {
-    enums.map { enum =>
-      ScalaEnums.build(enum)
+  private def generatePlayEnums(enums: Seq[(String, ScalaEnum)]): String = {
+    enums.map { case(name, enum) =>
+      ScalaEnums(name, enum).build
     }.mkString("\n\n")
   }
 

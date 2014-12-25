@@ -88,8 +88,11 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     } else {
       val listParams = params.map { p =>
         p.datatype match {
-          case ScalaDatatype.List(inner) => {
-            Some(s"""  ${p.name}.map("${p.originalName}" -> ${inner.asString("_")})""")
+          case ScalaDatatype.List(single :: Nil) => {
+            Some(s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})""")
+          }
+          case ScalaDatatype.List(multiple) => {
+            sys.error("TODO: UNION TYPE")
           }
           case other => {
             None

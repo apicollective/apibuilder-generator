@@ -123,7 +123,10 @@ case class ScalaClientMethodGenerator(
       }
 
       val hasOptionResult = op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
-        s"\ncase r if r.${config.responseStatusMethod} == 404 => ${r.datatype.nilValue(r.`type`)}"
+        val nilValue = r.datatype.nilValue(r.`type`).getOrElse {
+          sys.error(s"Datatype[${r.datatype}] does not support nil values")
+        }
+        s"\ncase r if r.${config.responseStatusMethod} == 404 => $nilValue"
       }
 
       val matchResponse: String = {

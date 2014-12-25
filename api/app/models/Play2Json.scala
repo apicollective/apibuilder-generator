@@ -3,15 +3,19 @@ package models
 import lib.Text._
 import generator.{ScalaDatatype, ScalaModel}
 
-case class Play2Json(serviceName: String) {
+case class Play2Json(
+  serviceName: String,
+  modelName: String,
+  model: ScalaModel
+) {
 
-  def generate(model: ScalaModel): String = {
-    readers(model) + "\n\n" + writers(model)
+  def generate(): String = {
+    readers + "\n\n" + writers
   }
 
-  def readers(model: ScalaModel): String = {
+  def readers(): String = {
     Seq(
-      s"implicit def jsonReads${serviceName}${model.name}: play.api.libs.json.Reads[${model.name}] = {",
+      s"implicit def jsonReads${serviceName}$modelName: play.api.libs.json.Reads[$modelName] = {",
       fieldReaders(model).indent(2),
       s"}"
     ).mkString("\n")
@@ -43,24 +47,24 @@ case class Play2Json(serviceName: String) {
 
     model.fields match {
       case field :: Nil => {
-        serializations.head + s""".map { x => new ${model.name}(${field.name} = x) }"""
+        serializations.head + s""".map { x => new $modelName(${field.name} = x) }"""
       }
       case fields => {
         Seq(
           "(",
           serializations.mkString(" and\n").indent(2),
-          s")(${model.name}.apply _)"
+          s")($modelName.apply _)"
         ).mkString("\n")
       }
     }
   }
 
-  def writers(model: ScalaModel): String = {
+  def writers(): String = {
     model.fields match {
       case field :: Nil => {
         Seq(
-          s"implicit def jsonWrites${serviceName}${model.name}: play.api.libs.json.Writes[${model.name}] = new play.api.libs.json.Writes[${model.name}] {",
-          s"  def writes(x: ${model.name}) = play.api.libs.json.Json.obj(",
+          s"implicit def jsonWrites${serviceName}$modelName: play.api.libs.json.Writes[$modelName] = new play.api.libs.json.Writes[$modelName] {",
+          s"  def writes(x: $modelName) = play.api.libs.json.Json.obj(",
           s"""    "${field.originalName}" -> play.api.libs.json.Json.toJson(x.${field.name})""",
           "  )",
           "}"
@@ -69,7 +73,7 @@ case class Play2Json(serviceName: String) {
 
       case fields => {
         Seq(
-          s"implicit def jsonWrites${serviceName}${model.name}: play.api.libs.json.Writes[${model.name}] = {",
+          s"implicit def jsonWrites${serviceName}$modelName: play.api.libs.json.Writes[$modelName] = {",
           s"  (",
           model.fields.map { field =>
             if (field.isOption) {
@@ -87,7 +91,7 @@ case class Play2Json(serviceName: String) {
               s"""(__ \\ "${field.originalName}").write[${field.datatype.name}]"""
             }
           }.mkString(" and\n").indent(4),
-          s"  )(unlift(${model.name}.unapply _))",
+          s"  )(unlift($modelName.unapply _))",
           s"}"
         ).mkString("\n")
       }

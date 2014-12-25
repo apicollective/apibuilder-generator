@@ -1,5 +1,7 @@
 package generator
 
+import lib.{Datatype, Primitives, Type, TypeKind}
+
 sealed trait ScalaPrimitive {
   def name: String
   def asString(originalVarName: String): String
@@ -158,18 +160,20 @@ case class ScalaTypeResolver(
   def scalaPrimitive(t: Type): ScalaPrimitive = {
     t match {
       case Type(TypeKind.Primitive, name) => {
-        Primitives(name) match {
-          case Boolean => ScalaPrimitive.Boolean
-          case Decimal => ScalaPrimitive.Decimal
-          case Integer => ScalaPrimitive.Integer
-          case Double => ScalaPrimitive.Double
-          case Long => ScalaPrimitive.Long
-          case Object => ScalaPrimitive.Object
-          case String => ScalaPrimitive.String
-          case DateIso8601 => ScalaPrimitive.DateIso8601
-          case DateTimeIso8601 => ScalaPrimitive.DateTimeIso8601
-          case Uuid => ScalaPrimitive.Uuid
-          case Unit => ScalaPrimitive.Unit
+        Primitives(name).getOrElse {
+          sys.error(s"Invalid primitive[$name]")
+        } match {
+          case Primitives.Boolean => ScalaPrimitive.Boolean
+          case Primitives.Decimal => ScalaPrimitive.Decimal
+          case Primitives.Integer => ScalaPrimitive.Integer
+          case Primitives.Double => ScalaPrimitive.Double
+          case Primitives.Long => ScalaPrimitive.Long
+          case Primitives.Object => ScalaPrimitive.Object
+          case Primitives.String => ScalaPrimitive.String
+          case Primitives.DateIso8601 => ScalaPrimitive.DateIso8601
+          case Primitives.DateTimeIso8601 => ScalaPrimitive.DateTimeIso8601
+          case Primitives.Uuid => ScalaPrimitive.Uuid
+          case Primitives.Unit => ScalaPrimitive.Unit
         }
       }
       case Type(TypeKind.Model, name) => {
@@ -189,10 +193,7 @@ case class ScalaTypeResolver(
 
       case Datatype.Option(types) => ScalaDatatype.Option(types.map(scalaPrimitive(_)))
 
-      case Datatype.Singleton(types) => types.map(scalaPrimitive(_)) match {
-        case single :: Nil => single
-        case multiple => sys.error("TODO: UNION TYPE")
-      }
+      case Datatype.Singleton(types) => ScalaDatatype.Singleton(types.map(scalaPrimitive(_)))
     }
   }
 
