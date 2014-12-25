@@ -448,7 +448,7 @@ case class RubyClientGenerator(form: InvocationForm) {
               }
             }
           }
-          case Datatype.Singleton(_) | Datatype.option(_) => {
+          case Datatype.Singleton(_) | Datatype.Option(_) => {
             sys.error("TODO: UNION TYPE")
           }
 
@@ -602,35 +602,33 @@ case class RubyClientGenerator(form: InvocationForm) {
     }
 
     dt match {
-      case Datatype.Singleton(single :: Nil) | Datatype.Option(single :: Nil) => {
-        case Type(TypeKind.Primitive, name) => {
-          parseArgumentPrimitive(fieldName, single.name, s"opts.delete(:$fieldName)", required, default)
-        }
-        case Type(TypeKind.Model, name) => {
-          val klass = qualifiedClassName(name)
-          wrapWithAssertion(
-            fieldName,
-            klass,
-            required,
-            s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
-          )
-        }
-        case Type(TypeKind.Enum, name) => {
-          val klass = qualifiedClassName(name)
-          wrapWithAssertion(
-            fieldName,
-            klass,
-            required,
-            s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
-          )
+      case Datatype.Singleton(_ :: Nil) | Datatype.Option(_ :: Nil) => {
+        dt.types.head match {
+          case Type(TypeKind.Primitive, name) => {
+            parseArgumentPrimitive(fieldName, name, s"opts.delete(:$fieldName)", required, default)
+          }
+          case Type(TypeKind.Model, name) => {
+            val klass = qualifiedClassName(name)
+            wrapWithAssertion(
+              fieldName,
+              klass,
+              required,
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
+            )
+          }
+          case Type(TypeKind.Enum, name) => {
+            val klass = qualifiedClassName(name)
+            wrapWithAssertion(
+              fieldName,
+              klass,
+              required,
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
+            )
+          }
         }
       }
 
-      case Datatype.Singleton(multiple) | Datatype.Option(multiple) => {
-        sys.error("TODO: UNION TYPE")
-      }
-
-      case Datatype.Singleton(multiple) => {
+      case Datatype.Singleton(_) | Datatype.Option(_) => {
         sys.error("TODO: UNION TYPE")
       }
 
@@ -764,7 +762,7 @@ case class RubyClientGenerator(form: InvocationForm) {
 
     val klass = single match {
       case Type(TypeKind.Primitive, ptName) => Primitives(ptName) match {
-        case None => sys.error(s"Unsupported primitive[$ptName] for instance[$instance]")
+        case None => sys.error(s"Unsupported primitive[$ptName] for type[$single]")
         case Some(pt) => rubyClass(pt)
       }
       case Type(TypeKind.Model, name) => qualifiedClassName(name)
@@ -808,41 +806,32 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   def generateResponses(op: Operation): String = {
     // TODO: match on all response codes
-    op.responses.headOption.map { response =>
-      generateResponse(response) match {
-        case None => "\n        nil"
-        case Some(v) => v
-      }
-    }.mkString("\n")
+    op.responses.keys.map(_.toInt).toSeq.sorted.headOption.flatMap { code =>
+      generateResponse(op.responses(code.toString))
+    }.getOrElse("\n        nil")
   }
 
   def generateResponse(response: Response): Option[String] = {
-    response.`type` match {
-      case TypeInstance(container, Type(TypeKind.Primitive, name)) => {
-        Primitives(name).getOrElse {
-          sys.error(s"Unknown primitive type[$name]")
-        } match {
-          case Primitives.Unit => None
-          case pt => {
-            Some(buildResponse(container, RubyUtil.toDefaultVariable()))
+    val dt = parseType(response.`type`).datatype
+
+    dt.types match {
+      case (single :: Nil) => {
+        single match {
+          case Type(TypeKind.Primitive, name) => {
+            Some(buildResponse(Container(dt), RubyUtil.toDefaultVariable()))
+          }
+          case Type(TypeKind.Model, name) => {
+            Some(buildResponse(Container(dt), name))
+          }
+
+          case Type(TypeKind.Enum, name) => {
+            Some(buildResponse(Container(dt), name))
           }
         }
       }
 
-      case TypeInstance(container, Type(TypeKind.Model, name)) => {
-        Some(buildResponse(container, name))
-      }
-
-      case TypeInstance(container, Type(TypeKind.Enum, name)) => {
-        Some(buildResponse(container, name))
-      }
-
-      case TypeInstance(Container.UNDEFINED(container), _) => {
-        sys.error(s"Invalid container[$container]")
-      }
-
-      case TypeInstance(_, Type(TypeKind.UNDEFINED(kind), name)) => {
-        sys.error(s"Unsupported typeKind[$kind] w/ name[$name]")
+      case (multiple) => {
+        sys.error("TODO: UNION TYPE")
       }
     }
   }
@@ -862,12 +851,6 @@ case class RubyClientGenerator(form: InvocationForm) {
       }
       case Container.Map => {
         s".inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : $varName.new(hash); hash }"
-      }
-      case Container.Union => {
-        sys.error("TODO: union type")
-      }
-      case Container.UNDEFINED(container) => {
-        sys.error(s"Invalid container[$container]")
       }
     }
   }
