@@ -1,7 +1,7 @@
 package generator
 
 import com.gilt.apidocgenerator.models._
-import lib.{Datatype, DatatypeResolver, Type}
+import lib.{Datatype, DatatypeResolver, Primitives, Type, TypeKind}
 
 case class ScalaService(
   service: Service,
@@ -199,14 +199,14 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
   }
 
   val responses: Seq[ScalaResponse] = {
-    operation.responses.toList.map { new ScalaResponse(ssd, method, _) } 
+    operation.responses.map { case (code, response) => new ScalaResponse(ssd, method, code.toInt, response) } 
   }
 
   lazy val resultType = responses.find(_.isSuccess).map(_.resultType).getOrElse("Unit")
 
 }
 
-class ScalaResponse(ssd: ScalaService, method: String, response: Response) {
+class ScalaResponse(ssd: ScalaService, method: String, code: Int, response: Response) {
 
   val isOption = response.`type`.container match {
     case Container.Singleton | Container.Option => !Methods.isJsonDocumentMethod(method)
@@ -218,13 +218,12 @@ class ScalaResponse(ssd: ScalaService, method: String, response: Response) {
     sys.error(s"Could not parse type[${response.`type`}] for response[$response]")
   }
 
-  val code = response.code
   val isSuccess = code >= 200 && code < 300
   val isNotFound = code == 404
 
   val datatype = ssd.scalaDatatype(`type`)
 
-  val isUnit = datatype == ScalaDatatype.ScalaUnitType
+  val isUnit = datatype.types.toList.forall( _ == Type(TypeKind.Primitive, Primitives.Unit.toString) )
 
   val resultType: String = datatype.name
 
