@@ -202,13 +202,13 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
 class ScalaResponse(ssd: ScalaService, method: Method, val code: Int, response: Response) {
 
+  val `type`: Datatype = ssd.datatypeResolver.parse(response.`type`).getOrElse {
+    sys.error(s"Could not parse type[${response.`type`}] for response[$response]")
+  }
+
   val isOption = Container(`type`) match {
     case Container.Singleton | Container.Option => !Methods.isJsonDocumentMethod(method.toString)
     case Container.List | Container.Map => false
-  }
-
-  val `type`: Datatype = ssd.datatypeResolver.parse(response.`type`).getOrElse {
-    sys.error(s"Could not parse type[${response.`type`}] for response[$response]")
   }
 
   val isSuccess = code >= 200 && code < 300
@@ -216,7 +216,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, val code: Int, response: 
 
   val datatype = ssd.scalaDatatype(`type`)
 
-  val isUnit = datatype.types.toList.forall( _ == Type(TypeKind.Primitive, Primitives.Unit.toString) )
+  val isUnit = `type`.types.toList.forall( _ == Type(TypeKind.Primitive, Primitives.Unit.toString) )
 
   val resultType: String = datatype.name
 
@@ -245,7 +245,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
    */
   def isOption: Boolean = !field.required.getOrElse(true) || field.default.nonEmpty
 
-  def definition: String = datatype.definition(field.`type`, name, isOption)
+  def definition: String = datatype.definition(name, isOption)
 }
 
 class ScalaParameter(ssd: ScalaService, param: Parameter) {
@@ -269,7 +269,7 @@ class ScalaParameter(ssd: ScalaService, param: Parameter) {
    */
   def isOption: Boolean = !param.required.getOrElse(true) || param.default.nonEmpty
 
-  def definition: String = datatype.definition(param.`type`, name, isOption)
+  def definition: String = datatype.definition(name, isOption)
 
   def location = param.location
 }

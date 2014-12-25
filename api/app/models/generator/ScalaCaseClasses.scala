@@ -6,7 +6,9 @@ import lib.Text._
 
 object ScalaCaseClasses extends CodeGenerator {
 
-  override def invoke(
+  override def invoke(form: InvocationForm): String = invoke(form, generatePlayEnums, addHeader = true)
+
+  def invoke(
     form: InvocationForm,
     genEnums: Map[String, ScalaEnum] => String = generatePlayEnums,
     addHeader: Boolean = true

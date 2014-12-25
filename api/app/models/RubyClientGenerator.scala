@@ -357,6 +357,10 @@ case class RubyClientGenerator(form: InvocationForm) {
                 requestBuilder.append(s".with_json(${ti.varName}.to_json)")
               }
 
+              case Datatype.Singleton(_) | Datatype.Option(_) => {
+                sys.error("TODO: UNION TYPE")
+              }
+
               case Datatype.List(Type(TypeKind.Primitive, _) :: Nil) => {
                 requestBuilder.append(s".with_json(${ti.varName}")
               }
@@ -369,6 +373,10 @@ case class RubyClientGenerator(form: InvocationForm) {
                 requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_json })")
               }
 
+              case Datatype.List(multiple) => {
+                sys.error("TODO: UNION TYPE")
+              }
+
               case Datatype.Map(Type(TypeKind.Primitive, _) :: Nil) => {
                 requestBuilder.append(s".with_json(${ti.varName}")
               }
@@ -379,6 +387,10 @@ case class RubyClientGenerator(form: InvocationForm) {
 
               case Datatype.Map(Type(TypeKind.Enum, _) :: Nil) => {
                 requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
+              }
+
+              case Datatype.Map(multiple) => {
+                sys.error("TODO: UNION TYPE")
               }
 
             }

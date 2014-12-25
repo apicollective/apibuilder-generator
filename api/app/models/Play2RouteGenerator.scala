@@ -74,6 +74,7 @@ private[models] case class Play2Route(
           case Some(ParameterLocation.Form) => false
           case Some(ParameterLocation.Query) => true
           case Some(ParameterLocation.Path) => true
+          case Some(ParameterLocation.UNDEFINED(_)) => false
         }
       }.
       filter { param =>
@@ -95,6 +96,7 @@ private[models] case class Play2Route(
       case Some(ParameterLocation.Form) => false
       case Some(ParameterLocation.Query) => true
       case Some(ParameterLocation.Path) => true
+      case Some(ParameterLocation.UNDEFINED(_)) => true
     }
   }.filter { param =>
     param.datatype match {

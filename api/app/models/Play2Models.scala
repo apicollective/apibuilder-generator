@@ -6,7 +6,7 @@ import generator.{ScalaEnums, ScalaCaseClasses, ScalaService, CodeGenerator}
 
 object Play2Models extends CodeGenerator {
 
-  override def generate(form: InvocationForm): String = {
+  override def invoke(form: InvocationForm): String = {
     apply(form)
   }
 

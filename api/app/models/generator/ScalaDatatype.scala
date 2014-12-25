@@ -119,6 +119,11 @@ sealed trait ScalaDatatype {
   // TODO: UNION TYPES - change to names: Seq[String] or similar
   def name: String
 
+  def definition(
+    originalVarName: String,
+    optional: Boolean
+  ): String
+
 }
 
 object ScalaDatatype {
@@ -128,6 +133,17 @@ object ScalaDatatype {
       case single :: Nil => s"Seq[${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
     }
+    override def definition(
+      originalVarName: String,
+      optional: Boolean
+    ): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      if (optional) {
+        s"$varName: $name = " + nilValue
+      } else {
+        s"$varName: $name"
+      }
+    }
   }
 
   case class Map(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
@@ -135,6 +151,17 @@ object ScalaDatatype {
     override def name = types match {
       case single :: Nil => s"Map[${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
+    }
+    override def definition(
+      originalVarName: String,
+      optional: Boolean
+    ): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      if (optional) {
+        s"$varName: $name = " + nilValue
+      } else {
+        s"$varName: $name"
+      }
     }
   }
 
@@ -144,6 +171,17 @@ object ScalaDatatype {
       case single :: Nil => s"_root_.scala.Option[${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
     }
+    override def definition(
+      originalVarName: String,
+      optional: Boolean
+    ): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      if (optional) {
+        s"$varName: $name" + " = " + nilValue
+      } else {
+        s"$varName: $name"
+      }
+    }
   }
 
   case class Singleton(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
@@ -151,6 +189,17 @@ object ScalaDatatype {
     override def name = types match {
       case single :: Nil => single.name
       case multiple => sys.error("TODO: UNION TYPES")
+    }
+    override def definition(
+      originalVarName: String,
+      optional: Boolean
+    ): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      if (optional) {
+        s"$varName: _root_.scala.Option[$name]" + " = " + nilValue
+      } else {
+        s"$varName: $name"
+      }
     }
   }
 
