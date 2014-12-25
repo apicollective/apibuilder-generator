@@ -1,7 +1,7 @@
 package generator
 
 import models.Container
-import lib.Datatype
+import lib.{Datatype, Type, TypeKind}
 import lib.Text._
 
 object ScalaUtil {
@@ -72,7 +72,7 @@ object ScalaUtil {
     dt.types match {
       case single :: Nil => {
         single match {
-          case Type(TypeKind.Primitive, name) => ScalaUtil.toDefaultVariable(multiple = multiple)
+          case Type(TypeKind.Primitive, _) => ScalaUtil.toDefaultVariable(multiple = multiple)
           case Type(TypeKind.Model, name) => ScalaUtil.toVariable(name, multiple = multiple)
           case Type(TypeKind.Enum, name) => ScalaUtil.toVariable(name, multiple = multiple)
         }

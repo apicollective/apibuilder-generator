@@ -193,17 +193,17 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
   }
 
   val responses: Seq[ScalaResponse] = {
-    operation.responses.map { case (code, response) => new ScalaResponse(ssd, method, code.toInt, response) } 
+    operation.responses.map { case (code, response) => new ScalaResponse(ssd, method, code.toInt, response) }.toSeq
   }
 
   lazy val resultType = responses.find(_.isSuccess).map(_.resultType).getOrElse("Unit")
 
 }
 
-class ScalaResponse(ssd: ScalaService, method: String, val code: Int, response: Response) {
+class ScalaResponse(ssd: ScalaService, method: Method, val code: Int, response: Response) {
 
   val isOption = Container(`type`) match {
-    case Container.Singleton | Container.Option => !Methods.isJsonDocumentMethod(method)
+    case Container.Singleton | Container.Option => !Methods.isJsonDocumentMethod(method.toString)
     case Container.List | Container.Map => false
   }
 
@@ -227,7 +227,7 @@ class ScalaResponse(ssd: ScalaService, method: String, val code: Int, response: 
 
 class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
 
-  def name: String = ScalaUtil.quoteNameIfKeyword(snakeToCamelCase(field.name))
+  def name: String = ScalaUtil.quoteNameIfKeyword(Text.snakeToCamelCase(field.name))
 
   def originalName: String = field.name
 
@@ -243,7 +243,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
    * If there is a default, ensure it is only set server side otherwise
    * changing the default would have no impact on deployed clients
    */
-  def isOption: Boolean = !field.required || field.default.nonEmpty
+  def isOption: Boolean = !field.required.getOrElse(true) || field.default.nonEmpty
 
   def definition: String = datatype.definition(field.`type`, name, isOption)
 }
@@ -267,7 +267,7 @@ class ScalaParameter(ssd: ScalaService, param: Parameter) {
    * If there is a default, ensure it is only set server side otherwise
    * changing the default would have no impact on deployed clients
    */
-  def isOption: Boolean = !param.required || param.default.nonEmpty
+  def isOption: Boolean = !param.required.getOrElse(true) || param.default.nonEmpty
 
   def definition: String = datatype.definition(param.`type`, name, isOption)
 
