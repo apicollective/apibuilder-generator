@@ -113,8 +113,11 @@ object ScalaPrimitive {
 sealed trait ScalaDatatype {
   def nilValue: Option[String]
 
+  def types: Seq[ScalaPrimitive]
+
   // TODO: UNION TYPES - change to names: Seq[String] or similar
   def name: String
+
 }
 
 object ScalaDatatype {

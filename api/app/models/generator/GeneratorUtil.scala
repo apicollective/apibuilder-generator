@@ -115,30 +115,44 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
       // TODO: Finish map val mapParamString = listParams.mkString(" ++\n")
 
-      val singleParams = params.map { p =>
-        if (p.isOption) {
-          s"""  ${p.name}.map("${p.originalName}" -> ${ScalaDatatype.asString("_", p.datatype)})"""
-        } else {
-          s"""  Some("${p.originalName}" -> ${ScalaDatatype.asString(p.name, p.datatype)})"""
+      val singleParams: Option[String] = params.map { p =>
+        p.datatype.types match {
+          case (single :: Nil) => {
+            if (p.isOption) {
+              s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})"""
+            } else {
+              s"""  Some("${p.originalName}" -> ${single.asString(p.name)})"""
+            }
+          }
+          case (multiple) => {
+            sys.error("TODO: UNION TYPE")
+          }
         }
       }.flatten match {
         case Nil => None
         case params => {
-          Seq(
-            s"val $fieldName = Seq(",
-            params.mkString(",\n"),
-            ").flatten"
-          ).mkString("\n")
+          Some(
+            Seq(
+              s"val $fieldName = Seq(",
+              params.mkString(",\n"),
+              ").flatten"
+            ).mkString("\n")
+          )
         }
       }
 
       Some(
-        if (singleParams.isEmpty) {
-          s"val $fieldName = " + arrayParamString.trim
-        } else if (listParams.isEmpty) {
-          singleParams
-        } else {
-          singleParams + " ++\n" + arrayParamString
+        singleParams match {
+          case None => {
+            s"val $fieldName = " + arrayParamString.trim
+          }
+          case Some(value) => {
+            if (listParams.isEmpty) {
+              value
+            } else {
+              value + " ++\n" + arrayParamString
+            }
+          }
         }
       )
     }
