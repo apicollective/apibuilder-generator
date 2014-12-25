@@ -21,6 +21,22 @@ object RubyUtil {
     toVariable("value", multiple = multiple)
   }
 
+  def toVariable(datatype: Datatype): String = {
+    val multiple = Container(datatype).multiple
+    datatype.types match {
+      case single :: Nil => {
+        single match {
+          case Type(TypeKind.Primitive, _) => RubyUtil.toDefaultVariable(multiple = multiple)
+          case Type(TypeKind.Model, name) => RubyUtil.toVariable(name, multiple = multiple)
+          case Type(TypeKind.Enum, name) => RubyUtil.toVariable(name, multiple = multiple)
+        }
+      }
+      case multiple => {
+        sys.error("TODO: UNION TYPE")
+      }
+    }
+  }
+
   def toVariable(
     name: String,
     multiple: Boolean = false
@@ -275,18 +291,7 @@ case class RubyClientGenerator(form: InvocationForm) {
               case Datatype.List(_) | Datatype.Map(_) => true
             }
 
-            dt.types match {
-              case single :: Nil => {
-                single match {
-                  case Type(TypeKind.Primitive, _) => paramStrings.append(RubyUtil.toDefaultVariable(multiple = multiple))
-                  case Type(TypeKind.Model, name) => paramStrings.append(RubyUtil.toVariable(name, multiple = multiple))
-                  case Type(TypeKind.Enum, name) => paramStrings.append(RubyUtil.toVariable(name, multiple = multiple))
-                }
-              }
-              case multiple => {
-                sys.error("TODO: UNION TYPE")
-              }
-            }
+            paramStrings.append(RubyUtil.toVariable(dt))
           }
         }
       }

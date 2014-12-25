@@ -184,7 +184,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
       val payload = body.datatype.types match {
         case (single :: Nil) => {
-          single.asString(ScalaUtil.toDefaultVariable(multiple = body.multiple))
+          single.asString(ScalaUtil.toVariable(body.`type`))
         }
         case (multiple) => {
           sys.error("TODO: UNION TYPE")

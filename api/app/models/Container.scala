@@ -2,14 +2,28 @@ package models
 
 import lib.Datatype
 
-sealed trait Container
+sealed trait Container {
+    def multiple: Boolean
+}
 
 object Container {
 
-  case object Singleton extends Container
-  case object Option extends Container
-  case object List extends Container
-  case object Map extends Container
+  case object Singleton extends Container {
+    override def multiple = false
+  }
+
+  case object Option extends Container {
+    override def multiple = false
+  }
+
+  case object List extends Container {
+    override def multiple = false
+  }
+
+  case object Map extends Container {
+    override def multiple = false
+  }
+
 
   def apply(dt: Datatype): Container = {
     dt match {

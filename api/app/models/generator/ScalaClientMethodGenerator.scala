@@ -69,7 +69,7 @@ case class ScalaClientMethodGenerator(
        Seq(errorTypeClass(response).indent(2),
            "}")
       ).mkString("\n")
-    }.distinct.sorted.mkString("\n\n")
+    }.toSeq.distinct.sorted.mkString("\n\n")
   }
 
   private[this] def errorTypeClass(response: ScalaResponse): String = {
@@ -125,7 +125,7 @@ case class ScalaClientMethodGenerator(
       }
 
       val hasOptionResult = op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
-        val nilValue = r.datatype.nilValue(r.`type`).getOrElse {
+        val nilValue = r.datatype.nilValue.getOrElse {
           sys.error(s"Datatype[${r.datatype}] does not support nil values")
         }
         s"\ncase r if r.${config.responseStatusMethod} == 404 => $nilValue"

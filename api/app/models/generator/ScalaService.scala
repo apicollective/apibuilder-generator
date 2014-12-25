@@ -1,7 +1,8 @@
 package generator
 
 import com.gilt.apidocgenerator.models._
-import lib.{Datatype, DatatypeResolver, Primitives, Type, TypeKind}
+import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
+import models.Container
 
 case class ScalaService(
   service: Service,
@@ -28,14 +29,14 @@ case class ScalaService(
   def enumClassName(name: String) = enumPackageName + "." + ScalaUtil.toClassName(name)
   // TODO: End make these private
 
-  val models = service.models.map { case (name, model) => (name -> new ScalaModel(this, model)) }.toMap
+  val models = service.models.map { case (name, model) => (name -> new ScalaModel(this, name, model)) }.toMap
 
-  val enums = service.enums.map { case (name, enum) => (name -> new ScalaEnum(enum)) }.toMap
+  val enums = service.enums.map { case (name, enum) => (name -> new ScalaEnum(name, enum)) }.toMap
 
   val packageNamePrivate = packageName.split("\\.").last
 
   val defaultHeaders: Seq[ScalaHeader] = {
-    service.headers.flatMap { _.default.map { default => ScalaHeader(h.name, default) } }
+    service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
   }
 
   val resources = service.resources.map { case (modelName, resource) =>
@@ -60,11 +61,11 @@ case class ScalaHeader(name: String, value: String) {
 }
 
 
-class ScalaModel(val ssd: ScalaService, val model: Model) {
+class ScalaModel(val ssd: ScalaService, modelName: String, val model: Model) {
 
-  val name: String = ScalaUtil.toClassName(model.name)
+  val name: String = ScalaUtil.toClassName(modelName)
 
-  val plural: String = underscoreAndDashToInitCap(model.plural)
+  val plural: String = Text.underscoreAndDashToInitCap(model.plural.getOrElse(Text.pluralize(modelName)))
 
   val description: Option[String] = model.description
 
@@ -76,7 +77,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
 class ScalaBody(ssd: ScalaService, val body: Body) {
 
-  private val `type`: Datatype = ssd.datatypeResolver.parse(body.`type`).getOrElse {
+  val `type`: Datatype = ssd.datatypeResolver.parse(body.`type`).getOrElse {
     sys.error(s"Could not parse type[${body.`type`}] for body[$body]")
   }
 
@@ -105,9 +106,9 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
 
 }
 
-class ScalaEnum(val enum: Enum) {
+class ScalaEnum(enumName: String, val enum: Enum) {
 
-  val name: String = ScalaUtil.toClassName(enum.name)
+  val name: String = ScalaUtil.toClassName(enumName)
 
   val description: Option[String] = enum.description
 
@@ -140,11 +141,11 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
   val method: Method = operation.method
 
-  val path: String = operation.path
+  val path: String = operation.path.getOrElse("")
 
   val description: Option[String] = operation.description
 
-  val body: Option[ScalaBody] = operation.body.map(ssd, new ScalaBody(_))
+  val body: Option[ScalaBody] = operation.body.map(new ScalaBody(ssd, _))
 
   val parameters: List[ScalaParameter] = {
     operation.parameters.toList.map { new ScalaParameter(ssd, _) }
@@ -156,25 +157,18 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
   lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
 
-  val name: String = GeneratorUtil.urlToMethodName(resource.model.plural, resource.path, operation.method, operation.path)
+  val name: String = GeneratorUtil.urlToMethodName(resource.model.plural, resource.path.getOrElse(""), operation.method, operation.path.getOrElse(""))
 
-  val argList: Option[String] = operation.body.map(_.`type`) match {
-    case None => ScalaUtil.fieldsToArgList(parameters.map(_.definition))
-    case Some(typeInstance) => {
-      val sdt = ssd.scalaDatatype(typeInstance)
-      val varName = typeInstance match {
-        case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, pt)) => ScalaUtil.toDefaultVariable()
-        case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => ScalaUtil.toVariable(name)
-        case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => ScalaUtil.toVariable(name)
-
-        case TypeInstance(Container.List | Container.Map, Type(TypeKind.Primitive, name)) => ScalaUtil.toDefaultVariable(true)
-        case TypeInstance(Container.List | Container.Map, Type(TypeKind.Model, name)) => ScalaUtil.toVariable(name, true)
-        case TypeInstance(Container.List | Container.Map, Type(TypeKind.Enum, name)) => ScalaUtil.toVariable(name, true)
-      }
+  val argList: Option[String] = body match {
+    case None => {
+      ScalaUtil.fieldsToArgList(parameters.map(_.definition))
+    }
+    case Some(body) => {
+      val varName = ScalaUtil.toVariable(body.`type`)
 
       Some(
         Seq(
-          Some(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(varName), sdt.name)),
+          Some(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(varName), body.datatype.name)),
           ScalaUtil.fieldsToArgList(parameters.map(_.definition))
         ).flatten.mkString(",")
       )
@@ -206,12 +200,11 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
 }
 
-class ScalaResponse(ssd: ScalaService, method: String, code: Int, response: Response) {
+class ScalaResponse(ssd: ScalaService, method: String, val code: Int, response: Response) {
 
-  val isOption = response.`type`.container match {
+  val isOption = Container(`type`) match {
     case Container.Singleton | Container.Option => !Methods.isJsonDocumentMethod(method)
-    case Container.List | Container.Map | Container.Union => false
-    case Container.UNDEFINED(_) => false
+    case Container.List | Container.Map => false
   }
 
   val `type`: Datatype = ssd.datatypeResolver.parse(response.`type`).getOrElse {
@@ -227,19 +220,9 @@ class ScalaResponse(ssd: ScalaService, method: String, code: Int, response: Resp
 
   val resultType: String = datatype.name
 
-  val errorVariableName = response.`type` match {
-    case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, name)) => ScalaUtil.toDefaultVariable(multiple = false)
-    case TypeInstance(Container.List | Container.Map, Type(TypeKind.Primitive, name)) => ScalaUtil.toDefaultVariable(multiple = false)
+  val errorVariableName = ScalaUtil.toVariable(`type`)
 
-    case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => ScalaUtil.toVariable(name, multiple = false)
-    case TypeInstance(Container.List | Container.Map, Type(TypeKind.Model, name)) => ScalaUtil.toVariable(name, multiple = true)
-
-    case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => ScalaUtil.toVariable(name, multiple = false)
-    case TypeInstance(Container.List | Container.Map, Type(TypeKind.Enum, name)) => ScalaUtil.toVariable(name, multiple = true)
-  }
-
-  val errorClassName =lib.Text.initCap(errorVariableName) + "Response"
-
+  val errorClassName = lib.Text.initCap(errorVariableName) + "Response"
 }
 
 class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
