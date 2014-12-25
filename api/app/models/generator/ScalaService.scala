@@ -33,9 +33,13 @@ case class ScalaService(
   def enumClassName(name: String) = enumPackageName + "." + ScalaUtil.toClassName(name)
   // TODO: End make these private
 
-  val models = service.models.map { case (name, model) => (name -> new ScalaModel(this, name, model)) }.toMap
+  val models = service.models.map { case (name, model) =>
+    (ScalaUtil.toClassName(name) -> new ScalaModel(this, name, model))
+  }.toMap
 
-  val enums = service.enums.map { case (name, enum) => (name -> new ScalaEnum(name, enum)) }.toMap
+  val enums = service.enums.map { case (name, enum) =>
+    (ScalaUtil.toClassName(name) -> new ScalaEnum(name, enum))
+  }.toMap
 
   val packageNamePrivate = packageName.split("\\.").last
 
@@ -50,8 +54,6 @@ case class ScalaService(
   def scalaDatatype(
     t: Datatype
   ): ScalaDatatype = {
-    println("T: " + t)
-    println("scalaTypeResolver: " + scalaTypeResolver)
     scalaTypeResolver.scalaDatatype(t)
   }
 
