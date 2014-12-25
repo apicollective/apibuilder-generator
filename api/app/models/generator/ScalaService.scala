@@ -197,7 +197,7 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
   val responses: Seq[ScalaResponse] = {
     operation.responses.map { case (code, response) => new ScalaResponse(ssd, method, code.toInt, response) }.toSeq
-  }
+  }.sortWith { _.code < _.code }
 
   lazy val resultType = responses.find(_.isSuccess).map(_.resultType).getOrElse("Unit")
 
