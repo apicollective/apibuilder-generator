@@ -12,7 +12,7 @@ case class ScalaClientMethodGenerator(
 
   private val generatorUtil = GeneratorUtil(config)
 
-  private val sortedResources: TreeMap[String, Resource] = TreeMap(ssd.resources.toArray)
+  private val sortedResources = TreeMap[String, ScalaResource]() ++ ssd.resources
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + failedRequestClass() + "\n\n" + errorPackage()).trim
@@ -26,17 +26,17 @@ case class ScalaClientMethodGenerator(
   }
 
   def traits(): String = {
-    sortedResources.map { case (plural, resources) =>
+    sortedResources.map { case (plural, resource) =>
       s"trait $plural {\n" +
-      methods(resources).map(_.interface).mkString("\n\n").indent(2) +
+      methods(resource).map(_.interface).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
   }
 
   def objects(): String = {
-    sortedResources.map { case (plural, resources) =>
+    sortedResources.map { case (plural, resource) =>
       s"object $plural extends $plural {\n" +
-      methods(resources).map(_.code).mkString("\n\n").indent(2) +
+      methods(resource).map(_.code).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
   }
@@ -55,7 +55,7 @@ case class ScalaClientMethodGenerator(
     * handled via these classes.
     */
   def errorPackage(): String = {
-    ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
+    ssd.resources.values.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
       val etc = errorTypeClass(response).distinct.sorted.mkString("\n\n").indent(2)
       val jsonImport = if (config.hasModelJsonPackage) {
         Seq("",
@@ -100,9 +100,8 @@ case class ScalaClientMethodGenerator(
 
   }
 
-  private[this] def methods(resources: Map[String, ScalaResource]): Seq[ClientMethod] = {
-
-    resources.flatMap(_.operations).map { op =>
+  private[this] def methods(resource: ScalaResource): Seq[ClientMethod] = {
+    resource.operations.map { op =>
       val path = generatorUtil.pathParams(op)
 
       val payload = generatorUtil.formBody(op)
