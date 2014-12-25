@@ -1,6 +1,5 @@
 package models
 
-import core._
 import generator.ScalaService
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
@@ -26,11 +25,11 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
     """
 
     it("generates valid json readers") {
-      val ssd = new ScalaService(ServiceBuilder(json))
-      val model = ssd.models.head
+      val ssd = TestHelper.scalaService(json)
+      val model = ssd.models.values.head
       TestHelper.assertEqualsFile(
         "test/resources/play2-json-spec-model-readers.txt",
-        Play2Json("Api Doc Test", "content", model).fieldReaders(model)
+        Play2Json("Api Doc Test", "content", model).fieldReaders()
       )
     }
 
@@ -38,11 +37,11 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
 
   describe("quality schema") {
 
-    lazy val quality = new ScalaService(TestHelper.parseFile("test/resources/examples/quality.json").serviceDescription.get)
+    lazy val quality = new ScalaService(TestHelper.parseFile("test/resources/examples/quality.json"))
 
     describe("plan") {
 
-      lazy val plan = quality.models.find(_.name == "Plan").get
+      lazy val plan = quality.models("plan")
 
       it("readers") {
         TestHelper.assertEqualsFile(
@@ -61,7 +60,7 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
 
     describe("healthcheck") {
 
-      lazy val healthcheck = quality.models.find(_.name == "Healthcheck").get
+      lazy val healthcheck = quality.models("healthcheck")
 
       it("readers") {
         TestHelper.assertEqualsFile(

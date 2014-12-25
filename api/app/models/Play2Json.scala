@@ -16,12 +16,12 @@ case class Play2Json(
   def readers(): String = {
     Seq(
       s"implicit def jsonReads${serviceName}$modelName: play.api.libs.json.Reads[$modelName] = {",
-      fieldReaders(model).indent(2),
+      fieldReaders().indent(2),
       s"}"
     ).mkString("\n")
   }
 
-  def fieldReaders(model: ScalaModel): String = {
+  def fieldReaders(): String = {
     val serializations = model.fields.map { field =>
       field.datatype match {
         case ScalaDatatype.List(types) => {
