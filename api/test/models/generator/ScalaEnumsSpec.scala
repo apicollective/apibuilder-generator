@@ -2,7 +2,6 @@ package generator
 
 import com.gilt.apidocgenerator.models.Service
 import models.TestHelper
-import core.ServiceBuilder
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
@@ -39,7 +38,7 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
     }
     """
 
-    val ssd = new ScalaService(ServiceBuilder(json))
+    val ssd = TestHelper.scalaService(json)
 
     it("generates valid models") {
       val enums = ssd.enums.map { case (name, enum) => ScalaEnums(name, enum).build() }.mkString("\n\n")

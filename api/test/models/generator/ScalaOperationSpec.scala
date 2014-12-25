@@ -3,24 +3,23 @@ package generator
 import models.TestHelper
 import lib.Primitives
 import com.gilt.apidocgenerator.models._
-import core._
 import org.scalatest._
 
 class ScalaOperationSpec extends FunSpec with ShouldMatchers {
 
-  private lazy val service = TestHelper.parseFile("reference-api/api.json").serviceDescription.get
+  private lazy val service = TestHelper.parseFile("reference-api/api.json")
   private lazy val ssd = new ScalaService(service)
 
   val q1 = new Parameter(
     "q1",
-    TypeInstance(Container.Singleton, Type(TypeKind.Primitive, Primitives.Double.toString)),
-    ParameterLocation.Query,
-    None, false, None, None, None, None)
+    "double",
+    Some(ParameterLocation.Query),
+    None, Some(false), None, None, None, None)
 
   it("models as a parameter in the body should use capitalize") {
-    val body = com.gilt.apidocgenerator.models.Body(TypeInstance(Container.Singleton, Type(TypeKind.Model, "model")))
-    val model = new Model("model", "models", None, Nil)
-    val operation = new Operation(model, "GET", "models", None, Some(body), Seq(q1), Nil)
+    val body = com.gilt.apidocgenerator.models.Body("model")
+    val model = new Model(Some("models"), None, Nil)
+    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Map.empty)
     val resource = new Resource(model, "models", Seq(operation))
 
     val scalaOperation = new ScalaOperation(
@@ -33,9 +32,9 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   }
 
   it("array of models as a parameter in the body should use capitalize") {
-    val body = com.gilt.apidocgenerator.models.Body(TypeInstance(Container.List, Type(TypeKind.Model, "model")))
+    val body = com.gilt.apidocgenerator.models.Body("model", None)
     val model = new Model("model", "models", None, Nil)
-    val operation = new Operation(model, "GET", "models", None, Some(body), Seq(q1), Nil)
+    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Nil)
     val resource = new Resource(model, "models", Seq(operation))
 
     val scalaOperation = new ScalaOperation(
@@ -48,9 +47,9 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   }
 
   it("primitive type as a parameter in the body should not use capitalize") {
-    val body = com.gilt.apidocgenerator.models.Body(TypeInstance(Container.Singleton, Type(TypeKind.Primitive, Primitives.Integer.toString)))
+    val body = com.gilt.apidocgenerator.models.Body("integer", None)
     val model = new Model("model", "models", None, Nil)
-    val operation = new Operation(model, "GET", "models", None, Some(body), Seq(q1), Nil)
+    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Nil)
     val resource = new Resource(model, "models", Seq(operation))
 
     val scalaOperation = new ScalaOperation(
@@ -63,9 +62,9 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   }
 
   it("array of primitive types as a parameter in the body should not use capitalize") {
-    val body = com.gilt.apidocgenerator.models.Body(TypeInstance(Container.List, Type(TypeKind.Primitive, Primitives.Integer.toString)))
+    val body = com.gilt.apidocgenerator.models.Body("integer", None)
     val model = new Model("model", "models", None, Nil)
-    val operation = new Operation(model, "GET", "models", None, Some(body), Seq(q1), Nil)
+    val operation = new Operation(model, Method.Get, "models", None, Some(body), Seq(q1), Nil)
     val resource = new Resource(model, "models", Seq(operation))
 
     val scalaOperation = new ScalaOperation(

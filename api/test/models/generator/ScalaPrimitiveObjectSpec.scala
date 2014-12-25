@@ -3,7 +3,6 @@ package generator
 import lib.Primitives
 import com.gilt.apidocgenerator.models._
 import models.TestHelper
-import core.ServiceBuilder
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
@@ -26,39 +25,39 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     """
 
     def ssd(typeString: String): ScalaService = {
-      new ScalaService(ServiceBuilder(baseJson.format(typeString)))
+      TestHelper.scalaService(baseJson.format(typeString))
     }
 
     def dataField(typeString: String): ScalaField = {
-      ssd(typeString).models.head.fields.head
+      ssd(typeString).models.values.head.fields.head
     }
 
     it("singleton object") {
-      dataField("object").`type` should be(TypeInstance(Container.Singleton, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      dataField("object").`type` should be("object")
     }
 
     it("list object") {
-      dataField("[object]").`type` should be(TypeInstance(Container.List, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      dataField("[object]").`type` should be("[object]")
     }
 
     it("map object") {
-      dataField("map[object]").`type` should be(TypeInstance(Container.Map, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      dataField("map[object]").`type` should be("map[object]")
     }
 
     describe("generates valid case classes") {
 
       it("singleton") {
-        val code = ScalaCaseClasses.generate(ssd("object"), addHeader = false)
+        val code = ScalaCaseClasses.invoke(InvocationForm(ssd("object")), addHeader = false)
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-singleton.txt", code)
       }
 
       it("list") {
-        val code = ScalaCaseClasses.generate(ssd("[object]"), addHeader = false)
+        val code = ScalaCaseClasses.invoke(InvocationForm(ssd("[object]")), addHeader = false)
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-list.txt", code)
       }
 
       it("map") {
-        val code = ScalaCaseClasses.generate(ssd("map[object]"), addHeader = false)
+        val code = ScalaCaseClasses.invoke(InvocationForm(ssd("map[object]")), addHeader = false)
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-map.txt", code)
       }
 
@@ -111,15 +110,15 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     it("singleton object") {
-      response("object").`type` should be(TypeInstance(Container.Singleton, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      response("object").`type` should be("object")
     }
 
     it("list object") {
-      response("[object]").`type` should be(TypeInstance(Container.List, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      response("[object]").`type` should be("[object]")
     }
 
     it("map object") {
-      response("map[object]").`type` should be(TypeInstance(Container.Map, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      response("map[object]").`type` should be("map[object]")
     }
 
     describe("generates valid response code") {

@@ -34,8 +34,8 @@ object TestHelper {
   }
 
   def service(json: String): Service = {
-    Json.parse(contents).asOpt[Service] match {
-      case None => sys.error(s"Invalid api.json file[${filename}]: " + validator.errors.mkString("\n"))
+    Json.parse(json).asOpt[Service] match {
+      case None => sys.error("Failed to parse json: " + json)
       case Some(s) => s
     }
   }

@@ -2,8 +2,7 @@ package models
 
 import lib.Primitives
 import com.gilt.apidocgenerator.models._
-import core.ServiceBuilder
-import org.scalatest.{ ShouldMatchers, FunSpec }
+import org.scalatest.{ShouldMatchers, FunSpec}
 
 class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
@@ -24,12 +23,12 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
     """
 
-    def sd(typeString: String): Service = {
-      ServiceBuilder(baseJson.format(typeString))
+    def service(typeString: String): Service = {
+      TestHelper.service(baseJson.format(typeString))
     }
 
     def model(typeString: String): Model = {
-      sd(typeString).models.head
+      service(typeString).models.values.head
     }
 
     def dataField(typeString: String): Field = {
@@ -37,31 +36,31 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     it("singleton object") {
-      dataField("object").`type` should be(TypeInstance(Container.Singleton, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      dataField("object").`type` should be("object")
     }
 
     it("list object") {
-      dataField("[object]").`type` should be(TypeInstance(Container.List, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      dataField("[object]").`type` should be("[object]")
     }
 
     it("map object") {
-      dataField("map[object]").`type` should be(TypeInstance(Container.Map, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      dataField("map[object]").`type` should be("map[object]")
     }
 
     describe("generates valid models") {
 
       it("singleton") {
-        val code = RubyClientGenerator(sd("object")).generateModel(model("object"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel("content", model("object"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-singleton.txt", code)
       }
 
       it("list") {
-        val code = RubyClientGenerator(sd("object")).generateModel(model("[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel("content", model("[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-list.txt", code)
       }
 
       it("map") {
-        val code = RubyClientGenerator(sd("object")).generateModel(model("map[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel("content", model("map[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-map.txt", code)
       }
 
@@ -101,45 +100,45 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
     """
 
-    def sd(typeString: String): Service = {
-      ServiceBuilder(baseJson.format(typeString))
+    def service(typeString: String): Service = {
+      TestHelper.service(baseJson.format(typeString))
     }
 
     def operation(typeString: String): Operation = {
-      sd(typeString).resources.head.operations.head
+      service(typeString).resources.values.head.operations.head
     }
 
     def response(typeString: String): Response = {
-      operation(typeString).responses.head
+      operation(typeString).responses.values.head
     }
 
 
     it("singleton object") {
-      response("object").`type` should be(TypeInstance(Container.Singleton, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      response("object").`type` should be("object")
     }
 
     it("list object") {
-      response("[object]").`type` should be(TypeInstance(Container.List, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      response("[object]").`type` should be("[object]")
     }
 
     it("map object") {
-      response("map[object]").`type` should be(TypeInstance(Container.Map, Type(TypeKind.Primitive, Primitives.Object.toString)))
+      response("map[object]").`type` should be("map[object]")
     }
 
     describe("generates valid response code") {
 
       it("singleton") {
-        val code = RubyClientGenerator(sd("object")).generateResponses(operation("object"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("object"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-response-singleton.txt", code)
       }
 
       it("list") {
-        val code = RubyClientGenerator(sd("object")).generateResponses(operation("[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-response-list.txt", code)
       }
 
       it("map") {
-        val code = RubyClientGenerator(sd("object")).generateResponses(operation("map[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("map[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-response-map.txt", code)
       }
 

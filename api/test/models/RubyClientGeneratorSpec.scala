@@ -1,8 +1,7 @@
 package models
 
 import java.io.File
-import com.gilt.apidocgenerator.models.{Enum, EnumValue}
-import core._
+import com.gilt.apidocgenerator.models.{Enum, EnumValue, InvocationForm}
 
 import org.scalatest.{ FunSpec, Matchers }
 
@@ -35,7 +34,6 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
 
     it("for enum with multiple values") {
       val enum = Enum(
-        name = "age_group",
         description = None,
         values = Seq(
           EnumValue(
@@ -49,14 +47,14 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
         )
       )
             
-      TestHelper.assertEqualsFile("test/resources/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum))
+      TestHelper.assertEqualsFile("test/resources/ruby-gem-enums.txt", RubyClientGenerator.generateEnum("age_group", enum))
     }
 
   }
 
   it("generate ruby") {
-    val json = io.Source.fromFile(new File("reference-api/api.json")).getLines.mkString("\n")
-    val generator = RubyClientGenerator(ServiceBuilder(json), "gilt 0.0.1-test")
-    TestHelper.assertEqualsFile("test/resources/ruby-client-generator-gilt-0.0.1-test.txt", generator.generate())
+    val service = TestHelper.parseFile("reference-api/api.json")
+    val code = RubyClientGenerator.invoke(InvocationForm(service = service, userAgent = Some("gilt 0.0.1-test")))
+    TestHelper.assertEqualsFile("test/resources/ruby-client-generator-gilt-0.0.1-test.txt", code)
   }
 }
