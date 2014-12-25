@@ -1,5 +1,8 @@
 package generator
 
+import com.gilt.apidocgenerator.models.Resource
+import scala.collection.immutable.TreeMap
+
 case class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,
   ssd: ScalaService
@@ -9,7 +12,7 @@ case class ScalaClientMethodGenerator(
 
   private val generatorUtil = GeneratorUtil(config)
 
-  private val sortedResources = ssd.resources.groupBy(_.model.plural).toSeq.sortBy(_._1)
+  private val sortedResources: TreeMap[String, Resource] = TreeMap(ssd.resources.toArray)
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + failedRequestClass() + "\n\n" + errorPackage()).trim
@@ -97,7 +100,7 @@ case class ScalaClientMethodGenerator(
 
   }
 
-  private[this] def methods(resources: Seq[ScalaResource]): Seq[ClientMethod] = {
+  private[this] def methods(resources: Map[String, ScalaResource]): Seq[ClientMethod] = {
 
     resources.flatMap(_.operations).map { op =>
       val path = generatorUtil.pathParams(op)

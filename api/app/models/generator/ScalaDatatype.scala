@@ -97,7 +97,8 @@ object ScalaPrimitive {
 
   case class Model(name: String) extends ScalaPrimitive {
     def asString(originalVarName: String): String = {
-      throw new UnsupportedOperationException(s"unsupported conversion of type model for $originalVarName")
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.toString"
     }
   }
 

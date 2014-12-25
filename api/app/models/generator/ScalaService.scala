@@ -74,17 +74,33 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
 }
 
-class ScalaBody(val body: Body) {
+class ScalaBody(ssd: ScalaService, val body: Body) {
 
-  val name: String = body.`type` match {
-    case TypeInstance(Container.Singleton, Type(TypeKind.Primitive, name)) => ScalaUtil.toDefaultClassName()
-    case TypeInstance(Container.List | Container.Map, Type(TypeKind.Primitive, name)) => ScalaUtil.toDefaultClassName(true)
+  private val `type`: Datatype = ssd.datatypeResolver.parse(body.`type`).getOrElse {
+    sys.error(s"Could not parse type[${body.`type`}] for body[$body]")
+  }
 
-    case TypeInstance(Container.Singleton, Type(TypeKind.Model, name)) => ScalaUtil.toClassName(name)
-    case TypeInstance(Container.List | Container.Map, Type(TypeKind.Model, name)) => ScalaUtil.toClassName(name, true)
+  val datatype = ssd.scalaDatatype(`type`)
 
-    case TypeInstance(Container.Singleton, Type(TypeKind.Enum, name)) => ScalaUtil.toClassName(name)
-    case TypeInstance(Container.List | Container.Map, Type(TypeKind.Enum, name)) => ScalaUtil.toClassName(name, true)
+  val multiple = `type` match {
+    case Datatype.Singleton(_) | Datatype.Option(_) => false
+    case Datatype.List(_) | Datatype.Map(_) => true
+  }
+
+  val name: String = `type`.types match {
+    case (single :: Nil) => {
+      single match {
+        case Type(TypeKind.Primitive, _) => {
+          ScalaUtil.toDefaultClassName(multiple = multiple)
+        }
+        case Type(TypeKind.Model, _) | Type(TypeKind.Enum, _) => {
+          ScalaUtil.toClassName(name, multiple = multiple)
+        }
+      }
+    }
+    case (multiple) => {
+      sys.error("TODO: UNION TYPE")
+    }
   }
 
 }
@@ -128,7 +144,7 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
   val description: Option[String] = operation.description
 
-  val body: Option[ScalaBody] = operation.body.map(new ScalaBody(_))
+  val body: Option[ScalaBody] = operation.body.map(ssd, new ScalaBody(_))
 
   val parameters: List[ScalaParameter] = {
     operation.parameters.toList.map { new ScalaParameter(ssd, _) }

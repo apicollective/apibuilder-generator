@@ -25,7 +25,7 @@ object NingVersions {
 object Ning18ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): String = {
-    NingClientGenerator.invoke(NingVersions.V1_8_x, form, service)
+    NingClientGenerator.invoke(NingVersions.V1_8_x, form)
   }
 
 }
@@ -33,7 +33,7 @@ object Ning18ClientGenerator extends CodeGenerator {
 object NingClientGenerator {
 
   def invoke(version: NingVersion, form: InvocationForm): String = {
-    invoke(version, form)
+    NingClientGenerator(version, form).invoke()
   }
 
 }
@@ -46,9 +46,9 @@ case class NingClientGenerator(
   private val ssd = new ScalaService(form.service)
 
   def invoke(): String = {
-    ApidocHeaders(ssd.serviceDescription.userAgent).toJavaString + "\n" +
+    ApidocHeaders(form.userAgent).toJavaString + "\n" +
     Seq(
-      Play2Models(ssd, addHeader = false),
+      Play2Models(form, addHeader = false),
       client()
     ).mkString("\n\n")
   }
@@ -94,7 +94,7 @@ case class NingClientGenerator(
     val logger = LoggerFactory.getLogger(getClass)
 
     val asyncHttpClient = new AsyncHttpClient()
-    private val UserAgent = "${ssd.serviceDescription.userAgent.getOrElse("unknown")}"
+    private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
 
 ${methodGenerator.accessors().indent(4)}
 

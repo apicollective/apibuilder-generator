@@ -8,7 +8,7 @@ object ScalaCaseClasses extends CodeGenerator {
 
   override def invoke(
     form: InvocationForm,
-    genEnums: Seq[(String, ScalaEnum)] => String = generatePlayEnums,
+    genEnums: Map[String, ScalaEnum] => String = generatePlayEnums,
     addHeader: Boolean = true
   ): String = {
     val ssd = new ScalaService(form.service)
@@ -34,7 +34,7 @@ object ScalaCaseClasses extends CodeGenerator {
     s"case class $name(${model.argList.getOrElse("")})"
   }
 
-  private def generatePlayEnums(enums: Seq[(String, ScalaEnum)]): String = {
+  private def generatePlayEnums(enums: Map[String, ScalaEnum]): String = {
     enums.map { case(name, enum) =>
       ScalaEnums(name, enum).build
     }.mkString("\n\n")
