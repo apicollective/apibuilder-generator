@@ -2,7 +2,7 @@ package generator
 
 import com.gilt.apidocgenerator.models._
 import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
-import models.Container
+import models.{Container, Paths}
 
 case class ScalaService(
   service: Service,
@@ -34,13 +34,11 @@ case class ScalaService(
   // TODO: End make these private
 
   val models = service.models.map { case (name, model) =>
-    val scalaName = ScalaUtil.toClassName(name)
-    (scalaName -> new ScalaModel(this, scalaName, model))
+    (ScalaUtil.toClassName(name) -> new ScalaModel(this, name, model))
   }.toMap
 
   val enums = service.enums.map { case (name, enum) =>
-    val scalaName = ScalaUtil.toClassName(name)
-    (scalaName -> new ScalaEnum(scalaName, enum))
+    (ScalaUtil.toClassName(name) -> new ScalaEnum(name, enum))
   }.toMap
 
   val packageNamePrivate = packageName.split("\\.").last
@@ -68,6 +66,8 @@ case class ScalaHeader(name: String, value: String) {
 
 
 class ScalaModel(val ssd: ScalaService, modelName: String, val model: Model) {
+
+  val originalName: String = modelName
 
   val name: String = ScalaUtil.toClassName(modelName)
 
@@ -135,11 +135,11 @@ class ScalaEnumValue(value: EnumValue) {
 
 }
 
-class ScalaResource(ssd: ScalaService, val model: ScalaModel, resource: Resource) {
+class ScalaResource(ssd: ScalaService, val model: ScalaModel, val resource: Resource) {
 
   val packageName: String = ssd.packageName
 
-  val path = resource.path
+  val path = Paths.resource(model.originalName, model.model.plural, resource)
 
   val operations = resource.operations.map { op =>
     new ScalaOperation(ssd, model, op, this)
@@ -150,7 +150,7 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
   val method: Method = operation.method
 
-  val path: String = operation.path.getOrElse("")
+  val path: String = Paths.operation(model.originalName, model.model.plural, resource.resource, operation)
 
   val description: Option[String] = operation.description
 
@@ -166,7 +166,7 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
   lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
 
-  val name: String = GeneratorUtil.urlToMethodName(resource.model.plural, resource.path.getOrElse(""), operation.method, operation.path.getOrElse(""))
+  val name: String = GeneratorUtil.urlToMethodName(resource.model.plural, resource.path, operation.method, path)
 
   val argList: Option[String] = body match {
     case None => {

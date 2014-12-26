@@ -230,7 +230,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       val queryParams = op.parameters.filter { p => p.location == ParameterLocation.Query }
       val formParams = op.parameters.filter { p => p.location == ParameterLocation.Form }
 
-      val rubyPath = op.path.getOrElse("").split("/").map { name =>
+      val rubyPath = Paths.operation(modelName, Some(modelPlural), resource, op).split("/").map { name =>
         if (name.startsWith(":")) {
           val varName = name.slice(1, name.length)
           val param = pathParams.find(_.name == varName).getOrElse {
@@ -275,7 +275,10 @@ case class RubyClientGenerator(form: InvocationForm) {
 
       val methodName =lib.Text.camelCaseToUnderscore(
         GeneratorUtil.urlToMethodName(
-          modelPlural, resource.path.getOrElse(""), op.method, op.path.getOrElse("")
+          modelPlural,
+          Paths.resource(modelName, Some(modelPlural), resource),
+          op.method,
+          Paths.operation(modelName, Some(modelPlural), resource, op)
         )
       ).toLowerCase
 

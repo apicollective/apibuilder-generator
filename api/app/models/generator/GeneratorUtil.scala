@@ -79,6 +79,7 @@ object GeneratorUtil {
 }
 
 case class GeneratorUtil(config: ScalaClientMethodConfig) {
+
   def params(
     fieldName: String,
     params: Seq[ScalaParameter]
