@@ -6,13 +6,13 @@ import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class Play2BindablesSpec extends FunSpec with ShouldMatchers {
 
-  lazy val service = TestHelper.parseFile(s"reference-api/api.json")
+  lazy val service = TestHelper.parseFile(s"../reference-api/api.json")
   lazy val ssd = new ScalaService(service)
 
   it("generates bindable for a single enum") {
     TestHelper.assertEqualsFile(
       "test/resources/generators/play-2-bindable-age-group.txt",
-      Play2Bindables.buildImplicit("age_group")
+      Play2Bindables.buildImplicit("AgeGroup")
     )
   }
 
