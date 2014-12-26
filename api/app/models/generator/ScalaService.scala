@@ -34,11 +34,13 @@ case class ScalaService(
   // TODO: End make these private
 
   val models = service.models.map { case (name, model) =>
-    (ScalaUtil.toClassName(name) -> new ScalaModel(this, name, model))
+    val scalaName = ScalaUtil.toClassName(name)
+    (scalaName -> new ScalaModel(this, scalaName, model))
   }.toMap
 
   val enums = service.enums.map { case (name, enum) =>
-    (ScalaUtil.toClassName(name) -> new ScalaEnum(name, enum))
+    val scalaName = ScalaUtil.toClassName(name)
+    (scalaName -> new ScalaEnum(scalaName, enum))
   }.toMap
 
   val packageNamePrivate = packageName.split("\\.").last
@@ -48,7 +50,8 @@ case class ScalaService(
   }
 
   val resources = service.resources.map { case (modelName, resource) =>
-    (modelName -> new ScalaResource(this, models(modelName), resource))
+    val scalaName = ScalaUtil.toClassName(modelName)
+    (scalaName -> new ScalaResource(this, models(scalaName), resource))
   }
 
   def scalaDatatype(
@@ -97,7 +100,10 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
         case Type(TypeKind.Primitive, _) => {
           ScalaUtil.toDefaultClassName(multiple = multiple)
         }
-        case Type(TypeKind.Model, _) | Type(TypeKind.Enum, _) => {
+        case Type(TypeKind.Model, name) => {
+          ScalaUtil.toClassName(name, multiple = multiple)
+        }
+        case Type(TypeKind.Enum, name) => {
           ScalaUtil.toClassName(name, multiple = multiple)
         }
       }

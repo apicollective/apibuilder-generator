@@ -204,8 +204,8 @@
                     "parameters": [
                         { "name": "id", "type": "long", "description": "Find organization with this id", "required": false },
                         { "name": "key", "type": "string", "description": "Find organization with this key", "required": false },
-                        { "name": "limit", "type": "integer", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "25", "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
                         "200": { "type": "[organization]" }
@@ -246,8 +246,8 @@
                         { "name": "model", "type": "model", "description": "Find events on this model", "required": false },
                         { "name": "action", "type": "action", "description": "Find events with this action", "required": false },
                         { "name": "number_hours", "type": "integer", "description": "Filter to events created in the last n hours", "required": false },
-                        { "name": "limit", "type": "integer", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "25", "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
                         "200": { "type": "[event]" }
@@ -263,8 +263,8 @@
 		    "description": "Search all teams. Results are always paginated.",
                     "parameters": [
                         { "name": "key", "type": "string", "description": "Find team with this key. Exact match", "required": false },
-                        { "name": "limit", "type": "integer", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "25", "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
                         "200": { "type": "[team]" }
@@ -304,7 +304,7 @@
                 "description": "Retrieve team statistics for all or one team.",
                 "parameters": [
                     { "name": "team_key", "type": "string", "description": "Find stats for this team. Leave blank to retrieve all teams", "required": false},
-                    { "name": "number_hours", "type": "integer", "description": "Number of hours in the past to retrieve requested statistics. Default is 1 week.", "default": 168}
+                    { "name": "number_hours", "type": "integer", "description": "Number of hours in the past to retrieve requested statistics. Default is 1 week.", "default": "168"}
                 ],
                 "responses": {
                     "200": {"type": "[statistic]"}
@@ -326,8 +326,8 @@
                         { "name": "has_team", "type": "boolean", "description": "If true, find incidents with a team assigned to them. If false, find incidents w/out a team", "required": false },
                         { "name": "has_plan", "type": "boolean", "description": "If true, find incidents with a plan. If false, find incidents w/out a plan", "required": false },
                         { "name": "has_grade", "type": "boolean", "description": "If true, find incidents with a grade. If false, find incidents w/out a grade", "required": false },
-                        { "name": "limit", "type": "integer", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "25", "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
                         "200": { "type": "[incident]" }
@@ -393,8 +393,8 @@
                         { "name": "id", "type": "long", "description": "Find plan with this id. Exact match", "required": false },
                         { "name": "incident_id", "type": "long", "description": "Find plan for this incident_id", "required": false },
                         { "name": "team_key", "type": "string", "description": "Find all plans for requested team", "required": false},
-                        { "name": "limit", "type": "integer", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "25", "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
                         "200": { "type": "[plan]" }
@@ -468,8 +468,8 @@
                     "description": "Search all meetings. Results are always paginated.",
                     "parameters": [
                         { "name": "id", "type": "long", "description": "Find meeting with this id. Exact match", "required": false },
-                        { "name": "limit", "type": "integer", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "25", "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
                         "200": { "type": "[meeting]" }
@@ -513,8 +513,8 @@
                         { "name": "meeting_id", "type": "long" },
                         { "name": "id", "type": "long", "description": "Find agenda items with this id", "required": false },
                         { "name": "task", "type": "task", "description": "Find agenda items with this task", "required": false },
-                        { "name": "limit", "type": "integer", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "25", "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
                         "200": { "type": "[agenda_item]" }
