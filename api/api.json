@@ -68,7 +68,7 @@
 		{ "name": "type", "type": "string" },
 		{ "name": "description", "type": "string", "required": false },
 		{ "name": "default", "type": "string", "required": false },
-		{ "name": "required", "type": "boolean", "default": true },
+		{ "name": "required", "type": "boolean", "default": "true" },
 		{ "name": "minimum", "type": "long", "required": false },
 		{ "name": "maximum", "type": "long", "required": false },
 		{ "name": "example", "type": "string", "required": false }
@@ -107,7 +107,7 @@
 		{ "name": "type", "type": "string" },
 		{ "name": "location", "type": "parameter_location", "required": false },
 		{ "name": "description", "type": "string", "required": false },
-		{ "name": "required", "type": "boolean", "default": true },
+		{ "name": "required", "type": "boolean", "default": "true" },
 		{ "name": "default", "type": "string", "required": false },
 		{ "name": "minimum", "type": "long", "required": false },
 		{ "name": "maximum", "type": "long", "required": false },
@@ -191,8 +191,8 @@
                     "description": "Get all available generators",
                     "parameters": [
                         { "name": "key", "type": "string", "description": "Filter generators with this key", "required": false },
-                        { "name": "limit", "type": "integer", "default": 100, "description": "The number of records to return", "minimum": 0 },
-                        { "name": "offset", "type": "integer", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "limit", "type": "integer", "default": "100", "description": "The number of records to return", "minimum": 0 },
+                        { "name": "offset", "type": "integer", "default": "0", "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
 		    ],
                     "responses": {
                         "200": { "type": "[generator]" }
