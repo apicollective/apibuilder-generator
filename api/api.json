@@ -34,9 +34,9 @@
 		{ "name": "base_url", "type": "string", "required": false },
 		{ "name": "description", "type": "string", "required": false },
 		{ "name": "headers", "type": "[header]" },
-		{ "name": "enums", "type": "map[enum]" },
-		{ "name": "models", "type": "map[model]" },
-		{ "name": "resources", "type": "map[resource]", "description": "keys are the names of a model" }
+		{ "name": "enums", "type": "[enum]" },
+		{ "name": "models", "type": "[model]" },
+		{ "name": "resources", "type": "[resource]", "description": "keys are the names of a model" }
 	    ]
 	},
 
@@ -56,6 +56,7 @@
 
 	"model": {
 	    "fields": [
+		{ "name": "name", "type": "string" },
 		{ "name": "plural", "type": "string", "required": false, "description": "Defaults to the plural of the model name. Used to generate resource paths which by default map to the plural of the model name" },
 		{ "name": "description", "type": "string", "required": false },
 		{ "name": "fields", "type": "[field]" }
@@ -68,7 +69,7 @@
 		{ "name": "type", "type": "string" },
 		{ "name": "description", "type": "string", "required": false },
 		{ "name": "default", "type": "string", "required": false },
-		{ "name": "required", "type": "boolean", "default": "true" },
+		{ "name": "required", "type": "boolean" },
 		{ "name": "minimum", "type": "long", "required": false },
 		{ "name": "maximum", "type": "long", "required": false },
 		{ "name": "example", "type": "string", "required": false }
@@ -77,8 +78,8 @@
 
 	"resource": {
 	    "fields": [
+		{ "name": "model", "type": "model" },
 		{ "name": "description", "type": "string", "required": false },
-		{ "name": "path", "type": "string", "required": false, "description": "Defaults to the plural of the model name" },
 		{ "name": "operations", "type": "[operation]" }
 	    ]
 	},
@@ -86,11 +87,11 @@
 	"operation": {
 	    "fields": [
 		{ "name": "method", "type": "method" },
-		{ "name": "path", "type": "string", "required": false },
+		{ "name": "path", "type": "string" },
 		{ "name": "description", "type": "string", "required": false },
 		{ "name": "body", "type": "body", "required": false },
 		{ "name": "parameters", "type": "[parameter]", "required": false },
-		{ "name": "responses", "type": "map[response]", "required": false, "description": "Keys are HTTP status codes" }
+		{ "name": "responses", "type": "[response]", "required": false }
 	    ]
 	},
 
@@ -107,7 +108,7 @@
 		{ "name": "type", "type": "string" },
 		{ "name": "location", "type": "parameter_location", "required": false },
 		{ "name": "description", "type": "string", "required": false },
-		{ "name": "required", "type": "boolean", "default": "true" },
+		{ "name": "required", "type": "boolean", "default": true },
 		{ "name": "default", "type": "string", "required": false },
 		{ "name": "minimum", "type": "long", "required": false },
 		{ "name": "maximum", "type": "long", "required": false },
