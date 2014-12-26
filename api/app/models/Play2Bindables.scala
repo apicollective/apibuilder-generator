@@ -20,7 +20,7 @@ object Play2Bindables {
       "",
       buildDefaults().indent(2),
       "",
-      ssd.enums.keys.map( buildImplicit(_) ).mkString("\n\n").indent(2),
+      ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n").indent(2),
       "",
       "}"
     ).mkString("\n")

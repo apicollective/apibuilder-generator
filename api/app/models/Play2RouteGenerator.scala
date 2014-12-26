@@ -24,9 +24,9 @@ case class Play2RouteGenerator(form: InvocationForm) {
   private val scalaService = ScalaService(service)
 
   def invoke(): Option[String] = {
-    val all = scalaService.resources.flatMap { case (modelName, resource) =>
+    val all = scalaService.resources.flatMap { resource =>
       resource.operations.map { op =>
-        Play2Route(scalaService, modelName, service.models(modelName), op, resource)
+        Play2Route(scalaService, op, resource)
       }
     }
     if (all.isEmpty) {
@@ -58,8 +58,6 @@ case class Play2RouteGenerator(form: InvocationForm) {
 
 private[models] case class Play2Route(
   ssd: ScalaService,
-  modelName: String,
-  model: Model,
   op: ScalaOperation,
   resource: ScalaResource
 ) {
@@ -117,10 +115,9 @@ private[models] case class Play2Route(
     }
   }
 
-  private val modelPlural = model.plural.getOrElse(Text.pluralize(modelName))
   val method = "%s.%s".format(
-    "controllers." + lib.Text.underscoreAndDashToInitCap(modelPlural),
-    GeneratorUtil.urlToMethodName(modelPlural, Paths.resource(modelName, model.plural, resource.resource), op.method, url)
+    "controllers." + lib.Text.underscoreAndDashToInitCap(resource.model.plural),
+    GeneratorUtil.urlToMethodName(resource.model.plural, op.method, url)
   )
 
   private def parametersWithTypesAndDefaults(params: Iterable[ScalaParameter]): Iterable[String] = {

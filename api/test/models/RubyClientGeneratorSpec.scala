@@ -34,6 +34,7 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
 
     it("for enum with multiple values") {
       val enum = Enum(
+        name = "age_group",
         description = None,
         values = Seq(
           EnumValue(
@@ -47,7 +48,7 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
         )
       )
             
-      TestHelper.assertEqualsFile("test/resources/ruby-gem-enums.txt", RubyClientGenerator.generateEnum("age_group", enum))
+      TestHelper.assertEqualsFile("test/resources/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum))
     }
 
   }

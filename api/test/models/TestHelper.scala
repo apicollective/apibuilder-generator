@@ -1,6 +1,6 @@
 package models
 
-import java.nio.file
+import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 
 import play.api.libs.json._
@@ -14,9 +14,9 @@ object TestHelper {
   lazy val referenceApiService = parseFile(s"../reference-api/api.json")
 
   def writeToFile(path: String, contents: String) {
-    val outputPath = file.Paths.get(path)
+    val outputPath = Paths.get(path)
     val bytes = contents.getBytes(StandardCharsets.UTF_8)
-    file.Files.write(outputPath, bytes)
+    Files.write(outputPath, bytes)
   }
 
   def readFile(path: String): String = {

@@ -28,7 +28,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     def model(typeString: String): Model = {
-      service(typeString).models.values.head
+      service(typeString).models.head
     }
 
     def dataField(typeString: String): Field = {
@@ -50,17 +50,17 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     describe("generates valid models") {
 
       it("singleton") {
-        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel("content", model("object"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("object"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-singleton.txt", code)
       }
 
       it("list") {
-        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel("content", model("[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-list.txt", code)
       }
 
       it("map") {
-        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel("content", model("map[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("map[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-map.txt", code)
       }
 
@@ -105,11 +105,11 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     def operation(typeString: String): Operation = {
-      service(typeString).resources.values.head.operations.head
+      service(typeString).resources.head.operations.head
     }
 
     def response(typeString: String): Response = {
-      operation(typeString).responses.values.head
+      operation(typeString).responses.head
     }
 
 

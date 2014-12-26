@@ -18,20 +18,20 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
   }
 
   it("urlToMethodName") {
-    GeneratorUtil.urlToMethodName("memberships", "/memberships", Method.Get, "/memberships") should be("get")
-    GeneratorUtil.urlToMethodName("memberships", "/memberships", Method.Post, "/memberships") should be("post")
-    GeneratorUtil.urlToMethodName("memberships", "/memberships", Method.Get, "/memberships/:guid") should be("getByGuid")
-    GeneratorUtil.urlToMethodName("memberships", "/memberships", Method.Post, "/memberships/:guid/accept") should be("postAcceptByGuid")
+    GeneratorUtil.urlToMethodName("memberships", Method.Get, "/memberships") should be("get")
+    GeneratorUtil.urlToMethodName("memberships", Method.Post, "/memberships") should be("post")
+    GeneratorUtil.urlToMethodName("memberships", Method.Get, "/memberships/:guid") should be("getByGuid")
+    GeneratorUtil.urlToMethodName("memberships", Method.Post, "/memberships/:guid/accept") should be("postAcceptByGuid")
 
-    GeneratorUtil.urlToMethodName("membership_requests", "/membership_requests", Method.Get, "/membership_requests") should be("get")
-    GeneratorUtil.urlToMethodName("membership_requests", "/membership_requests", Method.Post, "/membership_requests") should be("post")
-    GeneratorUtil.urlToMethodName("membership_requests", "/membership_requests", Method.Get, "/membership_requests/:guid") should be("getByGuid")
+    GeneratorUtil.urlToMethodName("membership_requests", Method.Get, "/membership_requests") should be("get")
+    GeneratorUtil.urlToMethodName("membership_requests", Method.Post, "/membership_requests") should be("post")
+    GeneratorUtil.urlToMethodName("membership_requests", Method.Get, "/membership_requests/:guid") should be("getByGuid")
 
-    GeneratorUtil.urlToMethodName("membership_requests", "/membership-requests", Method.Get, "/membership-requests") should be("get")
-    GeneratorUtil.urlToMethodName("membership_requests", "/membership-requests", Method.Post, "/membership-requests") should be("post")
-    GeneratorUtil.urlToMethodName("membership_requests", "/membership-requests", Method.Get, "/membership-requests/:guid") should be("getByGuid")
+    GeneratorUtil.urlToMethodName("membership_requests", Method.Get, "/membership-requests") should be("get")
+    GeneratorUtil.urlToMethodName("membership_requests", Method.Post, "/membership-requests") should be("post")
+    GeneratorUtil.urlToMethodName("membership_requests", Method.Get, "/membership-requests/:guid") should be("getByGuid")
 
-    GeneratorUtil.urlToMethodName("foos", "/:key", Method.Get, "/:key") should be("getByKey")
+    GeneratorUtil.urlToMethodName("foos", Method.Get, "/:key") should be("getByKey")
   }
 
 }

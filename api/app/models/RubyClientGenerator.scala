@@ -66,8 +66,8 @@ object RubyClientGenerator extends CodeGenerator {
     new RubyClientGenerator(form).invoke
   }
 
-  def generateEnum(name: String, enum: Enum): String = {
-    val className = RubyUtil.toClassName(name)
+  def generateEnum(enum: Enum): String = {
+    val className = RubyUtil.toClassName(enum.name)
     val lines = ListBuffer[String]()
     lines.append(s"class $className")
 
@@ -137,8 +137,8 @@ case class RubyClientGenerator(form: InvocationForm) {
   private val moduleName = RubyUtil.toClassName(service.name)
 
   private val datatypeResolver = DatatypeResolver(
-    enumNames = service.enums.keys.toSet,
-    modelNames = service.models.keys.toSet
+    enumNames = service.enums.map(_.name),
+    modelNames = service.models.map(_.name)
   )
 
   def invoke(): String = {
@@ -150,11 +150,11 @@ case class RubyClientGenerator(form: InvocationForm) {
     s"module ${moduleName}\n" +
     generateClient() +
     "\n\n  module Clients\n\n" +
-    service.resources.map { case (modelName, resource) => generateClientForResource(modelName, resource) }.mkString("\n\n") +
+    service.resources.map { generateClientForResource(_) }.mkString("\n\n") +
     "\n\n  end" +
     "\n\n  module Models\n" +
-    service.enums.map { case (name, enum) => RubyClientGenerator.generateEnum(name, enum) }.mkString("\n\n").indent(4) + "\n\n" +
-    service.models.map { case (name, model) => generateModel(name, model) }.mkString("\n\n").indent(4) + "\n\n" +
+    service.enums.map { RubyClientGenerator.generateEnum(_) }.mkString("\n\n").indent(4) + "\n\n" +
+    service.models.map { generateModel(_) }.mkString("\n\n").indent(4) + "\n\n" +
     "  end\n\n  # ===== END OF SERVICE DEFINITION =====\n  " +
     RubyHttpClient.contents +
     "\nend"
@@ -200,8 +200,8 @@ case class RubyClientGenerator(form: InvocationForm) {
     end
 """)
 
-    sb.append(service.resources.map { case (modelName, resource) =>
-      val modelPlural = service.models(modelName).plural.getOrElse(Text.pluralize(modelName))
+    sb.append(service.resources.map { resource =>
+      val modelPlural = resource.model.plural
       val className = RubyUtil.toClassName(modelPlural)
 
       s"    def ${modelPlural}\n" +
@@ -214,8 +214,8 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.mkString("\n")
   }
 
-  def generateClientForResource(modelName: String, resource: Resource): String = {
-    val modelPlural = service.models(modelName).plural.getOrElse(Text.pluralize(modelName))
+  def generateClientForResource(resource: Resource): String = {
+    val modelPlural = resource.model.plural
     val className = RubyUtil.toClassName(modelPlural)
 
     val sb = ListBuffer[String]()
@@ -230,7 +230,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       val queryParams = op.parameters.filter { p => p.location == ParameterLocation.Query }
       val formParams = op.parameters.filter { p => p.location == ParameterLocation.Form }
 
-      val rubyPath = Paths.operation(modelName, Some(modelPlural), resource, op).split("/").map { name =>
+      val rubyPath = op.path.split("/").map { name =>
         if (name.startsWith(":")) {
           val varName = name.slice(1, name.length)
           val param = pathParams.find(_.name == varName).getOrElse {
@@ -276,9 +276,8 @@ case class RubyClientGenerator(form: InvocationForm) {
       val methodName =lib.Text.camelCaseToUnderscore(
         GeneratorUtil.urlToMethodName(
           modelPlural,
-          Paths.resource(modelName, Some(modelPlural), resource),
           op.method,
-          Paths.operation(modelName, Some(modelPlural), resource, op)
+          op.path
         )
       ).toLowerCase
 
@@ -415,8 +414,8 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.mkString("\n")
   }
 
-  def generateModel(name: String, model: Model): String = {
-    val className = RubyUtil.toClassName(name)
+  def generateModel(model: Model): String = {
+    val className = RubyUtil.toClassName(model.name)
 
     val sb = ListBuffer[String]()
 
@@ -430,7 +429,7 @@ case class RubyClientGenerator(form: InvocationForm) {
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
 
     model.fields.map { field =>
-      sb.append(s"    @${field.name} = ${parseArgument(field.name, field.`type`, field.required.getOrElse(true), field.default)}")
+      sb.append(s"    @${field.name} = ${parseArgument(field.name, field.`type`, field.required, field.default)}")
     }
 
     sb.append("  end\n")
@@ -836,9 +835,7 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   def generateResponses(op: Operation): String = {
     // TODO: match on all response codes
-    op.responses.keys.map(_.toInt).toSeq.sorted.headOption.flatMap { code =>
-      generateResponse(op.responses(code.toString))
-    }.getOrElse("\n        nil")
+    op.responses.sortWith { _.code < _.code }.headOption.flatMap { generateResponse(_) }.getOrElse("\n        nil")
   }
 
   def generateResponse(response: Response): Option[String] = {

@@ -12,30 +12,30 @@ case class ScalaClientMethodGenerator(
 
   private val generatorUtil = GeneratorUtil(config)
 
-  private val sortedResources = TreeMap[String, ScalaResource]() ++ ssd.resources
+  private val sortedResources = ssd.resources.sortWith { _.model.name.toLowerCase < _.model.name.toLowerCase }
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + failedRequestClass() + "\n\n" + errorPackage()).trim
   }
 
   def accessors(): String = {
-    sortedResources.map { case (plural, resources) =>
-      val methodName =lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(plural).toLowerCase)
-      config.accessor(methodName, plural)
+    sortedResources.map { resource =>
+      val methodName = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(resource.model.plural).toLowerCase)
+      config.accessor(methodName, resource.model.plural)
     }.mkString("\n\n")
   }
 
   def traits(): String = {
-    sortedResources.map { case (plural, resource) =>
-      s"trait $plural {\n" +
+    sortedResources.map { resource =>
+      s"trait ${resource.model.plural} {\n" +
       methods(resource).map(_.interface).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
   }
 
   def objects(): String = {
-    sortedResources.map { case (plural, resource) =>
-      s"object $plural extends $plural {\n" +
+    sortedResources.map { resource =>
+      s"object ${resource.model.plural} extends ${resource.model.plural} {\n" +
       methods(resource).map(_.code).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
@@ -55,7 +55,7 @@ case class ScalaClientMethodGenerator(
     * handled via these classes.
     */
   def errorPackage(): String = {
-    ssd.resources.values.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
+    ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
       val etc = errorTypeClass(response).distinct.sorted.mkString("\n\n").indent(2)
       val jsonImport = if (config.hasModelJsonPackage) {
         Seq("",

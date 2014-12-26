@@ -2,7 +2,7 @@ package generator
 
 import com.gilt.apidocgenerator.models._
 import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
-import models.{Container, Paths}
+import models.Container
 
 case class ScalaService(
   service: Service,
@@ -23,8 +23,8 @@ case class ScalaService(
 
 
   val datatypeResolver = DatatypeResolver(
-    enumNames = service.enums.keys.toSet,
-    modelNames = service.models.keys.toSet
+    enumNames = service.enums.map(_.name),
+    modelNames = service.models.map(_.name)
   )
 
   val name = ScalaUtil.toClassName(service.name)
@@ -33,13 +33,9 @@ case class ScalaService(
   def enumClassName(name: String) = enumPackageName + "." + ScalaUtil.toClassName(name)
   // TODO: End make these private
 
-  val models = service.models.map { case (name, model) =>
-    (ScalaUtil.toClassName(name) -> new ScalaModel(this, name, model))
-  }.toMap
+  val models = service.models.map { new ScalaModel(this, _) }
 
-  val enums = service.enums.map { case (name, enum) =>
-    (ScalaUtil.toClassName(name) -> new ScalaEnum(name, enum))
-  }.toMap
+  val enums = service.enums.map { new ScalaEnum(_) }
 
   val packageNamePrivate = packageName.split("\\.").last
 
@@ -47,10 +43,7 @@ case class ScalaService(
     service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
   }
 
-  val resources = service.resources.map { case (modelName, resource) =>
-    val scalaName = ScalaUtil.toClassName(modelName)
-    (scalaName -> new ScalaResource(this, models(scalaName), resource))
-  }
+  val resources = service.resources.map { new ScalaResource(this, _) }
 
   def scalaDatatype(
     t: Datatype
@@ -65,13 +58,13 @@ case class ScalaHeader(name: String, value: String) {
 }
 
 
-class ScalaModel(val ssd: ScalaService, modelName: String, val model: Model) {
+class ScalaModel(val ssd: ScalaService, val model: Model) {
 
-  val originalName: String = modelName
+  val originalName: String = model.name
 
-  val name: String = ScalaUtil.toClassName(modelName)
+  val name: String = ScalaUtil.toClassName(model.name)
 
-  val plural: String = Text.underscoreAndDashToInitCap(model.plural.getOrElse(Text.pluralize(modelName)))
+  val plural: String = ScalaUtil.toClassName(model.plural)
 
   val description: Option[String] = model.description
 
@@ -115,9 +108,9 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
 
 }
 
-class ScalaEnum(enumName: String, val enum: Enum) {
+class ScalaEnum(val enum: Enum) {
 
-  val name: String = ScalaUtil.toClassName(enumName)
+  val name: String = ScalaUtil.toClassName(enum.name)
 
   val description: Option[String] = enum.description
 
@@ -135,22 +128,21 @@ class ScalaEnumValue(value: EnumValue) {
 
 }
 
-class ScalaResource(ssd: ScalaService, val model: ScalaModel, val resource: Resource) {
+class ScalaResource(ssd: ScalaService, val resource: Resource) {
+
+  val model = resource.model
 
   val packageName: String = ssd.packageName
 
-  val path = Paths.resource(model.originalName, model.model.plural, resource)
+  val operations = resource.operations.map { new ScalaOperation(ssd, _, this)}
 
-  val operations = resource.operations.map { op =>
-    new ScalaOperation(ssd, model, op, this)
-  }
 }
 
-class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operation, resource: ScalaResource) {
+class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: ScalaResource) {
 
   val method: Method = operation.method
 
-  val path: String = Paths.operation(model.originalName, model.model.plural, resource.resource, operation)
+  val path: String = operation.path
 
   val description: Option[String] = operation.description
 
@@ -166,7 +158,7 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
 
   lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
 
-  val name: String = GeneratorUtil.urlToMethodName(resource.model.plural, resource.path, operation.method, path)
+  val name: String = GeneratorUtil.urlToMethodName(resource.model.plural, operation.method, path)
 
   val argList: Option[String] = body match {
     case None => {
@@ -201,15 +193,17 @@ class ScalaOperation(val ssd: ScalaService, model: ScalaModel, operation: Operat
     ).flatten.mkString(",")
   }
 
-  val responses: Seq[ScalaResponse] = {
-    operation.responses.map { case (code, response) => new ScalaResponse(ssd, method, code.toInt, response) }.toSeq
-  }.sortWith { _.code < _.code }
+  val responses: Seq[ScalaResponse] = operation.responses
+    .sortWith { _.code < _.code }
+    .map { new ScalaResponse(ssd, method, _) }
 
   lazy val resultType = responses.find(_.isSuccess).map(_.resultType).getOrElse("Unit")
 
 }
 
-class ScalaResponse(ssd: ScalaService, method: Method, val code: Int, response: Response) {
+class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
+
+  val code: Int = response.code
 
   val `type`: Datatype = ssd.datatypeResolver.parse(response.`type`).getOrElse {
     sys.error(s"Could not parse type[${response.`type`}] for response[$response]")
@@ -252,7 +246,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
    * If there is a default, ensure it is only set server side otherwise
    * changing the default would have no impact on deployed clients
    */
-  def isOption: Boolean = !field.required.getOrElse(true) || field.default.nonEmpty
+  def isOption: Boolean = !field.required || field.default.nonEmpty
 
   def definition: String = datatype.definition(name, isOption)
 }

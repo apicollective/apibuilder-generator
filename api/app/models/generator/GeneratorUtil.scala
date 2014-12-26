@@ -11,10 +11,10 @@ object GeneratorUtil {
    */
   def urlToMethodName(
     resourcePlural: String,
-    resourcePath: String,
     method: Method,
     url: String
   ): String = {
+    val resourcePath = "/" // TODO
     val pieces = (if (resourcePath.startsWith("/:")) {
       url
     } else {

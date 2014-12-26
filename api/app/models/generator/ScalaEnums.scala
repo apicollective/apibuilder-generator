@@ -3,7 +3,6 @@ package generator
 import lib.Text
 
 case class ScalaEnums(
-  name: String,
   enum: ScalaEnum
 ) {
 
@@ -11,8 +10,8 @@ case class ScalaEnums(
     import lib.Text._
     Seq(
       enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-        s"sealed trait ${name}",
-      s"object ${name} {",
+        s"sealed trait ${enum.name}",
+      s"object ${enum.name} {",
       buildValues().indent(2),
       s"}"
     ).mkString("\n\n")
@@ -23,9 +22,9 @@ case class ScalaEnums(
     */
   def buildJson(prefix: String): String = {
     Seq(
-      s"implicit val jsonReads${prefix}Enum_$name = __.read[String].map(${name}.apply)",
-      s"implicit val jsonWrites${prefix}Enum_$name = new Writes[$name] {",
-      s"  def writes(x: $name) = JsString(x.toString)",
+      s"implicit val jsonReads${prefix}Enum_${enum.name} = __.read[String].map(${enum.name}.apply)",
+      s"implicit val jsonWrites${prefix}Enum_${enum.name} = new Writes[${enum.name}] {",
+      s"  def writes(x: ${enum.name}) = JsString(x.toString)",
       "}"
     ).mkString("\n")
   }
@@ -34,7 +33,7 @@ case class ScalaEnums(
     enum.values.map { value => 
       Seq(
         value.description.map { desc => ScalaUtil.textToComment(desc) },
-        Some(s"""case object ${value.name} extends ${name} { override def toString = "${value.originalName}" }""")
+        Some(s"""case object ${value.name} extends ${enum.name} { override def toString = "${value.originalName}" }""")
       ).flatten.mkString("\n")
     }.mkString("\n") + "\n" +
     s"""
@@ -47,7 +46,7 @@ case class ScalaEnums(
  * We use all CAPS for the variable name to avoid collisions
  * with the camel cased values above.
  */
-case class UNDEFINED(override val toString: String) extends $name
+case class UNDEFINED(override val toString: String) extends ${enum.name}
 
 /**
  * all returns a list of all the valid, known values. We use
@@ -58,8 +57,8 @@ case class UNDEFINED(override val toString: String) extends $name
     s"val all = Seq(" + enum.values.map(_.name).mkString(", ") + ")\n\n" +
     s"private[this]\n" +
     s"val byName = all.map(x => x.toString -> x).toMap\n\n" +
-    s"def apply(value: String): $name = fromString(value).getOrElse(UNDEFINED(value))\n\n" +
-    s"def fromString(value: String): scala.Option[$name] = byName.get(value)\n\n"
+    s"def apply(value: String): ${enum.name} = fromString(value).getOrElse(UNDEFINED(value))\n\n" +
+    s"def fromString(value: String): scala.Option[${enum.name}] = byName.get(value)\n\n"
   }
 
 }

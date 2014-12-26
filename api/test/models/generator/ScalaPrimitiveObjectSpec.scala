@@ -33,7 +33,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     def dataField(typeString: String): ScalaField = {
-      ssd(typeString).models.values.head.fields.head
+      ssd(typeString).models.head.fields.head
     }
 
     it("singleton object") {
@@ -110,7 +110,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     def operation(typeString: String): ScalaOperation = {
-      ssd(typeString).resources.values.head.operations.head
+      ssd(typeString).resources.head.operations.head
     }
 
     def response(typeString: String): ScalaResponse = {

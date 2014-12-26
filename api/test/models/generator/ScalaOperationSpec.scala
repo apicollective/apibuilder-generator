@@ -18,16 +18,15 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
 
   it("models as a parameter in the body should use capitalize") {
     val body = com.gilt.apidocgenerator.models.Body("user")
-    val model = new Model(Some("users"), None, Nil)
-    val operation = new Operation(Method.Get, Some("users"), None, Some(body), Seq(q1), Map.empty)
-    val resource = new Resource(None, Some("users"), Seq(operation))
-    val scalaModel = new ScalaModel(ssd, "user", model)
+    val model = new Model("user", "users", None, Nil)
+    val operation = new Operation(Method.Get, "/users", None, Some(body), Seq(q1), Nil)
+    val resource = new Resource(model, None, Seq(operation))
+    val scalaModel = new ScalaModel(ssd, model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      scalaModel,
       operation,
-      new ScalaResource(ssd, scalaModel, resource)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList shouldEqual Some("user: apidocreferenceapi.models.User,\n  q1: _root_.scala.Option[Double] = None\n")
@@ -35,16 +34,15 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
 
   it("array of models as a parameter in the body should pluralize model name") {
     val body = com.gilt.apidocgenerator.models.Body("[user]", None)
-    val model = new Model(Some("users"), None, Nil)
-    val operation = new Operation(Method.Get, Some("users"), None, Some(body), Seq(q1), Map.empty)
-    val resource = new Resource(None, Some("users"), Seq(operation))
-    val scalaModel = new ScalaModel(ssd, "user", model)
+    val model = new Model("user", "users", None, Nil)
+    val operation = new Operation(Method.Get, "/users", None, Some(body), Seq(q1), Nil)
+    val resource = new Resource(model, None, Seq(operation))
+    val scalaModel = new ScalaModel(ssd, model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      scalaModel,
       operation,
-      new ScalaResource(ssd, scalaModel, resource)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList shouldEqual Some("users: Seq[apidocreferenceapi.models.User],\n  q1: _root_.scala.Option[Double] = None\n")
@@ -52,16 +50,15 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
 
   it("primitive type as a parameter in the body should not use capitalize") {
     val body = com.gilt.apidocgenerator.models.Body("integer", None)
-    val model = new Model(Some("models"), None, Nil)
-    val operation = new Operation(Method.Get, Some("models"), None, Some(body), Seq(q1), Map.empty)
-    val resource = new Resource(None, Some("models"), Seq(operation))
-    val scalaModel = new ScalaModel(ssd, "model", model)
+    val model = new Model("model", "models", None, Nil)
+    val operation = new Operation(Method.Get, "/models", None, Some(body), Seq(q1), Nil)
+    val resource = new Resource(model, None, Seq(operation))
+    val scalaModel = new ScalaModel(ssd, model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      scalaModel,
       operation,
-      new ScalaResource(ssd, scalaModel, resource)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList shouldEqual Some("value: Int,\n  q1: _root_.scala.Option[Double] = None\n")
@@ -69,16 +66,15 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
 
   it("array of primitive types as a parameter in the body should not use capitalize") {
     val body = com.gilt.apidocgenerator.models.Body("[integer]", None)
-    val model = new Model(Some("models"), None, Nil)
-    val operation = new Operation(Method.Get, Some("models"), None, Some(body), Seq(q1), Map.empty)
-    val resource = new Resource(None, Some("models"), Seq(operation))
-    val scalaModel = new ScalaModel(ssd, "model", model)
+    val model = new Model("model", "models", None, Nil)
+    val operation = new Operation(Method.Get, "/models", None, Some(body), Seq(q1), Nil)
+    val resource = new Resource(model, None, Seq(operation))
+    val scalaModel = new ScalaModel(ssd, model)
 
     val scalaOperation = new ScalaOperation(
       ssd,
-      scalaModel,
       operation,
-      new ScalaResource(ssd, scalaModel, resource)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList shouldEqual Some("values: Seq[Int],\n  q1: _root_.scala.Option[Double] = None\n")

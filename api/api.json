@@ -42,6 +42,7 @@
 
 	"enum": {
 	    "fields": [
+		{ "name": "name", "type": "string" },
 		{ "name": "description", "type": "string", "required": false },
 		{ "name": "values", "type": "[enum_value]" }
 	    ]
@@ -57,7 +58,7 @@
 	"model": {
 	    "fields": [
 		{ "name": "name", "type": "string" },
-		{ "name": "plural", "type": "string", "required": false, "description": "Defaults to the plural of the model name. Used to generate resource paths which by default map to the plural of the model name" },
+		{ "name": "plural", "type": "string" },
 		{ "name": "description", "type": "string", "required": false },
 		{ "name": "fields", "type": "[field]" }
 	    ]
@@ -118,6 +119,7 @@
 
 	"response": {
 	    "fields": [
+		{ "name": "code", "type": "integer", "example": "200" },
 		{ "name": "type", "type": "string" }
 	    ]
 	},

@@ -8,13 +8,13 @@ import org.scalatest.{ShouldMatchers, FunSpec}
 class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
   def getResource(service: Service, name: String): Resource = {
-    service.resources.get(name).getOrElse {
+    service.resources.find(_.model.name == name).getOrElse {
       sys.error(s"Could not find $name resource")
     }
   }
 
   def getScalaResource(ssd: ScalaService, name: String): ScalaResource = {
-    ssd.resources.get(name).getOrElse {
+    ssd.resources.find(_.model.name == name).getOrElse {
       sys.error(s"Could not find $name resource")
     }
   }
@@ -38,7 +38,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
       it("GET w/ default path, parameters") {
         val op = userResource.operations.filter { op => op.method == Method.Get && op.path == "/users" }.head
-        val r = Play2Route(ssd, "user", service.models("user"), op, userResource)
+        val r = Play2Route(ssd, op, userResource)
         r.verb should be("GET")
         r.url should be("/users")
         r.method should be("controllers.Users.get")
@@ -47,7 +47,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
       it("GET w/ path, guid path param, no additional parameters") {
         val op = userResource.operations.filter { op => op.method == Method.Get && op.path == "/users/:guid" }.head
-        val r = Play2Route(ssd, "user", service.models("user"), op, userResource)
+        val r = Play2Route(ssd, op, userResource)
         r.verb should be("GET")
         r.url should be("/users/:guid")
         r.method should be("controllers.Users.getByGuid")
@@ -56,7 +56,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
       it("POST w/ default path, no parameters") {
         val op = userResource.operations.filter { op => op.method == Method.Post && op.path == "/users" }.head
-        val r = Play2Route(ssd, "user", service.models("user"), op, userResource)
+        val r = Play2Route(ssd, op, userResource)
         r.verb should be("POST")
         r.url should be("/users")
         r.method should be("controllers.Users.post")
@@ -65,7 +65,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
       it("PUT w/ guid in path, no parameters") {
         val op = userResource.operations.filter { op => op.method == Method.Put && op.path == "/users/:guid" }.head
-        val r = Play2Route(ssd, "user", service.models("user"), op, userResource)
+        val r = Play2Route(ssd, op, userResource)
         r.verb should be("PUT")
         r.url should be("/users/:guid")
         r.method should be("controllers.Users.putByGuid")
@@ -78,7 +78,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
       it("POST /membership_requests/:guid/accept") {
         val op = membershipRequestResource.operations.filter { op => op.method == Method.Post && op.path == "/membership_requests/:guid/accept" }.head
-        val r = Play2Route(ssd, "membership_request", service.models("membership_resource"), op, membershipRequestResource)
+        val r = Play2Route(ssd, op, membershipRequestResource)
         r.verb should be("POST")
         r.url should be("/membership_requests/:guid/accept")
         r.method should be("controllers.MembershipRequests.postAcceptByGuid")
@@ -90,7 +90,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       it("GET /:orgKey") {
         val membershipRequestResource = getScalaResource(ssd, "membership_request")
         val op = getScalaMethod(ssd, "service", Method.Get, "/:orgKey")
-        val r = Play2Route(ssd, "membership_request", service.models("membership_request"), op, membershipRequestResource)
+        val r = Play2Route(ssd, op, membershipRequestResource)
         r.method should be("controllers.Services.getByOrgKey")
       }
     }
@@ -103,14 +103,14 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     it("normalizes explicit paths that match resource name") {
       val resource = getScalaResource(ssd, "organization")
       val op = getScalaMethod(ssd, "organization", Method.Get, "/organizations")
-      val r = Play2Route(ssd, "organization", service.models("organization"), op, resource)
+      val r = Play2Route(ssd, op, resource)
       r.method should be("controllers.Organizations.get")
     }
 
     it("enums are strongly typed") {
       val resource = getScalaResource(ssd, "user")
       val op = getScalaMethod(ssd, "user", Method.Get, "/users/:age_group")
-      val r = Play2Route(ssd, "user", service.models("user"), op, resource)
+      val r = Play2Route(ssd, op, resource)
       r.method should be("controllers.Users.getByAgeGroup")
       r.params.mkString("") should be("age_group: apidocreferenceapi.models.AgeGroup")
     }
@@ -118,7 +118,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     it("supports multiple query parameters") {
       val echoResource = getScalaResource(ssd, "echo")
       val op = getScalaMethod(ssd, "echo", Method.Get, "/echoes")
-      val r = Play2Route(ssd, "echo", service.models("echo"), op, echoResource)
+      val r = Play2Route(ssd, op, echoResource)
       r.method should be("controllers.Echoes.get")
       r.params.mkString(" ") should be("foo: scala.Option[String]")
       r.paramComments.getOrElse("") should be("""
@@ -136,7 +136,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     it("camel cases hypen in route") {
       val echoResource = getScalaResource(ssd, "echo")
       val op = getScalaMethod(ssd, "echo", Method.Get, "/echoes/arrays-only")
-      val r = Play2Route(ssd, "echo", service.models("echo"), op, echoResource)
+      val r = Play2Route(ssd, op, echoResource)
       r.method should be("controllers.Echoes.getArraysOnly")
     }
 
