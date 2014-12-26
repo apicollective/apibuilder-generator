@@ -17,11 +17,11 @@ object Container {
   }
 
   case object List extends Container {
-    override def multiple = false
+    override def multiple = true
   }
 
   case object Map extends Container {
-    override def multiple = false
+    override def multiple = true
   }
 
 
