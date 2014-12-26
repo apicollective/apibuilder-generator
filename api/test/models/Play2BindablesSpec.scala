@@ -6,7 +6,7 @@ import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class Play2BindablesSpec extends FunSpec with ShouldMatchers {
 
-  lazy val service = TestHelper.parseFile(s"../reference-api/api.json")
+  lazy val service = TestHelper.referenceApiService
   lazy val ssd = new ScalaService(service)
 
   it("generates bindable for a single enum") {

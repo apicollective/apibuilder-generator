@@ -11,6 +11,8 @@ import lib.Text
 
 object TestHelper {
 
+  lazy val referenceApiService = parseFile(s"../reference-api/api.json")
+
   def writeToFile(path: String, contents: String) {
     val outputPath = Paths.get(path)
     val bytes = contents.getBytes(StandardCharsets.UTF_8)
