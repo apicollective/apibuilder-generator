@@ -112,7 +112,7 @@ object ScalaPrimitive {
 }
 
 sealed trait ScalaDatatype {
-  def nilValue: Option[String]
+  def nilValue: String
 
   def types: Seq[ScalaPrimitive]
 
@@ -128,7 +128,7 @@ sealed trait ScalaDatatype {
 
 object ScalaDatatype {
   case class List(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
-    override def nilValue = Some("Nil")
+    override def nilValue = "Nil"
     override def name = types.toList match {
       case single :: Nil => s"Seq[${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
@@ -147,9 +147,9 @@ object ScalaDatatype {
   }
 
   case class Map(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
-    override def nilValue = Some("Map.empty")
+    override def nilValue = "Map.empty"
     override def name = types.toList match {
-      case single :: Nil => s"Map[${single.name}]"
+      case single :: Nil => s"Map[String, ${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
     }
     override def definition(
@@ -166,7 +166,7 @@ object ScalaDatatype {
   }
 
   case class Option(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
-    override def nilValue = Some("None")
+    override def nilValue = "None"
     override def name = types.toList match {
       case single :: Nil => s"_root_.scala.Option[${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
@@ -185,7 +185,7 @@ object ScalaDatatype {
   }
 
   case class Singleton(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
-    override def nilValue = None
+    override def nilValue = "None"
     override def name = {
       types.toList match {
         case single :: Nil => single.name
