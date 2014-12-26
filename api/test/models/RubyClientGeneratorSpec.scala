@@ -53,7 +53,7 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
   }
 
   it("generate ruby") {
-    val service = TestHelper.parseFile("reference-api/api.json")
+    val service = TestHelper.referenceApiService
     val code = RubyClientGenerator.invoke(InvocationForm(service = service, userAgent = Some("gilt 0.0.1-test")))
     TestHelper.assertEqualsFile("test/resources/ruby-client-generator-gilt-0.0.1-test.txt", code)
   }
