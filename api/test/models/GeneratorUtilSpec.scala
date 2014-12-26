@@ -72,11 +72,6 @@ val queryParameters = optionalMessages.map("optional_messages" -> _) ++
 
   describe("with reference-api service") {
     it("supports optional seq  query parameters") {
-      ssd.resources("User").operations.foreach { op =>
-        println("op.method: " + op.method)
-        println("op.path: " + op.path)
-      }
-
       val operation = ssd.resources("User").operations.find(op => op.method == Method.Get && op.path == Some("/users")).get
 
       TestHelper.assertEqualsFile(
