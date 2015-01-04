@@ -2,137 +2,13 @@
     "name": "Apidoc Generator",
     "description": "Documentation for an apidoc code generator API",
     "base_url": "http://www.apidoc.me",
+    "namespace": "com.gilt.apidocgenerator",
 
-    "enums": {
-	"method": {
-	    "values": [
-		{ "name": "GET" },
-		{ "name": "POST" },
-		{ "name": "PUT" },
-		{ "name": "PATCH" },
-		{ "name": "DELETE" },
-		{ "name": "HEAD" },
-		{ "name": "CONNECT" },
-		{ "name": "OPTIONS" },
-		{ "name": "TRACE" }
-	    ]
-	},
-
-	"parameter_location": {
-	    "values": [
-		{ "name": "Path" },
-		{ "name": "Query" },
-		{ "name": "Form" }
-	    ]
-	}
-    },
+    "imports": [
+	{ "uri": "http://localhost:9000/gilt/apidoc-spec/0.7.39/service.json" }
+    ],
 
     "models": {
-	"service": {
-	    "fields": [
-		{ "name": "name", "type": "string" },
-		{ "name": "base_url", "type": "string", "required": false },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "headers", "type": "[header]" },
-		{ "name": "enums", "type": "[enum]" },
-		{ "name": "models", "type": "[model]" },
-		{ "name": "resources", "type": "[resource]", "description": "keys are the names of a model" }
-	    ]
-	},
-
-	"enum": {
-	    "fields": [
-		{ "name": "name", "type": "string" },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "values", "type": "[enum_value]" }
-	    ]
-	},
-
-	"enum_value": {
-	    "fields": [
-		{ "name": "name", "type": "string" },
-		{ "name": "description", "type": "string", "required": false }
-	    ]
-	},
-
-	"model": {
-	    "fields": [
-		{ "name": "name", "type": "string" },
-		{ "name": "plural", "type": "string" },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "fields", "type": "[field]" }
-	    ]
-	},
-
-	"field": {
-	    "fields": [
-		{ "name": "name", "type": "string" },
-		{ "name": "type", "type": "string" },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "default", "type": "string", "required": false },
-		{ "name": "required", "type": "boolean" },
-		{ "name": "minimum", "type": "long", "required": false },
-		{ "name": "maximum", "type": "long", "required": false },
-		{ "name": "example", "type": "string", "required": false }
-	    ]
-	},
-
-	"resource": {
-	    "fields": [
-		{ "name": "model", "type": "model" },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "operations", "type": "[operation]" }
-	    ]
-	},
-
-	"operation": {
-	    "fields": [
-		{ "name": "method", "type": "method" },
-		{ "name": "path", "type": "string" },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "body", "type": "body", "required": false },
-		{ "name": "parameters", "type": "[parameter]", "required": false },
-		{ "name": "responses", "type": "[response]", "required": false }
-	    ]
-	},
-
-	"body": {
-	    "fields": [
-		{ "name": "type", "type": "string" },
-		{ "name": "description", "type": "string", "required": false }
-	    ]
-	},
-
-	"parameter": {
-	    "fields": [
-		{ "name": "name", "type": "string" },
-		{ "name": "type", "type": "string" },
-		{ "name": "location", "type": "parameter_location", "required": false },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "required", "type": "boolean", "default": true },
-		{ "name": "default", "type": "string", "required": false },
-		{ "name": "minimum", "type": "long", "required": false },
-		{ "name": "maximum", "type": "long", "required": false },
-		{ "name": "example", "type": "string", "required": false }
-	    ]
-	},
-
-	"response": {
-	    "fields": [
-		{ "name": "code", "type": "integer", "example": "200" },
-		{ "name": "type", "type": "string" }
-	    ]
-	},
-
-	"header": {
-	    "fields": [
-		{ "name": "name", "type": "string" },
-		{ "name": "type", "type": "string" },
-		{ "name": "description", "type": "string", "required": false },
-		{ "name": "required", "type": "boolean" },
-		{ "name": "default", "type": "string", "required": false }
-	    ]
-	},
 
         "generator": {
             "description": "The generator metadata.",
@@ -153,8 +29,8 @@
 
         "invocation_form": {
           "fields": [
-            { "name": "service", "type": "service" },
-            { "name": "user_agent", "type": "string", "required": false }
+            { "name": "service", "type": "com.gilt.apidoc.spec.service" },
+            { "name": "user_agent", "type": "string", "required": "false" }
           ]
         },
 
