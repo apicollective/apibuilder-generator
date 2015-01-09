@@ -29,7 +29,7 @@ object Text {
     alphaNumericError ++ startsWithLetterError
   }
 
-  private val AlphaNumericRx = "^[a-zA-Z0-9_]*$".r
+  private val AlphaNumericRx = "^[a-zA-Z0-9_.\\.]*$".r
 
   def isAlphaNumeric(value: String): Boolean = {
     value match {
@@ -134,7 +134,7 @@ object Text {
   private val WordDelimeterRx = "_|\\-|\\.|:".r
 
   def splitIntoWords(value: String): Seq[String] = {
-    WordDelimeterRx.split(value)
+    WordDelimeterRx.split(value).map(_.trim).filter(!_.isEmpty)
   }
 
   def snakeToCamelCase(value: String) = {
