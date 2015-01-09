@@ -13,7 +13,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   val q1 = new Parameter(
     "q1",
     "double",
-    Some(ParameterLocation.Query),
+    ParameterLocation.Query,
     None, Some(false), None, None, None, None)
 
   it("models as a parameter in the body should use capitalize") {

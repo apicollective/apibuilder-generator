@@ -118,11 +118,13 @@ object RubyClientGenerator extends CodeGenerator {
   }
 
   def enumName(value: String): String = {
-    if (value == value.toUpperCase) {
-     lib.Text.camelCaseToUnderscore(value.toLowerCase).split("_").map(lib.Text.initLowerCase(_)).mkString("_")
+    val formatted = if (value == value.toUpperCase) {
+      value.toLowerCase
     } else {
-     lib.Text.camelCaseToUnderscore(value).split("_").map(lib.Text.initLowerCase(_)).mkString("_")
+      lib.Text.camelCaseToUnderscore(value)
     }
+
+    Text.splitIntoWords(formatted).map(lib.Text.initLowerCase(_)).mkString("_")
   }
 
 }

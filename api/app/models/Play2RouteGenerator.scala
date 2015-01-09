@@ -68,11 +68,10 @@ private[models] case class Play2Route(
     op.parameters.
       filter { param =>
         param.location match {
-          case None => false
-          case Some(ParameterLocation.Form) => false
-          case Some(ParameterLocation.Query) => true
-          case Some(ParameterLocation.Path) => true
-          case Some(ParameterLocation.UNDEFINED(_)) => false
+          case ParameterLocation.Form => false
+          case ParameterLocation.Query => true
+          case ParameterLocation.Path => true
+          case ParameterLocation.UNDEFINED(_) => false
         }
       }.
       filter { param =>
@@ -90,11 +89,10 @@ private[models] case class Play2Route(
     */
   val paramComments: Option[String] = op.parameters.filter { param =>
     param.location match {
-      case None => false
-      case Some(ParameterLocation.Form) => false
-      case Some(ParameterLocation.Query) => true
-      case Some(ParameterLocation.Path) => true
-      case Some(ParameterLocation.UNDEFINED(_)) => true
+      case ParameterLocation.Form => false
+      case ParameterLocation.Query => true
+      case ParameterLocation.Path => true
+      case ParameterLocation.UNDEFINED(_) => true
     }
   }.filter { param =>
     param.datatype match {

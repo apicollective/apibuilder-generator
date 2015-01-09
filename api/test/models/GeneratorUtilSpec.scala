@@ -19,13 +19,13 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
     val q1 = new Parameter(
       "q1",
       "double",
-      Some(ParameterLocation.Query),
+      ParameterLocation.Query,
       None, Some(true), None, None, None, None
     )
     val q2 = new Parameter(
       "q2",
       "double",
-      Some(ParameterLocation.Query),
+      ParameterLocation.Query,
       None, Some(false), None, None, None, None
     )
     val operation = new Operation(Method.Get, "/models", None, None, Seq(q1, q2), Nil)
