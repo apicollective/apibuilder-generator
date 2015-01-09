@@ -5,8 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 class TargetSpec extends FunSpec with Matchers {
 
-  private val Path = "api.json"
-  private lazy val service = TestHelper.parseFile(Path)
+  private lazy val service = TestHelper.generatorApiService
 
   it("Has a field named target") {
     service.models.find(_.name == "generator").get.fields.find(_.name == "key").getOrElse {

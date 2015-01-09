@@ -30,7 +30,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   describe("with apidoc service") {
-    lazy val service = TestHelper.parseFile(s"../api/api.json")
+    lazy val service = TestHelper.generatorApiService
     lazy val ssd = new ScalaService(service)
 
     describe("users resource") {
