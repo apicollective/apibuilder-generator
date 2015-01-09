@@ -2,7 +2,6 @@
     "name": "Apidoc Generator",
     "description": "Documentation for an apidoc code generator API",
     "base_url": "http://www.apidoc.me",
-    "namespace": "com.gilt.apidocgenerator",
 
     "imports": [
 	{ "uri": "http://localhost:9000/gilt/apidoc-spec/0.7.39/service.json" }
@@ -29,7 +28,7 @@
 
         "invocation_form": {
           "fields": [
-            { "name": "service", "type": "[com.gilt.apidoc-spec.models.service]" },
+            { "name": "service", "type": "[com.gilt.apidoc.spec.models.service]" },
             { "name": "user_agent", "type": "string", "required": "false" }
           ]
         },
