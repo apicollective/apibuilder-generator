@@ -89,7 +89,7 @@ package com.gilt.apidocgenerator.models {
   case class Parameter(
     name: String,
     `type`: String,
-    location: scala.Option[com.gilt.apidocgenerator.models.ParameterLocation] = None,
+    location: com.gilt.apidocgenerator.models.ParameterLocation,
     description: scala.Option[String] = None,
     required: scala.Option[Boolean] = None,
     default: scala.Option[String] = None,
@@ -433,7 +433,7 @@ package com.gilt.apidocgenerator.models {
       (
         (__ \ "name").read[String] and
         (__ \ "type").read[String] and
-        (__ \ "location").readNullable[com.gilt.apidocgenerator.models.ParameterLocation] and
+        (__ \ "location").read[com.gilt.apidocgenerator.models.ParameterLocation] and
         (__ \ "description").readNullable[String] and
         (__ \ "required").readNullable[Boolean] and
         (__ \ "default").readNullable[String] and
@@ -447,7 +447,7 @@ package com.gilt.apidocgenerator.models {
       (
         (__ \ "name").write[String] and
         (__ \ "type").write[String] and
-        (__ \ "location").write[scala.Option[com.gilt.apidocgenerator.models.ParameterLocation]] and
+        (__ \ "location").write[com.gilt.apidocgenerator.models.ParameterLocation] and
         (__ \ "description").write[scala.Option[String]] and
         (__ \ "required").write[scala.Option[Boolean]] and
         (__ \ "default").write[scala.Option[String]] and
