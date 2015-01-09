@@ -12,6 +12,7 @@ import lib.Text
 object TestHelper {
 
   lazy val referenceApiService = parseFile(s"../reference-api/service.json")
+  lazy val generatorApiService = parseFile(s"../api/service.json")
 
   def writeToFile(path: String, contents: String) {
     val outputPath = Paths.get(path)

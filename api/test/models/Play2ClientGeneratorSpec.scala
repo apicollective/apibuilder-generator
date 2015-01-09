@@ -11,7 +11,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("errorTypeClass") {
-    val service = TestHelper.parseFile("../api/api.json")
+    val service = TestHelper.generatorApiService
     val ssd = new ScalaService(service)
     val resource = ssd.resources.find(_.model.name == "organization").get
     val operation = resource.operations.find(_.method == Method.Post).get
@@ -24,35 +24,43 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("only generates error wrappers for model classes (not primitives)") {
-    val json = """
+    val userModel = """
+        {
+          "name": "user",
+          "plural": "user",
+          "fields": [
+            { "name": "id", "type": "long", "required": true }
+          ]
+        }
+    """.trim
+
+    val json = s"""
     {
       "base_url": "http://localhost:9000",
       "name": "Api Doc",
-      "models": {
-        "user": {
-          "fields": [
-            { "name": "id", "type": "long" }
-          ]
-        }
-      },
-      "resources": {
-        "user": {
+      "namespace": "test.apidoc.api",
+      "models": [$userModel],
+      "resources": [
+        {
+          "model": $userModel,
+          "path": "/users",
           "operations": [
             {
               "method": "GET",
               "path": "/:id",
-              "responses": {
-                "200": { "type": "user" },
-                "409": { "type": "unit" }
-              }
+              "responses": [
+                { "code": 200, "type": "user" },
+                { "code": 409, "type": "unit" }
+              ]
             }
           ]
         }
-      }
+      ]
     }
 
     """
 
+    println(json)
     val ssd = TestHelper.scalaService(json)
     ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage() should be("")
   }
