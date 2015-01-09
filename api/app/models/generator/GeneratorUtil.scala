@@ -1,7 +1,7 @@
 package generator
 
-import com.gilt.apidocgenerator.models.{Method}
-import lib.{Primitives, Type, TypeKind}
+import com.gilt.apidocgenerator.models.{Method, ParameterLocation}
+import lib.{Datatype, Primitives, Type}
 import lib.Text._
 
 object GeneratorUtil {
@@ -80,6 +80,27 @@ object GeneratorUtil {
 
 case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
+  private def isList(datatype: Datatype): Boolean = {
+    datatype match {
+      case Datatype.List(_) => true
+      case _ => false
+    }
+  }
+
+  private def isMap(datatype: Datatype): Boolean = {
+    datatype match {
+      case Datatype.Map(_) => true
+      case _ => false
+    }
+  }
+
+  private def isSingleValue(datatype: Datatype): Boolean = {
+    datatype match {
+      case Datatype.Singleton(_) | Datatype.Option(_) => true
+      case _ => false
+    }
+  }
+
   def params(
     fieldName: String,
     params: Seq[ScalaParameter]
@@ -87,73 +108,72 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     if (params.isEmpty) {
       None
     } else {
-      val listParams = params.map { p =>
-        p.datatype match {
-          case ScalaDatatype.List(single :: Nil) => {
-            Some(s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})""")
-          }
-          case ScalaDatatype.List(multiple) => {
-            sys.error("TODO: UNION TYPE")
-          }
-          case other => {
-            None
-          }
-        }
-      }.flatten
-
-      val arrayParamString = listParams.mkString(" ++\n")
-
-      val mapParams = params.map { p =>
-        p.datatype match {
-          case ScalaDatatype.Map(inner) => {
-            sys.error("TODO: Finish map")
-          }
-          case other => {
-            None
+      val listParams = params.filter(p => isList(p.`type`)) match {
+        case Nil => Seq.empty
+        case params => {
+          params.map { p =>
+            p.datatype.types.toList match {
+              case single :: Nil => {
+                s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})"""
+              }
+              case multiple => {
+                sys.error("TODO: Union Type")
+              }
+            }
           }
         }
       }
+      val arrayParamString = listParams.mkString(" ++\n")
 
-      // TODO: Finish map val mapParamString = listParams.mkString(" ++\n")
-
-      val singleParams: Option[String] = params.map { p =>
-        p.datatype.types.toList match {
-          case (single :: Nil) => {
-            if (p.isOption) {
-              s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})"""
-            } else {
-              s"""  Some("${p.originalName}" -> ${single.asString(p.name)})"""
+      val mapParams = params.filter(p => isMap(p.`type`)) match {
+        case Nil => Seq.empty
+        case params => {
+          params.map { p =>
+            p.datatype.types.toList match {
+              case single :: Nil => {
+                sys.error("TODO: Finish map")
+              }
+              case other => {
+                sys.error("TODO: Union Type")
+              }
             }
           }
-          case (multiple) => {
-            sys.error("TODO: UNION TYPE")
-          }
         }
-      }.flatten match {
-        case Nil => None
+      }
+      // TODO: Finish map val mapParamString = listParams.mkString(" ++\n")
+
+      val singleParams = params.filter(p => isSingleValue(p.`type`)) match {
+        case Nil => Seq.empty
         case params => {
-          Some(
-            Seq(
-              s"val $fieldName = Seq(",
-              params.mkString(",\n"),
-              ").flatten"
-            ).mkString("\n")
+          Seq(
+            s"val $fieldName = Seq(",
+            params.map { p =>
+              p.datatype.types.toList match {
+                case single :: Nil => {
+                  if (p.isOption) {
+                    s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})"""
+                  } else {
+                    s"""  Some("${p.originalName}" -> ${single.asString(p.name)})"""
+                  }
+                }
+                case multiple => {
+                  sys.error("TODO: Union Type")
+                }
+              }
+            }.mkString(",\n"),
+            ").flatten"
           )
         }
       }
+      val singleParamString = singleParams.mkString("\n")
 
       Some(
-        singleParams match {
-          case None => {
-            s"val $fieldName = " + arrayParamString.trim
-          }
-          case Some(value) => {
-            if (listParams.isEmpty) {
-              value
-            } else {
-              value + " ++\n" + arrayParamString
-            }
-          }
+        if (singleParams.isEmpty) {
+          s"val $fieldName = " + arrayParamString.trim
+        } else if (listParams.isEmpty) {
+          singleParamString
+        } else {
+          singleParamString + " ++\n" + arrayParamString
         }
       )
     }
@@ -161,6 +181,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
   def pathParams(op: ScalaOperation): String = {
     val pairs = op.pathParameters.map { p =>
+      require(p.location == ParameterLocation.Path, "Only singletons can be path parameters.")
       p.originalName -> PathParamHelper.urlEncode(p.name, p.datatype)
     }
     val tmp: String = pairs.foldLeft(op.path) {
@@ -181,13 +202,12 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
     } else if (!op.body.isEmpty) {
       val body = op.body.get
-      val name = op.body.get.name
 
       val payload = body.datatype.types.toList match {
-        case (single :: Nil) => {
+        case single :: Nil => {
           single.asString(ScalaUtil.toVariable(body.`type`))
         }
-        case (multiple) => {
+        case multiple => {
           sys.error("TODO: UNION TYPE")
         }
       }
@@ -215,7 +235,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       d: ScalaDatatype
     ): String = {
       d.types.toList match {
-        case (single :: Nil) => {
+        case single :: Nil => {
           single match {
             case ScalaPrimitive.String => s"""${config.pathEncodingMethod}($name, "UTF-8")"""
             case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
@@ -227,7 +247,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
             }
           }
         }
-        case (multiple) => {
+        case multiple => {
           sys.error("TODO: UNION TYPE")
         }
       }
