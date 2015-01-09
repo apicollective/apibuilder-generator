@@ -12,14 +12,17 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     {
       "base_url": "http://localhost:9000",
       "name": "Api Doc Test",
+      "namespace": "me.apidoc.test",
 
-      "models": {
-        "content": {
+      "models": [
+        {
+          "name": "content",
+          "plural": "contents",
           "fields": [
-            { "name": "data", "type": "%s" }
+            { "name": "data", "type": "%s", "required": true }
           ]
         }
-      }
+      ]
     }
     """
 
@@ -70,32 +73,38 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a response with an object field") {
 
-    val baseJson = """
+    val contentModel = """
+        {
+          "name": "content",
+          "plural": "contents",
+          "fields": [
+            { "name": "id", "type": "long", "required": true }
+          ]
+        }
+    """.trim
+
+    val baseJson = s"""
     {
       "base_url": "http://localhost:9000",
       "name": "Api Doc Test",
+      "namespace": "me.apidoc.test",
 
-      "models": {
-        "content": {
-          "fields": [
-            { "name": "id", "type": "long" }
-          ]
-        }
-      },
+      "models": [$contentModel],
 
-      "resources": {
-        "content": {
+      "resources": [
+        {
+          "model": $contentModel,
           "operations": [
             {
               "method": "GET",
               "path": "/data",
-              "responses": {
-                "200": { "type": "%s" }
-              }
+              "responses": [
+                { "code": 200, "type": "%s" }
+              ]
             }
           ]
         }
-      }
+      ]
 
     }
     """
