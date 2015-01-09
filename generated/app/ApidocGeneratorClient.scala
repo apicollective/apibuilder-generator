@@ -111,6 +111,7 @@ package com.gilt.apidocgenerator.models {
 
   case class Service(
     name: String,
+    namespace: String,
     baseUrl: scala.Option[String] = None,
     description: scala.Option[String] = None,
     headers: Seq[com.gilt.apidocgenerator.models.Header],
@@ -489,6 +490,7 @@ package com.gilt.apidocgenerator.models {
     implicit def jsonReadsApidocGeneratorService: play.api.libs.json.Reads[Service] = {
       (
         (__ \ "name").read[String] and
+        (__ \ "namespace").read[String] and
         (__ \ "base_url").readNullable[String] and
         (__ \ "description").readNullable[String] and
         (__ \ "headers").readNullable[Seq[com.gilt.apidocgenerator.models.Header]].map(_.getOrElse(Nil)) and
@@ -501,6 +503,7 @@ package com.gilt.apidocgenerator.models {
     implicit def jsonWritesApidocGeneratorService: play.api.libs.json.Writes[Service] = {
       (
         (__ \ "name").write[String] and
+        (__ \ "namespace").write[String] and
         (__ \ "base_url").write[scala.Option[String]] and
         (__ \ "description").write[scala.Option[String]] and
         (__ \ "headers").write[Seq[com.gilt.apidocgenerator.models.Header]] and

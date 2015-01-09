@@ -41,10 +41,6 @@ object ScalaUtil {
     }
   }
 
-  def packageName(serviceName: String): String = {
-   lib.Text.safeName(serviceName).toLowerCase
-  }
-
   def toClassName(
     name: String,
     multiple: Boolean = false

@@ -208,8 +208,8 @@ object ScalaDatatype {
 }
 
 case class ScalaTypeResolver(
-  modelPackageName: String,
-  enumPackageName: String
+  modelNamespace: String,
+  enumNamespace: String
 ) {
 
   def scalaPrimitive(t: Type): ScalaPrimitive = {
@@ -232,10 +232,10 @@ case class ScalaTypeResolver(
         }
       }
       case Type(TypeKind.Model, name) => {
-        ScalaPrimitive.Model(s"${modelPackageName}.${ScalaUtil.toClassName(name)}")
+        ScalaPrimitive.Model(s"${modelNamespace}.${ScalaUtil.toClassName(name)}")
       }
       case Type(TypeKind.Enum, name) => {
-        ScalaPrimitive.Enum(s"${enumPackageName}.${ScalaUtil.toClassName(name)}")
+        ScalaPrimitive.Enum(s"${enumNamespace}.${ScalaUtil.toClassName(name)}")
       }
     }
   }

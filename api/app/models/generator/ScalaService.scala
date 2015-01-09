@@ -5,20 +5,16 @@ import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKin
 import models.Container
 
 case class ScalaService(
-  service: Service,
-  orgPackageName: Option[String] = None
+  service: Service
 ) {
-  val packageName: String = orgPackageName match {
-    case None => ScalaUtil.packageName(service.name)
-    case Some(name) => name + "." + ScalaUtil.packageName(service.name)
-  }
+  val namespace = service.namespace
 
-  val modelPackageName = s"$packageName.models"
-  val enumPackageName = modelPackageName
+  val modelNamespace = s"$namespace.models"
+  val enumNamespace = modelNamespace
 
   private val scalaTypeResolver = ScalaTypeResolver(
-    modelPackageName = modelPackageName,
-    enumPackageName = enumPackageName
+    modelNamespace = modelNamespace,
+    enumNamespace = enumNamespace
   )
 
 
@@ -29,15 +25,15 @@ case class ScalaService(
 
   val name = ScalaUtil.toClassName(service.name)
  
-  def modelClassName(name: String) = modelPackageName + "." + ScalaUtil.toClassName(name)
-  def enumClassName(name: String) = enumPackageName + "." + ScalaUtil.toClassName(name)
+  def modelClassName(name: String) = modelNamespace + "." + ScalaUtil.toClassName(name)
+  def enumClassName(name: String) = enumNamespace + "." + ScalaUtil.toClassName(name)
   // TODO: End make these private
 
   val models = service.models.map { new ScalaModel(this, _) }
 
   val enums = service.enums.map { new ScalaEnum(_) }
 
-  val packageNamePrivate = packageName.split("\\.").last
+  val namespacePrivate = namespace.split("\\.").last
 
   val defaultHeaders: Seq[ScalaHeader] = {
     service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
@@ -132,7 +128,7 @@ class ScalaResource(ssd: ScalaService, val resource: Resource) {
 
   val model = resource.model
 
-  val packageName: String = ssd.packageName
+  val namespace: String = ssd.namespace
 
   val operations = resource.operations.map { new ScalaOperation(ssd, _, this)}
 

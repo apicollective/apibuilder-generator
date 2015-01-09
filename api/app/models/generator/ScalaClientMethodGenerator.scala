@@ -59,7 +59,7 @@ case class ScalaClientMethodGenerator(
       val etc = errorTypeClass(response).distinct.sorted.mkString("\n\n").indent(2)
       val jsonImport = if (config.hasModelJsonPackage) {
         Seq("",
-            s"  import ${ssd.modelPackageName}.json._",
+            s"  import ${ssd.modelNamespace}.json._",
             "")
       } else {
         Seq.empty
@@ -76,7 +76,7 @@ case class ScalaClientMethodGenerator(
     require(!response.isSuccess)
 
     val json = config.toJson("response", response.datatype.name)
-    val jsonImport = if (config.hasModelJsonPackage) Seq(s"import ${ssd.modelPackageName}.json._") else Seq.empty
+    val jsonImport = if (config.hasModelJsonPackage) Seq(s"import ${ssd.modelNamespace}.json._") else Seq.empty
     exceptionClass(response.errorClassName,
                    jsonImport :+ s"lazy val ${response.errorVariableName} = ${json.indent(2).trim}"
     )
@@ -153,7 +153,7 @@ case class ScalaClientMethodGenerator(
             None
 
           } else {
-            Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${ssd.packageName}.error.${response.errorClassName}(r)")
+            Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${ssd.namespace}.error.${response.errorClassName}(r)")
           }
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") + "\ncase r => throw new FailedRequest(r)\n"
