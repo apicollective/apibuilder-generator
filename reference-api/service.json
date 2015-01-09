@@ -572,7 +572,7 @@
       "operations": [
         {
           "method": "POST",
-          "path": "/organizations/organizations",
+          "path": "/organizations",
           "description": null,
           "body": null,
           "parameters": [
@@ -601,7 +601,7 @@
         },
         {
           "method": "GET",
-          "path": "/organizations/organizations",
+          "path": "/organizations",
           "description": null,
           "body": null,
           "parameters": [
@@ -637,7 +637,7 @@
         },
         {
           "method": "GET",
-          "path": "/organizations/:guid",
+          "path": "/:guid",
           "description": null,
           "body": null,
           "parameters": [
