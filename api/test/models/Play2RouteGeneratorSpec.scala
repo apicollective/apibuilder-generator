@@ -43,7 +43,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
         r.verb should be("GET")
         r.url should be("/users")
         r.method should be("controllers.Users.get")
-        r.params.mkString(", ") should be("guid: scala.Option[_root_.java.util.UUID], email: scala.Option[String], token: scala.Option[String]")
+        r.params.mkString(", ") should be("guid: _root_.scala.Option[_root_.java.util.UUID], email: _root_.scala.Option[String], token: _root_.scala.Option[String]")
       }
 
       it("GET w/ path, guid path param, no additional parameters") {
@@ -122,10 +122,10 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       val op = getScalaMethod(ssd, "echo", Method.Get, "/echoes")
       val r = Play2Route(ssd, op, echoResource)
       r.method should be("controllers.Echoes.get")
-      r.params.mkString(" ") should be("foo: scala.Option[String]")
+      r.params.mkString(" ") should be("foo: _root_.scala.Option[String] = None")
       r.paramComments.getOrElse("") should be("""
 # Additional parameters to GET /echoes
-#   - optional_messages: scala.Option[Seq[String]]
+#   - optional_messages: _root_.scala.Option[Seq[String]]
 #   - required_messages: Seq[String]
 """.trim)
 

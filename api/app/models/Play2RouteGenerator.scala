@@ -106,7 +106,7 @@ private[models] case class Play2Route(
         Seq(
           s"# Additional parameters to ${op.method} ${op.path}",
           paramsToComment.map { p =>
-            "#   - " + parameterWithType(ssd, p)
+            "#   - " + p.definition
           }.mkString("\n")
         ).mkString("\n")
       )
@@ -121,7 +121,7 @@ private[models] case class Play2Route(
   private def parametersWithTypesAndDefaults(params: Iterable[ScalaParameter]): Iterable[String] = {
     params.map { param =>
       Seq(
-        Some(parameterWithType(ssd, param)),
+        Some(param.definition),
         param.default.map( d =>
           param.datatype match {
             case ScalaDatatype.List(_) => {
@@ -175,10 +175,6 @@ private[models] case class Play2Route(
     case ScalaPrimitive.Model(_) | ScalaPrimitive.Unit => {
       sys.error(s"Unsupported type[$primitive] for default values")
     }
-  }
-
-  private def parameterWithType(ssd: ScalaService, param: ScalaParameter): String = {
-    s"${param.name}: ${param.datatype.name}"
   }
 
 }
