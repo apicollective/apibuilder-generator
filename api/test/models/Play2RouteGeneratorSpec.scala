@@ -97,7 +97,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   describe("with reference-api service") {
-    lazy val service = TestHelper.parseFile(s"reference-api/api.json")
+    lazy val service = TestHelper.referenceApiService
     lazy val ssd = new ScalaService(service)
 
     it("normalizes explicit paths that match resource name") {
@@ -147,9 +147,9 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     lazy val quality = ScalaService(TestHelper.parseFile("test/resources/examples/quality.json"))
 
     it("correctly orders parameters defined in path and parameters") {
-      val op = getScalaMethod(quality, "agenda_item", Method.Delete, "/meetings/:meeting_id/agenda_items/:id")
-      op.parameters.map(_.name) should be(Seq("meeting_id", "id"))
-      op.parameters.map(_.`type`) should be(Seq("long", "long"))
+      val op = getScalaMethod(quality, "team", Method.Get, "/:org/teams/:key")
+      op.parameters.map(_.name) should be(Seq("org", "key"))
+      op.parameters.map(_.`type`.label) should be(Seq("string", "string"))
     }
 
   }
