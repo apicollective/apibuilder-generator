@@ -1,6 +1,6 @@
 package generator
 
-import com.gilt.apidocgenerator.models.Method
+import com.gilt.apidocspec.models.Method
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class GeneratorUtilSpec extends FunSpec with ShouldMatchers {

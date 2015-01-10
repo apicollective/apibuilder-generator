@@ -1,7 +1,7 @@
 package models
 
 import lib.{Datatype, Primitives, Type, TypeKind}
-import com.gilt.apidocgenerator.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
+import com.gilt.apidocspec.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
 import generator._
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
@@ -20,13 +20,13 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
       "q1",
       "double",
       ParameterLocation.Query,
-      None, Some(true), None, None, None, None
+      None, true, None, None, None, None
     )
     val q2 = new Parameter(
       "q2",
       "double",
       ParameterLocation.Query,
-      None, Some(false), None, None, None, None
+      None, false, None, None, None, None
     )
     val operation = new Operation(Method.Get, "/models", None, None, Seq(q1, q2), Nil)
     val resource = new Resource(model, None, Seq(operation))

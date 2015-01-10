@@ -1,7 +1,8 @@
 package models
 
 import lib.Primitives
-import com.gilt.apidocgenerator.models._
+import com.gilt.apidocspec.models._
+import com.gilt.apidocgenerator.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {

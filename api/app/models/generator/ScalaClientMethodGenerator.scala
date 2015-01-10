@@ -1,6 +1,6 @@
 package generator
 
-import com.gilt.apidocgenerator.models.Resource
+import com.gilt.apidocspec.models.Resource
 import scala.collection.immutable.TreeMap
 
 case class ScalaClientMethodGenerator(

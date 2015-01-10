@@ -1,6 +1,7 @@
 package models
 
-import com.gilt.apidocgenerator.models.{InvocationForm, Service}
+import com.gilt.apidocspec.models.Service
+import com.gilt.apidocgenerator.models.InvocationForm
 import lib.Text._
 import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientMethodConfigs, ScalaClientMethodConfig}
 

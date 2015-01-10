@@ -1,6 +1,6 @@
 package generator
 
-import com.gilt.apidocgenerator.models.{Method, ParameterLocation}
+import com.gilt.apidocspec.models.{Method, ParameterLocation}
 import lib.{Datatype, Primitives, Type}
 import lib.Text._
 

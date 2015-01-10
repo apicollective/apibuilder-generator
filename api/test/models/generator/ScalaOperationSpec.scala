@@ -2,7 +2,7 @@ package generator
 
 import models.TestHelper
 import lib.Primitives
-import com.gilt.apidocgenerator.models._
+import com.gilt.apidocspec.models._
 import org.scalatest._
 
 class ScalaOperationSpec extends FunSpec with ShouldMatchers {
@@ -14,10 +14,10 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     "q1",
     "double",
     ParameterLocation.Query,
-    None, Some(false), None, None, None, None)
+    None, false, None, None, None, None)
 
   it("models as a parameter in the body should use capitalize") {
-    val body = com.gilt.apidocgenerator.models.Body("user")
+    val body = Body("user")
     val model = new Model("user", "users", None, Nil)
     val operation = new Operation(Method.Get, "/users", None, Some(body), Seq(q1), Nil)
     val resource = new Resource(model, None, Seq(operation))
@@ -33,7 +33,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   }
 
   it("array of models as a parameter in the body should pluralize model name") {
-    val body = com.gilt.apidocgenerator.models.Body("[user]", None)
+    val body = Body("[user]", None)
     val model = new Model("user", "users", None, Nil)
     val operation = new Operation(Method.Get, "/users", None, Some(body), Seq(q1), Nil)
     val resource = new Resource(model, None, Seq(operation))
@@ -49,7 +49,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   }
 
   it("primitive type as a parameter in the body should not use capitalize") {
-    val body = com.gilt.apidocgenerator.models.Body("integer", None)
+    val body = Body("integer", None)
     val model = new Model("model", "models", None, Nil)
     val operation = new Operation(Method.Get, "/models", None, Some(body), Seq(q1), Nil)
     val resource = new Resource(model, None, Seq(operation))
@@ -65,7 +65,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
   }
 
   it("array of primitive types as a parameter in the body should not use capitalize") {
-    val body = com.gilt.apidocgenerator.models.Body("[integer]", None)
+    val body = Body("[integer]", None)
     val model = new Model("model", "models", None, Nil)
     val operation = new Operation(Method.Get, "/models", None, Some(body), Seq(q1), Nil)
     val resource = new Resource(model, None, Seq(operation))

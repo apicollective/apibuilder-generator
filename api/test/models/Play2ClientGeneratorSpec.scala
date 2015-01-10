@@ -1,6 +1,6 @@
 package models
 
-import com.gilt.apidocgenerator.models.Method
+import com.gilt.apidocspec.models.Method
 import generator.{ScalaDatatype, ScalaPrimitive, ScalaService, ScalaClientMethodGenerator, ScalaClientMethodConfigs}
 import org.scalatest.{ShouldMatchers, FunSpec}
 

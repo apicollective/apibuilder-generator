@@ -1,6 +1,6 @@
 package generator
 
-import com.gilt.apidocgenerator.models._
+import com.gilt.apidocspec.models._
 import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
 import models.Container
 
@@ -19,8 +19,8 @@ case class ScalaService(
 
 
   val datatypeResolver = DatatypeResolver(
-    enumNames = service.enums.map(_.name),
-    modelNames = service.models.map(_.name)
+    enumNames = service.enums.map(_.name) ++ service.imports.flatMap(_.enums).map(name => s"${service.namespace}.enums.${name}"),
+    modelNames = service.models.map(_.name) ++ service.imports.flatMap(_.models).map(name => s"${service.namespace}.models.${name}")
   )
 
   val name = ScalaUtil.toClassName(service.name)
@@ -268,7 +268,7 @@ class ScalaParameter(ssd: ScalaService, param: Parameter) {
    * If there is a default, ensure it is only set server side otherwise
    * changing the default would have no impact on deployed clients
    */
-  def isOption: Boolean = !param.required.getOrElse(true) || param.default.nonEmpty
+  def isOption: Boolean = !param.required || param.default.nonEmpty
 
   def definition(varName: String = name): String = {
     datatype.definition(varName, isOption)

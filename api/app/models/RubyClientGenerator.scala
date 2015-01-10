@@ -1,6 +1,7 @@
 package models
 
-import com.gilt.apidocgenerator.models._
+import com.gilt.apidocgenerator.models.InvocationForm
+import com.gilt.apidocspec.models._
 import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
@@ -321,7 +322,7 @@ case class RubyClientGenerator(form: InvocationForm) {
         val paramBuilder = ListBuffer[String]()
 
         queryParams.foreach { param =>
-          paramBuilder.append(s":${param.name} => ${parseArgument(param.name, param.`type`, param.required.getOrElse(true), param.default)}")
+          paramBuilder.append(s":${param.name} => ${parseArgument(param.name, param.`type`, param.required, param.default)}")
         }
 
         sb.append("        opts = HttpClient::Helper.symbolize_keys(incoming)")
