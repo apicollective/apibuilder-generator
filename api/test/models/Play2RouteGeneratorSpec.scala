@@ -114,7 +114,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       val op = getScalaMethod(ssd, "user", Method.Get, "/users/:age_group")
       val r = Play2Route(ssd, op, resource)
       r.method should be("controllers.Users.getByAgeGroup")
-      r.params.mkString("") should be("ageGroup: com.gilt.apidoc.reference.api.models.AgeGroup")
+      r.params.mkString("") should be("age_group: com.gilt.apidoc.reference.api.models.AgeGroup")
     }
 
     it("supports multiple query parameters") {
@@ -125,7 +125,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       r.params.mkString(" ") should be("foo: _root_.scala.Option[String] = None")
       r.paramComments.getOrElse("") should be("""
 # Additional parameters to GET /echoes
-#   - optional_messages: _root_.scala.Option[Seq[String]]
+#   - optional_messages: _root_.scala.Option[Seq[String]] = Nil
 #   - required_messages: Seq[String]
 """.trim)
 

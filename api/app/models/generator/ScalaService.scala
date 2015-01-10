@@ -66,7 +66,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val fields = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
-  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition))
+  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
 
 }
 
@@ -158,7 +158,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   val argList: Option[String] = body match {
     case None => {
-      ScalaUtil.fieldsToArgList(parameters.map(_.definition))
+      ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
     }
     case Some(body) => {
       val varName = ScalaUtil.toVariable(body.`type`)
@@ -166,7 +166,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
       Some(
         Seq(
           Some(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(varName), body.datatype.name)),
-          ScalaUtil.fieldsToArgList(parameters.map(_.definition))
+          ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
         ).flatten.mkString(",")
       )
     }
@@ -185,7 +185,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
     Seq(
       Some(s"${ScalaUtil.toVariable(name, multiple)}: $className"),
-      ScalaUtil.fieldsToArgList(parameters.map(_.definition))
+      ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
     ).flatten.mkString(",")
   }
 
@@ -244,7 +244,9 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
    */
   def isOption: Boolean = !field.required || field.default.nonEmpty
 
-  def definition: String = datatype.definition(name, isOption)
+  def definition(varName: String = name): String = {
+    datatype.definition(varName, isOption)
+  }
 }
 
 class ScalaParameter(ssd: ScalaService, param: Parameter) {
@@ -268,7 +270,9 @@ class ScalaParameter(ssd: ScalaService, param: Parameter) {
    */
   def isOption: Boolean = !param.required.getOrElse(true) || param.default.nonEmpty
 
-  def definition: String = datatype.definition(name, isOption)
+  def definition(varName: String = name): String = {
+    datatype.definition(varName, isOption)
+  }
 
   def location = param.location
 }

@@ -106,7 +106,7 @@ private[models] case class Play2Route(
         Seq(
           s"# Additional parameters to ${op.method} ${op.path}",
           paramsToComment.map { p =>
-            "#   - " + p.definition
+            "#   - " + p.definition(p.originalName)
           }.mkString("\n")
         ).mkString("\n")
       )
@@ -121,7 +121,7 @@ private[models] case class Play2Route(
   private def parametersWithTypesAndDefaults(params: Iterable[ScalaParameter]): Iterable[String] = {
     params.map { param =>
       Seq(
-        Some(param.definition),
+        Some(param.definition(param.originalName)),
         param.default.map( d =>
           param.datatype match {
             case ScalaDatatype.List(_) => {

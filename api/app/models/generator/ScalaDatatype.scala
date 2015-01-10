@@ -122,27 +122,24 @@ sealed trait ScalaDatatype {
   def definition(
     originalVarName: String,
     optional: Boolean
-  ): String
+  ): String = {
+    val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+    if (optional) {
+      s"$varName: $name = " + nilValue
+    } else {
+      s"$varName: $name"
+    }
+  }
 
 }
 
 object ScalaDatatype {
+
   case class List(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
     override def nilValue = "Nil"
     override def name = types.toList match {
       case single :: Nil => s"Seq[${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
-    }
-    override def definition(
-      originalVarName: String,
-      optional: Boolean
-    ): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      if (optional) {
-        s"$varName: $name = " + nilValue
-      } else {
-        s"$varName: $name"
-      }
     }
   }
 
@@ -152,17 +149,6 @@ object ScalaDatatype {
       case single :: Nil => s"Map[String, ${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
     }
-    override def definition(
-      originalVarName: String,
-      optional: Boolean
-    ): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      if (optional) {
-        s"$varName: $name = " + nilValue
-      } else {
-        s"$varName: $name"
-      }
-    }
   }
 
   case class Option(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
@@ -170,17 +156,6 @@ object ScalaDatatype {
     override def name = types.toList match {
       case single :: Nil => s"_root_.scala.Option[${single.name}]"
       case multiple => sys.error("TODO: UNION TYPES")
-    }
-    override def definition(
-      originalVarName: String,
-      optional: Boolean
-    ): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      if (optional) {
-        s"$varName: $name" + " = " + nilValue
-      } else {
-        s"$varName: $name"
-      }
     }
   }
 
