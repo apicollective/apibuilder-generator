@@ -29,7 +29,6 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
-/*
   describe("with apidoc service") {
     lazy val service = TestHelper.generatorApiService
     lazy val ssd = new ScalaService(service)
@@ -96,7 +95,6 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       }
     }
   }
- */
 
   describe("with reference-api service") {
     lazy val service = TestHelper.referenceApiService
@@ -123,9 +121,10 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       val r = Play2Route(ssd, op, echoResource)
       r.method should be("controllers.Echoes.get")
       r.params.mkString(" ") should be("foo: _root_.scala.Option[String] = None")
+
       r.paramComments.getOrElse("") should be("""
 # Additional parameters to GET /echoes
-#   - optional_messages: _root_.scala.Option[Seq[String]] = Nil
+#   - optional_messages: Seq[String] = Nil
 #   - required_messages: Seq[String]
 """.trim)
 
