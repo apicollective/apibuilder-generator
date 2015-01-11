@@ -249,7 +249,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
   }
 }
 
-class ScalaParameter(ssd: ScalaService, param: Parameter) {
+class ScalaParameter(ssd: ScalaService, val param: Parameter) {
 
   def name: String = ScalaUtil.toVariable(param.name)
 

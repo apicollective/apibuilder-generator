@@ -90,15 +90,13 @@ private[models] case class Play2Route(
     */
   val paramComments: Option[String] = op.parameters.filter { param =>
     param.location match {
-      case ParameterLocation.Form => false
-      case ParameterLocation.Query => true
-      case ParameterLocation.Path => true
-      case ParameterLocation.UNDEFINED(_) => true
+      case ParameterLocation.Query | ParameterLocation.Path => true
+      case ParameterLocation.Form | ParameterLocation.UNDEFINED(_) => false
     }
   }.filter { param =>
     param.datatype match {
-      case ScalaDatatype.Option(_) | ScalaDatatype.Singleton(_) => false
       case ScalaDatatype.List(_) | ScalaDatatype.Map(_) => true
+      case ScalaDatatype.Option(_) | ScalaDatatype.Singleton(_) => false
     }
   } match {
     case Nil => None
@@ -107,7 +105,7 @@ private[models] case class Play2Route(
         Seq(
           s"# Additional parameters to ${op.method} ${op.path}",
           paramsToComment.map { p =>
-            "#   - " + p.definition(p.originalName)
+            s"#   - " + definition(p)
           }.mkString("\n")
         ).mkString("\n")
       )
@@ -122,7 +120,7 @@ private[models] case class Play2Route(
   private def parametersWithTypesAndDefaults(params: Iterable[ScalaParameter]): Iterable[String] = {
     params.map { param =>
       Seq(
-        Some(param.definition(param.originalName)),
+        Some(definition(param)),
         param.default.map( d =>
           param.datatype match {
             case ScalaDatatype.List(_) => {
@@ -178,5 +176,12 @@ private[models] case class Play2Route(
     }
   }
 
+  private def definition(scalaParam: ScalaParameter): String = {
+    if (scalaParam.param.required) {
+      s"${scalaParam.originalName}: ${scalaParam.datatype.name}"
+    } else {
+      s"${scalaParam.originalName}: _root_.scala.Option[${scalaParam.datatype.name}]"
+    }
+  }
 }
 
