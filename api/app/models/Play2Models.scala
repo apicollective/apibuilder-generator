@@ -27,6 +27,8 @@ object Play2Models extends CodeGenerator {
       case true => ApidocHeaders(form.userAgent).toJavaString() + "\n"
     }
 
+    val imports = form.service.imports.map(imp => s"import ${imp.namespace}.models.json._").mkString("\n", "\n", "")
+
 s"""$header$caseClasses
 
 package ${ssd.modelNamespace} {
@@ -34,7 +36,7 @@ package ${ssd.modelNamespace} {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
-    import play.api.libs.functional.syntax._
+    import play.api.libs.functional.syntax._${imports.indent(4)}
 
     private[${ssd.namespacePrivate}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
