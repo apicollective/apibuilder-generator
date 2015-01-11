@@ -30,13 +30,71 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  describe("with reference-api service") {
+    lazy val service = TestHelper.referenceApiService
+    lazy val ssd = new ScalaService(service)
+
+    it("normalizes explicit paths that match resource name") {
+      val resource = getScalaResource(ssd, "Organization")
+      val op = getScalaMethod(ssd, "Organization", Method.Get, "/organizations")
+      val r = Play2Route(ssd, op, resource)
+      r.method should be("controllers.Organizations.get")
+    }
+
+    it("enums are strongly typed") {
+      val resource = getScalaResource(ssd, "User")
+      val op = getScalaMethod(ssd, "User", Method.Get, "/users/:age_group")
+      val r = Play2Route(ssd, op, resource)
+      r.method should be("controllers.Users.getByAgeGroup")
+      r.params.mkString("") should be("age_group: com.gilt.apidoc.reference.api.models.AgeGroup")
+    }
+
+    it("supports multiple query parameters") {
+      val echoResource = getScalaResource(ssd, "Echo")
+      val op = getScalaMethod(ssd, "Echo", Method.Get, "/echoes")
+      val r = Play2Route(ssd, op, echoResource)
+      r.method should be("controllers.Echoes.get")
+      r.params.mkString(" ") should be("foo: _root_.scala.Option[String]")
+      r.paramComments.getOrElse("") should be("""
+# Additional parameters to GET /echoes
+#   - optional_messages: _root_.scala.Option[Seq[String]]
+#   - required_messages: Seq[String]
+""".trim)
+
+      TestHelper.assertEqualsFile(
+        "test/resources/generators/play-2-route-reference-api.routes",
+        Play2RouteGenerator(InvocationForm(service)).invoke().getOrElse("")
+      )
+    }
+
+    it("camel cases hypen in route") {
+      val echoResource = getScalaResource(ssd, "Echo")
+      val op = getScalaMethod(ssd, "Echo", Method.Get, "/echoes/arrays-only")
+      val r = Play2Route(ssd, op, echoResource)
+      r.method should be("controllers.Echoes.getArraysOnly")
+    }
+
+  }
+
+  describe("with quality service example") {
+
+    lazy val quality = ScalaService(TestHelper.parseFile("test/resources/examples/quality.json"))
+
+    it("correctly orders parameters defined in path and parameters") {
+      val op = getScalaMethod(quality, "Team", Method.Get, "/:org/teams/:key")
+      op.parameters.map(_.name) should be(Seq("org", "key"))
+      op.parameters.map(_.`type`.label) should be(Seq("string", "string"))
+    }
+
+  }
+
 /*
   describe("with apidoc service") {
     lazy val service = TestHelper.generatorApiService
     lazy val ssd = new ScalaService(service)
 
     describe("users resource") {
-      lazy val userResource = getScalaResource(ssd, "user")
+      lazy val userResource = getScalaResource(ssd, "User")
 
       it("GET w/ default path, parameters") {
         val op = userResource.operations.filter { op => op.method == Method.Get && op.path == "/users" }.head
@@ -76,7 +134,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     }
 
     describe("membership_request resource") {
-      lazy val membershipRequestResource = getScalaResource(ssd, "membership_requests")
+      lazy val membershipRequestResource = getScalaResource(ssd, "MembershipRequest")
 
       it("POST /membership_requests/:guid/accept") {
         val op = membershipRequestResource.operations.filter { op => op.method == Method.Post && op.path == "/membership_requests/:guid/accept" }.head
@@ -90,71 +148,13 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
     describe("service resource") {
       it("GET /:orgKey") {
-        val membershipRequestResource = getScalaResource(ssd, "membership_request")
-        val op = getScalaMethod(ssd, "service", Method.Get, "/:orgKey")
+        val membershipRequestResource = getScalaResource(ssd, "MembershipRequest")
+        val op = getScalaMethod(ssd, "Service", Method.Get, "/:orgKey")
         val r = Play2Route(ssd, op, membershipRequestResource)
         r.method should be("controllers.Services.getByOrgKey")
       }
     }
   }
  */
-
-  describe("with reference-api service") {
-    lazy val service = TestHelper.referenceApiService
-    lazy val ssd = new ScalaService(service)
-
-    it("normalizes explicit paths that match resource name") {
-      val resource = getScalaResource(ssd, "organization")
-      val op = getScalaMethod(ssd, "organization", Method.Get, "/organizations")
-      val r = Play2Route(ssd, op, resource)
-      r.method should be("controllers.Organizations.get")
-    }
-
-    it("enums are strongly typed") {
-      val resource = getScalaResource(ssd, "user")
-      val op = getScalaMethod(ssd, "user", Method.Get, "/users/:age_group")
-      val r = Play2Route(ssd, op, resource)
-      r.method should be("controllers.Users.getByAgeGroup")
-      r.params.mkString("") should be("age_group: com.gilt.apidoc.reference.api.models.AgeGroup")
-    }
-
-    it("supports multiple query parameters") {
-      val echoResource = getScalaResource(ssd, "echo")
-      val op = getScalaMethod(ssd, "echo", Method.Get, "/echoes")
-      val r = Play2Route(ssd, op, echoResource)
-      r.method should be("controllers.Echoes.get")
-      r.params.mkString(" ") should be("foo: _root_.scala.Option[String]")
-      r.paramComments.getOrElse("") should be("""
-# Additional parameters to GET /echoes
-#   - optional_messages: _root_.scala.Option[Seq[String]]
-#   - required_messages: Seq[String]
-""".trim)
-
-      TestHelper.assertEqualsFile(
-        "test/resources/generators/play-2-route-reference-api.routes",
-        Play2RouteGenerator(InvocationForm(service)).invoke().getOrElse("")
-      )
-    }
-
-    it("camel cases hypen in route") {
-      val echoResource = getScalaResource(ssd, "echo")
-      val op = getScalaMethod(ssd, "echo", Method.Get, "/echoes/arrays-only")
-      val r = Play2Route(ssd, op, echoResource)
-      r.method should be("controllers.Echoes.getArraysOnly")
-    }
-
-  }
-
-  describe("with quality service example") {
-
-    lazy val quality = ScalaService(TestHelper.parseFile("test/resources/examples/quality.json"))
-
-    it("correctly orders parameters defined in path and parameters") {
-      val op = getScalaMethod(quality, "team", Method.Get, "/:org/teams/:key")
-      op.parameters.map(_.name) should be(Seq("org", "key"))
-      op.parameters.map(_.`type`.label) should be(Seq("string", "string"))
-    }
-
-  }
 
 }

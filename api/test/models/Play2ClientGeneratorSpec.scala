@@ -13,7 +13,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
   it("errorTypeClass") {
     val service = TestHelper.generatorApiService
     val ssd = new ScalaService(service)
-    val resource = ssd.resources.find(_.model.name == "invocation").get
+    val resource = ssd.resources.find(_.model.name == "Invocation").get
     val operation = resource.operations.find(_.method == Method.Post).get
     val errorResponse = operation.responses.find(_.code == 409).get
     errorResponse.errorClassName should be("ErrorsResponse")
