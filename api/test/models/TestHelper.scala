@@ -13,6 +13,7 @@ object TestHelper {
 
   lazy val referenceApiService = parseFile(s"../reference-api/service.json")
   lazy val generatorApiService = parseFile(s"../api/service.json")
+  lazy val apidocApiService = parseFile(s"test/resources/examples/apidoc.json")
 
   def buildJson(json: String): String = {
     s"""
