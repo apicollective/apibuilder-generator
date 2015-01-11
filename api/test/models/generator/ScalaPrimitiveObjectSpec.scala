@@ -10,20 +10,17 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a field with an object field") {
 
-    val baseJson = """
-    {
-      "base_url": "http://localhost:9000",
-      "name": "Api Doc Test",
-
-      "models": {
-        "content": {
+    val baseJson = TestHelper.buildJson("""
+      "models": [
+        {
+          "name": "content",
+          "plural": "contents",
           "fields": [
-            { "name": "data", "type": "%s" }
+            { "name": "data", "type": "%s", "required": true }
           ]
         }
-      }
-    }
-    """
+      ]
+    """)
 
     def service(typeString: String): Service = {
       TestHelper.service(baseJson.format(typeString))
@@ -38,15 +35,15 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     it("singleton object") {
-      dataField("object").`type` should be("object")
+      dataField("object").`type`.label should be("object")
     }
 
     it("list object") {
-      dataField("[object]").`type` should be("[object]")
+      dataField("[object]").`type`.label should be("[object]")
     }
 
     it("map object") {
-      dataField("map[object]").`type` should be("map[object]")
+      dataField("map[object]").`type`.label should be("map[object]")
     }
 
     describe("generates valid case classes") {
@@ -72,35 +69,34 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a response with an object field") {
 
-    val baseJson = """
-    {
-      "base_url": "http://localhost:9000",
-      "name": "Api Doc Test",
-
-      "models": {
-        "content": {
+    val contentModel = """
+        {
+          "name": "content",
+          "plural": "contents",
           "fields": [
-            { "name": "id", "type": "long" }
+            { "name": "id", "type": "long", "required": true }
           ]
         }
-      },
+    """
 
-      "resources": {
-        "content": {
+    val baseJson = TestHelper.buildJson(s"""
+      "models": [$contentModel],
+
+      "resources": [
+        {
+          "model": $contentModel,
           "operations": [
             {
               "method": "GET",
-              "path": "/data",
-              "responses": {
-                "200": { "type": "%s" }
-              }
+              "path": "/contents/data",
+              "responses": [
+                { "code": 200, "type": "%s" }
+              ]
             }
           ]
         }
-      }
-
-    }
-    """
+      ]
+    """)
 
     def service(typeString: String): Service = {
       TestHelper.service(baseJson.format(typeString))
@@ -119,15 +115,15 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     }
 
     it("singleton object") {
-      response("object").`type` should be("object")
+      response("object").`type`.label should be("object")
     }
 
     it("list object") {
-      response("[object]").`type` should be("[object]")
+      response("[object]").`type`.label should be("[object]")
     }
 
     it("map object") {
-      response("map[object]").`type` should be("map[object]")
+      response("map[object]").`type`.label should be("map[object]")
     }
 
     describe("generates valid response code") {
@@ -146,7 +142,6 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
       it("map") {
         val generator = new ScalaClientMethodGenerator(ScalaClientMethodConfigs.Play23, ssd("map[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-response-map.txt", generator.objects)
-
       }
 
     }

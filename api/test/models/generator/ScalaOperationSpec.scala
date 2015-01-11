@@ -26,7 +26,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource)
+      new ScalaResource(ssd, resource, scalaModel)
     )
 
     scalaOperation.argList shouldEqual Some("user: apidoc.reference.api.models.User,\n  q1: _root_.scala.Option[Double] = None\n")
@@ -42,7 +42,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource)
+      new ScalaResource(ssd, resource, scalaModel)
     )
 
     scalaOperation.argList shouldEqual Some("users: Seq[apidoc.reference.api.models.User],\n  q1: _root_.scala.Option[Double] = None\n")
@@ -58,7 +58,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource)
+      new ScalaResource(ssd, resource, scalaModel)
     )
 
     scalaOperation.argList shouldEqual Some("value: Int,\n  q1: _root_.scala.Option[Double] = None\n")
@@ -74,7 +74,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource)
+      new ScalaResource(ssd, resource, scalaModel)
     )
 
     scalaOperation.argList shouldEqual Some("values: Seq[Int],\n  q1: _root_.scala.Option[Double] = None\n")

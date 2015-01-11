@@ -38,7 +38,7 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
         new ScalaOperation(
           ssd,
           operation,
-          new ScalaResource(ssd, resource)
+          new ScalaResource(ssd, resource, scalaModel)
         ).queryParameters
       )
       code.get should equal("""val queryParameters = Seq(
