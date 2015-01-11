@@ -58,7 +58,7 @@ case class UNDEFINED(override val toString: String) extends ${enum.name}
     s"private[this]\n" +
     s"val byName = all.map(x => x.toString -> x).toMap\n\n" +
     s"def apply(value: String): ${enum.name} = fromString(value).getOrElse(UNDEFINED(value))\n\n" +
-    s"def fromString(value: String): scala.Option[${enum.name}] = byName.get(value)\n\n"
+    s"def fromString(value: String): _root_.scala.Option[${enum.name}] = byName.get(value)\n\n"
   }
 
 }

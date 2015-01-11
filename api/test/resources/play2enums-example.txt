@@ -28,7 +28,7 @@ object AgeGroup {
 
   def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
 
-  def fromString(value: String): scala.Option[AgeGroup] = byName.get(value)
+  def fromString(value: String): _root_.scala.Option[AgeGroup] = byName.get(value)
 
 }
 
@@ -62,6 +62,6 @@ object Genre {
 
   def apply(value: String): Genre = fromString(value).getOrElse(UNDEFINED(value))
 
-  def fromString(value: String): scala.Option[Genre] = byName.get(value)
+  def fromString(value: String): _root_.scala.Option[Genre] = byName.get(value)
 
 }

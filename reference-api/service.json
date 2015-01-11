@@ -1,6 +1,11 @@
 {
   "name": "Apidoc Reference Api",
-  "key": "apidoc-reference-api",
+  "organization": {
+    "key": "gilt"
+  },
+  "application": {
+    "key": "apidoc-reference-api"
+  },
   "namespace": "com.gilt.apidoc.reference.api",
   "version": "0.0.1-dev",
   "base_url": "http://localhost:9000",

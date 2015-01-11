@@ -1,6 +1,11 @@
 {
   "name": "Quality",
-  "key": "quality",
+  "organization": {
+    "key": "gilt"
+  },
+  "application": {
+    "key": "quality"
+  },
   "namespace": "com.gilt.quality",
   "version": "0.0.1-dev",
   "base_url": "http://api.quality.architecture.giltaws.com",
@@ -4144,4 +4149,3 @@
     }
   ]
 }
-
