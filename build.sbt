@@ -33,7 +33,7 @@ lazy val api = project
   .aggregate(generated, lib)
   .enablePlugins(PlayScala)
   .settings(
-    routesImport += "com.gilt.apidocgenerator.Bindables._",
+    routesImport += "com.gilt.apidoc.generator.Bindables._",
     libraryDependencies ++= Seq(
       ws,
       "org.scalatestplus" %% "play" % "1.2.0" % "test"

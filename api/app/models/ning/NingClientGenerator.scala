@@ -1,6 +1,7 @@
 package models.ning
 
-import com.gilt.apidocgenerator.models.{InvocationForm, Service}
+import com.gilt.apidoc.generator.models.InvocationForm
+import com.gilt.apidoc.spec.models.Service
 import generator._
 import models._
 import lib.Text._

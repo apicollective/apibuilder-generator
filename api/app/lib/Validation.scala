@@ -1,6 +1,6 @@
 package lib
 
-import com.gilt.apidocgenerator.models.Error
+import com.gilt.apidoc.generator.models.Error
 import play.api.libs.json.JsError
 
 object Validation {

@@ -1,7 +1,7 @@
 package models
 
 import lib.{Primitives, Text}
-import com.gilt.apidocgenerator.models.InvocationForm
+import com.gilt.apidoc.generator.models.InvocationForm
 import com.gilt.apidoc.spec.models._
 import generator.{ScalaDatatype, ScalaPrimitive, GeneratorUtil, ScalaOperation, ScalaParameter, ScalaResource, ScalaService, ScalaUtil, CodeGenerator}
 

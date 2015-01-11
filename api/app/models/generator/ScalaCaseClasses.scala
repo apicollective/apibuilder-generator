@@ -1,7 +1,7 @@
 package generator
 
 import models.ApidocHeaders
-import com.gilt.apidocgenerator.models.InvocationForm
+import com.gilt.apidoc.generator.models.InvocationForm
 import com.gilt.apidoc.spec.models.Service
 import lib.Text._
 
