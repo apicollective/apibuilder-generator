@@ -8,35 +8,35 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
 
   describe("for a model with 2 enum fields") {
 
-    val json = """
-    {
-      "base_url": "http://localhost:9000",
-      "name": "Api Doc",
-      "enums": {
-        "age_group": {
+    val json = TestHelper.buildJson("""
+      "enums": [
+        {
+          "name": "age_group",
           "values": [
             { "name": "twenties" },
             { "name": "thirties" }
           ]
         },
-        "genre": {
+        {
+          "name": "genre",
           "values": [
             { "name": "Classical" },
             { "name": "Jazz" }
           ]
         }
-      },
+      ],
 
-      "models": {
-        "user": {
+      "models": [
+        {
+          "name": "user",
+          "plural": "users",
           "fields": [
-            { "name": "age_group", "type": "age_group" },
-            { "name": "music", "type": "genre" }
+            { "name": "age_group", "type": "age_group", "required": true },
+            { "name": "music", "type": "genre", "required": true }
           ]
         }
-      }
-    }
-    """
+      ]
+    """)
 
     lazy val ssd = TestHelper.scalaService(json)
 
