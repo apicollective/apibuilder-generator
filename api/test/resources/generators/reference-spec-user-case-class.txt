@@ -2,6 +2,6 @@ case class User(
   guid: _root_.java.util.UUID,
   email: String,
   active: Boolean,
-  ageGroup: apidocreferenceapi.models.AgeGroup,
+  ageGroup: com.gilt.apidoc.reference.api.models.AgeGroup,
   tags: Map[String, String] = Map.empty
 )
