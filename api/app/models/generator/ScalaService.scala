@@ -43,7 +43,12 @@ case class ScalaService(
     service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
   }
 
-  val resources = service.resources.map { new ScalaResource(this, _) }
+  val resources = service.resources.map { r =>
+    val sm = models.find(_.model.name == r.model.name).getOrElse {
+      sys.error("Could not find scala model for resource: " + r)
+    }
+    new ScalaResource(this, r, sm)
+  }
 
   def scalaDatatype(
     t: Datatype
@@ -128,9 +133,7 @@ class ScalaEnumValue(value: EnumValue) {
 
 }
 
-class ScalaResource(ssd: ScalaService, val resource: Resource) {
-
-  val model = resource.model
+class ScalaResource(ssd: ScalaService, val resource: Resource, val model: ScalaModel) {
 
   val namespace: String = ssd.namespace
 
