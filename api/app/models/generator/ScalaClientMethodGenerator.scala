@@ -162,8 +162,8 @@ case class ScalaClientMethodGenerator(
         name = op.name,
         argList = op.argList,
         returnType = hasOptionResult match {
-          case None => s"scala.concurrent.Future[${op.resultType}]"
-          case Some(_) => s"scala.concurrent.Future[scala.Option[${op.resultType}]]"
+          case None => s"_root_.scala.concurrent.Future[${op.resultType}]"
+          case Some(_) => s"_root_.scala.concurrent.Future[_root_.scala.Option[${op.resultType}]]"
         },
         methodCall = methodCall,
         response = matchResponse,
@@ -187,11 +187,11 @@ case class ScalaClientMethodGenerator(
     private val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
 
     val interface: String = {
-      s"""${commentString}def $name(${argList.getOrElse("")})(implicit ec: scala.concurrent.ExecutionContext): $returnType"""
+      s"""${commentString}def $name(${argList.getOrElse("")})(implicit ec: _root_.scala.concurrent.ExecutionContext): $returnType"""
     }
 
     val code: String = {
-      s"""override def $name(${argList.getOrElse("")})(implicit ec: scala.concurrent.ExecutionContext): $returnType = {
+      s"""override def $name(${argList.getOrElse("")})(implicit ec: _root_.scala.concurrent.ExecutionContext): $returnType = {
 ${methodCall.indent}.map {
 ${response.indent(4)}
   }

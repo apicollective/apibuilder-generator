@@ -33,9 +33,9 @@ case class ScalaService(
   def enumClassName(name: String) = enumNamespace + "." + ScalaUtil.toClassName(name)
   // TODO: End make these private
 
-  val models = service.models.map { new ScalaModel(this, _) }
+  val models = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 
-  val enums = service.enums.map { new ScalaEnum(_) }
+  val enums = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(_) }
 
   val namespacePrivate = namespace.split("\\.").last
 

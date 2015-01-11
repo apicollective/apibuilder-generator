@@ -168,10 +168,10 @@ private[models] case class Play2Route(
     case ScalaPrimitive.Object => {
       "play.api.libs.json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
     }
-    case ScalaPrimitive.Enum(_) => {
-      "%s(%s)".format(primitive.name, ScalaUtil.wrapInQuotes(value))
+    case ScalaPrimitive.Enum(_, _) => {
+      "%s(%s)".format(primitive.fullName, ScalaUtil.wrapInQuotes(value))
     }
-    case ScalaPrimitive.Model(_) | ScalaPrimitive.Unit => {
+    case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Unit => {
       sys.error(s"Unsupported type[$primitive] for default values")
     }
   }

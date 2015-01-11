@@ -1,7 +1,7 @@
 package generator
 
 import com.gilt.apidocspec.models.{Method, ParameterLocation}
-import lib.{Datatype, Primitives, Type}
+import lib.{Datatype, Primitives, Type, TypeKind}
 import lib.Text
 import lib.Text._
 
@@ -218,7 +218,11 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
       val payload = body.datatype.types.toList match {
         case single :: Nil => {
-          single.asString(ScalaUtil.toVariable(body.`type`))
+          single match {
+            case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name)
+            case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name)
+            case _ => single.asString(ScalaUtil.toVariable(body.`type`))
+          }
         }
         case multiple => {
           sys.error("TODO: UNION TYPE")
@@ -252,10 +256,10 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
           single match {
             case ScalaPrimitive.String => s"""${config.pathEncodingMethod}($name, "UTF-8")"""
             case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
-            case ScalaPrimitive.Enum(_) => s"""${config.pathEncodingMethod}($name.toString, "UTF-8")"""
+            case ScalaPrimitive.Enum(_, _) => s"""${config.pathEncodingMethod}($name.toString, "UTF-8")"""
             case ScalaPrimitive.DateIso8601 => s"$name.toString"
             case ScalaPrimitive.DateTimeIso8601 => s"${config.pathEncodingMethod}(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name))"
-            case ScalaPrimitive.Model(_) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
+            case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
               sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
             }
           }

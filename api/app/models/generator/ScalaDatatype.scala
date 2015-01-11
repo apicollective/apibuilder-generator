@@ -3,14 +3,19 @@ package generator
 import lib.{Datatype, Primitives, Type, TypeKind}
 
 sealed trait ScalaPrimitive {
-  def name: String
+  def shortName: String
   def asString(originalVarName: String): String
+  def namespace: Option[String] = None
+  def fullName: String = namespace match {
+    case None => shortName
+    case Some(ns) => s"$ns.$shortName"
+  }
 }
 
 object ScalaPrimitive {
 
   case object Boolean extends ScalaPrimitive {
-    def name = "Boolean"
+    def shortName = "Boolean"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -18,7 +23,7 @@ object ScalaPrimitive {
   }
 
   case object Double extends ScalaPrimitive {
-    def name = "Double"
+    def shortName = "Double"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -26,7 +31,7 @@ object ScalaPrimitive {
   }
 
   case object Integer extends ScalaPrimitive {
-    def name = "Int"
+    def shortName = "Int"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -34,7 +39,7 @@ object ScalaPrimitive {
   }
 
   case object Long extends ScalaPrimitive {
-    def name = "Long"
+    def shortName = "Long"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -42,7 +47,7 @@ object ScalaPrimitive {
   }
 
   case object DateIso8601 extends ScalaPrimitive {
-    def name = "_root_.org.joda.time.LocalDate"
+    def shortName = "_root_.org.joda.time.LocalDate"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -50,7 +55,7 @@ object ScalaPrimitive {
   }
 
   case object DateTimeIso8601 extends ScalaPrimitive {
-    def name = "_root_.org.joda.time.DateTime"
+    def shortName = "_root_.org.joda.time.DateTime"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
@@ -58,7 +63,7 @@ object ScalaPrimitive {
   }
 
   case object Decimal extends ScalaPrimitive {
-    def name = "Decimal"
+    def shortName = "Decimal"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -66,14 +71,14 @@ object ScalaPrimitive {
   }
 
   case object Object extends ScalaPrimitive {
-    def name = "_root_.play.api.libs.json.JsObject"
+    def shortName = "_root_.play.api.libs.json.JsObject"
     def asString(originalVarName: String): String = {
       throw new UnsupportedOperationException(s"unsupported conversion of type object for $originalVarName")
     }
   }
 
   case object String extends ScalaPrimitive {
-    def name = "String"
+    def shortName = "String"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName"
@@ -81,28 +86,30 @@ object ScalaPrimitive {
   }
 
   case object Unit extends ScalaPrimitive {
-    def name = "Unit"
+    def shortName = "Unit"
     def asString(originalVarName: String): String = {
       throw new UnsupportedOperationException(s"unsupported conversion of type object for $originalVarName")
     }
   }
 
   case object Uuid extends ScalaPrimitive {
-    def name = "_root_.java.util.UUID"
+    def shortName = "_root_.java.util.UUID"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
   }
 
-  case class Model(name: String) extends ScalaPrimitive {
+  case class Model(ns: String, shortName: String) extends ScalaPrimitive {
+    override def namespace = Some(ns)
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
   }
 
-  case class Enum(name: String) extends ScalaPrimitive {
+  case class Enum(ns: String, shortName: String) extends ScalaPrimitive {
+    override def namespace = Some(ns)
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -138,7 +145,7 @@ object ScalaDatatype {
   case class List(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
     override def nilValue = "Nil"
     override def name = types.toList match {
-      case single :: Nil => s"Seq[${single.name}]"
+      case single :: Nil => s"Seq[${single.fullName}]"
       case multiple => sys.error("TODO: UNION TYPES")
     }
   }
@@ -146,7 +153,7 @@ object ScalaDatatype {
   case class Map(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
     override def nilValue = "Map.empty"
     override def name = types.toList match {
-      case single :: Nil => s"Map[String, ${single.name}]"
+      case single :: Nil => s"Map[String, ${single.fullName}]"
       case multiple => sys.error("TODO: UNION TYPES")
     }
   }
@@ -154,7 +161,7 @@ object ScalaDatatype {
   case class Option(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
     override def nilValue = "None"
     override def name = types.toList match {
-      case single :: Nil => s"_root_.scala.Option[${single.name}]"
+      case single :: Nil => s"_root_.scala.Option[${single.fullName}]"
       case multiple => sys.error("TODO: UNION TYPES")
     }
   }
@@ -163,7 +170,7 @@ object ScalaDatatype {
     override def nilValue = "None"
     override def name = {
       types.toList match {
-        case single :: Nil => single.name
+        case single :: Nil => single.fullName
         case multiple => sys.error("TODO: UNION TYPES")
       }
     }
@@ -207,10 +214,10 @@ case class ScalaTypeResolver(
         }
       }
       case Type(TypeKind.Model, name) => {
-        ScalaPrimitive.Model(s"${modelNamespace}.${ScalaUtil.toClassName(name)}")
+        ScalaPrimitive.Model(modelNamespace, ScalaUtil.toClassName(name))
       }
       case Type(TypeKind.Enum, name) => {
-        ScalaPrimitive.Enum(s"${enumNamespace}.${ScalaUtil.toClassName(name)}")
+        ScalaPrimitive.Enum(enumNamespace, ScalaUtil.toClassName(name))
       }
     }
   }
