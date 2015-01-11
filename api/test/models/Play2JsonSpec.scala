@@ -7,12 +7,7 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
 
   describe("for models with lists") {
 
-    val json = """
-    {
-      "base_url": "http://localhost:9000",
-      "name": "Api Doc Test",
-      "namespace": "test.apidoc.apidoctest",
-
+    val json = TestHelper.buildJson("""
       "models": [
         {
           "name": "content",
@@ -24,8 +19,7 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
           ]
         }
       ]
-    }
-    """
+    """)
 
     it("generates valid json readers") {
       val ssd = TestHelper.scalaService(json)

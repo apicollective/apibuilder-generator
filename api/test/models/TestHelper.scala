@@ -14,6 +14,21 @@ object TestHelper {
   lazy val referenceApiService = parseFile(s"../reference-api/service.json")
   lazy val generatorApiService = parseFile(s"../api/service.json")
 
+  def buildJson(json: String): String = {
+    s"""
+    {
+      "base_url": "http://localhost:9000",
+      "name": "Api Doc Test",
+      "organization": { "key": "test" },
+      "application": { "key": "apidoc-test" },
+      "namespace": "test.apidoc.apidoctest",
+      "version": "1.0.0",
+
+      $json
+    }
+    """
+  }
+
   def writeToFile(path: String, contents: String) {
     val outputPath = Paths.get(path)
     val bytes = contents.getBytes(StandardCharsets.UTF_8)
