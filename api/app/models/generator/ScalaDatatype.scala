@@ -214,11 +214,33 @@ case class ScalaTypeResolver(
         }
       }
       case Type(TypeKind.Model, name) => {
-        ScalaPrimitive.Model(modelNamespace, ScalaUtil.toClassName(name))
+        name.split("\\.").toList match {
+          case n :: Nil => ScalaPrimitive.Model(modelNamespace, ScalaUtil.toClassName(n))
+          case multiple => {
+            val (ns, n) = parseQualifiedName(modelNamespace, name)
+            ScalaPrimitive.Model(ns, n)
+          }
+        }
       }
       case Type(TypeKind.Enum, name) => {
-        ScalaPrimitive.Enum(enumNamespace, ScalaUtil.toClassName(name))
+        val (ns, n) = parseQualifiedName(enumNamespace, name)
+        ScalaPrimitive.Enum(ns, n)
       }
+    }
+  }
+
+  /**
+   * If name is a qualified name (as identified by having a dot),
+   * parses the name and returns a tuple of (namespace,
+   * name). Otherwise, returns (defaultNamespace, name)
+   */
+  private def parseQualifiedName(defaultNamespace: String, name: String): (String, String) = {
+    name.split("\\.").toList match {
+      case n :: Nil => (defaultNamespace, ScalaUtil.toClassName(name))
+      case multiple => 
+        val n = multiple.last
+        val ns = multiple.reverse.drop(1).reverse.mkString(".")
+        (ns, ScalaUtil.toClassName(n))
     }
   }
 
