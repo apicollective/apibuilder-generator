@@ -34,11 +34,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
         }
     """.trim
 
-    val json = s"""
-    {
-      "base_url": "http://localhost:9000",
-      "name": "Api Doc",
-      "namespace": "test.apidoc.api",
+    val json = TestHelper.buildJson(s"""
       "models": [$userModel],
       "resources": [
         {
@@ -56,11 +52,8 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
           ]
         }
       ]
-    }
+    """)
 
-    """
-
-    println(json)
     val ssd = TestHelper.scalaService(json)
     ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage() should be("")
   }
