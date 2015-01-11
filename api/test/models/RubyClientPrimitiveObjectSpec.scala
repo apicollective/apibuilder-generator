@@ -1,7 +1,7 @@
 package models
 
 import lib.Primitives
-import com.gilt.apidocspec.models._
+import com.gilt.apidoc.spec.models._
 import com.gilt.apidocgenerator.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 

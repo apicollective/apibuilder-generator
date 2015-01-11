@@ -2,7 +2,7 @@ package models
 
 import lib.{Datatype, Primitives, Type, TypeKind}
 import com.gilt.apidocgenerator.models.InvocationForm
-import com.gilt.apidocspec.models.{Method, Operation, Resource, Service}
+import com.gilt.apidoc.spec.models.{Method, Operation, Resource, Service}
 import generator.{ScalaOperation, ScalaResource, ScalaService}
 import org.scalatest.{ShouldMatchers, FunSpec}
 

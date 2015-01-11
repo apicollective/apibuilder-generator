@@ -65,7 +65,7 @@ package com.gilt.apidocgenerator.models {
   )
 
   case class InvocationForm(
-    service: com.gilt.apidocspec.models.Service,
+    service: com.gilt.apidoc.spec.models.Service,
     userAgent: scala.Option[String] = None
   )
 
@@ -200,7 +200,7 @@ package com.gilt.apidocgenerator.models {
 package com.gilt.apidocgenerator.models {
   package object json {
     import play.api.libs.json.__
-    import com.gilt.apidocspec.models.json._
+    import com.gilt.apidoc.spec.models.json._
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
@@ -377,14 +377,14 @@ package com.gilt.apidocgenerator.models {
 
     implicit def jsonReadsApidocGeneratorInvocationForm: play.api.libs.json.Reads[InvocationForm] = {
       (
-        (__ \ "service").read[com.gilt.apidocspec.models.Service] and
+        (__ \ "service").read[com.gilt.apidoc.spec.models.Service] and
         (__ \ "user_agent").readNullable[String]
       )(InvocationForm.apply _)
     }
 
     implicit def jsonWritesApidocGeneratorInvocationForm: play.api.libs.json.Writes[InvocationForm] = {
       (
-        (__ \ "service").write[com.gilt.apidocspec.models.Service] and
+        (__ \ "service").write[com.gilt.apidoc.spec.models.Service] and
         (__ \ "user_agent").write[scala.Option[String]]
       )(unlift(InvocationForm.unapply _))
     }
@@ -519,7 +519,7 @@ package com.gilt.apidocgenerator {
 
   class Client(apiUrl: String, apiToken: scala.Option[String] = None) {
     import com.gilt.apidocgenerator.models.json._
-    import com.gilt.apidocspec.models.json._
+    import com.gilt.apidoc.spec.models.json._
 
     private val UserAgent = "apidoc:0.7.37 http://www.apidoc.me/gilt/apidoc-generator/0.7.39-dev/play_2_3_client"
     private val logger = play.api.Logger("com.gilt.apidocgenerator.client")
@@ -679,14 +679,14 @@ package com.gilt.apidocgenerator {
   package error {
 
     import com.gilt.apidocgenerator.models.json._
-    import com.gilt.apidocspec.models.json._
+    import com.gilt.apidoc.spec.models.json._
 
     case class ErrorsResponse(
       response: play.api.libs.ws.WSResponse,
       message: Option[String] = None
     ) extends Exception(message.getOrElse(response.status + ": " + response.body)){
       import com.gilt.apidocgenerator.models.json._
-      import com.gilt.apidocspec.models.json._
+      import com.gilt.apidoc.spec.models.json._
       lazy val errors = response.json.as[Seq[com.gilt.apidocgenerator.models.Error]]
     }
   }

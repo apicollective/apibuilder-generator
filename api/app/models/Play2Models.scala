@@ -1,7 +1,7 @@
 package models
 
 import com.gilt.apidocgenerator.models.InvocationForm
-import com.gilt.apidocspec.models.Service
+import com.gilt.apidoc.spec.models.Service
 import lib.Text._
 import generator.{ScalaEnums, ScalaCaseClasses, ScalaService, CodeGenerator}
 

@@ -2,7 +2,7 @@ package generator
 
 import lib.Primitives
 import com.gilt.apidocgenerator.models.InvocationForm
-import com.gilt.apidocspec.models._
+import com.gilt.apidoc.spec.models._
 import models.TestHelper
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
