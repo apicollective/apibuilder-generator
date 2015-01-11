@@ -19,8 +19,12 @@ case class ScalaService(
 
 
   val datatypeResolver = DatatypeResolver(
-    enumNames = service.enums.map(_.name) ++ service.imports.flatMap(_.enums).map(name => s"${service.namespace}.enums.${name}"),
-    modelNames = service.models.map(_.name) ++ service.imports.flatMap(_.models).map(name => s"${service.namespace}.models.${name}")
+    enumNames = service.enums.map(_.name) ++ service.imports.flatMap { imp =>
+      imp.enums.map(name => s"${imp.namespace}.enums.${name}")
+    },
+    modelNames = service.models.map(_.name) ++ service.imports.flatMap { imp =>
+      imp.models.map(name => s"${imp.namespace}.models.${name}")
+    }
   )
 
   val name = ScalaUtil.toClassName(service.name)
