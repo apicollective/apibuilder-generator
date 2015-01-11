@@ -9,12 +9,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a field with an object field") {
 
-    val baseJson = """
-    {
-      "base_url": "http://localhost:9000",
-      "name": "Api Doc Test",
-      "namespace": "me.apidoc.test",
-
+    val baseJson = TestHelper.buildJson("""
       "models": [
         {
           "name": "content",
@@ -24,8 +19,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
           ]
         }
       ]
-    }
-    """
+    """)
 
     def service(typeString: String): Service = {
       TestHelper.service(baseJson.format(typeString))
@@ -84,12 +78,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
         }
     """.trim
 
-    val baseJson = s"""
-    {
-      "base_url": "http://localhost:9000",
-      "name": "Api Doc Test",
-      "namespace": "me.apidoc.test",
-
+    val baseJson = TestHelper.buildJson(s"""
       "models": [$contentModel],
 
       "resources": [
@@ -106,9 +95,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
           ]
         }
       ]
-
-    }
-    """
+    """)
 
     def service(typeString: String): Service = {
       TestHelper.service(baseJson.format(typeString))
