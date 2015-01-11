@@ -29,7 +29,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
       new ScalaResource(ssd, resource, scalaModel)
     )
 
-    scalaOperation.argList shouldEqual Some("user: apidoc.reference.api.models.User,\n  q1: _root_.scala.Option[Double] = None\n")
+    scalaOperation.argList shouldEqual Some("user: com.gilt.apidoc.reference.api.models.User,\n  q1: _root_.scala.Option[Double] = None\n")
   }
 
   it("array of models as a parameter in the body should pluralize model name") {
@@ -45,7 +45,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
       new ScalaResource(ssd, resource, scalaModel)
     )
 
-    scalaOperation.argList shouldEqual Some("users: Seq[apidoc.reference.api.models.User],\n  q1: _root_.scala.Option[Double] = None\n")
+    scalaOperation.argList shouldEqual Some("users: Seq[com.gilt.apidoc.reference.api.models.User],\n  q1: _root_.scala.Option[Double] = None\n")
   }
 
   it("primitive type as a parameter in the body should not use capitalize") {
