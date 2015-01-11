@@ -2,6 +2,7 @@ package generator
 
 import com.gilt.apidocspec.models.{Method, ParameterLocation}
 import lib.{Datatype, Primitives, Type}
+import lib.Text
 import lib.Text._
 
 object GeneratorUtil {
@@ -14,12 +15,15 @@ object GeneratorUtil {
     method: Method,
     url: String
   ): String = {
-    val resourcePath = "/" // TODO
-    val pieces = (if (resourcePath.startsWith("/:")) {
-      url
-    } else {
-      url.replaceAll("^" + resourcePath, "")
-    }).split("/").filter { !_.isEmpty }
+    val pathsToSkip = Seq(
+      resourcePlural,
+      formatName(resourcePlural),
+      formatName(resourcePlural).toLowerCase
+    )
+
+    val resourcePath = formatName(resourcePlural)
+
+    val pieces = url.split("/").filter { !_.isEmpty }.filter { w => !pathsToSkip.contains(formatName(w)) }
 
     val named = pieces.filter { _.startsWith(":") }.map { name =>lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name.slice(1, name.length)))) }
     val notNamed = pieces.
@@ -39,6 +43,15 @@ object GeneratorUtil {
     } else {
       method.toString.toLowerCase + notNamed.mkString("And") + "By" + named.mkString("And")
     }
+  }
+
+  /**
+    * Creates a canonical form for the specified name. Eg
+    * MembershipRequest and membership-request both end up as
+    * membership_request
+    */
+  private def formatName(name: String): String = {
+    Text.splitIntoWords(Text.camelCaseToUnderscore(name)).mkString("_")
   }
 
   /**

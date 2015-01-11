@@ -136,7 +136,6 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
         val r = Play2Route(ssd, op, membershipRequestResource)
         r.verb should be(Method.Post)
         r.url should be("/membership_requests/:guid/accept")
-        println("r.method: " + r.method)
         r.method should be("controllers.MembershipRequests.postAcceptByGuid")
         r.params.mkString(", ") should be("guid: _root_.java.util.UUID")
       }
@@ -144,10 +143,9 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
     describe("application resource") {
       it("GET /:orgKey") {
-        val membershipRequestResource = getScalaResource(ssd, "MembershipRequest")
+        val resource = getScalaResource(ssd, "Application")
         val op = getScalaMethod(ssd, "Application", Method.Get, "/:orgKey")
-        val r = Play2Route(ssd, op, membershipRequestResource)
-        println("r.method: " + r.method)
+        val r = Play2Route(ssd, op, resource)
         r.method should be("controllers.Applications.getByOrgKey")
       }
     }
