@@ -30,8 +30,12 @@ case class Play2RouteGenerator(form: InvocationForm) {
         Play2Route(scalaService, op, resource)
       }
     }
+
     if (all.isEmpty) {
-      None
+      Some(
+        ApidocHeaders(form.userAgent).toRubyString() + "\n\n" +
+          "# Service does not have any resource operations. There are no routes"
+      )
     } else {
       val maxVerbLength = all.map(_.verb.toString.length).toSeq.sorted.last
       val maxUrlLength = all.map(_.url.length).toSeq.sorted.last
