@@ -170,11 +170,9 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
     case Some(body) => {
       val varName = ScalaUtil.toVariable(body.`type`)
 
-      Some(
-        Seq(
-          Some(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(varName), body.datatype.name)),
-          ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
-        ).flatten.mkString(",")
+      ScalaUtil.fieldsToArgList(
+        parameters.map(_.definition()) ++
+          Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(varName), body.datatype.name))
       )
     }
   }
