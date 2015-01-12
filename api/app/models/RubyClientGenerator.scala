@@ -348,53 +348,41 @@ case class RubyClientGenerator(form: InvocationForm) {
             val ti = parseType(body)
             sb.append("        " + ti.assertMethod)
 
-            ti.datatype match {
+            ti.datatype.types.toList match {
+              case single :: Nil => {
+                single match {
+                  case Type(TypeKind.Primitive, name) => {
+                    Container(ti.datatype) match {
+                      case Container.Singleton | Container.Option => {
+                        requestBuilder.append(s".with_body(${ti.varName})")
+                      }
+                      case Container.List => {
+                        requestBuilder.append(s".with_json(${ti.varName}")
+                      }
+                      case Container.Map => {
+                        requestBuilder.append(s".with_json(${ti.varName}")
+                      }
+                    }
+                  }
 
-              case Datatype.Singleton(Type(TypeKind.Primitive, _) :: Nil) | Datatype.Option(Type(TypeKind.Primitive, _) :: Nil) => {
-                requestBuilder.append(s".with_body(${ti.varName})")
+                  case Type(TypeKind.Model, _) | Type(TypeKind.Enum, _) => {
+                    Container(ti.datatype) match {
+                      case Container.Singleton | Container.Option => {
+                        requestBuilder.append(s".with_json(${ti.varName}.to_json)")
+                      }
+                      case Container.List => {
+                        requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_hash }.to_json)")
+                      }
+                      case Container.Map => {
+                        requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
+                      }
+                    }
+                  }
+
+                }
               }
 
-              case Datatype.Singleton(Type(TypeKind.Model, _) :: Nil) | Datatype.Option(Type(TypeKind.Model, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}.to_json)")
-              }
-
-              case Datatype.Singleton(Type(TypeKind.Enum, _) :: Nil) | Datatype.Option(Type(TypeKind.Enum, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}.to_json)")
-              }
-
-              case Datatype.Singleton(_) | Datatype.Option(_) => {
-                sys.error("TODO: UNION TYPE")
-              }
-
-              case Datatype.List(Type(TypeKind.Primitive, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}")
-              }
-
-              case Datatype.List(Type(TypeKind.Model, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_hash }.to_json)")
-              }
-
-              case Datatype.List(Type(TypeKind.Enum, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_json })")
-              }
-
-              case Datatype.List(multiple) => {
-                sys.error("TODO: UNION TYPE")
-              }
-
-              case Datatype.Map(Type(TypeKind.Primitive, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}")
-              }
-
-              case Datatype.Map(Type(TypeKind.Model, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
-              }
-
-              case Datatype.Map(Type(TypeKind.Enum, _) :: Nil) => {
-                requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
-              }
-
-              case Datatype.Map(multiple) => {
+              case multiple => {
                 sys.error("TODO: UNION TYPE")
               }
 
