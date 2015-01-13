@@ -8,5 +8,5 @@ WORKDIR /usr/share/apidoc-generator
 
 RUN sbt -Dsbt.ivy.home=.ivy2 clean stage
 
-RUN ln -s /usr/share/apidoc-generator/api/target/universal/stage /usr/share/apidoc-generator-api
+RUN ln -s /usr/share/apidoc-generator/generator/target/universal/stage /usr/share/apidoc-generator-generator
 
