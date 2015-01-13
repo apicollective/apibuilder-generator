@@ -1,7 +1,7 @@
 [
   {
     "service": "generator",
-    "s3": "s3://gilt-architecture-metadata/ionblaster/apidoc/.ionblaster.json",
+    "s3": "s3://gilt-architecture-metadata/ionblaster/apidoc-generator/.ionblaster.json",
     "profile": "architecture"
   }
 ]
