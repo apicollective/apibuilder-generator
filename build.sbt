@@ -27,8 +27,8 @@ lazy val generated = project
     )
   )
 
-lazy val api = project
-  .in(file("api"))
+lazy val generator = project
+  .in(file("generator"))
   .dependsOn(generated, lib)
   .aggregate(generated, lib)
   .enablePlugins(PlayScala)
