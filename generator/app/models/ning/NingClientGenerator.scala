@@ -6,18 +6,6 @@ import generator._
 import models._
 import lib.Text._
 
-case class NingVersion(
-  name: String
-)
-
-object NingVersions {
-
-  val V1_8_x = NingVersion(
-    name = "1.8.x"
-  )
-
-}
-
 /**
  * Uses play JSON libraries for json
  * serialization/deserialization. Otherwise only depends on ning async
@@ -26,21 +14,14 @@ object NingVersions {
 object Ning18ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): String = {
-    NingClientGenerator.invoke(NingVersions.V1_8_x, form)
-  }
-
-}
-
-object NingClientGenerator {
-
-  def invoke(version: NingVersion, form: InvocationForm): String = {
-    NingClientGenerator(version, form).invoke()
+    val config = ScalaClientMethodConfigs.Ning(form.service.namespace)
+    NingClientGenerator(config, form).invoke()
   }
 
 }
 
 case class NingClientGenerator(
-  version: NingVersion,
+  config: ScalaClientMethodConfig,
   form: InvocationForm
 ) {
 
@@ -68,24 +49,10 @@ case class NingClientGenerator(
       s""".addHeader("${h.name}", ${h.quotedValue}"""
     }.mkString("\n")
 
-    val methodConfig = new ScalaClientMethodConfigs.Ning {
-      override def namespace = ssd.namespace
-    }
-    val methodGenerator = ScalaClientMethodGenerator(methodConfig, ssd)
+    val methodGenerator = ScalaClientMethodGenerator(config, ssd)
 
     s"""package ${ssd.namespace} {
   import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response}
-
-  object Client {
-    def parseJson[T](r: com.ning.http.client.Response, f: (play.api.libs.json.JsValue => play.api.libs.json.JsResult[T])): T = {
-      f(play.api.libs.json.Json.parse(r.getResponseBody("UTF-8"))) match {
-        case play.api.libs.json.JsSuccess(x, _) => x
-        case play.api.libs.json.JsError(errors) => {
-          throw new ${ssd.modelNamespace}.error.FailedRequest(r.getStatusCode, "Invalid json: " + errors.mkString(" "))
-        }
-      }
-    }
-  }
 
   class Client(apiUrl: String, apiToken: scala.Option[String] = None) {
     import ${ssd.modelNamespace}.json._
@@ -152,6 +119,8 @@ ${methodGenerator.objects().indent(4)}
     }
 
   }
+
+${ScalaClientJsonParser(config).indent(2)}
 
 ${PathSegment.definition.indent(2)}
 

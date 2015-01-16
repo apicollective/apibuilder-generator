@@ -8,6 +8,8 @@ import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
+  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc")
+
   describe("for a field with an object field") {
 
     val baseJson = TestHelper.buildJson("""
@@ -130,17 +132,17 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
 
       it("singleton") {
-        val generator = new ScalaClientMethodGenerator(ScalaClientMethodConfigs.Play23, ssd("object"))
+        val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("object"))
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-response-singleton.txt", generator.objects)
       }
 
       it("list") {
-        val generator = new ScalaClientMethodGenerator(ScalaClientMethodConfigs.Play23, ssd("[object]"))
+        val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-response-list.txt", generator.objects)
       }
 
       it("map") {
-        val generator = new ScalaClientMethodGenerator(ScalaClientMethodConfigs.Play23, ssd("map[object]"))
+        val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("map[object]"))
         TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-response-map.txt", generator.objects)
       }
 

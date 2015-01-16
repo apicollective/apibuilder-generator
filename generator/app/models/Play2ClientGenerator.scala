@@ -3,7 +3,7 @@ package models
 import com.gilt.apidoc.spec.v0.models.Service
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.Text._
-import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientMethodConfigs, ScalaClientMethodConfig}
+import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientJsonParser, ScalaClientMethodConfigs, ScalaClientMethodConfig}
 
 case class PlayFrameworkVersion(
   name: String,
@@ -13,34 +13,34 @@ case class PlayFrameworkVersion(
   supportsHttpPatch: Boolean
 )
 
-object PlayFrameworkVersions {
-
-  val V2_2_x = PlayFrameworkVersion(
-    name = "2.2.x",
-    config = ScalaClientMethodConfigs.Play22,
-    requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
-    authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
-    supportsHttpPatch = false
-  )
-
-  val V2_3_x = PlayFrameworkVersion(
-    name = "2.3.x",
-    config = ScalaClientMethodConfigs.Play23,
-    requestHolderClass = "play.api.libs.ws.WSRequestHolder",
-    authSchemeClass = "play.api.libs.ws.WSAuthScheme",
-    supportsHttpPatch = true
-  )
-}
-
 object Play22ClientGenerator extends CodeGenerator {
+
   override def invoke(form: InvocationForm): String = {
-    Play2ClientGenerator.invoke(PlayFrameworkVersions.V2_2_x, form)
+    val config = PlayFrameworkVersion(
+      name = "2.2.x",
+      config = ScalaClientMethodConfigs.Play22(form.service.namespace),
+      requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
+      authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
+      supportsHttpPatch = false
+    )
+
+    Play2ClientGenerator.invoke(config, form)
   }
 }
 
 object Play23ClientGenerator extends CodeGenerator {
+
   override def invoke(form: InvocationForm): String = {
-    Play2ClientGenerator.invoke(PlayFrameworkVersions.V2_3_x, form)
+
+    val config = PlayFrameworkVersion(
+      name = "2.3.x",
+      config = ScalaClientMethodConfigs.Play23(form.service.namespace),
+      requestHolderClass = "play.api.libs.ws.WSRequestHolder",
+      authSchemeClass = "play.api.libs.ws.WSAuthScheme",
+      supportsHttpPatch = true
+    )
+
+    Play2ClientGenerator.invoke(config, form)
   }
 }
 
@@ -157,6 +157,8 @@ ${methodGenerator.objects().indent(4)}
     }
 
   }
+
+${ScalaClientJsonParser(version.config).indent(2)}
 
 ${methodGenerator.traitsAndErrors().indent(2)}
 

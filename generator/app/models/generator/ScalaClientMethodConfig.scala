@@ -3,6 +3,11 @@ package generator
 trait ScalaClientMethodConfig {
 
   /**
+    * Namespace in which the client is defined
+    */
+  def namespace: String
+
+  /**
     * The name of the method to call to encode a variable into a path.
     */
   def pathEncodingMethod: String
@@ -26,13 +31,18 @@ trait ScalaClientMethodConfig {
     * Given a response and a class name, returns code to create an
     * instance of the specified class.
     */
-  def toJson(responseName: String, className: String): String
+  def toJson(responseName: String, className: String): String = {
+    s"""_root_.${namespace}.Client.parseJson("$className", $responseName, _.validate[$className])"""
+  }
 
   /**
    * Given an accessor method name and a type, returns code to create an
    * accessor var.
    */
-  def accessor(methodName: String, typeName: String): String
+  def accessor(methodName: String, typeName: String): String = {
+    s"def ${methodName}: ${typeName} = ${typeName}"
+  }
+
 }
 
 object ScalaClientMethodConfigs {
@@ -41,34 +51,21 @@ object ScalaClientMethodConfigs {
     override val pathEncodingMethod = "play.utils.UriEncoding.encodePathSegment"
     override val responseStatusMethod = "status"
     override val responseBodyMethod = "body"
-    override def toJson(responseName: String, className: String) = {
-      s"$responseName.json.as[$className]"
-    }
-    override def accessor(methodName: String, typeName: String) = {
-      s"def ${methodName}: ${typeName} = ${typeName}"
-    }
   }
 
-  object Play22 extends Play {
+  case class Play22(namespace: String) extends Play {
     override val responseClass = "play.api.libs.ws.Response"
   }
 
-  object Play23 extends Play {
+  case class Play23(namespace: String) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
   }
 
-  trait Ning extends ScalaClientMethodConfig {
-    def namespace: String
+  case class Ning(namespace: String) extends ScalaClientMethodConfig {
     override val pathEncodingMethod = s"_root_.${namespace}.PathSegment.encode"
     override val responseStatusMethod = "getStatusCode"
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
     override val responseClass = "_root_.com.ning.http.client.Response"
-    override def toJson(responseName: String, className: String) = {
-      s"_root_.${namespace}.Client.parseJson($responseName, _.validate[$className])"
-    }
-    override def accessor(methodName: String, typeName: String) = {
-      s"def ${methodName}: ${typeName} = ${typeName}"
-    }
   }
 
 }
