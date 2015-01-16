@@ -1,7 +1,7 @@
 package generator
 
 import com.gilt.apidoc.spec.v0.models._
-import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
+import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, Kind}
 import models.Container
 
 case class ScalaService(
@@ -82,22 +82,15 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
     case Datatype.List(_) | Datatype.Map(_) => true
   }
 
-  val name: String = `type`.types.toList match {
-    case (single :: Nil) => {
-      single match {
-        case Type(TypeKind.Primitive, _) => {
-          ScalaUtil.toDefaultClassName(multiple = multiple)
-        }
-        case Type(TypeKind.Model, name) => {
-          ScalaUtil.toClassName(name, multiple = multiple)
-        }
-        case Type(TypeKind.Enum, name) => {
-          ScalaUtil.toClassName(name, multiple = multiple)
-        }
-      }
+  val name: String = `type`.`type` match {
+    case Type(Kind.Primitive, _) => {
+      ScalaUtil.toDefaultClassName(multiple = multiple)
     }
-    case (multiple) => {
-      sys.error("TODO: UNION TYPE")
+    case Type(Kind.Model, name) => {
+      ScalaUtil.toClassName(name, multiple = multiple)
+    }
+    case Type(Kind.Enum, name) => {
+      ScalaUtil.toClassName(name, multiple = multiple)
     }
   }
 
@@ -211,7 +204,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
 
   val datatype = ssd.scalaDatatype(`type`)
 
-  val isUnit = `type`.types.toList.forall( _ == Type(TypeKind.Primitive, Primitives.Unit.toString) )
+  val isUnit = `type`.`type` == Type(Kind.Primitive, Primitives.Unit.toString)
 
   val resultType: String = datatype.name
 

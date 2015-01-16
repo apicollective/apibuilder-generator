@@ -133,25 +133,11 @@ private[models] case class Play2Route(
             case ScalaDatatype.Map(_) => {
               sys.error("Cannot set defaults for maps")
             }
-            case ScalaDatatype.Singleton(types) => {
-              types.toList match {
-                case single :: Nil => {
-                  "?= " + defaultForPrimitive(single, d)
-                }
-                case multiple => {
-                  sys.error("TODO: UNION TYPE")
-                }
-              }
+            case ScalaDatatype.Singleton(primitive) => {
+              "?= " + defaultForPrimitive(primitive, d)
             }
-            case ScalaDatatype.Option(types) => {
-              types.toList match {
-                case single :: Nil => {
-                  "?= Some(" + defaultForPrimitive(single, d) + ")"
-                }
-                case multiple => {
-                  sys.error("TODO: UNION TYPE")
-                }
-              }
+            case ScalaDatatype.Option(primitive) => {
+              "?= Some(" + defaultForPrimitive(primitive, d) + ")"
             }
           }
         )

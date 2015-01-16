@@ -1,46 +1,42 @@
 package lib
 
 sealed trait Datatype {
-  def types: Seq[Type]
+  def `type`: Type
   def label: String
-
-  assert(!types.isEmpty, "Datatype requires at least 1 type")
 }
 
 object Datatype {
 
-  private val Divider = " | "
-
-  case class List(types: Seq[Type]) extends Datatype {
-    override def label = types.map(_.name).mkString("[", Divider, "]")
+  case class List(`type`: Type) extends Datatype {
+    override def label = "[" + `type`.name + "]"
   }
 
-  case class Map(types: Seq[Type]) extends Datatype {
-    override def label = types.map(_.name).mkString("map[", Divider, "]")
+  case class Map(`type`: Type) extends Datatype {
+    override def label = "map[" + `type`.name + "]"
   }
 
-  case class Option(types: Seq[Type]) extends Datatype {
-    override def label = types.map(_.name).mkString("option[", Divider, "]")
+  case class Option(`type`: Type) extends Datatype {
+    override def label = "option[" + `type`.name + "]"
   }
 
-  case class Singleton(types: Seq[Type]) extends Datatype {
-    override def label = types.map(_.name).mkString(Divider)
+  case class Singleton(`type`: Type) extends Datatype {
+    override def label = `type`.name
   }
 
 }
 
 case class Type(
-  typeKind: TypeKind,
+  typeKind: Kind,
   name: String
 )
 
-sealed trait TypeKind
+sealed trait Kind
 
-object TypeKind {
+object Kind {
 
-  case object Primitive extends TypeKind { override def toString = "primitive" }
-  case object Model extends TypeKind { override def toString = "model" }
-  case object Enum extends TypeKind { override def toString = "enum" }
+  case object Primitive extends Kind { override def toString = "primitive" }
+  case object Model extends Kind { override def toString = "model" }
+  case object Enum extends Kind { override def toString = "enum" }
 
 }
 
@@ -67,13 +63,13 @@ case class DatatypeResolver(
     */
   def toType(name: String): Option[Type] = {
     Primitives(name) match {
-      case Some(pt) => Some(Type(TypeKind.Primitive, name))
+      case Some(pt) => Some(Type(Kind.Primitive, name))
       case None => {
         enumNames.find(_ == name) match {
-          case Some(et) => Some(Type(TypeKind.Enum, name))
+          case Some(et) => Some(Type(Kind.Enum, name))
           case None => {
             modelNames.find(_ == name) match {
-              case Some(mt) => Some(Type(TypeKind.Model, name))
+              case Some(mt) => Some(Type(Kind.Model, name))
               case None => None
             }
           }
@@ -82,35 +78,17 @@ case class DatatypeResolver(
     }
   }
 
-  private val ListRx = "^\\[(.*)\\]$".r
-  private val MapRx = "^map\\[(.*)\\]$".r
-  private val MapDefaultRx = "^map$".r
-  private val OptionRx = "^option\\[(.*)\\]$".r
-
   /**
     * Parses a type string into an instance of a Datatype.
     * 
-    * @param value: Examples: "string", "string | uuid", "map[long]", "option[string | uuid]"
+    * @param value: Examples: "string", "uuid"
     */
   def parse(value: String): Option[Datatype] = {
-    value match {
-      case ListRx(names) => toTypesIfAllFound(names).map { Datatype.List(_) }
-      case MapRx(names) => toTypesIfAllFound(names).map { Datatype.Map(_) }
-      case MapDefaultRx() => toTypesIfAllFound(Primitives.String.toString).map { Datatype.Map(_) }
-      case OptionRx(names) => toTypesIfAllFound(names).map { Datatype.Option(_) }
-      case _ => toTypesIfAllFound(value).map { Datatype.Singleton(_) }
-    }
-  }
-
-  private def parseTypeNames(value: String): Seq[String] = {
-    value.split("\\|").map(_.trim)
-  }
-
-  private def toTypesIfAllFound(value: String): Option[Seq[Type]] = {
-    val types = parseTypeNames(value).map { n => toType(n) }
-    types.filter(!_.isDefined) match {
-      case Nil => Some(types.flatten)
-      case unknowns => None
+    TextDatatype(value) match {
+      case TextDatatype.List(typeName) => toType(typeName).map { Datatype.List(_) }
+      case TextDatatype.Map(typeName) => toType(typeName).map { Datatype.Map(_) }
+      case TextDatatype.Option(typeName) => toType(typeName).map { Datatype.Option(_) }
+      case TextDatatype.Singleton(typeName) => toType(typeName).map { Datatype.Singleton(_) }
     }
   }
 

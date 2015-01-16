@@ -2,7 +2,7 @@ package models
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models._
-import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
+import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, Kind}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
 import scala.collection.mutable.ListBuffer
@@ -24,17 +24,10 @@ object RubyUtil {
 
   def toVariable(datatype: Datatype): String = {
     val multiple = Container(datatype).multiple
-    datatype.types.toList match {
-      case single :: Nil => {
-        single match {
-          case Type(TypeKind.Primitive, _) => RubyUtil.toDefaultVariable(multiple = multiple)
-          case Type(TypeKind.Model, name) => RubyUtil.toVariable(name, multiple = multiple)
-          case Type(TypeKind.Enum, name) => RubyUtil.toVariable(name, multiple = multiple)
-        }
-      }
-      case multiple => {
-        sys.error("TODO: UNION TYPE")
-      }
+    datatype.`type` match {
+      case Type(Kind.Primitive, _) => RubyUtil.toDefaultVariable(multiple = multiple)
+      case Type(Kind.Model, name) => RubyUtil.toVariable(name, multiple = multiple)
+      case Type(Kind.Enum, name) => RubyUtil.toVariable(name, multiple = multiple)
     }
   }
 
@@ -244,23 +237,17 @@ case class RubyClientGenerator(form: InvocationForm) {
           }
           dt match {
             case Datatype.Singleton(_) | Datatype.Option(_) => {
-              dt.types.toList match {
-                case single :: Nil =>
-                  single match {
-                    case Type(TypeKind.Primitive, name) => {
-                      val code = asString(RubyUtil.toVariable(varName), name, escape = true)
-                      s"#{$code}"
-                    }
-                    case Type(TypeKind.Model, name) => {
-                      sys.error("Models cannot be in the path")
-                    }
-                    case Type(TypeKind.Enum, name) => {
-                      val code = RubyUtil.toVariable(varName)
-                      s"#{$code.value}"
-                    }
-                  }
-                case multiple => {
-                  sys.error("TODO: UNION TYPES")
+              dt.`type` match {
+                case Type(Kind.Primitive, name) => {
+                  val code = asString(RubyUtil.toVariable(varName), name, escape = true)
+                  s"#{$code}"
+                }
+                case Type(Kind.Model, name) => {
+                  sys.error("Models cannot be in the path")
+                }
+                case Type(Kind.Enum, name) => {
+                  val code = RubyUtil.toVariable(varName)
+                  s"#{$code.value}"
                 }
               }
             }
@@ -348,42 +335,33 @@ case class RubyClientGenerator(form: InvocationForm) {
             val ti = parseType(body)
             sb.append("        " + ti.assertMethod)
 
-            ti.datatype.types.toList match {
-              case single :: Nil => {
-                single match {
-                  case Type(TypeKind.Primitive, name) => {
-                    Container(ti.datatype) match {
-                      case Container.Singleton | Container.Option => {
-                        requestBuilder.append(s".with_body(${ti.varName})")
-                      }
-                      case Container.List => {
-                        requestBuilder.append(s".with_json(${ti.varName}")
-                      }
-                      case Container.Map => {
-                        requestBuilder.append(s".with_json(${ti.varName}")
-                      }
-                    }
+            ti.datatype.`type` match {
+              case Type(Kind.Primitive, name) => {
+                Container(ti.datatype) match {
+                  case Container.Singleton | Container.Option => {
+                    requestBuilder.append(s".with_body(${ti.varName})")
                   }
-
-                  case Type(TypeKind.Model, _) | Type(TypeKind.Enum, _) => {
-                    Container(ti.datatype) match {
-                      case Container.Singleton | Container.Option => {
-                        requestBuilder.append(s".with_json(${ti.varName}.to_json)")
-                      }
-                      case Container.List => {
-                        requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_hash }.to_json)")
-                      }
-                      case Container.Map => {
-                        requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
-                      }
-                    }
+                  case Container.List => {
+                    requestBuilder.append(s".with_json(${ti.varName}")
                   }
-
+                  case Container.Map => {
+                    requestBuilder.append(s".with_json(${ti.varName}")
+                  }
                 }
               }
 
-              case multiple => {
-                sys.error("TODO: UNION TYPE")
+              case Type(Kind.Model, _) | Type(Kind.Enum, _) => {
+                Container(ti.datatype) match {
+                  case Container.Singleton | Container.Option => {
+                    requestBuilder.append(s".with_json(${ti.varName}.to_json)")
+                  }
+                  case Container.List => {
+                    requestBuilder.append(s".with_json(${ti.varName}.map { |o| o.to_hash }.to_json)")
+                  }
+                  case Container.Map => {
+                    requestBuilder.append(s".with_json(${ti.varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json")
+                  }
+                }
               }
 
             }
@@ -440,72 +418,51 @@ case class RubyClientGenerator(form: InvocationForm) {
         val datatype = parseType(field.`type`).datatype
         val value = datatype match {
           case Datatype.Singleton(_) | Datatype.Option(_) => {
-            datatype.types.toList match {
-              case single :: Nil => {
-                single match {
-                  case Type(TypeKind.Primitive, name) => {
-                    Primitives(name) match {
-                      case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
-                      case _ => asString(field.name, name, escape = false)
-                    }
-                  }
-                  case Type(TypeKind.Model, name) => {
-                    s"${field.name}.nil? ? nil : ${field.name}.to_hash"
-                  }
-                  case Type(TypeKind.Enum, name) => {
-                    s"${field.name}.nil? ? nil : ${field.name}.value"
-                  }
+            datatype.`type` match {
+              case Type(Kind.Primitive, name) => {
+                Primitives(name) match {
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
+                  case _ => asString(field.name, name, escape = false)
                 }
               }
-              case multiple => {
-                sys.error("TODO: UNION TYPE")
+              case Type(Kind.Model, name) => {
+                s"${field.name}.nil? ? nil : ${field.name}.to_hash"
+              }
+              case Type(Kind.Enum, name) => {
+                s"${field.name}.nil? ? nil : ${field.name}.value"
               }
             }
           }
-          case Datatype.List(types) => {
-            types.toList match {
-              case single :: Nil => {
-                single match {
-                  case Type(TypeKind.Primitive, name) => {
-                    Primitives(name) match {
-                      case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
-                      case _ => asString(field.name, name, escape = false)
-                    }
-                  }
-                  case Type(TypeKind.Model, name) => {
-                    s"(${field.name} || []).map(&:to_hash)"
-                  }
-                  case Type(TypeKind.Enum, name) => {
-                    s"(${field.name} || []).map(&:value)"
-                  }
+          case Datatype.List(t) => {
+            t match {
+              case Type(Kind.Primitive, name) => {
+                Primitives(name) match {
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
+                  case _ => asString(field.name, name, escape = false)
                 }
               }
-              case multiple => {
-                sys.error("TODO: UNION TYPE")
+              case Type(Kind.Model, name) => {
+                s"(${field.name} || []).map(&:to_hash)"
+              }
+              case Type(Kind.Enum, name) => {
+                s"(${field.name} || []).map(&:value)"
               }
             }
           }
 
-          case Datatype.Map(types) => {
-            types.toList match {
-              case single :: nil => {
-                single match {
-                  case Type(TypeKind.Primitive, name) => {
-                    Primitives(name) match {
-                      case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
-                      case _ => asString(field.name, name, escape = false)
-                    }
-                  }
-                  case Type(TypeKind.Model, name) => {
-                    s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
-                  }
-                  case Type(TypeKind.Enum, name) => {
-                    s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
-                  }
+          case Datatype.Map(t) => {
+            t match {
+              case Type(Kind.Primitive, name) => {
+                Primitives(name) match {
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
+                  case _ => asString(field.name, name, escape = false)
                 }
               }
-              case multiple => {
-                sys.error("TODO: UNION TYPE")
+              case Type(Kind.Model, name) => {
+                s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
+              }
+              case Type(Kind.Enum, name) => {
+                s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
               }
             }
           }
@@ -614,85 +571,64 @@ case class RubyClientGenerator(form: InvocationForm) {
 
     dt match {
       case Datatype.Singleton(_) | Datatype.Option(_) => {
-        dt.types.toList match {
-          case (single :: Nil) => {
-            dt.types.head match {
-              case Type(TypeKind.Primitive, name) => {
-                parseArgumentPrimitive(fieldName, s"opts.delete(:$fieldName)", name, required, default)
-              }
-              case Type(TypeKind.Model, name) => {
-                val klass = qualifiedClassName(name)
-                wrapWithAssertion(
-                  fieldName,
-                  klass,
-                  required,
-                  s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
-                )
-              }
-              case Type(TypeKind.Enum, name) => {
-                val klass = qualifiedClassName(name)
-                wrapWithAssertion(
-                  fieldName,
-                  klass,
-                  required,
-                  s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
-                )
-              }
-            }
+        dt.`type` match {
+          case Type(Kind.Primitive, name) => {
+            parseArgumentPrimitive(fieldName, s"opts.delete(:$fieldName)", name, required, default)
           }
-          case multiple => {
-            sys.error("TODO: UNION TYPE")
+          case Type(Kind.Model, name) => {
+            val klass = qualifiedClassName(name)
+            wrapWithAssertion(
+              fieldName,
+              klass,
+              required,
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
+            )
+          }
+          case Type(Kind.Enum, name) => {
+            val klass = qualifiedClassName(name)
+            wrapWithAssertion(
+              fieldName,
+              klass,
+              required,
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
+            )
           }
         }
       }
 
-      case Datatype.List(types) => {
-        types.toList match {
-          case single :: Nil => {
-            single match {
-              case Type(TypeKind.Primitive, name) => {
-                withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |v| " + parseArgumentPrimitive(fieldName, "v", name, required, default) + "}"
-              }
-              case Type(TypeKind.Model, name) => {
-                val klass = qualifiedClassName(name)
-                withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }"
-              }
-              case Type(TypeKind.Enum, name) => {
-                val klass = qualifiedClassName(name)
-                withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + s".map { |el| el.nil? ? nil : (el.is_a?($klass) ? el : $klass.apply(el)) }"
-              }
-            }
+      case Datatype.List(t) => {
+        t match {
+          case Type(Kind.Primitive, name) => {
+            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |v| " + parseArgumentPrimitive(fieldName, "v", name, required, default) + "}"
           }
-          case multiple => {
-            sys.error("TODO: UNION TYPE")
+          case Type(Kind.Model, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }"
+          }
+          case Type(Kind.Enum, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + s".map { |el| el.nil? ? nil : (el.is_a?($klass) ? el : $klass.apply(el)) }"
           }
         }
       }
 
-      case Datatype.Map(types) => {
-        types.toList match {
-          case single :: Nil => {
-            single match {
-              case Type(TypeKind.Primitive, name) => {
-                withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, required, default) + "; h }"
-              }
-              case Type(TypeKind.Model, name) => {
-                val klass = qualifiedClassName(name)
-                withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}"
-              }
-              case Type(TypeKind.Enum, name) => {
-                val klass = qualifiedClassName(name)
-                wrapWithAssertion(
-                  fieldName,
-                  klass,
-                  required,
-                  s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
-                )
-              }
-            }
+      case Datatype.Map(t) => {
+        t match {
+          case Type(Kind.Primitive, name) => {
+            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, required, default) + "; h }"
           }
-          case multiple => {
-            sys.error("TODO: UNION TYPE")
+          case Type(Kind.Model, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}"
+          }
+          case Type(Kind.Enum, name) => {
+            val klass = qualifiedClassName(name)
+            wrapWithAssertion(
+              fieldName,
+              klass,
+              required,
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.apply(opts.delete(:$fieldName)))"
+            )
           }
         }
       }
@@ -773,20 +709,13 @@ case class RubyClientGenerator(form: InvocationForm) {
       sys.error("Invalid type[" + `type` + "]")
     }
 
-    val single = dt.types.toList match {
-      case one :: Nil => one
-      case multiple => {
-        sys.error("TODO: UNION TYPES")
-      }
-    }
-
-    val klass = single match {
-      case Type(TypeKind.Primitive, ptName) => Primitives(ptName) match {
-        case None => sys.error(s"Unsupported primitive[$ptName] for type[$single]")
+    val klass = dt.`type` match {
+      case Type(Kind.Primitive, ptName) => Primitives(ptName) match {
+        case None => sys.error(s"Unsupported primitive[$ptName] for type[${dt.label}]")
         case Some(pt) => rubyClass(pt)
       }
-      case Type(TypeKind.Model, name) => qualifiedClassName(name)
-      case Type(TypeKind.Enum, name) => qualifiedClassName(name)
+      case Type(Kind.Model, name) => qualifiedClassName(name)
+      case Type(Kind.Enum, name) => qualifiedClassName(name)
     }
 
     val multiple = dt match {
@@ -794,17 +723,17 @@ case class RubyClientGenerator(form: InvocationForm) {
       case Datatype.List(_) | Datatype.Map(_) => true
     }
 
-    val varName = single match {
-      case Type(TypeKind.Primitive, name) => {
+    val varName = dt.`type` match {
+      case Type(Kind.Primitive, name) => {
         fieldName match {
           case Some(n) => RubyUtil.toVariable(n, multiple = multiple)
           case None => RubyUtil.toDefaultVariable(multiple = multiple)
         }
       }
-      case Type(TypeKind.Model, name) => {
+      case Type(Kind.Model, name) => {
         RubyUtil.toVariable(fieldName.getOrElse(name), multiple = multiple)
       }
-      case Type(TypeKind.Enum, name) => {
+      case Type(Kind.Enum, name) => {
         RubyUtil.toVariable(fieldName.getOrElse(name), multiple = multiple)
       }
     }
@@ -832,24 +761,15 @@ case class RubyClientGenerator(form: InvocationForm) {
   def generateResponse(response: Response): Option[String] = {
     val dt = parseType(response.`type`).datatype
 
-    dt.types.toList match {
-      case (single :: Nil) => {
-        single match {
-          case Type(TypeKind.Primitive, name) => {
-            Some(buildResponse(Container(dt), RubyUtil.toDefaultVariable()))
-          }
-          case Type(TypeKind.Model, name) => {
-            Some(buildResponse(Container(dt), name))
-          }
-
-          case Type(TypeKind.Enum, name) => {
-            Some(buildResponse(Container(dt), name))
-          }
-        }
+    dt.`type` match {
+      case Type(Kind.Primitive, name) => {
+        Some(buildResponse(Container(dt), RubyUtil.toDefaultVariable()))
       }
-
-      case (multiple) => {
-        sys.error("TODO: UNION TYPE")
+      case Type(Kind.Model, name) => {
+        Some(buildResponse(Container(dt), name))
+      }
+      case Type(Kind.Enum, name) => {
+        Some(buildResponse(Container(dt), name))
       }
     }
   }

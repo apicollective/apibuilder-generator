@@ -1,7 +1,7 @@
 package generator
 
 import models.Container
-import lib.{Datatype, Type, TypeKind}
+import lib.{Datatype, Type, Kind}
 import lib.Text._
 
 object ScalaUtil {
@@ -65,17 +65,10 @@ object ScalaUtil {
 
   def toVariable(dt: Datatype): String = {
     val multiple = Container(dt).multiple
-    dt.types.toList match {
-      case single :: Nil => {
-        single match {
-          case Type(TypeKind.Primitive, _) => ScalaUtil.toDefaultVariable(multiple = multiple)
-          case Type(TypeKind.Model, name) => ScalaUtil.toVariable(name, multiple = multiple)
-          case Type(TypeKind.Enum, name) => ScalaUtil.toVariable(name, multiple = multiple)
-        }
-      }
-      case multiple => {
-        sys.error("TODO: UNION TYPE")
-      }
+    dt.`type` match {
+      case Type(Kind.Primitive, _) => ScalaUtil.toDefaultVariable(multiple = multiple)
+      case Type(Kind.Model, name) => ScalaUtil.toVariable(name, multiple = multiple)
+      case Type(Kind.Enum, name) => ScalaUtil.toVariable(name, multiple = multiple)
     }
   }
 

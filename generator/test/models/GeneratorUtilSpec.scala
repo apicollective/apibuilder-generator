@@ -1,6 +1,6 @@
 package models
 
-import lib.{Datatype, Primitives, Type, TypeKind}
+import lib.{Datatype, Primitives, Type, Kind}
 import com.gilt.apidoc.spec.v0.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
 import generator._
 import org.scalatest.{ ShouldMatchers, FunSpec }

@@ -1,7 +1,7 @@
 package generator
 
 import com.gilt.apidoc.spec.v0.models.{Method, ParameterLocation}
-import lib.{Datatype, Primitives, Type, TypeKind}
+import lib.{Datatype, Primitives, Type, Kind}
 import lib.Text
 import lib.Text._
 
@@ -125,14 +125,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
         case Nil => Seq.empty
         case params => {
           params.map { p =>
-            p.datatype.types.toList match {
-              case single :: Nil => {
-                s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})"""
-              }
-              case multiple => {
-                sys.error("TODO: Union Type")
-              }
-            }
+            s"""  ${p.name}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
           }
         }
       }
@@ -142,14 +135,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
         case Nil => Seq.empty
         case params => {
           params.map { p =>
-            p.datatype.types.toList match {
-              case single :: Nil => {
-                sys.error("TODO: Finish map")
-              }
-              case other => {
-                sys.error("TODO: Union Type")
-              }
-            }
+            sys.error("TODO: Finish map")
           }
         }
       }
@@ -161,17 +147,10 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
           Seq(
             s"val $fieldName = Seq(",
             params.map { p =>
-              p.datatype.types.toList match {
-                case single :: Nil => {
-                  if (p.isOption) {
-                    s"""  ${p.name}.map("${p.originalName}" -> ${single.asString("_")})"""
-                  } else {
-                    s"""  Some("${p.originalName}" -> ${single.asString(p.name)})"""
-                  }
-                }
-                case multiple => {
-                  sys.error("TODO: Union Type")
-                }
+              if (p.isOption) {
+                s"""  ${p.name}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
+              } else {
+                s"""  Some("${p.originalName}" -> ${p.datatype.primitive.asString(p.name)})"""
               }
             }.mkString(",\n"),
             ").flatten"
@@ -216,17 +195,10 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     } else if (!op.body.isEmpty) {
       val body = op.body.get
 
-      val payload = body.datatype.types.toList match {
-        case single :: Nil => {
-          single match {
-            case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name)
-            case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name)
-            case _ => single.asString(ScalaUtil.toVariable(body.`type`))
-          }
-        }
-        case multiple => {
-          sys.error("TODO: UNION TYPE")
-        }
+      val payload = body.datatype.primitive match {
+        case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name)
+        case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name)
+        case _ => body.datatype.primitive.asString(ScalaUtil.toVariable(body.`type`))
       }
 
       Some(s"val payload = play.api.libs.json.Json.toJson($payload)")
@@ -251,21 +223,14 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       name: String,
       d: ScalaDatatype
     ): String = {
-      d.types.toList match {
-        case single :: Nil => {
-          single match {
-            case ScalaPrimitive.String => s"""${config.pathEncodingMethod}($name, "UTF-8")"""
-            case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
-            case ScalaPrimitive.Enum(_, _) => s"""${config.pathEncodingMethod}($name.toString, "UTF-8")"""
-            case ScalaPrimitive.DateIso8601 => s"$name.toString"
-            case ScalaPrimitive.DateTimeIso8601 => s"${config.pathEncodingMethod}(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name))"
-            case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
-              sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
-            }
-          }
-        }
-        case multiple => {
-          sys.error("TODO: UNION TYPE")
+      d.primitive match {
+        case ScalaPrimitive.String => s"""${config.pathEncodingMethod}($name, "UTF-8")"""
+        case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
+        case ScalaPrimitive.Enum(_, _) => s"""${config.pathEncodingMethod}($name.toString, "UTF-8")"""
+        case ScalaPrimitive.DateIso8601 => s"$name.toString"
+        case ScalaPrimitive.DateTimeIso8601 => s"${config.pathEncodingMethod}(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name))"
+        case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
+          sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }
       }
     }

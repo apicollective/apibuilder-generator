@@ -1,6 +1,6 @@
 package generator
 
-import lib.{Datatype, Primitives, Type, TypeKind}
+import lib.{Datatype, Primitives, Type, Kind}
 
 sealed trait ScalaPrimitive {
   def shortName: String
@@ -121,9 +121,8 @@ object ScalaPrimitive {
 sealed trait ScalaDatatype {
   def nilValue: String
 
-  def types: Seq[ScalaPrimitive]
+  def primitive: ScalaPrimitive
 
-  // TODO: UNION TYPES - change to names: Seq[String] or similar
   def name: String
 
   def definition(
@@ -142,38 +141,24 @@ sealed trait ScalaDatatype {
 
 object ScalaDatatype {
 
-  case class List(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
+  case class List(primitive: ScalaPrimitive) extends ScalaDatatype {
     override def nilValue = "Nil"
-    override def name = types.toList match {
-      case single :: Nil => s"Seq[${single.fullName}]"
-      case multiple => sys.error("TODO: UNION TYPES")
-    }
+    override def name = s"Seq[${primitive.fullName}]"
   }
 
-  case class Map(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
+  case class Map(primitive: ScalaPrimitive) extends ScalaDatatype {
     override def nilValue = "Map.empty"
-    override def name = types.toList match {
-      case single :: Nil => s"Map[String, ${single.fullName}]"
-      case multiple => sys.error("TODO: UNION TYPES")
-    }
+    override def name = s"Map[String, ${primitive.fullName}]"
   }
 
-  case class Option(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
+  case class Option(primitive: ScalaPrimitive) extends ScalaDatatype {
     override def nilValue = "None"
-    override def name = types.toList match {
-      case single :: Nil => s"_root_.scala.Option[${single.fullName}]"
-      case multiple => sys.error("TODO: UNION TYPES")
-    }
+    override def name = s"_root_.scala.Option[${primitive.fullName}]"
   }
 
-  case class Singleton(types: Seq[ScalaPrimitive]) extends ScalaDatatype {
+  case class Singleton(primitive: ScalaPrimitive) extends ScalaDatatype {
     override def nilValue = "None"
-    override def name = {
-      types.toList match {
-        case single :: Nil => single.fullName
-        case multiple => sys.error("TODO: UNION TYPES")
-      }
-    }
+    override def name = primitive.fullName
     override def definition(
       originalVarName: String,
       optional: Boolean
@@ -195,7 +180,7 @@ case class ScalaTypeResolver(
 
   def scalaPrimitive(t: Type): ScalaPrimitive = {
     t match {
-      case Type(TypeKind.Primitive, name) => {
+      case Type(Kind.Primitive, name) => {
         Primitives(name).getOrElse {
           sys.error(s"Invalid primitive[$name]")
         } match {
@@ -212,7 +197,7 @@ case class ScalaTypeResolver(
           case Primitives.Unit => ScalaPrimitive.Unit
         }
       }
-      case Type(TypeKind.Model, name) => {
+      case Type(Kind.Model, name) => {
         name.split("\\.").toList match {
           case n :: Nil => ScalaPrimitive.Model(namespaces.models, ScalaUtil.toClassName(n))
           case multiple => {
@@ -221,7 +206,7 @@ case class ScalaTypeResolver(
           }
         }
       }
-      case Type(TypeKind.Enum, name) => {
+      case Type(Kind.Enum, name) => {
         val (ns, n) = parseQualifiedName(namespaces.enums, name)
         ScalaPrimitive.Enum(ns, n)
       }
@@ -245,13 +230,10 @@ case class ScalaTypeResolver(
 
   def scalaDatatype(datatype: Datatype): ScalaDatatype = {
     datatype match {
-      case Datatype.List(types) => ScalaDatatype.List(types.map(scalaPrimitive(_)))
-
-      case Datatype.Map(types) => ScalaDatatype.Map(types.map(scalaPrimitive(_)))
-
-      case Datatype.Option(types) => ScalaDatatype.Option(types.map(scalaPrimitive(_)))
-
-      case Datatype.Singleton(types) => ScalaDatatype.Singleton(types.map(scalaPrimitive(_)))
+      case Datatype.List(t) => ScalaDatatype.List(scalaPrimitive(t))
+      case Datatype.Map(t) => ScalaDatatype.Map(scalaPrimitive(t))
+      case Datatype.Option(t) => ScalaDatatype.Option(scalaPrimitive(t))
+      case Datatype.Singleton(t) => ScalaDatatype.Singleton(scalaPrimitive(t))
     }
   }
 
