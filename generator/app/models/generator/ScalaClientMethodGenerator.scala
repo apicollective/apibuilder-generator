@@ -135,7 +135,6 @@ case class ScalaClientMethodGenerator(
           case Some(_) => Seq(404)
         })
       ).distinct.sorted
-      val dollar = "$"
 
       val matchResponse: String = {
         op.responses.flatMap { response =>
