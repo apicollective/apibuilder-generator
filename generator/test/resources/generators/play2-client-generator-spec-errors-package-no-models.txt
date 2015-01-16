@@ -1,10 +1,6 @@
 package error {
 
-  case class FailedRequest(responseCode: Int, message: String) extends Exception(message)
-  object FailedRequest {
-    def apply(responseCode: Int) = FailedRequest(responseCode, s"HTTP $responseCode")
-    def apply(responseCode: Int, message: String) = FailedRequest(responseCode, s"HTTP $responseCode: $message")
-  )
+  case class FailedRequest(responseCode: Int, message: String) extends Exception(s"HTTP $responseCode: $message")
 
 }
   

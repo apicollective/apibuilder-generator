@@ -57,13 +57,7 @@ case class ScalaClientMethodGenerator(
   }
 
   private def failedRequestClass(): String = {
-    """
-case class FailedRequest(responseCode: Int, message: String) extends Exception(message)
-object FailedRequest {
-  def apply(responseCode: Int) = FailedRequest(responseCode, s"HTTP $responseCode")
-  def apply(responseCode: Int, message: String) = FailedRequest(responseCode, s"HTTP $responseCode: $message")
-)
-""".trim
+    """case class FailedRequest(responseCode: Int, message: String) extends Exception(s"HTTP $responseCode: $message")"""
   }
 
   /**
@@ -130,9 +124,16 @@ object FailedRequest {
       }
 
       val hasOptionResult = op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
-        val nilValue = r.datatype.nilValue
-        s"\ncase r if r.${config.responseStatusMethod} == 404 => $nilValue"
+        s"\ncase r if r.${config.responseStatusMethod} == 404 => ${r.datatype.nilValue}"
       }
+
+      val allResponseCodes = (
+        op.responses.map(_.code) ++ (hasOptionResult match {
+          case None => Seq.empty
+          case Some(_) => Seq(404)
+        })
+      ).distinct.sorted
+      val dollar = "$"
 
       val matchResponse: String = {
         op.responses.flatMap { response =>
@@ -161,7 +162,8 @@ object FailedRequest {
             Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${ssd.namespace}.error.${response.errorClassName}(r)")
           }
         }.mkString("\n")
-      } + hasOptionResult.getOrElse("") + s"\ncase r => throw new ${ssd.namespace}.error.FailedRequest(r.${config.responseStatusMethod})\n"
+      } + hasOptionResult.getOrElse("") +
+      s"""\ncase r => throw new ${ssd.namespace}.error.FailedRequest(r.${config.responseStatusMethod}, s"Unupported response code. Expected: ${allResponseCodes.mkString(", ")}")\n"""
 
       ClientMethod(
         name = op.name,
