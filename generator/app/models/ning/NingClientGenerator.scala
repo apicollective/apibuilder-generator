@@ -54,7 +54,8 @@ case class NingClientGenerator(
     s"""package ${ssd.namespaces.base} {
   import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response}
 
-  class Client(apiUrl: String, apiToken: scala.Option[String] = None) {
+  
+  ${ScalaClientCommon.clientSignature(config)} {
     import ${ssd.namespaces.models}.json._
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
@@ -77,14 +78,19 @@ ${methodGenerator.objects().indent(4)}
         .setUrl(apiUrl + path)
         .addHeader("User-Agent", UserAgent)
 
-      apiToken.fold(builder) { token =>
-        builder.setRealm(
-          new Realm.RealmBuilder()
-            .setPrincipal(token)
-            .setUsePreemptiveAuth(true)
-            .setScheme(Realm.AuthScheme.BASIC)
-            .build()
-        )
+      auth.fold(builder) { a =>
+        a match {
+          case Authorization.Basic(username, password) => {
+            builder.setRealm(
+              new Realm.RealmBuilder()
+                .setPrincipal(auth.username)
+                .setUsePreemptiveAuth(true)
+                .setScheme(Realm.AuthScheme.BASIC)
+                .build()
+            )
+          }
+          case _ => sys.error("Invalid authorization scheme[" + a.getClass + "]")
+        }
       }
     }
 
@@ -120,11 +126,11 @@ ${methodGenerator.objects().indent(4)}
 
   }
 
-${ScalaClientJsonParser(config).indent(2)}
-
-${PathSegment.definition.indent(2)}
+${ScalaClientCommon(config).indent(2)}
 
 ${methodGenerator.traitsAndErrors().indent(2)}
+
+${PathSegment.definition.indent(2)}
 }"""
   }
 

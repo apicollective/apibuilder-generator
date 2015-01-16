@@ -3,7 +3,7 @@ package models
 import com.gilt.apidoc.spec.v0.models.Service
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.Text._
-import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientJsonParser, ScalaClientMethodConfigs, ScalaClientMethodConfig}
+import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon, ScalaClientMethodConfig, ScalaClientMethodConfigs}
 
 case class PlayFrameworkVersion(
   name: String,
@@ -88,7 +88,7 @@ case class Play2ClientGenerator(
 
     s"""package ${ssd.namespaces.base} {
 
-  class Client(apiUrl: String, apiToken: scala.Option[String] = None) {
+  ${ScalaClientCommon.clientSignature(version.config)} {
     import ${ssd.namespaces.models}.json._
 
     private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
@@ -104,8 +104,13 @@ ${methodGenerator.objects().indent(4)}
       import play.api.Play.current
 
       val holder = play.api.libs.ws.WS.url(apiUrl + path)$headerString
-      apiToken.fold(holder) { token =>
-        holder.withAuth(token, "", ${version.authSchemeClass}.BASIC)
+      auth.fold(holder) { a =>
+        a match {
+          case Authorization.Basic(username, password) => {
+            holder.withAuth(username, password.getOrElse(""), ${version.authSchemeClass}.BASIC)
+          }
+          case _ => sys.error("Invalid authorization scheme[" + a.getClass + "]")
+        }
       }
     }
 
@@ -115,7 +120,7 @@ ${methodGenerator.objects().indent(4)}
         value <- values
       } yield name -> value
       val url = s"$${req.url}$${queryComponents.mkString("?", "&", "")}"
-      apiToken.fold(logger.info(s"curl -X $$method $$url")) { _ =>
+      auth.fold(logger.info(s"curl -X $$method $$url")) { _ =>
         logger.info(s"curl -X $$method -u '[REDACTED]:' $$url")
       }
       req
@@ -158,7 +163,7 @@ ${methodGenerator.objects().indent(4)}
 
   }
 
-${ScalaClientJsonParser(version.config).indent(2)}
+${ScalaClientCommon(version.config).indent(2)}
 
 ${methodGenerator.traitsAndErrors().indent(2)}
 
