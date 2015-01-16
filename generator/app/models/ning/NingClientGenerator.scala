@@ -81,7 +81,7 @@ case class NingClientGenerator(
       f(play.api.libs.json.Json.parse(r.getResponseBody("UTF-8"))) match {
         case play.api.libs.json.JsSuccess(x, _) => x
         case play.api.libs.json.JsError(errors) => {
-          throw new ${ssd.modelNamespace}.error.FailedRequest(r, Some("Invalid json: " + errors.mkString(" ")))
+          throw new ${ssd.modelNamespace}.error.FailedRequest(r.code, Some("Invalid json: " + errors.mkString(" ")))
         }
       }
     }

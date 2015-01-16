@@ -42,14 +42,6 @@ case class ScalaClientMethodGenerator(
     }.mkString("\n\n")
   }
 
-  /**
-    * Returns an implementation of FailedRequest class that is used to
-    * capture errors in the client.
-    */
-  def failedRequestClass(): String = {
-    exceptionClass("FailedRequest")
-  }
-
   def errorPackage(): String = {
     Seq(
       Some("package error {"),
@@ -64,12 +56,22 @@ case class ScalaClientMethodGenerator(
     ).flatten.mkString("\n\n")
   }
 
+  private def failedRequestClass(): String = {
+    """
+case class FailedRequest(responseCode: Int, message: String) extends Exception(message)
+object FailedRequest {
+  def apply(responseCode: Int) = FailedRequest(responseCode, s"HTTP $responseCode")
+  def apply(responseCode: Int, message: String) = FailedRequest(responseCode, s"HTTP $responseCode: $message")
+)
+""".trim
+  }
+
   /**
     * Returns custom case classes based on the service description for
     * all error return types. e.g. a 409 that returns Seq[Error] is
     * handled via these classes.
     */
-  def modelErrorClasses(): Seq[String] = {
+  private def modelErrorClasses(): Seq[String] = {
     ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
       errorTypeClass(response)
     }.distinct.sorted
@@ -81,7 +83,7 @@ case class ScalaClientMethodGenerator(
     val json = config.toJson("response", response.datatype.name)
     exceptionClass(
       response.errorClassName,
-      Some("lazy val ${response.errorVariableName} = ${json.indent(2).trim}")
+      Some(s"lazy val ${response.errorVariableName} = ${json.indent(2).trim}")
     )
   }
 
@@ -159,7 +161,7 @@ case class ScalaClientMethodGenerator(
             Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${ssd.namespace}.error.${response.errorClassName}(r)")
           }
         }.mkString("\n")
-      } + hasOptionResult.getOrElse("") + s"\ncase r => throw new ${ssd.namespace}.error.FailedRequest(r)\n"
+      } + hasOptionResult.getOrElse("") + s"\ncase r => throw new ${ssd.namespace}.error.FailedRequest(r.${config.responseStatusMethod})\n"
 
       ClientMethod(
         name = op.name,
