@@ -4,8 +4,8 @@ import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 
 import play.api.libs.json._
-import com.gilt.apidoc.spec.models.json._
-import com.gilt.apidoc.spec.models.Service
+import com.gilt.apidoc.spec.v0.models.json._
+import com.gilt.apidoc.spec.v0.models.Service
 import generator.ScalaService
 import lib.Text
 

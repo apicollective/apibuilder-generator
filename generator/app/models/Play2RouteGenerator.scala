@@ -1,8 +1,8 @@
 package models
 
 import lib.{Primitives, Text}
-import com.gilt.apidoc.generator.models.InvocationForm
-import com.gilt.apidoc.spec.models._
+import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.gilt.apidoc.spec.v0.models._
 import generator.{ScalaDatatype, ScalaPrimitive, GeneratorUtil, ScalaOperation, ScalaParameter, ScalaResource, ScalaService, ScalaUtil, CodeGenerator}
 
 object Play2RouteGenerator extends CodeGenerator {

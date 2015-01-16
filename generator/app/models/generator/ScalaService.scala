@@ -1,6 +1,6 @@
 package generator
 
-import com.gilt.apidoc.spec.models._
+import com.gilt.apidoc.spec.v0.models._
 import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind, VersionTag}
 import models.Container
 

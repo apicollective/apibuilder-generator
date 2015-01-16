@@ -1,6 +1,6 @@
 package generator
 
-import com.gilt.apidoc.generator.models.InvocationForm
+import com.gilt.apidoc.generator.v0.models.InvocationForm
 
 trait CodeGenerator {
 

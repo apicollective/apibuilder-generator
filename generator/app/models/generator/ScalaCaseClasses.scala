@@ -1,8 +1,8 @@
 package generator
 
 import models.ApidocHeaders
-import com.gilt.apidoc.generator.models.InvocationForm
-import com.gilt.apidoc.spec.models.Service
+import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.gilt.apidoc.spec.v0.models.Service
 import lib.Text._
 
 object ScalaCaseClasses extends CodeGenerator {

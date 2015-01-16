@@ -2,7 +2,7 @@ package generator
 
 import models.TestHelper
 import lib.Primitives
-import com.gilt.apidoc.spec.models._
+import com.gilt.apidoc.spec.v0.models._
 import org.scalatest._
 
 class ScalaOperationSpec extends FunSpec with ShouldMatchers {
