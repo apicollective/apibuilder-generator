@@ -178,9 +178,6 @@ class TextSpec extends FunSpec with Matchers {
       val errors = actuals.flatMap { case (singular, plural) =>
         if (Text.pluralize(singular) != plural) {
           Some("a: %s should have been %s but was %s".format(singular, plural, Text.pluralize(singular)))
-        } else if (Text.pluralize(plural) != plural) {
-          Some("a: %s should have been %s but was %s".format(plural, plural, Text.pluralize(plural)))
-          None // TODO
         } else {
           None
         }
