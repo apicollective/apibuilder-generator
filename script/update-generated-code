@@ -26,7 +26,7 @@ def download(service_name, map)
   downloads.each do |tmp, path|
     command = "cp #{tmp} #{path}"
     puts command
-    #system(command)
+    system(command)
   end
 end
 
