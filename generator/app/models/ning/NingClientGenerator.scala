@@ -51,11 +51,11 @@ case class NingClientGenerator(
 
     val methodGenerator = ScalaClientMethodGenerator(config, ssd)
 
-    s"""package ${ssd.namespace} {
+    s"""package ${ssd.namespaces.base} {
   import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response}
 
   class Client(apiUrl: String, apiToken: scala.Option[String] = None) {
-    import ${ssd.modelNamespace}.json._
+    import ${ssd.namespaces.models}.json._
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
 

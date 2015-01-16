@@ -7,16 +7,9 @@ import models.Container
 case class ScalaService(
   val service: Service
 ) {
-  val namespace = service.namespace
+  val namespaces = Namespaces(service.namespace)
 
-  val modelNamespace = s"$namespace.models"
-  val enumNamespace = modelNamespace
-
-  private val scalaTypeResolver = ScalaTypeResolver(
-    modelNamespace = modelNamespace,
-    enumNamespace = enumNamespace
-  )
-
+  private val scalaTypeResolver = ScalaTypeResolver(namespaces)
 
   val datatypeResolver = DatatypeResolver(
     enumNames = service.enums.map(_.name) ++ service.imports.flatMap { imp =>
@@ -29,14 +22,12 @@ case class ScalaService(
 
   val name = ScalaUtil.toClassName(service.name)
  
-  def modelClassName(name: String) = modelNamespace + "." + ScalaUtil.toClassName(name)
-  def enumClassName(name: String) = enumNamespace + "." + ScalaUtil.toClassName(name)
+  def modelClassName(name: String) = namespaces.models + "." + ScalaUtil.toClassName(name)
+  def enumClassName(name: String) = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
   val models = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 
   val enums = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(_) }
-
-  val namespacePrivate = namespace.split("\\.").last
 
   val defaultHeaders: Seq[ScalaHeader] = {
     service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
@@ -134,7 +125,7 @@ class ScalaEnumValue(value: EnumValue) {
 
 class ScalaResource(ssd: ScalaService, val resource: Resource, val model: ScalaModel) {
 
-  val namespace: String = ssd.namespace
+  val namespaces = ssd.namespaces
 
   val operations = resource.operations.map { new ScalaOperation(ssd, _, this)}
 

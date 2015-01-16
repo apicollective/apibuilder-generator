@@ -190,8 +190,7 @@ object ScalaDatatype {
 }
 
 case class ScalaTypeResolver(
-  modelNamespace: String,
-  enumNamespace: String
+  namespaces: Namespaces
 ) {
 
   def scalaPrimitive(t: Type): ScalaPrimitive = {
@@ -215,15 +214,15 @@ case class ScalaTypeResolver(
       }
       case Type(TypeKind.Model, name) => {
         name.split("\\.").toList match {
-          case n :: Nil => ScalaPrimitive.Model(modelNamespace, ScalaUtil.toClassName(n))
+          case n :: Nil => ScalaPrimitive.Model(namespaces.models, ScalaUtil.toClassName(n))
           case multiple => {
-            val (ns, n) = parseQualifiedName(modelNamespace, name)
+            val (ns, n) = parseQualifiedName(namespaces.models, name)
             ScalaPrimitive.Model(ns, n)
           }
         }
       }
       case Type(TypeKind.Enum, name) => {
-        val (ns, n) = parseQualifiedName(enumNamespace, name)
+        val (ns, n) = parseQualifiedName(namespaces.enums, name)
         ScalaPrimitive.Enum(ns, n)
       }
     }

@@ -16,7 +16,7 @@ object Play2Bindables {
       "  import play.api.mvc.{PathBindable, QueryStringBindable}",
       "  import org.joda.time.{DateTime, LocalDate}",
       "  import org.joda.time.format.ISODateTimeFormat",
-      s"  import ${ssd.namespace}.models._",
+      s"  import ${ssd.namespaces.models}._",
       "",
       buildDefaults().indent(2),
       "",

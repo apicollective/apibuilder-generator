@@ -1,9 +1,9 @@
 object Contents extends Contents {
   override def getData()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[_root_.play.api.libs.json.JsObject]] = {
     _executeRequest("GET", s"/contents/data").map {
-      case r if r.status == 200 => Some(r.json.as[_root_.play.api.libs.json.JsObject])
+      case r if r.status == 200 => Some(_root_.test.apidoc.Client.parseJson("_root_.play.api.libs.json.JsObject", r, _.validate[_root_.play.api.libs.json.JsObject]))
       case r if r.status == 404 => None
-      case r => throw new test.apidoc.apidoctest.error.FailedRequest(r.status)
+      case r => throw new test.apidoc.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200, 404")
     }
   }
 }

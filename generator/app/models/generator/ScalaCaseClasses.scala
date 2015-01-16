@@ -21,7 +21,7 @@ object ScalaCaseClasses extends CodeGenerator {
       case true => ApidocHeaders(form.userAgent).toJavaString() + "\n"
     }
 
-    s"${header}package ${ssd.modelNamespace} {\n\n  " +
+    s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
       ssd.models.map { generateCaseClass(_) }.mkString("\n\n").indent(2),
       "",

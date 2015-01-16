@@ -11,6 +11,8 @@ case class ScalaClientMethodGenerator(
   import lib.Text
   import lib.Text._
 
+  private val namespaces = Namespaces(config.namespace)
+
   private val generatorUtil = GeneratorUtil(config)
 
   private val sortedResources = ssd.resources.sortWith { _.model.name.toLowerCase < _.model.name.toLowerCase }
@@ -44,7 +46,7 @@ case class ScalaClientMethodGenerator(
 
   def errorPackage(): String = {
     Seq(
-      Some("package error {"),
+      Some("package errors {"),
       modelErrorClasses() match {
         case Nil => None
         case classes => {
@@ -159,11 +161,11 @@ case class ScalaClientMethodGenerator(
             None
 
           } else {
-            Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${ssd.namespace}.error.${response.errorClassName}(r)")
+            Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${namespaces.errors}.${response.errorClassName}(r)")
           }
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") +
-      s"""\ncase r => throw new ${ssd.namespace}.error.FailedRequest(r.${config.responseStatusMethod}, s"Unupported response code. Expected: ${allResponseCodes.mkString(", ")}")\n"""
+      s"""\ncase r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unupported response code. Expected: ${allResponseCodes.mkString(", ")}")\n"""
 
       ClientMethod(
         name = op.name,

@@ -29,7 +29,7 @@ object Play2Models extends CodeGenerator {
 
 s"""$header$caseClasses
 
-package ${ssd.modelNamespace} {
+package ${ssd.namespaces.models} {
   package object json {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
@@ -37,18 +37,18 @@ package ${ssd.modelNamespace} {
     import play.api.libs.functional.syntax._
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
-    private[${ssd.namespacePrivate}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
+    private[${ssd.namespaces.last}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
-    private[${ssd.namespacePrivate}] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
+    private[${ssd.namespaces.last}] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
       def writes(x: java.util.UUID) = JsString(x.toString)
     }
 
-    private[${ssd.namespacePrivate}] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
+    private[${ssd.namespaces.last}] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
       import org.joda.time.format.ISODateTimeFormat.dateTimeParser
       dateTimeParser.parseDateTime(str)
     }
 
-    private[${ssd.namespacePrivate}] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
+    private[${ssd.namespaces.last}] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
       def writes(x: org.joda.time.DateTime) = {
         import org.joda.time.format.ISODateTimeFormat.dateTime
         val str = dateTime.print(x)

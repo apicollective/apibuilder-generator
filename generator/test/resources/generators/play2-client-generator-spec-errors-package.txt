@@ -7,7 +7,7 @@ package error {
     response: play.api.libs.ws.Response,
     message: Option[String] = None
   ) extends Exception(message.getOrElse(response.status + ": " + response.body)){
-    lazy val errors = response.json.as[Seq[com.gilt.apidoc.generator.v0.models.Error]]
+    lazy val errors = _root_.test.apidoc.Client.parseJson("Seq[com.gilt.apidoc.generator.v0.models.Error]", response, _.validate[Seq[com.gilt.apidoc.generator.v0.models.Error]])
   }
 
   case class FailedRequest(responseCode: Int, message: String) extends Exception(s"HTTP $responseCode: $message")

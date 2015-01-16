@@ -86,15 +86,15 @@ case class Play2ClientGenerator(
         s""""${h.name}" -> ${h.quotedValue}"""
       } ++  Seq(""""User-Agent" -> UserAgent""")).mkString(", ") + ")"
 
-    s"""package ${ssd.namespace} {
+    s"""package ${ssd.namespaces.base} {
 
   class Client(apiUrl: String, apiToken: scala.Option[String] = None) {
-    import ${ssd.modelNamespace}.json._
+    import ${ssd.namespaces.models}.json._
 
     private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
-    private val logger = play.api.Logger("${ssd.namespace}.client")
+    private val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
-    logger.info(s"Initializing ${ssd.namespace}.client for url $$apiUrl")
+    logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$apiUrl")
 
 ${methodGenerator.accessors().indent(4)}
 
