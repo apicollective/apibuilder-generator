@@ -3,7 +3,7 @@ object Contents extends Contents {
     _executeRequest("GET", s"/contents/data").map {
       case r if r.status == 200 => Some(r.json.as[_root_.play.api.libs.json.JsObject])
       case r if r.status == 404 => None
-      case r => throw new FailedRequest(r)
+      case r => throw new test.apidoc.apidoctest.error.FailedRequest(r.status)
     }
   }
 }

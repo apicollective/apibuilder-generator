@@ -1,4 +1,4 @@
-package test.apidoc.apidoctest.v1.models {
+package test.apidoc.apidoctest.models {
 
   case class Content(
     data: Map[String, _root_.play.api.libs.json.JsObject]
