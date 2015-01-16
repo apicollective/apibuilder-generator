@@ -5,13 +5,12 @@ import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKin
 import models.Container
 
 case class ScalaService(
-  service: Service
+  val service: Service
 ) {
   val namespace = service.namespace
 
   val modelNamespace = s"$namespace.models"
   val enumNamespace = modelNamespace
-  val imports = service.imports
 
   private val scalaTypeResolver = ScalaTypeResolver(
     modelNamespace = modelNamespace,

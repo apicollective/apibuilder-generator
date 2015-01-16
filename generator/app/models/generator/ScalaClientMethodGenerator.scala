@@ -1,5 +1,6 @@
 package generator
 
+import models.JsonImports
 import com.gilt.apidoc.spec.v0.models.Resource
 import scala.collection.immutable.TreeMap
 
@@ -13,15 +14,6 @@ case class ScalaClientMethodGenerator(
   private val generatorUtil = GeneratorUtil(config)
 
   private val sortedResources = ssd.resources.sortWith { _.model.name.toLowerCase < _.model.name.toLowerCase }
-
-  private val jsonImports: Seq[String] = {
-    (
-      Seq(s"import ${ssd.modelNamespace}.json._") ++
-      ssd.imports.map { imp =>
-        s"import ${imp.namespace}.models.json._"
-      }
-    ).sorted
-  }
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + errorPackage()).trim
@@ -70,7 +62,7 @@ case class ScalaClientMethodGenerator(
 
     Seq(
       "package error {",
-      jsonImports.mkString("\n").indent(2),
+      JsonImports(ssd.service).mkString("\n").indent(2),
       errorClasses.mkString("\n\n").indent(2),
       failedRequestClass().indent(2),
       "}"
@@ -81,18 +73,19 @@ case class ScalaClientMethodGenerator(
     require(!response.isSuccess)
 
     val json = config.toJson("response", response.datatype.name)
-    exceptionClass(response.errorClassName,
-                   jsonImports :+ s"lazy val ${response.errorVariableName} = ${json.indent(2).trim}"
+    exceptionClass(
+      response.errorClassName,
+      Some("lazy val ${response.errorVariableName} = ${json.indent(2).trim}")
     )
   }
 
   private[this] def exceptionClass(
     className: String,
-    body: Seq[String] = Seq.empty
+    body: Option[String] = None
   ): String = {
     val bodyString = body match {
-      case Nil => ""
-      case b => "{\n" + body.mkString("\n").indent(2) + "\n}"
+      case None => ""
+      case Some(b) => "{\n" + b.indent(2) + "\n}"
     }
 
     Seq(
