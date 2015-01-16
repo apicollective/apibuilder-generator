@@ -1,13 +1,16 @@
 package generator
 
 import com.gilt.apidoc.spec.models._
-import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
+import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind, VersionTag}
 import models.Container
 
 case class ScalaService(
   service: Service
 ) {
-  val namespace = service.namespace
+  val namespace = VersionTag(service.version).major match {
+    case None => service.namespace
+    case Some(major) => s"${service.namespace}.v$major"
+  }
 
   val modelNamespace = s"$namespace.models"
   val enumNamespace = modelNamespace
@@ -31,7 +34,6 @@ case class ScalaService(
  
   def modelClassName(name: String) = modelNamespace + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String) = enumNamespace + "." + ScalaUtil.toClassName(name)
-  // TODO: End make these private
 
   val models = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 

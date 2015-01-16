@@ -3,7 +3,7 @@ object Bindables {
   import play.api.mvc.{PathBindable, QueryStringBindable}
   import org.joda.time.{DateTime, LocalDate}
   import org.joda.time.format.ISODateTimeFormat
-  import com.gilt.apidoc.reference.api.models._
+  import com.gilt.apidoc.reference.api.v0.models._
 
   // Type: date-time-iso8601
   implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[DateTime](
