@@ -1,16 +1,13 @@
 package generator
 
 import com.gilt.apidoc.spec.v0.models._
-import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind, VersionTag}
+import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, TypeKind}
 import models.Container
 
 case class ScalaService(
   service: Service
 ) {
-  val namespace = VersionTag(service.version).major match {
-    case None => service.namespace
-    case Some(major) => s"${service.namespace}.v$major"
-  }
+  val namespace = service.namespace
 
   val modelNamespace = s"$namespace.models"
   val enumNamespace = modelNamespace

@@ -28,7 +28,7 @@
 
         "invocation_form": {
           "fields": [
-            { "name": "service", "type": "com.gilt.apidoc.spec.models.service" },
+            { "name": "service", "type": "com.gilt.apidoc.spec.v0.models.service" },
             { "name": "user_agent", "type": "string", "required": "false" }
           ]
         },
