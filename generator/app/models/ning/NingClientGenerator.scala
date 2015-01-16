@@ -83,7 +83,7 @@ ${methodGenerator.objects().indent(4)}
           case Authorization.Basic(username, password) => {
             builder.setRealm(
               new Realm.RealmBuilder()
-                .setPrincipal(auth.username)
+                .setPrincipal(username)
                 .setUsePreemptiveAuth(true)
                 .setScheme(Realm.AuthScheme.BASIC)
                 .build()
