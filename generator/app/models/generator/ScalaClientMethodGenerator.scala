@@ -14,8 +14,17 @@ case class ScalaClientMethodGenerator(
 
   private val sortedResources = ssd.resources.sortWith { _.model.name.toLowerCase < _.model.name.toLowerCase }
 
+  private val jsonImports: Seq[String] = {
+    (
+      Seq(s"import ${ssd.modelNamespace}.json._") ++
+      ssd.imports.map { imp =>
+        s"import ${imp.namespace}.models.json._"
+      }
+    ).sorted
+  }
+
   def traitsAndErrors(): String = {
-    (traits() + "\n\n" + failedRequestClass() + "\n\n" + errorPackage()).trim
+    (traits() + "\n\n" + errorPackage()).trim
   }
 
   def accessors(): String = {
@@ -51,34 +60,29 @@ case class ScalaClientMethodGenerator(
 
   /**
     * Returns custom case classes based on the service description for
-    * all errors return types. e.g. a 409 that returns Seq[Error] is
+    * all error return types. e.g. a 409 that returns Seq[Error] is
     * handled via these classes.
     */
   def errorPackage(): String = {
-    ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
-      val etc = errorTypeClass(response).distinct.sorted.mkString("\n\n").indent(2)
-      val jsonImport = if (config.hasModelJsonPackage) {
-        Seq("",
-            s"  import ${ssd.modelNamespace}.json._",
-            "")
-      } else {
-        Seq.empty
-      }
-      (Seq("package error {") ++
-       jsonImport ++
-       Seq(errorTypeClass(response).indent(2),
-           "}")
-      ).mkString("\n")
-    }.toSeq.distinct.sorted.mkString("\n\n")
+    val errorClasses = ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
+      errorTypeClass(response)
+    }.distinct.sorted
+
+    Seq(
+      "package error {",
+      jsonImports.mkString("\n").indent(2),
+      errorClasses.mkString("\n\n").indent(2),
+      failedRequestClass().indent(2),
+      "}"
+    ).mkString("\n\n")
   }
 
   private[this] def errorTypeClass(response: ScalaResponse): String = {
     require(!response.isSuccess)
 
     val json = config.toJson("response", response.datatype.name)
-    val jsonImport = if (config.hasModelJsonPackage) Seq(s"import ${ssd.modelNamespace}.json._") else Seq.empty
     exceptionClass(response.errorClassName,
-                   jsonImport :+ s"lazy val ${response.errorVariableName} = ${json.indent(2).trim}"
+                   jsonImports :+ s"lazy val ${response.errorVariableName} = ${json.indent(2).trim}"
     )
   }
 
@@ -156,7 +160,7 @@ case class ScalaClientMethodGenerator(
             Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${ssd.namespace}.error.${response.errorClassName}(r)")
           }
         }.mkString("\n")
-      } + hasOptionResult.getOrElse("") + "\ncase r => throw new FailedRequest(r)\n"
+      } + hasOptionResult.getOrElse("") + s"\ncase r => throw new ${ssd.namespace}.error.FailedRequest(r)\n"
 
       ClientMethod(
         name = op.name,

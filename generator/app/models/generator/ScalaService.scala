@@ -11,6 +11,7 @@ case class ScalaService(
 
   val modelNamespace = s"$namespace.models"
   val enumNamespace = modelNamespace
+  val imports = service.imports
 
   private val scalaTypeResolver = ScalaTypeResolver(
     modelNamespace = modelNamespace,
