@@ -50,23 +50,29 @@ case class ScalaClientMethodGenerator(
     exceptionClass("FailedRequest")
   }
 
+  def errorPackage(): String = {
+    Seq(
+      Some("package error {"),
+      modelErrorClasses() match {
+        case Nil => None
+        case classes => {
+          Some(JsonImports(ssd.service).mkString("\n").indent(2) + "\n\n" + classes.mkString("\n\n").indent(2))
+        }
+      },
+      Some(failedRequestClass().indent(2)),
+      Some("}")
+    ).flatten.mkString("\n\n")
+  }
+
   /**
     * Returns custom case classes based on the service description for
     * all error return types. e.g. a 409 that returns Seq[Error] is
     * handled via these classes.
     */
-  def errorPackage(): String = {
-    val errorClasses = ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
+  def modelErrorClasses(): Seq[String] = {
+    ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
       errorTypeClass(response)
     }.distinct.sorted
-
-    Seq(
-      "package error {",
-      JsonImports(ssd.service).mkString("\n").indent(2),
-      errorClasses.mkString("\n\n").indent(2),
-      failedRequestClass().indent(2),
-      "}"
-    ).mkString("\n\n")
   }
 
   private[this] def errorTypeClass(response: ScalaResponse): String = {
