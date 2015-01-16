@@ -6,7 +6,7 @@
   "application": {
     "key": "apidoc-reference-api"
   },
-  "namespace": "com.gilt.apidoc.reference.api",
+  "namespace": "com.gilt.apidoc.reference.api.v0",
   "version": "0.0.1-dev",
   "base_url": "http://localhost:9000",
   "description": null,

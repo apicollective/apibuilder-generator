@@ -6,7 +6,7 @@
   "application": {
     "key": "apidoc-generator"
   },
-  "namespace": "com.gilt.apidoc.generator",
+  "namespace": "com.gilt.apidoc.generator.v0",
   "version": "0.0.1",
   "base_url": "http://www.apidoc.me",
   "description": "Documentation for an apidoc code generator API",
@@ -14,7 +14,7 @@
   "imports": [
     {
       "uri": "http://localhost:9000/gilt/apidoc-spec/0.7.39/service.json",
-      "namespace": "com.gilt.apidoc.spec",
+      "namespace": "com.gilt.apidoc.spec.v0",
       "organization": {
         "key": "gilt"
       },
@@ -161,7 +161,7 @@
       "fields": [
         {
           "name": "service",
-          "type": "com.gilt.apidoc.spec.models.service",
+          "type": "com.gilt.apidoc.spec.v0.models.service",
           "description": null,
           "default": null,
           "required": true,

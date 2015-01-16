@@ -55,7 +55,8 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     """)
 
     val ssd = TestHelper.scalaService(json)
-    ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage() should be("")
+    val contents = ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
+    TestHelper.assertEqualsFile("test/resources/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
   }
 
 }

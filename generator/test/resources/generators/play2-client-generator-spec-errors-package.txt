@@ -1,12 +1,19 @@
 package error {
 
   import com.gilt.apidoc.generator.v0.models.json._
+  import com.gilt.apidoc.spec.v0.models.json._
 
   case class ErrorsResponse(
     response: play.api.libs.ws.Response,
     message: Option[String] = None
   ) extends Exception(message.getOrElse(response.status + ": " + response.body)){
-    import com.gilt.apidoc.generator.v0.models.json._
     lazy val errors = response.json.as[Seq[com.gilt.apidoc.generator.v0.models.Error]]
   }
+
+  case class FailedRequest(responseCode: Int, message: String) extends Exception(message)
+  object FailedRequest {
+    def apply(responseCode: Int) = FailedRequest(responseCode, s"HTTP $responseCode")
+    def apply(responseCode: Int, message: String) = FailedRequest(responseCode, s"HTTP $responseCode: $message")
+  )
+
 }

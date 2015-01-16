@@ -6,7 +6,7 @@
   "application": {
     "key": "quality"
   },
-  "namespace": "com.gilt.quality",
+  "namespace": "com.gilt.quality.v0",
   "version": "0.0.1-dev",
   "base_url": "http://api.quality.architecture.giltaws.com",
   "description": "Application to track perfect day and quality at gilt",

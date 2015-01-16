@@ -6,7 +6,7 @@
   "application": {
     "key": "apidoc"
   },
-  "namespace": "com.gilt.apidoc",
+  "namespace": "com.gilt.apidoc.v0",
   "version": "0.0.1-dev",
   "base_url": "http://api.apidoc.me",
   "description": "Host API documentation for applications providing REST APIs, facilitating the design of good resource first APIs.",
