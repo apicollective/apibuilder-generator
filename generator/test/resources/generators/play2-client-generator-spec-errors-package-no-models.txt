@@ -1,6 +1,5 @@
-package error {
+package errors {
 
   case class FailedRequest(responseCode: Int, message: String) extends Exception(s"HTTP $responseCode: $message")
 
 }
-  
