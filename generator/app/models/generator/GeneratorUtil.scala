@@ -125,7 +125,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
         case Nil => Seq.empty
         case params => {
           params.map { p =>
-            s"""  ${p.name}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
+            s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
           }
         }
       }
@@ -148,7 +148,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
             s"val $fieldName = Seq(",
             params.map { p =>
               if (p.isOption) {
-                s"""  ${p.name}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
+                s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
               } else {
                 s"""  Some("${p.originalName}" -> ${p.datatype.primitive.asString(p.name)})"""
               }
