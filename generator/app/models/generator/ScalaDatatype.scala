@@ -63,7 +63,7 @@ object ScalaPrimitive {
   }
 
   case object Decimal extends ScalaPrimitive {
-    def shortName = "Decimal"
+    def shortName = "BigDecimal"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
