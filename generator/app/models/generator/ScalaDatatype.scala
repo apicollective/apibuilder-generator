@@ -116,6 +116,14 @@ object ScalaPrimitive {
     }
   }
 
+  case class Union(ns: String, shortName: String) extends ScalaPrimitive {
+    override def namespace = Some(ns)
+    def asString(originalVarName: String): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.toString"
+    }
+  }
+
 }
 
 sealed trait ScalaDatatype {
@@ -209,6 +217,10 @@ case class ScalaTypeResolver(
       case Type(Kind.Enum, name) => {
         val (ns, n) = parseQualifiedName(namespaces.enums, name)
         ScalaPrimitive.Enum(ns, n)
+      }
+      case Type(Kind.Union, name) => {
+        val (ns, n) = parseQualifiedName(namespaces.enums, name)
+        ScalaPrimitive.Union(ns, n)
       }
     }
   }

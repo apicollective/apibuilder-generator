@@ -67,8 +67,7 @@ object ScalaUtil {
     val multiple = Container(dt).multiple
     dt.`type` match {
       case Type(Kind.Primitive, _) => ScalaUtil.toDefaultVariable(multiple = multiple)
-      case Type(Kind.Model, name) => ScalaUtil.toVariable(name, multiple = multiple)
-      case Type(Kind.Enum, name) => ScalaUtil.toVariable(name, multiple = multiple)
+      case Type(Kind.Model | Kind.Enum | Kind.Union, name) => ScalaUtil.toVariable(name, multiple = multiple)
     }
   }
 

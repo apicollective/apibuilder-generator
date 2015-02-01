@@ -229,7 +229,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
         case ScalaPrimitive.Enum(_, _) => s"""${config.pathEncodingMethod}($name.toString, "UTF-8")"""
         case ScalaPrimitive.DateIso8601 => s"$name.toString"
         case ScalaPrimitive.DateTimeIso8601 => s"${config.pathEncodingMethod}(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name))"
-        case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
+        case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }
       }

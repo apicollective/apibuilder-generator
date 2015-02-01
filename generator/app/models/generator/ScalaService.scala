@@ -84,10 +84,7 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
     case Type(Kind.Primitive, _) => {
       ScalaUtil.toDefaultClassName(multiple = multiple)
     }
-    case Type(Kind.Model, name) => {
-      ScalaUtil.toClassName(name, multiple = multiple)
-    }
-    case Type(Kind.Enum, name) => {
+    case Type(Kind.Model | Kind.Enum | Kind.Union, name) => {
       ScalaUtil.toClassName(name, multiple = multiple)
     }
   }

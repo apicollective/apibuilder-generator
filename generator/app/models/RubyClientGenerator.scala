@@ -26,8 +26,7 @@ object RubyUtil {
     val multiple = Container(datatype).multiple
     datatype.`type` match {
       case Type(Kind.Primitive, _) => RubyUtil.toDefaultVariable(multiple = multiple)
-      case Type(Kind.Model, name) => RubyUtil.toVariable(name, multiple = multiple)
-      case Type(Kind.Enum, name) => RubyUtil.toVariable(name, multiple = multiple)
+      case Type(Kind.Model | Kind.Enum | Kind.Union, name) => RubyUtil.toVariable(name, multiple = multiple)
     }
   }
 
@@ -241,7 +240,7 @@ case class RubyClientGenerator(form: InvocationForm) {
                   val code = asString(RubyUtil.toVariable(varName), name, escape = true)
                   s"#{$code}"
                 }
-                case Type(Kind.Model, name) => {
+                case Type(Kind.Model | Kind.Union, name) => {
                   sys.error("Models cannot be in the path")
                 }
                 case Type(Kind.Enum, name) => {
@@ -349,7 +348,7 @@ case class RubyClientGenerator(form: InvocationForm) {
                 }
               }
 
-              case Type(Kind.Model, _) | Type(Kind.Enum, _) => {
+              case Type(Kind.Model | Kind.Enum | Kind.Union, _) => {
                 Container(ti.datatype) match {
                   case Container.Singleton | Container.Option => {
                     requestBuilder.append(s".with_json(${ti.varName}.to_json)")
@@ -424,7 +423,7 @@ case class RubyClientGenerator(form: InvocationForm) {
                   case _ => asString(field.name, name, escape = false)
                 }
               }
-              case Type(Kind.Model, name) => {
+              case Type(Kind.Model | Kind.Union, name) => {
                 s"${field.name}.nil? ? nil : ${field.name}.to_hash"
               }
               case Type(Kind.Enum, name) => {
@@ -440,7 +439,7 @@ case class RubyClientGenerator(form: InvocationForm) {
                   case _ => asString(field.name, name, escape = false)
                 }
               }
-              case Type(Kind.Model, name) => {
+              case Type(Kind.Model | Kind.Union, name) => {
                 s"(${field.name} || []).map(&:to_hash)"
               }
               case Type(Kind.Enum, name) => {
@@ -457,7 +456,7 @@ case class RubyClientGenerator(form: InvocationForm) {
                   case _ => asString(field.name, name, escape = false)
                 }
               }
-              case Type(Kind.Model, name) => {
+              case Type(Kind.Model | Kind.Union, name) => {
                 s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
               }
               case Type(Kind.Enum, name) => {
@@ -583,6 +582,9 @@ case class RubyClientGenerator(form: InvocationForm) {
               s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
             )
           }
+          case Type(Kind.Union, name) => {
+            sys.error("TODO: Union support")
+          }
           case Type(Kind.Enum, name) => {
             val klass = qualifiedClassName(name)
             wrapWithAssertion(
@@ -600,7 +602,7 @@ case class RubyClientGenerator(form: InvocationForm) {
           case Type(Kind.Primitive, name) => {
             withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |v| " + parseArgumentPrimitive(fieldName, "v", name, required, default) + "}"
           }
-          case Type(Kind.Model, name) => {
+          case Type(Kind.Model | Kind.Union, name) => {
             val klass = qualifiedClassName(name)
             withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }"
           }
@@ -616,7 +618,7 @@ case class RubyClientGenerator(form: InvocationForm) {
           case Type(Kind.Primitive, name) => {
             withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, required, default) + "; h }"
           }
-          case Type(Kind.Model, name) => {
+          case Type(Kind.Model | Kind.Union, name) => {
             val klass = qualifiedClassName(name)
             withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}"
           }
@@ -713,8 +715,7 @@ case class RubyClientGenerator(form: InvocationForm) {
         case None => sys.error(s"Unsupported primitive[$ptName] for type[${dt.label}]")
         case Some(pt) => rubyClass(pt)
       }
-      case Type(Kind.Model, name) => qualifiedClassName(name)
-      case Type(Kind.Enum, name) => qualifiedClassName(name)
+      case Type(Kind.Model | Kind.Enum | Kind.Union, name) => qualifiedClassName(name)
     }
 
     val multiple = dt match {
@@ -729,10 +730,7 @@ case class RubyClientGenerator(form: InvocationForm) {
           case None => RubyUtil.toDefaultVariable(multiple = multiple)
         }
       }
-      case Type(Kind.Model, name) => {
-        RubyUtil.toVariable(fieldName.getOrElse(name), multiple = multiple)
-      }
-      case Type(Kind.Enum, name) => {
+      case Type(Kind.Model | Kind.Enum | Kind.Union, name) => {
         RubyUtil.toVariable(fieldName.getOrElse(name), multiple = multiple)
       }
     }
@@ -764,10 +762,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       case Type(Kind.Primitive, name) => {
         Some(buildResponse(Container(dt), RubyUtil.toDefaultVariable()))
       }
-      case Type(Kind.Model, name) => {
-        Some(buildResponse(Container(dt), name))
-      }
-      case Type(Kind.Enum, name) => {
+      case Type(Kind.Model | Kind.Enum | Kind.Union, name) => {
         Some(buildResponse(Container(dt), name))
       }
     }
