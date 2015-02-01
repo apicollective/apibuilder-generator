@@ -197,11 +197,10 @@ case class RubyClientGenerator(form: InvocationForm) {
 """)
 
     sb.append(service.resources.map { resource =>
-      val modelPlural = resource.model.plural
-      val className = RubyUtil.toClassName(modelPlural)
+      val className = RubyUtil.toClassName(resource.plural)
 
-      s"    def ${modelPlural}\n" +
-      s"      @${modelPlural} ||= ${moduleName}::Clients::${className}.new(self)\n" +
+      s"    def ${resource.plural}\n" +
+      s"      @${resource.plural} ||= ${moduleName}::Clients::${className}.new(self)\n" +
       "    end"
     }.mkString("\n\n"))
 
@@ -211,8 +210,7 @@ case class RubyClientGenerator(form: InvocationForm) {
   }
 
   def generateClientForResource(resource: Resource): String = {
-    val modelPlural = resource.model.plural
-    val className = RubyUtil.toClassName(modelPlural)
+    val className = RubyUtil.toClassName(resource.plural)
 
     val sb = ListBuffer[String]()
     sb.append(s"    class ${className}")
@@ -265,7 +263,7 @@ case class RubyClientGenerator(form: InvocationForm) {
 
       val methodName =lib.Text.camelCaseToUnderscore(
         GeneratorUtil.urlToMethodName(
-          modelPlural,
+          resource.plural,
           op.method,
           op.path
         )

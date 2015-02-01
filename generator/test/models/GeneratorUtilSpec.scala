@@ -29,7 +29,7 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
       None, false, None, None, None, None
     )
     val operation = new Operation(Method.Get, "/models", None, None, Seq(q1, q2), Nil)
-    val resource = new Resource(model, None, Seq(operation))
+    val resource = new Resource(model.name, model.plural, None, Seq(operation))
 
     it("should handle required and non-required params") {
       val scalaModel = new ScalaModel(ssd, model)
@@ -38,7 +38,7 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
         new ScalaOperation(
           ssd,
           operation,
-          new ScalaResource(ssd, resource, scalaModel)
+          new ScalaResource(ssd, resource)
         ).queryParameters
       )
       code.get should equal("""val queryParameters = Seq(
@@ -49,7 +49,7 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
   }
 
   it("supports query parameters that contain lists") {
-    val operation = ssd.resources.find(_.model.name == "Echo").get.operations.head
+    val operation = ssd.resources.find(_.plural == "Echoes").get.operations.head
     val code = play2Util.params("queryParameters", operation.queryParameters).get
     code should be("""
 val queryParameters = Seq(
@@ -61,7 +61,7 @@ val queryParameters = Seq(
   }
 
   it("supports query parameters that ONLY have lists") {
-    val operation = ssd.resources.find(_.model.name == "Echo").get.operations.find(_.path == "/echoes/arrays-only").get
+    val operation = ssd.resources.find(_.plural == "Echoes").get.operations.find(_.path == "/echoes/arrays-only").get
     val code = play2Util.params("queryParameters", operation.queryParameters).get
     code should be("""
 val queryParameters = optionalMessages.map("optional_messages" -> _) ++
@@ -70,7 +70,7 @@ val queryParameters = optionalMessages.map("optional_messages" -> _) ++
   }
 
   it("supports optional seq query parameters") {
-    val operation = ssd.resources.find(_.model.name == "User").get.operations.find(op => op.method == Method.Get && op.path == "/users").get
+    val operation = ssd.resources.find(_.plural == "Users").get.operations.find(op => op.method == Method.Get && op.path == "/users").get
 
     TestHelper.assertEqualsFile(
       "test/resources/generators/play-2-route-util-reference-get-users.txt",

@@ -11,7 +11,9 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
   it("errorTypeClass") {
     val service = TestHelper.generatorApiService
     val ssd = new ScalaService(service)
-    val resource = ssd.resources.find(_.model.name == "Invocation").get
+    val resource = ssd.resources.find(_.plural == "Invocations").getOrElse {
+      sys.error("could not find resource with name[Invocations]")
+    }
     val operation = resource.operations.find(_.method == Method.Post).get
     val errorResponse = operation.responses.find(_.code == 409).get
     errorResponse.errorClassName should be("ErrorsResponse")
@@ -22,7 +24,8 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("only generates error wrappers for model classes (not primitives)") {
-    val userModel = """
+    val json = TestHelper.buildJson(s"""
+      "models": [
         {
           "name": "user",
           "plural": "user",
@@ -30,13 +33,13 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
             { "name": "id", "type": "long", "required": true }
           ]
         }
-    """.trim
 
-    val json = TestHelper.buildJson(s"""
-      "models": [$userModel],
+      ],
+
       "resources": [
         {
-          "model": $userModel,
+          "type": "user",
+          "plural": "users",
           "path": "/users",
           "operations": [
             {

@@ -20,13 +20,12 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("user")
     val model = new Model("user", "users", None, Nil)
     val operation = new Operation(Method.Get, "/users", None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model, None, Seq(operation))
-    val scalaModel = new ScalaModel(ssd, model)
+    val resource = new Resource(model.name, model.plural, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource, scalaModel)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList.map(_.trim) shouldEqual Some("user: com.gilt.apidoc.reference.api.v0.models.User,\n  q1: _root_.scala.Option[Double] = None")
@@ -36,13 +35,12 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("[user]", None)
     val model = new Model("user", "users", None, Nil)
     val operation = new Operation(Method.Get, "/users", None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model, None, Seq(operation))
-    val scalaModel = new ScalaModel(ssd, model)
+    val resource = new Resource(model.name, model.plural, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource, scalaModel)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList.map(_.trim) shouldEqual Some("users: Seq[com.gilt.apidoc.reference.api.v0.models.User],\n  q1: _root_.scala.Option[Double] = None")
@@ -52,13 +50,12 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("integer", None)
     val model = new Model("model", "models", None, Nil)
     val operation = new Operation(Method.Get, "/models", None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model, None, Seq(operation))
-    val scalaModel = new ScalaModel(ssd, model)
+    val resource = new Resource(model.name, model.plural, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource, scalaModel)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList.map(_.trim) shouldEqual Some("value: Int,\n  q1: _root_.scala.Option[Double] = None")
@@ -68,13 +65,12 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("[integer]", None)
     val model = new Model("model", "models", None, Nil)
     val operation = new Operation(Method.Get, "/models", None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model, None, Seq(operation))
-    val scalaModel = new ScalaModel(ssd, model)
+    val resource = new Resource(model.name, model.plural, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
       operation,
-      new ScalaResource(ssd, resource, scalaModel)
+      new ScalaResource(ssd, resource)
     )
 
     scalaOperation.argList.map(_.trim) shouldEqual Some("values: Seq[Int],\n  q1: _root_.scala.Option[Double] = None")

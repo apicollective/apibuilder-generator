@@ -39,16 +39,16 @@ module ApidocReferenceApi
       @echoes ||= ApidocReferenceApi::Clients::Echoes.new(self)
     end
 
+    def members
+      @members ||= ApidocReferenceApi::Clients::Members.new(self)
+    end
+
     def organizations
       @organizations ||= ApidocReferenceApi::Clients::Organizations.new(self)
     end
 
     def users
       @users ||= ApidocReferenceApi::Clients::Users.new(self)
-    end
-
-    def members
-      @members ||= ApidocReferenceApi::Clients::Members.new(self)
     end
   end
 
@@ -77,6 +77,35 @@ module ApidocReferenceApi
           :required_messages => HttpClient::Preconditions.assert_class('required_messages', opts.delete(:required_messages), Array).map { |v| HttpClient::Preconditions.assert_class('required_messages', v, String)}
         }.delete_if { |k, v| v.nil? }
         @client.request("/echoes/arrays-only").with_query(query).get { |hash| ApidocReferenceApi::Models::Value.new(hash) }
+      end
+
+    end
+
+    class Members
+
+      def initialize(client)
+        @client = HttpClient::Preconditions.assert_class('client', client, ApidocReferenceApi::Client)
+      end
+
+      def post(hash)
+        HttpClient::Preconditions.assert_class('hash', hash, Hash)
+        @client.request("/members").with_json(hash.to_json).post { |hash| ApidocReferenceApi::Models::Member.new(hash) }
+      end
+
+      def get(incoming={})
+        opts = HttpClient::Helper.symbolize_keys(incoming)
+        query = {
+          :guid => HttpClient::Preconditions.assert_class_or_nil('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String),
+          :organization_guid => HttpClient::Preconditions.assert_class_or_nil('organization_guid', HttpClient::Helper.to_uuid(opts.delete(:organization_guid)), String),
+          :user_guid => HttpClient::Preconditions.assert_class_or_nil('user_guid', HttpClient::Helper.to_uuid(opts.delete(:user_guid)), String),
+          :role => HttpClient::Preconditions.assert_class_or_nil('role', opts.delete(:role), String)
+        }.delete_if { |k, v| v.nil? }
+        @client.request("/members").with_query(query).get.map { |hash| ApidocReferenceApi::Models::Member.new(hash) }
+      end
+
+      def get_by_organization(organization)
+        HttpClient::Preconditions.assert_class('organization', organization, String)
+        @client.request("/members/#{organization}").get.map { |hash| ApidocReferenceApi::Models::Member.new(hash) }
       end
 
     end
@@ -143,35 +172,6 @@ module ApidocReferenceApi
 
     end
 
-    class Members
-
-      def initialize(client)
-        @client = HttpClient::Preconditions.assert_class('client', client, ApidocReferenceApi::Client)
-      end
-
-      def post(hash)
-        HttpClient::Preconditions.assert_class('hash', hash, Hash)
-        @client.request("/members").with_json(hash.to_json).post { |hash| ApidocReferenceApi::Models::Member.new(hash) }
-      end
-
-      def get(incoming={})
-        opts = HttpClient::Helper.symbolize_keys(incoming)
-        query = {
-          :guid => HttpClient::Preconditions.assert_class_or_nil('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String),
-          :organization_guid => HttpClient::Preconditions.assert_class_or_nil('organization_guid', HttpClient::Helper.to_uuid(opts.delete(:organization_guid)), String),
-          :user_guid => HttpClient::Preconditions.assert_class_or_nil('user_guid', HttpClient::Helper.to_uuid(opts.delete(:user_guid)), String),
-          :role => HttpClient::Preconditions.assert_class_or_nil('role', opts.delete(:role), String)
-        }.delete_if { |k, v| v.nil? }
-        @client.request("/members").with_query(query).get.map { |hash| ApidocReferenceApi::Models::Member.new(hash) }
-      end
-
-      def get_by_organization(organization)
-        HttpClient::Preconditions.assert_class('organization', organization, String)
-        @client.request("/members/#{organization}").get.map { |hash| ApidocReferenceApi::Models::Member.new(hash) }
-      end
-
-    end
-
   end
 
   module Models
@@ -211,56 +211,6 @@ module ApidocReferenceApi
       # 18 and over
       def AgeGroup.adult
         @@_adult ||= AgeGroup.new('Adult')
-      end
-
-    end
-
-    class Echo
-
-      attr_reader :value
-
-      def initialize(incoming={})
-        opts = HttpClient::Helper.symbolize_keys(incoming)
-        @value = HttpClient::Preconditions.assert_class('value', opts.delete(:value), String)
-      end
-
-      def to_json
-        JSON.dump(to_hash)
-      end
-
-      def copy(incoming={})
-        Echo.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
-      end
-
-      def to_hash
-        {
-          :value => value
-        }
-      end
-
-    end
-
-    class UserList
-
-      attr_reader :users
-
-      def initialize(incoming={})
-        opts = HttpClient::Helper.symbolize_keys(incoming)
-        @users = HttpClient::Preconditions.assert_class('users', opts.delete(:users), Array).map { |el| el.nil? ? nil : (el.is_a?(ApidocReferenceApi::Models::User) ? el : ApidocReferenceApi::Models::User.new(el)) }
-      end
-
-      def to_json
-        JSON.dump(to_hash)
-      end
-
-      def copy(incoming={})
-        UserList.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
-      end
-
-      def to_hash
-        {
-          :users => (users || []).map(&:to_hash)
-        }
       end
 
     end
@@ -331,6 +281,31 @@ module ApidocReferenceApi
 
     end
 
+    class Echo
+
+      attr_reader :value
+
+      def initialize(incoming={})
+        opts = HttpClient::Helper.symbolize_keys(incoming)
+        @value = HttpClient::Preconditions.assert_class('value', opts.delete(:value), String)
+      end
+
+      def to_json
+        JSON.dump(to_hash)
+      end
+
+      def copy(incoming={})
+        Echo.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+      end
+
+      def to_hash
+        {
+          :value => value
+        }
+      end
+
+    end
+
     # Models an API error.
     class Error
 
@@ -354,6 +329,37 @@ module ApidocReferenceApi
         {
           :code => code,
           :message => message
+        }
+      end
+
+    end
+
+    class Member
+
+      attr_reader :guid, :organization, :user, :role
+
+      def initialize(incoming={})
+        opts = HttpClient::Helper.symbolize_keys(incoming)
+        @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
+        @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(ApidocReferenceApi::Models::Organization) ? opts.delete(:organization) : ApidocReferenceApi::Models::Organization.new(opts.delete(:organization))), ApidocReferenceApi::Models::Organization)
+        @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(ApidocReferenceApi::Models::User) ? opts.delete(:user) : ApidocReferenceApi::Models::User.new(opts.delete(:user))), ApidocReferenceApi::Models::User)
+        @role = HttpClient::Preconditions.assert_class('role', opts.delete(:role), String)
+      end
+
+      def to_json
+        JSON.dump(to_hash)
+      end
+
+      def copy(incoming={})
+        Member.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+      end
+
+      def to_hash
+        {
+          :guid => guid,
+          :organization => organization.nil? ? nil : organization.to_hash,
+          :user => user.nil? ? nil : user.to_hash,
+          :role => role
         }
       end
 
@@ -419,16 +425,13 @@ module ApidocReferenceApi
 
     end
 
-    class Member
+    class UserList
 
-      attr_reader :guid, :organization, :user, :role
+      attr_reader :users
 
       def initialize(incoming={})
         opts = HttpClient::Helper.symbolize_keys(incoming)
-        @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-        @organization = HttpClient::Preconditions.assert_class('organization', opts[:organization].nil? ? nil : (opts[:organization].is_a?(ApidocReferenceApi::Models::Organization) ? opts.delete(:organization) : ApidocReferenceApi::Models::Organization.new(opts.delete(:organization))), ApidocReferenceApi::Models::Organization)
-        @user = HttpClient::Preconditions.assert_class('user', opts[:user].nil? ? nil : (opts[:user].is_a?(ApidocReferenceApi::Models::User) ? opts.delete(:user) : ApidocReferenceApi::Models::User.new(opts.delete(:user))), ApidocReferenceApi::Models::User)
-        @role = HttpClient::Preconditions.assert_class('role', opts.delete(:role), String)
+        @users = HttpClient::Preconditions.assert_class('users', opts.delete(:users), Array).map { |el| el.nil? ? nil : (el.is_a?(ApidocReferenceApi::Models::User) ? el : ApidocReferenceApi::Models::User.new(el)) }
       end
 
       def to_json
@@ -436,15 +439,12 @@ module ApidocReferenceApi
       end
 
       def copy(incoming={})
-        Member.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+        UserList.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
       end
 
       def to_hash
         {
-          :guid => guid,
-          :organization => organization.nil? ? nil : organization.to_hash,
-          :user => user.nil? ? nil : user.to_hash,
-          :role => role
+          :users => (users || []).map(&:to_hash)
         }
       end
 

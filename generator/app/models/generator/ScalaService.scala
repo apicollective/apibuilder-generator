@@ -33,12 +33,7 @@ case class ScalaService(
     service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
   }
 
-  val resources = service.resources.map { r =>
-    val sm = models.find(_.model.name == r.model.name).getOrElse {
-      sys.error("Could not find scala model for resource: " + r)
-    }
-    new ScalaResource(this, r, sm)
-  }
+  val resources = service.resources.map { r => new ScalaResource(this, r) }
 
   def scalaDatatype(
     t: Datatype
@@ -116,7 +111,9 @@ class ScalaEnumValue(value: EnumValue) {
 
 }
 
-class ScalaResource(ssd: ScalaService, val resource: Resource, val model: ScalaModel) {
+class ScalaResource(ssd: ScalaService, val resource: Resource) {
+
+  val plural: String = ScalaUtil.toClassName(resource.plural)
 
   val namespaces = ssd.namespaces
 
@@ -144,7 +141,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
 
-  val name: String = GeneratorUtil.urlToMethodName(resource.model.plural, operation.method, path)
+  val name: String = GeneratorUtil.urlToMethodName(resource.plural, operation.method, path)
 
   val argList: Option[String] = body match {
     case None => {

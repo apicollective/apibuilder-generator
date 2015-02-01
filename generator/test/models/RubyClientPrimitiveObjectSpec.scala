@@ -68,7 +68,8 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a response with an object field") {
 
-    val contentModel = """
+    val baseJson = TestHelper.buildJson(s"""
+      "models": [
         {
           "name": "content",
           "plural": "contents",
@@ -76,14 +77,13 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
             { "name": "id", "type": "long", "required": true }
           ]
         }
-    """.trim
 
-    val baseJson = TestHelper.buildJson(s"""
-      "models": [$contentModel],
+      ],
 
       "resources": [
         {
-          "model": $contentModel,
+          "type": "content",
+          "plural": "contents",
           "operations": [
             {
               "method": "GET",

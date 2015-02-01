@@ -15,7 +15,7 @@ case class ScalaClientMethodGenerator(
 
   private val generatorUtil = GeneratorUtil(config)
 
-  private val sortedResources = ssd.resources.sortWith { _.model.name.toLowerCase < _.model.name.toLowerCase }
+  private val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + errorPackage()).trim
@@ -23,14 +23,14 @@ case class ScalaClientMethodGenerator(
 
   def accessors(): String = {
     sortedResources.map { resource =>
-      val methodName = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(resource.model.plural).toLowerCase)
-      config.accessor(methodName, resource.model.plural)
+      val methodName = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(resource.plural).toLowerCase)
+      config.accessor(methodName, resource.plural)
     }.mkString("\n\n")
   }
 
   def traits(): String = {
     sortedResources.map { resource =>
-      s"trait ${resource.model.plural} {\n" +
+      s"trait ${resource.plural} {\n" +
       methods(resource).map(_.interface).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
@@ -38,7 +38,7 @@ case class ScalaClientMethodGenerator(
 
   def objects(): String = {
     sortedResources.map { resource =>
-      s"object ${resource.model.plural} extends ${resource.model.plural} {\n" +
+      s"object ${resource.plural} extends ${resource.plural} {\n" +
       methods(resource).map(_.code).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
