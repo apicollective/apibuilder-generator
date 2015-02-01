@@ -134,6 +134,7 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private val datatypeResolver = DatatypeResolver(
     enumNames = service.enums.map(_.name),
+    unionNames = service.unions.map(_.name),
     modelNames = service.models.map(_.name)
   )
 

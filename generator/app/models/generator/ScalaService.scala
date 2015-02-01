@@ -15,6 +15,9 @@ case class ScalaService(
     enumNames = service.enums.map(_.name) ++ service.imports.flatMap { imp =>
       imp.enums.map(name => s"${imp.namespace}.enums.${name}")
     },
+    unionNames = service.unions.map(_.name) ++ service.imports.flatMap { imp =>
+      imp.unions.map(name => s"${imp.namespace}.unions.${name}")
+    },
     modelNames = service.models.map(_.name) ++ service.imports.flatMap { imp =>
       imp.models.map(name => s"${imp.namespace}.models.${name}")
     }

@@ -36,13 +36,15 @@ object Kind {
 
   case object Primitive extends Kind { override def toString = "primitive" }
   case object Model extends Kind { override def toString = "model" }
+  case object Union extends Kind { override def toString = "union" }
   case object Enum extends Kind { override def toString = "enum" }
 
 }
 
 case class DatatypeResolver(
-  enumNames: Iterable[String] = Seq.empty,
-  modelNames: Iterable[String] = Seq.empty
+  enumNames: Iterable[String],
+  unionNames: Iterable[String],
+  modelNames: Iterable[String]
 ) {
 
   /**
@@ -53,6 +55,7 @@ case class DatatypeResolver(
     *   1. Primitive
     *   2. Enum
     *   3. Model
+    *   4. Union
     * 
     * If the type is not found, returns none.
     * 
@@ -63,14 +66,21 @@ case class DatatypeResolver(
     */
   def toType(name: String): Option[Type] = {
     Primitives(name) match {
-      case Some(pt) => Some(Type(Kind.Primitive, name))
+      case Some(_) => {
+        Some(Type(Kind.Primitive, name))
+      }
       case None => {
         enumNames.find(_ == name) match {
-          case Some(et) => Some(Type(Kind.Enum, name))
+          case Some(_) => Some(Type(Kind.Enum, name))
           case None => {
             modelNames.find(_ == name) match {
-              case Some(mt) => Some(Type(Kind.Model, name))
-              case None => None
+              case Some(_) => Some(Type(Kind.Model, name))
+              case None => {
+                unionNames.find(_ == name) match {
+                  case Some(_) => Some(Type(Kind.Union, name))
+                  case None => None
+                }
+              }
             }
           }
         }
