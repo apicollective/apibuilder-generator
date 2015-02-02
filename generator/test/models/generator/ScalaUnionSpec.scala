@@ -55,7 +55,7 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
   it("raises error if you try to generate json for a model that is part of union type") {
     val registeredUser = ssd.models.find(_.name == "RegisteredUser").get
     intercept[AssertionError] {
-      Play2Json("test", registeredUser).generate()
+      Play2Json("test").generate(registeredUser)
     }.getMessage should be("assertion failed: Cannot generate play json for models that are part of union types. User must use the json serialization for the parent union type")
   }
 

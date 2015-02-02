@@ -26,7 +26,7 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
       val model = ssd.models.head
       TestHelper.assertEqualsFile(
         "test/resources/play2-json-spec-model-readers.txt",
-        Play2Json("Api Doc Test", model).fieldReaders()
+        Play2Json("Api Doc Test").fieldReaders(model)
       )
     }
 
@@ -43,14 +43,14 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
       it("readers") {
         TestHelper.assertEqualsFile(
           "test/resources/generators/play-2-json-spec-quality-plan-readers.txt",
-          Play2Json(quality.name, plan).readers()
+          Play2Json(quality.name).readers(plan)
         )
       }
 
       it("writers") {
         TestHelper.assertEqualsFile(
           "test/resources/generators/play-2-json-spec-quality-plan-writers.txt",
-          Play2Json(quality.name, plan).writers()
+          Play2Json(quality.name).writers(plan)
         )
       }
     }
@@ -62,14 +62,14 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
       it("readers") {
         TestHelper.assertEqualsFile(
           "test/resources/generators/play-2-json-spec-quality-healthcheck-readers.txt",
-          Play2Json(quality.name, healthcheck).readers()
+          Play2Json(quality.name).readers(healthcheck)
         )
       }
 
       it("writers") {
         TestHelper.assertEqualsFile(
           "test/resources/generators/play-2-json-spec-quality-healthcheck-writers.txt",
-          Play2Json(quality.name, healthcheck).writers()
+          Play2Json(quality.name).writers(healthcheck)
         )
       }
     }
