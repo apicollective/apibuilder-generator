@@ -8,11 +8,6 @@ case class Play2Json(
 ) {
 
   def generate(model: ScalaModel): String = {
-    assert(
-      model.unions.isEmpty,
-      "Cannot generate play json for models that are part of union types. User must use the json serialization for the parent union type"
-    )
-
     readers(model) + "\n\n" + writers(model)
   }
 
@@ -20,9 +15,17 @@ case class Play2Json(
     ""
   }
 
+  private[models] def privateIdentifier(model: ScalaModel): String = {
+    if (model.unions.isEmpty) {
+      ""
+    } else {
+      "private "
+    }
+  }
+
   private[models] def readers(model: ScalaModel): String = {
     Seq(
-      s"implicit def jsonReads${serviceName}${model.name}: play.api.libs.json.Reads[${model.name}] = {",
+      s"${privateIdentifier(model)}implicit def jsonReads${serviceName}${model.name}: play.api.libs.json.Reads[${model.name}] = {",
       fieldReaders(model).indent(2),
       s"}"
     ).mkString("\n")
@@ -70,7 +73,7 @@ case class Play2Json(
     model.fields match {
       case field :: Nil => {
         Seq(
-          s"implicit def jsonWrites${serviceName}${model.name}: play.api.libs.json.Writes[${model.name}] = new play.api.libs.json.Writes[${model.name}] {",
+          s"${privateIdentifier(model)}implicit def jsonWrites${serviceName}${model.name}: play.api.libs.json.Writes[${model.name}] = new play.api.libs.json.Writes[${model.name}] {",
           s"  def writes(x: ${model.name}) = play.api.libs.json.Json.obj(",
           s"""    "${field.originalName}" -> play.api.libs.json.Json.toJson(x.${field.name})""",
           "  )",
@@ -80,7 +83,7 @@ case class Play2Json(
 
       case fields => {
         Seq(
-          s"implicit def jsonWrites${serviceName}${model.name}: play.api.libs.json.Writes[${model.name}] = {",
+          s"${privateIdentifier(model)}implicit def jsonWrites${serviceName}${model.name}: play.api.libs.json.Writes[${model.name}] = {",
           s"  (",
           model.fields.map { field =>
             if (field.isOption) {

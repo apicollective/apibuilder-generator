@@ -58,11 +58,10 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     TestHelper.assertEqualsFile("test/resources/scala-union-json.txt", code)
   }
 
-  it("raises error if you try to generate json for a model that is part of union type") {
+  it("models that are part of a union type have private json serializers") {
     val registeredUser = ssd.models.find(_.name == "RegisteredUser").get
-    intercept[AssertionError] {
-      Play2Json("test").generate(registeredUser)
-    }.getMessage should be("assertion failed: Cannot generate play json for models that are part of union types. User must use the json serialization for the parent union type")
+    val code = Play2Json("test").generate(registeredUser)
+    TestHelper.assertEqualsFile("test/resources/scala-union-model-json.txt", code)
   }
 
 }
