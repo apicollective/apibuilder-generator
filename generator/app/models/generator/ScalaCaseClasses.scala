@@ -41,9 +41,8 @@ object ScalaCaseClasses extends CodeGenerator {
     val unionModels = union.types.flatMap { t => models.find(_.qualifiedName == t.name) }
 
     val commonFields = if (!unionModels.isEmpty && unionModels.map(_.name).sorted == union.types.map(_.primitive.shortName).sorted) {
-      val allFields = unionModels.flatMap { _.fields.map { f => FieldType(f.name, f.datatype) } }.groupBy(ft => ft.name + ":" + ft.datatype.name)
-
-      val selected = allFields.filter(_._2.size == unionModels.size).map(_._2.head.name).toSeq
+      val allFields = unionModels.flatMap { _.fields.map( f => s"${f.definition(f.name)}" ) }.groupBy(_)
+      val selected = allFields.filter(_._2.size == unionModels.size).map(_._1).toSeq
 
       unionModels.head.fields.filter(field => selected.contains(field.name)) match {
         case Nil => ""
