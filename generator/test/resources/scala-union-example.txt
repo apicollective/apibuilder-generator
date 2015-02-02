@@ -1,10 +1,6 @@
 package test.apidoc.apidoctest.models {
 
-  sealed trait User {
-    def id: Long
-    def email: String
-    def name: _root_.scala.Option[String] = None
-  }
+  sealed trait User
 
   case class GuestUser(
     id: Long,

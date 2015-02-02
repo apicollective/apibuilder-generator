@@ -59,7 +59,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val description: Option[String] = union.description
 
-  val types: Seq[ScalaDatatype] = union.types.map { t =>
+  private val types: Seq[ScalaDatatype] = union.types.map { t =>
     val `type`: Datatype = ssd.datatypeResolver.parse(t.`type`).getOrElse {
       sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
     }
