@@ -49,7 +49,13 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
 
   it("generates valid models") {
     val code = ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false)
-    TestHelper.assertEqualsFile("test/resources/scala-union-example.txt", code)
+    TestHelper.assertEqualsFile("test/resources/scala-union-case-classes.txt", code)
+  }
+
+  it("generates valid json") {
+    val user = ssd.unions.find(_.name == "User").get
+    val code = Play2Json(ssd.name).generate(user)
+    TestHelper.assertEqualsFile("test/resources/scala-union-json.txt", code)
   }
 
   it("raises error if you try to generate json for a model that is part of union type") {

@@ -1,0 +1,12 @@
+implicit def jsonReadsQualityUser: play.api.libs.json.Reads[User] = {
+  (__ \ "registered_user").read[com.gilt.quality.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[com.gilt.quality.v0.models.User]]
+}
+
+implicit val jsonWritesQualityUser = new play.api.libs.json.Writes[User] {
+  def writes(user: User): play.api.libs.json.JsObject = {
+    user match {
+      case x: RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
+      case x: GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
+    }
+  }
+}
