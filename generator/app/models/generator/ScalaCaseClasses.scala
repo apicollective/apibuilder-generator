@@ -23,7 +23,7 @@ object ScalaCaseClasses extends CodeGenerator {
 
     s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
-      ssd.unions.map { generateUnionTraits(_) }.mkString("\n\n").indent(2),
+      ssd.unions.map { generateUnionTraits(ssd.models, _) }.mkString("\n\n").indent(2),
       "",
       ssd.models.map { generateCaseClass(_) }.mkString("\n\n").indent(2),
       "",
@@ -32,13 +32,35 @@ object ScalaCaseClasses extends CodeGenerator {
     s"\n\n}"
   }
 
-  def generateUnionTraits(union: ScalaUnion): String = {
+  private def generateUnionTraits(models: Seq[ScalaModel], union: ScalaUnion): String = {
     // TODO: handle primitive types
 
     // For union types across only models, find all common fields and bubble up to the trait
+    case class FieldType(name: String, datatype: ScalaDatatype)
+
+    val unionModels = union.types.flatMap { t => models.find(_.qualifiedName == t.name) }
+
+    val commonFields = if (!unionModels.isEmpty && unionModels.map(_.name).sorted == union.types.map(_.primitive.shortName).sorted) {
+      val allFields = unionModels.flatMap { _.fields.map { f => FieldType(f.name, f.datatype) } }.groupBy(ft => ft.name + ":" + ft.datatype.name)
+
+      val selected = allFields.filter(_._2.size == unionModels.size).map(_._2.head.name).toSeq
+
+      unionModels.head.fields.filter(field => selected.contains(field.name)) match {
+        case Nil => ""
+        case fields => {
+          Seq(
+            " {",
+            fields.map { f => s"def ${f.definition(f.name)}" }.mkString("\n").indent(2),
+            "}"
+          ).mkString("\n")
+        }
+      }
+    } else {
+      ""
+    }
 
     union.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-    s"sealed trait ${union.name}"
+    s"sealed trait ${union.name}$commonFields"
   }
 
   def generateCaseClass(model: ScalaModel): String = {

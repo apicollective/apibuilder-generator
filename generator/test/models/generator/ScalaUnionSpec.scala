@@ -25,14 +25,20 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
           "name": "registered_user",
           "plural": "registered_users",
           "fields": [
-            { "name": "id", "type": "long", "required": true }
+            { "name": "id", "type": "long", "required": true },
+            { "name": "email", "type": "string", "required": true },
+            { "name": "name", "type": "string", "required": false },
+            { "name": "foo", "type": "string", "required": true }
           ]
         },
         {
           "name": "guest_user",
           "plural": "guest_users",
           "fields": [
-            { "name": "id", "type": "long", "required": true }
+            { "name": "id", "type": "long", "required": true },
+            { "name": "email", "type": "string", "required": true },
+            { "name": "name", "type": "string", "required": false },
+            { "name": "bar", "type": "string", "required": true }
           ]
         }
       ]

@@ -59,7 +59,14 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val description: Option[String] = union.description
 
-  val types: Seq[String] = union.types.map(_.`type`)
+  val types: Seq[ScalaDatatype] = union.types.map { t =>
+    val `type`: Datatype = ssd.datatypeResolver.parse(t.`type`).getOrElse {
+      sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
+    }
+    ssd.scalaDatatype(`type`)
+  }
+
+  val qualifiedTypeNames: Seq[String] = types.map(_.name)
 
 }
 
@@ -68,6 +75,8 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
   val originalName: String = model.name
 
   val name: String = ScalaUtil.toClassName(model.name)
+
+  val qualifiedName: String = ssd.modelClassName(name)
 
   val plural: String = ScalaUtil.toClassName(model.plural)
 
@@ -78,7 +87,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
   val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
 
   // List of unions to which this model belongs
-  val unions: Seq[ScalaUnion] = ssd.unions.filter { _.types.contains(model.name) }
+  val unions: Seq[ScalaUnion] = ssd.unions.filter { u => u.qualifiedTypeNames.contains(qualifiedName) }
 
 }
 
