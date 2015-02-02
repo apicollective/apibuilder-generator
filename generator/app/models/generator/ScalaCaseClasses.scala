@@ -23,6 +23,8 @@ object ScalaCaseClasses extends CodeGenerator {
 
     s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
+      ssd.unions.map { generateUnionTraits(_) }.mkString("\n\n").indent(2),
+      "",
       ssd.models.map { generateCaseClass(_) }.mkString("\n\n").indent(2),
       "",
       genEnums(ssd.enums).indent(2)
@@ -30,9 +32,19 @@ object ScalaCaseClasses extends CodeGenerator {
     s"\n\n}"
   }
 
+  def generateUnionTraits(union: ScalaUnion): String = {
+    union.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
+    s"sealed trait ${union.name}"
+  }
+
   def generateCaseClass(model: ScalaModel): String = {
+    val extendsClause = model.unions match {
+      case Nil => ""
+      case unions => " extends " + unions.map(_.name).mkString(" with ")
+    }
+
     model.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-    s"case class ${model.name}(${model.argList.getOrElse("")})"
+    s"case class ${model.name}(${model.argList.getOrElse("")})" + extendsClause
   }
 
   private def generatePlayEnums(enums: Seq[ScalaEnum]): String = {

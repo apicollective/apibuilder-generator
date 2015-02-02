@@ -28,6 +28,8 @@ case class ScalaService(
   def modelClassName(name: String) = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String) = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
+  val unions = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
+
   val models = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 
   val enums = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(_) }
@@ -51,6 +53,16 @@ case class ScalaHeader(name: String, value: String) {
 }
 
 
+class ScalaUnion(val ssd: ScalaService, val union: Union) {
+
+  val name: String = ScalaUtil.toClassName(union.name)
+
+  val description: Option[String] = union.description
+
+  val types: Seq[String] = union.types.map(_.`type`)
+
+}
+
 class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val originalName: String = model.name
@@ -64,6 +76,9 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
   val fields = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
   val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
+
+  // List of unions to which this model belongs
+  val unions: Seq[ScalaUnion] = ssd.unions.filter { _.types.contains(model.name) }
 
 }
 

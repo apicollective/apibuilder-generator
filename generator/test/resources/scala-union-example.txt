@@ -1,0 +1,20 @@
+package test.apidoc.apidoctest.models {
+
+  sealed trait User {
+    def id: Long
+    def email: String
+  }
+
+  case class GuestUser(
+    id: Long,
+    email: String,
+    foo: String
+  ) extends User
+
+  case class RegisteredUser(
+    id: Long,
+    email: String,
+    bar: String
+  ) extends User
+
+}
