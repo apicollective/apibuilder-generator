@@ -33,6 +33,10 @@ object ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateUnionTraits(union: ScalaUnion): String = {
+    // TODO: handle primitive types
+
+    // For union types across only models, find all common fields and bubble up to the trait
+
     union.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
     s"sealed trait ${union.name}"
   }
