@@ -1,6 +1,6 @@
 package generator
 
-import models.TestHelper
+import models.{Play2Json, TestHelper}
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
@@ -42,12 +42,21 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
           ]
         }
       ]
-    """)
+  """)
 
-    lazy val service = TestHelper.service(json)
+  lazy val service = TestHelper.service(json)
+  lazy val ssd = ScalaService(service)
 
-    it("generates valid models") {
-      val code = ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false)
-      TestHelper.assertEqualsFile("test/resources/scala-union-example.txt", code)
-    }
+  it("generates valid models") {
+    val code = ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false)
+    TestHelper.assertEqualsFile("test/resources/scala-union-example.txt", code)
+  }
+
+  it("raises error if you try to generate json for a model that is part of union type") {
+    val registeredUser = ssd.models.find(_.name == "RegisteredUser").get
+    intercept[AssertionError] {
+      Play2Json("test", registeredUser).generate()
+    }.getMessage should be("assertion failed: Cannot generate play json for models that are part of union types. User must use the json serialization for the parent union type")
+  }
+
 }

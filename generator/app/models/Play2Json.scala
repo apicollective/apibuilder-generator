@@ -7,12 +7,16 @@ case class Play2Json(
   serviceName: String,
   model: ScalaModel
 ) {
-
   def generate(): String = {
+    assert(
+      model.unions.isEmpty,
+      "Cannot generate play json for models that are part of union types. User must use the json serialization for the parent union type"
+    )
+
     readers + "\n\n" + writers
   }
 
-  def readers(): String = {
+  private[models] def readers(): String = {
     Seq(
       s"implicit def jsonReads${serviceName}${model.name}: play.api.libs.json.Reads[${model.name}] = {",
       fieldReaders().indent(2),
@@ -20,7 +24,7 @@ case class Play2Json(
     ).mkString("\n")
   }
 
-  def fieldReaders(): String = {
+  private[models] def fieldReaders(): String = {
     val serializations = model.fields.map { field =>
       field.datatype match {
         case ScalaDatatype.List(types) => {
@@ -58,7 +62,7 @@ case class Play2Json(
     }
   }
 
-  def writers(): String = {
+  private[models] def writers(): String = {
     model.fields match {
       case field :: Nil => {
         Seq(
