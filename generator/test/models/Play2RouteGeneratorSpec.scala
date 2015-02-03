@@ -149,4 +149,57 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  describe("w/ a union resource") {
+
+    val json = TestHelper.buildJson("""
+      "unions": [
+        {
+          "name": "user",
+          "plural": "users",
+          "types": [
+            { "type": "registered_user" },
+            { "type": "guest_user" }
+          ]
+        }
+      ],
+
+      "models": [
+        {
+          "name": "registered_user",
+          "plural": "registered_users",
+          "fields": [
+            { "name": "guid", "type": "uuid", "required": true }
+          ]
+        },
+        {
+          "name": "guest_user",
+          "plural": "guest_users",
+          "fields": [
+            { "name": "guid", "type": "uuid", "required": true }
+          ]
+        }
+      ],
+
+      "resources": [
+        {
+          "type": "user",
+          "plural": "users",
+          "operations": [
+            { "method": "GET", "path": "/users/:guid", "parameters": [{ "name": "guid", "type": "uuid", "location": "Path", "required": true }] }
+          ]
+        }
+      ]
+    """)
+
+    lazy val ssd = TestHelper.scalaService(json)
+
+    it("can identify common type for path parameter") {
+      val userResource = getScalaResource(ssd, "Users")
+      val op = userResource.operations.filter { op => op.method == Method.Get && op.path == "/users/:guid" }.head
+      val r = Play2Route(ssd, op, userResource)
+      r.params.mkString(", ") should be("guid: _root_.java.util.UUID")
+    }
+
+  }
+
 }
