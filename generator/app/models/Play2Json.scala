@@ -32,8 +32,15 @@ case class Play2Json(
   def writers(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
+      s"  def writes(obj: User): play.api.libs.json.JsObject = {",
+      s"    user match {",
+      union.typesForJson.map { t =>
+        s"""case x: ${t.fullyQualifiedName} => play.api.libs.json.Json.obj("${t.shortName}" -> x)"""
+      }.mkString("\n").indent(6),
+      "    }",
+      "  }",
       "}"
-    ).mkString("\n\n")
+    ).mkString("\n")
   }
 
   private[models] def readers(model: ScalaModel): String = {
