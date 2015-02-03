@@ -25,7 +25,7 @@ object Play2Models extends CodeGenerator {
 
     val unionJson: String = ssd.unions.map(play2Json.generate(_)).mkString("\n\n")
 
-    val modelJson: String = ssd.models.filter(_.unions.isEmpty).map(play2Json.generate(_)).mkString("\n\n")
+    val modelJson: String = ssd.models.map(play2Json.generate(_)).mkString("\n\n")
 
     val header = addHeader match {
       case false => ""
@@ -61,8 +61,7 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
       }
     }
 
-${enumJson.indent(4)}
-${modelJson.indent(4)}
+${Seq(enumJson, unionJson, modelJson).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
   }
