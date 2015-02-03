@@ -1,12 +1,14 @@
-implicit def jsonReadsApidocUser: play.api.libs.json.Reads[User] = {
-  (__ \ "registered_user").read[com.gilt.apidoc.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[com.gilt.apidoc.v0.models.User]]
+implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
+  (__ \ "registered_user").read[test.apidoc.apidoctest.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.User]]
+  orElse
+  (__ \ "guest_user").read[test.apidoc.apidoctest.v0.models.GuestUser].asInstanceOf[play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.User]]
 }
 
-implicit val jsonWritesApidocUser = new play.api.libs.json.Writes[User] {
+implicit val jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
   def writes(user: User): play.api.libs.json.JsObject = {
     user match {
-      case x: RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
-      case x: GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
+      case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
+      case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
     }
   }
 }
