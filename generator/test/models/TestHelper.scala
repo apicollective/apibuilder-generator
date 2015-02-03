@@ -22,7 +22,7 @@ object TestHelper {
       "name": "Api Doc Test",
       "organization": { "key": "test" },
       "application": { "key": "apidoc-test" },
-      "namespace": "test.apidoc.apidoctest",
+      "namespace": "test.apidoc.apidoctest.v0",
       "version": "1.0.0",
 
       $json
