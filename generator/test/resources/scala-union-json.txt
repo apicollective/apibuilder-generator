@@ -1,7 +1,9 @@
 implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
-  (__ \ "registered_user").read[RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
-  orElse
-  (__ \ "guest_user").read[GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
+  (
+    (__ \ "registered_user").read[RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
+    orElse
+    (__ \ "guest_user").read[GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
+  )
 }
 
 implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
