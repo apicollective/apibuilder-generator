@@ -9,6 +9,7 @@ case class Namespaces(base: String) {
     * number of imports that users will need.
     */
   val enums: String = models
+  val unions: String = models
 
   val errors: String = s"$base.errors"
 

@@ -25,6 +25,7 @@ case class ScalaService(
 
   val name = ScalaUtil.toClassName(service.name)
  
+  def unionClassName(name: String) = namespaces.unions + "." + ScalaUtil.toClassName(name)
   def modelClassName(name: String) = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String) = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
@@ -57,16 +58,26 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val name: String = ScalaUtil.toClassName(union.name)
 
+  val qualifiedName = ssd.unionClassName(name)
+
   val description: Option[String] = union.description
 
-  private val types: Seq[ScalaDatatype] = union.types.map { t =>
-    val `type`: Datatype = ssd.datatypeResolver.parse(t.`type`).getOrElse {
-      sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
+  /*
+   * @param shortName The original short name to use in identifying objects of this type in the json document
+   * @param fullyQualifiedName Fully qualified type name of the specific class name for each type.
+   */
+  case class JsonType(shortName: String, fullyQualifiedName: String)
+
+  val typesForJson: Seq[JsonType] = {
+    union.types.map { t =>
+      val `type`: Datatype = ssd.datatypeResolver.parse(t.`type`).getOrElse {
+        sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
+      }
+      JsonType(t.`type`, ssd.scalaDatatype(`type`).name)
     }
-    ssd.scalaDatatype(`type`)
   }
 
-  val qualifiedTypeNames: Seq[String] = types.map(_.name)
+  val qualifiedTypeNames: Seq[String] = typesForJson.map(_.fullyQualifiedName)
 
 }
 

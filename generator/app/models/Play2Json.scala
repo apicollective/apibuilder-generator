@@ -22,6 +22,9 @@ case class Play2Json(
   def readers(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Reads)} = {",
+      union.typesForJson.map { jsonType =>
+        s"""(__ \\ "${jsonType.shortName}").read[${jsonType.fullyQualifiedName}].asInstanceOf[play.api.libs.json.Reads[${union.qualifiedName}]]"""
+      }.mkString("\norElse\n").indent(2),
       s"}"
     ).mkString("\n")
   }
