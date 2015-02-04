@@ -9,13 +9,13 @@ class ReferenceSpec extends FunSpec with Matchers {
 
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get
-    val code = ScalaCaseClasses.generateCaseClass(model)
+    val code = ScalaCaseClasses.generateCaseClass(model, Seq.empty)
     TestHelper.assertEqualsFile("test/resources/generators/reference-spec-user-case-class.txt", code)
   }
 
   it("member case classes") {
     val model = ssd.models.find(_.name == "Member").get
-    val code = ScalaCaseClasses.generateCaseClass(model)
+    val code = ScalaCaseClasses.generateCaseClass(model, Seq.empty)
     TestHelper.assertEqualsFile("test/resources/generators/reference-spec-member-case-class.txt", code)
   }
 

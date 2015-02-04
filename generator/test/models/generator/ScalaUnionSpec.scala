@@ -54,13 +54,13 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
 
   it("generates valid json") {
     val user = ssd.unions.find(_.name == "User").get
-    val code = Play2Json(ssd.name).generate(user)
+    val code = Play2Json(ssd).generate(user)
     TestHelper.assertEqualsFile("test/resources/scala-union-json.txt", code)
   }
 
   it("models that are part of a union type have private json serializers") {
     val registeredUser = ssd.models.find(_.name == "RegisteredUser").get
-    val code = Play2Json("test").generate(registeredUser)
+    val code = Play2Json(ssd).generate(registeredUser)
     TestHelper.assertEqualsFile("test/resources/scala-union-model-json.txt", code)
   }
 

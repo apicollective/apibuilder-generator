@@ -1,8 +1,7 @@
-private implicit def jsonReadstestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
-  (
-    (__ \ "id").read[Long] and
-    (__ \ "email").read[String] and
-    (__ \ "name").readNullable[String] and
-    (__ \ "foo").read[String]
-  )(RegisteredUser.apply _)
+implicit def jsonReadsQualityUser: play.api.libs.json.Reads[User] = new play.api.libs.json.Reads[User] {
+  def reads(obj: User): play.api.libs.json.JsObject = Helper_User.reads(obj)
+}
+
+implicit def jsonWritesQualityUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
+  def writes(obj: User): play.api.libs.json.JsObject = Helper_User.writes(obj)
 }

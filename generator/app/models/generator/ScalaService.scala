@@ -29,11 +29,11 @@ case class ScalaService(
   def modelClassName(name: String) = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String) = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
-  val unions = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
-
   val models = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 
   val enums = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(_) }
+
+  val unions = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
 
   val defaultHeaders: Seq[ScalaHeader] = {
     service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
@@ -45,6 +45,16 @@ case class ScalaService(
     t: Datatype
   ): ScalaDatatype = {
     scalaTypeResolver.scalaDatatype(t)
+  }
+
+  /**
+    * Looks up the list of union types to which the specified model
+    * belongs.
+    */
+  def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
+    unions.filter { u =>
+      u.types.flatMap(_.model).contains(model)
+    }
   }
 
 }
@@ -62,32 +72,57 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val description: Option[String] = union.description
 
-  /*
-   * @param shortName The original short name to use in identifying objects of this
-   *        type in the json document
-   * @param locallyQualifiedName If the union type is defined in the same namespace
-   *        as the service, returns only the scala class name.
-   * @param fullyQualifiedName Fully qualified type name of the specific class name
-   *        for each type.
-   */
-  case class JsonType(
-    shortName: String,
-    className: String,
-    primitive: ScalaPrimitive
-  )
+  val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
 
-  val typesForJson: Seq[JsonType] = {
-    union.types.map { t =>
-      val `type` = ssd.datatypeResolver.parse(t.`type`).getOrElse {
-        sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
+}
+
+/*
+ * @param shortName The original short name to use in identifying objects of this
+ *        type in the json document
+ * @param locallyQualifiedName If the union type is defined in the same namespace
+ *        as the service, returns only the scala class name.
+ * @param fullyQualifiedName Fully qualified type name of the specific class name
+ *        for each type.
+ */
+case class ScalaUnionType(
+  shortName: String,
+  className: String,
+  primitive: ScalaPrimitive,
+  enum: Option[ScalaEnum] = None,
+  model: Option[ScalaModel] = None
+)
+
+object ScalaUnionType {
+
+  def apply(ssd: ScalaService, t: UnionType): ScalaUnionType = {
+    val `type` = ssd.datatypeResolver.parse(t.`type`).getOrElse {
+      sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
+    }
+    ssd.scalaDatatype(`type`)  match {
+      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) => {
+        sys.error("Union type must be a singleton and not: " + t)
       }
-      ssd.scalaDatatype(`type`)  match {
-        case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) => {
-          sys.error("Union type must be a singleton and not: " + t)
-        }
 
-        case ScalaDatatype.Singleton(primitive) => {
-          JsonType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive)
+      case ScalaDatatype.Singleton(primitive) => {
+        primitive match {
+          case ScalaPrimitive.Enum(ns, name) => {
+            val enum = ssd.enums.find(_.name == name).getOrElse {
+              sys.error(s"UnionType[$t] Failed to find enum[$name]")
+            }
+
+            ScalaUnionType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive, enum = Some(enum))
+          }
+
+          case ScalaPrimitive.Model(ns, name) => {
+            val model = ssd.models.find(_.name == name).getOrElse {
+              sys.error(s"UnionType[$t] Failed to find model[$name]")
+            }
+
+            ScalaUnionType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive, model = Some(model))
+          }
+          case _ => {
+            ScalaUnionType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive)
+          }
         }
       }
     }
@@ -110,9 +145,6 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
   val fields = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
   val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
-
-  // List of unions to which this model belongs
-  val unions: Seq[ScalaUnion] = ssd.unions.filter { _.typesForJson.map(_.primitive.fullName).contains(qualifiedName) }
 
 }
 

@@ -1,10 +1,10 @@
 package models
 
 import lib.Text._
-import generator.{ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaUnion}
+import generator.{ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion}
 
 case class Play2Json(
-  serviceName: String
+  ssd: ScalaService
 ) {
 
   private case class ReadWrite(name: String)
@@ -12,60 +12,43 @@ case class Play2Json(
   private val Writes = ReadWrite("Writes")
 
   def generate(model: ScalaModel): String = {
-    model.unions match {
+    ssd.unionsForModel(model) match {
       case Nil => readers(model) + "\n\n" + writers(model)
       case unions => readers(model)
     }
   }
 
   def generate(union: ScalaUnion): String = {
-    readers(union) + "\n\n" + writers(union)
+    helpers(union) ++ "\n\n" ++ readers(union) + "\n\n" + writers(union)
   }
 
   def readers(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Reads)} = {",
       s"  (",
-      union.typesForJson.map { jsonType =>
-        s"""(__ \\ "${jsonType.shortName}").read[${jsonType.className}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+      union.types.map { scalaUnionType =>
+        s"""(__ \\ "${scalaUnionType.shortName}").read[${scalaUnionType.className}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indent(4),
       s"  )",
       s"}"
     ).mkString("\n")
   }
 
+  def helpers(union: ScalaUnion): String = {
+    // s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.shortName}" -> $method(x))"""
+    Seq(
+      "private object Helper_${union.name} {",
+      union.types.map { scalaUnionType =>
+        "${scalaUnionType}"
+      },
+      "}"
+    ).mkString("\n\n")
+  }
+
   def writers(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
-      s"  def writes(obj: ${union.name}): play.api.libs.json.JsObject = {",
-      s"    obj match {",
-      union.typesForJson.map { t =>
-        t.primitive match {
-          case ScalaPrimitive.Unit | ScalaPrimitive.Union(_, _) => {
-            sys.error(s"Invalid type[$t] for union")
-          }
-          case ScalaPrimitive.String | ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean => {
-            sys.error("TODO: Add primitive support to unions")
-          }
-          case ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.Enum(_, _)=> {
-            s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.shortName}" -> x)"""
-          }
-          case ScalaPrimitive.Model(ns, name) => {
-            Seq(
-              s"case x: ${t.className} => {",
-              s"  play.api.libs.json.Json.obj(",
-              s"""    "${t.shortName}" -> play.api.libs.json.Json.obj(""",
-              Seq("guid", "email").map( f => s""""$f" -> x.$f""" ).mkString(",\n").indent(6),
-              "    )",
-              "  )",
-              "}"
-            ).mkString("\n")
-          }
-        }
-
-      }.mkString("\n").indent(6),
-      "    }",
-      "  }",
+      s"  def writes(obj: ${union.name}): play.api.libs.json.JsObject = Helper_${union.name}.writes(obj)",
       "}"
     ).mkString("\n")
   }
@@ -117,7 +100,7 @@ case class Play2Json(
   }
 
   private[models] def writers(model: ScalaModel): String = {
-    assert(model.unions.isEmpty, s"Model[${model.name}] is part of a union type - writes is part of union type writer")
+    assert(ssd.unionsForModel(model).isEmpty, s"Model[${model.name}] is part of a union type - writes is part of union type writer")
     model.fields match {
       case field :: Nil => {
         Seq(
@@ -160,11 +143,11 @@ case class Play2Json(
     name: String,
     readWrite: ReadWrite
   ): String = {
-    s"implicit def json${readWrite.name}${serviceName}$name: play.api.libs.json.${readWrite.name}[$name]"
+    s"implicit def json${readWrite.name}${ssd.name}$name: play.api.libs.json.${readWrite.name}[$name]"
   }
 
   private[models] def privateIdentifier(model: ScalaModel): String = {
-    if (model.unions.isEmpty) {
+    if (ssd.unionsForModel(model).isEmpty) {
       ""
     } else {
       "private "

@@ -25,7 +25,7 @@ object ScalaCaseClasses extends CodeGenerator {
     Seq(
       ssd.unions.map { generateUnionTraits(ssd.models, _) }.mkString("\n\n").indent(2),
       "",
-      ssd.models.map { generateCaseClass(_) }.mkString("\n\n").indent(2),
+      ssd.models.map { m => generateCaseClass(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
       "",
       genEnums(ssd.enums).indent(2)
     ).mkString("\n").trim +
@@ -39,10 +39,10 @@ object ScalaCaseClasses extends CodeGenerator {
     s"sealed trait ${union.name}"
   }
 
-  def generateCaseClass(model: ScalaModel): String = {
-    val extendsClause = model.unions match {
+  def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
+    val extendsClause = unions match {
       case Nil => ""
-      case unions => " extends " + unions.map(_.name).mkString(" with ")
+      case unions => " extends " + unions.map(_.name).sorted.mkString(" with ")
     }
 
     model.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +

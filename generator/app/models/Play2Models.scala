@@ -21,7 +21,7 @@ object Play2Models extends CodeGenerator {
     val prefix = underscoreAndDashToInitCap(ssd.name)
     val enumJson: String = ssd.enums.map { ScalaEnums(_).buildJson(ssd.name) }.mkString("\n\n")
 
-    val play2Json = Play2Json(ssd.name)
+    val play2Json = Play2Json(ssd)
 
     val unionJson: String = ssd.unions.map(play2Json.generate(_)).mkString("\n\n")
 
