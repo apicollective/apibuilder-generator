@@ -6,12 +6,3 @@ private implicit def jsonReadstestRegisteredUser: play.api.libs.json.Reads[Regis
     (__ \ "foo").read[String]
   )(RegisteredUser.apply _)
 }
-
-private implicit def jsonWritestestRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
-  (
-    (__ \ "id").write[Long] and
-    (__ \ "email").write[String] and
-    (__ \ "name").write[scala.Option[String]] and
-    (__ \ "foo").write[String]
-  )(unlift(RegisteredUser.unapply _))
-}

@@ -12,7 +12,10 @@ case class Play2Json(
   private val Writes = ReadWrite("Writes")
 
   def generate(model: ScalaModel): String = {
-    readers(model) + "\n\n" + writers(model)
+    model.unions match {
+      case Nil => readers(model) + "\n\n" + writers(model)
+      case unions => readers(model)
+    }
   }
 
   def generate(union: ScalaUnion): String = {
@@ -92,6 +95,7 @@ case class Play2Json(
   }
 
   private[models] def writers(model: ScalaModel): String = {
+    assert(model.unions.isEmpty, s"Model[${model.name}] is part of a union type - writes is part of union type writer")
     model.fields match {
       case field :: Nil => {
         Seq(

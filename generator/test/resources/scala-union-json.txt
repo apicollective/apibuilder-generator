@@ -6,11 +6,25 @@ implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
   )
 }
 
-implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
-  def writes(obj: User): play.api.libs.json.JsObject = {
+implicit def jsonWritesQualityUserUnionType: play.api.libs.json.Writes[UserUnionType] = new play.api.libs.json.Writes[UserUnionType] {
+  def writes(obj: UserUnionType): play.api.libs.json.JsObject = {
     obj match {
-      case x: RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
-      case x: GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
+      case x: RegisteredUser => {
+        play.api.libs.json.Json.obj(
+          "registered_user" -> play.api.libs.json.Json.obj(
+            "guid" -> x.guid,
+            "email" -> x.email
+          )
+        )
+      }
+      case x: GuestUser => {
+        play.api.libs.json.Json.obj(
+          "guest_user" -> play.api.libs.json.Json.obj(
+            "guid" -> x.guid,
+            "email" -> x.email
+          )
+        )
+      }
     }
   }
 }
