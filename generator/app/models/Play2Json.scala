@@ -1,7 +1,7 @@
 package models
 
 import lib.Text._
-import generator.{ScalaDatatype, ScalaModel, ScalaUnion}
+import generator.{ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaUnion}
 
 case class Play2Json(
   serviceName: String
@@ -40,10 +40,29 @@ case class Play2Json(
       s"  def writes(obj: ${union.name}): play.api.libs.json.JsObject = {",
       s"    obj match {",
       union.typesForJson.map { t =>
-        //t.datatype match {
+        t.primitive match {
+          case ScalaPrimitive.Unit | ScalaPrimitive.Union(_, _) => {
+            sys.error(s"Invalid type[$t] for union")
+          }
+          case ScalaPrimitive.String | ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean => {
+            sys.error("TODO: Add primitive support to unions")
+          }
+          case ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.Enum(_, _)=> {
+            s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.shortName}" -> x)"""
+          }
+          case ScalaPrimitive.Model(ns, name) => {
+            Seq(
+              s"case x: ${t.className} => {",
+              s"  play.api.libs.json.Json.obj(",
+              s"""    "${t.shortName}" -> play.api.libs.json.Json.obj(""",
+              Seq("guid", "email").map( f => s""""$f" -> x.$f""" ).mkString(",\n").indent(6),
+              "    )",
+              "  )",
+              "}"
+            ).mkString("\n")
+          }
+        }
 
-
-        s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.shortName}" -> x)"""
       }.mkString("\n").indent(6),
       "    }",
       "  }",
