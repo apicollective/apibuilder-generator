@@ -70,18 +70,21 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
    * @param fullyQualifiedName Fully qualified type name of the specific class name
    *        for each type.
    */
-  case class JsonType(shortName: String, locallyQualifiedName: String, fullyQualifiedName: String)
+  case class JsonType(
+    shortName: String,
+    locallyQualifiedName: String,
+    datatype: ScalaDatatype
+  )
 
   val typesForJson: Seq[JsonType] = {
     union.types.map { t =>
       val `type`: Datatype = ssd.datatypeResolver.parse(t.`type`).getOrElse {
         sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
       }
-      JsonType(t.`type`, ScalaUtil.toClassName(t.`type`), ssd.scalaDatatype(`type`).name)
+
+      JsonType(t.`type`, ScalaUtil.toClassName(t.`type`), ssd.scalaDatatype(`type`))
     }
   }
-
-  val qualifiedTypeNames: Seq[String] = typesForJson.map(_.fullyQualifiedName)
 
 }
 
@@ -102,7 +105,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
   val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
 
   // List of unions to which this model belongs
-  val unions: Seq[ScalaUnion] = ssd.unions.filter { u => u.qualifiedTypeNames.contains(qualifiedName) }
+  val unions: Seq[ScalaUnion] = ssd.unions.filter { _.typesForJson.map(_.datatype.name).contains(qualifiedName) }
 
 }
 

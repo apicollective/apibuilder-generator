@@ -40,6 +40,10 @@ case class Play2Json(
       s"  def writes(obj: ${union.name}): play.api.libs.json.JsObject = {",
       s"    obj match {",
       union.typesForJson.map { t =>
+
+
+
+
         s"""case x: ${t.locallyQualifiedName} => play.api.libs.json.Json.obj("${t.shortName}" -> x)"""
       }.mkString("\n").indent(6),
       "    }",
