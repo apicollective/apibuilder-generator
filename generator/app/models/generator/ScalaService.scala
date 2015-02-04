@@ -72,17 +72,24 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
    */
   case class JsonType(
     shortName: String,
-    locallyQualifiedName: String,
-    datatype: ScalaDatatype
+    className: String,
+    primitive: ScalaPrimitive
   )
 
   val typesForJson: Seq[JsonType] = {
     union.types.map { t =>
-      val `type`: Datatype = ssd.datatypeResolver.parse(t.`type`).getOrElse {
+      val `type` = ssd.datatypeResolver.parse(t.`type`).getOrElse {
         sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
       }
+      ssd.scalaDatatype(`type`)  match {
+        case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) => {
+          sys.error("Union type must be a singleton and not: " + t)
+        }
 
-      JsonType(t.`type`, ScalaUtil.toClassName(t.`type`), ssd.scalaDatatype(`type`))
+        case ScalaDatatype.Singleton(primitive) => {
+          JsonType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive)
+        }
+      }
     }
   }
 
@@ -105,7 +112,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
   val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
 
   // List of unions to which this model belongs
-  val unions: Seq[ScalaUnion] = ssd.unions.filter { _.typesForJson.map(_.datatype.name).contains(qualifiedName) }
+  val unions: Seq[ScalaUnion] = ssd.unions.filter { _.typesForJson.map(_.primitive.fullName).contains(qualifiedName) }
 
 }
 
