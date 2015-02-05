@@ -198,7 +198,11 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       val payload = body.datatype.primitive match {
         case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name)
         case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name)
-        case _ => body.datatype.primitive.asString(ScalaUtil.toVariable(body.`type`))
+        case ScalaPrimitive.Union(ns, name) => ScalaUtil.toVariable(name)
+        case ScalaPrimitive.String | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Object |
+            ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Unit => {
+              body.datatype.primitive.asString(ScalaUtil.toVariable(body.`type`))
+            }
       }
 
       Some(s"val payload = play.api.libs.json.Json.toJson($payload)")
