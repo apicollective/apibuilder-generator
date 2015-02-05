@@ -11,19 +11,24 @@ case class Play2Json(
   private val Reads = ReadWrite("Reads")
   private val Writes = ReadWrite("Writes")
 
-  def generate(): String = {
-    Seq(
-      ssd.models.map(generateModel(_)).mkString("\n\n"),
-      ssd.unions.map(generateUnion(_)).mkString("\n\n")
-    ).filter(!_.trim.isEmpty).mkString("\n\n")
-  }
+  case class GeneratedCode(packages: String, implicits: String)
 
-  private[models] def generateModel(model: ScalaModel): String = {
-    readers(model) + "\n\n" + writers(model)
-  }
+  def generate(): GeneratedCode = {
+    val modelsWithUnions: Seq[(ScalaModel, Seq[ScalaUnion])] = ssd.models.map { m => (m, ssd.unionsForModel(m)) }
 
-  private[models] def generateUnion(union: ScalaUnion): String = {
-    readers(union) + "\n\n" + writers(union)
+    GeneratedCode(
+      packages = Seq(
+        modelsWithUnions.filter(!_._2.isEmpty).map(m => writers(m._1, m._2)).mkString("\n\n"),
+        ssd.unions.map(packageObject(_)).mkString("\n\n")
+      ).filter(!_.trim.isEmpty).mkString("\n\n"),
+
+      implicits = Seq(
+        modelsWithUnions.map(m => readers(m._1)).mkString("\n\n"),
+        modelsWithUnions.filter(_._2.isEmpty).map(m => writers(m._1, Nil)).mkString("\n\n"),
+        ssd.unions.map(readers(_)).mkString("\n\n"),
+        ssd.unions.map(writers(_)).mkString("\n\n")
+      ).filter(!_.trim.isEmpty).mkString("\n\n")
+    )
   }
 
   private[models] def readers(union: ScalaUnion): String = {
@@ -38,7 +43,7 @@ case class Play2Json(
     ).mkString("\n")
   }
 
-  def writers(union: ScalaUnion): String = {
+  private[models] def packageObject(union: ScalaUnion): String = {
     Seq(
       s"private object ${helperName(union.name)} {",
       union.types.flatMap(_.model).map { m => s"  import ${helperName(m.name)}._" }.mkString("\n"),
@@ -48,8 +53,12 @@ case class Play2Json(
       union.types.map { t => s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.originalName}" -> x)""" }.mkString("\n").indent(6),
       "    }",
       "  }",
-      "}",
-      "",
+      "}"
+    ).mkString("\n")
+  }
+
+  private[models] def writers(union: ScalaUnion): String = {
+    Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       s"  def writes(obj: ${union.name}) = ${helperName(union.name)}.writes(obj)",
       "}"
@@ -106,8 +115,8 @@ case class Play2Json(
     s"${name}_Helper"
   }
 
-  private[models] def writers(model: ScalaModel): String = {
-    ssd.unionsForModel(model) match {
+  private[models] def writers(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
+    unions match {
       case Nil => internalWriters(model)
       case unions => {
         Seq(

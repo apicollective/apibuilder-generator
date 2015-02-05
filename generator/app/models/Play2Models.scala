@@ -30,6 +30,9 @@ object Play2Models extends CodeGenerator {
 s"""$header$caseClasses
 
 package ${ssd.namespaces.models} {
+
+${play2Json.packages.indent(2)}
+
   package object json {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
@@ -56,7 +59,7 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
       }
     }
 
-${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(enumJson, play2Json.implicits).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
   }

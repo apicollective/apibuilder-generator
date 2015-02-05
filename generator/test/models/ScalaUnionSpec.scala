@@ -52,16 +52,26 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     TestHelper.assertEqualsFile("test/resources/scala-union-case-classes.txt", code)
   }
 
-  it("generates valid readers / writes for the union type itself") {
+  it("generates valid readers for the union type itself") {
     val user = ssd.unions.find(_.name == "User").get
-    val code = Play2Json(ssd).generateUnion(user)
-    TestHelper.assertEqualsFile("test/resources/scala-union-json.txt", code)
+    val code = Play2Json(ssd).readers(user)
+    TestHelper.assertEqualsFile("test/resources/scala-union-json-union-type-readers.txt", code)
   }
 
-  it("models that are part of a union type only have readers") {
-    val registeredUser = ssd.models.find(_.name == "RegisteredUser").get
-    val code = Play2Json(ssd).generateModel(registeredUser)
-    TestHelper.assertEqualsFile("test/resources/scala-union-model-json.txt", code)
+  it("generates valid writers for the union type itself") {
+    val user = ssd.unions.find(_.name == "User").get
+    val code = Play2Json(ssd).writers(user)
+    TestHelper.assertEqualsFile("test/resources/scala-union-json-union-type-writers.txt", code)
+  }
+
+  it("codegen implicits") {
+    val code = Play2Json(ssd).generate()
+    TestHelper.assertEqualsFile("test/resources/scala-union-json-implicits.txt", code.implicits)
+  }
+
+  it("codegen packages") {
+    val code = Play2Json(ssd).generate()
+    TestHelper.assertEqualsFile("test/resources/scala-union-json-packages.txt", code.packages)
   }
 
 }

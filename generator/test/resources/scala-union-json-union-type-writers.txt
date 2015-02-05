@@ -1,0 +1,3 @@
+implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
+  def writes(obj: User) = User_Helper.writes(obj)
+}
