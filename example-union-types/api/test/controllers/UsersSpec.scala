@@ -60,4 +60,32 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
     }
   }
 
+  "GET /users" in new WithServer {
+    val users = await(
+      client.users.get()
+    )
+
+    users.size must be(2)
+  }
+
+  "GET /users/:guid" in new WithServer {
+    val userGuid = await(
+      client.users.get()
+    ).headOption.getOrElse {
+      fail("No users returned")
+    } match {
+      case user: RegisteredUser => user.guid
+      case user: GuestUser => user.guid
+    }
+
+    await(client.users.getByGuid(userGuid)).getOrElse {
+      fail("failed to find user by guid")
+    } match {
+      case user: RegisteredUser => user.guid must be(userGuid)
+      case user: GuestUser => user.guid must be(userGuid)
+    }
+
+    await(client.users.getByGuid(UUID.randomUUID)) must be(None)
+  }
+
 }

@@ -40,11 +40,8 @@ object Users extends Controller {
    * curl -X POST -H "Content-Type: application/json" -d "{ \"guest_user\": { \"guid\": \"893ac5c5-2ea3-4b0d-8f82-ca8d73a26211\", \"email\": \"testing@mailinator.com\" } }" http://localhost:7100/users
    */
   def post() = Action(parse.json) { request =>
-    println("POST")
     request.body.validate[User] match {
       case e: JsError => {
-        println(request.body)
-        println("BAS JSON:" + e)
         BadRequest(Json.obj("message" -> s"invalid json: ${e}"))
       }
       case s: JsSuccess[User] => {
