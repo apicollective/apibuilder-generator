@@ -86,8 +86,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
  */
 case class ScalaUnionType(
   originalName: String,
-  className: String,
-  primitive: ScalaPrimitive,
+  datatype: ScalaDatatype,
   enum: Option[ScalaEnum] = None,
   model: Option[ScalaModel] = None
 )
@@ -98,32 +97,25 @@ object ScalaUnionType {
     val `type` = ssd.datatypeResolver.parse(t.`type`).getOrElse {
       sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
     }
-    ssd.scalaDatatype(`type`)  match {
-      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) => {
-        sys.error("Union type must be a singleton and not: " + t)
+    val dt:ScalaDatatype = ssd.scalaDatatype(`type`)
+    dt.primitive match {
+      case ScalaPrimitive.Enum(ns, name) => {
+        val enum = ssd.enums.find(_.name == name).getOrElse {
+          sys.error(s"UnionType[$t] Failed to find enum[$name]")
+        }
+
+        ScalaUnionType(t.`type`, dt, enum = Some(enum))
       }
 
-      case ScalaDatatype.Singleton(primitive) => {
-        primitive match {
-          case ScalaPrimitive.Enum(ns, name) => {
-            val enum = ssd.enums.find(_.name == name).getOrElse {
-              sys.error(s"UnionType[$t] Failed to find enum[$name]")
-            }
-
-            ScalaUnionType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive, enum = Some(enum))
-          }
-
-          case ScalaPrimitive.Model(ns, name) => {
-            val model = ssd.models.find(_.name == name).getOrElse {
-              sys.error(s"UnionType[$t] Failed to find model[$name]")
-            }
-
-            ScalaUnionType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive, model = Some(model))
-          }
-          case _ => {
-            ScalaUnionType(t.`type`, ScalaUtil.toClassName(t.`type`), primitive)
-          }
+      case ScalaPrimitive.Model(ns, name) => {
+        val model = ssd.models.find(_.name == name).getOrElse {
+          sys.error(s"UnionType[$t] Failed to find model[$name]")
         }
+
+        ScalaUnionType(t.`type`, dt, model = Some(model))
+      }
+      case _ => {
+        ScalaUnionType(t.`type`, dt)
       }
     }
   }

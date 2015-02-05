@@ -36,7 +36,7 @@ case class Play2Json(
       s"${identifier(union.name, Reads)} = {",
       s"  (",
       union.types.map { scalaUnionType =>
-        s"""(__ \\ "${scalaUnionType.originalName}").read[${scalaUnionType.className}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+        s"""(__ \\ "${scalaUnionType.originalName}").read[${scalaUnionType.datatype.name}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indent(4),
       s"  )",
       s"}"
@@ -50,7 +50,7 @@ case class Play2Json(
       "",
       s"  def writes(obj: ${union.name}) = {",
       "    obj match {",
-      union.types.map { t => s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.originalName}" -> x)""" }.mkString("\n").indent(6),
+      union.types.map { t => s"""case x: ${t.datatype.name} => play.api.libs.json.Json.obj("${t.originalName}" -> x)""" }.mkString("\n").indent(6),
       "    }",
       "  }",
       "}"

@@ -18,9 +18,9 @@ implicit def jsonReadsApiDocTestRegisteredUser: play.api.libs.json.Reads[Registe
 
 implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
   (
-    (__ \ "registered_user").read[RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
+    (__ \ "registered_user").read[test.apidoc.apidoctest.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
     orElse
-    (__ \ "guest_user").read[GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
+    (__ \ "guest_user").read[test.apidoc.apidoctest.v0.models.GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
   )
 }
 
