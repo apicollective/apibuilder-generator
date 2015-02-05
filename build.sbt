@@ -4,7 +4,7 @@ name := "apidoc-generator"
 
 organization := "com.gilt.apidoc.generator"
 
-scalaVersion in ThisBuild := "2.11.4"
+scalaVersion in ThisBuild := "2.11.5"
 
 // TODO: lib will eventually be published as a jar if it turns out
 // that we need it. For now it is here mostly for reference - hoping
