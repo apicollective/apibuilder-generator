@@ -38,4 +38,26 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
     }
   }
 
+  "POST /users with a registered user" in new WithServer {
+    val guid = UUID.randomUUID
+    val email = "registered-$guid@test.apidoc.me"
+
+    await(
+      client.users.post(
+        RegisteredUser(
+          guid = guid,
+          email = email
+        )
+      )
+    ) match {
+      case user: RegisteredUser => {
+        user.guid must be(guid)
+        user.email must be(email)
+      }
+      case user => {
+        fail("Creating a registered user returning a user w/ invalid type: " + user)
+      }
+    }
+  }
+
 }

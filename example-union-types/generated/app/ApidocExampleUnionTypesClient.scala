@@ -151,7 +151,7 @@ package com.gilt.apidoc.example.union.types.v0 {
       override def post(
         user: com.gilt.apidoc.example.union.types.v0.models.User
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User] = {
-        val payload = play.api.libs.json.Json.toJson(user.toString)
+        val payload = play.api.libs.json.Json.toJson(user)
 
         _executeRequest("POST", s"/users", body = Some(payload)).map {
           case r if r.status == 201 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User])
