@@ -58,8 +58,8 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
     def writes(obj: User) = {
       obj match {
-        case x: RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
-        case x: GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
+        case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
+        case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
       }
     }
   }
@@ -106,9 +106,9 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
     implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = {
       (
-        (__ \ "registered_user").read[RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
+        (__ \ "registered_user").read[com.gilt.apidoc.example.union.types.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
-        (__ \ "guest_user").read[GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
+        (__ \ "guest_user").read[com.gilt.apidoc.example.union.types.v0.models.GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
       )
     }
 
@@ -145,6 +145,17 @@ package com.gilt.apidoc.example.union.types.v0 {
           case r if r.status == 200 => Some(_root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User]))
           case r if r.status == 404 => None
           case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200, 404")
+        }
+      }
+
+      override def post(
+        user: com.gilt.apidoc.example.union.types.v0.models.User
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User] = {
+        val payload = play.api.libs.json.Json.toJson(user.toString)
+
+        _executeRequest("POST", s"/users", body = Some(payload)).map {
+          case r if r.status == 201 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User])
+          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 201")
         }
       }
     }
@@ -238,6 +249,10 @@ package com.gilt.apidoc.example.union.types.v0 {
     def getByGuid(
       guid: _root_.java.util.UUID
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[com.gilt.apidoc.example.union.types.v0.models.User]]
+
+    def post(
+      user: com.gilt.apidoc.example.union.types.v0.models.User
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User]
   }
 
   package errors {

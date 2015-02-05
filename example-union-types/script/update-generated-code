@@ -4,7 +4,7 @@ server = "http://localhost:9000"
 project = "apidoc-example-union-types"
 
 data = {
-  "play_2_3_client" => "generated/src/main/scala/GeneratedClient.scala",
+  "play_2_3_client" => "generated/app/ApidocExampleUnionTypesClient.scala",
   "play_2_x_routes" => "api/conf/routes"
 }
 
