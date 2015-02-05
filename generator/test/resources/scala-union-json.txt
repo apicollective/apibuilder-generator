@@ -1,30 +1,23 @@
-private[models] object Helper_User {
-  import play.api.libs.json.__
-  import play.api.libs.json.Writes
-  import play.api.libs.functional.syntax._
+implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
+  (
+    (__ \ "registered_user").read[RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
+    orElse
+    (__ \ "guest_user").read[GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
+  )
+}
 
-  implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
-    (
-      (__ \ "registered_user").read[RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
-      orElse
-      (__ \ "guest_user").read[GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
-    )
-  }
-  
-  implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
-    def writes(obj: User): play.api.libs.json.JsObject = {
-      obj match {
-        case x: RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> serializeQualityRegisteredUser(x))
-        case x: GuestUser => play.api.libs.json.Json.obj("guest_user" -> serializeQualityGuestUser(x))
-      }
-    }
-  }
+private object User_Helper {
+  import RegisteredUser_Helper._
+  import GuestUser_Helper._
 
-  def write(obj: User) = {
+  def writes(obj: User) = {
     obj match {
       case x: RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
       case x: GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
     }
   }
+}
 
+implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
+  def writes(obj: User) = User_Helper.writes(obj)
 }

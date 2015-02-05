@@ -85,7 +85,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
  *        for each type.
  */
 case class ScalaUnionType(
-  shortName: String,
+  originalName: String,
   className: String,
   primitive: ScalaPrimitive,
   enum: Option[ScalaEnum] = None,

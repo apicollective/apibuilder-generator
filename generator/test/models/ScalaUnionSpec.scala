@@ -1,8 +1,8 @@
-package generator
+package models
 
-import models.{Play2Json, TestHelper}
+import generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
 import com.gilt.apidoc.generator.v0.models.InvocationForm
-import org.scalatest.{ ShouldMatchers, FunSpec }
+import org.scalatest.{ShouldMatchers, FunSpec}
 
 class ScalaUnionSpec extends FunSpec with ShouldMatchers {
 
@@ -52,15 +52,15 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     TestHelper.assertEqualsFile("test/resources/scala-union-case-classes.txt", code)
   }
 
-  it("generates valid json") {
+  it("generates valid readers / writes for the union type itself") {
     val user = ssd.unions.find(_.name == "User").get
-    val code = Play2Json(ssd).generate(user)
+    val code = Play2Json(ssd).generateUnion(user)
     TestHelper.assertEqualsFile("test/resources/scala-union-json.txt", code)
   }
 
-  it("models that are part of a union type have private json serializers") {
+  it("models that are part of a union type only have readers") {
     val registeredUser = ssd.models.find(_.name == "RegisteredUser").get
-    val code = Play2Json(ssd).generate(registeredUser)
+    val code = Play2Json(ssd).generateModel(registeredUser)
     TestHelper.assertEqualsFile("test/resources/scala-union-model-json.txt", code)
   }
 

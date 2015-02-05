@@ -20,12 +20,7 @@ object Play2Models extends CodeGenerator {
     val caseClasses = ScalaCaseClasses.invoke(form, addHeader = false)
     val prefix = underscoreAndDashToInitCap(ssd.name)
     val enumJson: String = ssd.enums.map { ScalaEnums(_).buildJson(ssd.name) }.mkString("\n\n")
-
-    val play2Json = Play2Json(ssd)
-
-    val unionJson: String = ssd.unions.map(play2Json.generate(_)).mkString("\n\n")
-
-    val modelJson: String = ssd.models.map(play2Json.generate(_)).mkString("\n\n")
+    val play2Json = Play2Json(ssd).generate()
 
     val header = addHeader match {
       case false => ""
@@ -61,7 +56,7 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
       }
     }
 
-${Seq(enumJson, unionJson, modelJson).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
   }

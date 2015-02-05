@@ -11,51 +11,54 @@ case class Play2Json(
   private val Reads = ReadWrite("Reads")
   private val Writes = ReadWrite("Writes")
 
-  def generate(model: ScalaModel): String = {
-    ssd.unionsForModel(model) match {
-      case Nil => readers(model) + "\n\n" + writers(model)
-      case unions => readers(model)
-    }
+  def generate(): String = {
+    Seq(
+      ssd.models.map(generateModel(_)).mkString("\n\n"),
+      ssd.unions.map(generateUnion(_)).mkString("\n\n")
+    ).filter(!_.trim.isEmpty).mkString("\n\n")
   }
 
-  def generate(union: ScalaUnion): String = {
-    helpers(union) ++ "\n\n" ++ readers(union) + "\n\n" + writers(union)
+  private[models] def generateModel(model: ScalaModel): String = {
+    readers(model) + "\n\n" + writers(model)
   }
 
-  def readers(union: ScalaUnion): String = {
+  private[models] def generateUnion(union: ScalaUnion): String = {
+    readers(union) + "\n\n" + writers(union)
+  }
+
+  private[models] def readers(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Reads)} = {",
       s"  (",
       union.types.map { scalaUnionType =>
-        s"""(__ \\ "${scalaUnionType.shortName}").read[${scalaUnionType.className}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+        s"""(__ \\ "${scalaUnionType.originalName}").read[${scalaUnionType.className}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indent(4),
       s"  )",
       s"}"
     ).mkString("\n")
   }
 
-  def helpers(union: ScalaUnion): String = {
-    // s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.shortName}" -> $method(x))"""
-    Seq(
-      "private object Helper_${union.name} {",
-      union.types.map { scalaUnionType =>
-        "${scalaUnionType}"
-      },
-      "}"
-    ).mkString("\n\n")
-  }
-
   def writers(union: ScalaUnion): String = {
     Seq(
+      s"private object ${helperName(union.name)} {",
+      union.types.flatMap(_.model).map { m => s"  import ${helperName(m.name)}._" }.mkString("\n"),
+      "",
+      s"  def writes(obj: ${union.name}) = {",
+      "    obj match {",
+      union.types.map { t => s"""case x: ${t.className} => play.api.libs.json.Json.obj("${t.originalName}" -> x)""" }.mkString("\n").indent(6),
+      "    }",
+      "  }",
+      "}",
+      "",
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
-      s"  def writes(obj: ${union.name}): play.api.libs.json.JsObject = Helper_${union.name}.writes(obj)",
+      s"  def writes(obj: ${union.name}) = ${helperName(union.name)}.writes(obj)",
       "}"
     ).mkString("\n")
   }
 
   private[models] def readers(model: ScalaModel): String = {
     Seq(
-      s"${privateIdentifier(model)}${identifier(model.name, Reads)} = {",
+      s"${identifier(model.name, Reads)} = {",
       fieldReaders(model).indent(2),
       s"}"
     ).mkString("\n")
@@ -99,12 +102,35 @@ case class Play2Json(
     }
   }
 
+  private def helperName(name: String): String = {
+    s"${name}_Helper"
+  }
+
   private[models] def writers(model: ScalaModel): String = {
-    assert(ssd.unionsForModel(model).isEmpty, s"Model[${model.name}] is part of a union type - writes is part of union type writer")
+    ssd.unionsForModel(model) match {
+      case Nil => internalWriters(model)
+      case unions => {
+        Seq(
+          "/**",
+          s" * Writers are private as this model is part of a union type: ${unions.map(_.name).mkString(", ")}",
+          s" */",
+          s"private object ${helperName(model.name)} {",
+          s"  import play.api.libs.json.__",
+          s"  import play.api.libs.functional.syntax._",
+          "",
+          internalWriters(model).indent(2),
+          "",
+          s"}"
+        ).mkString("\n")
+      }
+    }
+  }
+
+  private def internalWriters(model: ScalaModel): String = {
     model.fields match {
       case field :: Nil => {
         Seq(
-          s"${privateIdentifier(model)}${identifier(model.name, Writes)} = new play.api.libs.json.Writes[${model.name}] {",
+          s"${identifier(model.name, Writes)} = new play.api.libs.json.Writes[${model.name}] {",
           s"  def writes(x: ${model.name}) = play.api.libs.json.Json.obj(",
           s"""    "${field.originalName}" -> play.api.libs.json.Json.toJson(x.${field.name})""",
           "  )",
@@ -114,7 +140,7 @@ case class Play2Json(
 
       case fields => {
         Seq(
-          s"${privateIdentifier(model)}${identifier(model.name, Writes)} = {",
+          s"${identifier(model.name, Writes)} = {",
           s"  (",
           model.fields.map { field =>
             if (field.isOption) {
@@ -144,14 +170,6 @@ case class Play2Json(
     readWrite: ReadWrite
   ): String = {
     s"implicit def json${readWrite.name}${ssd.name}$name: play.api.libs.json.${readWrite.name}[$name]"
-  }
-
-  private[models] def privateIdentifier(model: ScalaModel): String = {
-    if (ssd.unionsForModel(model).isEmpty) {
-      ""
-    } else {
-      "private "
-    }
   }
 
 }
