@@ -115,13 +115,13 @@ package com.gilt.apidoc.example.union.types.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesEnum_Bar = __.read[String].map(Bar.apply)
-    implicit val jsonWritesApidocExampleUnionTypesEnum_Bar = new Writes[Bar] {
+    implicit val jsonReadsApidocExampleUnionTypesBar = __.read[String].map(Bar.apply)
+    implicit val jsonWritesApidocExampleUnionTypesBar = new Writes[Bar] {
       def writes(x: Bar) = JsString(x.toString)
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesEnum_Foo = __.read[String].map(Foo.apply)
-    implicit val jsonWritesApidocExampleUnionTypesEnum_Foo = new Writes[Foo] {
+    implicit val jsonReadsApidocExampleUnionTypesFoo = __.read[String].map(Foo.apply)
+    implicit val jsonWritesApidocExampleUnionTypesFoo = new Writes[Foo] {
       def writes(x: Foo) = JsString(x.toString)
     }
 
@@ -157,16 +157,16 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
     implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[Foobar] = {
       (
-        (__ \ "foo").read(jsonReadsApidocExampleUnionTypesEnum_Foo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        (__ \ "foo").read(jsonReadsApidocExampleUnionTypesFoo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
         orElse
-        (__ \ "bar").read(jsonReadsApidocExampleUnionTypesEnum_Bar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        (__ \ "bar").read(jsonReadsApidocExampleUnionTypesBar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
       )
     }
 
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = new play.api.libs.json.Writes[Foobar] {
       def writes(obj: Foobar) = obj match {
-        case x: com.gilt.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesEnum_Foo.writes(x))
-        case x: com.gilt.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesEnum_Bar.writes(x))
+        case x: com.gilt.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
+        case x: com.gilt.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
       }
     }
 
