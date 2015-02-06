@@ -3,7 +3,7 @@ object Contents extends Contents {
     _executeRequest("GET", s"/contents/data").map {
       case r if r.status == 200 => Some(_root_.test.apidoc.Client.parseJson("_root_.play.api.libs.json.JsObject", r, _.validate[_root_.play.api.libs.json.JsObject]))
       case r if r.status == 404 => None
-      case r => throw new test.apidoc.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: ${allResponseCodes.mkString(", ")}")\n
+      case r => throw new test.apidoc.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
     }
   }
 }
