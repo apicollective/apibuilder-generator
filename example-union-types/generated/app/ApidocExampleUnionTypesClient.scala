@@ -134,7 +134,7 @@ package com.gilt.apidoc.example.union.types.v0 {
       override def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.example.union.types.v0.models.User]] = {
         _executeRequest("GET", s"/users").map {
           case r if r.status == 200 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("Seq[com.gilt.apidoc.example.union.types.v0.models.User]", r, _.validate[Seq[com.gilt.apidoc.example.union.types.v0.models.User]])
-          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200")
+          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code. Expected: 200")
         }
       }
 
@@ -144,7 +144,7 @@ package com.gilt.apidoc.example.union.types.v0 {
         _executeRequest("GET", s"/users/${guid}").map {
           case r if r.status == 200 => Some(_root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User]))
           case r if r.status == 404 => None
-          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200, 404")
+          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code. Expected: 200, 404")
         }
       }
 
@@ -155,7 +155,7 @@ package com.gilt.apidoc.example.union.types.v0 {
 
         _executeRequest("POST", s"/users", body = Some(payload)).map {
           case r if r.status == 201 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User])
-          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 201")
+          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code. Expected: 201")
         }
       }
     }

@@ -164,7 +164,7 @@ package com.gilt.apidoc.generator.v0 {
 
         _executeRequest("GET", s"/generators", queryParameters = queryParameters).map {
           case r if r.status == 200 => _root_.com.gilt.apidoc.generator.v0.Client.parseJson("Seq[com.gilt.apidoc.generator.v0.models.Generator]", r, _.validate[Seq[com.gilt.apidoc.generator.v0.models.Generator]])
-          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200")
+          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unsupported response code. Expected: 200")
         }
       }
 
@@ -174,7 +174,7 @@ package com.gilt.apidoc.generator.v0 {
         _executeRequest("GET", s"/generators/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}").map {
           case r if r.status == 200 => Some(_root_.com.gilt.apidoc.generator.v0.Client.parseJson("com.gilt.apidoc.generator.v0.models.Generator", r, _.validate[com.gilt.apidoc.generator.v0.models.Generator]))
           case r if r.status == 404 => None
-          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200, 404")
+          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unsupported response code. Expected: 200, 404")
         }
       }
     }
@@ -184,7 +184,7 @@ package com.gilt.apidoc.generator.v0 {
         _executeRequest("GET", s"/_internal_/healthcheck").map {
           case r if r.status == 200 => Some(_root_.com.gilt.apidoc.generator.v0.Client.parseJson("com.gilt.apidoc.generator.v0.models.Healthcheck", r, _.validate[com.gilt.apidoc.generator.v0.models.Healthcheck]))
           case r if r.status == 404 => None
-          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200, 404")
+          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unsupported response code. Expected: 200, 404")
         }
       }
     }
@@ -199,7 +199,7 @@ package com.gilt.apidoc.generator.v0 {
         _executeRequest("POST", s"/invocations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", body = Some(payload)).map {
           case r if r.status == 200 => _root_.com.gilt.apidoc.generator.v0.Client.parseJson("com.gilt.apidoc.generator.v0.models.Invocation", r, _.validate[com.gilt.apidoc.generator.v0.models.Invocation])
           case r if r.status == 409 => throw new com.gilt.apidoc.generator.v0.errors.ErrorsResponse(r)
-          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unupported response code. Expected: 200, 409")
+          case r => throw new com.gilt.apidoc.generator.v0.errors.FailedRequest(r.status, s"Unsupported response code. Expected: 200, 409")
         }
       }
     }
