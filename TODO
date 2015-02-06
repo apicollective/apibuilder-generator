@@ -1,2 +1,4 @@
+Standards json reader/writer method naming:
+  e.g. library to generate names like jsonReads${ssd.name}Enum_${enum.name}
+
 TODO: Finish map
-TODO: UNION TYPE
