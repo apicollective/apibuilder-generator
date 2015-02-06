@@ -8,7 +8,9 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
 
   val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc")
 
-  val json = TestHelper.buildJson("""
+  describe("models") {
+
+    val json = TestHelper.buildJson("""
       "unions": [
         {
           "name": "user",
@@ -44,29 +46,72 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
       ]
   """)
 
-  lazy val service = TestHelper.service(json)
-  lazy val ssd = ScalaService(service)
+    lazy val service = TestHelper.service(json)
+    lazy val ssd = ScalaService(service)
 
-  it("generates valid models") {
-    val code = ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false)
-    TestHelper.assertEqualsFile("test/resources/scala-union-case-classes.txt", code)
+    it("generates valid models") {
+      val code = ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false)
+      TestHelper.assertEqualsFile("test/resources/scala-union-models-case-classes.txt", code)
+    }
+
+    it("generates valid readers for the union type itself") {
+      val user = ssd.unions.find(_.name == "User").get
+      val code = Play2Json(ssd).readers(user)
+      TestHelper.assertEqualsFile("test/resources/scala-union-models-json-union-type-readers.txt", code)
+    }
+
+    it("generates valid writers for the union type itself") {
+      val user = ssd.unions.find(_.name == "User").get
+      val code = Play2Json(ssd).writers(user)
+      TestHelper.assertEqualsFile("test/resources/scala-union-models-json-union-type-writers.txt", code)
+    }
+
+    it("codegen") {
+      val code = Play2Json(ssd).generate()
+      TestHelper.assertEqualsFile("test/resources/scala-union-models-json.txt", code)
+    }
   }
 
-  it("generates valid readers for the union type itself") {
-    val user = ssd.unions.find(_.name == "User").get
-    val code = Play2Json(ssd).readers(user)
-    TestHelper.assertEqualsFile("test/resources/scala-union-json-union-type-readers.txt", code)
-  }
+  describe("enums") {
 
-  it("generates valid writers for the union type itself") {
-    val user = ssd.unions.find(_.name == "User").get
-    val code = Play2Json(ssd).writers(user)
-    TestHelper.assertEqualsFile("test/resources/scala-union-json-union-type-writers.txt", code)
-  }
+    val json = TestHelper.buildJson("""
+      "enums": [
+        {
+          "name": "member_type",
+          "plural": "member_types",
+          "values": [
+            { "name": "Registered" },
+            { "name": "Guest" }
+          ]
+        },
+        {
+          "name": "role_type",
+          "plural": "role_types",
+          "values": [
+            { "name": "Admin" }
+          ]
+        }
+      ],
 
-  it("codegen") {
-    val code = Play2Json(ssd).generate()
-    TestHelper.assertEqualsFile("test/resources/scala-union-json.txt", code)
+      "unions": [
+        {
+          "name": "user_type",
+          "plural": "user_types",
+          "types": [
+            { "type": "member_type" },
+            { "type": "role_type" }
+          ]
+        }
+      ]
+    """)
+
+    lazy val service = TestHelper.service(json)
+    lazy val ssd = ScalaService(service)
+
+    it("codegen") {
+      val code = Play2Json(ssd).generate()
+      TestHelper.assertEqualsFile("test/resources/scala-union-enums-json.txt", code)
+    }
   }
 
 }

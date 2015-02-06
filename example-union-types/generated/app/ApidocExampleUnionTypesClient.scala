@@ -4,6 +4,8 @@
  */
 package com.gilt.apidoc.example.union.types.v0.models {
 
+  sealed trait Foobar
+
   sealed trait User
 
   case class GuestUser(
@@ -13,8 +15,75 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
   case class RegisteredUser(
     guid: _root_.java.util.UUID,
-    email: String
+    email: String,
+    preference: com.gilt.apidoc.example.union.types.v0.models.Foobar
   ) extends User
+
+  sealed trait Bar extends Foobar
+
+  object Bar {
+
+    case object B extends Bar { override def toString = "b" }
+
+    /**
+     * UNDEFINED captures values that are sent either in error or
+     * that were added by the server after this library was
+     * generated. We want to make it easy and obvious for users of
+     * this library to handle this case gracefully.
+     *
+     * We use all CAPS for the variable name to avoid collisions
+     * with the camel cased values above.
+     */
+    case class UNDEFINED(override val toString: String) extends Bar
+
+    /**
+     * all returns a list of all the valid, known values. We use
+     * lower case to avoid collisions with the camel cased values
+     * above.
+     */
+    val all = Seq(B)
+
+    private[this]
+    val byName = all.map(x => x.toString -> x).toMap
+
+    def apply(value: String): Bar = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[Bar] = byName.get(value)
+
+  }
+
+  sealed trait Foo extends Foobar
+
+  object Foo {
+
+    case object A extends Foo { override def toString = "a" }
+
+    /**
+     * UNDEFINED captures values that are sent either in error or
+     * that were added by the server after this library was
+     * generated. We want to make it easy and obvious for users of
+     * this library to handle this case gracefully.
+     *
+     * We use all CAPS for the variable name to avoid collisions
+     * with the camel cased values above.
+     */
+    case class UNDEFINED(override val toString: String) extends Foo
+
+    /**
+     * all returns a list of all the valid, known values. We use
+     * lower case to avoid collisions with the camel cased values
+     * above.
+     */
+    val all = Seq(A)
+
+    private[this]
+    val byName = all.map(x => x.toString -> x).toMap
+
+    def apply(value: String): Foo = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[Foo] = byName.get(value)
+
+  }
 
 }
 
@@ -46,6 +115,16 @@ package com.gilt.apidoc.example.union.types.v0.models {
       }
     }
 
+    implicit val jsonReadsApidocExampleUnionTypesEnum_Bar = __.read[String].map(Bar.apply)
+    implicit val jsonWritesApidocExampleUnionTypesEnum_Bar = new Writes[Bar] {
+      def writes(x: Bar) = JsString(x.toString)
+    }
+
+    implicit val jsonReadsApidocExampleUnionTypesEnum_Foo = __.read[String].map(Foo.apply)
+    implicit val jsonWritesApidocExampleUnionTypesEnum_Foo = new Writes[Foo] {
+      def writes(x: Foo) = JsString(x.toString)
+    }
+
     implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[GuestUser] = {
       (
         (__ \ "guid").read[_root_.java.util.UUID] and
@@ -63,15 +142,32 @@ package com.gilt.apidoc.example.union.types.v0.models {
     implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
       (
         (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String]
+        (__ \ "email").read[String] and
+        (__ \ "preference").read[com.gilt.apidoc.example.union.types.v0.models.Foobar]
       )(RegisteredUser.apply _)
     }
 
     implicit def jsonWritesApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
       (
         (__ \ "guid").write[_root_.java.util.UUID] and
-        (__ \ "email").write[String]
+        (__ \ "email").write[String] and
+        (__ \ "preference").write[com.gilt.apidoc.example.union.types.v0.models.Foobar]
       )(unlift(RegisteredUser.unapply _))
+    }
+
+    implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[Foobar] = {
+      (
+        (__ \ "foo").read(jsonReadsApidocExampleUnionTypesEnum_Foo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        orElse
+        (__ \ "bar").read(jsonReadsApidocExampleUnionTypesEnum_Bar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+      )
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = new play.api.libs.json.Writes[Foobar] {
+      def writes(obj: Foobar) = obj match {
+        case x: com.gilt.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesEnum_Foo.writes(x))
+        case x: com.gilt.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesEnum_Bar.writes(x))
+      }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = {
@@ -259,7 +355,27 @@ package com.gilt.apidoc.example.union.types.v0 {
       ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: Exception) => s"Error parsing date $key. Example: 2014-04-29"
     )
 
+    // Enum: Bar
+    private val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${Bar.all.mkString(", ")}"
 
+    implicit val pathBindableEnumBar = new PathBindable.Parsing[Bar] (
+      Bar.fromString(_).get, _.toString, enumBarNotFound
+    )
+
+    implicit val queryStringBindableEnumBar = new QueryStringBindable.Parsing[Bar](
+      Bar.fromString(_).get, _.toString, enumBarNotFound
+    )
+
+    // Enum: Foo
+    private val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${Foo.all.mkString(", ")}"
+
+    implicit val pathBindableEnumFoo = new PathBindable.Parsing[Foo] (
+      Foo.fromString(_).get, _.toString, enumFooNotFound
+    )
+
+    implicit val queryStringBindableEnumFoo = new QueryStringBindable.Parsing[Foo](
+      Foo.fromString(_).get, _.toString, enumFooNotFound
+    )
 
   }
 
