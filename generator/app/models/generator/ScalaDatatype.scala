@@ -47,7 +47,8 @@ object ScalaPrimitive {
   }
 
   case object DateIso8601 extends ScalaPrimitive {
-    def shortName = "_root_.org.joda.time.LocalDate"
+    override def namespace = Some("_root_.org.joda.time.LocalDate")
+    def shortName = "LocalDate"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -55,7 +56,8 @@ object ScalaPrimitive {
   }
 
   case object DateTimeIso8601 extends ScalaPrimitive {
-    def shortName = "_root_.org.joda.time.DateTime"
+    override def namespace = Some("_root_.org.joda.time")
+    def shortName = "DateTime"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
@@ -71,7 +73,8 @@ object ScalaPrimitive {
   }
 
   case object Object extends ScalaPrimitive {
-    def shortName = "_root_.play.api.libs.json.JsObject"
+    override def namespace = Some("_root_.play.api.libs.json")
+    def shortName = "JsObject"
     def asString(originalVarName: String): String = {
       throw new UnsupportedOperationException(s"unsupported conversion of type object for $originalVarName")
     }
@@ -93,7 +96,8 @@ object ScalaPrimitive {
   }
 
   case object Uuid extends ScalaPrimitive {
-    def shortName = "_root_.java.util.UUID"
+    override def namespace = Some("_root_.java.util")
+    def shortName = "UUID"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"

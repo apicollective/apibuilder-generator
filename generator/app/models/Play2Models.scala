@@ -3,7 +3,7 @@ package models
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models.Service
 import lib.Text._
-import generator.{ScalaEnums, ScalaCaseClasses, ScalaService, CodeGenerator}
+import generator.{PrimitiveWrapper, ScalaEnums, ScalaCaseClasses, ScalaService, CodeGenerator}
 
 object Play2Models extends CodeGenerator {
 
@@ -21,6 +21,7 @@ object Play2Models extends CodeGenerator {
     val prefix = underscoreAndDashToInitCap(ssd.name)
     val enumJson: String = ssd.enums.map { ScalaEnums(ssd, _).buildJson() }.mkString("\n\n")
     val play2Json = Play2Json(ssd).generate()
+    val unionPrimitiveWrappers = PrimitiveWrapper(ssd).generate().getOrElse("")
 
     val header = addHeader match {
       case false => ""
@@ -57,7 +58,7 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
       }
     }
 
-${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(enumJson, play2Json, unionPrimitiveWrappers).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
   }
