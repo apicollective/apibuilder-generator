@@ -1,9 +1,16 @@
-/**
- * Writers are private as this model is part of a union type: User
- */
+// Private as this model is part of a union type: User
 private object GuestUser_Helper {
   import play.api.libs.json.__
   import play.api.libs.functional.syntax._
+
+  implicit def jsonReadsApiDocTestGuestUser: play.api.libs.json.Reads[GuestUser] = {
+    (
+      (__ \ "id").read[Long] and
+      (__ \ "email").read[String] and
+      (__ \ "name").readNullable[String] and
+      (__ \ "bar").read[String]
+    )(GuestUser.apply _)
+  }
 
   implicit def jsonWritesApiDocTestGuestUser: play.api.libs.json.Writes[GuestUser] = {
     (
@@ -13,15 +20,21 @@ private object GuestUser_Helper {
       (__ \ "bar").write[String]
     )(unlift(GuestUser.unapply _))
   }
-
 }
 
-/**
- * Writers are private as this model is part of a union type: User
- */
+// Private as this model is part of a union type: User
 private object RegisteredUser_Helper {
   import play.api.libs.json.__
   import play.api.libs.functional.syntax._
+
+  implicit def jsonReadsApiDocTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
+    (
+      (__ \ "id").read[Long] and
+      (__ \ "email").read[String] and
+      (__ \ "name").readNullable[String] and
+      (__ \ "foo").read[String]
+    )(RegisteredUser.apply _)
+  }
 
   implicit def jsonWritesApiDocTestRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
     (
@@ -31,17 +44,26 @@ private object RegisteredUser_Helper {
       (__ \ "foo").write[String]
     )(unlift(RegisteredUser.unapply _))
   }
-
 }
 
 private object User_Helper {
+  import play.api.libs.json.__
+  import play.api.libs.functional.syntax._
+
   import RegisteredUser_Helper._
   import GuestUser_Helper._
+  def reads: play.api.libs.json.Reads[User] = {
+    (
+      (__ \ "registered_user").read[test.apidoc.apidoctest.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
+      orElse
+      (__ \ "guest_user").read[test.apidoc.apidoctest.v0.models.GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
+    )
+  }
 
   def writes(obj: User) = {
     obj match {
-      case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
-      case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
+        case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
+        case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
     }
   }
 }

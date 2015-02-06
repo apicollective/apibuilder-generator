@@ -50,7 +50,7 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
       it("writers") {
         TestHelper.assertEqualsFile(
           "test/resources/generators/play-2-json-spec-quality-plan-writers.txt",
-          Play2Json(quality).writers(plan, Nil)
+          Play2Json(quality).writers(plan)
         )
       }
     }
@@ -69,7 +69,7 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
       it("writers") {
         TestHelper.assertEqualsFile(
           "test/resources/generators/play-2-json-spec-quality-healthcheck-writers.txt",
-          Play2Json(quality).writers(healthcheck, Nil)
+          Play2Json(quality).writers(healthcheck)
         )
       }
     }
