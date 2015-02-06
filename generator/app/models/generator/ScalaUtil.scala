@@ -17,6 +17,13 @@ object ScalaUtil {
                              "type", "val", "var", "while",
                              "with", "yield").toSet
 
+  def extendsClause(names: Seq[String]): Option[String] = {
+    names match {
+      case Nil => None
+      case unions => Some("extends " + names.sorted.mkString(" with "))
+    }
+  }
+
   def textToComment(text: String) = {
     if (text.trim.isEmpty) {
       ""

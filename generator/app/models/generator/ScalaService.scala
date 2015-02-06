@@ -47,13 +47,15 @@ case class ScalaService(
     scalaTypeResolver.scalaDatatype(t)
   }
 
-  /**
-    * Looks up the list of union types to which the specified model
-    * belongs.
-    */
   def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
     unions.filter { u =>
       u.types.flatMap(_.model).contains(model)
+    }
+  }
+
+  def unionsForEnum(enum: ScalaEnum): Seq[ScalaUnion] = {
+    unions.filter { u =>
+      u.types.flatMap(_.enum).contains(enum)
     }
   }
 

@@ -3,14 +3,17 @@ package generator
 import lib.Text
 
 case class ScalaEnums(
+  ssd: ScalaService,
   enum: ScalaEnum
 ) {
+
+  private val unions = ssd.unionsForEnum(enum)
 
   def build(): String = {
     import lib.Text._
     Seq(
       enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-        s"sealed trait ${enum.name}",
+      s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse(""),
       s"object ${enum.name} {",
       buildValues().indent(2),
       s"}"
@@ -20,10 +23,10 @@ case class ScalaEnums(
   /**
     * Returns the implicits for json serialization.
     */
-  def buildJson(prefix: String): String = {
+  def buildJson(): String = {
     Seq(
-      s"implicit val jsonReads${prefix}Enum_${enum.name} = __.read[String].map(${enum.name}.apply)",
-      s"implicit val jsonWrites${prefix}Enum_${enum.name} = new Writes[${enum.name}] {",
+      s"implicit val jsonReads${ssd.name}Enum_${enum.name} = __.read[String].map(${enum.name}.apply)",
+      s"implicit val jsonWrites${ssd.name}Enum_${enum.name} = new Writes[${enum.name}] {",
       s"  def writes(x: ${enum.name}) = JsString(x.toString)",
       "}"
     ).mkString("\n")
