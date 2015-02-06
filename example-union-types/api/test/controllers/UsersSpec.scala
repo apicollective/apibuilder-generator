@@ -18,7 +18,7 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
 
   "POST /users with a guest user" in new WithServer {
     val guid = UUID.randomUUID
-    val email = "guest-$guid@test.apidoc.me"
+    val email = s"guest-$guid@test.apidoc.me"
 
     await(
       client.users.post(
@@ -40,7 +40,7 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
 
   "POST /users with a registered user" in new WithServer {
     val guid = UUID.randomUUID
-    val email = "registered-$guid@test.apidoc.me"
+    val email = s"registered-$guid@test.apidoc.me"
 
     await(
       client.users.post(
