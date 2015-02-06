@@ -64,14 +64,9 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     TestHelper.assertEqualsFile("test/resources/scala-union-json-union-type-writers.txt", code)
   }
 
-  it("codegen implicits") {
+  it("codegen") {
     val code = Play2Json(ssd).generate()
-    TestHelper.assertEqualsFile("test/resources/scala-union-json-implicits.txt", code.implicits)
-  }
-
-  it("codegen packages") {
-    val code = Play2Json(ssd).generate()
-    TestHelper.assertEqualsFile("test/resources/scala-union-json-packages.txt", code.packages)
+    TestHelper.assertEqualsFile("test/resources/scala-union-json.txt", code)
   }
 
 }

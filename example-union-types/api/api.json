@@ -1,30 +1,11 @@
 {
     "name": "apidoc Example Union Types",
 
-    "enums": {
-	"foo": {
-	    "values": [
-		{ "name": "a" }
-	    ]
-	},
-	"bar": {
-	    "values": [
-		{ "name": "b" }
-	    ]
-	}
-    },
-
     "unions": {
 	"user": {
 	    "types": [
 		{ "type": "registered_user" },
 		{ "type": "guest_user" }
-	    ]
-	},
-	"foobar": {
-	    "types": [
-		{ "type": "foo" },
-		{ "type": "bar" }
 	    ]
 	}
     },
@@ -34,8 +15,7 @@
 	"registered_user": {
 	    "fields": [
                 { "name": "guid", "type": "uuid", "description": "Internal unique identifier for this user." },
-                { "name": "email", "type": "string" },
-                { "name": "preference", "type": "foobar" }
+                { "name": "email", "type": "string" }
             ]
         },
 

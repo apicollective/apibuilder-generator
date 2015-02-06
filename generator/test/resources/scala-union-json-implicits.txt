@@ -1,5 +1,0 @@
-implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = User_Helper.reads
-
-implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
-  def writes(obj: User) = User_Helper.writes(obj)
-}

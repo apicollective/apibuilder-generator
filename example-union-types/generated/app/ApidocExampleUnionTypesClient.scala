@@ -84,10 +84,8 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
       def writes(obj: User) = obj match {
-          case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser =>
-            play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
-          case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser =>
-            play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
+        case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
+        case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
       }
     }
   }

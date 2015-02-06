@@ -1,1 +1,7 @@
-implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = User_Helper.reads
+implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
+  (
+    (__ \ "registered_user").read(jsonReadsApiDocTestRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
+    orElse
+    (__ \ "guest_user").read(jsonReadsApiDocTestGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
+  )
+}
