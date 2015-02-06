@@ -20,12 +20,17 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
 package com.gilt.apidoc.example.union.types.v0.models {
 
-  /**
-   * Writers are private as this model is part of a union type: User
-   */
+  // Private as this model is part of a union type: User
   private object GuestUser_Helper {
     import play.api.libs.json.__
     import play.api.libs.functional.syntax._
+
+    implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[GuestUser] = {
+      (
+        (__ \ "guid").read[_root_.java.util.UUID] and
+        (__ \ "email").read[String]
+      )(GuestUser.apply _)
+    }
 
     implicit def jsonWritesApidocExampleUnionTypesGuestUser: play.api.libs.json.Writes[GuestUser] = {
       (
@@ -33,15 +38,19 @@ package com.gilt.apidoc.example.union.types.v0.models {
         (__ \ "email").write[String]
       )(unlift(GuestUser.unapply _))
     }
-
   }
 
-  /**
-   * Writers are private as this model is part of a union type: User
-   */
+  // Private as this model is part of a union type: User
   private object RegisteredUser_Helper {
     import play.api.libs.json.__
     import play.api.libs.functional.syntax._
+
+    implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
+      (
+        (__ \ "guid").read[_root_.java.util.UUID] and
+        (__ \ "email").read[String]
+      )(RegisteredUser.apply _)
+    }
 
     implicit def jsonWritesApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
       (
@@ -49,17 +58,26 @@ package com.gilt.apidoc.example.union.types.v0.models {
         (__ \ "email").write[String]
       )(unlift(RegisteredUser.unapply _))
     }
-
   }
 
   private object User_Helper {
+    import play.api.libs.json.__
+    import play.api.libs.functional.syntax._
+
     import RegisteredUser_Helper._
     import GuestUser_Helper._
+    def reads: play.api.libs.json.Reads[User] = {
+      (
+        (__ \ "registered_user").read[com.gilt.apidoc.example.union.types.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
+        orElse
+        (__ \ "guest_user").read[com.gilt.apidoc.example.union.types.v0.models.GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
+      )
+    }
 
     def writes(obj: User) = {
       obj match {
-        case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
-        case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
+          case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> x)
+          case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> x)
       }
     }
   }
@@ -90,27 +108,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[GuestUser] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String]
-      )(GuestUser.apply _)
-    }
-
-    implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String]
-      )(RegisteredUser.apply _)
-    }
-
-    implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = {
-      (
-        (__ \ "registered_user").read[com.gilt.apidoc.example.union.types.v0.models.RegisteredUser].asInstanceOf[play.api.libs.json.Reads[User]]
-        orElse
-        (__ \ "guest_user").read[com.gilt.apidoc.example.union.types.v0.models.GuestUser].asInstanceOf[play.api.libs.json.Reads[User]]
-      )
-    }
+    implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = User_Helper.reads
 
     implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
       def writes(obj: User) = User_Helper.writes(obj)
