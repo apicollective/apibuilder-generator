@@ -164,7 +164,7 @@ case class ScalaClientMethodGenerator(
           }
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") +
-      s"""\ncase r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + """}]. Expected: ${allResponseCodes.mkString(", ")}")\n"""
+      s"""\ncase r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}")\n"""
 
       ClientMethod(
         name = op.name,
