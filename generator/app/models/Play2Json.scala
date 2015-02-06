@@ -51,7 +51,7 @@ case class Play2Json(
       case Some(model) => methodName(model.name, Reads)
       case None => {
         ut.enum match {
-          case Some(enum) => methodName(s"Enum_${enum.name}", Reads)
+          case Some(enum) => methodName(enum.name, Reads)
           case None => ut.datatype.name
         }
       }
@@ -63,7 +63,7 @@ case class Play2Json(
       case Some(model) => methodName(model.name, Writes) + ".writes(x)"
       case None => {
         ut.enum match {
-          case Some(enum) => methodName(s"Enum_${enum.name}", Writes) + ".writes(x)"
+          case Some(enum) => methodName(enum.name, Writes) + ".writes(x)"
           case None => varName
         }
       }

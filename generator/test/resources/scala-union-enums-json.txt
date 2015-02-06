@@ -1,14 +1,14 @@
 implicit def jsonReadsApiDocTestUserType: play.api.libs.json.Reads[UserType] = {
   (
-    (__ \ "member_type").read(jsonReadsApiDocTestEnum_MemberType).asInstanceOf[play.api.libs.json.Reads[UserType]]
+    (__ \ "member_type").read(jsonReadsApiDocTestMemberType).asInstanceOf[play.api.libs.json.Reads[UserType]]
     orElse
-    (__ \ "role_type").read(jsonReadsApiDocTestEnum_RoleType).asInstanceOf[play.api.libs.json.Reads[UserType]]
+    (__ \ "role_type").read(jsonReadsApiDocTestRoleType).asInstanceOf[play.api.libs.json.Reads[UserType]]
   )
 }
 
 implicit def jsonWritesApiDocTestUserType: play.api.libs.json.Writes[UserType] = new play.api.libs.json.Writes[UserType] {
   def writes(obj: UserType) = obj match {
-    case x: test.apidoc.apidoctest.v0.models.MemberType => play.api.libs.json.Json.obj("member_type" -> jsonWritesApiDocTestEnum_MemberType.writes(x))
-    case x: test.apidoc.apidoctest.v0.models.RoleType => play.api.libs.json.Json.obj("role_type" -> jsonWritesApiDocTestEnum_RoleType.writes(x))
+    case x: test.apidoc.apidoctest.v0.models.MemberType => play.api.libs.json.Json.obj("member_type" -> jsonWritesApiDocTestMemberType.writes(x))
+    case x: test.apidoc.apidoctest.v0.models.RoleType => play.api.libs.json.Json.obj("role_type" -> jsonWritesApiDocTestRoleType.writes(x))
   }
 }

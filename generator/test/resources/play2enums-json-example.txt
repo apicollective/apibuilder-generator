@@ -1,9 +1,9 @@
-implicit val jsonReadsApiDocTestEnum_AgeGroup = __.read[String].map(AgeGroup.apply)
-implicit val jsonWritesApiDocTestEnum_AgeGroup = new Writes[AgeGroup] {
+implicit val jsonReadsApiDocTestAgeGroup = __.read[String].map(AgeGroup.apply)
+implicit val jsonWritesApiDocTestAgeGroup = new Writes[AgeGroup] {
   def writes(x: AgeGroup) = JsString(x.toString)
 }
 
-implicit val jsonReadsApiDocTestEnum_Genre = __.read[String].map(Genre.apply)
-implicit val jsonWritesApiDocTestEnum_Genre = new Writes[Genre] {
+implicit val jsonReadsApiDocTestGenre = __.read[String].map(Genre.apply)
+implicit val jsonWritesApiDocTestGenre = new Writes[Genre] {
   def writes(x: Genre) = JsString(x.toString)
 }

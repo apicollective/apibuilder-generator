@@ -25,8 +25,8 @@ case class ScalaEnums(
     */
   def buildJson(): String = {
     Seq(
-      s"implicit val jsonReads${ssd.name}Enum_${enum.name} = __.read[String].map(${enum.name}.apply)",
-      s"implicit val jsonWrites${ssd.name}Enum_${enum.name} = new Writes[${enum.name}] {",
+      s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)",
+      s"implicit val jsonWrites${ssd.name}${enum.name} = new Writes[${enum.name}] {",
       s"  def writes(x: ${enum.name}) = JsString(x.toString)",
       "}"
     ).mkString("\n")
