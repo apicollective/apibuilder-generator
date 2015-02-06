@@ -1,6 +1,6 @@
 package controllers
 
-import com.gilt.apidoc.example.union.types.v0.models.{GuestUser, RegisteredUser, User}
+import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UuidWrapper}
 import com.gilt.apidoc.example.union.types.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
@@ -9,8 +9,9 @@ import java.util.UUID
 object Users extends Controller {
 
   private val users: Seq[User] = Seq(
-    RegisteredUser(UUID.randomUUID(), "registered@test.apidoc.me"),
-    GuestUser(UUID.randomUUID(), "guest@test.apidoc.me")
+    RegisteredUser(UUID.randomUUID(), "registered@test.apidoc.me", preference = Foo.A),
+    GuestUser(UUID.randomUUID(), "guest@test.apidoc.me"),
+    UuidWrapper(UUID.randomUUID())
   )
 
   def get() = Action {
@@ -22,6 +23,7 @@ object Users extends Controller {
       u match {
         case user: RegisteredUser => user.guid == guid
         case user: GuestUser => user.guid == guid
+        case wrapper: UuidWrapper => wrapper.value == guid
       }
     } match {
       case None => {
@@ -50,6 +52,7 @@ object Users extends Controller {
         user match {
           case u: RegisteredUser => println("Received Registered User: " + u)
           case u: GuestUser => println("Received Guest User: " + u)
+          case wrapper: UuidWrapper => println("Received UUID: " + wrapper.value)
         }
 
         Created(Json.toJson(user))

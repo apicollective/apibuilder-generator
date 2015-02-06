@@ -1,6 +1,6 @@
 package controllers
 
-import com.gilt.apidoc.example.union.types.v0.models.{GuestUser, RegisteredUser, User}
+import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UuidWrapper}
 import com.gilt.apidoc.example.union.types.v0.models.json._
 import java.util.UUID
 
@@ -46,7 +46,8 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
       client.users.post(
         RegisteredUser(
           guid = guid,
-          email = email
+          email = email,
+          preference = Foo.A
         )
       )
     ) match {
@@ -60,29 +61,44 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
     }
   }
 
-  "GET /users" in new WithServer {
-    val users = await(
-      client.users.get()
-    )
+  "POST /users with a UUID" in new WithServer {
+    val guid = UUID.randomUUID
 
-    users.size must be(2)
+    await(
+      client.users.post(UuidWrapper(guid))
+    ) match {
+      case wrapper: UuidWrapper => {
+        wrapper.value must be(guid)
+      }
+      case user => {
+        fail("Creating a uuid wrapper returning a user w/ invalid type: " + user)
+      }
+    }
+  }
+
+  "GET /users" in new WithServer {
+    await(client.users.get()).size must be(3)
   }
 
   "GET /users/:guid" in new WithServer {
-    val userGuid = await(
+    val userGuids = await(
       client.users.get()
-    ).headOption.getOrElse {
-      fail("No users returned")
-    } match {
-      case user: RegisteredUser => user.guid
-      case user: GuestUser => user.guid
+    ).map { user =>
+      user match {
+        case user: RegisteredUser => user.guid
+        case user: GuestUser => user.guid
+        case wrapper: UuidWrapper => wrapper.value
+      }
     }
 
-    await(client.users.getByGuid(userGuid)).getOrElse {
-      fail("failed to find user by guid")
-    } match {
-      case user: RegisteredUser => user.guid must be(userGuid)
-      case user: GuestUser => user.guid must be(userGuid)
+    userGuids.foreach { userGuid =>
+      await(client.users.getByGuid(userGuid)).getOrElse {
+        fail("failed to find user by guid")
+      } match {
+        case user: RegisteredUser => user.guid must be(userGuid)
+        case user: GuestUser => user.guid must be(userGuid)
+        case wrapper: UuidWrapper => wrapper.value must be(userGuid)
+      }
     }
 
     await(client.users.getByGuid(UUID.randomUUID)) must be(None)

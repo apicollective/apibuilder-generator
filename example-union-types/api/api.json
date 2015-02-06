@@ -18,7 +18,8 @@
 	"user": {
 	    "types": [
 		{ "type": "registered_user" },
-		{ "type": "guest_user" }
+		{ "type": "guest_user" },
+		{ "type": "uuid" }
 	    ]
 	},
 	"foobar": {
