@@ -1,7 +1,7 @@
 package models
 
 import lib.Text._
-import generator.{ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion}
+import generator.{ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
 
 case class Play2Json(
   ssd: ScalaService
@@ -14,83 +14,59 @@ case class Play2Json(
   case class GeneratedCode(packages: String, implicits: String)
 
   def generate(): GeneratedCode = {
-    val modelsWithUnions: Seq[(ScalaModel, Seq[ScalaUnion])] = ssd.models.map { m => (m, ssd.unionsForModel(m)) }
-
     GeneratedCode(
-      packages = Seq(
-        modelsWithUnions.filter(!_._2.isEmpty).map(m => readersAndWriters(m._1, m._2)).mkString("\n\n"),
-        ssd.unions.map(unionObject(_)).mkString("\n\n")
-      ).filter(!_.trim.isEmpty).mkString("\n\n"),
-
+      packages = "",
       implicits = Seq(
-        modelsWithUnions.filter(_._2.isEmpty).map(m => readersAndWriters(m._1, Nil)).mkString("\n\n"),
-        ssd.unions.map(readers(_)).mkString("\n\n"),
-        ssd.unions.map(writers(_)).mkString("\n\n")
+        ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
+        ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
       ).filter(!_.trim.isEmpty).mkString("\n\n")
     )
   }
 
-  private[models] def readers(union: ScalaUnion): String = {
-    s"${identifier(union.name, Reads)} = ${helperName(union.name)}.reads"
+  private def readersAndWriters(union: ScalaUnion): String = {
+    readers(union) + "\n\n" + writers(union)
   }
 
-  private def privateObject(name: String, body: Seq[String]): String = {
+  private[models] def readers(union: ScalaUnion): String = {
     Seq(
-      s"private object ${helperName(name)} {",
-      s"  import play.api.libs.json.__",
-      s"  import play.api.libs.functional.syntax._",
-      "",
-      body.mkString("\n").indent(2),
+      s"${identifier(union.name, Reads)} = new play.api.libs.json.Reads[${union.name}] = {",
+      s"  (",
+      union.types.map { scalaUnionType =>
+        s"""(__ \\ "${scalaUnionType.originalName}").read[${scalaUnionType.datatype.name}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+      }.mkString("\norElse\n").indent(4),
+      s"  )",
       s"}"
     ).mkString("\n")
-  }
-
-  private[models] def unionObject(union: ScalaUnion): String = {
-    privateObject(
-      union.name,
-      Seq(
-        union.types.flatMap(_.model).map { m => s"import ${helperName(m.name)}._" }.mkString("\n"),
-        s"def reads: play.api.libs.json.Reads[${union.name}] = {",
-        s"  (",
-        union.types.map { scalaUnionType =>
-          s"""(__ \\ "${scalaUnionType.originalName}").read[${scalaUnionType.datatype.name}].asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
-        }.mkString("\norElse\n").indent(4),
-        s"  )",
-        "}",
-        "",
-        s"def writes(obj: ${union.name}) = {",
-        "  obj match {",
-        union.types.map { t => s"""case x: ${t.datatype.name} => play.api.libs.json.Json.obj("${t.originalName}" -> x)""" }.mkString("\n").indent(6),
-        "  }",
-        "}"
-      )
-    )
   }
 
   private[models] def writers(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
-      s"  def writes(obj: ${union.name}) = ${helperName(union.name)}.writes(obj)",
+      s"def writes(obj: ${union.name}) = {",
+      "  obj match {",
+      union.types.map { t =>
+        s"""case x: ${t.datatype.name} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", t)})"""
+      }.mkString("\n").indent(6),
+      "  }",
+      "}",
       "}"
     ).mkString("\n")
   }
 
-
-  private def helperName(name: String): String = {
-    s"${name}_Helper"
-  }
-
-  private[models] def readersAndWriters(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    unions match {
-      case Nil => readers(model) ++ writers(model)
-      case unions => {
-        s"// Private as this model is part of a union type: ${unions.map(_.name).mkString(", ")}\n" +
-        privateObject(
-          model.name,
-          Seq(readers(model), "", writers(model))
-        )
+  private def writer(varName: String, ut: ScalaUnionType): String = {
+    ut.model match {
+      case Some(model) => identifier(model.name, Writes)
+      case None => {
+        ut.enum match {
+          case Some(enum) => identifier(enum.name, Writes)
+          case None => varName
+        }
       }
     }
+  }
+
+  private[models] def readersAndWriters(model: ScalaModel): String = {
+    readers(model) ++ writers(model)
   }
 
   private[models] def readers(model: ScalaModel): String = {
