@@ -1,4 +1,3 @@
-Standards json reader/writer method naming:
-  e.g. library to generate names like jsonReads${ssd.name}Enum_${enum.name}
+primitive wrapper for unit
 
 TODO: Finish map
