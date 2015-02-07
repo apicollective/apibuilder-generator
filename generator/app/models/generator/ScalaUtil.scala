@@ -24,11 +24,15 @@ object ScalaUtil {
     }
   }
 
-  def textToComment(text: String) = {
+  def textToComment(text: Seq[String]): String = {
+    "/**\n * " + text.mkString("\n * ") + "\n */"
+  }
+
+  def textToComment(text: String): String = {
     if (text.trim.isEmpty) {
       ""
     } else {
-      "/**\n * " + GeneratorUtil.splitIntoLines(text).mkString("\n * ") + "\n */"
+      textToComment(GeneratorUtil.splitIntoLines(text))
     }
   }
 

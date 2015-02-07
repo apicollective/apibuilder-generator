@@ -33,7 +33,7 @@ case class Play2RouteGenerator(form: InvocationForm) {
 
     if (all.isEmpty) {
       Some(
-        ApidocHeaders(form.userAgent).toRubyString() + "\n\n" +
+        ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
           "# Service does not have any resource operations. There are no routes"
       )
     } else {
@@ -42,7 +42,7 @@ case class Play2RouteGenerator(form: InvocationForm) {
       val (paramStart, pathStart) = all.partition(_.url.startsWith("/:"))
 
       Some(
-        ApidocHeaders(form.userAgent).toRubyString() + "\n\n" +
+        ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
         (pathStart ++ paramStart).map { r =>
           Seq(
             r.verb,

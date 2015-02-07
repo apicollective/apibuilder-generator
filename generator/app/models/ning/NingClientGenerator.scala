@@ -28,7 +28,7 @@ case class NingClientGenerator(
   private val ssd = new ScalaService(form.service)
 
   def invoke(): String = {
-    ApidocHeaders(form.userAgent).toJavaString + "\n" +
+    ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
     Seq(
       Play2Models(form, addHeader = false),
       client()

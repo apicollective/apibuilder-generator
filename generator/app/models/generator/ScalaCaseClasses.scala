@@ -1,6 +1,6 @@
 package generator
 
-import models.ApidocHeaders
+import models.ApidocComments
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models.Service
 import lib.Text._
@@ -17,7 +17,7 @@ object ScalaCaseClasses extends CodeGenerator {
 
     val header = addHeader match {
       case false => ""
-      case true => ApidocHeaders(form.userAgent).toJavaString() + "\n"
+      case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
     }
 
     val wrappers = PrimitiveWrapper(ssd).wrappers match {

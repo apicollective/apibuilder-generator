@@ -9,6 +9,18 @@ import scala.collection.mutable.ListBuffer
 
 object RubyUtil {
 
+  def textToComment(text: Seq[String]): String = {
+    text.map(s => s"# $s").mkString("\n")
+  }
+
+  def textToComment(text: String): String = {
+    if (text.trim.isEmpty) {
+      ""
+    } else {
+      textToComment(GeneratorUtil.splitIntoLines(text))
+    }
+  }
+
   def toClassName(
     name: String,
     multiple: Boolean = false
@@ -138,7 +150,7 @@ case class RubyClientGenerator(form: InvocationForm) {
   )
 
   def invoke(): String = {
-    ApidocHeaders(form.userAgent).toRubyString() +
+    ApidocComments(form.service.version, form.userAgent).toRubyString() +
     "\n\n" +
     RubyHttpClient.require +
     "\n\n" +

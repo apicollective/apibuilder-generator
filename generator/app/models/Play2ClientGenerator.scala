@@ -63,7 +63,7 @@ case class Play2ClientGenerator(
   private val ssd = new ScalaService(form.service)
 
   def invoke(): String = {
-    ApidocHeaders(form.userAgent).toJavaString + "\n" +
+    ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
     Seq(
       Play2Models(form, addHeader = false),
       client()
@@ -84,7 +84,9 @@ case class Play2ClientGenerator(
     val headerString = ".withHeaders(" +
       (ssd.defaultHeaders.map { h =>
         s""""${h.name}" -> ${h.quotedValue}"""
-      } ++  Seq(""""User-Agent" -> UserAgent""")).mkString(", ") + ")"
+      } ++ Seq(
+        """"User-Agent" -> UserAgent"""
+      )).mkString(", ") + ")"
 
     s"""package ${ssd.namespaces.base} {
 
