@@ -2,6 +2,7 @@ package models
 
 import com.gilt.apidoc.spec.v0.models.Service
 import com.gilt.apidoc.generator.v0.models.InvocationForm
+import lib.VersionTag
 import lib.Text._
 import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon, ScalaClientMethodConfig, ScalaClientMethodConfigs}
 
@@ -81,20 +82,33 @@ case class Play2ClientGenerator(
       case false => s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
     }
 
+    val versionMajor: Option[Int] = VersionTag(form.service.version).major
+
+    val headerConstants = Seq(
+      Some("UserAgent", form.userAgent.getOrElse("apidoc:unknown")),
+      Some("Version", form.service.version),
+      versionMajor.map { major => ("VersionMajor", major.toString) }
+    ).flatten.map { pair =>
+      s"""private val ${pair._1} = "${pair._2}""""
+    }.mkString("\n")
+
     val headerString = ".withHeaders(" +
-      (ssd.defaultHeaders.map { h =>
-        s""""${h.name}" -> ${h.quotedValue}"""
-      } ++ Seq(
-        """"User-Agent" -> UserAgent"""
-      )).mkString(", ") + ")"
+      (
+        ssd.defaultHeaders.map { h =>
+          s""""${h.name}" -> ${h.quotedValue}"""
+        } ++ Seq(
+          Some(""""User-Agent" -> UserAgent"""),
+          Some(""""X-Apidoc-Version" -> Version"""),
+          versionMajor.map { major => """"X-Apidoc-Version-Major" -> VersionMajor""" }
+        ).flatten
+      ).mkString(", ") + ")"
 
     s"""package ${ssd.namespaces.base} {
 
   ${ScalaClientCommon.clientSignature(version.config)} {
     import ${ssd.namespaces.models}.json._
 
-    private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
-    private val logger = play.api.Logger("${ssd.namespaces.base}.Client")
+${headerConstants.indent(4)}
 
     logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$apiUrl")
 
