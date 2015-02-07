@@ -20,12 +20,20 @@ object ScalaCaseClasses extends CodeGenerator {
       case true => ApidocHeaders(form.userAgent).toJavaString() + "\n"
     }
 
+    val wrappers = PrimitiveWrapper(ssd).models match {
+      case Nil => ""
+      case models => {
+        // TODO: Figure out how to get the unions right here
+        "\n" + models.map { m => generateCaseClass(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2) + "\n"
+      }
+    }
+
     s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
       ssd.unions.map { generateUnionTraits(ssd.models, _) }.mkString("\n\n").indent(2),
       "",
       ssd.models.map { m => generateCaseClass(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
-      "",
+      wrappers,
       generatePlayEnums(ssd).indent(2)
     ).mkString("\n").trim +
     s"\n\n}"

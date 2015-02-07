@@ -19,7 +19,12 @@ package com.gilt.apidoc.example.union.types.v0.models {
     preference: com.gilt.apidoc.example.union.types.v0.models.Foobar
   ) extends User
 
-  case class UuidWrapper(value: _root_.java.util.UUID) extends User
+  /**
+   * Wrapper class to support the union types containing the datatype[uuid]
+   */
+  case class UuidWrapper(
+    value: _root_.java.util.UUID
+  ) extends User
 
   sealed trait Bar extends Foobar
 
@@ -157,6 +162,16 @@ package com.gilt.apidoc.example.union.types.v0.models {
       )(unlift(RegisteredUser.unapply _))
     }
 
+    implicit def jsonReadsApidocExampleUnionTypesUuidWrapper: play.api.libs.json.Reads[UuidWrapper] = {
+      (__ \ "value").read[_root_.java.util.UUID].map { x => new UuidWrapper(value = x) }
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesUuidWrapper: play.api.libs.json.Writes[UuidWrapper] = new play.api.libs.json.Writes[UuidWrapper] {
+      def writes(x: UuidWrapper) = play.api.libs.json.Json.obj(
+        "value" -> play.api.libs.json.Json.toJson(x.value)
+      )
+    }
+
     implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[Foobar] = {
       (
         (__ \ "foo").read(jsonReadsApidocExampleUnionTypesFoo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
@@ -178,7 +193,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
         orElse
         (__ \ "guest_user").read(jsonReadsApidocExampleUnionTypesGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
-        (__ \ "uuid").read[_root_.java.util.UUID].map(UuidWrapper(_))
+        (__ \ "uuid").read(jsonReadsApidocExampleUnionTypesUuidWrapper).asInstanceOf[play.api.libs.json.Reads[User]]
       )
     }
 
@@ -186,7 +201,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
       def writes(obj: User) = obj match {
         case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
         case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
-        case x: com.gilt.apidoc.example.union.types.v0.models.UuidWrapper => play.api.libs.json.Json.obj("uuid" -> x.value)
+        case x: UuidWrapper => play.api.libs.json.Json.obj("uuid" -> jsonWritesApidocExampleUnionTypesUuidWrapper.writes(x))
       }
     }
   }

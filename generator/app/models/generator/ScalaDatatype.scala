@@ -3,6 +3,7 @@ package generator
 import lib.{Datatype, Primitives, Type, Kind}
 
 sealed trait ScalaPrimitive {
+  def apidocType: String
   def shortName: String
   def asString(originalVarName: String): String
   def namespace: Option[String] = None
@@ -15,6 +16,7 @@ sealed trait ScalaPrimitive {
 object ScalaPrimitive {
 
   case object Boolean extends ScalaPrimitive {
+    def apidocType = "boolean"
     def shortName = "Boolean"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -23,6 +25,7 @@ object ScalaPrimitive {
   }
 
   case object Double extends ScalaPrimitive {
+    def apidocType = "double"
     def shortName = "Double"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -31,6 +34,7 @@ object ScalaPrimitive {
   }
 
   case object Integer extends ScalaPrimitive {
+    def apidocType = "integer"
     def shortName = "Int"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -39,6 +43,7 @@ object ScalaPrimitive {
   }
 
   case object Long extends ScalaPrimitive {
+    def apidocType = "long"
     def shortName = "Long"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -48,6 +53,7 @@ object ScalaPrimitive {
 
   case object DateIso8601 extends ScalaPrimitive {
     override def namespace = Some("_root_.org.joda.time.LocalDate")
+    def apidocType = "date-iso8601"
     def shortName = "LocalDate"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -57,6 +63,7 @@ object ScalaPrimitive {
 
   case object DateTimeIso8601 extends ScalaPrimitive {
     override def namespace = Some("_root_.org.joda.time")
+    def apidocType = "date-time-iso8601"
     def shortName = "DateTime"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -65,6 +72,7 @@ object ScalaPrimitive {
   }
 
   case object Decimal extends ScalaPrimitive {
+    def apidocType = "decimal"
     def shortName = "BigDecimal"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -74,6 +82,7 @@ object ScalaPrimitive {
 
   case object Object extends ScalaPrimitive {
     override def namespace = Some("_root_.play.api.libs.json")
+    def apidocType = "object"
     def shortName = "JsObject"
     def asString(originalVarName: String): String = {
       throw new UnsupportedOperationException(s"unsupported conversion of type object for $originalVarName")
@@ -81,6 +90,7 @@ object ScalaPrimitive {
   }
 
   case object String extends ScalaPrimitive {
+    def apidocType = "string"
     def shortName = "String"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -89,6 +99,7 @@ object ScalaPrimitive {
   }
 
   case object Unit extends ScalaPrimitive {
+    def apidocType = "unit"
     def shortName = "Unit"
     def asString(originalVarName: String): String = {
       throw new UnsupportedOperationException(s"unsupported conversion of type object for $originalVarName")
@@ -97,6 +108,7 @@ object ScalaPrimitive {
 
   case object Uuid extends ScalaPrimitive {
     override def namespace = Some("_root_.java.util")
+    def apidocType = "uuid"
     def shortName = "UUID"
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -106,6 +118,7 @@ object ScalaPrimitive {
 
   case class Model(ns: String, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(ns)
+    def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -114,6 +127,7 @@ object ScalaPrimitive {
 
   case class Enum(ns: String, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(ns)
+    def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -122,6 +136,7 @@ object ScalaPrimitive {
 
   case class Union(ns: String, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(ns)
+    def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"

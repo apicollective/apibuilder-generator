@@ -1,7 +1,7 @@
 package models
 
 import lib.Text._
-import generator.{ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+import generator.{PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
 
 case class Play2Json(
   ssd: ScalaService
@@ -14,6 +14,7 @@ case class Play2Json(
   def generate(): String = {
     Seq(
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
+      PrimitiveWrapper(ssd).models.map(readersAndWriters(_)).mkString("\n\n"),
       ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
     ).filter(!_.trim.isEmpty).mkString("\n\n")
   }
@@ -39,7 +40,15 @@ case class Play2Json(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       s"  def writes(obj: ${union.name}) = obj match {",
       union.types.map { t =>
-        s"""case x: ${t.datatype.name} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", t)})"""
+        val typeName = t.datatype.primitive match {
+          case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+            t.datatype.name
+          }
+          case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+            PrimitiveWrapper.className(t.datatype.primitive)
+          }
+        }
+        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", t)})"""
       }.mkString("\n").indent(4),
       "  }",
       "}"
@@ -52,7 +61,7 @@ case class Play2Json(
       case None => {
         ut.enum match {
           case Some(enum) => methodName(enum.name, Reads)
-          case None => ut.datatype.name
+          case None => methodName(PrimitiveWrapper.className(ut.datatype.primitive), Reads)
         }
       }
     }
@@ -64,7 +73,7 @@ case class Play2Json(
       case None => {
         ut.enum match {
           case Some(enum) => methodName(enum.name, Writes) + ".writes(x)"
-          case None => varName
+          case None => methodName(PrimitiveWrapper.className(ut.datatype.primitive), Writes) + ".writes(x)"
         }
       }
     }
