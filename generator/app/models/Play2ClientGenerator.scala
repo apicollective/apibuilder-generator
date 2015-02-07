@@ -85,7 +85,7 @@ case class Play2ClientGenerator(
     val versionMajor: Option[Int] = VersionTag(form.service.version).major
 
     val headerConstants = Seq(
-      Some("UserAgent", form.userAgent.getOrElse("apidoc:unknown")),
+      Some("UserAgent", form.userAgent.getOrElse("apidoc:play_2x_client:unknown")),
       Some("Version", form.service.version),
       versionMajor.map { major => ("VersionMajor", major.toString) }
     ).flatten.map { pair =>

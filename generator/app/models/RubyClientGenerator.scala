@@ -2,7 +2,7 @@ package models
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models._
-import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, Kind}
+import lib.{Datatype, DatatypeResolver, Kind, Methods, Primitives, Text, Type, VersionTag}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
 import scala.collection.mutable.ListBuffer
@@ -173,7 +173,11 @@ case class RubyClientGenerator(form: InvocationForm) {
   private def headers(): Seq[Header] = {
     service.headers.filter(!_.default.isEmpty).map { h =>
       Header(h.name, s"'${h.default.get}'")
-    } ++ Seq(Header("User-Agent", "USER_AGENT"))
+    } ++ Seq(
+      Some(Header("User-Agent", "USER_AGENT")),
+      Some(Header("X-Apidoc-Version", "VERSION")),
+      VersionTag(service.version).major.map { major => Header("X-Apidoc-Version-Major", "VERSION_MAJOR") }
+    ).flatten
   }
 
   private def generateClient(): String = {
@@ -184,10 +188,18 @@ case class RubyClientGenerator(form: InvocationForm) {
       s"with_header('${h.name}', ${h.value})"
     }.mkString(".")
 
+    val headerConstants = Seq(
+      Some( ("USER_AGENT", form.userAgent.getOrElse("apidoc:ruby_client:unknown")) ),
+      Some( ("VERSION", service.version) ),
+      VersionTag(service.version).major.map { major => ("VERSION_MAJOR", major.toString) }
+    ).flatten.map { pair =>
+      s"${pair._1} = ${RubyUtil.wrapInQuotes(pair._2)} unless defined?(${pair._1})"
+    }.mkString("\n")
+
     sb.append(s"""
   class Client
 
-    USER_AGENT = '${form.userAgent.getOrElse("apidoc:ruby_client:unknown")}' unless defined?(USER_AGENT)
+${headerConstants.indent(4)}
 
     def initialize(url, opts={})
       @url = HttpClient::Preconditions.assert_class('url', url, String)

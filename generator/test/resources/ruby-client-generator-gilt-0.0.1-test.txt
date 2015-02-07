@@ -17,6 +17,8 @@ module ApidocReferenceApi
   class Client
 
     USER_AGENT = 'gilt 0.0.1-test' unless defined?(USER_AGENT)
+    VERSION = '0.0.1-dev' unless defined?(VERSION)
+    VERSION_MAJOR = '0' unless defined?(VERSION_MAJOR)
 
     def initialize(url, opts={})
       @url = HttpClient::Preconditions.assert_class('url', url, String)
@@ -27,7 +29,7 @@ module ApidocReferenceApi
 
     def request(path=nil)
       HttpClient::Preconditions.assert_class_or_nil('path', path, String)
-      request = HttpClient::Request.new(URI.parse(@url + path.to_s)).with_header('User-Agent', USER_AGENT)
+      request = HttpClient::Request.new(URI.parse(@url + path.to_s)).with_header('User-Agent', USER_AGENT).with_header('X-Apidoc-Version', VERSION).with_header('X-Apidoc-Version-Major', VERSION_MAJOR)
 
       if @authorization
         request.with_auth(@authorization)
