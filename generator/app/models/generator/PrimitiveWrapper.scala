@@ -12,9 +12,11 @@ object PrimitiveWrapper {
 
 case class PrimitiveWrapper(ssd: ScalaService) {
 
+  case class Wrapper(model: ScalaModel, unions: Seq[ScalaUnion])
+
   private val primitives = ssd.unions.flatMap(_.types).map(_.datatype.primitive).filter(isBasicType(_)).sortWith(_.shortName < _.shortName)
 
-  val models: Seq[ScalaModel] = primitives.map { p =>
+  val wrappers: Seq[Wrapper] = primitives.map { p =>
     val name = PrimitiveWrapper.className(p)
     val model = Model(
       name = name,
@@ -28,7 +30,10 @@ case class PrimitiveWrapper(ssd: ScalaService) {
         )
       )
     )
-    new ScalaModel(ssd, model)
+    new Wrapper(
+      new ScalaModel(ssd, model),
+      unions(p)
+    )
   }
 
   private def unions(primitive: ScalaPrimitive): Seq[ScalaUnion] = {
