@@ -109,6 +109,7 @@ case class Play2ClientGenerator(
     import ${ssd.namespaces.models}.json._
 
 ${headerConstants.indent(4)}
+    private val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
     logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$apiUrl")
 
