@@ -33,7 +33,7 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
 
     it("should handle required and non-required params") {
       val scalaModel = new ScalaModel(ssd, model)
-      val code = play2Util.params(
+      val code = play2Util.queryParameters(
         "queryParameters",
         new ScalaOperation(
           ssd,
@@ -50,7 +50,7 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
 
   it("supports query parameters that contain lists") {
     val operation = ssd.resources.find(_.plural == "Echoes").get.operations.head
-    val code = play2Util.params("queryParameters", operation.queryParameters).get
+    val code = play2Util.queryParameters("queryParameters", operation.queryParameters).get
     code should be("""
 val queryParameters = Seq(
   foo.map("foo" -> _)
@@ -62,7 +62,7 @@ val queryParameters = Seq(
 
   it("supports query parameters that ONLY have lists") {
     val operation = ssd.resources.find(_.plural == "Echoes").get.operations.find(_.path == "/echoes/arrays-only").get
-    val code = play2Util.params("queryParameters", operation.queryParameters).get
+    val code = play2Util.queryParameters("queryParameters", operation.queryParameters).get
     code should be("""
 val queryParameters = optionalMessages.map("optional_messages" -> _) ++
   requiredMessages.map("required_messages" -> _)
@@ -74,7 +74,7 @@ val queryParameters = optionalMessages.map("optional_messages" -> _) ++
 
     TestHelper.assertEqualsFile(
       "test/resources/generators/play-2-route-util-reference-get-users.txt",
-      play2Util.params("queryParameters", operation.queryParameters).get
+      play2Util.queryParameters("queryParameters", operation.queryParameters).get
     )
   }
 

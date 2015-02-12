@@ -114,7 +114,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     }
   }
 
-  def params(
+  def queryParameters(
     fieldName: String,
     params: Seq[ScalaParameter]
   ): Option[String] = {
@@ -134,13 +134,9 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       val mapParams = params.filter(p => isMap(p.`type`)) match {
         case Nil => Seq.empty
         case params => {
-          params.map { p =>
-            sys.error("TODO: Finish map")
-          }
+          sys.error(s"Maps as parameters are not supported. Use body instead. fieldName[$fieldName]")
         }
       }
-      // TODO: Finish map val mapParamString = listParams.mkString(" ++\n")
-
       val singleParams = params.filter(p => isSingleValue(p.`type`)) match {
         case Nil => Seq.empty
         case params => {

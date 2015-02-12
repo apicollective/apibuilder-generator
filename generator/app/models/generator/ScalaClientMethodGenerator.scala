@@ -106,7 +106,7 @@ case class ScalaClientMethodGenerator(
       val path = generatorUtil.pathParams(op)
 
       val payload = generatorUtil.formBody(op)
-      val queryParameters = generatorUtil.params("queryParameters", op.queryParameters)
+      val queryParameters = generatorUtil.queryParameters("queryParameters", op.queryParameters)
 
       val code = new scala.collection.mutable.ListBuffer[String]()
       val args = new scala.collection.mutable.ListBuffer[String]()
