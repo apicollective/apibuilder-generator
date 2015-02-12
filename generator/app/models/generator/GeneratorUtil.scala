@@ -131,12 +131,6 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       }
       val arrayParamString = listParams.mkString(" ++\n")
 
-      val mapParams = params.filter(p => isMap(p.`type`)) match {
-        case Nil => Seq.empty
-        case params => {
-          sys.error(s"Maps as parameters are not supported. Use body instead. fieldName[$fieldName]")
-        }
-      }
       val singleParams = params.filter(p => isSingleValue(p.`type`)) match {
         case Nil => Seq.empty
         case params => {
