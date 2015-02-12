@@ -16,4 +16,13 @@ package test.apidoc.apidoctest.v0.models {
     foo: String
   ) extends User
 
+  /**
+   * Provides future compatibility in clients - in the future, when a type is added
+   * to the union User, it will need to be handled in the client code. This
+   * implementation will deserialize these future types as an instance of this class.
+   */
+  case class UserUndefinedType(
+    description: String
+  ) extends User
+
 }

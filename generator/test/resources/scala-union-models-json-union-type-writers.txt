@@ -2,5 +2,6 @@ implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new pla
   def writes(obj: User) = obj match {
     case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApiDocTestRegisteredUser.writes(x))
     case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApiDocTestGuestUser.writes(x))
+    case x: test.apidoc.apidoctest.v0.models.UserUndefinedType => sys.error(s"The type[test.apidoc.apidoctest.v0.models.UserUndefinedType] should never be serialized")
   }
 }

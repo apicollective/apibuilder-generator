@@ -74,6 +74,11 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val description: Option[String] = union.description
 
+  // Include an undefined instance to nudge the developer to think
+  // about what happens in the future when a new type is added to the
+  // union type.
+  val undefinedType = ScalaPrimitive.Model(ssd.namespaces.models, name + "UndefinedType")
+
   val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
 
 }

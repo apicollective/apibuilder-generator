@@ -20,12 +20,23 @@ object ScalaCaseClasses extends CodeGenerator {
       case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
     }
 
+    val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
+      case Nil => ""
+      case wrappers => {
+        wrappers.map { w => generateCaseClass(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
+      }
+    }
+
     val wrappers = PrimitiveWrapper(ssd).wrappers match {
       case Nil => ""
       case wrappers => {
-        // TODO: Figure out how to get the unions right here
-        "\n" + wrappers.map { w => generateCaseClass(w.model, w.unions) }.mkString("\n\n").indent(2) + "\n"
+        wrappers.map { w => generateCaseClass(w.model, w.unions) }.mkString("\n\n").indent(2) + "\n"
       }
+    }
+
+    val generatedClasses = Seq(undefinedModels, wrappers).filter(!_.isEmpty) match {
+      case Nil => ""
+      case code => "\n" + code.mkString("\n\n")
     }
 
     s"${header}package ${ssd.namespaces.models} {\n\n  " +
@@ -33,7 +44,7 @@ object ScalaCaseClasses extends CodeGenerator {
       ssd.unions.map { generateUnionTraits(ssd.models, _) }.mkString("\n\n").indent(2),
       "",
       ssd.models.map { m => generateCaseClass(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
-      wrappers,
+      generatedClasses,
       generatePlayEnums(ssd).indent(2)
     ).mkString("\n").trim +
     s"\n\n}"

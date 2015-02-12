@@ -16,6 +16,15 @@ package com.gilt.apidoc.example.union.types.v0.models {
     email: String
   ) extends User
 
+  /**
+   * Provides future compatibility in clients - in the future, when a type is added
+   * to the union User, it will need to be handled in the client code. This
+   * implementation will deserialize these future types as an instance of this class.
+   */
+  case class UserUndefinedType(
+    description: String
+  ) extends User
+
 }
 
 package com.gilt.apidoc.example.union.types.v0.models {
@@ -79,6 +88,8 @@ package com.gilt.apidoc.example.union.types.v0.models {
         (__ \ "registered_user").read(jsonReadsApidocExampleUnionTypesRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
         (__ \ "guest_user").read(jsonReadsApidocExampleUnionTypesGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
+        orElse
+        UserUndefinedType(__.toString).asInstanceOf[play.api.libs.json.Reads[User]]
       )
     }
 
@@ -86,6 +97,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
       def writes(obj: User) = obj match {
         case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
         case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
+        case x: com.gilt.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.gilt.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
     }
   }

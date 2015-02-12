@@ -30,6 +30,8 @@ case class Play2Json(
       union.types.map { scalaUnionType =>
         s"""(__ \\ "${scalaUnionType.originalName}").read(${reader(scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indent(4),
+      s"    orElse",
+      s"    ${union.undefinedType.shortName}(__.toString).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
       s"  )",
       s"}"
     ).mkString("\n")
@@ -50,6 +52,7 @@ case class Play2Json(
         }
         s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", t)})"""
       }.mkString("\n").indent(4),
+      s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
       "}"
     ).mkString("\n")
