@@ -178,6 +178,7 @@ module ApidocReferenceApi
   end
 
   module Models
+
     class AgeGroup
 
       attr_reader :value

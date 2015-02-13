@@ -150,22 +150,37 @@ case class RubyClientGenerator(form: InvocationForm) {
   )
 
   def invoke(): String = {
-    ApidocComments(form.service.version, form.userAgent).toRubyString() +
-    "\n\n" +
-    RubyHttpClient.require +
-    "\n\n" +
-    service.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
-    s"module ${moduleName}\n" +
-    generateClient() +
-    "\n\n  module Clients\n\n" +
-    service.resources.map { generateClientForResource(_) }.mkString("\n\n") +
-    "\n\n  end" +
-    "\n\n  module Models\n" +
-    service.enums.map { RubyClientGenerator.generateEnum(_) }.mkString("\n\n").indent(4) + "\n\n" +
-    service.models.map { generateModel(_) }.mkString("\n\n").indent(4) + "\n\n" +
-    "  end\n\n  # ===== END OF SERVICE DEFINITION =====\n  " +
-    RubyHttpClient.contents +
-    "\nend"
+    val parts = Seq(moduleName)
+    val moduleIndent = 2 * parts.size
+
+    Seq(
+      ApidocComments(form.service.version, form.userAgent).toRubyString(),
+      RubyHttpClient.require,
+      Seq(
+        service.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
+        s"module ${parts.mkString("::")}",
+        generateClient(),
+        "",
+        Seq(
+          "module Clients",
+          service.resources.map { generateClientForResource(_) }.mkString("\n\n").indent(2),
+          "end"
+        ).mkString("\n\n").indent(moduleIndent),
+        "",
+        Seq(
+          "module Models",
+          Seq(
+            service.enums.map { RubyClientGenerator.generateEnum(_) },
+            service.models.map { generateModel(_) }
+          ).filter(!_.isEmpty).flatten.mkString("\n\n").indent(2),
+          "end"
+        ).mkString("\n\n").indent(moduleIndent),
+        "",
+        "# ===== END OF SERVICE DEFINITION =====".indent(moduleIndent),
+        RubyHttpClient.contents.indent(moduleIndent),
+        "end"
+      ).mkString("\n")
+    ).mkString("\n\n")
   }
 
   case class Header(name: String, value: String)
@@ -237,11 +252,11 @@ ${headerConstants.indent(4)}
     val className = RubyUtil.toClassName(resource.plural)
 
     val sb = ListBuffer[String]()
-    sb.append(s"    class ${className}")
+    sb.append(s"class ${className}")
     sb.append("")
-    sb.append("      def initialize(client)")
-    sb.append(s"        @client = HttpClient::Preconditions.assert_class('client', client, ${moduleName}::Client)")
-    sb.append("      end")
+    sb.append("  def initialize(client)")
+    sb.append(s"    @client = HttpClient::Preconditions.assert_class('client', client, ${moduleName}::Client)")
+    sb.append("  end")
 
     resource.operations.foreach { op =>
       val pathParams = op.parameters.filter { p => p.location == ParameterLocation.Path }
@@ -320,11 +335,11 @@ ${headerConstants.indent(4)}
       }
 
       val paramCall = if (paramStrings.isEmpty) { "" } else { "(" + paramStrings.mkString(", ") + ")" }
-      sb.append(s"      def ${methodName}$paramCall")
+      sb.append(s"  def ${methodName}$paramCall")
 
       pathParams.foreach { param =>
         val ti = parseType(param.`type`, fieldName = Some(param.name))
-        sb.append(s"        " + ti.assertMethod)
+        sb.append("    " + ti.assertMethod)
       }
 
       if (!queryParams.isEmpty) {
@@ -334,10 +349,10 @@ ${headerConstants.indent(4)}
           paramBuilder.append(s":${param.name} => ${parseArgument(param.name, param.`type`, param.required, param.default)}")
         }
 
-        sb.append("        opts = HttpClient::Helper.symbolize_keys(incoming)")
-        sb.append("        query = {")
-        sb.append("          " + paramBuilder.mkString(",\n          "))
-        sb.append("        }.delete_if { |k, v| v.nil? }")
+        sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
+        sb.append("    query = {")
+        sb.append("      " + paramBuilder.mkString(",\n      "))
+        sb.append("    }.delete_if { |k, v| v.nil? }")
       }
 
       val requestBuilder = new StringBuilder()
@@ -350,12 +365,12 @@ ${headerConstants.indent(4)}
       if (Methods.isJsonDocumentMethod(op.method.toString)) {
         op.body.map(_.`type`) match {
           case None => {
-            sb.append("        HttpClient::Preconditions.assert_class('hash', hash, Hash)")
+            sb.append("    HttpClient::Preconditions.assert_class('hash', hash, Hash)")
             requestBuilder.append(".with_json(hash.to_json)")
           }
           case Some(body) => {
             val ti = parseType(body)
-            sb.append("        " + ti.assertMethod)
+            sb.append("    " + ti.assertMethod)
 
             ti.datatype.`type` match {
               case Type(Kind.Primitive, name) => {
@@ -395,12 +410,12 @@ ${headerConstants.indent(4)}
 
       val response = generateResponses(op)
 
-      sb.append(s"        ${requestBuilder.toString}$response")
-      sb.append("      end")
+      sb.append(s"    ${requestBuilder.toString}$response")
+      sb.append("  end")
     }
 
     sb.append("")
-    sb.append("    end")
+    sb.append("end")
 
     sb.mkString("\n")
   }
