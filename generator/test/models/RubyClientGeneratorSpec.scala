@@ -20,6 +20,7 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
     it("for enum with multiple values") {
       val enum = Enum(
         name = "age_group",
+        plural = "age_groups",
         description = None,
         values = Seq(
           EnumValue(

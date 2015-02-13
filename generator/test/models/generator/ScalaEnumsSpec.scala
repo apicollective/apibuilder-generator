@@ -12,6 +12,7 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
       "enums": [
         {
           "name": "age_group",
+          "plural": "age_groups",
           "values": [
             { "name": "twenties" },
             { "name": "thirties" }
@@ -19,6 +20,7 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
         },
         {
           "name": "genre",
+          "plural": "genres",
           "values": [
             { "name": "Classical" },
             { "name": "Jazz" }
