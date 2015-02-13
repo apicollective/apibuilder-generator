@@ -148,7 +148,6 @@ case class RubyClientGenerator(form: InvocationForm) {
   private val service = form.service
 
   private val module = RubyUtil.Module(service.namespace)
-  //private val module = RubyUtil.Module(service.name)
 
   private val datatypeResolver = DatatypeResolver(
     enumNames = service.enums.map(_.name),
@@ -219,38 +218,38 @@ case class RubyClientGenerator(form: InvocationForm) {
     }.mkString("\n")
 
     sb.append(s"""
-  class Client
+class Client
 
-${headerConstants.indent(4)}
+${headerConstants.indent(2)}
 
-    def initialize(url, opts={})
-      @url = HttpClient::Preconditions.assert_class('url', url, String)
-      @authorization = HttpClient::Preconditions.assert_class_or_nil('authorization', opts.delete(:authorization), HttpClient::Authorization)
-      HttpClient::Preconditions.assert_empty_opts(opts)
-      HttpClient::Preconditions.check_state(url.match(/http.+/i), "URL[%s] must start with http" % url)
+  def initialize(url, opts={})
+    @url = HttpClient::Preconditions.assert_class('url', url, String)
+    @authorization = HttpClient::Preconditions.assert_class_or_nil('authorization', opts.delete(:authorization), HttpClient::Authorization)
+    HttpClient::Preconditions.assert_empty_opts(opts)
+    HttpClient::Preconditions.check_state(url.match(/http.+/i), "URL[%s] must start with http" % url)
+  end
+
+  def request(path=nil)
+    HttpClient::Preconditions.assert_class_or_nil('path', path, String)
+    request = HttpClient::Request.new(URI.parse(@url + path.to_s)).$headerString
+
+    if @authorization
+      request.with_auth(@authorization)
+    else
+      request
     end
-
-    def request(path=nil)
-      HttpClient::Preconditions.assert_class_or_nil('path', path, String)
-      request = HttpClient::Request.new(URI.parse(@url + path.to_s)).$headerString
-
-      if @authorization
-        request.with_auth(@authorization)
-      else
-        request
-      end
-    end
+  end
 """)
 
     sb.append(service.resources.map { resource =>
       val className = RubyUtil.toClassName(resource.plural)
 
-      s"    def ${resource.plural}\n" +
-      s"      @${resource.plural} ||= ${module.fullName}::Clients::${className}.new(self)\n" +
-      "    end"
+      s"  def ${resource.plural}\n" +
+      s"    @${resource.plural} ||= ${module.fullName}::Clients::${className}.new(self)\n" +
+      s"  end"
     }.mkString("\n\n"))
 
-    sb.append("  end")
+    sb.append("end")
 
     sb.mkString("\n")
   }
