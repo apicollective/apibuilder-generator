@@ -7,7 +7,13 @@ import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
 import scala.collection.mutable.ListBuffer
 
+
 object RubyUtil {
+
+  case class Module(namespace: String) {
+    val parts = namespace.split("\\.").map(toClassName(_))
+    val fullName = parts.mkString("::")
+  }
 
   def textToComment(text: Seq[String]): String = {
     text.map(s => s"# $s").mkString("\n")
@@ -141,7 +147,8 @@ object RubyClientGenerator extends CodeGenerator {
 case class RubyClientGenerator(form: InvocationForm) {
   private val service = form.service
 
-  private val moduleName = RubyUtil.toClassName(service.name)
+  private val module = RubyUtil.Module(service.namespace)
+  //private val module = RubyUtil.Module(service.name)
 
   private val datatypeResolver = DatatypeResolver(
     enumNames = service.enums.map(_.name),
@@ -150,16 +157,16 @@ case class RubyClientGenerator(form: InvocationForm) {
   )
 
   def invoke(): String = {
-    val parts = Seq(moduleName)
-    val moduleIndent = 2 * parts.size
+    val spacerSize = 2
+    val moduleIndent = spacerSize * module.parts.size
 
     Seq(
       ApidocComments(form.service.version, form.userAgent).toRubyString(),
       RubyHttpClient.require,
       Seq(
         service.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
-        s"module ${parts.mkString("::")}",
-        generateClient(),
+          module.parts.zipWithIndex.map { case (name, i) => s"module $name".indent(spacerSize * i) }.mkString("\n"),
+        generateClient().indent(moduleIndent),
         "",
         Seq(
           "module Clients",
@@ -178,7 +185,7 @@ case class RubyClientGenerator(form: InvocationForm) {
         "",
         "# ===== END OF SERVICE DEFINITION =====".indent(moduleIndent),
         RubyHttpClient.contents.indent(moduleIndent),
-        "end"
+        module.parts.zipWithIndex.reverse.map { case (name, i) => "end".indent(spacerSize * i) }.mkString("\n")
       ).mkString("\n")
     ).mkString("\n\n")
   }
@@ -239,7 +246,7 @@ ${headerConstants.indent(4)}
       val className = RubyUtil.toClassName(resource.plural)
 
       s"    def ${resource.plural}\n" +
-      s"      @${resource.plural} ||= ${moduleName}::Clients::${className}.new(self)\n" +
+      s"      @${resource.plural} ||= ${module.fullName}::Clients::${className}.new(self)\n" +
       "    end"
     }.mkString("\n\n"))
 
@@ -255,7 +262,7 @@ ${headerConstants.indent(4)}
     sb.append(s"class ${className}")
     sb.append("")
     sb.append("  def initialize(client)")
-    sb.append(s"    @client = HttpClient::Preconditions.assert_class('client', client, ${moduleName}::Client)")
+    sb.append(s"    @client = HttpClient::Preconditions.assert_class('client', client, ${module.fullName}::Client)")
     sb.append("  end")
 
     resource.operations.foreach { op =>
@@ -689,7 +696,7 @@ ${headerConstants.indent(4)}
     name: String
   ): String = {
     "%s::Models::%s".format(
-      moduleName,
+      module.fullName,
       RubyUtil.toClassName(name)
     )
   }
