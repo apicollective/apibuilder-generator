@@ -134,7 +134,7 @@ module HttpClient
       if @auth
         curl << "-u \"%s:%s\"" % [@auth.username, @auth.password]
         Preconditions.check_state(!@header_keys_lower_case.include?("authorization"),
-                                  "Cannot specify both an Authorization header and an explicit username")
+                                  "Cannot specify both an Authorization header and an auth instance")
         user_pass = "%s:%s" % [@auth.username, @auth.password]
         encoded = Base64.encode64(user_pass).to_s.split("\n").map(&:strip).join
         request.add_field("Authorization", "Basic %s" % encoded)
