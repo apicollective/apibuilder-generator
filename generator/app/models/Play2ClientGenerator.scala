@@ -75,8 +75,6 @@ case class Play2ClientGenerator(
 
     val methodGenerator = ScalaClientMethodGenerator(version.config, ssd)
 
-    val bindables = Play2Bindables.build(ssd).indent(2)
-
     val patchMethod = version.supportsHttpPatch match {
       case true => """_logRequest("PATCH", _requestHolder(path).withQueryString(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
       case false => s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
@@ -183,8 +181,6 @@ ${methodGenerator.objects().indent(4)}
 ${ScalaClientCommon(version.config).indent(2)}
 
 ${methodGenerator.traitsAndErrors().indent(2)}
-
-$bindables
 
 }"""
   }

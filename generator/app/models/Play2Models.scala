@@ -59,6 +59,11 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
 
 ${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
+}
+
+package ${ssd.namespaces.base} {
+
+${Play2Bindables(ssd).build().indent(2)}
 }"""
   }
 }

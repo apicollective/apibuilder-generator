@@ -3,11 +3,9 @@ package models
 import lib.Text
 import generator.{ScalaEnum, ScalaService}
 
-object Play2Bindables {
+case class Play2Bindables(ssd: ScalaService) {
 
-  def build(
-    ssd: ScalaService
-  ): String = {
+  def build(): String = {
     import lib.Text._
 
     Seq(
@@ -29,20 +27,20 @@ object Play2Bindables {
   private def buildDefaults(): String = {
     """
 // Type: date-time-iso8601
-implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[DateTime](
+implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](
   ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
 )
 
-implicit val queryStringBindableTypeDateTimeIso8601 = new QueryStringBindable.Parsing[DateTime](
+implicit val queryStringBindableTypeDateTimeIso8601 = new QueryStringBindable.Parsing[org.joda.time.DateTime](
   ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
 )
 
 // Type: date-iso8601
-implicit val pathBindableTypeDateIso8601 = new PathBindable.Parsing[LocalDate](
+implicit val pathBindableTypeDateIso8601 = new PathBindable.Parsing[org.joda.time.LocalDate](
   ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: Exception) => s"Error parsing date $key. Example: 2014-04-29"
 )
 
-implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsing[LocalDate](
+implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsing[org.joda.time.LocalDate](
   ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: Exception) => s"Error parsing date $key. Example: 2014-04-29"
 )
 """.trim
@@ -51,15 +49,16 @@ implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsin
   private[models] def buildImplicit(
     enumName: String
   ): String = {
+    val fullyQualifiedName = ssd.enumClassName(enumName)
     s"// Enum: $enumName\n" +
-    """private val enum%sNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${%s.all.mkString(", ")}"""".format(enumName, enumName) +
+    """private val enum%sNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${%s.all.mkString(", ")}"""".format(enumName, fullyQualifiedName) +
     s"""
 
-implicit val pathBindableEnum$enumName = new PathBindable.Parsing[$enumName] (
+implicit val pathBindableEnum$enumName = new PathBindable.Parsing[$fullyQualifiedName] (
   $enumName.fromString(_).get, _.toString, enum${enumName}NotFound
 )
 
-implicit val queryStringBindableEnum$enumName = new QueryStringBindable.Parsing[$enumName](
+implicit val queryStringBindableEnum$enumName = new QueryStringBindable.Parsing[$fullyQualifiedName](
   $enumName.fromString(_).get, _.toString, enum${enumName}NotFound
 )"""
   }
