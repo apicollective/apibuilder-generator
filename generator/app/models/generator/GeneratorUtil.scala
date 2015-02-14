@@ -109,8 +109,8 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
 
   private def isSingleValue(datatype: Datatype): Boolean = {
     datatype match {
-      case Datatype.Singleton(_) | Datatype.Option(_) => true
-      case _ => false
+      case Datatype.Singleton(_) => true
+      case Datatype.List(_) | Datatype.Map(_) => false
     }
   }
 

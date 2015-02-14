@@ -12,10 +12,6 @@ object Container {
     override def multiple = false
   }
 
-  case object Option extends Container {
-    override def multiple = false
-  }
-
   case object List extends Container {
     override def multiple = true
   }
@@ -28,7 +24,6 @@ object Container {
   def apply(dt: Datatype): Container = {
     dt match {
       case Datatype.Singleton(_) => Singleton
-      case Datatype.Option(_) => Option
       case Datatype.List(_) => List
       case Datatype.Map(_) => Map
     }

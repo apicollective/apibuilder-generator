@@ -105,9 +105,6 @@ case class Play2Json(
           val nilValue = field.datatype.nilValue
           s"""(__ \\ "${field.originalName}").readNullable[${field.datatype.name}].map(_.getOrElse($nilValue))"""
         }
-        case ScalaDatatype.Option(types) => {
-            s"""(__ \\ "${field.originalName}").readNullable[${field.datatype.name}]"""
-        }
         case ScalaDatatype.Singleton(types) => {
           if (field.isOption) {
             s"""(__ \\ "${field.originalName}").readNullable[${field.datatype.name}]"""
@@ -151,7 +148,7 @@ case class Play2Json(
           model.fields.map { field =>
             if (field.isOption) {
               field.datatype match {
-                case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) => {
+                case ScalaDatatype.List(_) | ScalaDatatype.Map(_) => {
                   s"""(__ \\ "${field.originalName}").write[${field.datatype.name}]"""
                 }
 

@@ -279,7 +279,7 @@ ${headerConstants.indent(2)}
             sys.error(s"Invalid type[${param.`type`}]")
           }
           dt match {
-            case Datatype.Singleton(_) | Datatype.Option(_) => {
+            case Datatype.Singleton(_) => {
               dt.`type` match {
                 case Type(Kind.Primitive, name) => {
                   val code = asString(RubyUtil.toVariable(varName), name, escape = true)
@@ -322,7 +322,7 @@ ${headerConstants.indent(2)}
           case None => paramStrings.append("hash")
           case Some(dt) => {
             val multiple = dt match {
-              case Datatype.Singleton(_) | Datatype.Option(_) => false
+              case Datatype.Singleton(_) => false
               case Datatype.List(_) | Datatype.Map(_) => true
             }
 
@@ -381,7 +381,7 @@ ${headerConstants.indent(2)}
             ti.datatype.`type` match {
               case Type(Kind.Primitive, name) => {
                 Container(ti.datatype) match {
-                  case Container.Singleton | Container.Option => {
+                  case Container.Singleton => {
                     requestBuilder.append(s".with_body(${ti.varName})")
                   }
                   case Container.List => {
@@ -395,7 +395,7 @@ ${headerConstants.indent(2)}
 
               case Type(Kind.Model | Kind.Enum | Kind.Union, _) => {
                 Container(ti.datatype) match {
-                  case Container.Singleton | Container.Option => {
+                  case Container.Singleton => {
                     requestBuilder.append(s".with_json(${ti.varName}.to_json)")
                   }
                   case Container.List => {
@@ -460,7 +460,7 @@ ${headerConstants.indent(2)}
       model.fields.map { field =>
         val datatype = parseType(field.`type`).datatype
         val value = datatype match {
-          case Datatype.Singleton(_) | Datatype.Option(_) => {
+          case Datatype.Singleton(_) => {
             datatype.`type` match {
               case Type(Kind.Primitive, name) => {
                 Primitives(name) match {
@@ -613,7 +613,7 @@ ${headerConstants.indent(2)}
     }
 
     dt match {
-      case Datatype.Singleton(_) | Datatype.Option(_) => {
+      case Datatype.Singleton(_) => {
         dt.`type` match {
           case Type(Kind.Primitive, name) => {
             parseArgumentPrimitive(fieldName, s"opts.delete(:$fieldName)", name, required, default)
@@ -764,7 +764,7 @@ ${headerConstants.indent(2)}
     }
 
     val multiple = dt match {
-      case Datatype.Singleton(_) | Datatype.Option(_) => false
+      case Datatype.Singleton(_) => false
       case Datatype.List(_) | Datatype.Map(_) => true
     }
 
@@ -782,7 +782,6 @@ ${headerConstants.indent(2)}
 
     val assertStub = dt match {
       case Datatype.Singleton(_) => "assert_class"
-      case Datatype.Option(_) => "assert_class_or_nil"
       case Datatype.List(_) => "assert_collection_of_class"
       case Datatype.Map(_) => "assert_hash_of_class"
     }
@@ -820,7 +819,7 @@ ${headerConstants.indent(2)}
     val varName = qualifiedClassName(name)
     val mapSingleObject = s" { |hash| $varName.new(hash) }"
     container match {
-      case Container.Singleton | Container.Option => {
+      case Container.Singleton => {
         mapSingleObject
       }
       case Container.List => {

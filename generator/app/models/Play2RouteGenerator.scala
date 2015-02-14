@@ -81,7 +81,7 @@ private[models] case class Play2Route(
       }.
       filter { param =>
         param.datatype match {
-          case ScalaDatatype.Option(_) | ScalaDatatype.Singleton(_) => true
+          case ScalaDatatype.Singleton(_) => true
           case ScalaDatatype.List(_) | ScalaDatatype.Map(_) => false
         }
       }
@@ -100,7 +100,7 @@ private[models] case class Play2Route(
   }.filter { param =>
     param.datatype match {
       case ScalaDatatype.List(_) | ScalaDatatype.Map(_) => true
-      case ScalaDatatype.Option(_) | ScalaDatatype.Singleton(_) => false
+      case ScalaDatatype.Singleton(_) => false
     }
   } match {
     case Nil => None
@@ -135,9 +135,6 @@ private[models] case class Play2Route(
             }
             case ScalaDatatype.Singleton(primitive) => {
               "?= " + defaultForPrimitive(primitive, d)
-            }
-            case ScalaDatatype.Option(primitive) => {
-              "?= Some(" + defaultForPrimitive(primitive, d) + ")"
             }
           }
         )

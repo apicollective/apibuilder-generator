@@ -178,11 +178,6 @@ object ScalaDatatype {
     override def name = s"Map[String, ${primitive.fullName}]"
   }
 
-  case class Option(primitive: ScalaPrimitive) extends ScalaDatatype {
-    override def nilValue = "None"
-    override def name = s"_root_.scala.Option[${primitive.fullName}]"
-  }
-
   case class Singleton(primitive: ScalaPrimitive) extends ScalaDatatype {
     override def nilValue = "None"
     override def name = primitive.fullName
@@ -263,7 +258,6 @@ case class ScalaTypeResolver(
     datatype match {
       case Datatype.List(t) => ScalaDatatype.List(scalaPrimitive(t))
       case Datatype.Map(t) => ScalaDatatype.Map(scalaPrimitive(t))
-      case Datatype.Option(t) => ScalaDatatype.Option(scalaPrimitive(t))
       case Datatype.Singleton(t) => ScalaDatatype.Singleton(scalaPrimitive(t))
     }
   }

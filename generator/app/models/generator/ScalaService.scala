@@ -156,7 +156,7 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
   val datatype = ssd.scalaDatatype(`type`)
 
   val multiple = `type` match {
-    case Datatype.Singleton(_) | Datatype.Option(_) => false
+    case Datatype.Singleton(_) => false
     case Datatype.List(_) | Datatype.Map(_) => true
   }
 
@@ -272,7 +272,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
   }
 
   val isOption = Container(`type`) match {
-    case Container.Singleton | Container.Option => !Methods.isJsonDocumentMethod(method.toString)
+    case Container.Singleton => !Methods.isJsonDocumentMethod(method.toString)
     case Container.List | Container.Map => false
   }
 
