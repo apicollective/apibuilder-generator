@@ -1,5 +1,6 @@
 package models
 
+import generator.Namespaces
 import com.gilt.apidoc.spec.v0.models.Service
 
 /**
@@ -10,9 +11,9 @@ object JsonImports {
 
   def apply(service: Service): Seq[String] = {
     (
-      Seq(s"import ${service.namespace}.models.json._") ++
+      Seq(s"import ${Namespaces(service.namespace).models}.json._") ++
       service.imports.map { imp =>
-        s"import ${imp.namespace}.models.json._"
+        s"import ${Namespaces(imp.namespace).models}.json._"
       }
     ).sorted
   }
