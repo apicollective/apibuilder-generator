@@ -117,7 +117,7 @@ object ScalaPrimitive {
   }
 
   case class Model(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(Namespaces(ns).models)
+    override def namespace = Some(ns)
     def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -126,7 +126,7 @@ object ScalaPrimitive {
   }
 
   case class Enum(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(Namespaces(ns).enums)
+    override def namespace = Some(ns)
     def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -135,7 +135,7 @@ object ScalaPrimitive {
   }
 
   case class Union(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(Namespaces(ns).unions)
+    override def namespace = Some(ns)
     def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -233,7 +233,7 @@ case class ScalaTypeResolver(
         ScalaPrimitive.Enum(ns, n)
       }
       case Type(Kind.Union, name) => {
-        val (ns, n) = parseQualifiedName(namespaces.enums, name)
+        val (ns, n) = parseQualifiedName(namespaces.unions, name)
         ScalaPrimitive.Union(ns, n)
       }
     }
@@ -250,7 +250,7 @@ case class ScalaTypeResolver(
       case multiple => 
         val n = multiple.last
         val ns = multiple.reverse.drop(1).reverse.mkString(".")
-        (ns, ScalaUtil.toClassName(n))
+        (Namespaces.quote(ns), ScalaUtil.toClassName(n))
     }
   }
 
