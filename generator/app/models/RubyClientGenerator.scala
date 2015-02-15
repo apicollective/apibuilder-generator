@@ -337,7 +337,7 @@ ${headerConstants.indent(2)}
 
       sb.append("")
       op.description.map { desc =>
-        sb.append(GeneratorUtil.formatComment(desc, 6))
+        sb.append(GeneratorUtil.formatComment(desc, 2))
       }
 
       val paramCall = if (paramStrings.isEmpty) { "" } else { "(" + paramStrings.mkString(", ") + ")" }
