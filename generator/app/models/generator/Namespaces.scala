@@ -1,6 +1,8 @@
 package generator
 
-case class Namespaces(base: String) {
+case class Namespaces(original: String) {
+
+  val base = original.split("\\.").map(ScalaUtil.quoteNameIfKeyword(_)).mkString(".")
 
   val models: String = s"$base.models"
 
