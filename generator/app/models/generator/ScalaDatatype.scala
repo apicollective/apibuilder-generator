@@ -52,7 +52,7 @@ object ScalaPrimitive {
   }
 
   case object DateIso8601 extends ScalaPrimitive {
-    override def namespace = Some("_root_.org.joda.time.LocalDate")
+    override def namespace = Some("_root_.org.joda.time")
     def apidocType = "date-iso8601"
     def shortName = "LocalDate"
     def asString(originalVarName: String): String = {
@@ -117,7 +117,7 @@ object ScalaPrimitive {
   }
 
   case class Model(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(ns)
+    override def namespace = Some(Namespaces(ns).models)
     def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -126,7 +126,7 @@ object ScalaPrimitive {
   }
 
   case class Enum(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(ns)
+    override def namespace = Some(Namespaces(ns).enums)
     def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -135,7 +135,7 @@ object ScalaPrimitive {
   }
 
   case class Union(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(ns)
+    override def namespace = Some(Namespaces(ns).unions)
     def apidocType = shortName
     def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)

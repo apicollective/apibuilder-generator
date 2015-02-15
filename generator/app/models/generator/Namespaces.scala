@@ -1,8 +1,16 @@
 package generator
 
+object Namespaces {
+
+  def quote(ns: String): String = {
+    ns.split("\\.").map(ScalaUtil.quoteNameIfKeyword(_)).mkString(".")
+  }
+
+}
+
 case class Namespaces(original: String) {
 
-  val base = original.split("\\.").map(ScalaUtil.quoteNameIfKeyword(_)).mkString(".")
+  val base = Namespaces.quote(original)
 
   val models: String = s"$base.models"
 

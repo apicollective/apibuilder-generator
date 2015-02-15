@@ -4,7 +4,7 @@ import com.gilt.apidoc.spec.v0.models.Service
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
-import generator.{ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon, ScalaClientMethodConfig, ScalaClientMethodConfigs}
+import generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon, ScalaClientMethodConfig, ScalaClientMethodConfigs}
 
 case class PlayFrameworkVersion(
   name: String,
@@ -19,7 +19,7 @@ object Play22ClientGenerator extends CodeGenerator {
   override def invoke(form: InvocationForm): String = {
     val config = PlayFrameworkVersion(
       name = "2.2.x",
-      config = ScalaClientMethodConfigs.Play22(form.service.namespace),
+      config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace)),
       requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
       authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
       supportsHttpPatch = false
@@ -35,7 +35,7 @@ object Play23ClientGenerator extends CodeGenerator {
 
     val config = PlayFrameworkVersion(
       name = "2.3.x",
-      config = ScalaClientMethodConfigs.Play23(form.service.namespace),
+      config = ScalaClientMethodConfigs.Play23(Namespaces.quote(form.service.namespace)),
       requestHolderClass = "play.api.libs.ws.WSRequestHolder",
       authSchemeClass = "play.api.libs.ws.WSAuthScheme",
       supportsHttpPatch = true

@@ -14,7 +14,7 @@ import lib.Text._
 object Ning18ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): String = {
-    val config = ScalaClientMethodConfigs.Ning(form.service.namespace)
+    val config = ScalaClientMethodConfigs.Ning(Namespaces.quote(form.service.namespace))
     NingClientGenerator(config, form).invoke()
   }
 
