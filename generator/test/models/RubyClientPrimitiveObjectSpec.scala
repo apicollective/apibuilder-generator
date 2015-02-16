@@ -48,17 +48,17 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     describe("generates valid models") {
 
       it("singleton") {
-        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("object"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("object"), None)
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-singleton.txt", code)
       }
 
       it("list") {
-        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("[object]"), None)
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-list.txt", code)
       }
 
       it("map") {
-        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("map[object]"))
+        val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("map[object]"), None)
         TestHelper.assertEqualsFile("test/resources/generators/ruby-client-primitive-object-map.txt", code)
       }
 

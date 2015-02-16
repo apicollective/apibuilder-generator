@@ -15,6 +15,11 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
     RubyClientGenerator.enumName("CancelRequest") should be("cancel_request")
   }
 
+  it("classDeclaration") {
+    RubyClientGenerator.classDeclaration("RegisteredUser", None) should be("class RegisteredUser")
+    RubyClientGenerator.classDeclaration("RegisteredUser", Some("User")) should be("class RegisteredUser < User")
+  }
+
   describe("generateEnumClass") {
 
     it("for enum with multiple values") {
@@ -34,7 +39,7 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
         )
       )
             
-      TestHelper.assertEqualsFile("test/resources/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum))
+      TestHelper.assertEqualsFile("test/resources/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum, None))
     }
 
   }

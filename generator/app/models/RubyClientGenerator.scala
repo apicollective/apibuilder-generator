@@ -6,7 +6,7 @@ import lib.{Datatype, Kind, Methods, Primitives, Text, Type, VersionTag}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
 import scala.collection.mutable.ListBuffer
-
+import play.api.Logger
 
 object RubyUtil {
 
@@ -84,10 +84,18 @@ object RubyClientGenerator extends CodeGenerator {
     new RubyClientGenerator(form).invoke
   }
 
-  def generateEnum(enum: Enum): String = {
+  def classDeclaration(name: String, parent: Option[String]): String = {
+    Seq(
+      Some(s"class $name"),
+      parent.map { p => s"< $p" }
+    ).flatten.mkString(" ")
+  }
+
+  def generateEnum(enum: Enum, union: Option[Union]): String = {
     val className = RubyUtil.toClassName(enum.name)
+
     val lines = ListBuffer[String]()
-    lines.append(s"class $className")
+    lines.append(classDeclaration(className, union.map { u => RubyUtil.toClassName(u.name) }))
 
     lines.append("")
     lines.append("  attr_reader :value")
@@ -158,6 +166,34 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 
+  /**
+    * Ruby does not support multiple inheritance. This method
+    * standardizes how we select the single union type.
+    */
+  private def singleUnion(unions: Seq[Union]): Option[Union] = {
+    unions.toList match {
+      case Nil => None
+      case single :: Nil => Some(single)
+      case multiple => {
+        val types = multiple.map(_.name).mkString(", ")
+        Logger.warn("Ruby client does not support multiple inheritance. Multiple union types: ${types}. Using first type")
+        Some(multiple.head)
+      }
+    }
+  }
+
+  private def unionsFor(model: Model): Seq[Union] = {
+    service.unions.filter { u =>
+      u.types.map(_.`type`).contains(model.name)
+    }
+  }
+
+  private def unionsFor(enum: Enum): Seq[Union] = {
+    service.unions.filter { u =>
+      u.types.map(_.`type`).contains(enum.name)
+    }
+  }
+
   def invoke(): String = {
     val spacerSize = 2
     val moduleIndent = spacerSize * module.parts.size
@@ -179,9 +215,9 @@ case class RubyClientGenerator(form: InvocationForm) {
         Seq(
           "module Models",
           Seq(
-            service.enums.map { RubyClientGenerator.generateEnum(_) },
             service.unions.map { generateUnion(_) },
-            service.models.map { generateModel(_) }
+            service.enums.map { e => RubyClientGenerator.generateEnum(e, singleUnion(unionsFor(e))) },
+            service.models.map { m => generateModel(m, singleUnion(unionsFor(m))) }
           ).filter(!_.isEmpty).flatten.mkString("\n\n").indent(2),
           "end"
         ).mkString("\n\n").indent(moduleIndent),
@@ -525,13 +561,13 @@ ${headerConstants.indent(2)}
     ).mkString("\n\n")
   }
 
-  def generateModel(model: Model): String = {
+  def generateModel(model: Model, union: Option[Union]): String = {
     val className = RubyUtil.toClassName(model.name)
 
     val sb = ListBuffer[String]()
 
     model.description.map { desc => sb.append(GeneratorUtil.formatComment(desc)) }
-    sb.append(s"class $className\n")
+    sb.append(RubyClientGenerator.classDeclaration(className, union.map(u => RubyUtil.toClassName(u.name))) + "\n")
 
     sb.append("  attr_reader " + model.fields.map( f => s":${f.name}" ).mkString(", "))
 
@@ -727,13 +763,12 @@ ${headerConstants.indent(2)}
             )
           }
           case Type(Kind.Union, name) => {
-            println(s"TODO: Union support for type: ${name}")
             val klass = qualifiedClassName(name)
             wrapWithAssertion(
               fieldName,
               klass,
               required,
-              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.from_json(opts.delete(:$fieldName)))"
             )
           }
           case Type(Kind.Enum, name) => {
