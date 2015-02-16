@@ -344,8 +344,11 @@ ${headerConstants.indent(2)}
                   val code = asString(RubyUtil.toVariable(varName), name, escape = true)
                   s"#{$code}"
                 }
-                case Type(Kind.Model | Kind.Union, name) => {
+                case Type(Kind.Model, name) => {
                   sys.error("Models cannot be in the path")
+                }
+                case Type(Kind.Union, name) => {
+                  sys.error("Unions cannot be in the path")
                 }
                 case Type(Kind.Enum, name) => {
                   val code = RubyUtil.toVariable(varName)
@@ -819,9 +822,13 @@ ${headerConstants.indent(2)}
           case Type(Kind.Primitive, name) => {
             withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |v| " + parseArgumentPrimitive(fieldName, "v", name, required, default) + "}"
           }
-          case Type(Kind.Model | Kind.Union, name) => {
+          case Type(Kind.Model, name) => {
             val klass = qualifiedClassName(name)
             withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }"
+          }
+          case Type(Kind.Union, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.from_json(el)) }"
           }
           case Type(Kind.Enum, name) => {
             val klass = qualifiedClassName(name)
@@ -835,9 +842,13 @@ ${headerConstants.indent(2)}
           case Type(Kind.Primitive, name) => {
             withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, required, default) + "; h }"
           }
-          case Type(Kind.Model | Kind.Union, name) => {
+          case Type(Kind.Model, name) => {
             val klass = qualifiedClassName(name)
             withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}"
+          }
+          case Type(Kind.Union, name) => {
+            val klass = qualifiedClassName(name)
+            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.from_json(el[1])); h" + "}"
           }
           case Type(Kind.Enum, name) => {
             val klass = qualifiedClassName(name)
@@ -986,18 +997,22 @@ ${headerConstants.indent(2)}
       case Type(Kind.Primitive, name) => {
         Some(buildResponse(Container(dt), RubyUtil.toDefaultVariable()))
       }
-      case Type(Kind.Model | Kind.Enum | Kind.Union, name) => {
+      case Type(Kind.Model | Kind.Enum, name) => {
         Some(buildResponse(Container(dt), name))
+      }
+      case Type(Kind.Union, name) => {
+        Some(buildResponse(Container(dt), name, "from_json"))
       }
     }
   }
 
   private def buildResponse(
     container: Container,
-    name: String
+    name: String,
+    constructor: String = "new"
   ): String = {
     val varName = qualifiedClassName(name)
-    val mapSingleObject = s" { |hash| $varName.new(hash) }"
+    val mapSingleObject = s" { |hash| $varName.$constructor(hash) }"
     container match {
       case Container.Singleton => {
         mapSingleObject
