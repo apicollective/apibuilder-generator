@@ -189,6 +189,7 @@ module Com
                   attr_reader :value
 
                   def initialize(value)
+                    super(:name => Foobar::Types::BAR)
                     @value = HttpClient::Preconditions.assert_class('value', value, String)
                   end
 
@@ -216,12 +217,9 @@ module Com
                     @@_b ||= Bar.new('b')
                   end
 
-                  def to_hash
+                  def subtype_to_hash
                     value
                   end
-
-                  # Parent union type will expect a method named subtype_to_hash
-                  alias :subtype_to_hash :to_hash
 
                 end
 
@@ -230,6 +228,7 @@ module Com
                   attr_reader :value
 
                   def initialize(value)
+                    super(:name => Foobar::Types::FOO)
                     @value = HttpClient::Preconditions.assert_class('value', value, String)
                   end
 
@@ -257,12 +256,9 @@ module Com
                     @@_a ||= Foo.new('a')
                   end
 
-                  def to_hash
+                  def subtype_to_hash
                     value
                   end
-
-                  # Parent union type will expect a method named subtype_to_hash
-                  alias :subtype_to_hash :to_hash
 
                 end
 
@@ -717,7 +713,7 @@ module Com
                   TRUE_STRINGS = ['t', 'true', 'y', 'yes', 'on', '1', 'trueclass'] unless defined?(TRUE_STRINGS)
                   FALSE_STRINGS = ['f', 'false', 'n', 'no', 'off', '0', 'falseclass'] unless defined?(FALSE_STRINGS)
 
-                  def Helper.to_boolean(field_name, value, opts={})
+                  def Helper.to_boolean(field_name, value)
                     string = value.to_s.strip.downcase
                     if TRUE_STRINGS.include?(string)
                       true
