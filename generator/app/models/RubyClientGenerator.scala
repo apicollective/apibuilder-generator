@@ -432,6 +432,7 @@ ${headerConstants.indent(2)}
 
   def generateUnion(union: Union): String = {
     val className = RubyUtil.toClassName(union.name)
+    val undefinedTypeClassName = RubyUtil.toClassName(union.name + "UndefinedType")
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
       Seq(
@@ -454,6 +455,20 @@ ${headerConstants.indent(2)}
         "def to_json",
         "  { @name => subtype_to_json }",
         "end"
+      ).mkString("\n"),
+
+      Seq(
+        s"def $className.from_json(hash)",
+        s"  HttpClient::Preconditions.assert_class('hash', hash, Hash)",
+        s"  hash.map do |union_type_name, data|",
+        s"    case union_type_name",
+        union.types.map { ut =>
+          s"when Types::${RubyUtil.toConstant(ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(data)"
+        }.mkString("\n").indent(6),
+        s"      else ${undefinedTypeClassName}.new(:name => union_type_name)",
+        s"    end",
+        s"  end.first",
+        s"end"
       ).mkString("\n")
 
     ).mkString("\n\n").indent(2) +
