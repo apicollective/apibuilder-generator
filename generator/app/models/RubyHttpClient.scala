@@ -378,7 +378,7 @@ module HttpClient
     TRUE_STRINGS = ['t', 'true', 'y', 'yes', 'on', '1', 'trueclass'] unless defined?(TRUE_STRINGS)
     FALSE_STRINGS = ['f', 'false', 'n', 'no', 'off', '0', 'falseclass'] unless defined?(FALSE_STRINGS)
 
-    def Helper.to_boolean(field_name, value, opts={})
+    def Helper.to_boolean(field_name, value)
       string = value.to_s.strip.downcase
       if TRUE_STRINGS.include?(string)
         true
