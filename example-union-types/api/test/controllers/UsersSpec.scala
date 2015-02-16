@@ -1,6 +1,6 @@
 package controllers
 
-import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UuidWrapper}
+import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UuidWrapper}
 import com.gilt.apidoc.example.union.types.v0.models.json._
 import java.util.UUID
 
@@ -83,11 +83,12 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
   "GET /users/:guid" in new WithServer {
     val userGuids = await(
       client.users.get()
-    ).map { user =>
+    ).flatMap { user =>
       user match {
-        case user: RegisteredUser => user.guid
-        case user: GuestUser => user.guid
-        case wrapper: UuidWrapper => wrapper.value
+        case RegisteredUser(id, email, preference) => Some(id)
+        case GuestUser(id, email) => Some(id)
+        case UuidWrapper(value) => Some(value)
+        case UserUndefinedType(name) => None
       }
     }
 
@@ -95,9 +96,10 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
       await(client.users.getByGuid(userGuid)).getOrElse {
         fail("failed to find user by guid")
       } match {
-        case user: RegisteredUser => user.guid must be(userGuid)
-        case user: GuestUser => user.guid must be(userGuid)
-        case wrapper: UuidWrapper => wrapper.value must be(userGuid)
+        case RegisteredUser(id, email, preference) => id must be(userGuid)
+        case GuestUser(id, email) => id must be(userGuid)
+        case UuidWrapper(value) => value must be(userGuid)
+        case UserUndefinedType(name) => fail("Should note have received undefined type")
       }
     }
 

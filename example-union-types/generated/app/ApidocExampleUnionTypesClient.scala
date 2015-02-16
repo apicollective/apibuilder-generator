@@ -197,8 +197,8 @@ package com.gilt.apidoc.example.union.types.v0.models {
         (__ \ "foo").read(jsonReadsApidocExampleUnionTypesFoo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
         orElse
         (__ \ "bar").read(jsonReadsApidocExampleUnionTypesBar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
-        orElse
-        FoobarUndefinedType(__.toString).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+//        orElse
+///        FoobarUndefinedType("asdf").asInstanceOf[play.api.libs.json.Reads[Foobar]]
       )
     }
 
@@ -217,8 +217,8 @@ package com.gilt.apidoc.example.union.types.v0.models {
         (__ \ "guest_user").read(jsonReadsApidocExampleUnionTypesGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
         (__ \ "uuid").read(jsonReadsApidocExampleUnionTypesUuidWrapper).asInstanceOf[play.api.libs.json.Reads[User]]
-        orElse
-        UserUndefinedType(__.toString).asInstanceOf[play.api.libs.json.Reads[User]]
+//        orElse
+//        UserUndefinedType(__.toString).asInstanceOf[play.api.libs.json.Reads[User]]
       )
     }
 

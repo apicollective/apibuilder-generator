@@ -1,6 +1,6 @@
 package controllers
 
-import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UuidWrapper}
+import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UuidWrapper}
 import com.gilt.apidoc.example.union.types.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
@@ -21,9 +21,10 @@ object Users extends Controller {
   def getByGuid(guid: UUID) = Action {
     users.find { u =>
       u match {
-        case user: RegisteredUser => user.guid == guid
-        case user: GuestUser => user.guid == guid
-        case wrapper: UuidWrapper => wrapper.value == guid
+        case RegisteredUser(id, email, preference) => id == guid
+        case GuestUser(id, email) => id == guid
+        case UuidWrapper(value) => value == guid
+        case UserUndefinedType(name) => false
       }
     } match {
       case None => {
@@ -50,9 +51,10 @@ object Users extends Controller {
         val user = s.get
 
         user match {
-          case u: RegisteredUser => println("Received Registered User: " + u)
-          case u: GuestUser => println("Received Guest User: " + u)
-          case wrapper: UuidWrapper => println("Received UUID: " + wrapper.value)
+          case RegisteredUser(id, email, preference) => println(s"Received Registered User $id")
+          case GuestUser(id, email) => println(s"Received Guest User $id")
+          case UuidWrapper(value) => println(s"Received UUID $value")
+          case UserUndefinedType(name) => println(s"Received undefined type $name")
         }
 
         Created(Json.toJson(user))
