@@ -34,6 +34,13 @@ object RubyUtil {
     ScalaUtil.toClassName(name, multiple)
   }
 
+  def toConstant(
+    name: String,
+    multiple: Boolean = false
+  ): String = {
+    Text.splitIntoWords(Text.camelCaseToUnderscore(name)).map(_.toUpperCase).mkString("_")
+  }
+
   def toDefaultVariable(
     multiple: Boolean = false
   ): String = {
@@ -173,6 +180,7 @@ case class RubyClientGenerator(form: InvocationForm) {
           "module Models",
           Seq(
             service.enums.map { RubyClientGenerator.generateEnum(_) },
+            service.unions.map { generateUnion(_) },
             service.models.map { generateModel(_) }
           ).filter(!_.isEmpty).flatten.mkString("\n\n").indent(2),
           "end"
@@ -420,6 +428,22 @@ ${headerConstants.indent(2)}
     sb.append("end")
 
     sb.mkString("\n")
+  }
+
+  def generateUnion(union: Union): String = {
+    val className = RubyUtil.toClassName(union.name)
+    Seq(
+      union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className",
+      Seq(
+        "module Types",
+        union.types.map { ut =>
+          ut.description.map { desc => GeneratorUtil.formatComment(desc) }.getOrElse("") +
+          s"${RubyUtil.toConstant(ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} if !defined?(${RubyUtil.toConstant(ut.`type`)})"
+        }.mkString("\n").indent(2),
+        "end"
+      ).mkString("\n").indent(2),
+      "end"
+    ).mkString("\n\n")
   }
 
   def generateModel(model: Model): String = {

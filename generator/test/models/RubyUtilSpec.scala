@@ -31,4 +31,10 @@ class RubyUtilSpec extends FunSpec with Matchers {
     RubyUtil.wrapInQuotes("'value'") should be(""""'value'"""")
   }
 
+  it("RubyUtil.toConstant") {
+    RubyUtil.toConstant("foo") should be("FOO")
+    RubyUtil.toConstant("fooBar") should be("FOO_BAR")
+    RubyUtil.toConstant("foo_bar") should be("FOO_BAR")
+    RubyUtil.toConstant("FOO_BAR") should be("FOO_BAR")
+  }
 }
