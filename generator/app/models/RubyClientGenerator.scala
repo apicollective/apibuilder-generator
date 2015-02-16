@@ -35,10 +35,25 @@ object RubyUtil {
   }
 
   def toConstant(
-    name: String,
-    multiple: Boolean = false
+    name: String
   ): String = {
     Text.splitIntoWords(Text.camelCaseToUnderscore(name)).map(_.toUpperCase).mkString("_")
+  }
+
+  /**
+    * Since ruby does not give us multiple inheritance, we create a
+    * wrapper for each combination of union type / primitive to avoid
+    * conflicts if the same primitive type is used in more than one
+    * union type.
+    */
+  def toUnionConstant(
+    union: Union,
+    name: String
+  ): String = {
+    Primitives(name) match {
+      case None => RubyUtil.toConstant(name)
+      case Some(p) => RubyUtil.toConstant(RubyPrimitiveWrapper.className(union, p))
+    }
   }
 
   def toDefaultVariable(
@@ -48,6 +63,7 @@ object RubyUtil {
   }
 
   def toVariable(datatype: Datatype): String = {
+
     val multiple = Container(datatype).multiple
     datatype.`type` match {
       case Type(Kind.Primitive, _) => RubyUtil.toDefaultVariable(multiple = multiple)
@@ -166,6 +182,8 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 
+  private val primitiveWrapper = RubyPrimitiveWrapper(service)
+
   /**
     * Ruby does not support multiple inheritance. This method
     * standardizes how we select the single union type.
@@ -217,7 +235,8 @@ case class RubyClientGenerator(form: InvocationForm) {
           Seq(
             service.unions.map { generateUnion(_) },
             service.enums.map { e => RubyClientGenerator.generateEnum(e, singleUnion(unionsFor(e))) },
-            service.models.map { m => generateModel(m, singleUnion(unionsFor(m))) }
+            service.models.map { m => generateModel(m, singleUnion(unionsFor(m))) },
+            primitiveWrapper.wrappers.map { w => generateModel(w.model, Some(w.union)) }
           ).filter(!_.isEmpty).flatten.mkString("\n\n").indent(2),
           "end"
         ).mkString("\n\n").indent(moduleIndent),
@@ -485,7 +504,7 @@ ${headerConstants.indent(2)}
         "module Types",
         union.types.map { ut =>
           ut.description.map { desc => GeneratorUtil.formatComment(desc) }.getOrElse("") +
-          s"${RubyUtil.toConstant(ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} unless defined?(${RubyUtil.toConstant(ut.`type`)})"
+          s"${RubyUtil.toUnionConstant(union, ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} unless defined?(${RubyUtil.toUnionConstant(union, ut.`type`)})"
         }.mkString("\n").indent(2),
         "end"
       ).mkString("\n"),
@@ -509,7 +528,10 @@ ${headerConstants.indent(2)}
         s"  hash.map do |union_type_name, data|",
         s"    case union_type_name",
         union.types.map { ut =>
-          s"when Types::${RubyUtil.toConstant(ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(data)"
+          Primitives(ut.`type`) match {
+            case None => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(data)"
+            case Some(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(data)"
+          }
         }.mkString("\n").indent(6),
         s"      else ${undefinedTypeClassName(union)}.new(:name => union_type_name)",
         s"    end",
@@ -574,10 +596,7 @@ ${headerConstants.indent(2)}
     sb.append("")
     sb.append("  def initialize(incoming={})")
     union.map { u =>
-      val ut = u.types.find(_.`type` == model.name).getOrElse {
-        sys.error(s"Model[${model.name}] union[${u.name}] Failed to find type. All types: " + u.types.map(_.`type`).mkString(", "))
-      }
-      sb.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toConstant(ut.`type`)})")
+      sb.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, model.name)})")
     }
 
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
