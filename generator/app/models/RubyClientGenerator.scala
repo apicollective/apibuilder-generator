@@ -498,8 +498,8 @@ ${headerConstants.indent(2)}
       ).mkString("\n"),
 
       Seq(
-        "def to_json",
-        "  { @name => subtype_to_json }",
+        "def to_hash",
+        "  { @name => subtype_to_hash }",
         "end"
       ).mkString("\n"),
 
@@ -538,7 +538,7 @@ ${headerConstants.indent(2)}
         ).mkString("\n"),
 
         Seq(
-          "def subtype_to_json",
+          "def subtype_to_hash",
           "  raise 'Unable to serialize undefined type to json'",
           "end"
         ).mkString("\n"),
@@ -573,6 +573,13 @@ ${headerConstants.indent(2)}
 
     sb.append("")
     sb.append("  def initialize(incoming={})")
+    union.map { u =>
+      val ut = u.types.find(_.`type` == model.name).getOrElse {
+        sys.error(s"Model[${model.name}] union[${u.name}] Failed to find type. All types: " + u.types.map(_.`type`).mkString(", "))
+      }
+      sb.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toConstant(ut.`type`)})")
+    }
+
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
 
     model.fields.map { field =>
@@ -585,11 +592,16 @@ ${headerConstants.indent(2)}
     sb.append("    JSON.dump(to_hash)")
     sb.append("  end\n")
 
+    val toHashMethodName = union match {
+      case None => "to_hash"
+      case Some(_) => "subtype_to_hash"
+    }
+
     sb.append("  def copy(incoming={})")
-    sb.append(s"    $className.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))")
+    sb.append(s"    $className.new(${toHashMethodName}.merge(HttpClient::Helper.symbolize_keys(incoming)))")
     sb.append("  end\n")
 
-    sb.append("  def to_hash")
+    sb.append(s"  def $toHashMethodName")
     sb.append("    {")
     sb.append(
       model.fields.map { field =>
