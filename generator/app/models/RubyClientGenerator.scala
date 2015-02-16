@@ -430,9 +430,19 @@ ${headerConstants.indent(2)}
     sb.mkString("\n")
   }
 
+  private def undefinedTypeClassName(union: Union): String = {
+    RubyUtil.toClassName(union.name + "UndefinedType")
+  }
+
   def generateUnion(union: Union): String = {
+    Seq(
+      generateUnionClass(union),
+      generateUnionUndefinedType(union)
+    ).mkString("\n\n")
+  }
+
+  def generateUnionClass(union: Union): String = {
     val className = RubyUtil.toClassName(union.name)
-    val undefinedTypeClassName = RubyUtil.toClassName(union.name + "UndefinedType")
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
       Seq(
@@ -465,7 +475,7 @@ ${headerConstants.indent(2)}
         union.types.map { ut =>
           s"when Types::${RubyUtil.toConstant(ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(data)"
         }.mkString("\n").indent(6),
-        s"      else ${undefinedTypeClassName}.new(:name => union_type_name)",
+        s"      else ${undefinedTypeClassName(union)}.new(:name => union_type_name)",
         s"    end",
         s"  end.first",
         s"end"
@@ -473,6 +483,46 @@ ${headerConstants.indent(2)}
 
     ).mkString("\n\n").indent(2) +
     "\n\nend"
+  }
+
+  def generateUnionUndefinedType(union: Union): String = {
+    val className = undefinedTypeClassName(union)
+    Seq(
+      s"class $className < ${RubyUtil.toClassName(union.name)}",
+
+      Seq(
+        "attr_reader :name",
+
+        Seq(
+          "def initialize(incoming={})",
+	  "  super(:name => 'undefined_type')",
+          "  opts = HttpClient::Helper.symbolize_keys(incoming)",
+          "  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)",
+          "end"
+        ).mkString("\n"),
+
+        Seq(
+          "def subtype_to_json",
+          "  raise 'Unable to serialize undefined type to json'",
+          "end"
+        ).mkString("\n"),
+
+        Seq(
+          "def copy(incoming={})",
+          "  raise 'Operation not supported for undefined type'",
+          "end"
+        ).mkString("\n"),
+
+        Seq(
+          "def to_hash",
+          "  raise 'Operation not supported for undefined type'",
+          "end"
+        ).mkString("\n")
+
+      ).mkString("\n\n").indent(2),
+
+      "end"
+    ).mkString("\n\n")
   }
 
   def generateModel(model: Model): String = {
