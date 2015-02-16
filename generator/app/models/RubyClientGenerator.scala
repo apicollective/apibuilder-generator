@@ -624,7 +624,7 @@ ${headerConstants.indent(2)}
             )
           }
           case Type(Kind.Union, name) => {
-            println("TODO: Union support for type: #{name}")
+            println(s"TODO: Union support for type: ${name}")
             val klass = qualifiedClassName(name)
             wrapWithAssertion(
               fieldName,
