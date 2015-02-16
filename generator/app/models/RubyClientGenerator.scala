@@ -438,7 +438,7 @@ ${headerConstants.indent(2)}
         "module Types",
         union.types.map { ut =>
           ut.description.map { desc => GeneratorUtil.formatComment(desc) }.getOrElse("") +
-          s"${RubyUtil.toConstant(ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} if !defined?(${RubyUtil.toConstant(ut.`type`)})"
+          s"${RubyUtil.toConstant(ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} unless defined?(${RubyUtil.toConstant(ut.`type`)})"
         }.mkString("\n").indent(2),
         "end"
       ).mkString("\n"),
@@ -447,6 +447,12 @@ ${headerConstants.indent(2)}
         "def initialize(incoming={})",
         "  opts = HttpClient::Helper.symbolize_keys(incoming)",
         "  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)",
+        "end"
+      ).mkString("\n"),
+
+      Seq(
+        "def to_json",
+        "  { @name => subtype_to_json }",
         "end"
       ).mkString("\n")
 
