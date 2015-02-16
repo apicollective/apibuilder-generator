@@ -1,11 +1,25 @@
 package generator
 
-import com.gilt.apidoc.spec.v0.models.{Method, ParameterLocation}
-import lib.{Datatype, Primitives, Type, Kind}
+import com.gilt.apidoc.spec.v0.models.{Method, ParameterLocation, Service}
+import lib.{Datatype, DatatypeResolver, Primitives, Type, Kind}
 import lib.Text
 import lib.Text._
 
 object GeneratorUtil {
+
+  def datatypeResolver(service: Service): DatatypeResolver = {
+    DatatypeResolver(
+      enumNames = service.enums.map(_.name) ++ service.imports.flatMap { imp =>
+        imp.enums.map(name => s"${imp.namespace}.enums.${name}")
+      },
+      unionNames = service.unions.map(_.name) ++ service.imports.flatMap { imp =>
+        imp.unions.map(name => s"${imp.namespace}.unions.${name}")
+      },
+      modelNames = service.models.map(_.name) ++ service.imports.flatMap { imp =>
+        imp.models.map(name => s"${imp.namespace}.models.${name}")
+      }
+    )
+  }
 
   /**
    * Turns a URL path to a camelcased method name.

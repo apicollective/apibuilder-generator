@@ -2,7 +2,7 @@ package models
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models._
-import lib.{Datatype, DatatypeResolver, Kind, Methods, Primitives, Text, Type, VersionTag}
+import lib.{Datatype, Kind, Methods, Primitives, Text, Type, VersionTag}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
 import scala.collection.mutable.ListBuffer
@@ -149,11 +149,7 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private val module = RubyUtil.Module(service.namespace)
 
-  private val datatypeResolver = DatatypeResolver(
-    enumNames = service.enums.map(_.name),
-    unionNames = service.unions.map(_.name),
-    modelNames = service.models.map(_.name)
-  )
+  private val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 
   def invoke(): String = {
     val spacerSize = 2
@@ -628,7 +624,14 @@ ${headerConstants.indent(2)}
             )
           }
           case Type(Kind.Union, name) => {
-            sys.error("TODO: Union support")
+            println("TODO: Union support for type: #{name}")
+            val klass = qualifiedClassName(name)
+            wrapWithAssertion(
+              fieldName,
+              klass,
+              required,
+              s"opts[:$fieldName].nil? ? nil : (opts[:$fieldName].is_a?($klass) ? opts.delete(:$fieldName) : $klass.new(opts.delete(:$fieldName)))"
+            )
           }
           case Type(Kind.Enum, name) => {
             val klass = qualifiedClassName(name)
@@ -694,10 +697,18 @@ ${headerConstants.indent(2)}
   private def qualifiedClassName(
     name: String
   ): String = {
-    "%s::Models::%s".format(
-      module.fullName,
-      RubyUtil.toClassName(name)
-    )
+    // If the name is already full qualified (e.g. com.foo.bar), then
+    // use the name directly. Otherwise add this service's module
+    // name.
+    val thisModule = RubyUtil.Module(name)
+    if (thisModule.parts.size <= 1) {
+      "%s::Models::%s".format(
+        module.fullName,
+        RubyUtil.toClassName(name)
+      )
+    } else {
+      thisModule.fullName
+    }
   }
 
   private def rubyClass(pt: Primitives): String = {
