@@ -222,6 +222,10 @@ module Com
                   @@_adult ||= AgeGroup.new('Adult')
                 end
 
+                def to_hash
+                  value
+                end
+
               end
 
               # A model with a lot of fields.

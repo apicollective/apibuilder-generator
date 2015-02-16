@@ -62,12 +62,12 @@ module Com
 
                   def get_by_guid(guid)
                     HttpClient::Preconditions.assert_class('guid', guid, String)
-                    @client.request("/users/#{guid}").get { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.new(hash) }
+                    @client.request("/users/#{guid}").get { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
                   end
 
                   def post(user)
                     HttpClient::Preconditions.assert_class('user', user, Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User)
-                    @client.request("/users").with_json(user.to_json).post { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.new(hash) }
+                    @client.request("/users").with_json(user.to_json).post { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
                   end
 
                 end
@@ -76,34 +76,193 @@ module Com
 
               module Models
 
-		class User
+                class Foobar
 
-		  module Types
-    		    GUEST = "guest_user" unless defined?(GUEST)
-                    REGISTERED = "registered_user" unless defined?(REGISTERED)
-                    UUID = "uuid" unless defined?(UUID)
+                  module Types
+                    FOO = 'foo' unless defined?(FOO)
+                    BAR = 'bar' unless defined?(BAR)
                   end
 
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
-  		  end
+                  end
 
-  		  def to_json
-		    { @name => subtype_to_json }
-  		  end
+                  def to_hash
+                    { @name => subtype_to_hash }
+                  end
 
-  		  def User.from_json(hash)
+                  def Foobar.from_json(hash)
                     HttpClient::Preconditions.assert_class('hash', hash, Hash)
                     hash.map do |union_type_name, data|
                       case union_type_name
-                      when Types::REGISTERED; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::RegisteredUser.new(data)
-                      when Types::GUEST; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::GuestUser.new(data)
-                      when Types::UUID; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UUIDWrapper.new(data)
-                      else Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UserUndefinedType.new(:name => union_type_name)
+                        when Types::FOO; Foo.new(data)
+                        when Types::BAR; Bar.new(data)
+                        else FoobarUndefinedType.new(:name => union_type_name)
                       end
                     end.first
                   end
+
+                end
+
+                class FoobarUndefinedType < Foobar
+
+                  attr_reader :name
+
+                  def initialize(incoming={})
+                    super(:name => 'undefined_type')
+                    opts = HttpClient::Helper.symbolize_keys(incoming)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                  end
+
+                  def subtype_to_hash
+                    raise 'Unable to serialize undefined type to json'
+                  end
+
+                  def copy(incoming={})
+                    raise 'Operation not supported for undefined type'
+                  end
+
+                  def to_hash
+                    raise 'Operation not supported for undefined type'
+                  end
+
+                end
+
+                class User
+
+                  module Types
+                    REGISTERED_USER = 'registered_user' unless defined?(REGISTERED_USER)
+                    GUEST_USER = 'guest_user' unless defined?(GUEST_USER)
+                    USER_UUID_WRAPPER = 'uuid' unless defined?(USER_UUID_WRAPPER)
+                  end
+
+                  def initialize(incoming={})
+                    opts = HttpClient::Helper.symbolize_keys(incoming)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                  end
+
+                  def to_hash
+                    { @name => subtype_to_hash }
+                  end
+
+                  def User.from_json(hash)
+                    HttpClient::Preconditions.assert_class('hash', hash, Hash)
+                    hash.map do |union_type_name, data|
+                      case union_type_name
+                        when Types::REGISTERED_USER; RegisteredUser.new(data)
+                        when Types::GUEST_USER; GuestUser.new(data)
+                        when Types::USER_UUID_WRAPPER; UserUuidWrapper.new(data)
+                        else UserUndefinedType.new(:name => union_type_name)
+                      end
+                    end.first
+                  end
+
+                end
+
+                class UserUndefinedType < User
+
+                  attr_reader :name
+
+                  def initialize(incoming={})
+                    super(:name => 'undefined_type')
+                    opts = HttpClient::Helper.symbolize_keys(incoming)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                  end
+
+                  def subtype_to_hash
+                    raise 'Unable to serialize undefined type to json'
+                  end
+
+                  def copy(incoming={})
+                    raise 'Operation not supported for undefined type'
+                  end
+
+                  def to_hash
+                    raise 'Operation not supported for undefined type'
+                  end
+
+                end
+
+                class Bar < Foobar
+
+                  attr_reader :value
+
+                  def initialize(value)
+                    @value = HttpClient::Preconditions.assert_class('value', value, String)
+                  end
+
+                  # Returns the instance of Bar for this value, creating a new instance for an unknown value
+                  def Bar.apply(value)
+                    if value.instance_of?(Bar)
+                      value
+                    else
+                      HttpClient::Preconditions.assert_class_or_nil('value', value, String)
+                      value.nil? ? nil : (from_string(value) || Bar.new(value))
+                    end
+                  end
+
+                  # Returns the instance of Bar for this value, or nil if not found
+                  def Bar.from_string(value)
+                    HttpClient::Preconditions.assert_class('value', value, String)
+                    Bar.ALL.find { |v| v.value == value }
+                  end
+
+                  def Bar.ALL
+                    @@all ||= [Bar.b]
+                  end
+
+                  def Bar.b
+                    @@_b ||= Bar.new('b')
+                  end
+
+                  def to_hash
+                    value
+                  end
+
+                  # Parent union type will expect a method named subtype_to_hash
+                  alias :subtype_to_hash :to_hash
+
+                end
+
+                class Foo < Foobar
+
+                  attr_reader :value
+
+                  def initialize(value)
+                    @value = HttpClient::Preconditions.assert_class('value', value, String)
+                  end
+
+                  # Returns the instance of Foo for this value, creating a new instance for an unknown value
+                  def Foo.apply(value)
+                    if value.instance_of?(Foo)
+                      value
+                    else
+                      HttpClient::Preconditions.assert_class_or_nil('value', value, String)
+                      value.nil? ? nil : (from_string(value) || Foo.new(value))
+                    end
+                  end
+
+                  # Returns the instance of Foo for this value, or nil if not found
+                  def Foo.from_string(value)
+                    HttpClient::Preconditions.assert_class('value', value, String)
+                    Foo.ALL.find { |v| v.value == value }
+                  end
+
+                  def Foo.ALL
+                    @@all ||= [Foo.a]
+                  end
+
+                  def Foo.a
+                    @@_a ||= Foo.new('a')
+                  end
+
+                  def to_hash
+                    value
+                  end
+
+                  # Parent union type will expect a method named subtype_to_hash
+                  alias :subtype_to_hash :to_hash
 
                 end
 
@@ -112,74 +271,24 @@ module Com
                   attr_reader :guid, :email
 
                   def initialize(incoming={})
-		    super(:name => User::Types::GUEST)
+                    super(:name => User::Types::GUEST_USER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                     @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
                   end
 
-                  def subtype_to_json
+                  def to_json
                     JSON.dump(to_hash)
                   end
 
                   def copy(incoming={})
-                    GuestUser.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+                    GuestUser.new(subtype_to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
                   end
 
-                  def to_hash
+                  def subtype_to_hash
                     {
                       :guid => guid,
                       :email => email
-                    }
-                  end
-
-                end
-
-                class UserUndefinedType < User
-
-		  attr_reader :name
-
-                  def initialize(incoming={})
-		    super(:name => "undefined_type")
-                    opts = HttpClient::Helper.symbolize_keys(incoming)
-                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
-                  end
-
-                  def subtype_to_json
-                    raise "Unable to serialize undefined type to json"
-                  end
-
-                  def copy(incoming={})
-                    raise "Operation not supported for undefined type"
-                  end
-
-                  def to_hash
-                    raise "Operation not supported for undefined type"
-                  end
-
-                end
-
-                class UUIDWrapper < User
-
-		  attr_reader :value
-
-                  def initialize(incoming={})
-		    super(:name => User::Types::UUID)
-                    opts = HttpClient::Helper.symbolize_keys(incoming)
-                    @value = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:value)), String)
-                  end
-
-                  def subtype_to_json
-                    JSON.dump(to_hash)
-                  end
-
-                  def copy(incoming={})
-                    UUIDWrapper.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
-                  end
-
-                  def to_hash
-                    {
-                      :value => value
                     }
                   end
 
@@ -187,27 +296,56 @@ module Com
 
                 class RegisteredUser < User
 
-                  attr_reader :guid, :email
+                  attr_reader :guid, :email, :preference
 
                   def initialize(incoming={})
-		    super(:name => User::Types::REGISTERED)
+                    super(:name => User::Types::REGISTERED_USER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                     @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
+                    @preference = HttpClient::Preconditions.assert_class('preference', opts[:preference].nil? ? nil : (opts[:preference].is_a?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar) ? opts.delete(:preference) : Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar.from_json(opts.delete(:preference))), Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar)
                   end
 
-                  def subtype_to_json
+                  def to_json
                     JSON.dump(to_hash)
                   end
 
                   def copy(incoming={})
-                    RegisteredUser.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+                    RegisteredUser.new(subtype_to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
                   end
 
-                  def to_hash
+                  def subtype_to_hash
                     {
                       :guid => guid,
-                      :email => email
+                      :email => email,
+                      :preference => preference.nil? ? nil : preference.to_hash
+                    }
+                  end
+
+                end
+
+                # Wrapper class to support the union type[user] datatype[uuid]
+                class UserUuidWrapper < User
+
+                  attr_reader :value
+
+                  def initialize(incoming={})
+                    super(:name => User::Types::USER_UUID_WRAPPER)
+                    opts = HttpClient::Helper.symbolize_keys(incoming)
+                    @value = HttpClient::Preconditions.assert_class('value', HttpClient::Helper.to_uuid(opts.delete(:value)), String)
+                  end
+
+                  def to_json
+                    JSON.dump(to_hash)
+                  end
+
+                  def copy(incoming={})
+                    UserUuidWrapper.new(subtype_to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+                  end
+
+                  def subtype_to_hash
+                    {
+                      :value => value
                     }
                   end
 
