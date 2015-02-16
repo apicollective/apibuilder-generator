@@ -118,6 +118,10 @@ object RubyClientGenerator extends CodeGenerator {
 
     lines.append("")
     lines.append("  def initialize(value)")
+    union.map { u =>
+      lines.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, enum.name)})")
+    }
+
     lines.append("    @value = HttpClient::Preconditions.assert_class('value', value, String)")
     lines.append("  end")
 
@@ -155,16 +159,15 @@ object RubyClientGenerator extends CodeGenerator {
       lines.append("")
     }
 
-    lines.append(s"  def to_hash")
+    val toHashMethodName = union match {
+      case None => "to_hash"
+      case Some(_) => "subtype_to_hash"
+    }
+
+    lines.append(s"  def $toHashMethodName")
     lines.append("    value")
     lines.append("  end")
     lines.append("")
-
-    union.map { u =>
-      lines.append("  # Parent union type will expect a method named subtype_to_hash")
-      lines.append("  alias :subtype_to_hash :to_hash")
-      lines.append("")
-    }
 
     lines.append("end")
     lines.mkString("\n")
