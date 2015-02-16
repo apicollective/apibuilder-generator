@@ -76,17 +76,49 @@ module Com
 
               module Models
 
-                class GuestUser
+		class User
+
+		  module Types
+    		    GUEST = "guest_user" unless defined?(GUEST)
+                    REGISTERED = "registered_user" unless defined?(REGISTERED)
+                    UUID = "uuid" unless defined?(UUID)
+                  end
+
+                  def initialize(incoming={})
+                    opts = HttpClient::Helper.symbolize_keys(incoming)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+  		  end
+
+  		  def to_json
+		    { @name => subtype_to_json }
+  		  end
+
+  		  def User.from_json(hash)
+                    HttpClient::Preconditions.assert_class('hash', hash, Hash)
+                    hash.map do |union_type_name, data|
+                      case union_type_name
+                      when Types::REGISTERED; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::RegisteredUser.new(data)
+                      when Types::GUEST; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::GuestUser.new(data)
+                      when Types::UUID; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UUIDWrapper.new(data)
+                      else Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UserUndefinedType.new(:name => union_type_name)
+                      end
+                    end.first
+                  end
+
+                end
+
+                class GuestUser < User
 
                   attr_reader :guid, :email
 
                   def initialize(incoming={})
+		    super(:name => User::Types::GUEST)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                     @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
                   end
 
-                  def to_json
+                  def subtype_to_json
                     JSON.dump(to_hash)
                   end
 
@@ -103,55 +135,41 @@ module Com
 
                 end
 
-		module User
-
-  		  def User.to_json(instance)
-		    if instance.instance_of?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::RegisteredUser)
-		      { "registered_user" => instance.to_json }
-		    elsif instance.instance_of?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::GuestUser)
-		      { "guest_user" => instance.to_json }
-		    elsif instance.instance_of?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UUIDWrapper)
-		      { "uuid" => instance.to_json }
-                    else
-                      raise "Do not know how to serialize instances of type #{instance.class.name}"
-                    end
-  		  end
-
-  		  def User.from_json(hash)
-                    HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                    hash.map do |union_type_name, data|
-                      case union_type_name
-                      when "registered_user"; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::RegisteredUser.new(data)
-                      when "guest_user"; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::GuestUser.new(data)
-                      when "uuid"; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UUIDWrapper.new(data)
-                      else Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UserUndefinedType.new(:name => union_type_name)
-                      end
-                    end.first
-                  end
-
-                end
-
-                class UserUndefinedType
+                class UserUndefinedType < User
 
 		  attr_reader :name
 
                   def initialize(incoming={})
+		    super(:name => "undefined_type")
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
                   end
 
+                  def subtype_to_json
+                    raise "Unable to serialize undefined type to json"
+                  end
+
+                  def copy(incoming={})
+                    raise "Operation not supported for undefined type"
+                  end
+
+                  def to_hash
+                    raise "Operation not supported for undefined type"
+                  end
+
                 end
 
-                class UUIDWrapper
+                class UUIDWrapper < User
 
 		  attr_reader :value
 
                   def initialize(incoming={})
+		    super(:name => User::Types::UUID)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @value = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:value)), String)
                   end
 
-                  def to_json
+                  def subtype_to_json
                     JSON.dump(to_hash)
                   end
 
@@ -167,17 +185,18 @@ module Com
 
                 end
 
-                class RegisteredUser
+                class RegisteredUser < User
 
                   attr_reader :guid, :email
 
                   def initialize(incoming={})
+		    super(:name => User::Types::REGISTERED)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                     @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
                   end
 
-                  def to_json
+                  def subtype_to_json
                     JSON.dump(to_hash)
                   end
 
