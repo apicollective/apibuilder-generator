@@ -432,8 +432,8 @@ ${headerConstants.indent(2)}
 
   def generateUnion(union: Union): String = {
     val className = RubyUtil.toClassName(union.name)
+    union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
-      union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className",
       Seq(
         "module Types",
         union.types.map { ut =>
@@ -441,9 +441,17 @@ ${headerConstants.indent(2)}
           s"${RubyUtil.toConstant(ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} if !defined?(${RubyUtil.toConstant(ut.`type`)})"
         }.mkString("\n").indent(2),
         "end"
-      ).mkString("\n").indent(2),
-      "end"
-    ).mkString("\n\n")
+      ).mkString("\n"),
+
+      Seq(
+        "def initialize(incoming={})",
+        "  opts = HttpClient::Helper.symbolize_keys(incoming)",
+        "  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)",
+        "end"
+      ).mkString("\n")
+
+    ).mkString("\n\n").indent(2) +
+    "\n\nend"
   }
 
   def generateModel(model: Model): String = {
