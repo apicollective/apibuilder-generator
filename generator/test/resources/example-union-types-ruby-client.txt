@@ -57,7 +57,7 @@ module Com
                   end
 
                   def get
-                    @client.request("/users").get.map { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.new(hash) }
+                    @client.request("/users").get.map { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
                   end
 
                   def get_by_guid(guid)
@@ -98,6 +98,70 @@ module Com
                     {
                       :guid => guid,
                       :email => email
+                    }
+                  end
+
+                end
+
+		module User
+
+  		  def User.to_json(instance)
+		    if instance.instance_of?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::RegisteredUser)
+		      { "registered_user" => instance.to_json }
+		    elsif instance.instance_of?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::GuestUser)
+		      { "guest_user" => instance.to_json }
+		    elsif instance.instance_of?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UUIDWrapper)
+		      { "uuid" => instance.to_json }
+                    else
+                      raise "Do not know how to serialize instances of type #{instance.class.name}"
+                    end
+  		  end
+
+  		  def User.from_json(hash)
+                    HttpClient::Preconditions.assert_class('hash', hash, Hash)
+                    hash.map do |union_type_name, data|
+                      case union_type_name
+                      when "registered_user"; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::RegisteredUser.new(data)
+                      when "guest_user"; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::GuestUser.new(data)
+                      when "uuid"; Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UUIDWrapper.new(data)
+                      else Com::Gilt::Apidoc::Example::Union::Types::V0::Models::UserUndefinedType.new(:name => union_type_name)
+                      end
+                    end.first
+                  end
+
+                end
+
+                class UserUndefinedType
+
+		  attr_reader :name
+
+                  def initialize(incoming={})
+                    opts = HttpClient::Helper.symbolize_keys(incoming)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                  end
+
+                end
+
+                class UUIDWrapper
+
+		  attr_reader :value
+
+                  def initialize(incoming={})
+                    opts = HttpClient::Helper.symbolize_keys(incoming)
+                    @value = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:value)), String)
+                  end
+
+                  def to_json
+                    JSON.dump(to_hash)
+                  end
+
+                  def copy(incoming={})
+                    UUIDWrapper.new(to_hash.merge(HttpClient::Helper.symbolize_keys(incoming)))
+                  end
+
+                  def to_hash
+                    {
+                      :value => value
                     }
                   end
 
