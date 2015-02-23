@@ -1,0 +1,6 @@
+gilt:
+  apidoc-generator:
+    play_2_3_client: generated/app/ApidocGeneratorClient.scala
+    play_2_x_routes: generator/conf/routes
+  apidoc-spec:
+    play_2_3_client: generated/app/ApidocSpecClient.scala
