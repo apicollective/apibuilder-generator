@@ -139,7 +139,11 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
         case Nil => Seq.empty
         case params => {
           params.map { p =>
-            s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
+            val nilValue = p.isOption match {
+              case true => ".getOrElse(Nil)"
+              case false => ""
+            }
+            s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}${nilValue}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
           }
         }
       }

@@ -314,7 +314,7 @@ package com.gilt.apidoc.reference.api.v0 {
         val queryParameters = Seq(
           foo.map("foo" -> _)
         ).flatten ++
-          optionalMessages.map("optional_messages" -> _) ++
+          optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
           requiredMessages.map("required_messages" -> _)
 
         _executeRequest("GET", s"/echoes", queryParameters = queryParameters).map {
@@ -328,7 +328,7 @@ package com.gilt.apidoc.reference.api.v0 {
         optionalMessages: _root_.scala.Option[Seq[String]] = None,
         requiredMessages: Seq[String]
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[Unit]] = {
-        val queryParameters = optionalMessages.map("optional_messages" -> _) ++
+        val queryParameters = optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
           requiredMessages.map("required_messages" -> _)
 
         _executeRequest("GET", s"/echoes/arrays-only", queryParameters = queryParameters).map {
@@ -462,7 +462,7 @@ package com.gilt.apidoc.reference.api.v0 {
           email.map("email" -> _),
           active.map("active" -> _.toString)
         ).flatten ++
-          organizationGuids.map("organization_guids" -> _.toString)
+          organizationGuids.getOrElse(Nil).map("organization_guids" -> _.toString)
 
         _executeRequest("GET", s"/users", queryParameters = queryParameters).map {
           case r if r.status == 200 => _root_.com.gilt.apidoc.reference.api.v0.Client.parseJson("Seq[com.gilt.apidoc.reference.api.v0.models.User]", r, _.validate[Seq[com.gilt.apidoc.reference.api.v0.models.User]])

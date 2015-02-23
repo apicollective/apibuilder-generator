@@ -4,4 +4,4 @@ val queryParameters = Seq(
   email.map("email" -> _),
   active.map("active" -> _.toString)
 ).flatten ++
-  organizationGuids.map("organization_guids" -> _.toString)
+  organizationGuids.getOrElse(Nil).map("organization_guids" -> _.toString)

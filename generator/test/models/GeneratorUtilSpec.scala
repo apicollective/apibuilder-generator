@@ -55,7 +55,7 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
 val queryParameters = Seq(
   foo.map("foo" -> _)
 ).flatten ++
-  optionalMessages.map("optional_messages" -> _) ++
+  optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
   requiredMessages.map("required_messages" -> _)
 """.trim)
   }
@@ -64,7 +64,7 @@ val queryParameters = Seq(
     val operation = ssd.resources.find(_.plural == "Echoes").get.operations.find(_.path == "/echoes/arrays-only").get
     val code = play2Util.queryParameters("queryParameters", operation.queryParameters).get
     code should be("""
-val queryParameters = optionalMessages.map("optional_messages" -> _) ++
+val queryParameters = optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
   requiredMessages.map("required_messages" -> _)
 """.trim)
   }
