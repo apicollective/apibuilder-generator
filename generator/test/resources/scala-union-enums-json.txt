@@ -3,8 +3,6 @@ implicit def jsonReadsApiDocTestUserType: play.api.libs.json.Reads[UserType] = {
     (__ \ "member_type").read(jsonReadsApiDocTestMemberType).asInstanceOf[play.api.libs.json.Reads[UserType]]
     orElse
     (__ \ "role_type").read(jsonReadsApiDocTestRoleType).asInstanceOf[play.api.libs.json.Reads[UserType]]
-    orElse
-    UserTypeUndefinedType(__.toString).asInstanceOf[play.api.libs.json.Reads[UserType]]
   )
 }
 
