@@ -10,9 +10,9 @@ class RubyUtilSpec extends FunSpec with Matchers {
 
   it("RubyUtil.Module") {
     RubyUtil.Module("com.gilt.apidoc.v0").parts should be(Seq("Com", "Gilt", "Apidoc", "V0"))
-    RubyUtil.Module("com.gilt.apidoc.v0").fullName should be("Com::Gilt::Apidoc::V0")
-    RubyUtil.Module("foobar").fullName should be("Foobar")
-    RubyUtil.Module("foo_bar").fullName should be("FooBar")
+    RubyUtil.Module("com.gilt.apidoc.v0").fullName should be("::Com::Gilt::Apidoc::V0")
+    RubyUtil.Module("foobar").fullName should be("::Foobar")
+    RubyUtil.Module("foo_bar").fullName should be("::FooBar")
   }
 
   it("RubyUtil.toVariableName") {
