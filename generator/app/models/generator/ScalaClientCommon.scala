@@ -6,7 +6,7 @@ object ScalaClientCommon {
     config: ScalaClientMethodConfig
   ): String = {
     Seq(
-      ScalaClientJsonParser(config),
+      ScalaClientObject(config),
       ScalaClientAuthClassses()
     ).mkString("\n\n")
   }
@@ -14,7 +14,18 @@ object ScalaClientCommon {
   def clientSignature(
     config: ScalaClientMethodConfig
   ): String = {
-    s"class Client(apiUrl: String, auth: scala.Option[${config.namespace}.Authorization] = None)"
+    
+    val executorService = config.requiresExecutorService match {
+      case true => ",\n  executorService: java.util.concurrent.ExecutorService = Client.defaultExecutorService"
+      case false => ""
+    }
+
+    s"""
+class Client(
+  apiUrl: String,
+  auth: scala.Option[${config.namespace}.Authorization] = None$executorService
+)
+""".trim
   }
 
 }

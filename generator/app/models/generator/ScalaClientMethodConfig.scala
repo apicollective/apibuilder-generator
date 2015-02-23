@@ -28,6 +28,13 @@ trait ScalaClientMethodConfig {
   def responseClass: String
 
   /**
+    * true if we need to provide our own executore service (in which
+    * case we add a default executor and also expose it in the client
+    * API)
+    */
+  def requiresExecutorService: Boolean
+
+  /**
     * Given a response and a class name, returns code to create an
     * instance of the specified class.
     */
@@ -51,6 +58,7 @@ object ScalaClientMethodConfigs {
     override val pathEncodingMethod = "play.utils.UriEncoding.encodePathSegment"
     override val responseStatusMethod = "status"
     override val responseBodyMethod = "body"
+    override val requiresExecutorService = false
   }
 
   case class Play22(namespace: String) extends Play {
@@ -66,6 +74,7 @@ object ScalaClientMethodConfigs {
     override val responseStatusMethod = "getStatusCode"
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
     override val responseClass = "_root_.com.ning.http.client.Response"
+    override val requiresExecutorService = true
   }
 
 }

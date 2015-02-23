@@ -105,7 +105,7 @@ case class Play2ClientGenerator(
 
     s"""package ${ssd.namespaces.base} {
 
-  ${ScalaClientCommon.clientSignature(version.config)} {
+${ScalaClientCommon.clientSignature(version.config).indent(2)} {
     import ${ssd.namespaces.models}.json._
 
 ${headerConstants.indent(4)}

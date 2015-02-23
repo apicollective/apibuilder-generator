@@ -1,12 +1,20 @@
 package generator
 
-object ScalaClientJsonParser {
+import lib.Text._
+
+object ScalaClientObject {
 
   def apply(
     config: ScalaClientMethodConfig
   ): String = {
+    val executorService = config.requiresExecutorService match {
+      case true => "\nprivate lazy val defaultExecutorService = java.util.concurrent.Executors.newCachedThreadPool()\n\n"
+      case false => ""
+    }
+
     s"""
 object Client {
+${executorService.indent(2)}
   def parseJson[T](
     className: String,
     r: ${config.responseClass},
@@ -19,6 +27,7 @@ object Client {
       }
     }
   }
+
 }
 """.trim
   }

@@ -52,17 +52,23 @@ case class NingClientGenerator(
     val methodGenerator = ScalaClientMethodGenerator(config, ssd)
 
     s"""package ${ssd.namespaces.base} {
-  import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response}
+  import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, AsyncHttpClientConfig, Realm, Request, RequestBuilder, Response}
 
-  
-  ${ScalaClientCommon.clientSignature(config)} {
+${ScalaClientCommon.clientSignature(config).indent(2)} {
     import ${ssd.namespaces.models}.json._
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
 
     val logger = LoggerFactory.getLogger(getClass)
 
-    val asyncHttpClient = new AsyncHttpClient()
+    val asyncHttpClient = {
+      new AsyncHttpClient(
+        new AsyncHttpClientConfig.Builder()
+          .setExecutorService(this.executorService)
+          .build()
+      )
+    }
+
     private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
 
 ${methodGenerator.accessors().indent(4)}
