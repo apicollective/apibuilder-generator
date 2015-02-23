@@ -8,6 +8,7 @@ import com.gilt.apidoc.spec.v0.models.json._
 import com.gilt.apidoc.spec.v0.models.Service
 import generator.ScalaService
 import lib.Text
+import java.io.File
 
 object TestHelper {
 
@@ -37,7 +38,11 @@ object TestHelper {
   }
 
   def readFile(path: String): String = {
-    scala.io.Source.fromFile(path).getLines.mkString("\n")
+    if ((new File(path)).exists()) {
+      scala.io.Source.fromFile(path).getLines.mkString("\n")
+    } else {
+      ""
+    }
   }
 
   def parseFile(filename: String): Service = {
