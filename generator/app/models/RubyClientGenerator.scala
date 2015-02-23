@@ -12,7 +12,7 @@ object RubyUtil {
 
   case class Module(namespace: String) {
     val parts = namespace.split("\\.").map(toClassName(_))
-    val fullName = parts.mkString("::")
+    val fullName = "::" + parts.mkString("::")
   }
 
   def textToComment(text: Seq[String]): String = {

@@ -44,7 +44,7 @@ module Com
                 end
 
                 def users
-                  @users ||= Com::Gilt::Apidoc::Example::Union::Types::V0::Clients::Users.new(self)
+                  @users ||= ::Com::Gilt::Apidoc::Example::Union::Types::V0::Clients::Users.new(self)
                 end
               end
 
@@ -53,21 +53,21 @@ module Com
                 class Users
 
                   def initialize(client)
-                    @client = HttpClient::Preconditions.assert_class('client', client, Com::Gilt::Apidoc::Example::Union::Types::V0::Client)
+                    @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Example::Union::Types::V0::Client)
                   end
 
                   def get
-                    @client.request("/users").get.map { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
+                    @client.request("/users").get.map { |hash| ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
                   end
 
                   def get_by_guid(guid)
                     HttpClient::Preconditions.assert_class('guid', guid, String)
-                    @client.request("/users/#{guid}").get { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
+                    @client.request("/users/#{guid}").get { |hash| ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
                   end
 
                   def post(user)
-                    HttpClient::Preconditions.assert_class('user', user, Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User)
-                    @client.request("/users").with_json(user.to_json).post { |hash| Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
+                    HttpClient::Preconditions.assert_class('user', user, ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User)
+                    @client.request("/users").with_json(user.to_json).post { |hash| ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(hash) }
                   end
 
                 end
@@ -299,7 +299,7 @@ module Com
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                     @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
-                    @preference = HttpClient::Preconditions.assert_class('preference', opts[:preference].nil? ? nil : (opts[:preference].is_a?(Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar) ? opts.delete(:preference) : Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar.from_json(opts.delete(:preference))), Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar)
+                    @preference = HttpClient::Preconditions.assert_class('preference', opts[:preference].nil? ? nil : (opts[:preference].is_a?(::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar) ? opts.delete(:preference) : ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar.from_json(opts.delete(:preference))), ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar)
                   end
 
                   def to_json

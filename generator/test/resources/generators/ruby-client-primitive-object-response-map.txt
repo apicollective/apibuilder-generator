@@ -1,1 +1,1 @@
-.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : Test::Apidoc::Apidoctest::V0::Models::Value.new(hash); hash }
+.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : ::Test::Apidoc::Apidoctest::V0::Models::Value.new(hash); hash }

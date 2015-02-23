@@ -1,1 +1,1 @@
-{ |hash| Test::Apidoc::Apidoctest::V0::Models::Value.new(hash) }
+{ |hash| ::Test::Apidoc::Apidoctest::V0::Models::Value.new(hash) }
