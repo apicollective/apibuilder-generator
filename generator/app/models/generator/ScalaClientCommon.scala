@@ -15,8 +15,8 @@ object ScalaClientCommon {
     config: ScalaClientMethodConfig
   ): String = {
     
-    val executorService = config.requiresExecutorService match {
-      case true => ",\n  executorService: java.util.concurrent.ExecutorService = Client.defaultExecutorService"
+    val executorService = config.requiresAsyncHttpClient match {
+      case true => ",\n  asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient"
       case false => ""
     }
 

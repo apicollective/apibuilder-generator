@@ -61,14 +61,6 @@ ${ScalaClientCommon.clientSignature(config).indent(2)} {
 
     val logger = LoggerFactory.getLogger(getClass)
 
-    val asyncHttpClient = {
-      new AsyncHttpClient(
-        new AsyncHttpClientConfig.Builder()
-          .setExecutorService(this.executorService)
-          .build()
-      )
-    }
-
     private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
 
 ${methodGenerator.accessors().indent(4)}

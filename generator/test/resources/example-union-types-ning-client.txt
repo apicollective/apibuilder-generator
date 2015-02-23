@@ -234,21 +234,13 @@ package com.gilt.apidoc.example.union.types.v0 {
   class Client(
     apiUrl: String,
     auth: scala.Option[com.gilt.apidoc.example.union.types.v0.Authorization] = None,
-    executorService: java.util.concurrent.ExecutorService = Client.defaultExecutorService
+    asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient
   ) {
     import com.gilt.apidoc.example.union.types.v0.models.json._
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
 
     val logger = LoggerFactory.getLogger(getClass)
-
-    val asyncHttpClient = {
-      new AsyncHttpClient(
-        new AsyncHttpClientConfig.Builder()
-          .setExecutorService(this.executorService)
-          .build()
-      )
-    }
 
     private val UserAgent = "unknown"
 
@@ -343,7 +335,16 @@ package com.gilt.apidoc.example.union.types.v0 {
 
   object Client {
 
-    private lazy val defaultExecutorService = java.util.concurrent.Executors.newCachedThreadPool()
+    private lazy val defaultAsyncHttpClient = {
+      val asyncHttpClient = {
+        new AsyncHttpClient(
+          new AsyncHttpClientConfig.Builder()
+            .setExecutorService(java.util.concurrent.Executors.newCachedThreadPool())
+            .build()
+        )
+      }
+    }
+
     def parseJson[T](
       className: String,
       r: _root_.com.ning.http.client.Response,
