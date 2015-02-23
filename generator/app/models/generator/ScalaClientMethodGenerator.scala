@@ -168,7 +168,7 @@ case class ScalaClientMethodGenerator(
 
       ClientMethod(
         name = op.name,
-        argList = op.argList,
+        argList = op.clientArgList,
         returnType = hasOptionResult match {
           case None => s"scala.concurrent.Future[${op.resultType}]"
           case Some(_) => s"scala.concurrent.Future[_root_.scala.Option[${op.resultType}]]"

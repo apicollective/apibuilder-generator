@@ -152,7 +152,23 @@ sealed trait ScalaDatatype {
 
   def name: String
 
-  def definition(
+  def clientDefinition(
+    originalVarName: String,
+    optional: Boolean
+  ): String = {
+    val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+    if (optional) {
+      s"$varName: _root_.scala.Option[$name] = None"
+    } else {
+      s"$varName: $name"
+    }
+  }
+
+  /**
+    * For collections, the server side optional definition uses the
+    * nil value - e.g. a List will be Nil (instead of None).
+    */
+  def serverDefinition(
     originalVarName: String,
     optional: Boolean
   ): String = {
@@ -181,17 +197,16 @@ object ScalaDatatype {
   case class Singleton(primitive: ScalaPrimitive) extends ScalaDatatype {
     override def nilValue = "None"
     override def name = primitive.fullName
-    override def definition(
+
+    /**
+      * For singleton, server definition matches client definition
+      * wrapping the type in an Option always.
+      */
+    override def serverDefinition(
       originalVarName: String,
       optional: Boolean
-    ): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      if (optional) {
-        s"$varName: _root_.scala.Option[$name]" + " = " + nilValue
-      } else {
-        s"$varName: $name"
-      }
-    }
+    ): String = clientDefinition(originalVarName, optional)
+
   }
 
 }

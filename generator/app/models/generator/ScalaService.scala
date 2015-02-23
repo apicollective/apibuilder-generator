@@ -133,7 +133,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val fields = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
-  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
+  val serverArgList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.serverDefinition()))
 
 }
 
@@ -213,36 +213,19 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   val name: String = GeneratorUtil.urlToMethodName(resource.plural, operation.method, path)
 
-  val argList: Option[String] = body match {
+  val clientArgList: Option[String] = body match {
     case None => {
-      ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
+      ScalaUtil.fieldsToArgList(parameters.map(_.clientDefinition()))
     }
     case Some(body) => {
       val bodyVarName = ScalaUtil.toVariable(body.`type`)
 
       ScalaUtil.fieldsToArgList(
-        parameters.filter(_.param.required).map(_.definition()) ++
+        parameters.filter(_.param.required).map(_.clientDefinition()) ++
         Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), body.datatype.name)) ++
-        parameters.filter(!_.param.required).map(_.definition())
+        parameters.filter(!_.param.required).map(_.clientDefinition())
       )
     }
-  }
-
-  private def bodyClassArg(
-    name: String,
-    multiple: Boolean
-  ): String = {
-    val baseClassName = ssd.modelClassName(name)
-    val className = if (multiple) {
-      s"Seq[$baseClassName]"
-    } else {
-      baseClassName
-    }
-
-    Seq(
-      Some(s"${ScalaUtil.toVariable(name, multiple)}: $className"),
-      ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
-    ).flatten.mkString(",")
   }
 
   val responses: Seq[ScalaResponse] = operation.responses
@@ -300,8 +283,12 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
    */
   def isOption: Boolean = !field.required || field.default.nonEmpty
 
-  def definition(varName: String = name): String = {
-    datatype.definition(varName, isOption)
+  def clientDefinition(varName: String = name): String = {
+    datatype.clientDefinition(varName, isOption)
+  }
+
+  def serverDefinition(varName: String = name): String = {
+    datatype.serverDefinition(varName, isOption)
   }
 }
 
@@ -326,8 +313,12 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
    */
   def isOption: Boolean = !param.required || param.default.nonEmpty
 
-  def definition(varName: String = name): String = {
-    datatype.definition(varName, isOption)
+  def clientDefinition(varName: String = name): String = {
+    datatype.clientDefinition(varName, isOption)
+  }
+
+  def serverDefinition(varName: String = name): String = {
+    datatype.serverDefinition(varName, isOption)
   }
 
   def location = param.location
