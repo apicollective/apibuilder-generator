@@ -336,13 +336,11 @@ package com.gilt.apidoc.example.union.types.v0 {
   object Client {
 
     private lazy val defaultAsyncHttpClient = {
-      val asyncHttpClient = {
-        new AsyncHttpClient(
-          new AsyncHttpClientConfig.Builder()
-            .setExecutorService(java.util.concurrent.Executors.newCachedThreadPool())
-            .build()
-        )
-      }
+      new AsyncHttpClient(
+        new AsyncHttpClientConfig.Builder()
+          .setExecutorService(java.util.concurrent.Executors.newCachedThreadPool())
+          .build()
+      )
     }
 
     def parseJson[T](
