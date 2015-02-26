@@ -12,14 +12,14 @@ class Play2BindablesSpec extends FunSpec with ShouldMatchers {
   it("generates bindable for a single enum") {
     TestHelper.assertEqualsFile(
       "test/resources/generators/play-2-bindable-age-group.txt",
-      Play2Bindables.buildImplicit("AgeGroup")
+      Play2Bindables(ssd).buildImplicit("AgeGroup")
     )
   }
 
   it("generates bindable object") {
     TestHelper.assertEqualsFile(
       "test/resources/generators/play-2-bindable-reference-api-object.txt",
-      Play2Bindables.build(ssd)
+      Play2Bindables(ssd).build()
     )
   }
 
