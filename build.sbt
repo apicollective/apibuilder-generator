@@ -11,12 +11,7 @@ scalaVersion in ThisBuild := "2.11.5"
 // we end up not needing it.
 lazy val lib = project
   .in(file("lib"))
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.atteo" % "evo-inflector" % "1.2.1",
-      "org.scalatestplus" %% "play" % "1.2.0" % "test"
-    )
-  )
+  .settings(commonSettings: _*)
 
 lazy val generated = project
   .in(file("generated"))
@@ -39,3 +34,13 @@ lazy val generator = project
       "org.scalatestplus" %% "play" % "1.2.0" % "test"
     )
   )
+
+lazy val commonSettings: Seq[Setting[_]] = Seq(
+  name <<= name("apidoc-" + _),
+  organization := "com.gilt.apidoc",
+  libraryDependencies ++= Seq(
+    "org.atteo" % "evo-inflector" % "1.2.1",
+    "org.scalatest" %% "scalatest" % "2.2.0" % "test"
+  ),
+  scalacOptions += "-feature"
+)
