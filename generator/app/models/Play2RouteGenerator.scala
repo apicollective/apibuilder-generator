@@ -52,8 +52,7 @@ case class Play2RouteGenerator(form: InvocationForm) {
             r.method,
             "(",
             r.params.mkString(", "),
-            ")",
-            r.paramComments.map( c => "\n" + c ).getOrElse("")
+            ")"
           ).mkString("")
         }.mkString("\n")
       )
@@ -81,40 +80,11 @@ private[models] case class Play2Route(
       }.
       filter { param =>
         param.datatype match {
-          case ScalaDatatype.Singleton(_) => true
-          case ScalaDatatype.List(_) | ScalaDatatype.Map(_) => false
+          case ScalaDatatype.Singleton(_) | ScalaDatatype.List(_) => true
+          case ScalaDatatype.Map(_) => false
         }
       }
   )
-
-  /**
-    * Play does not have native support for providing a list as a
-    * query parameter. Document these query parameters in the routes
-    * file - but do not implement.
-    */
-  val paramComments: Option[String] = op.parameters.filter { param =>
-    param.location match {
-      case ParameterLocation.Query | ParameterLocation.Path => true
-      case ParameterLocation.Form | ParameterLocation.UNDEFINED(_) => false
-    }
-  }.filter { param =>
-    param.datatype match {
-      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) => true
-      case ScalaDatatype.Singleton(_) => false
-    }
-  } match {
-    case Nil => None
-    case paramsToComment => {
-      Some(
-        Seq(
-          s"# Additional parameters to ${op.method} ${op.path}",
-          paramsToComment.map { p =>
-            s"#   - " + definition(p)
-          }.mkString("\n")
-        ).mkString("\n")
-      )
-    }
-  }
 
   val method = "%s.%s".format(
     "controllers." + lib.Text.underscoreAndDashToInitCap(resource.plural),
@@ -164,10 +134,20 @@ private[models] case class Play2Route(
   }
 
   private def definition(scalaParam: ScalaParameter): String = {
+    val datatypeName = scalaParam.datatype match {
+      case ScalaDatatype.Singleton(_) => scalaParam.datatype.name
+      case ScalaDatatype.List(primitive) => {
+        s"List[${primitive.fullName}]"
+      }
+      case ScalaDatatype.Map(_) => {
+        sys.error("Cannot have maps as parameters")
+      }
+    }
+
     if (scalaParam.param.required) {
-      s"${scalaParam.originalName}: ${scalaParam.datatype.name}"
+      s"${scalaParam.originalName}: $datatypeName"
     } else {
-      s"${scalaParam.originalName}: _root_.scala.Option[${scalaParam.datatype.name}]"
+      s"${scalaParam.originalName}: _root_.scala.Option[$datatypeName]"
     }
   }
 }
