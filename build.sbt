@@ -13,7 +13,7 @@ lazy val lib = project
   .in(file("lib"))
   .settings(
     libraryDependencies ++= Seq(
-     "org.atteo" % "evo-inflector" % "1.2.1",
+      "org.atteo" % "evo-inflector" % "1.2.1",
       "org.scalatestplus" %% "play" % "1.2.0" % "test"
     )
   )
