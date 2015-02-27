@@ -85,7 +85,8 @@ object ScalaPrimitive {
     def apidocType = "object"
     def shortName = "JsObject"
     def asString(originalVarName: String): String = {
-      throw new UnsupportedOperationException(s"unsupported conversion of type object for $originalVarName")
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.toString"
     }
   }
 
