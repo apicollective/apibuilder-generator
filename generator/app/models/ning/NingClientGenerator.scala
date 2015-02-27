@@ -14,14 +14,23 @@ import lib.Text._
 object Ning18ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): String = {
-    val config = ScalaClientMethodConfigs.Ning(Namespaces.quote(form.service.namespace))
+    val config = ScalaClientMethodConfigs.Ning18(Namespaces.quote(form.service.namespace))
+    NingClientGenerator(config, form).invoke()
+  }
+
+}
+
+object Ning19ClientGenerator extends CodeGenerator {
+
+  override def invoke(form: InvocationForm): String = {
+    val config = ScalaClientMethodConfigs.Ning19(Namespaces.quote(form.service.namespace))
     NingClientGenerator(config, form).invoke()
   }
 
 }
 
 case class NingClientGenerator(
-  config: ScalaClientMethodConfig,
+  config: ScalaClientMethodConfigs.Ning,
   form: InvocationForm
 ) {
 
@@ -30,7 +39,7 @@ case class NingClientGenerator(
   def invoke(): String = {
     ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
     Seq(
-      Play2Models(form, addHeader = false),
+      Play2Models(form, addBindables = false, addHeader = false),
       client()
     ).mkString("\n\n")
   }
@@ -101,7 +110,7 @@ ${methodGenerator.objects().indent(4)}
       val request = _requestBuilder(method, path)
 
       queryParameters.foreach { pair =>
-        request.addQueryParameter(pair._1, pair._2)
+        request.${config.addQueryParamMethod}(pair._1, pair._2)
       }
 
       val requestWithParamsAndBody = body.fold(request) { b =>

@@ -69,12 +69,22 @@ object ScalaClientMethodConfigs {
     override val responseClass = "play.api.libs.ws.WSResponse"
   }
 
-  case class Ning(namespace: String) extends ScalaClientMethodConfig {
+  trait Ning extends ScalaClientMethodConfig {
     override val pathEncodingMethod = s"_root_.${namespace}.PathSegment.encode"
     override val responseStatusMethod = "getStatusCode"
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
     override val responseClass = "_root_.com.ning.http.client.Response"
     override val requiresAsyncHttpClient = true
+
+    def addQueryParamMethod: String
+  }
+
+  case class Ning18(namespace: String) extends Ning {
+    override def addQueryParamMethod: String = "addQueryParameter"
+  }
+
+  case class Ning19(namespace: String) extends Ning {
+    override def addQueryParamMethod: String = "addQueryParam"
   }
 
 }
