@@ -66,7 +66,7 @@ case class Play2ClientGenerator(
   def invoke(): String = {
     ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
     Seq(
-      Play2Models(form, addHeader = false),
+      Play2Models(form, addBindables = true, addHeader = false),
       client()
     ).mkString("\n\n")
   }

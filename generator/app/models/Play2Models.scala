@@ -7,13 +7,16 @@ import generator.{PrimitiveWrapper, ScalaEnums, ScalaCaseClasses, ScalaService, 
 
 object Play2Models extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): String = {
-    apply(form)
+  override def invoke(
+    form: InvocationForm
+  ): String = {
+    apply(form, addBindables = true, addHeader = true)
   }
 
   def apply(
     form: InvocationForm,
-    addHeader: Boolean = true
+    addBindables: Boolean,
+    addHeader: Boolean
   ): String = {
     val ssd = ScalaService(form.service)
 
@@ -27,7 +30,19 @@ object Play2Models extends CodeGenerator {
       case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
     }
 
-s"""$header$caseClasses
+    val bindables = addBindables match {
+      case false => ""
+      case true => {
+        "\n" +
+        Seq(
+          s"package ${ssd.namespaces.base} {",
+          Play2Bindables(ssd).build().indent(2),
+          "}"
+        ).mkString("\n\n")
+      }
+    }
+
+    s"""$header$caseClasses
 
 package ${ssd.namespaces.models} {
 
@@ -60,10 +75,7 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
 ${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }
-
-package ${ssd.namespaces.base} {
-
-${Play2Bindables(ssd).build().indent(2)}
-}"""
+$bindables
+"""
   }
 }

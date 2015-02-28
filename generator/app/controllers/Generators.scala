@@ -44,11 +44,21 @@ object Generators extends Controller {
         status = generator.Status.Beta,
         codeGenerator = Some(models.RubyClientGenerator)
       ),
-      CodeGenTarget(
+       CodeGenTarget(
+        metaData = Generator(
+          key = "ning_1_9_client",
+          name = "Ning Async Http Client 1.9",
+          description = Some("Ning Async Http v. 1.9.x Client - see https://sonatype.github.io/async-http-client"),
+          language = Some("Java, Scala")
+        ),
+        status = generator.Status.Alpha,
+        codeGenerator = Some(models.ning.Ning19ClientGenerator)
+      ),
+       CodeGenTarget(
         metaData = Generator(
           key = "ning_1_8_client",
           name = "Ning Async Http Client 1.8",
-          description = Some("Ning Async Http v.18 Client - see https://sonatype.github.io/async-http-client"),
+          description = Some("Ning Async Http v. 1.8.x Client - see https://sonatype.github.io/async-http-client"),
           language = Some("Java, Scala")
         ),
         status = generator.Status.Alpha,
