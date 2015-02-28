@@ -278,7 +278,9 @@ package com.gilt.apidoc.example.union.types.v0 {
     )
 
   }
+
 }
+
 
 package com.gilt.apidoc.example.union.types.v0 {
 
