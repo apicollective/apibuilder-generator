@@ -262,38 +262,20 @@ case class RubyClientGenerator(form: InvocationForm) {
     ).mkString("\n\n")
   }
 
-  case class Header(name: String, value: String)
-
-  private def headers(): Seq[Header] = {
-    service.headers.filter(!_.default.isEmpty).map { h =>
-      Header(h.name, RubyUtil.wrapInQuotes(h.default.get))
-    } ++ Seq(
-      Some(Header("User-Agent", "USER_AGENT")),
-      Some(Header("X-Apidoc-Version", "VERSION")),
-      VersionTag(service.version).major.map { major => Header("X-Apidoc-Version-Major", "VERSION_MAJOR") }
-    ).flatten
-  }
-
   private def generateClient(): String = {
     val sb = ListBuffer[String]()
     val url = service.baseUrl
 
-    val headerString = headers.map { h =>
-      s"with_header('${h.name}', ${h.value})"
-    }.mkString(".")
+    val headers = Headers(form)
 
-    val headerConstants = Seq(
-      Some( ("USER_AGENT", form.userAgent.getOrElse("apidoc:ruby_client:unknown")) ),
-      Some( ("VERSION", service.version) ),
-      VersionTag(service.version).major.map { major => ("VERSION_MAJOR", major.toString) }
-    ).flatten.map { pair =>
-      s"${pair._1} = ${RubyUtil.wrapInQuotes(pair._2)} unless defined?(${pair._1})"
-    }.mkString("\n")
+    val headerString = headers.ruby.map { case (name, value) =>
+      s"with_header(${RubyUtil.wrapInQuotes(name)}, $value)"
+    }.mkString(".", ".", "")
 
     sb.append(s"""
 class Client
 
-${headerConstants.indent(2)}
+${headers.rubyModuleConstants.indent(2)}
 
   def initialize(url, opts={})
     @url = HttpClient::Preconditions.assert_class('url', url, String)
@@ -304,7 +286,7 @@ ${headerConstants.indent(2)}
 
   def request(path=nil)
     HttpClient::Preconditions.assert_class_or_nil('path', path, String)
-    request = HttpClient::Request.new(URI.parse(@url + path.to_s)).$headerString
+    request = HttpClient::Request.new(URI.parse(@url + path.to_s))$headerString
 
     if @authorization
       request.with_auth(@authorization)

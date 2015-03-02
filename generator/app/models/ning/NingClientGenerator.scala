@@ -55,7 +55,7 @@ case class NingClientGenerator(
 
   private def client(): String = {
     val headers = Headers(form)
-    val headerString = headers.all.map { case (name, value) =>
+    val headerString = headers.scala.map { case (name, value) =>
       s".addHeader(${ScalaUtil.wrapInQuotes(name)}, $value)"
     }.mkString("\n")
 

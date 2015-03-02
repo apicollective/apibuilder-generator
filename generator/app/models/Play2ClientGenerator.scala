@@ -82,7 +82,7 @@ case class Play2ClientGenerator(
     }
 
     val headers = Headers(form)
-    val headerString = headers.all.
+    val headerString = headers.scala.
       map { case (name, value) => s""""$name" -> ${value}""" }.
       mkString(".withHeaders(\n        ", ",\n        ", "") + "\n      )"
 
