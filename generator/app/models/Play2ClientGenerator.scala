@@ -5,7 +5,7 @@ import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 import generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon}
-import generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs, ScalaUtil}
+import generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs, ScalaHeaders}
 
 case class PlayFrameworkVersion(
   name: String,
@@ -81,40 +81,12 @@ case class Play2ClientGenerator(
       case false => s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
     }
 
-    val versionMajor: Option[Int] = VersionTag(form.service.version).major
-
-    val VersionMajorName = "VersionMajor"
-
-    val constants = Seq(
-      Some("UserAgent", form.userAgent.getOrElse("apidoc:play_2x_client:unknown")),
-      Some("Version", form.service.version),
-      versionMajor.map { major => (VersionMajorName, major.toString) }
-    ).flatten
-
-    val headerConstants = constants.map { pair =>
-      if (pair._1 == VersionMajorName) {
-        s"val ${pair._1} = ${pair._2}"
-      } else {
-        s"val ${pair._1} = ${ScalaUtil.wrapInQuotes(pair._2)}"
-      }
-    }.mkString("\n")
-
-    val headerString = ".withHeaders(" +
-      (
-        ssd.defaultHeaders.map { h =>
-          s""""${h.name}" -> ${h.quotedValue}"""
-        } ++ Seq(
-          Some(""""User-Agent" -> Constants.UserAgent"""),
-          Some(""""X-Apidoc-Version" -> Constants.Version"""),
-          versionMajor.map { major => """"X-Apidoc-Version-Major" -> Constants.VersionMajor.toString""" }
-        ).flatten
-      ).mkString("\n        ", ",\n        ", "") + "\n      )"
+    val headers = ScalaHeaders(form)
+    val headerString = headers.formatted.mkString(".withHeaders(\n        ", ",\n        ", "") + "\n      )"
 
     s"""package ${ssd.namespaces.base} {
 
-  object Constants {
-${headerConstants.indent(4)}
-  }
+${headers.objectConstants.indent(2)}
 
 ${ScalaClientCommon.clientSignature(version.config).indent(2)} {
     import ${ssd.namespaces.models}.json._
