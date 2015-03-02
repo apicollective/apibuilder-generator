@@ -1,10 +1,11 @@
-package generator
+package models
 
+import generator.ScalaUtil
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 
-case class ScalaHeaders(
+case class Headers(
   form: InvocationForm
 ) {
 

@@ -5,7 +5,7 @@ import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 import generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon}
-import generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs, ScalaHeaders}
+import generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs}
 
 case class PlayFrameworkVersion(
   name: String,
@@ -81,7 +81,7 @@ case class Play2ClientGenerator(
       case false => s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
     }
 
-    val headers = ScalaHeaders(form)
+    val headers = Headers(form)
     val headerString = headers.all.
       map { case (name, value) => s""""$name" -> ${value}""" }.
       mkString(".withHeaders(\n        ", ",\n        ", "") + "\n      )"
