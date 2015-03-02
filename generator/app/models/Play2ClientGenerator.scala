@@ -4,7 +4,8 @@ import com.gilt.apidoc.spec.v0.models.Service
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
-import generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon, ScalaClientMethodConfig, ScalaClientMethodConfigs}
+import generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon}
+import generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs, ScalaUtil}
 
 case class PlayFrameworkVersion(
   name: String,
@@ -82,12 +83,20 @@ case class Play2ClientGenerator(
 
     val versionMajor: Option[Int] = VersionTag(form.service.version).major
 
-    val headerConstants = Seq(
+    val VersionMajorName = "VersionMajor"
+
+    val constants = Seq(
       Some("UserAgent", form.userAgent.getOrElse("apidoc:play_2x_client:unknown")),
       Some("Version", form.service.version),
-      versionMajor.map { major => ("VersionMajor", major.toString) }
-    ).flatten.map { pair =>
-      s"""private val ${pair._1} = "${pair._2}""""
+      versionMajor.map { major => (VersionMajorName, major.toString) }
+    ).flatten
+
+    val headerConstants = constants.map { pair =>
+      if (pair._1 == VersionMajorName) {
+        s"val ${pair._1} = ${pair._2}"
+      } else {
+        s"val ${pair._1} = ${ScalaUtil.wrapInQuotes(pair._2)}"
+      }
     }.mkString("\n")
 
     val headerString = ".withHeaders(" +
@@ -95,18 +104,21 @@ case class Play2ClientGenerator(
         ssd.defaultHeaders.map { h =>
           s""""${h.name}" -> ${h.quotedValue}"""
         } ++ Seq(
-          Some(""""User-Agent" -> UserAgent"""),
-          Some(""""X-Apidoc-Version" -> Version"""),
-          versionMajor.map { major => """"X-Apidoc-Version-Major" -> VersionMajor""" }
+          Some(""""User-Agent" -> Constants.UserAgent"""),
+          Some(""""X-Apidoc-Version" -> Constants.Version"""),
+          versionMajor.map { major => """"X-Apidoc-Version-Major" -> Constants.VersionMajor.toString""" }
         ).flatten
-      ).mkString(", ") + ")"
+      ).mkString("\n        ", ",\n        ", "") + "\n      )"
 
     s"""package ${ssd.namespaces.base} {
+
+  object Constants {
+${headerConstants.indent(4)}
+  }
 
 ${ScalaClientCommon.clientSignature(version.config).indent(2)} {
     import ${ssd.namespaces.models}.json._
 
-${headerConstants.indent(4)}
     private val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
     logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$apiUrl")
