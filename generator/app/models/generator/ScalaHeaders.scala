@@ -36,6 +36,8 @@ case class ScalaHeaders(
     Some("User-Agent" -> "Constants.UserAgent"),
     Some("X-Apidoc-Version" -> "Constants.Version"),
     versionMajor.map { major => "X-Apidoc-Version-Major" -> "Constants.VersionMajor.toString" }
-  ).flatten
+  ).flatten ++ form.service.headers.filter(!_.default.isEmpty).map { h =>
+    (h.name -> ScalaUtil.wrapInQuotes(h.default.get))
+  }
 
 }

@@ -25,10 +25,6 @@ case class ScalaService(
 
   val unions = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
 
-  val defaultHeaders: Seq[ScalaHeader] = {
-    service.headers.flatMap { h => h.default.map { default => ScalaHeader(h.name, default) } }
-  }
-
   val resources = service.resources.map { r => new ScalaResource(this, r) }
 
   def scalaDatatype(
@@ -50,11 +46,6 @@ case class ScalaService(
   }
 
 }
-
-case class ScalaHeader(name: String, value: String) {
-  val quotedValue = s""""$value""""
-}
-
 
 class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
