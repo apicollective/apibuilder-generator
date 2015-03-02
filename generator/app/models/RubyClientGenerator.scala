@@ -266,7 +266,7 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private def headers(): Seq[Header] = {
     service.headers.filter(!_.default.isEmpty).map { h =>
-      Header(h.name, s"'${h.default.get}'")
+      Header(h.name, RubyUtil.wrapInQuotes(h.default.get))
     } ++ Seq(
       Some(Header("User-Agent", "USER_AGENT")),
       Some(Header("X-Apidoc-Version", "VERSION")),
