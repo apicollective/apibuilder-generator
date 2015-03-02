@@ -233,6 +233,14 @@ package com.gilt.apidoc.example.union.types.v0.models {
 package com.gilt.apidoc.example.union.types.v0 {
   import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, AsyncHttpClientConfig, Realm, Request, RequestBuilder, Response}
 
+  object Constants {
+
+    val UserAgent = "apidoc:play_2x_client:unknown"
+    val Version = "0.0.1-dev"
+    val VersionMajor = 0
+
+  }
+
   class Client(
     apiUrl: String,
     auth: scala.Option[com.gilt.apidoc.example.union.types.v0.Authorization] = None,
@@ -243,8 +251,6 @@ package com.gilt.apidoc.example.union.types.v0 {
     import org.slf4j.LoggerFactory
 
     val logger = LoggerFactory.getLogger(getClass)
-
-    private val UserAgent = "unknown"
 
     def users: Users = Users
 
@@ -285,7 +291,9 @@ package com.gilt.apidoc.example.union.types.v0 {
     def _requestBuilder(method: String, path: String): RequestBuilder = {
       val builder = new RequestBuilder(method)
         .setUrl(apiUrl + path)
-        .addHeader("User-Agent", UserAgent)
+        .addHeader("User-Agent", Constants.UserAgent)
+        .addHeader("X-Apidoc-Version", Constants.Version)
+        .addHeader("X-Apidoc-Version-Major", Constants.VersionMajor.toString)
 
       auth.fold(builder) { a =>
         a match {

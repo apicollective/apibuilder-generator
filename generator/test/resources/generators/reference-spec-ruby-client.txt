@@ -20,9 +20,13 @@ module Com
 
             class Client
 
-              USER_AGENT = 'apidoc:ruby_client:unknown' unless defined?(USER_AGENT)
-              VERSION = '0.0.1-dev' unless defined?(VERSION)
-              VERSION_MAJOR = '0' unless defined?(VERSION_MAJOR)
+              module Constants
+
+                USER_AGENT = 'apidoc:play_2x_client:unknown' unless defined?(USER_AGENT)
+                VERSION = '0.0.1-dev' unless defined?(VERSION)
+                VERSION_MAJOR = 0 unless defined?(VERSION_MAJOR)
+
+              end
 
               def initialize(url, opts={})
                 @url = HttpClient::Preconditions.assert_class('url', url, String)
@@ -33,7 +37,7 @@ module Com
 
               def request(path=nil)
                 HttpClient::Preconditions.assert_class_or_nil('path', path, String)
-                request = HttpClient::Request.new(URI.parse(@url + path.to_s)).with_header('User-Agent', USER_AGENT).with_header('X-Apidoc-Version', VERSION).with_header('X-Apidoc-Version-Major', VERSION_MAJOR)
+                request = HttpClient::Request.new(URI.parse(@url + path.to_s)).with_header('User-Agent', Constants::USER_AGENT).with_header('X-Apidoc-Version', Constants::VERSION).with_header('X-Apidoc-Version-Major', Constants::VERSION_MAJOR)
 
                 if @authorization
                   request.with_auth(@authorization)
