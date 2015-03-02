@@ -54,8 +54,9 @@ case class NingClientGenerator(
   }
 
   private def client(): String = {
-    val headerString = (ssd.defaultHeaders ++ Seq(ScalaHeader("User-Agent", "UserAgent"))).map { h =>
-      s""".addHeader("${h.name}", ${h.quotedValue}"""
+    val headers = ScalaHeaders(form)
+    val headerString = headers.all.map { case (name, value) =>
+      s".addHeader(${ScalaUtil.wrapInQuotes(name)}, $value)"
     }.mkString("\n")
 
     val methodGenerator = ScalaClientMethodGenerator(config, ssd)
@@ -63,14 +64,14 @@ case class NingClientGenerator(
     s"""package ${ssd.namespaces.base} {
   import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, AsyncHttpClientConfig, Realm, Request, RequestBuilder, Response}
 
+${headers.objectConstants.indent(2)}
+
 ${ScalaClientCommon.clientSignature(config).indent(2)} {
     import ${ssd.namespaces.models}.json._
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
 
     val logger = LoggerFactory.getLogger(getClass)
-
-    private val UserAgent = "${form.userAgent.getOrElse("unknown")}"
 
 ${methodGenerator.accessors().indent(4)}
 
@@ -83,7 +84,7 @@ ${methodGenerator.objects().indent(4)}
     def _requestBuilder(method: String, path: String): RequestBuilder = {
       val builder = new RequestBuilder(method)
         .setUrl(apiUrl + path)
-        .addHeader("User-Agent", UserAgent)
+${headerString.indent(8)}
 
       auth.fold(builder) { a =>
         a match {
