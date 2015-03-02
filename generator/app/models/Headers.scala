@@ -12,6 +12,7 @@ case class Headers(
   private val versionMajor: Option[Int] = VersionTag(form.service.version).major
 
   private val VersionMajorName = "VersionMajor"
+  private val VersionMajorHeaderName = "X-Apidoc-Version-Major"
 
   private val constants = Seq(
     Some("UserAgent", form.userAgent.getOrElse("apidoc:play_2x_client:unknown")),
@@ -48,14 +49,20 @@ case class Headers(
     ).mkString("\n\n")
   }
 
-  val scala = joinHeaders(".")
+  val scala = joinHeaders(".").map { case (name, value) =>
+    if (name == VersionMajorHeaderName) {
+      (name, s"${value}.toString")
+    } else {
+      (name, value)
+    }
+  }
   val ruby = joinHeaders("::")
 
   private def joinHeaders(separator: String) = {
     Seq(
       Some("User-Agent" -> s"Constants${separator}UserAgent"),
       Some("X-Apidoc-Version" -> s"Constants${separator}Version"),
-      versionMajor.map { major => "X-Apidoc-Version-Major" -> s"Constants${separator}VersionMajor" }
+      versionMajor.map { major => VersionMajorHeaderName -> s"Constants${separator}VersionMajor" }
     ).flatten ++ form.service.headers.filter(!_.default.isEmpty).map { h =>
       (h.name -> ScalaUtil.wrapInQuotes(h.default.get))
     }
