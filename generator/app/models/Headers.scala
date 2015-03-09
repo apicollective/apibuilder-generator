@@ -25,9 +25,9 @@ case class Headers(
       "object Constants {",
       constants.map { pair =>
         if (pair._1 == VersionMajorName) {
-          s"val ${pair._1} = ${pair._2}"
+          s"val ${pair._1} = ${pair._2.trim}"
         } else {
-          s"val ${pair._1} = ${ScalaUtil.wrapInQuotes(pair._2)}"
+          s"val ${pair._1} = ${ScalaUtil.wrapInQuotes(pair._2.trim)}"
         }
       }.mkString("\n").indent(2),
       "}"
@@ -42,7 +42,7 @@ case class Headers(
         if (pair._1 == VersionMajorName) {
           s"$name = ${pair._2} unless defined?($name)"
         } else {
-          s"$name = ${RubyUtil.wrapInQuotes(pair._2)} unless defined?($name)"
+          s"$name = ${RubyUtil.wrapInQuotes(pair._2)} unless defined?(Constants::$name)"
         }
       }.mkString("\n").indent(2),
       "end"
