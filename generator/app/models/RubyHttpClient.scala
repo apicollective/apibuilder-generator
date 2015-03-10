@@ -148,10 +148,10 @@ module HttpClient
         request.add_field("Authorization", "Basic %s" % encoded)
       end
 
-      @headers.each do |key, value|
+      @headers.each { |key, value|
         curl <<  "-H \"%s: %s\"" % [key, value]
         request.add_field(key, value)
-      end
+      }
 
       curl << "'%s'" % uri
       # DEBUG puts curl.join(" ")
@@ -168,13 +168,13 @@ module HttpClient
 
     private
     def to_query(params={})
-      parts = (params || {}).map do |k,v|
+      parts = (params || {}).map { |k,v|
         if v.respond_to?(:each)
           v.map { |el| "%s=%s" % [k, CGI.escape(el.to_s)] }
         else
           "%s=%s" % [k, CGI.escape(v.to_s)]
         end
-      end
+      }
       parts.empty? ? nil : parts.join("&")
     end
 
@@ -335,9 +335,9 @@ module HttpClient
     def Helper.symbolize_keys(hash)
       Preconditions.assert_class('hash', hash, Hash)
       new_hash = {}
-      hash.each do |k, v|
+      hash.each { |k, v|
         new_hash[k.to_sym] = v
-      end
+      }
       new_hash
     end
 
