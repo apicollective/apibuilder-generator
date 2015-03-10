@@ -204,9 +204,9 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       val body = op.body.get
 
       val payload = body.datatype.primitive match {
-        case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name)
-        case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name)
-        case ScalaPrimitive.Union(ns, name) => ScalaUtil.toVariable(name)
+        case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
+        case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
+        case ScalaPrimitive.Union(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
         case ScalaPrimitive.String | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Object |
             ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Unit => {
               body.datatype.primitive.asString(ScalaUtil.toVariable(body.`type`))
