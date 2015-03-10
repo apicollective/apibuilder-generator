@@ -79,7 +79,6 @@ object ScalaClientMethodConfigs {
     override val pathEncodingMethod = s"_root_.${namespace}.PathSegment.encode"
     override val responseStatusMethod = "getStatusCode"
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
-    override val requestUriMethod = "getUri"
     override val responseClass = "_root_.com.ning.http.client.Response"
     override val requiresAsyncHttpClient = true
 
@@ -88,10 +87,12 @@ object ScalaClientMethodConfigs {
 
   case class Ning18(namespace: String) extends Ning {
     override def addQueryParamMethod: String = "addQueryParameter"
+    override val requestUriMethod = "getUri"
   }
 
   case class Ning19(namespace: String) extends Ning {
     override def addQueryParamMethod: String = "addQueryParam"
+    override val requestUriMethod = "getUri.toJavaNetURI"
   }
 
 }
