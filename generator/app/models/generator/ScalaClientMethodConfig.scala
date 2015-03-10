@@ -18,6 +18,11 @@ trait ScalaClientMethodConfig {
   def responseStatusMethod: String
 
   /**
+    * The name of the method on the response providing the request URI.
+    */
+  def requestUriMethod: String
+
+  /**
     * The name of the method on the response providing the body.
     */
   def responseBodyMethod: String
@@ -57,6 +62,7 @@ object ScalaClientMethodConfigs {
   trait Play extends ScalaClientMethodConfig {
     override val pathEncodingMethod = "play.utils.UriEncoding.encodePathSegment"
     override val responseStatusMethod = "status"
+    override val requestUriMethod = "requestUri"
     override val responseBodyMethod = "body"
     override val requiresAsyncHttpClient = false
   }
@@ -73,6 +79,7 @@ object ScalaClientMethodConfigs {
     override val pathEncodingMethod = s"_root_.${namespace}.PathSegment.encode"
     override val responseStatusMethod = "getStatusCode"
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
+    override val requestUriMethod = "getUri"
     override val responseClass = "_root_.com.ning.http.client.Response"
     override val requiresAsyncHttpClient = true
 

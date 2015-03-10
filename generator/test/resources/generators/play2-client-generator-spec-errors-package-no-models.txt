@@ -1,5 +1,5 @@
 package errors {
 
-  case class FailedRequest(responseCode: Int, message: String) extends Exception(s"HTTP $responseCode: $message")
+  case class FailedRequest(responseCode: Int, message: String, requestUri: String) extends Exception(s"HTTP $responseCode: $message")
 
 }

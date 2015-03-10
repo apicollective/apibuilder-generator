@@ -31,7 +31,7 @@ $executorService
     f(play.api.libs.json.Json.parse(r.${config.responseBodyMethod})) match {
       case play.api.libs.json.JsSuccess(x, _) => x
       case play.api.libs.json.JsError(errors) => {
-        throw new ${Namespaces(config.namespace).errors}.FailedRequest(r.${config.responseStatusMethod}, s"Invalid json for class[" + className + "]: " + errors.mkString(" "))
+        throw new ${Namespaces(config.namespace).errors}.FailedRequest(r.${config.responseStatusMethod}, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), r.${config.requestUriMethod})
       }
     }
   }
