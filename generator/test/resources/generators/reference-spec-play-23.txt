@@ -705,7 +705,7 @@ package com.gilt.apidoc.reference.api.v0 {
       lazy val errors = _root_.com.gilt.apidoc.reference.api.v0.Client.parseJson("Seq[com.gilt.apidoc.reference.api.v0.models.Error]", response, _.validate[Seq[com.gilt.apidoc.reference.api.v0.models.Error]])
     }
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: String) extends Exception(s"HTTP $responseCode: $message")
+    case class FailedRequest(responseCode: Int, message: String, requestUri: _root_.java.net.URI) extends Exception(s"HTTP $responseCode: $message")
 
   }
 

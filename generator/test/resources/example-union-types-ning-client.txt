@@ -387,7 +387,7 @@ package com.gilt.apidoc.example.union.types.v0 {
 
   package errors {
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: String) extends Exception(s"HTTP $responseCode: $message")
+    case class FailedRequest(responseCode: Int, message: String, requestUri: _root_.java.net.URI) extends Exception(s"HTTP $responseCode: $message")
 
   }
 
