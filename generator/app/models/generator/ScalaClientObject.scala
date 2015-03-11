@@ -4,6 +4,13 @@ import lib.Text._
 
 object ScalaClientObject {
 
+  def failedRequestUriParam(config: ScalaClientMethodConfig): String = {
+    config.requestUriMethod match {
+      case None => ""
+      case Some(methodName) => s", requestUri = Some(r.$methodName)"
+    }
+  }
+
   def apply(
     config: ScalaClientMethodConfig
   ): String = {
@@ -31,7 +38,7 @@ $executorService
     f(play.api.libs.json.Json.parse(r.${config.responseBodyMethod})) match {
       case play.api.libs.json.JsSuccess(x, _) => x
       case play.api.libs.json.JsError(errors) => {
-        throw new ${Namespaces(config.namespace).errors}.FailedRequest(r.${config.responseStatusMethod}, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), r.${config.requestUriMethod})
+        throw new ${Namespaces(config.namespace).errors}.FailedRequest(r.${config.responseStatusMethod}, s"Invalid json for class[" + className + "]: " + errors.mkString(" ")${ScalaClientObject.failedRequestUriParam(config)})
       }
     }
   }

@@ -20,7 +20,7 @@ trait ScalaClientMethodConfig {
   /**
     * The name of the method on the response providing the request URI.
     */
-  def requestUriMethod: String
+  def requestUriMethod: Option[String]
 
   /**
     * The name of the method on the response providing the body.
@@ -68,12 +68,12 @@ object ScalaClientMethodConfigs {
 
   case class Play22(namespace: String) extends Play {
     override val responseClass = "play.api.libs.ws.Response"
-    override val requestUriMethod = "ahcResponse.getUri"
+    override val requestUriMethod = Some("ahcResponse.getUri")
   }
 
   case class Play23(namespace: String) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
-    override val requestUriMethod = "requestUri"
+    override val requestUriMethod = None
   }
 
   trait Ning extends ScalaClientMethodConfig {
@@ -88,12 +88,12 @@ object ScalaClientMethodConfigs {
 
   case class Ning18(namespace: String) extends Ning {
     override def addQueryParamMethod: String = "addQueryParameter"
-    override val requestUriMethod = "getUri"
+    override val requestUriMethod = Some("getUri")
   }
 
   case class Ning19(namespace: String) extends Ning {
     override def addQueryParamMethod: String = "addQueryParam"
-    override val requestUriMethod = "getUri.toJavaNetURI"
+    override val requestUriMethod = Some("getUri.toJavaNetURI")
   }
 
 }

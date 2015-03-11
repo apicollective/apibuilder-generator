@@ -59,7 +59,7 @@ case class ScalaClientMethodGenerator(
   }
 
   private def failedRequestClass(): String = {
-    """case class FailedRequest(responseCode: Int, message: String, requestUri: _root_.java.net.URI) extends Exception(s"HTTP $responseCode: $message")"""
+    """case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")"""
   }
 
   /**
@@ -164,7 +164,7 @@ case class ScalaClientMethodGenerator(
           }
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") +
-      s"""\ncase r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}", r.${config.requestUriMethod})\n"""
+      s"""\ncase r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})\n"""
 
       ClientMethod(
         name = op.name,
