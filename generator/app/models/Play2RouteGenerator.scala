@@ -25,37 +25,38 @@ case class Play2RouteGenerator(form: InvocationForm) {
   private val scalaService = ScalaService(service)
 
   def invoke(): Option[String] = {
-    val all = scalaService.resources.flatMap { resource =>
+    scalaService.resources.flatMap { resource =>
       resource.operations.map { op =>
         Play2Route(scalaService, op, resource)
       }
-    }
+    } match {
+      case Nil => {
+        Some(
+          ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
+            "# Service does not have any resource operations. There are no routes"
+        )
+      }
+      case all => {
+        val maxVerbLength = all.map(_.verb.toString.length).toSeq.sorted.last
+        val maxUrlLength = all.map(_.url.length).toSeq.sorted.last
+        val (paramStart, pathStart) = all.partition(_.url.startsWith("/:"))
 
-    if (all.isEmpty) {
-      Some(
-        ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
-          "# Service does not have any resource operations. There are no routes"
-      )
-    } else {
-      val maxVerbLength = all.map(_.verb.toString.length).toSeq.sorted.last
-      val maxUrlLength = all.map(_.url.length).toSeq.sorted.last
-      val (paramStart, pathStart) = all.partition(_.url.startsWith("/:"))
-
-      Some(
-        ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
-        (pathStart ++ paramStart).map { r =>
-          Seq(
-            r.verb,
-            " " * (maxVerbLength - r.verb.toString.length + GlobalPad),
-            r.url,
-            " " * (maxUrlLength - r.url.length + GlobalPad),
-            r.method,
-            "(",
-            r.params.mkString(", "),
-            ")"
-          ).mkString("")
-        }.mkString("\n")
-      )
+        Some(
+          ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
+            (pathStart ++ paramStart).map { r =>
+              Seq(
+                r.verb,
+                " " * (maxVerbLength - r.verb.toString.length + GlobalPad),
+                r.url,
+                " " * (maxUrlLength - r.url.length + GlobalPad),
+                r.method,
+                "(",
+                r.params.mkString(", "),
+                ")"
+              ).mkString("")
+            }.mkString("\n")
+        )
+      }
     }
   }
 }
