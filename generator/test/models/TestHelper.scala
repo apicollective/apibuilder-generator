@@ -17,18 +17,19 @@ object TestHelper {
   lazy val apidocApiService = parseFile(s"test/resources/examples/apidoc.json")
 
   def buildJson(json: String): String = {
-    s"""
-    {
+    val body = s"""
       "base_url": "http://localhost:9000",
       "name": "Api Doc Test",
       "organization": { "key": "test" },
       "application": { "key": "apidoc-test" },
       "namespace": "test.apidoc.apidoctest.v0",
-      "version": "1.0.0",
-
-      $json
-    }
+      "version": "1.0.0"
     """
+
+    json.isEmpty match {
+      case true => s"{ $body } "
+      case false => s"{ $body, $json } "
+    }
   }
 
   def writeToFile(path: String, contents: String) {
