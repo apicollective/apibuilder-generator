@@ -24,6 +24,15 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  it("service with no operations") {
+    val service = TestHelper.service(TestHelper.buildJson(""))
+
+    TestHelper.assertEqualsFile(
+      "test/resources/generators/play-2-route-no-operations.routes",
+      Play2RouteGenerator(InvocationForm(service)).invoke().getOrElse("")
+    )
+  }
+
   describe("with reference-api service") {
     lazy val service = TestHelper.referenceApiService
     lazy val ssd = new ScalaService(service)
