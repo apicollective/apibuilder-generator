@@ -59,7 +59,7 @@ object ScalaCaseClasses extends CodeGenerator {
 
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
     model.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-    s"case class ${model.name}(${model.serverArgList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
+    s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
   }
 
   private def generatePlayEnums(ssd: ScalaService): String = {

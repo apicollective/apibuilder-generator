@@ -1,0 +1,6 @@
+case class User(
+  email: String,
+  role: String = "admin",
+  groups: Seq[String],
+  permissions: Seq[String]
+)

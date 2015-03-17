@@ -12,6 +12,8 @@ import java.io.File
 
 object TestHelper {
 
+  lazy val collectionJsonDefaultsService = parseFile("test/resources/examples/collection-json-defaults.json")
+  lazy val illegalNonRequiredWithDefaultService = parseFile("test/resources/examples/illegal-non-required-with-default.json")
   lazy val referenceApiService = parseFile(s"../reference-api/service.json")
   lazy val generatorApiService = parseFile(s"test/resources/examples/generator.json")
   lazy val apidocApiService = parseFile(s"test/resources/examples/apidoc.json")
@@ -42,7 +44,7 @@ object TestHelper {
     if ((new File(path)).exists()) {
       scala.io.Source.fromFile(path).getLines.mkString("\n")
     } else {
-      ""
+      sys.error(s"no such file: $path")
     }
   }
 
@@ -54,8 +56,10 @@ object TestHelper {
     if (contents.trim != readFile(filename).trim) {
       val tmpPath = "/tmp/apidoc.tmp." + Text.safeName(filename)
       TestHelper.writeToFile(tmpPath, contents.trim)
-      // TestHelper.writeToFile(filename, contents.trim)
-      sys.error(s"Test output did not match. diff $tmpPath $filename")
+      import sys.process._
+      val cmd = s"diff $tmpPath $filename"
+      cmd.!
+      sys.error(s"Test output did not match. $cmd")
     }
   }
 

@@ -81,8 +81,9 @@ private[models] case class Play2Route(
       }.
       filter { param =>
         param.datatype match {
-          case ScalaDatatype.Singleton(_) | ScalaDatatype.List(_) => true
+          case (_: ScalaPrimitive) | ScalaDatatype.List(_) => true
           case ScalaDatatype.Map(_) => false
+          case ScalaDatatype.Option(inner) => true
         }
       }
   )
@@ -104,8 +105,11 @@ private[models] case class Play2Route(
             case ScalaDatatype.Map(_) => {
               sys.error("Cannot set defaults for maps")
             }
-            case ScalaDatatype.Singleton(primitive) => {
-              "?= " + defaultForPrimitive(primitive, d)
+            case ScalaDatatype.Option(_) => {
+              sys.error("Cannot set defaults for options")
+            }
+            case p: ScalaPrimitive => {
+              "?= " + defaultForPrimitive(p, d)
             }
           }
         )
@@ -136,20 +140,20 @@ private[models] case class Play2Route(
 
   private def definition(scalaParam: ScalaParameter): String = {
     val datatypeName = scalaParam.datatype match {
-      case ScalaDatatype.Singleton(_) => scalaParam.datatype.name
-      case ScalaDatatype.List(primitive) => {
-        s"List[${primitive.fullName}]"
-      }
       case ScalaDatatype.Map(_) => {
         sys.error("Cannot have maps as parameters")
       }
+      case ScalaDatatype.List(primitive) => {
+        s"List[${primitive.fullName}]"
+      }
+      case ScalaDatatype.Option(ScalaDatatype.List(primitive)) => {
+        s"_root_.scala.Option[List[${primitive.fullName}]]"
+      }
+      case datatype @ (ScalaDatatype.Option(_) | _: ScalaPrimitive) =>
+        datatype.name
     }
 
-    if (scalaParam.param.required) {
-      s"${scalaParam.originalName}: $datatypeName"
-    } else {
-      s"${scalaParam.originalName}: _root_.scala.Option[$datatypeName]"
-    }
+    s"${scalaParam.originalName}: $datatypeName"
   }
 }
 

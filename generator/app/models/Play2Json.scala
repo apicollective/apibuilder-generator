@@ -44,13 +44,12 @@ case class Play2Json(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       s"  def writes(obj: ${union.name}) = obj match {",
       union.types.map { t =>
-        val typeName = t.datatype.primitive match {
-          case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
-            t.datatype.name
+        val typeName = t.datatype match {
+          case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
+            p.name
           }
-          case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
-            PrimitiveWrapper.className(t.datatype.primitive)
-          }
+          case p: ScalaPrimitive => PrimitiveWrapper.className(p)
+          case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
         }
         s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", t)})"""
       }.mkString("\n").indent(4),
@@ -66,7 +65,16 @@ case class Play2Json(
       case None => {
         ut.enum match {
           case Some(enum) => methodName(enum.name, Reads)
-          case None => methodName(PrimitiveWrapper.className(ut.datatype.primitive), Reads)
+          case None => ut.datatype match {
+            // TODO enum representation should be refactored
+            // so that the type can be read directly from
+            // the enum (not ut). The enum type is always
+            // a primitive, so this match is redundant,
+            // but necessary due to the way the data is currently
+            // structured
+            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(p), Reads)
+            case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
+          }
         }
       }
     }
@@ -78,7 +86,10 @@ case class Play2Json(
       case None => {
         ut.enum match {
           case Some(enum) => methodName(enum.name, Writes) + ".writes(x)"
-          case None => methodName(PrimitiveWrapper.className(ut.datatype.primitive), Writes) + ".writes(x)"
+          case None => ut.datatype match {
+            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(p), Writes) + ".writes(x)"
+            case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
+          }
         }
       }
     }
@@ -99,20 +110,11 @@ case class Play2Json(
   private[models] def fieldReaders(model: ScalaModel): String = {
     val serializations = model.fields.map { field =>
       field.datatype match {
-        case ScalaDatatype.List(types) => {
-          val nilValue = field.datatype.nilValue
-          s"""(__ \\ "${field.originalName}").readNullable[${field.datatype.name}].map(_.getOrElse($nilValue))"""
+        case ScalaDatatype.Option(inner) => {
+          s"""(__ \\ "${field.originalName}").readNullable[${inner.name}]"""
         }
-        case ScalaDatatype.Map(types) => {
-          val nilValue = field.datatype.nilValue
-          s"""(__ \\ "${field.originalName}").readNullable[${field.datatype.name}].map(_.getOrElse($nilValue))"""
-        }
-        case ScalaDatatype.Singleton(types) => {
-          if (field.isOption) {
-            s"""(__ \\ "${field.originalName}").readNullable[${field.datatype.name}]"""
-          } else {
-            s"""(__ \\ "${field.originalName}").read[${field.datatype.name}]"""
-          }
+        case datatype => {
+          s"""(__ \\ "${field.originalName}").read[${datatype.name}]"""
         }
       }
     }
@@ -148,19 +150,11 @@ case class Play2Json(
           s"${identifier(model.name, Writes)} = {",
           s"  (",
           model.fields.map { field =>
-            if (field.isOption) {
-              field.datatype match {
-                case ScalaDatatype.List(_) | ScalaDatatype.Map(_) => {
-                  s"""(__ \\ "${field.originalName}").write[${field.datatype.name}]"""
-                }
-
-                case ScalaDatatype.Singleton(_) => {
-                  s"""(__ \\ "${field.originalName}").write[scala.Option[${field.datatype.name}]]"""
-                }
-
-              }
-            } else {
-              s"""(__ \\ "${field.originalName}").write[${field.datatype.name}]"""
+            field.datatype match {
+              case ScalaDatatype.Option(inner) =>
+                s"""(__ \\ "${field.originalName}").writeNullable[${inner.name}]"""
+              case datatype =>
+                s"""(__ \\ "${field.originalName}").write[${datatype.name}]"""
             }
           }.mkString(" and\n").indent(4),
           s"  )(unlift(${model.name}.unapply _))",

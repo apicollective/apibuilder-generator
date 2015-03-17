@@ -1,8 +1,12 @@
 package generator
 
+import java.util.UUID
+
 import models.Container
 import lib.{Datatype, Type, Kind}
 import lib.Text._
+import play.api.libs.json._
+import org.joda.time.DateTime
 
 object ScalaUtil {
 
@@ -100,6 +104,13 @@ object ScalaUtil {
   def wrapInQuotes(value: String): String = {
     // TODO: Quote values if needed
     s""""$value""""
+  }
+
+  def scalaDefault(value: String, datatype: ScalaDatatype): String = try {
+    datatype.default(value)
+  } catch {
+    case e: Exception => throw new RuntimeException(
+      s"parsing default `$value` for datatype $datatype", e)
   }
 }
 

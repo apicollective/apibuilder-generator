@@ -21,7 +21,11 @@ object Datatype {
 
 }
 
-case class Type(
+// NOTE: need sealed to get compiler
+// warnings about incomplete match/case
+// one would think sealed not needed on
+// Type, since Kind has it, but the sealed here is necessary.
+sealed case class Type(
   typeKind: Kind,
   name: String
 )

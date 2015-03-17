@@ -656,7 +656,7 @@
           "type": "visibility",
           "description": "Public organizations will be listed in apidoc directory. Organizations with visibility organization will only be visible to members of that org.",
           "default": "organization",
-          "required": false,
+          "required": true,
           "minimum": null,
           "maximum": null,
           "example": null
