@@ -70,11 +70,11 @@ package com.gilt.apidoc.example.union.types.v0.models {
     val all = Seq(B)
 
     private[this]
-    val byName = all.map(x => x.toString -> x).toMap
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Bar = fromString(value).getOrElse(UNDEFINED(value))
 
-    def fromString(value: String): _root_.scala.Option[Bar] = byName.get(value)
+    def fromString(value: String): _root_.scala.Option[Bar] = byName.get(value.toLowerCase)
 
   }
 
@@ -103,11 +103,11 @@ package com.gilt.apidoc.example.union.types.v0.models {
     val all = Seq(A)
 
     private[this]
-    val byName = all.map(x => x.toString -> x).toMap
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Foo = fromString(value).getOrElse(UNDEFINED(value))
 
-    def fromString(value: String): _root_.scala.Option[Foo] = byName.get(value)
+    def fromString(value: String): _root_.scala.Option[Foo] = byName.get(value.toLowerCase)
 
   }
 

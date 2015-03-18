@@ -59,9 +59,9 @@ case class UNDEFINED(override val toString: String) extends ${enum.name}
 """ +
     s"val all = Seq(" + enum.values.map(_.name).mkString(", ") + ")\n\n" +
     s"private[this]\n" +
-    s"val byName = all.map(x => x.toString -> x).toMap\n\n" +
+    s"val byName = all.map(x => x.toString.toLowerCase -> x).toMap\n\n" +
     s"def apply(value: String): ${enum.name} = fromString(value).getOrElse(UNDEFINED(value))\n\n" +
-    s"def fromString(value: String): _root_.scala.Option[${enum.name}] = byName.get(value)\n\n"
+    s"def fromString(value: String): _root_.scala.Option[${enum.name}] = byName.get(value.toLowerCase)\n\n"
   }
 
 }

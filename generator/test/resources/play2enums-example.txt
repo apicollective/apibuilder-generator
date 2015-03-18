@@ -24,11 +24,11 @@ object AgeGroup {
   val all = Seq(Twenties, Thirties)
 
   private[this]
-  val byName = all.map(x => x.toString -> x).toMap
+  val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
   def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
 
-  def fromString(value: String): _root_.scala.Option[AgeGroup] = byName.get(value)
+  def fromString(value: String): _root_.scala.Option[AgeGroup] = byName.get(value.toLowerCase)
 
 }
 
@@ -58,10 +58,10 @@ object Genre {
   val all = Seq(Classical, Jazz)
 
   private[this]
-  val byName = all.map(x => x.toString -> x).toMap
+  val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
   def apply(value: String): Genre = fromString(value).getOrElse(UNDEFINED(value))
 
-  def fromString(value: String): _root_.scala.Option[Genre] = byName.get(value)
+  def fromString(value: String): _root_.scala.Option[Genre] = byName.get(value.toLowerCase)
 
 }

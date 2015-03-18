@@ -99,11 +99,11 @@ package com.gilt.apidoc.reference.api.v0.models {
     val all = Seq(Youth, Adult)
 
     private[this]
-    val byName = all.map(x => x.toString -> x).toMap
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
 
-    def fromString(value: String): _root_.scala.Option[AgeGroup] = byName.get(value)
+    def fromString(value: String): _root_.scala.Option[AgeGroup] = byName.get(value.toLowerCase)
 
   }
 
