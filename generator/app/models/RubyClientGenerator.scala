@@ -911,7 +911,8 @@ ${headers.rubyModuleConstants.indent(2)}
     Primitives(ptName).getOrElse {
       sys.error(s"Unknown primitive type[$ptName]")
     } match {
-      case Primitives.Integer | Primitives.Double | Primitives.Long | Primitives.Uuid | Primitives.Decimal | Primitives.Boolean => varName
+      case Primitives.Decimal => s"${varName}.to_f"
+      case Primitives.Integer | Primitives.Double | Primitives.Long | Primitives.Uuid | Primitives.Boolean => varName
       case Primitives.String => {
         if (escape) {
           s"CGI.escape($varName)"
