@@ -75,7 +75,7 @@ module Com
                   opts = HttpClient::Helper.symbolize_keys(incoming)
                   query = {
                     :foo => HttpClient::Preconditions.assert_class_or_nil('foo', opts.delete(:foo), String),
-                    :optional_messages => (opts.delete(:optional_messages) || []).map { |v| HttpClient::Preconditions.assert_class_or_nil('optional_messages', v, String)},
+                    :optional_messages => (x = opts.delete(:optional_messages); x.nil? ? nil : x.map { |v| HttpClient::Preconditions.assert_class('optional_messages', v, String)}),
                     :required_messages => HttpClient::Preconditions.assert_class('required_messages', opts.delete(:required_messages), Array).map { |v| HttpClient::Preconditions.assert_class('required_messages', v, String)}
                   }.delete_if { |k, v| v.nil? }
                   @client.request("/echoes").with_query(query).get { |hash| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Value.new(hash) }
@@ -84,7 +84,7 @@ module Com
                 def get_arrays_only(incoming={})
                   opts = HttpClient::Helper.symbolize_keys(incoming)
                   query = {
-                    :optional_messages => (opts.delete(:optional_messages) || []).map { |v| HttpClient::Preconditions.assert_class_or_nil('optional_messages', v, String)},
+                    :optional_messages => (x = opts.delete(:optional_messages); x.nil? ? nil : x.map { |v| HttpClient::Preconditions.assert_class('optional_messages', v, String)}),
                     :required_messages => HttpClient::Preconditions.assert_class('required_messages', opts.delete(:required_messages), Array).map { |v| HttpClient::Preconditions.assert_class('required_messages', v, String)}
                   }.delete_if { |k, v| v.nil? }
                   @client.request("/echoes/arrays-only").with_query(query).get { |hash| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Value.new(hash) }
@@ -163,10 +163,10 @@ module Com
                   opts = HttpClient::Helper.symbolize_keys(incoming)
                   query = {
                     :guid => HttpClient::Preconditions.assert_class_or_nil('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String),
-                    :organization_guids => (opts.delete(:organization_guids) || []).map { |v| HttpClient::Preconditions.assert_class_or_nil('organization_guids', v, Integer)},
+                    :organization_guids => (x = opts.delete(:organization_guids); x.nil? ? nil : x.map { |v| HttpClient::Preconditions.assert_class('organization_guids', v, Integer)}),
                     :age_group => HttpClient::Preconditions.assert_class_or_nil('age_group', opts[:age_group].nil? ? nil : (opts[:age_group].is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup) ? opts.delete(:age_group) : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(opts.delete(:age_group))), ::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup),
                     :email => HttpClient::Preconditions.assert_class_or_nil('email', opts.delete(:email), String),
-                    :active => HttpClient::Preconditions.assert_boolean_or_nil('active', opts.delete(:active))
+                    :active => HttpClient::Preconditions.assert_boolean('active', (x = opts.delete(:active); x.nil? true : x))
                   }.delete_if { |k, v| v.nil? }
                   @client.request("/users").with_query(query).get.map { |hash| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(hash) }
                 end
@@ -418,7 +418,7 @@ module Com
                   @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
                   @active = HttpClient::Preconditions.assert_boolean('active', opts.delete(:active))
                   @age_group = HttpClient::Preconditions.assert_class('age_group', opts[:age_group].nil? ? nil : (opts[:age_group].is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup) ? opts.delete(:age_group) : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(opts.delete(:age_group))), ::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup)
-                  @tags = (opts.delete(:tags) || {}).inject({}) { |h, d| h[d[0]] = HttpClient::Preconditions.assert_class_or_nil('tags', d[1], String); h }
+                  @tags = (x = opts.delete(:tags); x.nil? ? nil : x.inject({}) { |h, d| h[d[0]] = HttpClient::Preconditions.assert_class('tags', d[1], String); h })
                 end
 
                 def to_json
@@ -460,7 +460,7 @@ module Com
 
                 def to_hash
                   {
-                    :users => (users || []).map(&:to_hash)
+                    :users => users.nil? ? nil : users.map(&:to_hash)
                   }
                 end
 

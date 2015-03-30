@@ -11,7 +11,7 @@ implicit def jsonWritesApiDocTestGuestUser: play.api.libs.json.Writes[GuestUser]
   (
     (__ \ "id").write[Long] and
     (__ \ "email").write[String] and
-    (__ \ "name").write[scala.Option[String]] and
+    (__ \ "name").writeNullable[String] and
     (__ \ "bar").write[String]
   )(unlift(GuestUser.unapply _))
 }
@@ -29,7 +29,7 @@ implicit def jsonWritesApiDocTestRegisteredUser: play.api.libs.json.Writes[Regis
   (
     (__ \ "id").write[Long] and
     (__ \ "email").write[String] and
-    (__ \ "name").write[scala.Option[String]] and
+    (__ \ "name").writeNullable[String] and
     (__ \ "foo").write[String]
   )(unlift(RegisteredUser.unapply _))
 }

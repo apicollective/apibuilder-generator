@@ -28,9 +28,10 @@ case class ScalaService(
   val resources = service.resources.map { r => new ScalaResource(this, r) }
 
   def scalaDatatype(
-    t: Datatype
+    t: Datatype,
+    required: Boolean
   ): ScalaDatatype = {
-    scalaTypeResolver.scalaDatatype(t)
+    scalaTypeResolver.scalaDatatype(t, required)
   }
 
   def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
@@ -85,8 +86,8 @@ object ScalaUnionType {
     val `type` = ssd.datatypeResolver.parse(t.`type`).getOrElse {
       sys.error(s"Could not parse type[${t.`type`}] for union type[$t]")
     }
-    val dt:ScalaDatatype = ssd.scalaDatatype(`type`)
-    dt.primitive match {
+    val dt:ScalaDatatype = ssd.scalaDatatype(`type`, true)
+    dt match {
       case ScalaPrimitive.Enum(ns, name) => {
         val enum = ssd.enums.find(_.name == name).getOrElse {
           sys.error(s"UnionType[$t] Failed to find enum[$name]")
@@ -102,9 +103,10 @@ object ScalaUnionType {
 
         ScalaUnionType(t.`type`, dt, model = Some(model))
       }
-      case _ => {
-        ScalaUnionType(t.`type`, dt)
+      case p: ScalaPrimitive => {
+        ScalaUnionType(t.`type`, p)
       }
+      case c: ScalaDatatype.Container => sys.error(s"illegal container type ${c} encountered in union ${t.`type`}")
     }
   }
 
@@ -124,7 +126,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val fields = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
-  val serverArgList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.serverDefinition()))
+  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
 
 }
 
@@ -134,7 +136,7 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
     sys.error(s"Could not parse type[${body.`type`}] for body[$body]")
   }
 
-  val datatype = ssd.scalaDatatype(`type`)
+  val datatype = ssd.scalaDatatype(`type`, true)
 
   val multiple = `type` match {
     case Datatype.Singleton(_) => false
@@ -204,17 +206,17 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   val name: String = GeneratorUtil.urlToMethodName(resource.plural, operation.method, path)
 
-  val clientArgList: Option[String] = body match {
+  val argList: Option[String] = body match {
     case None => {
-      ScalaUtil.fieldsToArgList(parameters.map(_.clientDefinition()))
+      ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
     }
     case Some(body) => {
       val bodyVarName = ScalaUtil.toVariable(body.`type`)
 
       ScalaUtil.fieldsToArgList(
-        parameters.filter(_.param.required).map(_.clientDefinition()) ++
+        parameters.filter(_.param.required).map(_.definition()) ++
         Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), body.datatype.name)) ++
-        parameters.filter(!_.param.required).map(_.clientDefinition())
+        parameters.filter(!_.param.required).map(_.definition())
       )
     }
   }
@@ -243,7 +245,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
   val isSuccess = code >= 200 && code < 300
   val isNotFound = code == 404
 
-  val datatype = ssd.scalaDatatype(`type`)
+  val datatype = ssd.scalaDatatype(`type`, true)
 
   val isUnit = `type`.`type` == Type(Kind.Primitive, Primitives.Unit.toString)
 
@@ -264,22 +266,16 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     sys.error(s"Could not parse type[${field.`type`}] for model[$modelName] field[$name]")
   }
 
-  def datatype = ssd.scalaDatatype(`type`)
+  def datatype = ssd.scalaDatatype(`type`, required)
 
   def description: Option[String] = field.description
 
-  /**
-   * If there is a default, ensure it is only set server side otherwise
-   * changing the default would have no impact on deployed clients
-   */
-  def isOption: Boolean = !field.required || field.default.nonEmpty
+  def required = field.required
 
-  def clientDefinition(varName: String = name): String = {
-    datatype.clientDefinition(varName, isOption)
-  }
+  def default = field.default.map(ScalaUtil.scalaDefault(_, datatype))
 
-  def serverDefinition(varName: String = name): String = {
-    datatype.serverDefinition(varName, isOption)
+  def definition(varName: String = name): String = {
+    datatype.definition(varName, default)
   }
 }
 
@@ -293,23 +289,16 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
 
   def originalName: String = param.name
 
-  def datatype = ssd.scalaDatatype(`type`)
+  def datatype = ssd.scalaDatatype(`type`, required)
+
   def description: String = param.description.getOrElse(name)
 
-  def default = param.default
+  def default = param.default.map(ScalaUtil.scalaDefault(_, datatype))
 
-  /**
-   * If there is a default, ensure it is only set server side otherwise
-   * changing the default would have no impact on deployed clients
-   */
-  def isOption: Boolean = !param.required || param.default.nonEmpty
+  def required = param.required
 
-  def clientDefinition(varName: String = name): String = {
-    datatype.clientDefinition(varName, isOption)
-  }
-
-  def serverDefinition(varName: String = name): String = {
-    datatype.serverDefinition(varName, isOption)
+  def definition(varName: String = name): String = {
+    datatype.definition(varName, default)
   }
 
   def location = param.location

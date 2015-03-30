@@ -1,0 +1,192 @@
+{
+  "name": "test",
+  "organization": {
+    "key": "mreed"
+  },
+  "application": {
+    "key": "test"
+  },
+  "namespace": "com.gilt.test.v0",
+  "version": "0.0.1-dev",
+  "base_url": null,
+  "description": null,
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [],
+  "models": [
+    {
+      "name": "user",
+      "plural": "users",
+      "description": null,
+      "deprecation": null,
+      "fields": [
+        {
+          "name": "email",
+          "type": "string",
+          "description": null,
+          "deprecation": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "description": null,
+          "deprecation": null,
+          "default": "admin",
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "groups",
+          "type": "[string]",
+          "description": null,
+          "deprecation": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "permissions",
+          "type": "[string]",
+          "description": null,
+          "deprecation": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    },
+    {
+      "name": "user_patch",
+      "plural": "user_patches",
+      "description": null,
+      "deprecation": null,
+      "fields": [
+        {
+          "name": "groups",
+          "type": "[string]",
+          "description": null,
+          "deprecation": null,
+          "default": null,
+          "required": false,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "permissions",
+          "type": "[string]",
+          "description": null,
+          "deprecation": null,
+          "default": "[]",
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "preferences",
+          "type": "[string]",
+          "description": null,
+          "deprecation": null,
+          "default": "[\"foo\"]",
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "type": "user",
+      "plural": "users",
+      "description": null,
+      "deprecation": null,
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/users",
+          "description": null,
+          "deprecation": null,
+          "body": {
+            "type": "user",
+            "description": null,
+            "deprecation": null
+          },
+          "parameters": [],
+          "responses": [
+            {
+              "code": 201,
+              "type": "user",
+              "description": null,
+              "deprecation": null
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/users/:email",
+          "description": null,
+          "deprecation": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "email",
+              "type": "string",
+              "location": "Path",
+              "description": null,
+              "deprecation": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": 200,
+              "type": "user",
+              "description": null,
+              "deprecation": null
+            }
+          ]
+        },
+        {
+          "method": "PATCH",
+          "path": "/users",
+          "description": null,
+          "deprecation": null,
+          "body": {
+            "type": "user_patch",
+            "description": null,
+            "deprecation": null
+          },
+          "parameters": [],
+          "responses": [
+            {
+              "code": 200,
+              "type": "user",
+              "description": null,
+              "deprecation": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

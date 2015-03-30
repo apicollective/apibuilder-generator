@@ -1,12 +1,15 @@
 package models
 
+import java.util.UUID
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models._
+import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import lib.{Datatype, Kind, Methods, Primitives, Text, Type, VersionTag}
 import lib.Text._
 import generator.{GeneratorUtil, CodeGenerator, ScalaUtil}
 import scala.collection.mutable.ListBuffer
 import play.api.Logger
+import play.api.libs.json._
 
 object RubyUtil {
 
@@ -92,6 +95,82 @@ object RubyUtil {
     }
   }
 
+  def rubyDefault(value: String, datatype: Datatype): String = try {
+    datatype match {
+      case Datatype.Singleton(Type(Kind.Primitive, name)) => {
+        Primitives(name).fold(sys.error(s"unknown primitive: $name")) {
+          case Primitives.String |
+            Primitives.DateIso8601 |
+            Primitives.DateTimeIso8601 |
+            Primitives.Uuid => rubyDefault(JsString(value), datatype)
+
+          case _ => rubyDefault(Json.parse(value), datatype)
+        }
+      }
+      case Datatype.Singleton(Type(Kind.Enum, name)) => {
+        rubyDefault(JsString(value), datatype)
+      }
+      case _ => rubyDefault(Json.parse(value), datatype)
+    }
+  } catch {
+    case e: Exception => {
+      throw new RuntimeException(s"parsing default `$value` for datatype $datatype", e)
+    }
+  }
+
+  private def rubyDefault(json: JsValue, datatype: Datatype): String = datatype match {
+    case Datatype.Singleton(tpe) => rubyDefault(json, tpe)
+    case Datatype.List(tpe) => {
+      val innerType = Datatype.Singleton(tpe)
+      val seq = json.as[Seq[JsValue]].map { value =>
+        rubyDefault(value, innerType)
+      }
+      seq.mkString("[", ",", "]")
+    }
+    case Datatype.Map(tpe) => {
+      val innerType = Datatype.Singleton(tpe)
+      val map = json.as[Map[String, JsValue]].map { case (key, value) =>
+        s""""${key}" => ${rubyDefault(value, innerType)}"""
+      }
+      map.mkString("{", ",", "}")
+    }
+  }
+
+  private def rubyDefault(json: JsValue, tpe: Type): String = {
+    tpe match {
+      case Type(Kind.Primitive, name) => {
+        Primitives(name).fold(sys.error(s"unknown primitive: $name")) {
+          case Primitives.Boolean => json.as[Boolean].toString
+          case Primitives.Decimal => json.as[BigDecimal].toString
+          case Primitives.Integer => json.as[Int].toString
+          case Primitives.Double => json.as[Double].toString
+          case Primitives.Long => json.as[Long].toString
+          case Primitives.String => s""""${json.as[String]}""""
+          case Primitives.DateIso8601 => {
+            val dt = dateTimeParser.parseLocalDate(json.as[String])
+            s"Date.parse(${json})"
+          }
+          case Primitives.DateTimeIso8601 => {
+            val dt = dateTimeParser.parseDateTime(json.as[String])
+            s"""DateTime.parse(${json})"""
+          }
+          case Primitives.Uuid => s"""UUID.new("${json.as[UUID]}")"""
+          case Primitives.Object | Primitives.Unit => {
+            throw new UnsupportedOperationException(
+            s"unsupported default for type $tpe")
+          }
+        }
+      }
+      case Type(Kind.Enum, enumName)  => {
+        val value = json.as[String]
+        s"""${toClassName(enumName)}.apply("${value}")"""
+      }
+      case Type(Kind.Model | Kind.Union, _) => {
+        throw new UnsupportedOperationException(
+          s"unsupported default for type $tpe")
+      }
+    }
+  }
 }
 
 object RubyClientGenerator extends CodeGenerator {
@@ -650,10 +729,10 @@ ${headers.rubyModuleConstants.indent(2)}
                 }
               }
               case Type(Kind.Model | Kind.Union, name) => {
-                s"(${field.name} || []).map(&:to_hash)"
+                s"${field.name}.nil? ? nil : ${field.name}.map(&:to_hash)"
               }
               case Type(Kind.Enum, name) => {
-                s"(${field.name} || []).map(&:value)"
+                s"${field.name}.nil? ? nil : ${field.name}.map(&:value)"
               }
             }
           }
@@ -667,10 +746,10 @@ ${headers.rubyModuleConstants.indent(2)}
                 }
               }
               case Type(Kind.Model | Kind.Union, name) => {
-                s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
+                s"${field.name}.nil? ? nil : ${field.name}.inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
               }
               case Type(Kind.Enum, name) => {
-                s"(${field.name} || {}).inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
+                s"${field.name}.nil? ? nil : ${field.name}.inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
               }
             }
           }
@@ -732,19 +811,28 @@ ${headers.rubyModuleConstants.indent(2)}
       }
     }
 
-    val mustBeSpecified = required && default.isEmpty
-
-    (pt, mustBeSpecified) match {
+    (pt, required) match {
       case (Primitives.Boolean, true) => {
-        s"HttpClient::Preconditions.assert_boolean('$fieldName', $arg)"
+        default.map { d =>
+          s"HttpClient::Preconditions.assert_boolean('$fieldName', (x = $arg; x.nil? $d : x))"
+        }.getOrElse {
+          s"HttpClient::Preconditions.assert_boolean('$fieldName', $arg)"
+        }
       }
       case (Primitives.Boolean, false) => {
         s"HttpClient::Preconditions.assert_boolean_or_nil('$fieldName', $arg)"
       }
-      case (_, req) => {
+      case (_, true) => {
         val className = rubyClass(pt)
-        val assertMethod = if (req) { "assert_class" } else { "assert_class_or_nil" }
-        s"HttpClient::Preconditions.$assertMethod('$fieldName', $arg, $className)"
+        default.map { d =>
+          s"HttpClient::Preconditions.assert_class('$fieldName', $arg || $d, $className)"
+        }.getOrElse {
+          s"HttpClient::Preconditions.assert_class('$fieldName', $arg, $className)"
+        }
+      }
+      case (_, false) => {
+        val className = rubyClass(pt)
+        s"HttpClient::Preconditions.assert_class_or_nil('$fieldName', $arg, $className)"
       }
     }
   }
@@ -752,30 +840,55 @@ ${headers.rubyModuleConstants.indent(2)}
   private def withDefaultArray(
     fieldName: String,
     arg: String,
-    required: Boolean
-  ) = required match {
-    case false => s"($arg || [])"
-    case true => s"HttpClient::Preconditions.assert_class('$fieldName', $arg, Array)"
-  }
+    required: Boolean,
+    call: String,
+    default: Option[String]
+  ) = withDefaultCollection(
+    fieldName,
+    arg,
+    required,
+    call,
+    "Array",
+    default
+  )
 
   private def withDefaultMap(
     fieldName: String,
     arg: String,
-    required: Boolean
+    required: Boolean,
+    call: String,
+    default: Option[String]
+  ) = withDefaultCollection(
+    fieldName,
+    arg,
+    required,
+    call,
+    "Hash",
+    default
+  )
+
+  private def withDefaultCollection(
+    fieldName: String,
+    arg: String,
+    required: Boolean,
+    call: String,
+    collectionName: String,
+    default: Option[String]
   ) = required match {
-    case false => s"($arg || {})"
-    case true => s"HttpClient::Preconditions.assert_class('$fieldName', $arg, Hash)"
+    case false => s"(x = $arg; x.nil? ? nil : x.$call)"
+    case true => s"HttpClient::Preconditions.assert_class('$fieldName', ${default.fold(arg)(d => s"$arg || $d")}, $collectionName).$call"
   }
 
   private def parseArgument(
     fieldName: String,
     `type`: String,
     required: Boolean,
-    default: Option[String]
+    rawDefault: Option[String]
   ): String = {
     val dt = datatypeResolver.parse(`type`).getOrElse {
       sys.error("Invalid type[" + `type` + "]")
     }
+    val default = rawDefault.map(RubyUtil.rubyDefault(_, dt))
 
     dt match {
       case Datatype.Singleton(_) => {
@@ -816,19 +929,31 @@ ${headers.rubyModuleConstants.indent(2)}
       case Datatype.List(t) => {
         t match {
           case Type(Kind.Primitive, name) => {
-            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |v| " + parseArgumentPrimitive(fieldName, "v", name, required, default) + "}"
+            withDefaultArray(
+              fieldName, s"opts.delete(:$fieldName)", required,
+              "map { |v| " + parseArgumentPrimitive(fieldName, "v", name, true, None) + "}",
+              default)
           }
           case Type(Kind.Model, name) => {
             val klass = qualifiedClassName(name)
-            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }"
+            withDefaultArray(
+              fieldName, s"opts.delete(:$fieldName)", required,
+              "map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.new(el)) }",
+              default)
           }
           case Type(Kind.Union, name) => {
             val klass = qualifiedClassName(name)
-            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + ".map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.from_json(el)) }"
+            withDefaultArray(
+              fieldName, s"opts.delete(:$fieldName)", required,
+              "map { |el| " + s"el.nil? ? nil : (el.is_a?($klass) ? el : $klass.from_json(el)) }",
+              default)
           }
           case Type(Kind.Enum, name) => {
             val klass = qualifiedClassName(name)
-            withDefaultArray(fieldName, s"opts.delete(:$fieldName)", required) + s".map { |el| el.nil? ? nil : (el.is_a?($klass) ? el : $klass.apply(el)) }"
+            withDefaultArray(
+              fieldName, s"opts.delete(:$fieldName)", required,
+              s"map { |el| el.nil? ? nil : (el.is_a?($klass) ? el : $klass.apply(el)) }",
+              default)
           }
         }
       }
@@ -836,15 +961,24 @@ ${headers.rubyModuleConstants.indent(2)}
       case Datatype.Map(t) => {
         t match {
           case Type(Kind.Primitive, name) => {
-            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, required, default) + "; h }"
+            withDefaultMap(
+              fieldName, s"opts.delete(:$fieldName)", required,
+              "inject({}) { |h, d| h[d[0]] = " + parseArgumentPrimitive(fieldName, "d[1]", name, true, None) + "; h }",
+              default)
           }
           case Type(Kind.Model, name) => {
             val klass = qualifiedClassName(name)
-            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}"
+            withDefaultMap(
+              fieldName, s"opts.delete(:$fieldName)", required,
+              "inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.new(el[1])); h" + "}",
+              default)
           }
           case Type(Kind.Union, name) => {
             val klass = qualifiedClassName(name)
-            withDefaultMap(fieldName, s"opts.delete(:$fieldName)", required) + ".inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.from_json(el[1])); h" + "}"
+            withDefaultMap(
+              fieldName, s"opts.delete(:$fieldName)", required,
+              "inject({}) { |h, el| h[el[0]] = " + s"el[1].nil? ? nil : (el[1].is_a?($klass) ? el[1] : $klass.from_json(el[1])); h" + "}",
+              default)
           }
           case Type(Kind.Enum, name) => {
             val klass = qualifiedClassName(name)

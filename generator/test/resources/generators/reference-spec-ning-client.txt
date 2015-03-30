@@ -60,7 +60,7 @@ package com.gilt.apidoc.reference.api.v0.models {
     email: String,
     active: Boolean,
     ageGroup: com.gilt.apidoc.reference.api.v0.models.AgeGroup,
-    tags: Map[String, String] = Map.empty
+    tags: _root_.scala.Option[Map[String, String]] = None
   )
 
   case class UserList(
@@ -256,7 +256,7 @@ package com.gilt.apidoc.reference.api.v0.models {
         (__ \ "email").read[String] and
         (__ \ "active").read[Boolean] and
         (__ \ "age_group").read[com.gilt.apidoc.reference.api.v0.models.AgeGroup] and
-        (__ \ "tags").readNullable[Map[String, String]].map(_.getOrElse(Map.empty))
+        (__ \ "tags").readNullable[Map[String, String]]
       )(User.apply _)
     }
 
@@ -266,12 +266,12 @@ package com.gilt.apidoc.reference.api.v0.models {
         (__ \ "email").write[String] and
         (__ \ "active").write[Boolean] and
         (__ \ "age_group").write[com.gilt.apidoc.reference.api.v0.models.AgeGroup] and
-        (__ \ "tags").write[Map[String, String]]
+        (__ \ "tags").writeNullable[Map[String, String]]
       )(unlift(User.unapply _))
     }
 
     implicit def jsonReadsApidocReferenceApiUserList: play.api.libs.json.Reads[UserList] = {
-      (__ \ "users").readNullable[Seq[com.gilt.apidoc.reference.api.v0.models.User]].map(_.getOrElse(Nil)).map { x => new UserList(users = x) }
+      (__ \ "users").read[Seq[com.gilt.apidoc.reference.api.v0.models.User]].map { x => new UserList(users = x) }
     }
 
     implicit def jsonWritesApidocReferenceApiUserList: play.api.libs.json.Writes[UserList] = new play.api.libs.json.Writes[UserList] {
@@ -463,13 +463,13 @@ package com.gilt.apidoc.reference.api.v0 {
         organizationGuids: _root_.scala.Option[Seq[Long]] = None,
         ageGroup: _root_.scala.Option[com.gilt.apidoc.reference.api.v0.models.AgeGroup] = None,
         email: _root_.scala.Option[String] = None,
-        active: _root_.scala.Option[Boolean] = None
+        active: Boolean = true
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.User]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
           ageGroup.map("age_group" -> _.toString),
           email.map("email" -> _),
-          active.map("active" -> _.toString)
+          Some("active" -> active.toString)
         ).flatten ++
           organizationGuids.getOrElse(Nil).map("organization_guids" -> _.toString)
 
@@ -645,7 +645,7 @@ package com.gilt.apidoc.reference.api.v0 {
       organizationGuids: _root_.scala.Option[Seq[Long]] = None,
       ageGroup: _root_.scala.Option[com.gilt.apidoc.reference.api.v0.models.AgeGroup] = None,
       email: _root_.scala.Option[String] = None,
-      active: _root_.scala.Option[Boolean] = None
+      active: Boolean = true
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.User]]
 
     def getByAgeGroup(

@@ -1,16 +1,45 @@
 package generator
 
-import lib.{Datatype, Primitives, Type, Kind}
+import java.util.UUID
+import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 
-sealed trait ScalaPrimitive {
+import lib.{Datatype, Primitives, Type, Kind}
+import play.api.libs.json._
+
+sealed trait ScalaDatatype {
+  def asString(originalVarName: String): String = {
+    throw new UnsupportedOperationException(s"unsupported conversion of type ${name} for var $originalVarName")
+  }
+
+  def name: String
+
+  def definition(
+    originalVarName: String,
+    default: Option[String]
+  ): String = {
+    val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+    default.fold(s"$varName: $name") { default =>
+      s"$varName: $name = $default"
+    }
+  }
+
+  def default(value: String): String = default(Json.parse(value))
+
+  protected def default(json: JsValue): String = {
+    throw new UnsupportedOperationException(s"default for type ${name}")
+  }
+}
+
+sealed trait ScalaPrimitive extends ScalaDatatype {
   def apidocType: String
   def shortName: String
-  def asString(originalVarName: String): String
+  override def asString(originalVarName: String): String
   def namespace: Option[String] = None
   def fullName: String = namespace match {
     case None => shortName
     case Some(ns) => s"$ns.$shortName"
   }
+  def name = fullName
 }
 
 object ScalaPrimitive {
@@ -18,46 +47,62 @@ object ScalaPrimitive {
   case object Boolean extends ScalaPrimitive {
     def apidocType = "boolean"
     def shortName = "Boolean"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
+
+    override protected def default(json: JsValue) = json.as[scala.Boolean].toString
   }
 
   case object Double extends ScalaPrimitive {
     def apidocType = "double"
     def shortName = "Double"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
+
+    override protected def default(json: JsValue) = json.as[scala.Double].toString
   }
 
   case object Integer extends ScalaPrimitive {
     def apidocType = "integer"
     def shortName = "Int"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
+
+    override protected def default(json: JsValue) = json.as[scala.Int].toString
   }
 
   case object Long extends ScalaPrimitive {
     def apidocType = "long"
     def shortName = "Long"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
+
+    override protected def default(json: JsValue) = json.as[scala.Long].toString
   }
 
   case object DateIso8601 extends ScalaPrimitive {
     override def namespace = Some("_root_.org.joda.time")
     def apidocType = "date-iso8601"
     def shortName = "LocalDate"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
+    }
+
+    override def default(value: String) = default(JsString(value))
+
+
+    override protected def default(json: JsValue) = {
+      val dt = dateTimeParser.parseLocalDate(json.as[String])
+      s"new ${fullName}(${dt.getYear}, ${dt.getMonthOfYear}, ${dt.getDayOfMonth})"
     }
   }
 
@@ -65,26 +110,37 @@ object ScalaPrimitive {
     override def namespace = Some("_root_.org.joda.time")
     def apidocType = "date-time-iso8601"
     def shortName = "DateTime"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
+    }
+
+    override def default(value: String) = default(JsString(value))
+
+    override protected def default(json: JsValue) = {
+      val dt = dateTimeParser.parseDateTime(json.as[String])
+      // TODO would like to use the constructor for DateTime, since that would
+      // be faster code, but things get quite tricky because of time zones :(
+      s"""_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${json})"""
     }
   }
 
   case object Decimal extends ScalaPrimitive {
     def apidocType = "decimal"
     def shortName = "BigDecimal"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
+
+    override protected def default(json: JsValue) = json.as[scala.BigDecimal].toString
   }
 
   case object Object extends ScalaPrimitive {
     override def namespace = Some("_root_.play.api.libs.json")
     def apidocType = "object"
     def shortName = "JsObject"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
@@ -93,16 +149,20 @@ object ScalaPrimitive {
   case object String extends ScalaPrimitive {
     def apidocType = "string"
     def shortName = "String"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName"
     }
+
+    override def default(value: String) = default(JsString(value))
+
+    override protected def default(json: JsValue) = s""""${json.as[String]}""""
   }
 
   case object Unit extends ScalaPrimitive {
     def apidocType = "unit"
     def shortName = "Unit"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       throw new UnsupportedOperationException(s"unsupported conversion of type object for $originalVarName")
     }
   }
@@ -111,16 +171,23 @@ object ScalaPrimitive {
     override def namespace = Some("_root_.java.util")
     def apidocType = "uuid"
     def shortName = "UUID"
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
+    }
+
+    override def default(value: String) = default(JsString(value))
+
+    override protected def default(json: JsValue) = {
+      val uuid = json.as[UUID]
+      s"new UUID(${uuid.getMostSignificantBits}, ${uuid.getLeastSignificantBits})"
     }
   }
 
   case class Model(ns: String, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(ns)
     def apidocType = shortName
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
@@ -129,85 +196,64 @@ object ScalaPrimitive {
   case class Enum(ns: String, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(ns)
     def apidocType = shortName
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
+
+    override def default(value: String): String = default(JsString(value))
+
+    override protected def default(json: JsValue) = s"${fullName}(${json})"
   }
 
   case class Union(ns: String, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(ns)
     def apidocType = shortName
-    def asString(originalVarName: String): String = {
+    override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
-    }
-  }
-
-}
-
-sealed trait ScalaDatatype {
-  def nilValue: String
-
-  def primitive: ScalaPrimitive
-
-  def name: String
-
-  def clientDefinition(
-    originalVarName: String,
-    optional: Boolean
-  ): String = {
-    val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-    if (optional) {
-      s"$varName: _root_.scala.Option[$name] = None"
-    } else {
-      s"$varName: $name"
-    }
-  }
-
-  /**
-    * For collections, the server side optional definition uses the
-    * nil value - e.g. a List will be Nil (instead of None).
-    */
-  def serverDefinition(
-    originalVarName: String,
-    optional: Boolean
-  ): String = {
-    val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-    if (optional) {
-      s"$varName: $name = " + nilValue
-    } else {
-      s"$varName: $name"
     }
   }
 
 }
 
 object ScalaDatatype {
+  sealed abstract class Container(inner: ScalaDatatype) extends ScalaDatatype
 
-  case class List(primitive: ScalaPrimitive) extends ScalaDatatype {
-    override def nilValue = "Nil"
+  case class List(primitive: ScalaPrimitive) extends Container(primitive) {
     override def name = s"Seq[${primitive.fullName}]"
+
+    override protected def default(json: JsValue) = {
+      val arr = json.as[JsArray]
+      val seq = arr.value.map { value =>
+        primitive.default(value)
+      }
+      if (seq.isEmpty) "Nil" else seq.mkString(s"Seq(", ",", ")")
+    }
   }
 
-  case class Map(primitive: ScalaPrimitive) extends ScalaDatatype {
-    override def nilValue = "Map.empty"
+  case class Map(primitive: ScalaPrimitive) extends Container(primitive) {
     override def name = s"Map[String, ${primitive.fullName}]"
+
+    override protected def default(json: JsValue) = {
+      val map = json.as[scala.collection.immutable.Map[String, JsValue]].map {
+        case (key, value) => s""""${key}" -> ${primitive.default(value)}"""
+      }
+      if (map.isEmpty) "Map.empty" else map.mkString(s"Map(", ",", ")")
+    }
   }
 
-  case class Singleton(primitive: ScalaPrimitive) extends ScalaDatatype {
-    override def nilValue = "None"
-    override def name = primitive.fullName
+  case class Option(datatype: ScalaDatatype) extends Container(datatype) {
+    override def name = s"_root_.scala.Option[${datatype.name}]"
 
-    /**
-      * For singleton, server definition matches client definition
-      * wrapping the type in an Option always.
-      */
-    override def serverDefinition(
+    override def definition(
       originalVarName: String,
-      optional: Boolean
-    ): String = clientDefinition(originalVarName, optional)
-
+      default: scala.Option[String]
+    ): String = {
+      require(default.isEmpty, s"no defaults allowed on options: ${default}")
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName: $name = None"
+    }
   }
 
 }
@@ -270,12 +316,13 @@ case class ScalaTypeResolver(
     }
   }
 
-  def scalaDatatype(datatype: Datatype): ScalaDatatype = {
-    datatype match {
+  def scalaDatatype(datatype: Datatype, required: Boolean): ScalaDatatype = {
+    val base = datatype match {
       case Datatype.List(t) => ScalaDatatype.List(scalaPrimitive(t))
       case Datatype.Map(t) => ScalaDatatype.Map(scalaPrimitive(t))
-      case Datatype.Singleton(t) => ScalaDatatype.Singleton(scalaPrimitive(t))
+      case Datatype.Singleton(t) => scalaPrimitive(t)
     }
+    if (required) base else ScalaDatatype.Option(base)
   }
 
 }

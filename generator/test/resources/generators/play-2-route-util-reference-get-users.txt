@@ -2,6 +2,6 @@ val queryParameters = Seq(
   guid.map("guid" -> _.toString),
   ageGroup.map("age_group" -> _.toString),
   email.map("email" -> _),
-  active.map("active" -> _.toString)
+  Some("active" -> active.toString)
 ).flatten ++
   organizationGuids.getOrElse(Nil).map("organization_guids" -> _.toString)

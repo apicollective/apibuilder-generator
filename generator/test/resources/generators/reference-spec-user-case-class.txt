@@ -3,5 +3,5 @@ case class User(
   email: String,
   active: Boolean,
   ageGroup: com.gilt.apidoc.reference.api.v0.models.AgeGroup,
-  tags: Map[String, String] = Map.empty
+  tags: _root_.scala.Option[Map[String, String]] = None
 )

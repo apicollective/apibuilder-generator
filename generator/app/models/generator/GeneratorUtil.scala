@@ -135,35 +135,28 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     if (params.isEmpty) {
       None
     } else {
-      val listParams = params.filter(p => isList(p.`type`)) match {
-        case Nil => Seq.empty
-        case params => {
-          params.map { p =>
-            val nilValue = p.isOption match {
-              case true => ".getOrElse(Nil)"
-              case false => ""
-            }
-            s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}${nilValue}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
-          }
+      val listParams = params.map(p => p -> p.datatype).collect {
+        case (p, ScalaDatatype.Option(ScalaDatatype.List(inner))) => {
+          s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.getOrElse(Nil).map("${p.originalName}" -> ${inner.asString("_")})"""
+        }
+        case (p, ScalaDatatype.List(inner)) => {
+          s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${inner.asString("_")})"""
         }
       }
       val arrayParamString = listParams.mkString(" ++\n")
 
       val singleParams = params.filter(p => isSingleValue(p.`type`)) match {
         case Nil => Seq.empty
-        case params => {
-          Seq(
-            s"val $fieldName = Seq(",
-            params.map { p =>
-              if (p.isOption) {
-                s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${p.datatype.primitive.asString("_")})"""
-              } else {
-                s"""  Some("${p.originalName}" -> ${p.datatype.primitive.asString(p.name)})"""
-              }
-            }.mkString(",\n"),
-            ").flatten"
-          )
-        }
+        case params => Seq(
+          s"val $fieldName = Seq(",
+          params.map(p => p -> p.datatype).collect {
+            case (p, ScalaDatatype.Option(inner)) => {
+              s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${inner.asString("_")})"""
+            }
+            case (p, dt: ScalaPrimitive) => s"""  Some("${p.originalName}" -> ${dt.asString(p.name)})"""
+          }.mkString(",\n"),
+          ").flatten"
+        )
       }
       val singleParamString = singleParams.mkString("\n")
 
@@ -203,14 +196,12 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     } else if (!op.body.isEmpty) {
       val body = op.body.get
 
-      val payload = body.datatype.primitive match {
+      val payload = body.datatype match {
         case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
         case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
         case ScalaPrimitive.Union(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
-        case ScalaPrimitive.String | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Object |
-            ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Unit => {
-              body.datatype.primitive.asString(ScalaUtil.toVariable(body.`type`))
-            }
+        case p: ScalaPrimitive => p.asString(ScalaUtil.toVariable(body.`type`))
+        case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered as body for $op")
       }
 
       Some(s"val payload = play.api.libs.json.Json.toJson($payload)")
@@ -235,7 +226,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       name: String,
       d: ScalaDatatype
     ): String = {
-      d.primitive match {
+      d match {
         case ScalaPrimitive.String => s"""${config.pathEncodingMethod}($name, "UTF-8")"""
         case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
         case ScalaPrimitive.Enum(_, _) => s"""${config.pathEncodingMethod}($name.toString, "UTF-8")"""
@@ -244,6 +235,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
         case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }
+        case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encounteered as path param($name)")
       }
     }
   }

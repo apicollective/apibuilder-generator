@@ -126,7 +126,7 @@ case class ScalaClientMethodGenerator(
       }
 
       val hasOptionResult = op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
-        s"\ncase r if r.${config.responseStatusMethod} == 404 => ${r.datatype.nilValue}"
+        s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
       }
 
       val allResponseCodes = (
@@ -168,7 +168,7 @@ case class ScalaClientMethodGenerator(
 
       ClientMethod(
         name = op.name,
-        argList = op.clientArgList,
+        argList = op.argList,
         returnType = hasOptionResult match {
           case None => s"scala.concurrent.Future[${op.resultType}]"
           case Some(_) => s"scala.concurrent.Future[_root_.scala.Option[${op.resultType}]]"
