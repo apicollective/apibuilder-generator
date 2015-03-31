@@ -13,6 +13,12 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
   describe("for a field with an object field") {
 
     val baseJson = TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "enums": [],
+      "unions": [],
+      "resources": [],
+
       "models": [
         {
           "name": "content",
@@ -72,6 +78,11 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
   describe("for a response with an object field") {
 
     val baseJson = TestHelper.buildJson(s"""
+      "imports": [],
+      "headers": [],
+      "enums": [],
+      "unions": [],
+
       "models": [
         {
           "name": "content",
@@ -91,6 +102,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
             {
               "method": "GET",
               "path": "/contents/data",
+              "parameters": [],
               "responses": [
                 { "code": 200, "type": "%s" }
               ]

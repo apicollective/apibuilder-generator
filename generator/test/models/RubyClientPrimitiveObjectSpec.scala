@@ -10,6 +10,12 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
   describe("for a field with an object field") {
 
     val baseJson = TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "models": [],
+      "enums": [],
+      "unions": [],
+      "resources": [],
       "models": [
         {
           "name": "content",
@@ -69,6 +75,12 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
   describe("for a response with an object field") {
 
     val baseJson = TestHelper.buildJson(s"""
+      "imports": [],
+      "headers": [],
+      "models": [],
+      "enums": [],
+      "unions": [],
+
       "models": [
         {
           "name": "content",
@@ -88,6 +100,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
             {
               "method": "GET",
               "path": "/data",
+              "parameters": [],
               "responses": [
                 { "code": 200, "type": "%s" }
               ]

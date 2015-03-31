@@ -25,6 +25,12 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
 
   it("only generates error wrappers for model classes (not primitives)") {
     val json = TestHelper.buildJson(s"""
+      "imports": [],
+      "headers": [],
+      "models": [],
+      "enums": [],
+      "unions": [],
+
       "models": [
         {
           "name": "user",
@@ -45,6 +51,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
             {
               "method": "GET",
               "path": "/:id",
+              "parameters": [],
               "responses": [
                 { "code": 200, "type": "user" },
                 { "code": 409, "type": "unit" }

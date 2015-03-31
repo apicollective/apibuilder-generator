@@ -109,8 +109,10 @@ object ScalaUtil {
   def scalaDefault(value: String, datatype: ScalaDatatype): String = try {
     datatype.default(value)
   } catch {
-    case e: Exception => throw new RuntimeException(
-      s"parsing default `$value` for datatype $datatype", e)
+    case e: Exception => {
+      e.printStackTrace(System.err)
+      throw new RuntimeException(s"parsing default `$value` for datatype $datatype", e)
+    }
   }
 }
 

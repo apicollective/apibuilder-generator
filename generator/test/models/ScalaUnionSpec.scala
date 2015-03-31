@@ -11,6 +11,11 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
   describe("models") {
 
     val json = TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "enums": [],
+      "resources": [],
+
       "unions": [
         {
           "name": "user",
@@ -75,6 +80,11 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
   describe("enums") {
 
     val json = TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "models": [],
+      "resources": [],
+
       "enums": [
         {
           "name": "member_type",

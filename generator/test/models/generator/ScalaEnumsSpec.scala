@@ -9,6 +9,11 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
   describe("for a model with 2 enum fields") {
 
     val json = TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "unions": [],
+      "resources": [],
+
       "enums": [
         {
           "name": "age_group",

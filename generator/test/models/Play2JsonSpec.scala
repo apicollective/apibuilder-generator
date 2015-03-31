@@ -8,6 +8,11 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
   describe("for models with lists") {
 
     val json = TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "unions": [],
+      "enums": [],
+      "resources": [],
       "models": [
         {
           "name": "content",

@@ -25,7 +25,15 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("service with no operations") {
-    val service = TestHelper.service(TestHelper.buildJson(""))
+    val service = TestHelper.service(TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "models": [],
+      "enums": [],
+      "unions": [],
+      "models": [],
+      "resources": []
+    """))
 
     TestHelper.assertEqualsFile(
       "test/resources/generators/play-2-route-no-operations.routes",
