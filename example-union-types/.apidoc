@@ -1,0 +1,6 @@
+code:
+  gilt:
+    apidoc-example-union-types:
+      version: latest
+      generators:
+        play_2_3_client: generated/app/ApidocExampleUnionTypesClient.scala
