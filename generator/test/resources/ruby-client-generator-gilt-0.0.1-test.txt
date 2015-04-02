@@ -120,6 +120,18 @@ module Com
                   @client.request("/members/#{organization}").get.map { |hash| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(hash) }
                 end
 
+                def post_members_bulk_by_organization(organization, members)
+                  HttpClient::Preconditions.assert_class('organization', organization, String)
+                  HttpClient::Preconditions.assert_collection_of_class('members', members, ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member)
+                  @client.request("/members/#{organization}/members_bulk").with_json(members.map { |o| o.to_hash }.to_json).post.map { |hash| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(hash) }
+                end
+
+                def post_members_map_by_organization(organization, members)
+                  HttpClient::Preconditions.assert_class('organization', organization, String)
+                  HttpClient::Preconditions.assert_hash_of_class('members', members, ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member)
+                  @client.request("/members/#{organization}/members_map").with_json(members.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }).to_json.post.map { |hash| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(hash) }
+                end
+
               end
 
               class Organizations

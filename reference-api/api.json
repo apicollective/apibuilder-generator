@@ -229,6 +229,14 @@
                     "responses": {
                         "200": { "type": "[member]" }
                     }
+                },
+                {
+                    "method": "POST",
+                    "path": "/:organization/members_bulk",
+                    "body": { "type": "[member]" },
+                    "responses": {
+                        "200": { "type": "[member]" }
+                    }
                 }
             ]
         }

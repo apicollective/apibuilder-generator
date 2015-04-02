@@ -681,6 +681,56 @@
               "type": "[member]"
             }
           ]
+        },
+        {
+            "method": "POST",
+            "path": "/members/:organization/members_bulk",
+            "parameters": [
+                {
+                    "name": "organization",
+                    "type": "uuid",
+                    "location": "Path",
+                    "description": null,
+                    "required": true,
+                    "default": null,
+                    "minimum": null,
+                    "maximum": null,
+                    "example": null
+                }
+            ],
+            "description": null,
+            "body": { "type": "[member]" },
+            "responses": [
+                {
+                    "code": 200,
+                    "type": "[member]"
+                }
+            ]
+        },
+        {
+            "method": "POST",
+            "path": "/members/:organization/members_map",
+            "parameters": [
+                {
+                    "name": "organization",
+                    "type": "uuid",
+                    "location": "Path",
+                    "description": null,
+                    "required": true,
+                    "default": null,
+                    "minimum": null,
+                    "maximum": null,
+                    "example": null
+                }
+            ],
+            "description": null,
+            "body": { "type": "map[member]" },
+            "responses": [
+                {
+                    "code": 200,
+                    "type": "[member]"
+                }
+            ]
         }
       ]
     },

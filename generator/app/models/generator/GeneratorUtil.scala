@@ -197,11 +197,10 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       val body = op.body.get
 
       val payload = body.datatype match {
-        case ScalaPrimitive.Enum(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
-        case ScalaPrimitive.Model(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
-        case ScalaPrimitive.Union(ns, name) => ScalaUtil.toVariable(name, multiple = body.multiple)
-        case p: ScalaPrimitive => p.asString(ScalaUtil.toVariable(body.`type`))
-        case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered as body for $op")
+        case p: ScalaPrimitive => ScalaUtil.toVariable(p.shortName, multiple = false)
+        case ScalaDatatype.List(t) => ScalaUtil.toVariable(t.shortName, multiple = true)
+        case ScalaDatatype.Map(t) => t.asString(ScalaUtil.toVariable(body.`type`))
+        case c: ScalaDatatype.Option => sys.error(s"unsupported container type ${c} encountered as body for $op")
       }
 
       Some(s"val payload = play.api.libs.json.Json.toJson($payload)")
