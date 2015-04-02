@@ -396,6 +396,30 @@ package com.gilt.apidoc.reference.api.v0 {
           case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
+
+      override def postMembersBulkByOrganization(
+        organization: _root_.java.util.UUID,
+        members: Seq[com.gilt.apidoc.reference.api.v0.models.Member]
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.Member]] = {
+        val payload = play.api.libs.json.Json.toJson(members)
+
+        _executeRequest("POST", s"/members/${organization}/members_bulk", body = Some(payload)).map {
+          case r if r.getStatusCode == 200 => _root_.com.gilt.apidoc.reference.api.v0.Client.parseJson("Seq[com.gilt.apidoc.reference.api.v0.models.Member]", r, _.validate[Seq[com.gilt.apidoc.reference.api.v0.models.Member]])
+          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+        }
+      }
+
+      override def postMembersMapByOrganization(
+        organization: _root_.java.util.UUID,
+        members: Map[String, com.gilt.apidoc.reference.api.v0.models.Member]
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.Member]] = {
+        val payload = play.api.libs.json.Json.toJson(members.toString)
+
+        _executeRequest("POST", s"/members/${organization}/members_map", body = Some(payload)).map {
+          case r if r.getStatusCode == 200 => _root_.com.gilt.apidoc.reference.api.v0.Client.parseJson("Seq[com.gilt.apidoc.reference.api.v0.models.Member]", r, _.validate[Seq[com.gilt.apidoc.reference.api.v0.models.Member]])
+          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+        }
+      }
     }
 
     object Organizations extends Organizations {
@@ -615,6 +639,16 @@ package com.gilt.apidoc.reference.api.v0 {
 
     def getByOrganization(
       organization: _root_.java.util.UUID
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.Member]]
+
+    def postMembersBulkByOrganization(
+      organization: _root_.java.util.UUID,
+      members: Seq[com.gilt.apidoc.reference.api.v0.models.Member]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.Member]]
+
+    def postMembersMapByOrganization(
+      organization: _root_.java.util.UUID,
+      members: Map[String, com.gilt.apidoc.reference.api.v0.models.Member]
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.Member]]
   }
 
