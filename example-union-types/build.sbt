@@ -4,7 +4,7 @@ name := "apidoc-example-union-types"
 
 organization := "com.gilt.apidoc.generator"
 
-scalaVersion in ThisBuild := "2.11.5"
+scalaVersion in ThisBuild := "2.11.6"
 
 lazy val generated = project
   .in(file("generated"))
