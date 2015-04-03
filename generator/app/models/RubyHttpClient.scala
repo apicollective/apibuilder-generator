@@ -190,7 +190,7 @@ module HttpClient
         response.body
       else
         body = response.body rescue nil
-        raise HttpClient::ServerError.new(response.code.to_i, response.message, :body => body, :uri => @uri)
+        raise HttpClient::ServerError.new(response.code.to_i, response.message, :body => body, :uri => @uri.to_s)
       end
     end
   end
