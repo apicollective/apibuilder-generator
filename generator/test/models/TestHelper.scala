@@ -56,6 +56,7 @@ object TestHelper {
     if (contents.trim != readFile(filename).trim) {
       val tmpPath = "/tmp/apidoc.tmp." + Text.safeName(filename)
       TestHelper.writeToFile(tmpPath, contents.trim)
+      // TestHelper.writeToFile(filename, contents.trim)
       import sys.process._
       val cmd = s"diff $tmpPath $filename"
       cmd.!
