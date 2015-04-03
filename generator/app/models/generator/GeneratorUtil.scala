@@ -197,7 +197,7 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       val body = op.body.get
 
       val payload = body.datatype match {
-        case p: ScalaPrimitive => ScalaUtil.toVariable(p.shortName, multiple = false)
+        case p: ScalaPrimitive => ScalaUtil.toDefaultVariable(multiple = false)
         case ScalaDatatype.List(t) => ScalaUtil.toVariable(t.shortName, multiple = true)
         case ScalaDatatype.Map(t) => t.asString(ScalaUtil.toVariable(body.`type`))
         case c: ScalaDatatype.Option => sys.error(s"unsupported container type ${c} encountered as body for $op")
