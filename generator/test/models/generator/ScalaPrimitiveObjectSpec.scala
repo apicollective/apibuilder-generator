@@ -57,18 +57,30 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     describe("generates valid case classes") {
 
       it("singleton") {
-        val code = ScalaCaseClasses.invoke(InvocationForm(service("object")), addHeader = false)
-        TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-singleton.txt", code)
+        ScalaCaseClasses.invoke(InvocationForm(service("object")), addHeader = false) match {
+          case Left(errors) => fail(errors.mkString(", "))
+          case Right(code) => {
+            TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-singleton.txt", code)
+          }
+        }
       }
 
       it("list") {
-        val code = ScalaCaseClasses.invoke(InvocationForm(service("[object]")), addHeader = false)
-        TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-list.txt", code)
+        ScalaCaseClasses.invoke(InvocationForm(service("[object]")), addHeader = false) match {
+          case Left(errors) => fail(errors.mkString(", "))
+          case Right(code) => {
+            TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-list.txt", code)
+          }
+        }
       }
 
       it("map") {
-        val code = ScalaCaseClasses.invoke(InvocationForm(service("map[object]")), addHeader = false)
-        TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-map.txt", code)
+        ScalaCaseClasses.invoke(InvocationForm(service("map[object]")), addHeader = false) match {
+          case Left(errors) => fail(errors.mkString(", "))
+          case Right(code) => {
+            TestHelper.assertEqualsFile("test/resources/generators/scala-primitive-object-map.txt", code)
+          }
+        }
       }
 
     }

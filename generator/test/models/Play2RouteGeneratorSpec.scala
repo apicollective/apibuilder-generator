@@ -35,10 +35,10 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       "resources": []
     """))
 
-    TestHelper.assertEqualsFile(
-      "test/resources/generators/play-2-route-no-operations.routes",
-      Play2RouteGenerator(InvocationForm(service)).invoke().getOrElse("")
-    )
+    Play2RouteGenerator(InvocationForm(service)).invoke() match {
+      case Left(errors) => errors.mkString(", ") should be("Service does not have any resource operations")
+      case Right(code) => fail("expected error when generating routes for a service with no operations")
+    }
   }
 
   describe("with reference-api service") {
@@ -67,10 +67,15 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       r.method should be("controllers.Echoes.get")
       r.params.mkString(", ") should be("foo: _root_.scala.Option[String], optional_messages: _root_.scala.Option[List[String]], required_messages: List[String]")
 
-      TestHelper.assertEqualsFile(
-        "test/resources/generators/play-2-route-reference-api.routes",
-        Play2RouteGenerator(InvocationForm(service)).invoke().getOrElse("")
-      )
+      Play2RouteGenerator(InvocationForm(service)).invoke() match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(code) => {
+          TestHelper.assertEqualsFile(
+            "test/resources/generators/play-2-route-reference-api.routes",
+            code
+         ) 
+        }
+      }
     }
 
     it("camel cases hypen in route") {

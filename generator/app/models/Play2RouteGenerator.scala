@@ -7,8 +7,8 @@ import generator.{ScalaDatatype, ScalaPrimitive, GeneratorUtil, ScalaOperation, 
 
 object Play2RouteGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): String = {
-    new Play2RouteGenerator(form).invoke.getOrElse("")
+  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
+    new Play2RouteGenerator(form).invoke
   }
 }
 
@@ -24,16 +24,15 @@ case class Play2RouteGenerator(form: InvocationForm) {
   private val service = form.service
   private val scalaService = ScalaService(service)
 
-  def invoke(): Option[String] = {
+  def invoke(): Either[Seq[String], String] = {
     scalaService.resources.flatMap { resource =>
       resource.operations.map { op =>
         Play2Route(scalaService, op, resource)
       }
     } match {
       case Nil => {
-        Some(
-          ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
-            "# Service does not have any resource operations. There are no routes"
+        Left(
+          Seq("Service does not have any resource operations")
         )
       }
       case all => {
@@ -41,7 +40,7 @@ case class Play2RouteGenerator(form: InvocationForm) {
         val maxUrlLength = all.map(_.url.length).toSeq.sorted.last
         val (paramStart, pathStart) = all.partition(_.url.startsWith("/:"))
 
-        Some(
+        Right(
           ApidocComments(form.service.version, form.userAgent).toRubyString() + "\n\n" +
             (pathStart ++ paramStart).map { r =>
               Seq(

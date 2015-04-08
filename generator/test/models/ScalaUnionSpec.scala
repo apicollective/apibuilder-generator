@@ -55,8 +55,12 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     lazy val ssd = ScalaService(service)
 
     it("generates valid models") {
-      val code = ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false)
-      TestHelper.assertEqualsFile("test/resources/scala-union-models-case-classes.txt", code)
+      ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false) match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(code) => {
+          TestHelper.assertEqualsFile("test/resources/scala-union-models-case-classes.txt", code)
+        }
+      }
     }
 
     it("generates valid readers for the union type itself") {

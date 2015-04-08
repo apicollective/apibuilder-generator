@@ -13,7 +13,14 @@ object Invocations extends Controller {
       case Some((_, generator)) =>
         request.body.validate[InvocationForm] match {
           case e: JsError => Conflict(Json.toJson(Validation.invalidJson(e)))
-          case s: JsSuccess[InvocationForm] => Ok(Json.toJson(Invocation(generator.invoke(s.get))))
+          case s: JsSuccess[InvocationForm] => {
+            generator.invoke(s.get) match {
+              case Left(errors) => Conflict(Json.toJson(Validation.errors(errors)))
+              case Right(code) => {
+                Ok(Json.toJson(Invocation(code)))
+              }
+            }
+          }
         }
       case _ => NotFound
     }

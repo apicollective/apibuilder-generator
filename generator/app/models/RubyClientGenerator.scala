@@ -175,7 +175,7 @@ object RubyUtil {
 
 object RubyClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): String = {
+  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
     new RubyClientGenerator(form).invoke
   }
 
@@ -305,7 +305,11 @@ case class RubyClientGenerator(form: InvocationForm) {
     }
   }
 
-  def invoke(): String = {
+  def invoke(): Either[Seq[String], String] = {
+    Right(generateCode())
+  }
+
+  private def generateCode(): String = {
     val spacerSize = 2
     val moduleIndent = spacerSize * module.parts.size
 

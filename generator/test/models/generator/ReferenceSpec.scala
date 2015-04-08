@@ -24,18 +24,30 @@ class ReferenceSpec extends FunSpec with Matchers {
   }
 
   it("generates expected code for play 2.3 client") {
-    val code = Play23ClientGenerator.invoke(InvocationForm(service = TestHelper.referenceApiService))
-    TestHelper.assertEqualsFile("test/resources/generators/reference-spec-play-23.txt", code)
+    Play23ClientGenerator.invoke(InvocationForm(service = TestHelper.referenceApiService)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(code) => {
+        TestHelper.assertEqualsFile("test/resources/generators/reference-spec-play-23.txt", code)
+      }
+    }
   }
 
   it("generates expected code for ning client") {
-    val code = Ning18ClientGenerator.invoke(InvocationForm(service = TestHelper.referenceApiService))
-    TestHelper.assertEqualsFile("test/resources/generators/reference-spec-ning-client.txt", code)
+    Ning18ClientGenerator.invoke(InvocationForm(service = TestHelper.referenceApiService)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(code) => {
+        TestHelper.assertEqualsFile("test/resources/generators/reference-spec-ning-client.txt", code)
+      }
+    }
   }
 
   it("generates expected code for ruby client") {
-    val code = RubyClientGenerator.invoke(InvocationForm(service = TestHelper.referenceApiService))
-    TestHelper.assertEqualsFile("test/resources/generators/reference-spec-ruby-client.txt", code)
+    RubyClientGenerator.invoke(InvocationForm(service = TestHelper.referenceApiService)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(code) => {
+        TestHelper.assertEqualsFile("test/resources/generators/reference-spec-ruby-client.txt", code)
+      }
+    }
   }
 
 }

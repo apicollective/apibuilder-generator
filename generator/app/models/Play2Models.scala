@@ -9,18 +9,21 @@ object Play2Models extends CodeGenerator {
 
   override def invoke(
     form: InvocationForm
-  ): String = {
-    apply(form, addBindables = true, addHeader = true)
+  ): Either[Seq[String], String] = {
+    ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
+      case Nil => Right(generateCode(form = form, addBindables = true, addHeader = true))
+      case errors => Left(errors)
+    }
   }
 
-  def apply(
+  def generateCode(
     form: InvocationForm,
     addBindables: Boolean,
     addHeader: Boolean
   ): String = {
     val ssd = ScalaService(form.service)
 
-    val caseClasses = ScalaCaseClasses.invoke(form, addHeader = false)
+    val caseClasses = ScalaCaseClasses.generateCode(form, addHeader = false)
     val prefix = underscoreAndDashToInitCap(ssd.name)
     val enumJson: String = ssd.enums.map { ScalaEnums(ssd, _).buildJson() }.mkString("\n\n")
     val play2Json = Play2Json(ssd).generate()

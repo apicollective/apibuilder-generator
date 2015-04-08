@@ -5,7 +5,7 @@ import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 import generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon}
-import generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs}
+import generator.{ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
 
 case class PlayFrameworkVersion(
   name: String,
@@ -17,7 +17,7 @@ case class PlayFrameworkVersion(
 
 object Play22ClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): String = {
+  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
     val config = PlayFrameworkVersion(
       name = "2.2.x",
       config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace)),
@@ -32,7 +32,7 @@ object Play22ClientGenerator extends CodeGenerator {
 
 object Play23ClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): String = {
+  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
 
     val config = PlayFrameworkVersion(
       name = "2.3.x",
@@ -51,7 +51,7 @@ object Play2ClientGenerator {
   def invoke(
     version: PlayFrameworkVersion,
     form: InvocationForm
-  ): String = {
+  ): Either[Seq[String], String] = {
     Play2ClientGenerator(version, form).invoke()
   }
 
@@ -64,10 +64,17 @@ case class Play2ClientGenerator(
 
   private val ssd = new ScalaService(form.service)
 
-  def invoke(): String = {
+  def invoke(): Either[Seq[String], String] = {
+    ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
+      case Nil => Right(generateCode())
+      case errors => Left(errors)
+    }
+  }
+
+  private def generateCode(): String = {
     ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
     Seq(
-      Play2Models(form, addBindables = true, addHeader = false),
+      Play2Models.generateCode(form, addBindables = true, addHeader = false),
       client()
     ).mkString("\n\n")
   }

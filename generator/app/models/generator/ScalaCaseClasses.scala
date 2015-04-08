@@ -7,9 +7,30 @@ import lib.Text._
 
 object ScalaCaseClasses extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): String = invoke(form, addHeader = true)
+  private val MaxNumberOfFields = 21
+
+  override def invoke(form: InvocationForm): Either[Seq[String], String] = invoke(form, addHeader = true)
+
+  def modelsWithTooManyFieldsErrors(service: Service): Seq[String] = {
+    service.models.filter(_.fields.size > MaxNumberOfFields) match {
+      case Nil => Nil
+      case invalidModels => {
+        Seq(s"One or more models has more than $MaxNumberOfFields - this generators uses case classes which do not yet support larger number of fields: " + invalidModels.map(_.name).mkString(", "))
+      }
+    }
+  }
 
   def invoke(
+    form: InvocationForm,
+    addHeader: Boolean = true
+  ): Either[Seq[String], String] = {
+    modelsWithTooManyFieldsErrors(form.service) match {
+      case Nil => Right(generateCode(form, addHeader))
+      case errors => Left(errors)
+    }
+  }
+
+  def generateCode(
     form: InvocationForm,
     addHeader: Boolean = true
   ): String = {
