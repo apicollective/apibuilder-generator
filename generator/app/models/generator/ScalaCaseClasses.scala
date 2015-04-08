@@ -15,7 +15,7 @@ object ScalaCaseClasses extends CodeGenerator {
     service.models.filter(_.fields.size > MaxNumberOfFields) match {
       case Nil => Nil
       case invalidModels => {
-        Seq(s"One or more models has more than $MaxNumberOfFields - this generators uses case classes which do not yet support larger number of fields: " + invalidModels.map(_.name).mkString(", "))
+        Seq(s"One or more models has more than $MaxNumberOfFields fields. This generators relies on scala case classes and play json serialization which do not yet support a larger number of fields. Models with too many fields: " + invalidModels.map(_.name).mkString(", "))
       }
     }
   }
