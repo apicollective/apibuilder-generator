@@ -4,6 +4,7 @@ import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 
 import play.api.libs.json._
+import com.gilt.apidoc.spec.v0.models.{ResponseCode, IntWrapper, StringWrapper, ResponseCodeUndefinedType}
 import com.gilt.apidoc.spec.v0.models.json._
 import com.gilt.apidoc.spec.v0.models.Service
 import generator.ScalaService
@@ -73,6 +74,14 @@ object TestHelper {
 
   def scalaService(json: String): ScalaService = {
     ScalaService(service(json))
+  }
+
+  def responseCode(responseCode: ResponseCode): String = {
+    responseCode match {
+      case StringWrapper(value) => value
+      case IntWrapper(value) => value.toString
+      case ResponseCodeUndefinedType(_) => sys.error("invalid value")
+    }
   }
 
 }

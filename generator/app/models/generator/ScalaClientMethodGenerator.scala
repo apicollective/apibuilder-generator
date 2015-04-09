@@ -1,7 +1,7 @@
 package generator
 
 import models.JsonImports
-import com.gilt.apidoc.spec.v0.models.Resource
+import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, IntWrapper, StringWrapper, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
 case class ScalaClientMethodGenerator(
@@ -130,11 +130,31 @@ case class ScalaClientMethodGenerator(
       }
 
       val allResponseCodes = (
-        op.responses.map(_.code) ++ (hasOptionResult match {
+        op.responses.flatMap { r =>
+          r.code match {
+            case IntWrapper(value) => Some(value)
+            case StringWrapper(_) | ResponseCodeUndefinedType(_) => None
+          }
+        } ++ (hasOptionResult match {
           case None => Seq.empty
           case Some(_) => Seq(404)
         })
       ).distinct.sorted
+
+      val defaultResponse = op.responses.find { r =>
+        r.code match {
+          case StringWrapper("default") => true
+          case StringWrapper(other) => sys.error(s"Unexpected response code of type string[$other]")
+          case IntWrapper(_) | ResponseCodeUndefinedType(_) => false
+        }
+      } match {
+        case Some(response) => {
+          s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r)"
+        }
+        case None => {
+          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})"""
+        }
+      }
 
       val matchResponse: String = {
         op.responses.flatMap { response =>
@@ -163,8 +183,7 @@ case class ScalaClientMethodGenerator(
             Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${namespaces.errors}.${response.errorClassName}(r)")
           }
         }.mkString("\n")
-      } + hasOptionResult.getOrElse("") +
-      s"""\ncase r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})\n"""
+      } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
 
       ClientMethod(
         name = op.name,

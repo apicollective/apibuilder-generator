@@ -2,7 +2,7 @@ package generator
 
 import com.gilt.apidoc.spec.v0.models._
 import lib.{Datatype, DatatypeResolver, Methods, Primitives, Text, Type, Kind}
-import models.Container
+import models.{Container, Util}
 
 case class ScalaService(
   val service: Service
@@ -222,7 +222,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
   }
 
   val responses: Seq[ScalaResponse] = operation.responses
-    .sortWith { _.code < _.code }
+    .sortBy { r => Util.responseCodeAsString(r.code) }
     .map { new ScalaResponse(ssd, method, _) }
 
   lazy val resultType = responses.find(_.isSuccess).map(_.resultType).getOrElse("Unit")
@@ -231,7 +231,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
 class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
 
-  val code: Int = response.code
+  val code: ResponseCode = response.code
 
   val `type`: Datatype = ssd.datatypeResolver.parse(response.`type`).getOrElse {
     sys.error(s"Could not parse type[${response.`type`}] for response[$response]")
@@ -242,8 +242,15 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
     case Container.List | Container.Map => false
   }
 
-  val isSuccess = code >= 200 && code < 300
-  val isNotFound = code == 404
+  val isSuccess = response.code match {
+    case IntWrapper(value) => value >= 200 && value < 300
+    case StringWrapper(_) | ResponseCodeUndefinedType(_) => false
+  }
+
+  val isNotFound = response.code match {
+    case IntWrapper(value) => value == 404
+    case StringWrapper(_) | ResponseCodeUndefinedType(_) => false
+  }
 
   val datatype = ssd.scalaDatatype(`type`, true)
 

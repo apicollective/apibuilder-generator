@@ -15,7 +15,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
       sys.error("could not find resource with name[Invocations]")
     }
     val operation = resource.operations.find(_.method == Method.Post).get
-    val errorResponse = operation.responses.find(_.code == 409).get
+    val errorResponse = operation.responses.find(r => TestHelper.responseCode(r.code) == "409").get
     errorResponse.errorClassName should be("ErrorsResponse")
     errorResponse.datatype.name should be("Seq[com.gilt.apidoc.generator.v0.models.Error]")
 

@@ -1123,7 +1123,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
   def generateResponses(op: Operation): String = {
     // TODO: match on all response codes
-    op.responses.sortWith { _.code < _.code }.headOption.flatMap { generateResponse(_) }.getOrElse("\n        nil")
+    op.responses.sortBy { r => Util.responseCodeAsString(r.code).toString }.headOption.flatMap { generateResponse(_) }.getOrElse("\n        nil")
   }
 
   def generateResponse(response: Response): Option[String] = {
