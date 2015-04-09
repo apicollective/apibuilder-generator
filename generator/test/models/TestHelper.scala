@@ -4,7 +4,7 @@ import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 
 import play.api.libs.json._
-import com.gilt.apidoc.spec.v0.models.{ResponseCode, IntWrapper, StringWrapper, ResponseCodeUndefinedType}
+import com.gilt.apidoc.spec.v0.models.{IntWrapper, ResponseCode, ResponseCodeOption, ResponseCodeUndefinedType}
 import com.gilt.apidoc.spec.v0.models.json._
 import com.gilt.apidoc.spec.v0.models.Service
 import generator.ScalaService
@@ -78,9 +78,10 @@ object TestHelper {
 
   def responseCode(responseCode: ResponseCode): String = {
     responseCode match {
-      case StringWrapper(value) => value
       case IntWrapper(value) => value.toString
-      case ResponseCodeUndefinedType(_) => sys.error("invalid value")
+      case ResponseCodeOption.Default => ResponseCodeOption.Default.toString
+      case ResponseCodeOption.UNDEFINED(value) => sys.error(s"invalid value[$value]")
+      case ResponseCodeUndefinedType(value) => sys.error(s"invalid response code type[$value]")
     }
   }
 

@@ -244,12 +244,12 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
 
   val isSuccess = response.code match {
     case IntWrapper(value) => value >= 200 && value < 300
-    case StringWrapper(_) | ResponseCodeUndefinedType(_) => false
+    case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
   }
 
   val isNotFound = response.code match {
     case IntWrapper(value) => value == 404
-    case StringWrapper(_) | ResponseCodeUndefinedType(_) => false
+    case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
   }
 
   val datatype = ssd.scalaDatatype(`type`, true)

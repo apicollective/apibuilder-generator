@@ -1,7 +1,7 @@
 package generator
 
 import models.JsonImports
-import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, IntWrapper, StringWrapper, ResponseCodeUndefinedType}
+import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, IntWrapper, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
 case class ScalaClientMethodGenerator(
@@ -133,7 +133,7 @@ case class ScalaClientMethodGenerator(
         op.responses.flatMap { r =>
           r.code match {
             case IntWrapper(value) => Some(value)
-            case StringWrapper(_) | ResponseCodeUndefinedType(_) => None
+            case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => None
           }
         } ++ (hasOptionResult match {
           case None => Seq.empty
@@ -143,9 +143,8 @@ case class ScalaClientMethodGenerator(
 
       val defaultResponse = op.responses.find { r =>
         r.code match {
-          case StringWrapper("default") => true
-          case StringWrapper(other) => sys.error(s"Unexpected response code of type string[$other]")
-          case IntWrapper(_) | ResponseCodeUndefinedType(_) => false
+          case ResponseCodeOption.Default => true
+          case ResponseCodeOption.UNDEFINED(_) | IntWrapper(_) | ResponseCodeUndefinedType(_) => false
         }
       } match {
         case Some(response) => {
@@ -186,7 +185,7 @@ case class ScalaClientMethodGenerator(
               }
             }
 
-            case StringWrapper(_) | ResponseCodeUndefinedType(_) => {
+            case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
               None
             }
           }
