@@ -587,7 +587,7 @@ ${headers.rubyModuleConstants.indent(2)}
       Seq(
         "module Types",
         union.types.map { ut =>
-          ut.description.map { desc => GeneratorUtil.formatComment(desc) }.getOrElse("") +
+          ut.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
           s"${RubyUtil.toUnionConstant(union, ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} unless defined?(${RubyUtil.toUnionConstant(union, ut.`type`)})"
         }.mkString("\n").indent(2),
         "end"
