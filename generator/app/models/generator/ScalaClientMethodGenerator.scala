@@ -158,29 +158,37 @@ case class ScalaClientMethodGenerator(
 
       val matchResponse: String = {
         op.responses.flatMap { response =>
-          if (response.isSuccess) {
-            if (response.isOption) {
-              if (response.isUnit) {
-                Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => Some(Unit)")
+          response.code match {
+            case IntWrapper(statusCode) => {
+              if (response.isSuccess) {
+                if (response.isOption) {
+                  if (response.isUnit) {
+                    Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => Some(Unit)")
+                  } else {
+                    val json = config.toJson("r", response.datatype.name)
+                    Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => Some($json)")
+                  }
+
+                } else if (response.isUnit) {
+                  Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => ${response.datatype.name}")
+
+                } else {
+                  val json = config.toJson("r", response.datatype.name)
+                  Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => $json")
+                }
+
+              } else if (response.isNotFound && response.isOption) {
+                // will be added later
+                None
+
               } else {
-                val json = config.toJson("r", response.datatype.name)
-                Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => Some($json)")
+                Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => throw new ${namespaces.errors}.${response.errorClassName}(r)")
               }
-
-            } else if (response.isUnit) {
-              Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => ${response.datatype.name}")
-
-            } else {
-              val json = config.toJson("r", response.datatype.name)
-              Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => $json")
             }
 
-          } else if (response.isNotFound && response.isOption) {
-            // will be added later
-            None
-
-          } else {
-            Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${namespaces.errors}.${response.errorClassName}(r)")
+            case StringWrapper(_) | ResponseCodeUndefinedType(_) => {
+              None
+            }
           }
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
