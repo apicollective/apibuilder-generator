@@ -91,7 +91,7 @@ object RubyUtil {
     } else if (value.indexOf("\"") < 0) {
       s""""$value""""
     } else {
-      sys.error("TODO: Support quoting quotes")
+      sys.error(s"Unable to quote value[$value]")
     }
   }
 
