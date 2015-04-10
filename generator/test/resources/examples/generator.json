@@ -232,7 +232,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[generator]"
             }
           ]
@@ -257,7 +257,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "generator"
             }
           ]
@@ -277,7 +277,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "healthcheck"
             }
           ]
@@ -312,11 +312,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "invocation"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]

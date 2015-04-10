@@ -53,8 +53,8 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
               "path": "/:id",
               "parameters": [],
               "responses": [
-                { "code": 200, "type": "user" },
-                { "code": 409, "type": "unit" }
+                { "code": { "integer": { "value": 200 } }, "type": "user" },
+                { "code": { "integer": { "value": 409 } }, "type": "unit" }
               ]
             }
           ]
