@@ -1,6 +1,6 @@
 package controllers
 
-import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UuidWrapper}
+import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
 import com.gilt.apidoc.example.union.types.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
@@ -11,7 +11,7 @@ object Users extends Controller {
   private val users: Seq[User] = Seq(
     RegisteredUser(UUID.randomUUID(), "registered@test.apidoc.me", preference = Foo.A),
     GuestUser(UUID.randomUUID(), "guest@test.apidoc.me"),
-    UuidWrapper(UUID.randomUUID())
+    UserUuid(UUID.randomUUID())
   )
 
   def get() = Action {
@@ -23,7 +23,7 @@ object Users extends Controller {
       u match {
         case RegisteredUser(id, email, preference) => id == guid
         case GuestUser(id, email) => id == guid
-        case UuidWrapper(value) => value == guid
+        case UserUuid(value) => value == guid
         case UserUndefinedType(name) => false
       }
     } match {
@@ -53,7 +53,7 @@ object Users extends Controller {
         user match {
           case RegisteredUser(id, email, preference) => println(s"Received Registered User $id")
           case GuestUser(id, email) => println(s"Received Guest User $id")
-          case UuidWrapper(value) => println(s"Received UUID $value")
+          case UserUuid(value) => println(s"Received UUID $value")
           case UserUndefinedType(name) => println(s"Received undefined type $name")
         }
 

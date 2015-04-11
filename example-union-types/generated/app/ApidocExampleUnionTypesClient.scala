@@ -42,7 +42,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
   /**
    * Wrapper class to support the union types containing the datatype[uuid]
    */
-  case class UuidWrapper(
+  case class UserUuid(
     value: _root_.java.util.UUID
   ) extends User
 
@@ -182,12 +182,12 @@ package com.gilt.apidoc.example.union.types.v0.models {
       )(unlift(RegisteredUser.unapply _))
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesUuidWrapper: play.api.libs.json.Reads[UuidWrapper] = {
-      (__ \ "value").read[_root_.java.util.UUID].map { x => new UuidWrapper(value = x) }
+    implicit def jsonReadsApidocExampleUnionTypesUserUuid: play.api.libs.json.Reads[UserUuid] = {
+      (__ \ "value").read[_root_.java.util.UUID].map { x => new UserUuid(value = x) }
     }
 
-    implicit def jsonWritesApidocExampleUnionTypesUuidWrapper: play.api.libs.json.Writes[UuidWrapper] = new play.api.libs.json.Writes[UuidWrapper] {
-      def writes(x: UuidWrapper) = play.api.libs.json.Json.obj(
+    implicit def jsonWritesApidocExampleUnionTypesUserUuid: play.api.libs.json.Writes[UserUuid] = new play.api.libs.json.Writes[UserUuid] {
+      def writes(x: UserUuid) = play.api.libs.json.Json.obj(
         "value" -> play.api.libs.json.Json.toJson(x.value)
       )
     }
@@ -214,7 +214,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
         orElse
         (__ \ "guest_user").read(jsonReadsApidocExampleUnionTypesGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
-        (__ \ "uuid").read(jsonReadsApidocExampleUnionTypesUuidWrapper).asInstanceOf[play.api.libs.json.Reads[User]]
+        (__ \ "uuid").read(jsonReadsApidocExampleUnionTypesUserUuid).asInstanceOf[play.api.libs.json.Reads[User]]
       )
     }
 
@@ -222,7 +222,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
       def writes(obj: User) = obj match {
         case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
         case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
-        case x: UuidWrapper => play.api.libs.json.Json.obj("uuid" -> jsonWritesApidocExampleUnionTypesUuidWrapper.writes(x))
+        case x: UserUuid => play.api.libs.json.Json.obj("uuid" -> jsonWritesApidocExampleUnionTypesUserUuid.writes(x))
         case x: com.gilt.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.gilt.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
     }

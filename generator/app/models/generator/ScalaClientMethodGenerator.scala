@@ -1,7 +1,7 @@
 package generator
 
 import models.JsonImports
-import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, IntWrapper, ResponseCodeOption, ResponseCodeUndefinedType}
+import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
 case class ScalaClientMethodGenerator(
@@ -132,7 +132,7 @@ case class ScalaClientMethodGenerator(
       val allResponseCodes = (
         op.responses.flatMap { r =>
           r.code match {
-            case IntWrapper(value) => Some(value)
+            case ResponseCodeInt(value) => Some(value)
             case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => None
           }
         } ++ (hasOptionResult match {
@@ -144,7 +144,7 @@ case class ScalaClientMethodGenerator(
       val defaultResponse = op.responses.find { r =>
         r.code match {
           case ResponseCodeOption.Default => true
-          case ResponseCodeOption.UNDEFINED(_) | IntWrapper(_) | ResponseCodeUndefinedType(_) => false
+          case ResponseCodeOption.UNDEFINED(_) | ResponseCodeInt(_) | ResponseCodeUndefinedType(_) => false
         }
       } match {
         case Some(response) => {
@@ -158,7 +158,7 @@ case class ScalaClientMethodGenerator(
       val matchResponse: String = {
         op.responses.flatMap { response =>
           response.code match {
-            case IntWrapper(statusCode) => {
+            case ResponseCodeInt(statusCode) => {
               if (response.isSuccess) {
                 if (response.isOption) {
                   if (response.isUnit) {
