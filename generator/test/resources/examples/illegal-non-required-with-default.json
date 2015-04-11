@@ -118,7 +118,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 201,
+              "code": { "integer": { "value": 201 } },
               "type": "user",
               "description": null,
               "deprecation": null
@@ -147,7 +147,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "user",
               "description": null,
               "deprecation": null
@@ -167,7 +167,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "user",
               "description": null,
               "deprecation": null

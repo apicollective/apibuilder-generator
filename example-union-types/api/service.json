@@ -152,7 +152,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[user]"
             }
           ]
@@ -177,7 +177,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "user"
             }
           ]
@@ -193,7 +193,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 201,
+              "code": { "integer": { "value": 201 } },
               "type": "user"
             }
           ]

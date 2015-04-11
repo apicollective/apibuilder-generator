@@ -1232,7 +1232,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[application]"
             }
           ]
@@ -1260,11 +1260,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "application"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -1303,11 +1303,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "application"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -1343,7 +1343,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -1408,11 +1408,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "code"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -1447,11 +1447,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "domain"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -1487,7 +1487,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -1510,11 +1510,11 @@
           "parameters": [],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -1579,7 +1579,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[generator]"
             }
           ]
@@ -1604,7 +1604,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "generator"
             }
           ]
@@ -1620,11 +1620,11 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "generator"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -1652,11 +1652,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "generator"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -1681,7 +1681,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -1701,7 +1701,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "healthcheck"
             }
           ]
@@ -1788,7 +1788,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[membership]"
             }
           ]
@@ -1813,7 +1813,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "membership"
             }
           ]
@@ -1838,7 +1838,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -1925,7 +1925,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[membership_request]"
             }
           ]
@@ -1972,11 +1972,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "membership_request"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2001,11 +2001,11 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2030,11 +2030,11 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2132,7 +2132,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[organization]"
             }
           ]
@@ -2157,7 +2157,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "organization"
             }
           ]
@@ -2173,11 +2173,11 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "organization"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2205,11 +2205,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "organization"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2234,7 +2234,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -2257,11 +2257,11 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "password_reset_success"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2284,11 +2284,11 @@
           "parameters": [],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2375,7 +2375,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[subscription]"
             }
           ]
@@ -2400,7 +2400,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "subscription"
             }
           ]
@@ -2416,11 +2416,11 @@
           "parameters": [],
           "responses": [
             {
-              "code": 201,
+              "code": { "integer": { "value": 201 } },
               "type": "subscription"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2445,7 +2445,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -2499,7 +2499,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[user]"
             }
           ]
@@ -2524,7 +2524,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "user"
             }
           ]
@@ -2560,11 +2560,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "user"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2611,11 +2611,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "user"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2662,11 +2662,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "user"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2689,7 +2689,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "validation"
             }
           ]
@@ -2754,7 +2754,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[version]"
             }
           ]
@@ -2801,7 +2801,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "version"
             }
           ]
@@ -2840,11 +2840,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "version"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2894,11 +2894,11 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "version"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -2945,7 +2945,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -3032,7 +3032,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[watch]"
             }
           ]
@@ -3057,7 +3057,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "watch"
             }
           ]
@@ -3104,7 +3104,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "boolean"
             }
           ]
@@ -3120,11 +3120,11 @@
           "parameters": [],
           "responses": [
             {
-              "code": 201,
+              "code": { "integer": { "value": 201 } },
               "type": "watch"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -3149,7 +3149,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]

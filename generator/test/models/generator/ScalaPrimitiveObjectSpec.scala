@@ -116,7 +116,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
               "path": "/contents/data",
               "parameters": [],
               "responses": [
-                { "code": 200, "type": "%s" }
+                { "code": { "integer": { "value": 200 } }, "type": "%s" }
               ]
             }
           ]

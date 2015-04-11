@@ -1,7 +1,7 @@
 package generator
 
 import models.JsonImports
-import com.gilt.apidoc.spec.v0.models.Resource
+import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, IntWrapper, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
 case class ScalaClientMethodGenerator(
@@ -130,41 +130,67 @@ case class ScalaClientMethodGenerator(
       }
 
       val allResponseCodes = (
-        op.responses.map(_.code) ++ (hasOptionResult match {
+        op.responses.flatMap { r =>
+          r.code match {
+            case IntWrapper(value) => Some(value)
+            case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => None
+          }
+        } ++ (hasOptionResult match {
           case None => Seq.empty
           case Some(_) => Seq(404)
         })
       ).distinct.sorted
 
+      val defaultResponse = op.responses.find { r =>
+        r.code match {
+          case ResponseCodeOption.Default => true
+          case ResponseCodeOption.UNDEFINED(_) | IntWrapper(_) | ResponseCodeUndefinedType(_) => false
+        }
+      } match {
+        case Some(response) => {
+          s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r)"
+        }
+        case None => {
+          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})"""
+        }
+      }
+
       val matchResponse: String = {
         op.responses.flatMap { response =>
-          if (response.isSuccess) {
-            if (response.isOption) {
-              if (response.isUnit) {
-                Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => Some(Unit)")
+          response.code match {
+            case IntWrapper(statusCode) => {
+              if (response.isSuccess) {
+                if (response.isOption) {
+                  if (response.isUnit) {
+                    Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => Some(Unit)")
+                  } else {
+                    val json = config.toJson("r", response.datatype.name)
+                    Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => Some($json)")
+                  }
+
+                } else if (response.isUnit) {
+                  Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => ${response.datatype.name}")
+
+                } else {
+                  val json = config.toJson("r", response.datatype.name)
+                  Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => $json")
+                }
+
+              } else if (response.isNotFound && response.isOption) {
+                // will be added later
+                None
+
               } else {
-                val json = config.toJson("r", response.datatype.name)
-                Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => Some($json)")
+                Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => throw new ${namespaces.errors}.${response.errorClassName}(r)")
               }
-
-            } else if (response.isUnit) {
-              Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => ${response.datatype.name}")
-
-            } else {
-              val json = config.toJson("r", response.datatype.name)
-              Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => $json")
             }
 
-          } else if (response.isNotFound && response.isOption) {
-            // will be added later
-            None
-
-          } else {
-            Some(s"case r if r.${config.responseStatusMethod} == ${response.code} => throw new ${namespaces.errors}.${response.errorClassName}(r)")
+            case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
+              None
+            }
           }
         }.mkString("\n")
-      } + hasOptionResult.getOrElse("") +
-      s"""\ncase r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})\n"""
+      } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
 
       ClientMethod(
         name = op.name,

@@ -6,7 +6,7 @@ import org.scalatest.{ShouldMatchers, FunSpec}
 
 class ExampleUnionTypesSpec extends FunSpec with ShouldMatchers {
 
-  val service = TestHelper.parseFile(s"../example-union-types/api/service.json")
+  private lazy val service = TestHelper.parseFile(s"../example-union-types/api/service.json")
 
   it("generates expected code for play 2.3 client") {
     Play23ClientGenerator.invoke(InvocationForm(service = service)) match {

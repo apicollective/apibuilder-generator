@@ -489,7 +489,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -525,7 +525,7 @@
           ],
           "responses": [
             {
-              "code": 204,
+              "code": { "integer": { "value": 204 } },
               "type": "unit"
             }
           ]
@@ -590,11 +590,11 @@
           ],
           "responses": [
             {
-              "code": 201,
+              "code": { "integer": { "value": 201 } },
               "type": "member"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -652,7 +652,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[member]"
             }
           ]
@@ -677,7 +677,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[member]"
             }
           ]
@@ -702,7 +702,7 @@
             "body": { "type": "[member]" },
             "responses": [
                 {
-                    "code": 200,
+                    "code": { "integer": { "value": 200 } },
                     "type": "[member]"
                 }
             ]
@@ -727,7 +727,7 @@
             "body": { "type": "map[member]" },
             "responses": [
                 {
-                    "code": 200,
+                    "code": { "integer": { "value": 200 } },
                     "type": "[member]"
                 }
             ]
@@ -759,11 +759,11 @@
           ],
           "responses": [
             {
-              "code": 201,
+              "code": { "integer": { "value": 201 } },
               "type": "organization"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -799,7 +799,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[organization]"
             }
           ]
@@ -824,7 +824,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "organization"
             }
           ]
@@ -878,11 +878,11 @@
           ],
           "responses": [
             {
-              "code": 201,
+              "code": { "integer": { "value": 201 } },
               "type": "user"
             },
             {
-              "code": 409,
+              "code": { "integer": { "value": 409 } },
               "type": "[error]"
             }
           ]
@@ -951,7 +951,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[user]"
             }
           ]
@@ -976,7 +976,7 @@
           ],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "[user]"
             }
           ]
@@ -989,7 +989,7 @@
           "parameters": [],
           "responses": [
             {
-              "code": 200,
+              "code": { "integer": { "value": 200 } },
               "type": "unit"
             }
           ]
