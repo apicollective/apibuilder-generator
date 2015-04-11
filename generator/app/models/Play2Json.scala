@@ -28,7 +28,7 @@ case class Play2Json(
       s"${identifier(union.name, Reads)} = {",
       s"  (",
       union.types.map { scalaUnionType =>
-        s"""(__ \\ "${scalaUnionType.originalName}").read(${reader(scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+        s"""(__ \\ "${scalaUnionType.originalName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indent(4),
       // TODO: Figure out appropriate way to deserialize the undefined
       // type. This example creates a runtime error
@@ -48,10 +48,10 @@ case class Play2Json(
           case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
             p.name
           }
-          case p: ScalaPrimitive => PrimitiveWrapper.className(p)
+          case p: ScalaPrimitive => PrimitiveWrapper.className(union, p)
           case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
         }
-        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", t)})"""
+        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -59,7 +59,7 @@ case class Play2Json(
     ).mkString("\n")
   }
 
-  private def reader(ut: ScalaUnionType): String = {
+  private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
     ut.model match {
       case Some(model) => methodName(model.name, Reads)
       case None => {
@@ -72,7 +72,7 @@ case class Play2Json(
             // a primitive, so this match is redundant,
             // but necessary due to the way the data is currently
             // structured
-            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(p), Reads)
+            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(union, p), Reads)
             case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
           }
         }
@@ -80,14 +80,14 @@ case class Play2Json(
     }
   }
 
-  private def writer(varName: String, ut: ScalaUnionType): String = {
+  private def writer(varName: String, union: ScalaUnion, ut: ScalaUnionType): String = {
     ut.model match {
       case Some(model) => methodName(model.name, Writes) + ".writes(x)"
       case None => {
         ut.enum match {
           case Some(enum) => methodName(enum.name, Writes) + ".writes(x)"
           case None => ut.datatype match {
-            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(p), Writes) + ".writes(x)"
+            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(union, p), Writes) + ".writes(x)"
             case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
           }
         }

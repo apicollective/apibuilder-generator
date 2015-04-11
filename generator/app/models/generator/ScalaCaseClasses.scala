@@ -51,7 +51,7 @@ object ScalaCaseClasses extends CodeGenerator {
     val wrappers = PrimitiveWrapper(ssd).wrappers match {
       case Nil => ""
       case wrappers => {
-        wrappers.map { w => generateCaseClass(w.model, w.unions) }.mkString("\n\n").indent(2) + "\n"
+        wrappers.map { w => generateCaseClass(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
       }
     }
 

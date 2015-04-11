@@ -1,6 +1,6 @@
 package controllers
 
-import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UuidWrapper}
+import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
 import com.gilt.apidoc.example.union.types.v0.models.json._
 import java.util.UUID
 
@@ -65,9 +65,9 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
     val guid = UUID.randomUUID
 
     await(
-      client.users.post(UuidWrapper(guid))
+      client.users.post(UserUuid(guid))
     ) match {
-      case wrapper: UuidWrapper => {
+      case wrapper: UserUuid => {
         wrapper.value must be(guid)
       }
       case user => {
@@ -87,7 +87,7 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
       user match {
         case RegisteredUser(id, email, preference) => Some(id)
         case GuestUser(id, email) => Some(id)
-        case UuidWrapper(value) => Some(value)
+        case UserUuid(value) => Some(value)
         case UserUndefinedType(name) => None
       }
     }
@@ -98,7 +98,7 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
       } match {
         case RegisteredUser(id, email, preference) => id must be(userGuid)
         case GuestUser(id, email) => id must be(userGuid)
-        case UuidWrapper(value) => value must be(userGuid)
+        case UserUuid(value) => value must be(userGuid)
         case UserUndefinedType(name) => fail("Should note have received undefined type")
       }
     }
