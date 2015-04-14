@@ -1,4 +1,7 @@
 {
+  "apidoc": {
+    "version": "0.9.6"
+  },
   "name": "Apidoc Reference Api",
   "organization": {
     "key": "gilt"

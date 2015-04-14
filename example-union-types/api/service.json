@@ -1,4 +1,7 @@
 {
+  "apidoc": {
+    "version": "0.9.6"
+  },
   "name": "apidoc Example Union Types",
   "organization": {
     "key": "gilt"
@@ -8,30 +11,24 @@
   },
   "namespace": "com.gilt.apidoc.example.union.types.v0",
   "version": "0.0.1-dev",
-  "base_url": null,
-  "description": null,
   "headers": [],
   "imports": [],
   "enums": [
     {
       "name": "bar",
       "plural": "bars",
-      "description": null,
       "values": [
         {
-          "name": "b",
-          "description": null
+          "name": "b"
         }
       ]
     },
     {
       "name": "foo",
       "plural": "foos",
-      "description": null,
       "values": [
         {
-          "name": "a",
-          "description": null
+          "name": "a"
         }
       ]
     }
@@ -40,34 +37,27 @@
     {
       "name": "foobar",
       "plural": "foobars",
-      "description": null,
       "types": [
         {
-          "type": "foo",
-          "description": null
+          "type": "foo"
         },
         {
-          "type": "bar",
-          "description": null
+          "type": "bar"
         }
       ]
     },
     {
       "name": "user",
       "plural": "users",
-      "description": null,
       "types": [
         {
-          "type": "registered_user",
-          "description": null
+          "type": "registered_user"
         },
         {
-          "type": "guest_user",
-          "description": null
+          "type": "guest_user"
         },
         {
-          "type": "uuid",
-          "description": null
+          "type": "uuid"
         }
       ]
     }
@@ -76,64 +66,39 @@
     {
       "name": "guest_user",
       "plural": "guest_users",
-      "description": null,
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
           "description": "Internal unique identifier for this user.",
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         },
         {
           "name": "email",
           "type": "string",
-          "description": null,
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         }
       ]
     },
     {
       "name": "registered_user",
       "plural": "registered_users",
-      "description": null,
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
           "description": "Internal unique identifier for this user.",
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         },
         {
           "name": "email",
           "type": "string",
-          "description": null,
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         },
         {
           "name": "preference",
           "type": "foobar",
-          "description": null,
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         }
       ]
     }
@@ -142,17 +107,18 @@
     {
       "type": "user",
       "plural": "users",
-      "description": null,
       "operations": [
         {
           "method": "GET",
           "path": "/users",
-          "description": null,
-          "body": null,
           "parameters": [],
           "responses": [
             {
-              "code": { "integer": { "value": 200 } },
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
               "type": "[user]"
             }
           ]
@@ -160,24 +126,21 @@
         {
           "method": "GET",
           "path": "/users/:guid",
-          "description": null,
-          "body": null,
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Path",
-              "description": null,
-              "required": true,
-              "default": null,
-              "minimum": null,
-              "maximum": null,
-              "example": null
+              "required": true
             }
           ],
           "responses": [
             {
-              "code": { "integer": { "value": 200 } },
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
               "type": "user"
             }
           ]
@@ -185,15 +148,17 @@
         {
           "method": "POST",
           "path": "/users",
-          "description": null,
           "body": {
-            "type": "user",
-            "description": null
+            "type": "user"
           },
           "parameters": [],
           "responses": [
             {
-              "code": { "integer": { "value": 201 } },
+              "code": {
+                "integer": {
+                  "value": 201
+                }
+              },
               "type": "user"
             }
           ]

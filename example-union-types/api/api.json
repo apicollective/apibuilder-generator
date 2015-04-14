@@ -1,4 +1,8 @@
 {
+    "apidoc": {
+      "version": "0.9.6"
+    },
+
     "name": "apidoc Example Union Types",
 
     "enums": {
