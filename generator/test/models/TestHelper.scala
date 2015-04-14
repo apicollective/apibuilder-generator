@@ -16,11 +16,13 @@ object TestHelper {
   lazy val collectionJsonDefaultsService = parseFile("test/resources/examples/collection-json-defaults.json")
   lazy val illegalNonRequiredWithDefaultService = parseFile("test/resources/examples/illegal-non-required-with-default.json")
   lazy val referenceApiService = parseFile(s"../reference-api/service.json")
-  lazy val generatorApiService = parseFile(s"test/resources/examples/generator.json")
-  lazy val apidocApiService = parseFile(s"test/resources/examples/apidoc.json")
+  lazy val generatorApiService = parseFile(s"test/resources/examples/apidoc-generator.json")
+  lazy val apidocApiService = parseFile(s"test/resources/examples/apidoc-api.json")
 
   def buildJson(json: String): String = {
+    val specVersion = com.gilt.apidoc.spec.v0.Constants.Version
     val body = s"""
+      "apidoc": { "version": "$specVersion" },
       "base_url": "http://localhost:9000",
       "name": "Api Doc Test",
       "organization": { "key": "test" },

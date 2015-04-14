@@ -1,5 +1,8 @@
 {
-  "name": "Apidoc Generator",
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "apidoc generator",
   "organization": {
     "key": "gilt"
   },
@@ -7,13 +10,13 @@
     "key": "apidoc-generator"
   },
   "namespace": "com.gilt.apidoc.generator.v0",
-  "version": "0.0.1-dev",
-  "base_url": "http://www.apidoc.me",
+  "version": "0.9.6",
+  "base_url": "http://localhost:9000",
   "description": "Documentation for an apidoc code generator API",
   "headers": [],
   "imports": [
     {
-      "uri": "http://localhost:9000/gilt/apidoc-spec/0.7.39/service.json",
+      "uri": "http://localhost:9000/gilt/apidoc-spec/0.9.6/service.json",
       "namespace": "com.gilt.apidoc.spec.v0",
       "organization": {
         "key": "gilt"
@@ -21,15 +24,20 @@
       "application": {
         "key": "apidoc-spec"
       },
-      "version": "0.7.39",
+      "version": "0.9.6",
       "enums": [
         "method",
-        "parameter_location"
+        "parameter_location",
+        "response_code_option"
       ],
-      "unions": [],
+      "unions": [
+        "response_code"
+      ],
       "models": [
+        "apidoc",
         "application",
         "body",
+        "deprecation",
         "enum",
         "enum_value",
         "field",
@@ -41,7 +49,9 @@
         "parameter",
         "resource",
         "response",
-        "service"
+        "service",
+        "union",
+        "union_type"
       ]
     }
   ],
@@ -51,27 +61,18 @@
     {
       "name": "error",
       "plural": "errors",
-      "description": null,
       "fields": [
         {
           "name": "code",
           "type": "string",
           "description": "Machine readable code for this specific error message",
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         },
         {
           "name": "message",
           "type": "string",
           "description": "Description of the error",
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         }
       ]
     },
@@ -83,58 +84,33 @@
         {
           "name": "key",
           "type": "string",
-          "description": null,
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         },
         {
           "name": "name",
           "type": "string",
-          "description": null,
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         },
         {
           "name": "language",
           "type": "string",
-          "description": null,
-          "default": null,
-          "required": false,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": false
         },
         {
           "name": "description",
           "type": "string",
-          "description": null,
-          "default": null,
-          "required": false,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": false
         }
       ]
     },
     {
       "name": "healthcheck",
       "plural": "healthchecks",
-      "description": null,
       "fields": [
         {
           "name": "status",
           "type": "string",
-          "description": null,
-          "default": null,
           "required": true,
-          "minimum": null,
-          "maximum": null,
           "example": "healthy"
         }
       ]
@@ -148,38 +124,23 @@
           "name": "source",
           "type": "string",
           "description": "The actual source code.",
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         }
       ]
     },
     {
       "name": "invocation_form",
       "plural": "invocation_forms",
-      "description": null,
       "fields": [
         {
           "name": "service",
           "type": "com.gilt.apidoc.spec.v0.models.service",
-          "description": null,
-          "default": null,
-          "required": true,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": true
         },
         {
           "name": "user_agent",
           "type": "string",
-          "description": null,
-          "default": null,
-          "required": false,
-          "minimum": null,
-          "maximum": null,
-          "example": null
+          "required": false
         }
       ]
     }
@@ -188,24 +149,18 @@
     {
       "type": "generator",
       "plural": "generators",
-      "description": null,
       "operations": [
         {
           "method": "GET",
           "path": "/generators",
           "description": "Get all available generators",
-          "body": null,
           "parameters": [
             {
               "name": "key",
               "type": "string",
               "location": "Query",
               "description": "Filter generators with this key",
-              "required": false,
-              "default": null,
-              "minimum": null,
-              "maximum": null,
-              "example": null
+              "required": false
             },
             {
               "name": "limit",
@@ -214,9 +169,7 @@
               "description": "The number of records to return",
               "required": true,
               "default": "100",
-              "minimum": 0,
-              "maximum": null,
-              "example": null
+              "minimum": 0
             },
             {
               "name": "offset",
@@ -225,14 +178,16 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0,
-              "maximum": null,
-              "example": null
+              "minimum": 0
             }
           ],
           "responses": [
             {
-              "code": { "integer": { "value": 200 } },
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
               "type": "[generator]"
             }
           ]
@@ -241,23 +196,21 @@
           "method": "GET",
           "path": "/generators/:key",
           "description": "Get generator with this key",
-          "body": null,
           "parameters": [
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "description": null,
-              "required": true,
-              "default": null,
-              "minimum": null,
-              "maximum": null,
-              "example": null
+              "required": true
             }
           ],
           "responses": [
             {
-              "code": { "integer": { "value": 200 } },
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
               "type": "generator"
             }
           ]
@@ -267,17 +220,18 @@
     {
       "type": "healthcheck",
       "plural": "healthchecks",
-      "description": null,
       "operations": [
         {
           "method": "GET",
           "path": "/_internal_/healthcheck",
-          "description": null,
-          "body": null,
           "parameters": [],
           "responses": [
             {
-              "code": { "integer": { "value": 200 } },
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
               "type": "healthcheck"
             }
           ]
@@ -287,36 +241,37 @@
     {
       "type": "invocation",
       "plural": "invocations",
-      "description": null,
       "operations": [
         {
           "method": "POST",
           "path": "/invocations/:key",
           "description": "Invoke a generator",
           "body": {
-            "type": "invocation_form",
-            "description": null
+            "type": "invocation_form"
           },
           "parameters": [
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "description": null,
-              "required": true,
-              "default": null,
-              "minimum": null,
-              "maximum": null,
-              "example": null
+              "required": true
             }
           ],
           "responses": [
             {
-              "code": { "integer": { "value": 200 } },
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
               "type": "invocation"
             },
             {
-              "code": { "integer": { "value": 409 } },
+              "code": {
+                "integer": {
+                  "value": 409
+                }
+              },
               "type": "[error]"
             }
           ]

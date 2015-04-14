@@ -1,4 +1,7 @@
 {
+  "apidoc": {
+    "version": "0.9.6"
+  },
   "name": "test",
   "organization": {
     "key": "mreed"

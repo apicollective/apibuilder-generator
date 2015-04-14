@@ -1,4 +1,7 @@
 {
+  "apidoc": {
+    "version": "0.9.4"
+  },
   "name": "Quality",
   "organization": {
     "key": "gilt"
