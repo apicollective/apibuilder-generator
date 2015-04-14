@@ -1,6 +1,7 @@
 package generator
 
-import models.JsonImports
+import lib.VersionTag
+import models.{FeatureMigration, JsonImports}
 import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
@@ -16,6 +17,8 @@ case class ScalaClientMethodGenerator(
   private val generatorUtil = GeneratorUtil(config)
 
   private val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
+
+  private val featureMigration = FeatureMigration(ssd.service.version)
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + errorPackage()).trim
@@ -125,8 +128,13 @@ case class ScalaClientMethodGenerator(
         case v => s"""${v.mkString("\n\n")}\n\n_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
       }
 
-      val hasOptionResult = op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
-        s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
+      val hasOptionResult = featureMigration.hasImplicit404s match {
+        case true => {
+          op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
+            s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
+          }
+        }
+        case false => None
       }
 
       val allResponseCodes = (
