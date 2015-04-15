@@ -1,44 +1,64 @@
 package lib
 
-sealed trait Datatype {
-  def `type`: Type
-  def label: String
-}
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
+
+sealed abstract class Datatype(val name: String)
 
 object Datatype {
+  sealed abstract class Primitive(override val name: String)
+    extends Datatype(name)
 
-  case class List(`type`: Type) extends Datatype {
-    override def label = "[" + `type`.name + "]"
+  object Primitive {
+    def apply(name: String): Try[Primitive] = Try(name match {
+      case "boolean" => Boolean
+      case "double" => Double
+      case "integer" => Integer
+      case "long" => Long
+      case "date-iso8601" => DateIso8601
+      case "date-time-iso8601" => DateTimeIso8601
+      case "decimal" => Decimal
+      case "object" => Object
+      case "string" => String
+      case "unit" => Unit
+      case "uuid" => Uuid
+    })
+
+    case object Boolean extends Primitive("boolean")
+    case object Double extends Primitive("double")
+    case object Integer extends Primitive("integer")
+    case object Long extends Primitive("long")
+    case object DateIso8601 extends Primitive("date-iso8601")
+    case object DateTimeIso8601 extends Primitive("date-time-iso8601")
+    case object Decimal extends Primitive("decimal")
+    case object Object extends Primitive("object")
+    case object String extends Primitive("string")
+    case object Unit extends Primitive("unit")
+    case object Uuid extends Primitive("uuid")
   }
 
-  case class Map(`type`: Type) extends Datatype {
-    override def label = "map[" + `type`.name + "]"
+  sealed abstract class UserDefined(override val name: String)
+    extends Datatype(name)
+
+  object UserDefined {
+    case class Model(override val name: String) extends UserDefined(name)
+
+    case class Enum(override val name: String) extends UserDefined(name)
+
+    case class Union(override val name: String) extends UserDefined(name)
   }
 
-  case class Singleton(`type`: Type) extends Datatype {
-    override def label = `type`.name
+  sealed abstract class Container(val inner: Datatype, prefix: String, suffix: String)
+    extends Datatype(s"${prefix}${inner.name}${suffix}")
+
+  object Container {
+    case class List(override val inner: Datatype) extends Container(inner, "[", "]")
+
+    case class Map(override val inner: Datatype) extends Container(inner, "map[", "]")
+
+    case class Option(override val inner: Datatype) extends Container(inner, "option[", "]")
   }
-
-}
-
-// NOTE: need sealed to get compiler
-// warnings about incomplete match/case
-// one would think sealed not needed on
-// Type, since Kind has it, but the sealed here is necessary.
-sealed case class Type(
-  typeKind: Kind,
-  name: String
-)
-
-sealed trait Kind
-
-object Kind {
-
-  case object Primitive extends Kind { override def toString = "primitive" }
-  case object Model extends Kind { override def toString = "model" }
-  case object Union extends Kind { override def toString = "union" }
-  case object Enum extends Kind { override def toString = "enum" }
-
 }
 
 case class DatatypeResolver(
@@ -47,58 +67,58 @@ case class DatatypeResolver(
   modelNames: Iterable[String]
 ) {
 
-  /**
-    * Takes the name of a singleton type - a primitive, model or enum. If
-    * valid - returns an instance of a Type. Types are resolved in the
-    * following order:
-    * 
-    *   1. Primitive
-    *   2. Enum
-    *   3. Model
-    *   4. Union
-    * 
-    * If the type is not found, returns none.
-    * 
-    * Examples:
-    *   toType("string") => Some(Primitives.String)
-    *   toType("long") => Some(Primitives.Long)
-    *   toType("foo") => None
-    */
-  def toType(name: String): Option[Type] = {
-    Primitives(name) match {
-      case Some(_) => {
-        Some(Type(Kind.Primitive, name))
-      }
-      case None => {
-        enumNames.find(_ == name) match {
-          case Some(_) => Some(Type(Kind.Enum, name))
-          case None => {
-            modelNames.find(_ == name) match {
-              case Some(_) => Some(Type(Kind.Model, name))
-              case None => {
-                unionNames.find(_ == name) match {
-                  case Some(_) => Some(Type(Kind.Union, name))
-                  case None => None
-                }
-              }
-            }
-          }
-        }
-      }
+  private val userDefinedTypes = {
+    val builder = Map.newBuilder[String, Datatype.UserDefined]
+    enumNames.foreach { name =>
+      builder += name -> Datatype.UserDefined.Enum(name)
+    }
+    unionNames.foreach { name =>
+      builder += name -> Datatype.UserDefined.Union(name)
+    }
+    modelNames.foreach { name =>
+      builder += name -> Datatype.UserDefined.Model(name)
+    }
+    builder.result
+  }
+
+  private object UserDefined {
+    def unapply(value: String): Option[Datatype.UserDefined] = {
+      userDefinedTypes.get(value)
     }
   }
+
+  private final val ListRx = "^\\[(.*)\\]$".r
+  private final val MapRx = "^map\\[(.*)\\]$".r
+  private final val MapDefaultRx = "^map$".r
 
   /**
     * Parses a type string into an instance of a Datatype.
     * 
     * @param value: Examples: "string", "uuid"
     */
-  def parse(value: String): Option[Datatype] = {
-    TextDatatype(value) match {
-      case TextDatatype.List(typeName) => toType(typeName).map { Datatype.List(_) }
-      case TextDatatype.Map(typeName) => toType(typeName).map { Datatype.Map(_) }
-      case TextDatatype.Singleton(typeName) => toType(typeName).map { Datatype.Singleton(_) }
+  def parse(value: String, required: Boolean): Try[Datatype] = {
+    val dt = value match {
+      case "boolean" => Success(Datatype.Primitive.Boolean)
+      case "double" => Success(Datatype.Primitive.Double)
+      case "integer" => Success(Datatype.Primitive.Integer)
+      case "long" => Success(Datatype.Primitive.Long)
+      case "date-iso8601" => Success(Datatype.Primitive.DateIso8601)
+      case "date-time-iso8601" => Success(Datatype.Primitive.DateTimeIso8601)
+      case "decimal" => Success(Datatype.Primitive.Decimal)
+      case "object" => Success(Datatype.Primitive.Object)
+      case "string" => Success(Datatype.Primitive.String)
+      case "unit" => Success(Datatype.Primitive.Unit)
+      case "uuid" => Success(Datatype.Primitive.Uuid)
+
+      case ListRx(inner) => parse(inner, true).map(Datatype.Container.List)
+      case MapRx(inner) => parse(inner, true).map(Datatype.Container.Map)
+      case MapDefaultRx() => Success(Datatype.Container.Map(Datatype.Primitive.String))
+
+      case UserDefined(dt) => Success(dt)
+      case _ => Failure(new RuntimeException(s"cannot parse ${value} as datatype"))
     }
+
+    if (required) dt else dt.map(Datatype.Container.Option)
   }
 
 }

@@ -11,6 +11,7 @@ scalaVersion in ThisBuild := "2.11.6"
 // we end up not needing it.
 lazy val lib = project
   .in(file("lib"))
+  .dependsOn(generated)
   .settings(commonSettings: _*)
 
 lazy val generated = project
@@ -24,8 +25,8 @@ lazy val generated = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(generated, lib)
-  .aggregate(generated, lib)
+  .dependsOn(scalaGenerator, rubyGenerator)
+  .aggregate(scalaGenerator, rubyGenerator)
   .enablePlugins(PlayScala)
   .settings(
     routesImport += "com.gilt.apidoc.generator.v0.Bindables._",
@@ -34,6 +35,16 @@ lazy val generator = project
       "org.scalatestplus" %% "play" % "1.2.0" % "test"
     )
   )
+
+lazy val scalaGenerator = project
+  .in(file("scala-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+
+lazy val rubyGenerator = project
+  .in(file("ruby-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("apidoc-" + _),
