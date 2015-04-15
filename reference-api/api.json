@@ -3,21 +3,21 @@
     "name": "Apidoc Reference Api",
 
     "enums": {
-	"age_group": {
-	    "values": [
-		{ "name": "Youth", "description": "under 18" },
-		{ "name": "Adult", "description": "18 and over" }
-	    ]
-	}
+        "age_group": {
+            "values": [
+                { "name": "Youth", "description": "under 18" },
+                { "name": "Adult", "description": "18 and over" }
+            ]
+        }
     },
 
     "models": {
-	"echo": {
-	    "plural": "echoes",
-	    "fields": [
+        "echo": {
+            "plural": "echoes",
+            "fields": [
                 { "name": "value", "type": "string" }
-	    ]
-	},
+            ]
+        },
 
         "user_list": {
             "fields": [
@@ -88,35 +88,35 @@
     },
 
     "resources": {
-	"echo": {
-	    "operations": [
-		{
-		    "method": "GET",
+        "echo": {
+            "operations": [
+                {
+                    "method": "GET",
                     "parameters": [
                         { "name": "foo", "type": "string", "required": false },
                         { "name": "optional_messages", "type": "[string]", "required": false },
                         { "name": "required_messages", "type": "[string]" }
                     ]
                 },
-		{
-		    "method": "GET",
-		    "path": "/arrays-only",
+                {
+                    "method": "GET",
+                    "path": "/arrays-only",
                     "parameters": [
                         { "name": "optional_messages", "type": "[string]", "required": false },
                         { "name": "required_messages", "type": "[string]" }
                     ]
                 }
 
-	    ]
-	},
+            ]
+        },
 
         "organization": {
-	    "path": "/",
+            "path": "/",
 
             "operations": [
                 {
                     "method": "POST",
-		    "path": "organizations",
+                    "path": "organizations",
                     "parameters": [
                         { "name": "organization", "type": "organization" }
                     ],
@@ -127,7 +127,7 @@
                 },
                 {
                     "method": "GET",
-		    "path": "organizations",
+                    "path": "organizations",
                     "parameters": [
                         { "name": "guid", "type": "uuid", "required": false },
                         { "name": "name", "type": "string", "required": false }
@@ -137,7 +137,7 @@
                     }
                 },
                 {
-		    "path": ":guid",
+                    "path": ":guid",
                     "method": "GET",
                     "responses": {
                         "200": { "type": "organization" }
@@ -166,7 +166,7 @@
                     "parameters": [
                         { "name": "guid", "type": "uuid", "required": false },
                         { "name": "organization_guids", "type": "[long]", "description": "Limits users to the specified organizations.", "required": false },
-			{ "name": "age_group", "type": "age_group", "required": false, "description": "Limit to users in this age group" },
+                        { "name": "age_group", "type": "age_group", "required": false, "description": "Limit to users in this age group" },
                         { "name": "email", "type": "string", "required": false },
                         { "name": "active", "type": "boolean", "default": "true" }
                     ],
@@ -177,7 +177,7 @@
 
                 {
                     "method": "GET",
-		    "path": "/:age_group",
+                    "path": "/:age_group",
                     "responses": {
                         "200": { "type": "[user]" }
                     }
@@ -224,7 +224,7 @@
                     "method": "GET",
                     "path": "/:organization",
                     "parameters": [
-                      { "name": "organization", "type": "uuid" }
+                        { "name": "organization", "type": "uuid" }
                     ],
                     "responses": {
                         "200": { "type": "[member]" }
