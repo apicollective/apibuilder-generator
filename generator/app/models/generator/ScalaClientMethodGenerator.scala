@@ -168,7 +168,7 @@ case class ScalaClientMethodGenerator(
           response.code match {
             case ResponseCodeInt(statusCode) => {
               if (response.isSuccess) {
-                if (response.isOption) {
+                if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
                     Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => Some(Unit)")
                   } else {
@@ -184,7 +184,7 @@ case class ScalaClientMethodGenerator(
                   Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => $json")
                 }
 
-              } else if (response.isNotFound && response.isOption) {
+              } else if (featureMigration.hasImplicit404s && response.isNotFound && response.isOption) {
                 // will be added later
                 None
 
