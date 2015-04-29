@@ -258,9 +258,18 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
 
   val resultType: String = datatype.name
 
-  val errorVariableName = ScalaUtil.toVariable(`type`)
-
-  val errorClassName = lib.Text.initCap(errorVariableName) + "Response"
+  val (errorVariableName, errorClassName) = isUnit match {
+    case true => {
+      (None, "UnitResponse")
+    }
+    case false => {
+      val variableName = ScalaUtil.toVariable(`type`)
+      (
+        Some(variableName),
+        lib.Text.initCap(variableName) + "Response"
+      )
+    }
+  }
 }
 
 class ScalaField(ssd: ScalaService, modelName: String, field: Field) {

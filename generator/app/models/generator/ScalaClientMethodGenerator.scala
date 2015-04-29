@@ -71,7 +71,7 @@ case class ScalaClientMethodGenerator(
     * handled via these classes.
     */
   private def modelErrorClasses(): Seq[String] = {
-    ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !(r.isSuccess || r.isUnit)).map { response =>
+    ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !r.isSuccess).map { response =>
       errorTypeClass(response)
     }.distinct.sorted
   }
@@ -79,11 +79,20 @@ case class ScalaClientMethodGenerator(
   private[this] def errorTypeClass(response: ScalaResponse): String = {
     require(!response.isSuccess)
 
-    val json = config.toJson("response", response.datatype.name)
-    exceptionClass(
-      response.errorClassName,
-      Some(s"lazy val ${response.errorVariableName} = ${json.indent(2).trim}")
-    )
+    response.isUnit match {
+      case true => {
+        unitExceptionClass(response.errorClassName)
+      }
+      case false => {
+        exceptionClass(
+          response.errorClassName,
+          response.errorVariableName.map { name =>
+            val json = config.toJson("response", response.datatype.name)
+            s"lazy val $name = ${json.indent(2).trim}"
+          }
+        )
+      }
+    }
   }
 
   private[this] def exceptionClass(
@@ -102,6 +111,12 @@ case class ScalaClientMethodGenerator(
       s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$bodyString"""
     ).mkString("\n")
 
+  }
+
+  private[this] def unitExceptionClass(
+    className: String
+  ): String = {
+    s"case class $className(status: Int) extends Exception"
   }
 
   private[this] def methods(resource: ScalaResource): Seq[ClientMethod] = {
@@ -156,7 +171,11 @@ case class ScalaClientMethodGenerator(
         }
       } match {
         case Some(response) => {
-          s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r)"
+          if (response.isUnit) {
+            s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})"
+          } else {
+            s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r)"
+          }
         }
         case None => {
           s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})"""
@@ -170,18 +189,18 @@ case class ScalaClientMethodGenerator(
               if (response.isSuccess) {
                 if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => Some(Unit)")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some(Unit)")
                   } else {
                     val json = config.toJson("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => Some($json)")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($json)")
                   }
 
                 } else if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => ${response.datatype.name}")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${response.datatype.name}")
 
                 } else {
                   val json = config.toJson("r", response.datatype.name)
-                  Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => $json")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json")
                 }
 
               } else if (featureMigration.hasImplicit404s && response.isNotFound && response.isOption) {
@@ -189,7 +208,12 @@ case class ScalaClientMethodGenerator(
                 None
 
               } else {
-                Some(s"case r if r.${config.responseStatusMethod} == ${statusCode} => throw new ${namespaces.errors}.${response.errorClassName}(r)")
+                if (response.isUnit) {
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})")
+
+                } else {
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw new ${namespaces.errors}.${response.errorClassName}(r)")
+                }
               }
             }
 
