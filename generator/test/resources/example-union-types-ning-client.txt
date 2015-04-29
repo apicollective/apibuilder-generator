@@ -244,6 +244,7 @@ package com.gilt.apidoc.example.union.types.v0 {
   class Client(
     apiUrl: String,
     auth: scala.Option[com.gilt.apidoc.example.union.types.v0.Authorization] = None,
+    defaultHeaders: Seq[(String, String)] = Nil,
     asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient
   ) {
     import com.gilt.apidoc.example.union.types.v0.models.json._
