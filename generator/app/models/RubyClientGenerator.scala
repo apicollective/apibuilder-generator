@@ -381,6 +381,7 @@ ${headers.rubyModuleConstants.indent(2)}
   def initialize(url, opts={})
     @url = HttpClient::Preconditions.assert_class('url', url, String)
     @authorization = HttpClient::Preconditions.assert_class_or_nil('authorization', opts.delete(:authorization), HttpClient::Authorization)
+    @default_headers = HttpClient::Preconditions.assert_class('default_headers', opts.delete(:default_headers) || {}, Hash)
     HttpClient::Preconditions.assert_empty_opts(opts)
     HttpClient::Preconditions.check_state(url.match(/http.+/i), "URL[%s] must start with http" % url)
   end
@@ -389,11 +390,15 @@ ${headers.rubyModuleConstants.indent(2)}
     HttpClient::Preconditions.assert_class_or_nil('path', path, String)
     request = HttpClient::Request.new(URI.parse(@url + path.to_s))$headerString
 
-    if @authorization
-      request.with_auth(@authorization)
-    else
-      request
+    @default_headers.each do |key, value|
+      request = request.with_header(key, value)
     end
+
+    if @authorization
+      request = request.with_auth(@authorization)
+    end
+
+    request
   end
 """)
 
