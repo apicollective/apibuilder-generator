@@ -74,9 +74,9 @@ case class NingClientGenerator(
 ${headers.objectConstants.indent(2)}
 
 ${ScalaClientCommon.clientSignature(config).indent(2)} {
-    import ${ssd.namespaces.models}.json._
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
+${JsonImports(form.service).mkString("\n").indent(4)}
 
     val logger = LoggerFactory.getLogger(getClass)
 

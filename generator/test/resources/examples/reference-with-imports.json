@@ -1,0 +1,1043 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "Apidoc Reference Api",
+  "organization": {
+    "key": "gilt"
+  },
+  "application": {
+    "key": "apidoc-reference-api"
+  },
+  "namespace": "com.gilt.apidoc.reference.api.v0",
+  "version": "0.0.1-dev",
+  "base_url": "http://localhost:9000",
+  "description": null,
+  "headers": [],
+  "imports": [
+    {
+      "uri": "http://localhost:9000/gilt/apidoc-spec/0.9.6/service.json",
+      "namespace": "com.gilt.apidoc.spec.v0",
+      "organization": {
+        "key": "gilt"
+      },
+      "application": {
+        "key": "apidoc-spec"
+      },
+      "version": "0.9.6",
+      "enums": [
+        "method",
+        "parameter_location",
+        "response_code_option"
+      ],
+      "unions": [
+        "response_code"
+      ],
+      "models": [
+        "apidoc",
+        "application",
+        "body",
+        "deprecation",
+        "enum",
+        "enum_value",
+        "field",
+        "header",
+        "import",
+        "model",
+        "operation",
+        "organization",
+        "parameter",
+        "resource",
+        "response",
+        "service",
+        "union",
+        "union_type"
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "age_group",
+      "plural": "age_groups",
+      "description": null,
+      "values": [
+        {
+          "name": "Youth",
+          "description": "under 18"
+        },
+        {
+          "name": "Adult",
+          "description": "18 and over"
+        }
+      ]
+    }
+  ],
+  "unions": [],
+  "models": [
+    {
+      "name": "big",
+      "plural": "bigs",
+      "description": "A model with a lot of fields.",
+      "fields": [
+        {
+          "name": "f1",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f2",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f3",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f4",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f5",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f6",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f7",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f8",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f9",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f10",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f11",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f12",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f13",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f14",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f15",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f16",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f17",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f18",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f19",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f20",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "f21",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    },
+    {
+      "name": "echo",
+      "plural": "echoes",
+      "description": null,
+      "fields": [
+        {
+          "name": "value",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    },
+    {
+      "name": "error",
+      "plural": "errors",
+      "description": "Models an API error.",
+      "fields": [
+        {
+          "name": "code",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    },
+    {
+      "name": "member",
+      "plural": "members",
+      "description": null,
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "organization",
+          "type": "organization",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "user",
+          "type": "user",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    },
+    {
+      "name": "organization",
+      "plural": "organizations",
+      "description": null,
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "plural": "users",
+      "description": null,
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "age_group",
+          "type": "age_group",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        },
+        {
+          "name": "tags",
+          "type": "map[string]",
+          "description": null,
+          "default": null,
+          "required": false,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    },
+    {
+      "name": "user_list",
+      "plural": "user_lists",
+      "description": null,
+      "fields": [
+        {
+          "name": "users",
+          "type": "[user]",
+          "description": null,
+          "default": null,
+          "required": true,
+          "minimum": null,
+          "maximum": null,
+          "example": null
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "type": "echo",
+      "plural": "echoes",
+      "description": null,
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/echoes",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "foo",
+              "type": "string",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "optional_messages",
+              "type": "[string]",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "required_messages",
+              "type": "[string]",
+              "location": "Query",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 204 } },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/echoes/arrays-only",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "optional_messages",
+              "type": "[string]",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "required_messages",
+              "type": "[string]",
+              "location": "Query",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 204 } },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "member",
+      "plural": "members",
+      "description": null,
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/members",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "organization",
+              "type": "uuid",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "user",
+              "type": "uuid",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "role",
+              "type": "string",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 201 } },
+              "type": "member"
+            },
+            {
+              "code": { "integer": { "value": 409 } },
+              "type": "[error]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/members",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "organization_guid",
+              "type": "uuid",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "user_guid",
+              "type": "uuid",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "role",
+              "type": "string",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 200 } },
+              "type": "[member]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/members/:organization",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "organization",
+              "type": "uuid",
+              "location": "Path",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 200 } },
+              "type": "[member]"
+            }
+          ]
+        },
+        {
+            "method": "POST",
+            "path": "/members/:organization/members_bulk",
+            "parameters": [
+                {
+                    "name": "organization",
+                    "type": "uuid",
+                    "location": "Path",
+                    "description": null,
+                    "required": true,
+                    "default": null,
+                    "minimum": null,
+                    "maximum": null,
+                    "example": null
+                }
+            ],
+            "description": null,
+            "body": { "type": "[member]" },
+            "responses": [
+                {
+                    "code": { "integer": { "value": 200 } },
+                    "type": "[member]"
+                }
+            ]
+        },
+        {
+            "method": "POST",
+            "path": "/members/:organization/members_map",
+            "parameters": [
+                {
+                    "name": "organization",
+                    "type": "uuid",
+                    "location": "Path",
+                    "description": null,
+                    "required": true,
+                    "default": null,
+                    "minimum": null,
+                    "maximum": null,
+                    "example": null
+                }
+            ],
+            "description": null,
+            "body": { "type": "map[member]" },
+            "responses": [
+                {
+                    "code": { "integer": { "value": 200 } },
+                    "type": "[member]"
+                }
+            ]
+        }
+      ]
+    },
+    {
+      "type": "organization",
+      "plural": "organizations",
+      "description": null,
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/organizations",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "organization",
+              "type": "organization",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 201 } },
+              "type": "organization"
+            },
+            {
+              "code": { "integer": { "value": 409 } },
+              "type": "[error]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/organizations",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 200 } },
+              "type": "[organization]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/:guid",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Path",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 200 } },
+              "type": "organization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "user",
+      "plural": "users",
+      "description": null,
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/users",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "email",
+              "type": "string",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "active",
+              "type": "boolean",
+              "location": "Form",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 201 } },
+              "type": "user"
+            },
+            {
+              "code": { "integer": { "value": 409 } },
+              "type": "[error]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/users",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "organization_guids",
+              "type": "[long]",
+              "location": "Query",
+              "description": "Limits users to the specified organizations.",
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "age_group",
+              "type": "age_group",
+              "location": "Query",
+              "description": "Limit to users in this age group",
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "email",
+              "type": "string",
+              "location": "Query",
+              "description": null,
+              "required": false,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            },
+            {
+              "name": "active",
+              "type": "boolean",
+              "location": "Query",
+              "description": null,
+              "required": true,
+              "default": "true",
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 200 } },
+              "type": "[user]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/users/:age_group",
+          "description": null,
+          "body": null,
+          "parameters": [
+            {
+              "name": "age_group",
+              "type": "age_group",
+              "location": "Path",
+              "description": null,
+              "required": true,
+              "default": null,
+              "minimum": null,
+              "maximum": null,
+              "example": null
+            }
+          ],
+          "responses": [
+            {
+              "code": { "integer": { "value": 200 } },
+              "type": "[user]"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/users/noop",
+          "description": null,
+          "body": null,
+          "parameters": [],
+          "responses": [
+            {
+              "code": { "integer": { "value": 200 } },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

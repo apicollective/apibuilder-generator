@@ -16,6 +16,7 @@ object TestHelper {
   lazy val collectionJsonDefaultsService = parseFile("test/resources/examples/collection-json-defaults.json")
   lazy val illegalNonRequiredWithDefaultService = parseFile("test/resources/examples/illegal-non-required-with-default.json")
   lazy val referenceApiService = parseFile(s"../reference-api/service.json")
+  lazy val referenceWithImportsApiService = parseFile(s"test/resources/examples/reference-with-imports.json")
   lazy val generatorApiService = parseFile(s"test/resources/examples/apidoc-generator.json")
   lazy val apidocApiService = parseFile(s"test/resources/examples/apidoc-api.json")
 

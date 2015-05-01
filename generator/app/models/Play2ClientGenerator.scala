@@ -98,7 +98,7 @@ case class Play2ClientGenerator(
 ${headers.objectConstants.indent(2)}
 
 ${ScalaClientCommon.clientSignature(version.config).indent(2)} {
-    import ${ssd.namespaces.models}.json._
+${JsonImports(form.service).mkString("\n").indent(4)}
 
     private val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 

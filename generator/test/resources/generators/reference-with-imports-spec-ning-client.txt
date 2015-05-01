@@ -117,6 +117,7 @@ package com.gilt.apidoc.reference.api.v0.models {
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
     import com.gilt.apidoc.reference.api.v0.models.json._
+    import com.gilt.apidoc.spec.v0.models.json._
 
     private[v0] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
@@ -304,6 +305,7 @@ package com.gilt.apidoc.reference.api.v0 {
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
     import com.gilt.apidoc.reference.api.v0.models.json._
+    import com.gilt.apidoc.spec.v0.models.json._
 
     val logger = LoggerFactory.getLogger(getClass)
 
@@ -693,6 +695,7 @@ package com.gilt.apidoc.reference.api.v0 {
   package errors {
 
     import com.gilt.apidoc.reference.api.v0.models.json._
+    import com.gilt.apidoc.spec.v0.models.json._
 
     case class ErrorsResponse(
       response: _root_.com.ning.http.client.Response,
