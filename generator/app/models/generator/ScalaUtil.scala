@@ -10,16 +10,18 @@ import org.joda.time.DateTime
 
 object ScalaUtil {
 
-  private val Keywords = Seq("case", "catch", "class", "def", "do",
-                             "else", "extends", "false", "final",
-                             "finally", "for", "forSome", "if",
-                             "implicit", "import", "lazy", "match",
-                             "new", "null", "object", "override",
-                             "package", "private", "protected",
-                             "return", "sealed", "super", "this",
-                             "throw", "trait", "try", "true",
-                             "type", "val", "var", "while",
-                             "with", "yield").toSet
+  private val ReservedWords = Seq(
+    "case", "catch", "class", "def", "do",
+    "else", "extends", "false", "final",
+    "finally", "for", "forSome", "if",
+    "implicit", "import", "lazy", "match",
+    "new", "null", "object", "override",
+    "package", "private", "protected",
+    "return", "sealed", "super", "this",
+    "throw", "trait", "try", "true",
+    "type", "val", "var", "while",
+    "with", "yield"
+  ).toSet
 
   def extendsClause(names: Seq[String]): Option[String] = {
     names match {
@@ -49,7 +51,7 @@ object ScalaUtil {
   }
 
   def quoteNameIfKeyword(name: String): String = {
-    if (Keywords.contains(name)) {
+    if (ReservedWords.contains(name)) {
       "`" + name + "`"
     } else {
       name

@@ -13,6 +13,14 @@ import play.api.libs.json._
 
 object RubyUtil {
 
+  private val ReservedWords = Seq(
+    "alias", "and", "begin", "break", "case", "class", "def", "defined?", "do",
+    "else", "elsif", "end", "ensure", "false", "for", "if", "module",
+    "next, nil, not", "or", "redo, rescue", "retry", "return", "self, super",
+    "then, true", "undef", "unless", "until", "when", "while", "yield",
+    "__FILE__", "__LINE__"
+  ).toSet
+
   case class Module(namespace: String) {
     val parts = namespace.split("\\.").map(toClassName(_))
     val fullName = "::" + parts.mkString("::")
@@ -30,11 +38,19 @@ object RubyUtil {
     }
   }
 
+  def quoteNameIfKeyword(name: String): String = {
+    if (ReservedWords.contains(name)) {
+      name + "_"
+    } else {
+      name
+    }
+  }
+
   def toClassName(
     name: String,
     multiple: Boolean = false
   ): String = {
-    ScalaUtil.toClassName(name, multiple)
+    quoteNameIfKeyword(ScalaUtil.toClassName(name, multiple))
   }
 
   def toConstant(
@@ -383,9 +399,10 @@ ${headers.rubyModuleConstants.indent(2)}
 
     sb.append(service.resources.map { resource =>
       val className = RubyUtil.toClassName(resource.plural)
+      val varName = RubyUtil.quoteNameIfKeyword(resource.plural)
 
-      s"  def ${resource.plural}\n" +
-      s"    @${resource.plural} ||= ${module.fullName}::Clients::${className}.new(self)\n" +
+      s"  def $varName\n" +
+      s"    @$varName ||= ${module.fullName}::Clients::${className}.new(self)\n" +
       s"  end"
     }.mkString("\n\n"))
 
@@ -675,7 +692,7 @@ ${headers.rubyModuleConstants.indent(2)}
     model.description.map { desc => sb.append(GeneratorUtil.formatComment(desc)) }
     sb.append(RubyClientGenerator.classDeclaration(className, union.map(u => RubyUtil.toClassName(u.name))) + "\n")
 
-    sb.append("  attr_reader " + model.fields.map( f => s":${f.name}" ).mkString(", "))
+    sb.append("  attr_reader " + model.fields.map( f => s":${RubyUtil.quoteNameIfKeyword(f.name)}" ).mkString(", "))
 
     sb.append("")
     sb.append("  def initialize(incoming={})")
@@ -686,7 +703,8 @@ ${headers.rubyModuleConstants.indent(2)}
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
 
     model.fields.map { field =>
-      sb.append(s"    @${field.name} = ${parseArgument(field.name, field.`type`, field.required, field.default)}")
+      val varName = RubyUtil.quoteNameIfKeyword(field.name)
+      sb.append(s"    @$varName = ${parseArgument(field.name, field.`type`, field.required, field.default)}")
     }
 
     sb.append("  end\n")
@@ -708,21 +726,22 @@ ${headers.rubyModuleConstants.indent(2)}
     sb.append("    {")
     sb.append(
       model.fields.map { field =>
+        val varName = RubyUtil.quoteNameIfKeyword(field.name)
         val datatype = parseType(field.`type`).datatype
         val value = datatype match {
           case Datatype.Singleton(_) => {
             datatype.`type` match {
               case Type(Kind.Primitive, name) => {
                 Primitives(name) match {
-                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
-                  case _ => asString(field.name, name, escape = false)
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => varName
+                  case _ => asString(varName, name, escape = false)
                 }
               }
               case Type(Kind.Model | Kind.Union, name) => {
-                s"${field.name}.nil? ? nil : ${field.name}.to_hash"
+                s"$varName.nil? ? nil : $varName.to_hash"
               }
               case Type(Kind.Enum, name) => {
-                s"${field.name}.nil? ? nil : ${field.name}.value"
+                s"$varName.nil? ? nil : $varName.value"
               }
             }
           }
@@ -730,15 +749,15 @@ ${headers.rubyModuleConstants.indent(2)}
             t match {
               case Type(Kind.Primitive, name) => {
                 Primitives(name) match {
-                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
-                  case _ => asString(field.name, name, escape = false)
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => varName
+                  case _ => asString(varName, name, escape = false)
                 }
               }
               case Type(Kind.Model | Kind.Union, name) => {
-                s"${field.name}.nil? ? nil : ${field.name}.map(&:to_hash)"
+                s"$varName.nil? ? nil : $varName.map(&:to_hash)"
               }
               case Type(Kind.Enum, name) => {
-                s"${field.name}.nil? ? nil : ${field.name}.map(&:value)"
+                s"$varName.nil? ? nil : $varName.map(&:value)"
               }
             }
           }
@@ -747,15 +766,15 @@ ${headers.rubyModuleConstants.indent(2)}
             t match {
               case Type(Kind.Primitive, name) => {
                 Primitives(name) match {
-                  case Some(Primitives.Object) | Some(Primitives.Unit) => field.name
-                  case _ => asString(field.name, name, escape = false)
+                  case Some(Primitives.Object) | Some(Primitives.Unit) => varName
+                  case _ => asString(varName, name, escape = false)
                 }
               }
               case Type(Kind.Model | Kind.Union, name) => {
-                s"${field.name}.nil? ? nil : ${field.name}.inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
+                s"$varName.nil? ? nil : $varName.inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].to_hash; h }"
               }
               case Type(Kind.Enum, name) => {
-                s"${field.name}.nil? ? nil : ${field.name}.inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
+                s"$varName.nil? ? nil : $varName.inject({}).map { |h, o| h[o[0]] = o[1].nil? ? nil : o[1].value; h }"
               }
             }
           }
