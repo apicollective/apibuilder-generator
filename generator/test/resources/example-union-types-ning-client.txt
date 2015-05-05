@@ -247,9 +247,9 @@ package com.gilt.apidoc.example.union.types.v0 {
     defaultHeaders: Seq[(String, String)] = Nil,
     asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient
   ) {
-    import com.gilt.apidoc.example.union.types.v0.models.json._
     import org.slf4j.Logger
     import org.slf4j.LoggerFactory
+    import com.gilt.apidoc.example.union.types.v0.models.json._
 
     val logger = LoggerFactory.getLogger(getClass)
 
