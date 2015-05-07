@@ -186,7 +186,10 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     s""" s"$tmp" """.trim
   }
 
-  def formBody(op: ScalaOperation): Option[String] = {
+  def formBody(
+    op: ScalaOperation,
+    canSerializeUuid: Boolean
+  ): Option[String] = {
     // Can have both or form params but not both as we can only send a single document
     assert(op.body.isEmpty || op.formParameters.isEmpty)
 
@@ -198,7 +201,14 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
       val bodyVarName = ScalaUtil.toVariable(body.`type`)
 
       val payload = body.datatype match {
-        case p: ScalaPrimitive => ScalaUtil.toVariable(bodyVarName, multiple = false)
+        case p: ScalaPrimitive => {
+          (canSerializeUuid, p) match {
+            case (false, ScalaPrimitive.Uuid) => {
+              ScalaUtil.toVariable(bodyVarName, multiple = false) + ".toString"
+            }
+            case _ => ScalaUtil.toVariable(bodyVarName, multiple = false)
+          }
+        }
         case ScalaDatatype.List(t) => ScalaUtil.toVariable(t.shortName, multiple = true)
         case ScalaDatatype.Map(t) => t.asString(ScalaUtil.toVariable(body.`type`))
         case c: ScalaDatatype.Option => sys.error(s"unsupported container type ${c} encountered as body for $op")
@@ -209,7 +219,18 @@ case class GeneratorUtil(config: ScalaClientMethodConfig) {
     } else {
       val params = op.formParameters.map { param =>
         val varName = ScalaUtil.quoteNameIfKeyword(param.name)
-        s""" "${param.originalName}" -> play.api.libs.json.Json.toJson($varName)""".trim
+        (canSerializeUuid, param.`type`) match {
+          case (false, Datatype.Singleton(Type(kind, Primitives.UuidName))) => {
+            s""" "${param.originalName}" -> play.api.libs.json.Json.toJson($varName.toString)""".trim
+          }
+          case (false, Datatype.List(Type(kind, Primitives.UuidName))) => {
+            s""" "${param.originalName}" -> play.api.libs.json.Json.toJson($varName.map(_.toString))""".trim
+          }
+          case (false, Datatype.Map(Type(kind, Primitives.UuidName))) => {
+            s""" "${param.originalName}" -> play.api.libs.json.Json.toJson($varName.map( case (k, v) => k -> v.toString ))""".trim
+          }
+          case _ => s""" "${param.originalName}" -> play.api.libs.json.Json.toJson($varName)""".trim
+        }
       }.mkString(",\n")
       Some(
         Seq(

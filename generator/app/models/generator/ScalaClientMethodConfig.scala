@@ -40,6 +40,13 @@ trait ScalaClientMethodConfig {
   def requiresAsyncHttpClient: Boolean
 
   /**
+    * true if the native libraries can serialized UUID. False
+    * otherwise. If false, we map the UUIDs to strings in the
+    * generated code.
+    */
+  def canSerializeUuid: Boolean
+
+  /**
     * Given a response and a class name, returns code to create an
     * instance of the specified class.
     */
@@ -69,11 +76,13 @@ object ScalaClientMethodConfigs {
   case class Play22(namespace: String) extends Play {
     override val responseClass = "play.api.libs.ws.Response"
     override val requestUriMethod = Some("ahcResponse.getUri")
+    override val canSerializeUuid = false
   }
 
   case class Play23(namespace: String) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod = None
+    override val canSerializeUuid = true
   }
 
   trait Ning extends ScalaClientMethodConfig {
@@ -82,6 +91,7 @@ object ScalaClientMethodConfigs {
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
     override val responseClass = "_root_.com.ning.http.client.Response"
     override val requiresAsyncHttpClient = true
+    override val canSerializeUuid = true
 
     def addQueryParamMethod: String
   }

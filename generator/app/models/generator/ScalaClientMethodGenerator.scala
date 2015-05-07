@@ -123,7 +123,7 @@ case class ScalaClientMethodGenerator(
     resource.operations.map { op =>
       val path = generatorUtil.pathParams(op)
 
-      val payload = generatorUtil.formBody(op)
+      val payload = generatorUtil.formBody(op, canSerializeUuid = config.canSerializeUuid)
       val queryParameters = generatorUtil.queryParameters("queryParameters", op.queryParameters)
 
       val code = new scala.collection.mutable.ListBuffer[String]()
