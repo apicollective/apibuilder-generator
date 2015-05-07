@@ -93,6 +93,8 @@ ${methodGenerator.objects().indent(4)}
         .setUrl(apiUrl + path)
 ${headerString.indent(8)}
 
+      defaultHeaders.foreach { h => builder.addHeader(h._1, h._2) }
+
       auth.fold(builder) { a =>
         a match {
           case Authorization.Basic(username, password) => {

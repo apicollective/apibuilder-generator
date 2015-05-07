@@ -296,6 +296,8 @@ package com.gilt.apidoc.example.union.types.v0 {
         .addHeader("X-Apidoc-Version", Constants.Version)
         .addHeader("X-Apidoc-Version-Major", Constants.VersionMajor.toString)
 
+      defaultHeaders.foreach { h => builder.addHeader(h._1, h._2) }
+
       auth.fold(builder) { a =>
         a match {
           case Authorization.Basic(username, password) => {
