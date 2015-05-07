@@ -4,6 +4,8 @@ sealed trait Primitives
 
 object Primitives {
 
+  val UuidName = "uuid"
+
   case object Boolean extends Primitives { override def toString = "boolean" }
   case object Decimal extends Primitives { override def toString = "decimal" }
   case object Integer extends Primitives { override def toString = "integer" }
@@ -13,7 +15,7 @@ object Primitives {
   case object String extends Primitives { override def toString = "string" }
   case object DateIso8601 extends Primitives { override def toString = "date-iso8601" }
   case object DateTimeIso8601 extends Primitives { override def toString = "date-time-iso8601" }
-  case object Uuid extends Primitives { override def toString = "uuid" }
+  case object Uuid extends Primitives { override def toString = UuidName }
   case object Unit extends Primitives { override def toString = "unit" }
 
   val All = Seq(Boolean, Decimal, Integer, Double, Long, Object, String, DateIso8601, DateTimeIso8601, Uuid, Unit)
