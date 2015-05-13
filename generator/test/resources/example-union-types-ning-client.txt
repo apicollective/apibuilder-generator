@@ -265,11 +265,10 @@ package com.gilt.apidoc.example.union.types.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[com.gilt.apidoc.example.union.types.v0.models.User]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User] = {
         _executeRequest("GET", s"/users/${guid}").map {
-          case r if r.getStatusCode == 200 => Some(_root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User]))
-          case r if r.getStatusCode == 404 => None
-          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200, 404", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 200 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User])
+          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -381,7 +380,7 @@ package com.gilt.apidoc.example.union.types.v0 {
 
     def getByGuid(
       guid: _root_.java.util.UUID
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[com.gilt.apidoc.example.union.types.v0.models.User]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User]
 
     def post(
       user: com.gilt.apidoc.example.union.types.v0.models.User

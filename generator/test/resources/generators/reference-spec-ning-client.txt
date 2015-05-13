@@ -320,7 +320,7 @@ package com.gilt.apidoc.reference.api.v0 {
         foo: _root_.scala.Option[String] = None,
         optionalMessages: _root_.scala.Option[Seq[String]] = None,
         requiredMessages: Seq[String]
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[Unit]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val queryParameters = Seq(
           foo.map("foo" -> _)
         ).flatten ++
@@ -328,23 +328,21 @@ package com.gilt.apidoc.reference.api.v0 {
           requiredMessages.map("required_messages" -> _)
 
         _executeRequest("GET", s"/echoes", queryParameters = queryParameters).map {
-          case r if r.getStatusCode == 204 => Some(Unit)
-          case r if r.getStatusCode == 404 => None
-          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204, 404", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 204 => Unit
+          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
       }
 
       override def getArraysOnly(
         optionalMessages: _root_.scala.Option[Seq[String]] = None,
         requiredMessages: Seq[String]
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[Unit]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val queryParameters = optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
           requiredMessages.map("required_messages" -> _)
 
         _executeRequest("GET", s"/echoes/arrays-only", queryParameters = queryParameters).map {
-          case r if r.getStatusCode == 204 => Some(Unit)
-          case r if r.getStatusCode == 404 => None
-          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204, 404", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 204 => Unit
+          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
       }
     }
@@ -455,11 +453,10 @@ package com.gilt.apidoc.reference.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[com.gilt.apidoc.reference.api.v0.models.Organization]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.reference.api.v0.models.Organization] = {
         _executeRequest("GET", s"/${guid}").map {
-          case r if r.getStatusCode == 200 => Some(_root_.com.gilt.apidoc.reference.api.v0.Client.parseJson("com.gilt.apidoc.reference.api.v0.models.Organization", r, _.validate[com.gilt.apidoc.reference.api.v0.models.Organization]))
-          case r if r.getStatusCode == 404 => None
-          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200, 404", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 200 => _root_.com.gilt.apidoc.reference.api.v0.Client.parseJson("com.gilt.apidoc.reference.api.v0.models.Organization", r, _.validate[com.gilt.apidoc.reference.api.v0.models.Organization])
+          case r => throw new com.gilt.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
     }
@@ -617,12 +614,12 @@ package com.gilt.apidoc.reference.api.v0 {
       foo: _root_.scala.Option[String] = None,
       optionalMessages: _root_.scala.Option[Seq[String]] = None,
       requiredMessages: Seq[String]
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[Unit]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
 
     def getArraysOnly(
       optionalMessages: _root_.scala.Option[Seq[String]] = None,
       requiredMessages: Seq[String]
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[Unit]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
   trait Members {
@@ -667,7 +664,7 @@ package com.gilt.apidoc.reference.api.v0 {
 
     def getByGuid(
       guid: _root_.java.util.UUID
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[com.gilt.apidoc.reference.api.v0.models.Organization]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.reference.api.v0.models.Organization]
   }
 
   trait Users {

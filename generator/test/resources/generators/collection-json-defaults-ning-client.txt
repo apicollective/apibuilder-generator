@@ -124,11 +124,10 @@ package com.gilt.test.v0 {
 
       override def getByEmail(
         email: String
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[com.gilt.test.v0.models.User]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User] = {
         _executeRequest("GET", s"/users/${_root_.com.gilt.test.v0.PathSegment.encode(email, "UTF-8")}").map {
-          case r if r.getStatusCode == 200 => Some(_root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User]))
-          case r if r.getStatusCode == 404 => None
-          case r => throw new com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200, 404", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 200 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
+          case r => throw new com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -242,7 +241,7 @@ package com.gilt.test.v0 {
 
     def getByEmail(
       email: String
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[_root_.scala.Option[com.gilt.test.v0.models.User]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User]
 
     def patch(
       userPatch: com.gilt.test.v0.models.UserPatch
