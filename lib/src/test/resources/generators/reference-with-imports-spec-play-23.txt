@@ -453,7 +453,7 @@ package com.gilt.apidoc.reference.api.v0 {
         organization: _root_.java.util.UUID,
         members: Map[String, com.gilt.apidoc.reference.api.v0.models.Member]
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.reference.api.v0.models.Member]] = {
-        val payload = play.api.libs.json.Json.toJson(members.toString)
+        val payload = play.api.libs.json.Json.toJson(members)
 
         _executeRequest("POST", s"/members/${organization}/members_map", body = Some(payload)).map {
           case r if r.status == 200 => _root_.com.gilt.apidoc.reference.api.v0.Client.parseJson("Seq[com.gilt.apidoc.reference.api.v0.models.Member]", r, _.validate[Seq[com.gilt.apidoc.reference.api.v0.models.Member]])
