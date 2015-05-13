@@ -18,7 +18,7 @@ case class ScalaClientMethodGenerator(
 
   private val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
-  private val featureMigration = FeatureMigration(ssd.service.version)
+  private val featureMigration = FeatureMigration(ssd.service.apidoc.version)
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + errorPackage()).trim
