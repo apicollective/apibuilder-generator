@@ -1,1 +1,1 @@
-add default_headers to ruby client
+add tests for play 2.2 client with uuid type - stand alone and in a collection
