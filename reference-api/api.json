@@ -1,6 +1,9 @@
 {
     "base_url": "http://localhost:9000",
     "name": "Apidoc Reference Api",
+    "apidoc": {
+        "version": "0.9.6"
+    },
 
     "enums": {
         "age_group": {
@@ -74,6 +77,13 @@
                 { "name": "active", "type": "boolean" },
                 { "name": "age_group", "type": "age_group" },
                 { "name": "tags", "type": "map[string]", "required": false }
+            ]
+        },
+
+        "group": {
+            "description": "A group of users in an organization.",
+            "fields": [
+                { "name": "members", "type": "[user]" }
             ]
         },
 
@@ -233,9 +243,27 @@
                 {
                     "method": "POST",
                     "path": "/:organization/members_bulk",
+                    "parameters": [
+                        { "name": "organization", "type": "uuid" }
+                    ],
                     "body": { "type": "[member]" },
                     "responses": {
                         "200": { "type": "[member]" }
+                    }
+                }
+            ]
+        },
+
+        "group": {
+            "operations": [
+                {
+                    "method": "GET",
+                    "path": "/:organization",
+                    "parameters": [
+                        { "name": "organization", "type": "uuid" }
+                    ],
+                    "responses": {
+                        "200": { "type": "map[[user]]" }
                     }
                 }
             ]

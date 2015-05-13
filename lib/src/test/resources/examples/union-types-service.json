@@ -1,0 +1,169 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "apidoc Example Union Types",
+  "organization": {
+    "key": "gilt"
+  },
+  "application": {
+    "key": "apidoc-example-union-types"
+  },
+  "namespace": "com.gilt.apidoc.example.union.types.v0",
+  "version": "0.0.1-dev",
+  "headers": [],
+  "imports": [],
+  "enums": [
+    {
+      "name": "bar",
+      "plural": "bars",
+      "values": [
+        {
+          "name": "b"
+        }
+      ]
+    },
+    {
+      "name": "foo",
+      "plural": "foos",
+      "values": [
+        {
+          "name": "a"
+        }
+      ]
+    }
+  ],
+  "unions": [
+    {
+      "name": "foobar",
+      "plural": "foobars",
+      "types": [
+        {
+          "type": "foo"
+        },
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "plural": "users",
+      "types": [
+        {
+          "type": "registered_user"
+        },
+        {
+          "type": "guest_user"
+        },
+        {
+          "type": "uuid"
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "guest_user",
+      "plural": "guest_users",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "description": "Internal unique identifier for this user.",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "registered_user",
+      "plural": "registered_users",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "description": "Internal unique identifier for this user.",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "preference",
+          "type": "foobar",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "type": "user",
+      "plural": "users",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/users",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[user]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/users/:guid",
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "user"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/users",
+          "body": {
+            "type": "user"
+          },
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 201
+                }
+              },
+              "type": "user"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
