@@ -743,7 +743,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
       case p: Primitive => {
         val (helperExpr, className) = p match {
-          case Primitive.String | Primitive.Integer | Primitive.Double | Primitive.Long =>
+          case Primitive.Boolean | Primitive.String | Primitive.Integer | Primitive.Double | Primitive.Long | Primitive.Unit =>
             (expr, rubyClass(p))
 
           case Primitive.DateIso8601 =>
