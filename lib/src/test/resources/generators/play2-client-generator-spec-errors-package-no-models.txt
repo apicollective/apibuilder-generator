@@ -2,7 +2,7 @@ package errors {
 
   import test.apidoc.apidoctest.v0.models.json._
 
-  case class UnitResponse(status: Int) extends Exception
+  case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
   case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")
 

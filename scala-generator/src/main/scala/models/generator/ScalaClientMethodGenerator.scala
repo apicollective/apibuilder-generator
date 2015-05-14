@@ -116,7 +116,7 @@ case class ScalaClientMethodGenerator(
   private[this] def unitExceptionClass(
     className: String
   ): String = {
-    s"case class $className(status: Int) extends Exception"
+    s"case class $className(status: Int)" + """ extends Exception(s"HTTP $status")"""
   }
 
   private[this] def methods(resource: ScalaResource): Seq[ClientMethod] = {
