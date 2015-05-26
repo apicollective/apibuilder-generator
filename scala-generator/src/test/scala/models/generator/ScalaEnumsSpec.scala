@@ -1,14 +1,14 @@
 package scala.generator
 
 import com.gilt.apidoc.spec.v0.models.Service
-import scala.models.TestHelper
+import models.TestHelper
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
 
   describe("for a model with 2 enum fields") {
 
-    val json = TestHelper.buildJson("""
+    val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
       "unions": [],
@@ -45,16 +45,16 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
       ]
     """)
 
-    lazy val ssd = ScalaService(TestHelper.service(json))
+    lazy val ssd = ScalaService(models.TestHelper.service(json))
 
     it("generates valid models") {
       val enums = ssd.enums.map { ScalaEnums(ssd, _).build() }.mkString("\n\n")
-      TestHelper.assertEqualsFile("/play2enums-example.txt", enums)
+      models.TestHelper.assertEqualsFile("/play2enums-example.txt", enums)
     }
 
     it("generates valid json conversions") {
       val jsonConversions = ssd.enums.map { ScalaEnums(ssd, _).buildJson() }.mkString("\n\n")
-      TestHelper.assertEqualsFile("/play2enums-json-example.txt", jsonConversions)
+      models.TestHelper.assertEqualsFile("/play2enums-json-example.txt", jsonConversions)
     }
   }
 

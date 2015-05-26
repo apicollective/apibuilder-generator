@@ -5,12 +5,12 @@ import com.gilt.apidoc.spec.v0.models.{Method, Model, Parameter, ParameterLocati
 import scala.generator._
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
-class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
+class ScalaGeneratorUtilSpec extends FunSpec with ShouldMatchers {
 
-  private lazy val service = TestHelper.referenceApiService
+  private lazy val service = models.TestHelper.referenceApiService
   private lazy val ssd = new ScalaService(service)
 
-  private val play2Util = GeneratorUtil(
+  private val play2Util = ScalaGeneratorUtil(
     ScalaClientMethodConfigs.Play22("test.apidoc")
   )
 
@@ -72,7 +72,7 @@ val queryParameters = optionalMessages.getOrElse(Nil).map("optional_messages" ->
   it("supports optional seq query parameters") {
     val operation = ssd.resources.find(_.plural == "Users").get.operations.find(op => op.method == Method.Get && op.path == "/users").get
 
-    TestHelper.assertEqualsFile(
+    models.TestHelper.assertEqualsFile(
       "/generators/play-2-route-util-reference-get-users.txt",
       play2Util.queryParameters("queryParameters", operation.queryParameters).get
     )

@@ -25,7 +25,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("service with no operations") {
-    val service = TestHelper.service(TestHelper.buildJson("""
+    val service = models.TestHelper.service(models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
       "models": [],
@@ -42,7 +42,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   describe("with reference-api service") {
-    lazy val service = TestHelper.referenceApiService
+    lazy val service = models.TestHelper.referenceApiService
     lazy val ssd = new ScalaService(service)
 
     it("normalizes explicit paths that match resource name") {
@@ -70,7 +70,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       Play2RouteGenerator(InvocationForm(service)).invoke() match {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(code) => {
-          TestHelper.assertEqualsFile(
+          models.TestHelper.assertEqualsFile(
             "/generators/play-2-route-reference-api.routes",
             code
          ) 
@@ -89,7 +89,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
   describe("with quality service example") {
 
-    lazy val quality = ScalaService(TestHelper.parseFile("/examples/quality.json"))
+    lazy val quality = ScalaService(models.TestHelper.parseFile("/examples/quality.json"))
 
     it("correctly orders parameters defined in path and parameters") {
       val op = getScalaMethod(quality, "Teams", Method.Get, "/:org/teams/:key")
@@ -100,7 +100,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   describe("with apidoc service") {
-    lazy val service = TestHelper.apidocApiService
+    lazy val service = models.TestHelper.apidocApiService
     lazy val ssd = new ScalaService(service)
 
     describe("users resource") {
