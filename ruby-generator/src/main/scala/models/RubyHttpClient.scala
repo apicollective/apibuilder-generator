@@ -1,4 +1,4 @@
-package models
+package ruby.models
 
 object RubyHttpClient {
 

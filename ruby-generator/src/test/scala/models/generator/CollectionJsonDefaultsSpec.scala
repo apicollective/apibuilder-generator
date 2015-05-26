@@ -1,9 +1,9 @@
 package generator
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
-import models.RubyClientGenerator
+import ruby.models.RubyClientGenerator
 
-import models.TestHelper
+import ruby.models.TestHelper
 import org.scalatest.{FunSpec, Matchers}
 
 class CollectionJsonDefaultsSpec extends FunSpec with Matchers {

@@ -42,7 +42,7 @@ object Generators extends Controller {
           language = Some("Ruby")
         ),
         status = generator.Status.Beta,
-        codeGenerator = Some(models.RubyClientGenerator)
+        codeGenerator = Some(ruby.models.RubyClientGenerator)
       ),
        CodeGenTarget(
         metaData = Generator(

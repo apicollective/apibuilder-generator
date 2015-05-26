@@ -1,4 +1,4 @@
-package models
+package ruby.models
 
 import java.io.File
 import com.gilt.apidoc.generator.v0.models.InvocationForm
