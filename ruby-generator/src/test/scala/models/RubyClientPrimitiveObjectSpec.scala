@@ -8,7 +8,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a field with an object field") {
 
-    val baseJson = TestHelper.buildJson("""
+    val baseJson = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
       "models": [],
@@ -27,7 +27,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     """)
 
     def service(typeString: String): Service = {
-      TestHelper.service(baseJson.format(typeString))
+      models.TestHelper.service(baseJson.format(typeString))
     }
 
     def model(typeString: String): Model = {
@@ -54,17 +54,17 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
       it("singleton") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("object"), None)
-        TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-singleton.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-singleton.txt", code)
       }
 
       it("list") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("[object]"), None)
-        TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-list.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-list.txt", code)
       }
 
       it("map") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("map[object]"), None)
-        TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-map.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-map.txt", code)
       }
 
     }
@@ -73,7 +73,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a response with an object field") {
 
-    val baseJson = TestHelper.buildJson(s"""
+    val baseJson = models.TestHelper.buildJson(s"""
       "imports": [],
       "headers": [],
       "models": [],
@@ -110,7 +110,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     """)
 
     def service(typeString: String): Service = {
-      TestHelper.service(baseJson.format(typeString))
+      models.TestHelper.service(baseJson.format(typeString))
     }
 
     def operation(typeString: String): Operation = {
@@ -138,17 +138,17 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
       it("singleton") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("object"), "r")
-        TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-singleton.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-singleton.txt", code)
       }
 
       it("list") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("[object]"), "r")
-        TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-list.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-list.txt", code)
       }
 
       it("map") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("map[object]"), "r")
-        TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-map.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-map.txt", code)
       }
 
     }
