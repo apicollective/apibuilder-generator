@@ -311,7 +311,7 @@ package com.gilt.apidoc.reference.api.v0 {
     )
 
     // Enum: AgeGroup
-    private val enumAgeGroupNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.gilt.apidoc.reference.api.v0.models.AgeGroup.all.mkString(", ")}"
+    private[this] val enumAgeGroupNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.gilt.apidoc.reference.api.v0.models.AgeGroup.all.mkString(", ")}"
 
     implicit val pathBindableEnumAgeGroup = new PathBindable.Parsing[com.gilt.apidoc.reference.api.v0.models.AgeGroup] (
       AgeGroup.fromString(_).get, _.toString, enumAgeGroupNotFound
@@ -344,7 +344,7 @@ package com.gilt.apidoc.reference.api.v0 {
     import com.gilt.apidoc.reference.api.v0.models.json._
     import com.gilt.apidoc.spec.v0.models.json._
 
-    private val logger = play.api.Logger("com.gilt.apidoc.reference.api.v0.Client")
+    private[this] val logger = play.api.Logger("com.gilt.apidoc.reference.api.v0.Client")
 
     logger.info(s"Initializing com.gilt.apidoc.reference.api.v0.Client for url $apiUrl")
 
