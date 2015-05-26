@@ -1,11 +1,11 @@
-package generator
+package scala.generator
 
 import models.TestHelper
 import org.scalatest.{FunSpec, Matchers}
 
 class TargetSpec extends FunSpec with Matchers {
 
-  private lazy val service = TestHelper.generatorApiService
+  private lazy val service = models.TestHelper.generatorApiService
 
   it("Has a field named target") {
     service.models.find(_.name == "generator").get.fields.find(_.name == "key").getOrElse {

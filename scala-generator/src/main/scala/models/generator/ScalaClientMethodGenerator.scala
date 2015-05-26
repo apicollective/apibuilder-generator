@@ -1,7 +1,8 @@
-package generator
+package scala.generator
 
 import lib.VersionTag
-import models.{FeatureMigration, JsonImports}
+import lib.generator.GeneratorUtil
+import scala.models.{FeatureMigration, JsonImports}
 import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
@@ -14,7 +15,7 @@ case class ScalaClientMethodGenerator(
 
   private val namespaces = Namespaces(config.namespace)
 
-  private val generatorUtil = GeneratorUtil(config)
+  private val generatorUtil = ScalaGeneratorUtil(config)
 
   private val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 

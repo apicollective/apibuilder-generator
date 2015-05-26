@@ -1,13 +1,13 @@
-package models
+package scala.models
 
-import generator.ScalaService
+import scala.generator.ScalaService
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class Play2JsonSpec extends FunSpec with ShouldMatchers {
 
   describe("for models with lists") {
 
-    val json = TestHelper.buildJson("""
+    val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
       "unions": [],
@@ -27,9 +27,9 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
     """)
 
     it("generates valid json readers") {
-      val ssd = ScalaService(TestHelper.service(json))
+      val ssd = ScalaService(models.TestHelper.service(json))
       val model = ssd.models.head
-      TestHelper.assertEqualsFile(
+      models.TestHelper.assertEqualsFile(
         "/play2-json-spec-model-readers.txt",
         Play2Json(ssd).fieldReaders(model)
       )
@@ -39,21 +39,21 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
 
   describe("quality schema") {
 
-    lazy val quality = new ScalaService(TestHelper.parseFile("/examples/quality.json"))
+    lazy val quality = new ScalaService(models.TestHelper.parseFile("/examples/quality.json"))
 
     describe("plan") {
 
       lazy val plan = quality.models.find(_.name == "Plan").get
 
       it("readers") {
-        TestHelper.assertEqualsFile(
+        models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-plan-readers.txt",
           Play2Json(quality).readers(plan)
         )
       }
 
       it("writers") {
-        TestHelper.assertEqualsFile(
+        models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-plan-writers.txt",
           Play2Json(quality).writers(plan)
         )
@@ -65,14 +65,14 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
       lazy val healthcheck = quality.models.find(_.name == "Healthcheck").get
 
       it("readers") {
-        TestHelper.assertEqualsFile(
+        models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-healthcheck-readers.txt",
           Play2Json(quality).readers(healthcheck)
         )
       }
 
       it("writers") {
-        TestHelper.assertEqualsFile(
+        models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-healthcheck-writers.txt",
           Play2Json(quality).writers(healthcheck)
         )

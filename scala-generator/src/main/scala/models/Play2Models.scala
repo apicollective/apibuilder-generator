@@ -1,9 +1,10 @@
-package models
+package scala.models
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models.Service
 import lib.Text._
-import generator.{PrimitiveWrapper, ScalaEnums, ScalaCaseClasses, ScalaService, CodeGenerator}
+import lib.generator.CodeGenerator
+import scala.generator.{PrimitiveWrapper, ScalaEnums, ScalaCaseClasses, ScalaService}
 
 object Play2Models extends CodeGenerator {
 

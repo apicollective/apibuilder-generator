@@ -1,6 +1,6 @@
-package models
+package scala.models
 
-import generator.Namespaces
+import scala.generator.Namespaces
 import com.gilt.apidoc.spec.v0.models.Service
 
 /**

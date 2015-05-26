@@ -1,4 +1,4 @@
-package models.ning
+package scala.models.ning
 
 /**
   * This file has been modified from

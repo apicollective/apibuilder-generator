@@ -1,8 +1,9 @@
-package generator
+package scala.generator
 
 import com.gilt.apidoc.spec.v0.models._
 import lib.{Datatype, DatatypeResolver, Methods, Text}
-import models.Util
+import lib.generator.GeneratorUtil
+import scala.models.Util
 
 case class ScalaService(
   val service: Service

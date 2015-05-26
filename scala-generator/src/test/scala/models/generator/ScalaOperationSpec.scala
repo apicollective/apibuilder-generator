@@ -1,4 +1,4 @@
-package generator
+package scala.generator
 
 import models.TestHelper
 import com.gilt.apidoc.spec.v0.models._
@@ -6,7 +6,7 @@ import org.scalatest._
 
 class ScalaOperationSpec extends FunSpec with ShouldMatchers {
 
-  private lazy val service = TestHelper.referenceApiService
+  private lazy val service = models.TestHelper.referenceApiService
   private lazy val ssd = new ScalaService(service)
 
   val q1 = new Parameter(

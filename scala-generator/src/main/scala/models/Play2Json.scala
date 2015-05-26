@@ -1,7 +1,7 @@
-package models
+package scala.models
 
 import lib.Text._
-import generator.{PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
 
 case class Play2Json(
   ssd: ScalaService

@@ -39,17 +39,17 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
         )
       )
 
-      TestHelper.assertEqualsFile("/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum, None))
+      models.TestHelper.assertEqualsFile("/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum, None))
     }
 
   }
 
   it("generate ruby") {
-    val service = TestHelper.referenceApiService
+    val service = models.TestHelper.referenceApiService
     RubyClientGenerator.invoke(InvocationForm(service = service, userAgent = Some("gilt 0.0.1-test"))) match {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(code) => {
-        TestHelper.assertEqualsFile("/ruby-client-generator-gilt-0.0.1-test.txt", code)
+        models.TestHelper.assertEqualsFile("/ruby-client-generator-gilt-0.0.1-test.txt", code)
       }
     }
   }

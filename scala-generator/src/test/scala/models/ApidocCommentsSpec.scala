@@ -1,4 +1,4 @@
-package models
+package scala.models
 
 import org.scalatest.{ShouldMatchers, FunSpec}
 

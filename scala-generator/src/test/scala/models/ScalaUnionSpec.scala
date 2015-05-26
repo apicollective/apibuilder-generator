@@ -1,6 +1,6 @@
-package models
+package scala.models
 
-import generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
+import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 
@@ -10,7 +10,7 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
 
   describe("models") {
 
-    val json = TestHelper.buildJson("""
+    val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
       "enums": [],
@@ -51,14 +51,14 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
       ]
   """)
 
-    lazy val service = TestHelper.service(json)
+    lazy val service = models.TestHelper.service(json)
     lazy val ssd = ScalaService(service)
 
     it("generates valid models") {
       ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false) match {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(code) => {
-          TestHelper.assertEqualsFile("/scala-union-models-case-classes.txt", code)
+          models.TestHelper.assertEqualsFile("/scala-union-models-case-classes.txt", code)
         }
       }
     }
@@ -66,24 +66,24 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     it("generates valid readers for the union type itself") {
       val user = ssd.unions.find(_.name == "User").get
       val code = Play2Json(ssd).readers(user)
-      TestHelper.assertEqualsFile("/scala-union-models-json-union-type-readers.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-readers.txt", code)
     }
 
     it("generates valid writers for the union type itself") {
       val user = ssd.unions.find(_.name == "User").get
       val code = Play2Json(ssd).writers(user)
-      TestHelper.assertEqualsFile("/scala-union-models-json-union-type-writers.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-writers.txt", code)
     }
 
     it("codegen") {
       val code = Play2Json(ssd).generate()
-      TestHelper.assertEqualsFile("/scala-union-models-json.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-models-json.txt", code)
     }
   }
 
   describe("enums") {
 
-    val json = TestHelper.buildJson("""
+    val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
       "models": [],
@@ -119,12 +119,12 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
       ]
     """)
 
-    lazy val service = TestHelper.service(json)
+    lazy val service = models.TestHelper.service(json)
     lazy val ssd = ScalaService(service)
 
     it("codegen") {
       val code = Play2Json(ssd).generate()
-      TestHelper.assertEqualsFile("/scala-union-enums-json.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-enums-json.txt", code)
     }
   }
 

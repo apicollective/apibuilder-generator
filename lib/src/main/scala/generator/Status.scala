@@ -1,4 +1,4 @@
-package generator
+package lib.generator
 
 sealed trait Status
 

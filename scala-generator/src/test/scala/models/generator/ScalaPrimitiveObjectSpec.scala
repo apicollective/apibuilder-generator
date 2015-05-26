@@ -1,4 +1,4 @@
-package generator
+package scala.generator
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models._
@@ -11,7 +11,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a field with an object field") {
 
-    val baseJson = TestHelper.buildJson("""
+    val baseJson = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
       "enums": [],
@@ -30,7 +30,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     """)
 
     def service(typeString: String): Service = {
-      TestHelper.service(baseJson.format(typeString))
+      models.TestHelper.service(baseJson.format(typeString))
     }
 
     def ssd(typeString: String): ScalaService = {
@@ -59,7 +59,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
         ScalaCaseClasses.invoke(InvocationForm(service("object")), addHeader = false) match {
           case Left(errors) => fail(errors.mkString(", "))
           case Right(code) => {
-            TestHelper.assertEqualsFile("/generators/scala-primitive-object-singleton.txt", code)
+            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-singleton.txt", code)
           }
         }
       }
@@ -68,7 +68,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
         ScalaCaseClasses.invoke(InvocationForm(service("[object]")), addHeader = false) match {
           case Left(errors) => fail(errors.mkString(", "))
           case Right(code) => {
-            TestHelper.assertEqualsFile("/generators/scala-primitive-object-list.txt", code)
+            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-list.txt", code)
           }
         }
       }
@@ -77,7 +77,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
         ScalaCaseClasses.invoke(InvocationForm(service("map[object]")), addHeader = false) match {
           case Left(errors) => fail(errors.mkString(", "))
           case Right(code) => {
-            TestHelper.assertEqualsFile("/generators/scala-primitive-object-map.txt", code)
+            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-map.txt", code)
           }
         }
       }
@@ -88,7 +88,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
   describe("for a response with an object field") {
 
-    val baseJson = TestHelper.buildJson(s"""
+    val baseJson = models.TestHelper.buildJson(s"""
       "imports": [],
       "headers": [],
       "enums": [],
@@ -124,7 +124,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     """)
 
     def service(typeString: String): Service = {
-      TestHelper.service(baseJson.format(typeString))
+      models.TestHelper.service(baseJson.format(typeString))
     }
 
     def ssd(typeString: String): ScalaService = {
@@ -156,17 +156,17 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
       it("singleton") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("object"))
-        TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-singleton.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-singleton.txt", generator.objects)
       }
 
       it("list") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("[object]"))
-        TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-list.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-list.txt", generator.objects)
       }
 
       it("map") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("map[object]"))
-        TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-map.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-map.txt", generator.objects)
       }
 
     }
