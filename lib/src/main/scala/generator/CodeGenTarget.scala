@@ -1,4 +1,4 @@
-package generator
+package lib.generator
 
 import com.gilt.apidoc.generator.v0.models.Generator
 

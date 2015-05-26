@@ -1,4 +1,4 @@
-package models
+package scala.models
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import ning.Ning18ClientGenerator

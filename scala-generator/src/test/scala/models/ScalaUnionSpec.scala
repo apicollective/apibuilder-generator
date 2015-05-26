@@ -1,6 +1,6 @@
-package models
+package scala.models
 
-import generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
+import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 

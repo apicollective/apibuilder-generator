@@ -1,10 +1,10 @@
-package generator
+package scala.generator
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
-import models.Play23ClientGenerator
-import models.ning.Ning18ClientGenerator
+import scala.models.Play23ClientGenerator
+import scala.models.ning.Ning18ClientGenerator
 
-import models.TestHelper
+import scala.models.TestHelper
 import org.scalatest.{FunSpec, Matchers}
 
 class ReferenceSpec extends FunSpec with Matchers {

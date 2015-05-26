@@ -1,7 +1,7 @@
-package models
+package scala.models
 
 import com.gilt.apidoc.spec.v0.models.Service
-import generator.ScalaService
+import scala.generator.ScalaService
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class Play2BindablesSpec extends FunSpec with ShouldMatchers {

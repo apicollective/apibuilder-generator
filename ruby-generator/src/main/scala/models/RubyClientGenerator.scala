@@ -8,7 +8,8 @@ import com.gilt.apidoc.spec.v0.models._
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import lib.{Datatype, Methods, Text, VersionTag}
 import lib.Text._
-import generator.{GeneratorUtil, CodeGenerator}
+import lib.generator.{CodeGenerator, GeneratorUtil}
+
 import scala.collection.mutable.ListBuffer
 import play.api.Logger
 import play.api.libs.json._

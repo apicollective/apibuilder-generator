@@ -1,7 +1,7 @@
-package models
+package scala.models
 
 import lib.Text
-import generator.{ScalaEnum, ScalaService}
+import scala.generator.{ScalaEnum, ScalaService}
 
 case class Play2Bindables(ssd: ScalaService) {
 

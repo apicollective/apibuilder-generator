@@ -1,4 +1,4 @@
-package generator
+package scala.generator
 
 import scala.annotation.tailrec
 

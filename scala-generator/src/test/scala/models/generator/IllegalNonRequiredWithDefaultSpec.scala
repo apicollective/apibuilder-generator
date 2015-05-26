@@ -1,8 +1,8 @@
-package generator
+package scala.generator
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 
-import models.TestHelper
+import scala.models.TestHelper
 import org.scalatest.{FunSpec, Matchers}
 
 class IllegalNonRequiredWithDefaultSpec extends FunSpec with Matchers {

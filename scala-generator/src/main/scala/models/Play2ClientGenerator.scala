@@ -1,11 +1,12 @@
-package models
+package scala.models
 
 import com.gilt.apidoc.spec.v0.models.Service
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
-import generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, CodeGenerator, ScalaClientCommon}
-import generator.{ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
+import lib.generator.CodeGenerator
+import scala.generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, ScalaClientCommon}
+import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
 
 case class PlayFrameworkVersion(
   name: String,

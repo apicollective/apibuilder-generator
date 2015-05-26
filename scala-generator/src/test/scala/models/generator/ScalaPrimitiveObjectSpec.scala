@@ -1,8 +1,8 @@
-package generator
+package scala.generator
 
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models._
-import models.TestHelper
+import scala.models.TestHelper
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {

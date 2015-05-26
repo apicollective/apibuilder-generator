@@ -1,7 +1,7 @@
-package models
+package scala.models
 
 import com.gilt.apidoc.spec.v0.models.Method
-import generator.{ScalaDatatype, ScalaPrimitive, ScalaService, ScalaClientMethodGenerator, ScalaClientMethodConfigs}
+import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaService, ScalaClientMethodGenerator, ScalaClientMethodConfigs}
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {

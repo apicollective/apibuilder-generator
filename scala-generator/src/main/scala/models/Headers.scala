@@ -1,6 +1,6 @@
-package models
+package scala.models
 
-import generator.ScalaUtil
+import scala.generator.ScalaUtil
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._

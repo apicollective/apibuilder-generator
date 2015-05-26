@@ -1,4 +1,4 @@
-package models
+package scala.models
 
 import lib.VersionTag
 import com.gilt.apidoc.spec.v0.models.Service

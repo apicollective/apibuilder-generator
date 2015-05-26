@@ -1,6 +1,6 @@
-package models
+package scala.models
 
-import generator.ScalaService
+import scala.generator.ScalaService
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class Play2JsonSpec extends FunSpec with ShouldMatchers {

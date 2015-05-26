@@ -1,9 +1,9 @@
-package models
+package scala.models
 
 import lib.Datatype
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models.{Method, Operation, Resource, Service}
-import generator.{ScalaOperation, ScalaResource, ScalaService}
+import scala.generator.{ScalaOperation, ScalaResource, ScalaService}
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {

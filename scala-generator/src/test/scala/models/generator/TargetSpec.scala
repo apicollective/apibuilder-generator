@@ -1,6 +1,6 @@
-package generator
+package scala.generator
 
-import models.TestHelper
+import scala.models.TestHelper
 import org.scalatest.{FunSpec, Matchers}
 
 class TargetSpec extends FunSpec with Matchers {

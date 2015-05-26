@@ -4,7 +4,7 @@ import com.gilt.apidoc.generator.v0.models.Generator
 import com.gilt.apidoc.generator.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
-import generator.{CodeGenerator, CodeGenTarget}
+import lib.generator.{CodeGenerator, CodeGenTarget}
 
 object Generators extends Controller {
 
@@ -16,7 +16,7 @@ object Generators extends Controller {
     Ok(
       Json.toJson(
         targets.
-          filter(t => t.codeGenerator.isDefined && t.status != generator.Status.Proposal).
+          filter(t => t.codeGenerator.isDefined && t.status != lib.generator.Status.Proposal).
           filter(t => key.isEmpty || key == Some(t.metaData.key))
           map(t => t.metaData)))
   }
@@ -41,7 +41,7 @@ object Generators extends Controller {
           description = Some("A pure ruby library to consume api.json web services. The ruby client has minimal dependencies and does not require any additional gems."),
           language = Some("Ruby")
         ),
-        status = generator.Status.Beta,
+        status = lib.generator.Status.Beta,
         codeGenerator = Some(ruby.models.RubyClientGenerator)
       ),
        CodeGenTarget(
@@ -51,8 +51,8 @@ object Generators extends Controller {
           description = Some("Ning Async Http v. 1.9.x Client - see https://sonatype.github.io/async-http-client"),
           language = Some("Java, Scala")
         ),
-        status = generator.Status.Alpha,
-        codeGenerator = Some(models.ning.Ning19ClientGenerator)
+        status = lib.generator.Status.Alpha,
+        codeGenerator = Some(scala.models.ning.Ning19ClientGenerator)
       ),
        CodeGenTarget(
         metaData = Generator(
@@ -61,8 +61,8 @@ object Generators extends Controller {
           description = Some("Ning Async Http v. 1.8.x Client - see https://sonatype.github.io/async-http-client"),
           language = Some("Java, Scala")
         ),
-        status = generator.Status.Alpha,
-        codeGenerator = Some(models.ning.Ning18ClientGenerator)
+        status = lib.generator.Status.Alpha,
+        codeGenerator = Some(scala.models.ning.Ning18ClientGenerator)
       ),
       CodeGenTarget(
         metaData = Generator(
@@ -71,8 +71,8 @@ object Generators extends Controller {
           description = Some("Play Framework 2.2 client based on <a href='http://www.playframework.com/documentation/2.2.x/ScalaWS''>WS API</a>. Note this client does NOT support HTTP PATCH. If you need PATCH, we recommend using the ning client instead, which uses play-json underneath so should require minimal new dependencies in Play."),
           language = Some("Scala")
         ),
-        status = generator.Status.Beta,
-        codeGenerator = Some(models.Play22ClientGenerator)
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.models.Play22ClientGenerator)
       ),
       CodeGenTarget(
         metaData = Generator(
@@ -81,8 +81,8 @@ object Generators extends Controller {
           description = Some("Play Framework 2.3 client based on  <a href='http://www.playframework.com/documentation/2.3.x/ScalaWS'>WS API</a>."),
           language = Some("Scala")
         ),
-        status = generator.Status.Beta,
-        codeGenerator = Some(models.Play23ClientGenerator)
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.models.Play23ClientGenerator)
       ),
       CodeGenTarget(
         metaData = Generator(
@@ -91,8 +91,8 @@ object Generators extends Controller {
           description = Some("Generate play 2.x case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
           language = Some("Scala")
         ),
-        status = generator.Status.Beta,
-        codeGenerator = Some(models.Play2Models)
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.models.Play2Models)
       ),
       CodeGenTarget(
         metaData = Generator(
@@ -101,8 +101,8 @@ object Generators extends Controller {
           description = Some("""Generate a routes file for play 2.x framework. See <a href="/doc/playRoutesFile">Play Routes File</a>."""),
           language = Some("Scala")
         ),
-        status = generator.Status.Beta,
-        codeGenerator = Some(models.Play2RouteGenerator)
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.models.Play2RouteGenerator)
       ),
       CodeGenTarget(
         metaData = Generator(
@@ -111,8 +111,8 @@ object Generators extends Controller {
           description = Some("Generate scala models from the API description."),
           language = Some("Scala")
         ),
-        status = generator.Status.Beta,
-        codeGenerator = Some(generator.ScalaCaseClasses)
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.generator.ScalaCaseClasses)
       ),
       CodeGenTarget(
         metaData = Generator(
@@ -121,7 +121,7 @@ object Generators extends Controller {
           description = Some("Generate a valid swagger 2.0 json description of a service."),
           language = None
         ),
-        status = generator.Status.Proposal,
+        status = lib.generator.Status.Proposal,
         codeGenerator = None
       ),
       CodeGenTarget(
@@ -131,7 +131,7 @@ object Generators extends Controller {
           description = Some("Generate a simple to use wrapper to access a service from AngularJS"),
           language = Some("JavaScript")
         ),
-        status = generator.Status.InDevelopment,
+        status = lib.generator.Status.InDevelopment,
         codeGenerator = None
       ),
       CodeGenTarget(
@@ -141,7 +141,7 @@ object Generators extends Controller {
           description = Some("Generate a simple to use wrapper to access a service from javascript."),
           language = Some("JavaScript")
         ),
-        status = generator.Status.Proposal,
+        status = lib.generator.Status.Proposal,
         codeGenerator = None
       )
   ).sortBy(_.metaData.key)

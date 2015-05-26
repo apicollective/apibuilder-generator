@@ -1,6 +1,6 @@
-package generator
+package scala.generator
 
-import models.TestHelper
+import scala.models.TestHelper
 import com.gilt.apidoc.spec.v0.models._
 import org.scalatest._
 

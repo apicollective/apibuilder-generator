@@ -1,4 +1,4 @@
-package generator
+package scala.generator
 
 import java.util.UUID
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser

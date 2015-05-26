@@ -1,9 +1,10 @@
-package generator
+package scala.generator
 
-import models.ApidocComments
+import scala.models.ApidocComments
 import com.gilt.apidoc.generator.v0.models.InvocationForm
 import com.gilt.apidoc.spec.v0.models.Service
 import lib.Text._
+import lib.generator.CodeGenerator
 
 object ScalaCaseClasses extends CodeGenerator {
 

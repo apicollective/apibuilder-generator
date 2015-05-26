@@ -1,4 +1,4 @@
-package models
+package scala.models
 
 import com.gilt.apidoc.spec.v0.models._
 

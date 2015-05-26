@@ -1,7 +1,7 @@
-package generator
+package scala.generator
 
 import com.gilt.apidoc.spec.v0.models.Service
-import models.TestHelper
+import scala.models.TestHelper
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
