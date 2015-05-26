@@ -29,7 +29,7 @@ object Text {
     alphaNumericError ++ startsWithLetterError
   }
 
-  private val AlphaNumericRx = "^[a-zA-Z0-9_.\\.]*$".r
+  private[this] val AlphaNumericRx = "^[a-zA-Z0-9_.\\.]*$".r
 
   def isAlphaNumeric(value: String): Boolean = {
     value match {
@@ -38,7 +38,7 @@ object Text {
     }
   }
 
-  private val StartsWithLetterRx = "^[a-zA-Z].*".r
+  private[this] val StartsWithLetterRx = "^[a-zA-Z].*".r
 
   def startsWithLetter(value: String): Boolean = {
     val result = value match {
@@ -48,7 +48,7 @@ object Text {
     result
   }
 
-  private val Ellipsis = "..."
+  private[this] val Ellipsis = "..."
 
   /**
    * if value is longer than maxLength characters, it wil be truncated to <= 97
@@ -76,7 +76,7 @@ object Text {
     }
   }
 
-  private val Plurals = Map(
+  private[this] val Plurals = Map(
     "metadatum" -> "metadata",
     "datum" -> "data",
     "person" -> "people",
@@ -118,7 +118,7 @@ object Text {
     }
   }
 
-  private val RemoveUnsafeCharacters = """([^0-9a-zA-Z])""".r
+  private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z])""".r
   def safeName(name: String): String = {
     RemoveUnsafeCharacters.replaceAllIn(name, m => "").trim
   }
@@ -131,7 +131,7 @@ object Text {
     initCap(splitIntoWords(value).flatMap(_.split("-")))
   }
 
-  private val WordDelimeterRx = "_|\\-|\\.|:".r
+  private[this] val WordDelimeterRx = "_|\\-|\\.|:".r
 
   def splitIntoWords(value: String): Seq[String] = {
     WordDelimeterRx.split(value).map(_.trim).filter(!_.isEmpty)
@@ -155,12 +155,12 @@ object Text {
   /**
     * Returns the word with first character in lower case
     */
-  private val InitLowerCaseRx = """^([A-Z])""".r
+  private[this] val InitLowerCaseRx = """^([A-Z])""".r
   def initLowerCase(word: String) = {
     InitLowerCaseRx.replaceAllIn(word, m => s"${m.toString.toLowerCase}")
   }
 
-  private val Capitals = """([A-Z])""".r
+  private[this] val Capitals = """([A-Z])""".r
   def camelCaseToUnderscore(phrase: String): String = {
     if (phrase == phrase.toUpperCase) {
       phrase.toLowerCase

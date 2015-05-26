@@ -10,7 +10,7 @@ import org.joda.time.DateTime
 
 object ScalaUtil {
 
-  private val ReservedWords = Seq(
+  private[this] val ReservedWords = Seq(
     "case", "catch", "class", "def", "do",
     "else", "extends", "false", "final",
     "finally", "for", "forSome", "if",

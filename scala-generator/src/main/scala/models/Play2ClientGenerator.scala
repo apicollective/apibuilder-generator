@@ -63,7 +63,7 @@ case class Play2ClientGenerator(
   form: InvocationForm
 ) {
 
-  private val ssd = new ScalaService(form.service)
+  private[this] val ssd = new ScalaService(form.service)
 
   def invoke(): Either[Seq[String], String] = {
     ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
@@ -101,7 +101,7 @@ ${headers.objectConstants.indent(2)}
 ${ScalaClientCommon.clientSignature(version.config).indent(2)} {
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
-    private val logger = play.api.Logger("${ssd.namespaces.base}.Client")
+    private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
     logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$apiUrl")
 

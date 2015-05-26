@@ -10,7 +10,7 @@ case class ScalaService(
 ) {
   val namespaces = Namespaces(service.namespace)
 
-  private val scalaTypeResolver = ScalaTypeResolver(namespaces)
+  private[this] val scalaTypeResolver = ScalaTypeResolver(namespaces)
 
   val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 

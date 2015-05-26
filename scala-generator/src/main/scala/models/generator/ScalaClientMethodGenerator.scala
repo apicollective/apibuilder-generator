@@ -13,13 +13,13 @@ case class ScalaClientMethodGenerator(
   import lib.Text
   import lib.Text._
 
-  private val namespaces = Namespaces(config.namespace)
+  private[this] val namespaces = Namespaces(config.namespace)
 
-  private val generatorUtil = ScalaGeneratorUtil(config)
+  private[this] val generatorUtil = ScalaGeneratorUtil(config)
 
-  private val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
+  private[this] val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
-  private val featureMigration = FeatureMigration(ssd.service.apidoc.version)
+  private[this] val featureMigration = FeatureMigration(ssd.service.apidoc.version)
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + errorPackage()).trim
@@ -251,7 +251,7 @@ case class ScalaClientMethodGenerator(
   ) {
     import lib.Text._
     
-    private val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
+    private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
 
     val interface: String = {
       s"""${commentString}def $name(${argList.getOrElse("")})(implicit ec: scala.concurrent.ExecutionContext): $returnType"""

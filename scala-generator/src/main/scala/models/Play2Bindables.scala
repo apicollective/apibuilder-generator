@@ -51,7 +51,7 @@ implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsin
   ): String = {
     val fullyQualifiedName = ssd.enumClassName(enumName)
     s"// Enum: $enumName\n" +
-    """private val enum%sNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${%s.all.mkString(", ")}"""".format(enumName, fullyQualifiedName) +
+    """private[this] val enum%sNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${%s.all.mkString(", ")}"""".format(enumName, fullyQualifiedName) +
     s"""
 
 implicit val pathBindableEnum$enumName = new PathBindable.Parsing[$fullyQualifiedName] (

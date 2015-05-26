@@ -5,7 +5,7 @@ import com.gilt.apidoc.spec.v0.models.Service
 
 case class FeatureMigration(serviceVersion: String) {
 
-  private val version = VersionTag(serviceVersion)
+  private[this] val version = VersionTag(serviceVersion)
 
   def hasImplicit404s(): Boolean = {
     versionLessThanOrEqual("0.9.4")
