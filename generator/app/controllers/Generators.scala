@@ -13,12 +13,12 @@ object Generators extends Controller {
     limit: Integer = 100,
     offset: Integer = 0
   ) = Action { request: Request[AnyContent] =>
-    Ok(
-      Json.toJson(
-        targets.
-          filter(t => t.codeGenerator.isDefined && t.status != lib.generator.Status.Proposal).
-          filter(t => key.isEmpty || key == Some(t.metaData.key))
-          map(t => t.metaData)))
+    val generators = targets.
+      filter(t => t.codeGenerator.isDefined && t.status != lib.generator.Status.Proposal).
+      filter(t => key.isEmpty || key == Some(t.metaData.key)).
+      map(t => t.metaData)
+
+    Ok(Json.toJson(generators.drop(offset).take(limit)))
   }
 
   def getByKey(key: String) = Action { request: Request[AnyContent] =>
