@@ -25,8 +25,8 @@ lazy val generated = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator)
-  .aggregate(scalaGenerator, rubyGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator)
   .enablePlugins(PlayScala)
   .settings(
     routesImport += "com.gilt.apidoc.generator.v0.Bindables._",
@@ -43,6 +43,11 @@ lazy val scalaGenerator = project
 
 lazy val rubyGenerator = project
   .in(file("ruby-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+
+lazy val javaGenerator = project
+  .in(file("java-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
 
