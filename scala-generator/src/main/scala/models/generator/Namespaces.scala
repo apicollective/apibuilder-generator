@@ -1,5 +1,7 @@
 package scala.generator
 
+import lib.generator.GeneratorUtil
+
 object Namespaces {
 
   def quote(ns: String): String = {
@@ -12,7 +14,7 @@ case class Namespaces(original: String) {
 
   val base = Namespaces.quote(original)
 
-  val models: String = s"$base.models"
+  val models: String = GeneratorUtil.fullyQualifiedName(base)
 
   /**
     * We use a single namespace for models and enums to minimize
