@@ -8,8 +8,8 @@ case class Play2Json(
 ) {
 
   private case class ReadWrite(name: String)
-  private val Reads = ReadWrite("Reads")
-  private val Writes = ReadWrite("Writes")
+  private[this] val Reads = ReadWrite("Reads")
+  private[this] val Writes = ReadWrite("Writes")
 
   def generate(): String = {
     Seq(

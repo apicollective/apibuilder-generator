@@ -185,7 +185,7 @@ package com.gilt.apidoc.generator.v0 {
   ) {
     import com.gilt.apidoc.generator.v0.models.json._
 
-    private val logger = play.api.Logger("com.gilt.apidoc.generator.v0.Client")
+    private[this] val logger = play.api.Logger("com.gilt.apidoc.generator.v0.Client")
 
     logger.info(s"Initializing com.gilt.apidoc.generator.v0.Client for url $apiUrl")
 

@@ -8,7 +8,7 @@ import lib.generator.CodeGenerator
 
 object ScalaCaseClasses extends CodeGenerator {
 
-  private val MaxNumberOfFields = 21
+  private[this] val MaxNumberOfFields = 21
 
   override def invoke(form: InvocationForm): Either[Seq[String], String] = invoke(form, addHeader = true)
 

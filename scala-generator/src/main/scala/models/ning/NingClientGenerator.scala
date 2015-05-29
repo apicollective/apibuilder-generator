@@ -35,7 +35,7 @@ case class NingClientGenerator(
   form: InvocationForm
 ) {
 
-  private val ssd = new ScalaService(form.service)
+  private[this] val ssd = new ScalaService(form.service)
 
   def invoke(): Either[Seq[String], String] = {
     ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {

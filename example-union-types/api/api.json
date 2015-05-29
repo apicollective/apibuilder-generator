@@ -66,7 +66,8 @@
                     "method": "GET",
                     "path": "/:guid",
                     "responses": {
-                        "200": { "type": "user" }
+                        "200": { "type": "user" },
+                        "404": { "type": "unit" }
                     }
                 },
 

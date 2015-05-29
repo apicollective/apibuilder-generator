@@ -7,7 +7,7 @@ case class ScalaEnums(
   enum: ScalaEnum
 ) {
 
-  private val unions = ssd.unionsForEnum(enum)
+  private[this] val unions = ssd.unionsForEnum(enum)
 
   def build(): String = {
     import lib.Text._

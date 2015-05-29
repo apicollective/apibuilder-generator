@@ -44,25 +44,41 @@ object TestHelper {
   }
 
   def readFile(path: String): String = {
-    val stream = getClass.getResourceAsStream(path);
-    if (stream == null) sys.error(s"unable to find resource at ${path}")
-    scala.io.Source.fromInputStream(stream)
-      .getLines.mkString("\n")
+    scala.io.Source.fromFile(new File(path)).getLines.mkString("\n")
   }
 
   def parseFile(path: String): Service = {
-    service(readFile(path))
+    service(readFile(resolvePath(path)))
+  }
+
+  /**
+    * Finds the actual source file for the resource with this name. We
+    * need this to easily overwrite the resource when updating our
+    * generated code.
+    */
+  private[this] def resolvePath(filename: String): String = {
+    import sys.process._
+
+    val targetPath = new File(getClass.getResource(filename).getPath)
+    val cmd = s"find . -type f -name ${targetPath.getName}"
+
+    cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).toList match {
+      case Nil => sys.error(s"Could not find source file named[$filename]")
+      case one :: Nil => one
+      case multiple => sys.error(s"Multiple source files named[$filename]: " + multiple.mkString(", "))
+    }
   }
 
   def assertEqualsFile(filename: String, contents: String) {
-    val expected = readFile(filename).trim
-    if (contents.trim != expected) {
-      val actualPath = "/tmp/apidoc.tmp." + Text.safeName(filename)
-      val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
-      TestHelper.writeToFile(actualPath, contents.trim)
-      TestHelper.writeToFile(expectedPath, expected)
-      // TestHelper.writeToFile(filename, contents.trim)
+    val actualPath = resolvePath(filename)
+    val current = readFile(actualPath).trim
+    if (current != contents.trim) {
       import sys.process._
+
+      val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
+      TestHelper.writeToFile(expectedPath, contents.trim)
+      // TestHelper.writeToFile(actualPath, contents.trim)
+
       val cmd = s"diff $actualPath $expectedPath"
       println(cmd)
       cmd.!

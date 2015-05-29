@@ -8,7 +8,7 @@ import java.util.UUID
 
 object Users extends Controller {
 
-  private val users: Seq[User] = Seq(
+  private[this] val users: Seq[User] = Seq(
     RegisteredUser(UUID.randomUUID(), "registered@test.apidoc.me", preference = Foo.A),
     GuestUser(UUID.randomUUID(), "guest@test.apidoc.me"),
     UserUuid(UUID.randomUUID())

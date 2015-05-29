@@ -16,7 +16,7 @@ import play.api.libs.json._
 
 object RubyUtil {
 
-  private val ReservedWords = Seq(
+  private[this] val ReservedWords = Seq(
     "alias", "and", "begin", "break", "case", "class", "def", "defined?", "do",
     "else", "elsif", "end", "ensure", "false", "for", "if", "module",
     "next, nil, not", "or", "redo, rescue", "retry", "return", "self, super",
@@ -300,13 +300,13 @@ object RubyClientGenerator extends CodeGenerator {
  * from api.json
  */
 case class RubyClientGenerator(form: InvocationForm) {
-  private val service = form.service
+  private[this] val service = form.service
 
-  private val module = RubyUtil.Module(service.namespace)
+  private[this] val module = RubyUtil.Module(service.namespace)
 
-  private val datatypeResolver = GeneratorUtil.datatypeResolver(service)
+  private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 
-  private val primitiveWrapper = RubyPrimitiveWrapper(service)
+  private[this] val primitiveWrapper = RubyPrimitiveWrapper(service)
 
   /**
     * Ruby does not support multiple inheritance. This method
@@ -748,10 +748,10 @@ ${headers.rubyModuleConstants.indent(2)}
             (expr, rubyClass(p))
 
           case Primitive.DateIso8601 =>
-            (s"HttpClient::Helper.to_date_iso8601(${expr})", "String")
+            (s"HttpClient::Helper.to_date_iso8601(${expr})", "Date")
 
           case Primitive.DateTimeIso8601 =>
-            (s"HttpClient::Helper.to_date_time_iso8601(${expr})", "String")
+            (s"HttpClient::Helper.to_date_time_iso8601(${expr})", "DateTime")
 
           case Primitive.Uuid =>
             (s"HttpClient::Helper.to_uuid(${expr})", "String")
