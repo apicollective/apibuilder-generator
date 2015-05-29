@@ -211,6 +211,7 @@ class TextSpec extends FunSpec with Matchers {
     Text.safeName("foo") should be("foo")
     Text.safeName("val") should be("val")
     Text.safeName("foo Bar") should be("fooBar")
+    Text.safeName("foo.Bar") should be("fooBar")
   }
 
   it("underscoreToInitCap") {

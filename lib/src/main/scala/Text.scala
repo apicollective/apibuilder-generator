@@ -118,9 +118,9 @@ object Text {
     }
   }
 
-  private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z])""".r
+  private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z\_])""".r
   def safeName(name: String): String = {
-    RemoveUnsafeCharacters.replaceAllIn(name, m => "").trim
+    RemoveUnsafeCharacters.replaceAllIn(name, m => "").replaceAll("\\.", "_").replaceAll("\\_+", "_").trim
   }
 
   def underscoreToInitCap(value: String): String = {
@@ -134,7 +134,7 @@ object Text {
   private[this] val WordDelimeterRx = "_|\\-|\\.|:".r
 
   def splitIntoWords(value: String): Seq[String] = {
-    WordDelimeterRx.split(value).map(_.trim).filter(!_.isEmpty)
+    WordDelimeterRx.split(lib.Text.camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
   }
 
   def snakeToCamelCase(value: String) = {

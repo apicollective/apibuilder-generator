@@ -39,6 +39,13 @@ class RubyUtilSpec extends FunSpec with Matchers {
     RubyUtil.toConstant("FOO_BAR") should be("FOO_BAR")
   }
 
+  it("RubyUtil.toMethodName") {
+    RubyUtil.toMethodName("foo") should be("foo")
+    RubyUtil.toMethodName("foo_bar") should be("foo_bar")
+    RubyUtil.toMethodName("foo.bar") should be("foo_bar")
+    RubyUtil.toMethodName("fooBar") should be("foo_bar")
+  }
+
   describe("rubyDefault") {
     import lib.Datatype.Container
     import lib.Datatype.Primitive

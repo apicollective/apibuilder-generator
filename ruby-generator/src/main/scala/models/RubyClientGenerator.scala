@@ -49,6 +49,16 @@ object RubyUtil {
     }
   }
 
+  def toMethodName(
+    name: String
+  ): String = {
+    quoteNameIfKeyword(
+      lib.Text.safeName(
+        lib.Text.initLowerCase(lib.Text.splitIntoWords(name).map(_.toLowerCase).mkString("_"))
+      )
+    )
+  }
+
   def toClassName(
     name: String,
     multiple: Boolean = false
@@ -419,7 +429,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
     sb.append(service.resources.map { resource =>
       val className = RubyUtil.toClassName(resource.plural)
-      val varName = RubyUtil.quoteNameIfKeyword(resource.plural)
+      val varName = RubyUtil.toMethodName(resource.plural)
 
       s"  def $varName\n" +
       s"    @$varName ||= ${module.fullName}::Clients::${className}.new(self)\n" +
