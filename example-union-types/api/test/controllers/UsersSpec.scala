@@ -1,5 +1,6 @@
 package controllers
 
+import com.gilt.apidoc.example.union.types.v0.errors.UnitResponse
 import com.gilt.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
 import com.gilt.apidoc.example.union.types.v0.models.json._
 import java.util.UUID
@@ -93,9 +94,7 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
     }
 
     userGuids.foreach { userGuid =>
-      await(client.users.getByGuid(userGuid)).getOrElse {
-        fail("failed to find user by guid")
-      } match {
+      await(client.users.getByGuid(userGuid)) match {
         case RegisteredUser(id, email, preference) => id must be(userGuid)
         case GuestUser(id, email) => id must be(userGuid)
         case UserUuid(value) => value must be(userGuid)
@@ -103,7 +102,9 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
       }
     }
 
-    await(client.users.getByGuid(UUID.randomUUID)) must be(None)
+    intercept[UnitResponse] {
+      await(client.users.getByGuid(UUID.randomUUID))
+    }.status must be(404)
   }
 
 }
