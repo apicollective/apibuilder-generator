@@ -7,16 +7,24 @@ import lib.Text._
 
 object GeneratorUtil {
 
+  def fullyQualifiedName(namespace: String, name: Option[String] = None): String = {
+    val base = s"$namespace.models"
+    name match {
+      case None => base
+      case Some(n) => s"$base.$n"
+    }
+  }
+
   def datatypeResolver(service: Service): DatatypeResolver = {
     DatatypeResolver(
       enumNames = service.enums.map(_.name) ++ service.imports.flatMap { imp =>
-        imp.enums.map(name => s"${imp.namespace}.enums.${name}")
+        imp.enums.map(n => fullyQualifiedName(imp.namespace, Some(n)))
       },
       unionNames = service.unions.map(_.name) ++ service.imports.flatMap { imp =>
-        imp.unions.map(name => s"${imp.namespace}.unions.${name}")
+        imp.unions.map(n => fullyQualifiedName(imp.namespace, Some(n)))
       },
       modelNames = service.models.map(_.name) ++ service.imports.flatMap { imp =>
-        imp.models.map(name => s"${imp.namespace}.models.${name}")
+        imp.models.map(n => fullyQualifiedName(imp.namespace, Some(n)))
       }
     )
   }
