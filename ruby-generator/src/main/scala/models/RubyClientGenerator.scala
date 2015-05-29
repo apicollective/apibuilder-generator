@@ -748,10 +748,10 @@ ${headers.rubyModuleConstants.indent(2)}
             (expr, rubyClass(p))
 
           case Primitive.DateIso8601 =>
-            (s"HttpClient::Helper.to_date_iso8601(${expr})", "String")
+            (s"HttpClient::Helper.to_date_iso8601(${expr})", "Date")
 
           case Primitive.DateTimeIso8601 =>
-            (s"HttpClient::Helper.to_date_time_iso8601(${expr})", "String")
+            (s"HttpClient::Helper.to_date_time_iso8601(${expr})", "DateTime")
 
           case Primitive.Uuid =>
             (s"HttpClient::Helper.to_uuid(${expr})", "String")
