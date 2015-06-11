@@ -91,7 +91,7 @@ module Com
                     :required_messages => HttpClient::Preconditions.assert_class('required_messages', opts.delete(:required_messages), Array).map { |v| HttpClient::Preconditions.assert_class('required_messages', v, String) }
                   }.delete_if { |k, v| v.nil? }
                   r = @client.request("/echoes").with_query(query).get
-                  ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Value.new(r)
+                  nil
                 end
 
                 def get_arrays_only(incoming={})
@@ -101,7 +101,7 @@ module Com
                     :required_messages => HttpClient::Preconditions.assert_class('required_messages', opts.delete(:required_messages), Array).map { |v| HttpClient::Preconditions.assert_class('required_messages', v, String) }
                   }.delete_if { |k, v| v.nil? }
                   r = @client.request("/echoes/arrays-only").with_query(query).get
-                  ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Value.new(r)
+                  nil
                 end
 
               end
@@ -216,7 +216,7 @@ module Com
                 def post_noop(hash)
                   HttpClient::Preconditions.assert_class('hash', hash, Hash)
                   r = @client.request("/users/noop").with_json(hash.to_json).post
-                  ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Value.new(r)
+                  nil
                 end
 
               end
