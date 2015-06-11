@@ -59,7 +59,9 @@ object TestHelper {
   private[this] def resolvePath(filename: String): String = {
     import sys.process._
 
-    val targetPath = new File(getClass.getResource(filename).getPath)
+    val targetPath = Option(getClass.getResource(filename)).map(r => new File(r.getPath)).getOrElse {
+      sys.error(s"Could not find file named[$filename]")
+    }
     val cmd = s"find . -type f -name ${targetPath.getName}"
 
     cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).toList match {
@@ -79,7 +81,7 @@ object TestHelper {
       TestHelper.writeToFile(expectedPath, contents.trim)
       // TestHelper.writeToFile(actualPath, contents.trim)
 
-      val cmd = s"diff $actualPath $expectedPath"
+      val cmd = s"diff $expectedPath $actualPath"
       println(cmd)
       cmd.!
       sys.error(s"Test output did not match. $cmd")

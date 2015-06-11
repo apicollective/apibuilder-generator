@@ -974,8 +974,14 @@ ${headers.rubyModuleConstants.indent(2)}
   private def generateResponse(dt: Datatype, varName: String): String = {
     import Datatype._
     dt match {
-      case p: Primitive =>
-        s"${qualifiedClassName(RubyUtil.toDefaultVariable())}.new(${varName})"
+      case p: Primitive => {
+        p match {
+          case Primitive.Unit => "nil"
+          case Primitive.Boolean | Primitive.Decimal | Primitive.Double | Primitive.Integer | Primitive.Long | Primitive.DateIso8601 | Primitive.DateTimeIso8601 | Primitive.Object | Primitive.String | Primitive.Uuid => {
+            s"${qualifiedClassName(RubyUtil.toDefaultVariable())}.new(${varName})"
+          }
+        }
+      }
       case t @ (UserDefined.Model(_) | UserDefined.Enum(_)) =>
         s"${qualifiedClassName(t.name)}.new(${varName})"
       case UserDefined.Union(name) =>

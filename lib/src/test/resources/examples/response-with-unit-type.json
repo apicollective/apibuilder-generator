@@ -1,0 +1,55 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "apidoc response with unit type",
+  "organization": {
+    "key": "bryzek"
+  },
+  "application": {
+    "key": "apidoc-response-with-unit-type"
+  },
+  "namespace": "com.gilt.apidoc.test",
+  "version": "0.0.1-dev",
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [],
+  "models": [
+    {
+      "name": "user",
+      "plural": "users",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "description": "Internal unique identifier for this user.",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "type": "user",
+      "plural": "users",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/users",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
