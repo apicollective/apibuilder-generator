@@ -26,8 +26,9 @@ class ReferenceSpec extends FunSpec with Matchers {
   it("generates expected code for play 2.3 client") {
     Play23ClientGenerator.invoke(InvocationForm(service = models.TestHelper.referenceApiService)) match {
       case Left(errors) => fail(errors.mkString(", "))
-      case Right(code) => {
-        models.TestHelper.assertEqualsFile("/generators/reference-spec-play-23.txt", code)
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/generators/reference-spec-play-23.txt", sourceFiles.head.contents)
       }
     }
   }
@@ -35,8 +36,9 @@ class ReferenceSpec extends FunSpec with Matchers {
   it("generates expected code for ning client") {
     Ning18ClientGenerator.invoke(InvocationForm(service = models.TestHelper.referenceApiService)) match {
       case Left(errors) => fail(errors.mkString(", "))
-      case Right(code) => {
-        models.TestHelper.assertEqualsFile("/generators/reference-spec-ning-client.txt", code)
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/generators/reference-spec-ning-client.txt", sourceFiles.head.contents)
       }
     }
   }

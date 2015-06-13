@@ -1,16 +1,16 @@
 package scala.models
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import com.bryzek.apidoc.spec.v0.models.Service
+import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
-import scala.generator.{PrimitiveWrapper, ScalaEnums, ScalaCaseClasses, ScalaService}
+import scala.generator.{ScalaEnums, ScalaCaseClasses, ScalaService}
+import generator.ServiceFileNames
 
 object Play2Models extends CodeGenerator {
 
   override def invoke(
     form: InvocationForm
-  ): Either[Seq[String], String] = {
+  ): Either[Seq[String], Seq[File]] = {
     ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
       case Nil => Right(generateCode(form = form, addBindables = true, addHeader = true))
       case errors => Left(errors)
@@ -21,10 +21,10 @@ object Play2Models extends CodeGenerator {
     form: InvocationForm,
     addBindables: Boolean,
     addHeader: Boolean
-  ): String = {
+  ): Seq[File] = {
     val ssd = ScalaService(form.service)
 
-    val caseClasses = ScalaCaseClasses.generateCode(form, addHeader = false)
+    val caseClasses = ScalaCaseClasses.generateCode(form, addHeader = false).map(_.contents).mkString("\n\n")
     val prefix = underscoreAndDashToInitCap(ssd.name)
     val enumJson: String = ssd.enums.map { ScalaEnums(ssd, _).buildJson() }.mkString("\n\n")
     val play2Json = Play2Json(ssd).generate()
@@ -46,7 +46,7 @@ object Play2Models extends CodeGenerator {
       }
     }
 
-    s"""$header$caseClasses
+    val source = s"""$header$caseClasses
 
 package ${ssd.namespaces.models} {
 
@@ -81,5 +81,7 @@ ${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
 }
 $bindables
 """
+
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
   }
 }

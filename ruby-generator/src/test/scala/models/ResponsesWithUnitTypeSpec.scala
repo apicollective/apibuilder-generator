@@ -10,8 +10,9 @@ class ResponsesWithUnitTypeSpec extends FunSpec with ShouldMatchers {
   it("parses response type") {
     RubyClientGenerator.invoke(InvocationForm(service = service)) match {
       case Left(errors) => fail(errors.mkString(", "))
-      case Right(code) => {
-        models.TestHelper.assertEqualsFile("/example-response-with-unit-type.txt", code)
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/example-response-with-unit-type.txt", sourceFiles.head.contents)
       }
     }
   }

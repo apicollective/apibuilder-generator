@@ -1,16 +1,17 @@
 package scala.generator
 
 import scala.models.ApidocComments
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models.Service
 import lib.Text._
 import lib.generator.CodeGenerator
+import generator.ServiceFileNames
 
 object ScalaCaseClasses extends CodeGenerator {
 
   private[this] val MaxNumberOfFields = 21
 
-  override def invoke(form: InvocationForm): Either[Seq[String], String] = invoke(form, addHeader = true)
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = invoke(form, addHeader = true)
 
   def modelsWithTooManyFieldsErrors(service: Service): Seq[String] = {
     service.models.filter(_.fields.size > MaxNumberOfFields) match {
@@ -24,7 +25,7 @@ object ScalaCaseClasses extends CodeGenerator {
   def invoke(
     form: InvocationForm,
     addHeader: Boolean = true
-  ): Either[Seq[String], String] = {
+  ): Either[Seq[String], Seq[File]] = {
     modelsWithTooManyFieldsErrors(form.service) match {
       case Nil => Right(generateCode(form, addHeader))
       case errors => Left(errors)
@@ -34,7 +35,7 @@ object ScalaCaseClasses extends CodeGenerator {
   def generateCode(
     form: InvocationForm,
     addHeader: Boolean = true
-  ): String = {
+  ): Seq[File] = {
     val ssd = new ScalaService(form.service)
 
     val header = addHeader match {
@@ -61,7 +62,7 @@ object ScalaCaseClasses extends CodeGenerator {
       case code => "\n" + code.mkString("\n\n")
     }
 
-    s"${header}package ${ssd.namespaces.models} {\n\n  " +
+    val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
       ssd.unions.map { generateUnionTraits(ssd.models, _) }.mkString("\n\n").indent(2),
       "",
@@ -70,6 +71,8 @@ object ScalaCaseClasses extends CodeGenerator {
       generatePlayEnums(ssd).indent(2)
     ).mkString("\n").trim +
     s"\n\n}"
+
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
   }
 
   private def generateUnionTraits(models: Seq[ScalaModel], union: ScalaUnion): String = {

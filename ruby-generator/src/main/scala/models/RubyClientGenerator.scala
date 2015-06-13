@@ -3,7 +3,7 @@ package ruby.models
 import java.util.UUID
 import scala.util.Failure
 import scala.util.Success
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models._
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import lib.{Datatype, Methods, Text, VersionTag}
@@ -13,6 +13,7 @@ import lib.generator.{CodeGenerator, GeneratorUtil}
 import scala.collection.mutable.ListBuffer
 import play.api.Logger
 import play.api.libs.json._
+import generator.ServiceFileNames
 
 object RubyUtil {
 
@@ -216,7 +217,7 @@ object RubyUtil {
 //    in a new place, one must remember to use that method.
 object RubyClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     new RubyClientGenerator(form).invoke
   }
 
@@ -346,15 +347,15 @@ case class RubyClientGenerator(form: InvocationForm) {
     }
   }
 
-  def invoke(): Either[Seq[String], String] = {
+  def invoke(): Either[Seq[String], Seq[File]] = {
     Right(generateCode())
   }
 
-  private def generateCode(): String = {
+  private def generateCode(): Seq[File] = {
     val spacerSize = 2
     val moduleIndent = spacerSize * module.parts.size
 
-    Seq(
+    val source = Seq(
       ApidocComments(form.service.version, form.userAgent).toRubyString(),
       RubyHttpClient.require,
       Seq(
@@ -384,6 +385,8 @@ case class RubyClientGenerator(form: InvocationForm) {
         module.parts.zipWithIndex.reverse.map { case (name, i) => "end".indent(spacerSize * i) }.mkString("\n")
       ).mkString("\n")
     ).mkString("\n\n")
+
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Ruby")))
   }
 
   private def generateClient(): String = {

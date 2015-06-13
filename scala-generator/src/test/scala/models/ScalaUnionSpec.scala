@@ -58,8 +58,9 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     it("generates valid models") {
       ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false) match {
         case Left(errors) => fail(errors.mkString(", "))
-        case Right(code) => {
-          models.TestHelper.assertEqualsFile("/scala-union-models-case-classes.txt", code)
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
+          models.TestHelper.assertEqualsFile("/scala-union-models-case-classes.txt", sourceFiles.head.contents)
         }
       }
     }

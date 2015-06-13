@@ -1,11 +1,11 @@
 package scala.models.ning
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import com.bryzek.apidoc.spec.v0.models.Service
+import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import scala.generator._
 import scala.models._
 import lib.Text._
 import lib.generator.CodeGenerator
+import generator.ServiceFileNames
 
 /**
  * Uses play JSON libraries for json
@@ -14,7 +14,7 @@ import lib.generator.CodeGenerator
  */
 object Ning18ClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val config = ScalaClientMethodConfigs.Ning18(Namespaces.quote(form.service.namespace))
     NingClientGenerator(config, form).invoke()
   }
@@ -23,7 +23,7 @@ object Ning18ClientGenerator extends CodeGenerator {
 
 object Ning19ClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val config = ScalaClientMethodConfigs.Ning19(Namespaces.quote(form.service.namespace))
     NingClientGenerator(config, form).invoke()
   }
@@ -37,19 +37,21 @@ case class NingClientGenerator(
 
   private[this] val ssd = new ScalaService(form.service)
 
-  def invoke(): Either[Seq[String], String] = {
+  def invoke(): Either[Seq[String], Seq[File]] = {
     ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
       case Nil => Right(generateCode())
       case errors => Left(errors)
     }
   }
 
-  private def generateCode(): String = {
-    ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
-    Seq(
-      Play2Models.generateCode(form, addBindables = false, addHeader = false),
-      client()
-    ).mkString("\n\n")
+  private def generateCode(): Seq[File] = {
+    val source = ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
+      Seq(
+        Play2Models.generateCode(form, addBindables = false, addHeader = false).map(_.contents).mkString("\n\n"),
+        client()
+      ).mkString("\n\n")
+
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
   }
 
   private[ning] def toJson(klass: String): String = {

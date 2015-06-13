@@ -1,6 +1,5 @@
 package ruby.models
 
-import java.io.File
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import com.bryzek.apidoc.spec.v0.models.{Enum, EnumValue}
 
@@ -48,8 +47,9 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
     val service = models.TestHelper.referenceApiService
     RubyClientGenerator.invoke(InvocationForm(service = service, userAgent = Some("gilt 0.0.1-test"))) match {
       case Left(errors) => fail(errors.mkString(", "))
-      case Right(code) => {
-        models.TestHelper.assertEqualsFile("/ruby-client-generator-gilt-0.0.1-test.txt", code)
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/ruby-client-generator-gilt-0.0.1-test.txt", sourceFiles.head.contents)
       }
     }
   }

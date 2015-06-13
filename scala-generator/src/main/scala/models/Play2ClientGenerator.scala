@@ -1,12 +1,11 @@
 package scala.models
 
-import com.bryzek.apidoc.spec.v0.models.Service
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import lib.VersionTag
+import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
 import scala.generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, ScalaClientCommon}
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
+import generator.ServiceFileNames
 
 case class PlayFrameworkVersion(
   name: String,
@@ -18,7 +17,7 @@ case class PlayFrameworkVersion(
 
 object Play22ClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val config = PlayFrameworkVersion(
       name = "2.2.x",
       config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace)),
@@ -33,7 +32,7 @@ object Play22ClientGenerator extends CodeGenerator {
 
 object Play23ClientGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
 
     val config = PlayFrameworkVersion(
       name = "2.3.x",
@@ -52,7 +51,7 @@ object Play2ClientGenerator {
   def invoke(
     version: PlayFrameworkVersion,
     form: InvocationForm
-  ): Either[Seq[String], String] = {
+  ): Either[Seq[String], Seq[File]] = {
     Play2ClientGenerator(version, form).invoke()
   }
 
@@ -65,19 +64,21 @@ case class Play2ClientGenerator(
 
   private[this] val ssd = new ScalaService(form.service)
 
-  def invoke(): Either[Seq[String], String] = {
+  def invoke(): Either[Seq[String], Seq[File]] = {
     ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
       case Nil => Right(generateCode())
       case errors => Left(errors)
     }
   }
 
-  private def generateCode(): String = {
-    ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
-    Seq(
-      Play2Models.generateCode(form, addBindables = true, addHeader = false),
-      client()
-    ).mkString("\n\n")
+  private def generateCode(): Seq[File] = {
+    val source = ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
+      Seq(
+        Play2Models.generateCode(form, addBindables = true, addHeader = false).map(_.contents).mkString("\n\n"),
+        client()
+      ).mkString("\n\n")
+
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
   }
 
   private def client(): String = {

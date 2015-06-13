@@ -10,8 +10,9 @@ class ExampleUnionTypesSpec extends FunSpec with ShouldMatchers {
   it("generates expected code for ruby client") {
     RubyClientGenerator.invoke(InvocationForm(service = service)) match {
       case Left(errors) => fail(errors.mkString(", "))
-      case Right(code) => {
-        models.TestHelper.assertEqualsFile("/example-union-types-ruby-client.txt", code)
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/example-union-types-ruby-client.txt", sourceFiles.head.contents)
       }
     }
   }

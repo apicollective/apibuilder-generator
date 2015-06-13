@@ -32,13 +32,13 @@ object ServiceFileNames {
     )
   }
 
-  private[lib] sealed trait Language {
+  private[generator] sealed trait Language {
     def isCamelCased: Boolean
     def name: String
     def extension: String
   }
 
-  private[lib] object Language {
+  private[generator] object Language {
 
     val All = Seq(
       new Language {
@@ -94,7 +94,7 @@ object ServiceFileNames {
 
   }
 
-  private[lib] def toLanguages(languages: String): Seq[Language] = {
+  private[generator] def toLanguages(languages: String): Seq[Language] = {
     languages.split(",").map(_.trim).flatMap(Language(_))
   }
 

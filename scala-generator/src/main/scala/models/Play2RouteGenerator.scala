@@ -1,14 +1,13 @@
 package scala.models
 
-import lib.Text
 import lib.generator.{CodeGenerator, GeneratorUtil}
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models._
 import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaOperation, ScalaParameter, ScalaResource, ScalaService, ScalaUtil}
 
 object Play2RouteGenerator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): Either[Seq[String], String] = {
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     new Play2RouteGenerator(form).invoke
   }
 }
@@ -25,7 +24,7 @@ case class Play2RouteGenerator(form: InvocationForm) {
   private[this] val service = form.service
   private[this] val scalaService = ScalaService(service)
 
-  def invoke(): Either[Seq[String], String] = {
+  def invoke(): Either[Seq[String], Seq[File]] = {
     scalaService.resources.flatMap { resource =>
       resource.operations.map { op =>
         Play2Route(scalaService, op, resource)
@@ -42,19 +41,23 @@ case class Play2RouteGenerator(form: InvocationForm) {
         val (paramStart, pathStart) = all.partition(_.url.startsWith("/:"))
 
         Right(
-          ApidocComments(form.service.version, form.userAgent).forPlayRoutes + "\n\n" +
-            (pathStart ++ paramStart).map { r =>
-              Seq(
-                r.verb,
-                " " * (maxVerbLength - r.verb.toString.length + GlobalPad),
-                r.url,
-                " " * (maxUrlLength - r.url.length + GlobalPad),
-                r.method,
-                "(",
-                r.params.mkString(", "),
-                ")"
-              ).mkString("")
-            }.mkString("\n")
+          Seq(File(
+            "routes",
+            None,
+            ApidocComments(form.service.version, form.userAgent).forPlayRoutes + "\n\n" +
+              (pathStart ++ paramStart).map { r =>
+                Seq(
+                  r.verb,
+                  " " * (maxVerbLength - r.verb.toString.length + GlobalPad),
+                  r.url,
+                  " " * (maxUrlLength - r.url.length + GlobalPad),
+                  r.method,
+                  "(",
+                  r.params.mkString(", "),
+                  ")"
+                ).mkString("")
+              }.mkString("\n")
+          ))
         )
       }
     }

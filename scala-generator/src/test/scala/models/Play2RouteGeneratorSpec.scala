@@ -1,8 +1,7 @@
 package scala.models
 
-import lib.Datatype
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import com.bryzek.apidoc.spec.v0.models.{Method, Operation, Resource, Service}
+import com.bryzek.apidoc.spec.v0.models.Method
 import scala.generator.{ScalaOperation, ScalaResource, ScalaService}
 import org.scalatest.{ShouldMatchers, FunSpec}
 
@@ -70,10 +69,11 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
 
       Play2RouteGenerator(InvocationForm(service)).invoke() match {
         case Left(errors) => fail(errors.mkString(", "))
-        case Right(code) => {
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
           models.TestHelper.assertEqualsFile(
             "/generators/play-2-route-reference-api.routes",
-            code
+            sourceFiles.head.contents
          ) 
         }
       }
