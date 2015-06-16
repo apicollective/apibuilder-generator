@@ -1,5 +1,5 @@
 code:
-  gilt:
+  bryzek:
     apidoc-generator:
       version: latest
       generators:
