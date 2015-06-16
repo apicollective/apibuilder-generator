@@ -1,7 +1,7 @@
 package ruby.models
 
-import com.gilt.apidoc.spec.v0.models._
-import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models._
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
@@ -11,6 +11,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     val baseJson = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
+      "info": [],
       "models": [],
       "enums": [],
       "unions": [],
@@ -76,6 +77,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     val baseJson = models.TestHelper.buildJson(s"""
       "imports": [],
       "headers": [],
+      "info": [],
       "models": [],
       "enums": [],
       "unions": [],

@@ -3,7 +3,7 @@
  * Service version: 0.0.1-dev
  * apidoc:0.9.17 http://localhost:9000/gilt/apidoc-example-union-types/0.0.1-dev/play_2_3_client
  */
-package com.gilt.apidoc.example.union.types.v0.models {
+package com.bryzek.apidoc.example.union.types.v0.models {
 
   sealed trait Foobar
 
@@ -17,7 +17,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
   case class RegisteredUser(
     guid: _root_.java.util.UUID,
     email: String,
-    preference: com.gilt.apidoc.example.union.types.v0.models.Foobar
+    preference: com.bryzek.apidoc.example.union.types.v0.models.Foobar
   ) extends User
 
   /**
@@ -114,14 +114,14 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
 }
 
-package com.gilt.apidoc.example.union.types.v0.models {
+package com.bryzek.apidoc.example.union.types.v0.models {
 
   package object json {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
-    import com.gilt.apidoc.example.union.types.v0.models.json._
+    import com.bryzek.apidoc.example.union.types.v0.models.json._
 
     private[v0] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
@@ -170,7 +170,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
       (
         (__ \ "guid").read[_root_.java.util.UUID] and
         (__ \ "email").read[String] and
-        (__ \ "preference").read[com.gilt.apidoc.example.union.types.v0.models.Foobar]
+        (__ \ "preference").read[com.bryzek.apidoc.example.union.types.v0.models.Foobar]
       )(RegisteredUser.apply _)
     }
 
@@ -178,7 +178,7 @@ package com.gilt.apidoc.example.union.types.v0.models {
       (
         (__ \ "guid").write[_root_.java.util.UUID] and
         (__ \ "email").write[String] and
-        (__ \ "preference").write[com.gilt.apidoc.example.union.types.v0.models.Foobar]
+        (__ \ "preference").write[com.bryzek.apidoc.example.union.types.v0.models.Foobar]
       )(unlift(RegisteredUser.unapply _))
     }
 
@@ -202,9 +202,9 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = new play.api.libs.json.Writes[Foobar] {
       def writes(obj: Foobar) = obj match {
-        case x: com.gilt.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
-        case x: com.gilt.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
-        case x: com.gilt.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.gilt.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
       }
     }
 
@@ -220,23 +220,23 @@ package com.gilt.apidoc.example.union.types.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
       def writes(obj: User) = obj match {
-        case x: com.gilt.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
-        case x: com.gilt.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
         case x: UserUuid => play.api.libs.json.Json.obj("uuid" -> jsonWritesApidocExampleUnionTypesUserUuid.writes(x))
-        case x: com.gilt.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.gilt.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
+        case x: com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
     }
   }
 }
 
-package com.gilt.apidoc.example.union.types.v0 {
+package com.bryzek.apidoc.example.union.types.v0 {
 
   object Bindables {
 
     import play.api.mvc.{PathBindable, QueryStringBindable}
     import org.joda.time.{DateTime, LocalDate}
     import org.joda.time.format.ISODateTimeFormat
-    import com.gilt.apidoc.example.union.types.v0.models._
+    import com.bryzek.apidoc.example.union.types.v0.models._
 
     // Type: date-time-iso8601
     implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](
@@ -257,24 +257,24 @@ package com.gilt.apidoc.example.union.types.v0 {
     )
 
     // Enum: Bar
-    private[this] val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.gilt.apidoc.example.union.types.v0.models.Bar.all.mkString(", ")}"
+    private[this] val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Bar.all.mkString(", ")}"
 
-    implicit val pathBindableEnumBar = new PathBindable.Parsing[com.gilt.apidoc.example.union.types.v0.models.Bar] (
+    implicit val pathBindableEnumBar = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Bar] (
       Bar.fromString(_).get, _.toString, enumBarNotFound
     )
 
-    implicit val queryStringBindableEnumBar = new QueryStringBindable.Parsing[com.gilt.apidoc.example.union.types.v0.models.Bar](
+    implicit val queryStringBindableEnumBar = new QueryStringBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Bar](
       Bar.fromString(_).get, _.toString, enumBarNotFound
     )
 
     // Enum: Foo
-    private[this] val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.gilt.apidoc.example.union.types.v0.models.Foo.all.mkString(", ")}"
+    private[this] val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Foo.all.mkString(", ")}"
 
-    implicit val pathBindableEnumFoo = new PathBindable.Parsing[com.gilt.apidoc.example.union.types.v0.models.Foo] (
+    implicit val pathBindableEnumFoo = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Foo] (
       Foo.fromString(_).get, _.toString, enumFooNotFound
     )
 
-    implicit val queryStringBindableEnumFoo = new QueryStringBindable.Parsing[com.gilt.apidoc.example.union.types.v0.models.Foo](
+    implicit val queryStringBindableEnumFoo = new QueryStringBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Foo](
       Foo.fromString(_).get, _.toString, enumFooNotFound
     )
 
@@ -283,7 +283,7 @@ package com.gilt.apidoc.example.union.types.v0 {
 }
 
 
-package com.gilt.apidoc.example.union.types.v0 {
+package com.bryzek.apidoc.example.union.types.v0 {
 
   object Constants {
 
@@ -295,43 +295,43 @@ package com.gilt.apidoc.example.union.types.v0 {
 
   class Client(
     apiUrl: String,
-    auth: scala.Option[com.gilt.apidoc.example.union.types.v0.Authorization] = None,
+    auth: scala.Option[com.bryzek.apidoc.example.union.types.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) {
-    import com.gilt.apidoc.example.union.types.v0.models.json._
+    import com.bryzek.apidoc.example.union.types.v0.models.json._
 
-    private[this] val logger = play.api.Logger("com.gilt.apidoc.example.union.types.v0.Client")
+    private[this] val logger = play.api.Logger("com.bryzek.apidoc.example.union.types.v0.Client")
 
-    logger.info(s"Initializing com.gilt.apidoc.example.union.types.v0.Client for url $apiUrl")
+    logger.info(s"Initializing com.bryzek.apidoc.example.union.types.v0.Client for url $apiUrl")
 
     def users: Users = Users
 
     object Users extends Users {
-      override def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.example.union.types.v0.models.User]] = {
+      override def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]] = {
         _executeRequest("GET", s"/users").map {
-          case r if r.status == 200 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("Seq[com.gilt.apidoc.example.union.types.v0.models.User]", r, _.validate[Seq[com.gilt.apidoc.example.union.types.v0.models.User]])
-          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+          case r if r.status == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("Seq[com.bryzek.apidoc.example.union.types.v0.models.User]", r, _.validate[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]])
+          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
       }
 
       override def getByGuid(
         guid: _root_.java.util.UUID
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User] = {
         _executeRequest("GET", s"/users/${guid}").map {
-          case r if r.status == 200 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User])
-          case r if r.status == 404 => throw new com.gilt.apidoc.example.union.types.v0.errors.UnitResponse(r.status)
-          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
+          case r if r.status == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.models.User])
+          case r if r.status == 404 => throw new com.bryzek.apidoc.example.union.types.v0.errors.UnitResponse(r.status)
+          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
         }
       }
 
       override def post(
-        user: com.gilt.apidoc.example.union.types.v0.models.User
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User] = {
+        user: com.bryzek.apidoc.example.union.types.v0.models.User
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User] = {
         val payload = play.api.libs.json.Json.toJson(user)
 
         _executeRequest("POST", s"/users", body = Some(payload)).map {
-          case r if r.status == 201 => _root_.com.gilt.apidoc.example.union.types.v0.Client.parseJson("com.gilt.apidoc.example.union.types.v0.models.User", r, _.validate[com.gilt.apidoc.example.union.types.v0.models.User])
-          case r => throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201")
+          case r if r.status == 201 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.models.User])
+          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201")
         }
       }
     }
@@ -413,7 +413,7 @@ package com.gilt.apidoc.example.union.types.v0 {
       f(play.api.libs.json.Json.parse(r.body)) match {
         case play.api.libs.json.JsSuccess(x, _) => x
         case play.api.libs.json.JsError(errors) => {
-          throw new com.gilt.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Invalid json for class[" + className + "]: " + errors.mkString(" "))
+          throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Invalid json for class[" + className + "]: " + errors.mkString(" "))
         }
       }
     }
@@ -426,20 +426,20 @@ package com.gilt.apidoc.example.union.types.v0 {
   }
 
   trait Users {
-    def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.gilt.apidoc.example.union.types.v0.models.User]]
+    def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]]
 
     def getByGuid(
       guid: _root_.java.util.UUID
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User]
 
     def post(
-      user: com.gilt.apidoc.example.union.types.v0.models.User
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.apidoc.example.union.types.v0.models.User]
+      user: com.bryzek.apidoc.example.union.types.v0.models.User
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User]
   }
 
   package errors {
 
-    import com.gilt.apidoc.example.union.types.v0.models.json._
+    import com.bryzek.apidoc.example.union.types.v0.models.json._
 
     case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 

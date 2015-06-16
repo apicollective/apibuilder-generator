@@ -1,7 +1,7 @@
 package scala.models.ning
 
-import com.gilt.apidoc.generator.v0.models.InvocationForm
-import com.gilt.apidoc.spec.v0.models.Service
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models.Service
 import scala.generator._
 import scala.models._
 import lib.Text._

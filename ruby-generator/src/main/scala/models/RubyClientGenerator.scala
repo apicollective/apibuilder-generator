@@ -3,8 +3,8 @@ package ruby.models
 import java.util.UUID
 import scala.util.Failure
 import scala.util.Success
-import com.gilt.apidoc.generator.v0.models.InvocationForm
-import com.gilt.apidoc.spec.v0.models._
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models._
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import lib.{Datatype, Methods, Text, VersionTag}
 import lib.Text._

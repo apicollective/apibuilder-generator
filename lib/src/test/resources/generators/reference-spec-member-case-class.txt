@@ -1,6 +1,6 @@
 case class Member(
   guid: _root_.java.util.UUID,
-  organization: com.gilt.apidoc.reference.api.v0.models.Organization,
-  user: com.gilt.apidoc.reference.api.v0.models.User,
+  organization: com.bryzek.apidoc.reference.api.v0.models.Organization,
+  user: com.bryzek.apidoc.reference.api.v0.models.User,
   role: String
 )

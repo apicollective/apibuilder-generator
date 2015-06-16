@@ -2,6 +2,6 @@ case class User(
   guid: _root_.java.util.UUID,
   email: String,
   active: Boolean,
-  ageGroup: com.gilt.apidoc.reference.api.v0.models.AgeGroup,
+  ageGroup: com.bryzek.apidoc.reference.api.v0.models.AgeGroup,
   tags: _root_.scala.Option[Map[String, String]] = None
 )

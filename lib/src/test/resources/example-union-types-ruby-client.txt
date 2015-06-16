@@ -12,7 +12,7 @@ require 'json'
 require 'bigdecimal'
 
 module Com
-  module Gilt
+  module Bryzek
     module Apidoc
       module Example
         module Union
@@ -55,7 +55,7 @@ module Com
                 end
 
                 def users
-                  @users ||= ::Com::Gilt::Apidoc::Example::Union::Types::V0::Clients::Users.new(self)
+                  @users ||= ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Clients::Users.new(self)
                 end
               end
 
@@ -64,24 +64,24 @@ module Com
                 class Users
 
                   def initialize(client)
-                    @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Example::Union::Types::V0::Client)
+                    @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Client)
                   end
 
                   def get
                     r = @client.request("/users").get
-                    r.map { |x| ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(x) }
+                    r.map { |x| ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(x) }
                   end
 
                   def get_by_guid(guid)
                     HttpClient::Preconditions.assert_class('guid', guid, String)
                     r = @client.request("/users/#{guid}").get
-                    ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
+                    ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
                   end
 
                   def post(user)
-                    HttpClient::Preconditions.assert_class('user', user, ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User)
+                    HttpClient::Preconditions.assert_class('user', user, ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User)
                     r = @client.request("/users").with_json(user.to_json).post
-                    ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
+                    ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
                   end
 
                 end
@@ -313,7 +313,7 @@ module Com
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                     @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
-                    @preference = (x = opts.delete(:preference); x.is_a?(::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar) ? x : ::Com::Gilt::Apidoc::Example::Union::Types::V0::Models::Foobar.from_json(x))
+                    @preference = (x = opts.delete(:preference); x.is_a?(::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::Foobar) ? x : ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::Foobar.from_json(x))
                   end
 
                   def to_json

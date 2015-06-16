@@ -1,7 +1,7 @@
 package scala.models
 
 import scala.generator.ScalaUtil
-import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 

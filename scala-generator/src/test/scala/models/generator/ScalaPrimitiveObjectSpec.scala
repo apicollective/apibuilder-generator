@@ -1,7 +1,7 @@
 package scala.generator
 
-import com.gilt.apidoc.generator.v0.models.InvocationForm
-import com.gilt.apidoc.spec.v0.models._
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models._
 import models.TestHelper
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
@@ -14,6 +14,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     val baseJson = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
+      "info": [],
       "enums": [],
       "unions": [],
       "resources": [],
@@ -91,6 +92,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
     val baseJson = models.TestHelper.buildJson(s"""
       "imports": [],
       "headers": [],
+      "info": [],
       "enums": [],
       "unions": [],
 

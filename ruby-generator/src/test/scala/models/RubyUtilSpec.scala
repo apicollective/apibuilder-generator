@@ -2,16 +2,16 @@ package ruby.models
 
 import java.io.File
 
-import com.gilt.apidoc.generator.v0.models.InvocationForm
-import com.gilt.apidoc.spec.v0.models.{Enum, EnumValue}
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models.{Enum, EnumValue}
 
 import org.scalatest.{ FunSpec, Matchers }
 
 class RubyUtilSpec extends FunSpec with Matchers {
 
   it("RubyUtil.Module") {
-    RubyUtil.Module("com.gilt.apidoc.v0").parts should be(Seq("Com", "Gilt", "Apidoc", "V0"))
-    RubyUtil.Module("com.gilt.apidoc.v0").fullName should be("::Com::Gilt::Apidoc::V0")
+    RubyUtil.Module("com.bryzek.apidoc.v0").parts should be(Seq("Com", "Bryzek", "Apidoc", "V0"))
+    RubyUtil.Module("com.bryzek.apidoc.v0").fullName should be("::Com::Bryzek::Apidoc::V0")
     RubyUtil.Module("foobar").fullName should be("::Foobar")
     RubyUtil.Module("foo_bar").fullName should be("::FooBar")
   }

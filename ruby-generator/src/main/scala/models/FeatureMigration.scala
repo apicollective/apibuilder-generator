@@ -1,7 +1,7 @@
 package ruby.models
 
 import lib.VersionTag
-import com.gilt.apidoc.spec.v0.models.Service
+import com.bryzek.apidoc.spec.v0.models.Service
 
 case class FeatureMigration(serviceVersion: String) {
 

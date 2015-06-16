@@ -1,7 +1,7 @@
 package scala.models
 
-import com.gilt.apidoc.spec.v0.models.Service
-import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models.Service
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 import lib.generator.CodeGenerator

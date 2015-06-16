@@ -1,6 +1,6 @@
 package ruby.models
 
-import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 

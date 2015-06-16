@@ -1,6 +1,6 @@
 package scala.generator
 
-import com.gilt.apidoc.spec.v0.models.ParameterLocation
+import com.bryzek.apidoc.spec.v0.models.ParameterLocation
 import lib.Datatype
 import lib.Text._
 

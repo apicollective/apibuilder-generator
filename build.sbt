@@ -2,7 +2,7 @@ import play.PlayImport.PlayKeys._
 
 name := "apidoc-generator"
 
-organization := "com.gilt.apidoc.generator"
+organization := "com.bryzek.apidoc.generator"
 
 scalaVersion in ThisBuild := "2.11.6"
 
@@ -29,7 +29,7 @@ lazy val generator = project
   .aggregate(scalaGenerator, rubyGenerator)
   .enablePlugins(PlayScala)
   .settings(
-    routesImport += "com.gilt.apidoc.generator.v0.Bindables._",
+    routesImport += "com.bryzek.apidoc.generator.v0.Bindables._",
     libraryDependencies ++= Seq(
       ws,
       "org.scalatestplus" %% "play" % "1.2.0" % "test"
@@ -48,7 +48,7 @@ lazy val rubyGenerator = project
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("apidoc-" + _),
-  organization := "com.gilt.apidoc",
+  organization := "com.bryzek.apidoc",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.1",
     "org.scalatest" %% "scalatest" % "2.2.0" % "test"

@@ -1,7 +1,7 @@
 package scala.models
 
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
-import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class ScalaUnionSpec extends FunSpec with ShouldMatchers {
@@ -13,6 +13,7 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
+      "info": [],
       "enums": [],
       "resources": [],
 
@@ -86,6 +87,7 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
+      "info": [],
       "models": [],
       "resources": [],
 

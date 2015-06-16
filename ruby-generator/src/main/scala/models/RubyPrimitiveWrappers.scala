@@ -4,7 +4,7 @@ import scala.util.Try
 
 import lib.Datatype.Primitive
 
-import com.gilt.apidoc.spec.v0.models.{Field, Model, Service, Union}
+import com.bryzek.apidoc.spec.v0.models.{Field, Model, Service, Union}
 
 private[models] object RubyPrimitiveWrapper {
 

@@ -9,15 +9,16 @@
   "application": {
     "key": "apidoc-api"
   },
-  "namespace": "com.gilt.apidoc.api.v0",
+  "namespace": "com.bryzek.apidoc.api.v0",
   "version": "0.9.6",
   "base_url": "http://api.apidoc.me",
   "description": "Host API documentation for applications providing REST APIs, facilitating the design of good resource first APIs.",
   "headers": [],
+  "info": [],
   "imports": [
     {
       "uri": "http://localhost:9000/gilt/apidoc-spec/0.9.6/service.json",
-      "namespace": "com.gilt.apidoc.spec.v0",
+      "namespace": "com.bryzek.apidoc.spec.v0",
       "organization": {
         "key": "gilt"
       },
@@ -878,7 +879,7 @@
         },
         {
           "name": "service",
-          "type": "com.gilt.apidoc.spec.v0.models.service",
+          "type": "com.bryzek.apidoc.spec.v0.models.service",
           "description": "spec/service.json description of this API",
           "required": true
         }

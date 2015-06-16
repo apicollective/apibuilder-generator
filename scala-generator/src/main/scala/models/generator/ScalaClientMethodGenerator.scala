@@ -3,7 +3,7 @@ package scala.generator
 import lib.VersionTag
 import lib.generator.GeneratorUtil
 import scala.models.{FeatureMigration, JsonImports}
-import com.gilt.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
+import com.bryzek.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
 case class ScalaClientMethodGenerator(

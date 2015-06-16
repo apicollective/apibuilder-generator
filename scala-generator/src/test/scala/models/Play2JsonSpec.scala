@@ -10,6 +10,7 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
     val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
+      "info": [],
       "unions": [],
       "enums": [],
       "resources": [],

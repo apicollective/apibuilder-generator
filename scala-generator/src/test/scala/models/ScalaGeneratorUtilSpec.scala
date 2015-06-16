@@ -1,7 +1,7 @@
 package scala.models
 
 import lib.Datatype
-import com.gilt.apidoc.spec.v0.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
+import com.bryzek.apidoc.spec.v0.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
 import scala.generator._
 import org.scalatest.{ ShouldMatchers, FunSpec }
 

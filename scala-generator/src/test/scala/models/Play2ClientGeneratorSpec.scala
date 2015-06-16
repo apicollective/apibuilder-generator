@@ -1,6 +1,6 @@
 package scala.models
 
-import com.gilt.apidoc.spec.v0.models.Method
+import com.bryzek.apidoc.spec.v0.models.Method
 import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaService, ScalaClientMethodGenerator, ScalaClientMethodConfigs}
 import org.scalatest.{ShouldMatchers, FunSpec}
 
@@ -17,7 +17,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     val operation = resource.operations.find(_.method == Method.Post).get
     val errorResponse = operation.responses.find(r => models.TestHelper.responseCode(r.code) == "409").get
     errorResponse.errorClassName should be("ErrorsResponse")
-    errorResponse.datatype.name should be("Seq[com.gilt.apidoc.generator.v0.models.Error]")
+    errorResponse.datatype.name should be("Seq[com.bryzek.apidoc.generator.v0.models.Error]")
 
     val contents = ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
     models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package.txt", contents)
@@ -27,6 +27,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     val json = models.TestHelper.buildJson(s"""
       "imports": [],
       "headers": [],
+      "info": [],
       "models": [],
       "enums": [],
       "unions": [],

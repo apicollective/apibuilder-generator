@@ -12,7 +12,7 @@ require 'json'
 require 'bigdecimal'
 
 module Com
-  module Gilt
+  module Bryzek
     module Apidoc
       module Test
 
@@ -52,7 +52,7 @@ module Com
           end
 
           def users
-            @users ||= ::Com::Gilt::Apidoc::Test::Clients::Users.new(self)
+            @users ||= ::Com::Bryzek::Apidoc::Test::Clients::Users.new(self)
           end
         end
 
@@ -61,7 +61,7 @@ module Com
           class Users
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Test::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Test::Client)
             end
 
             def post(hash)

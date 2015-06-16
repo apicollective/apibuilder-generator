@@ -1,8 +1,8 @@
 package scala.models
 
 import lib.Datatype
-import com.gilt.apidoc.generator.v0.models.InvocationForm
-import com.gilt.apidoc.spec.v0.models.{Method, Operation, Resource, Service}
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models.{Method, Operation, Resource, Service}
 import scala.generator.{ScalaOperation, ScalaResource, ScalaService}
 import org.scalatest.{ShouldMatchers, FunSpec}
 
@@ -28,6 +28,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     val service = models.TestHelper.service(models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
+      "info": [],
       "models": [],
       "enums": [],
       "unions": [],
@@ -57,7 +58,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       val op = getScalaMethod(ssd, "Users", Method.Get, "/users/:age_group")
       val r = Play2Route(ssd, op, resource)
       r.method should be("controllers.Users.getByAgeGroup")
-      r.params.mkString("") should be("age_group: com.gilt.apidoc.reference.api.v0.models.AgeGroup")
+      r.params.mkString("") should be("age_group: com.bryzek.apidoc.reference.api.v0.models.AgeGroup")
     }
 
     it("supports multiple query parameters") {

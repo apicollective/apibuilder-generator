@@ -9,15 +9,16 @@
   "application": {
     "key": "apidoc-reference-api"
   },
-  "namespace": "com.gilt.apidoc.reference.api.v0",
+  "namespace": "com.bryzek.apidoc.reference.api.v0",
   "version": "0.0.1-dev",
   "base_url": "http://localhost:9000",
   "description": null,
   "headers": [],
+  "info": [],
   "imports": [
     {
       "uri": "http://localhost:9000/gilt/apidoc-spec/0.9.6/service.json",
-      "namespace": "com.gilt.apidoc.spec.v0",
+      "namespace": "com.bryzek.apidoc.spec.v0",
       "organization": {
         "key": "gilt"
       },

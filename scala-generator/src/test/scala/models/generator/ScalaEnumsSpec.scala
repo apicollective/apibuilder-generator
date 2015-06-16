@@ -1,6 +1,6 @@
 package scala.generator
 
-import com.gilt.apidoc.spec.v0.models.Service
+import com.bryzek.apidoc.spec.v0.models.Service
 import models.TestHelper
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
@@ -11,6 +11,7 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
     val json = models.TestHelper.buildJson("""
       "imports": [],
       "headers": [],
+      "info": [],
       "unions": [],
       "resources": [],
 

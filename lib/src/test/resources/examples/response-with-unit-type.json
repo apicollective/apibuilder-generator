@@ -9,9 +9,10 @@
   "application": {
     "key": "apidoc-response-with-unit-type"
   },
-  "namespace": "com.gilt.apidoc.test",
+  "namespace": "com.bryzek.apidoc.test",
   "version": "0.0.1-dev",
   "headers": [],
+  "info": [],
   "imports": [],
   "enums": [],
   "unions": [],

@@ -1,13 +1,13 @@
 package errors {
 
-  import com.gilt.apidoc.generator.v0.models.json._
-  import com.gilt.apidoc.spec.v0.models.json._
+  import com.bryzek.apidoc.generator.v0.models.json._
+  import com.bryzek.apidoc.spec.v0.models.json._
 
   case class ErrorsResponse(
     response: play.api.libs.ws.Response,
     message: Option[String] = None
   ) extends Exception(message.getOrElse(response.status + ": " + response.body)){
-    lazy val errors = _root_.test.apidoc.Client.parseJson("Seq[com.gilt.apidoc.generator.v0.models.Error]", response, _.validate[Seq[com.gilt.apidoc.generator.v0.models.Error]])
+    lazy val errors = _root_.test.apidoc.Client.parseJson("Seq[com.bryzek.apidoc.generator.v0.models.Error]", response, _.validate[Seq[com.bryzek.apidoc.generator.v0.models.Error]])
   }
 
   case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")

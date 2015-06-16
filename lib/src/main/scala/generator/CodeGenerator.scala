@@ -1,6 +1,6 @@
 package lib.generator
 
-import com.gilt.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
 
 trait CodeGenerator {
 

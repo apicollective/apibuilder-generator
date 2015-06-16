@@ -13,7 +13,7 @@ require 'json'
 require 'bigdecimal'
 
 module Com
-  module Gilt
+  module Bryzek
     module Apidoc
       module Reference
         module Api
@@ -55,23 +55,23 @@ module Com
               end
 
               def echoes
-                @echoes ||= ::Com::Gilt::Apidoc::Reference::Api::V0::Clients::Echoes.new(self)
+                @echoes ||= ::Com::Bryzek::Apidoc::Reference::Api::V0::Clients::Echoes.new(self)
               end
 
               def members
-                @members ||= ::Com::Gilt::Apidoc::Reference::Api::V0::Clients::Members.new(self)
+                @members ||= ::Com::Bryzek::Apidoc::Reference::Api::V0::Clients::Members.new(self)
               end
 
               def organizations
-                @organizations ||= ::Com::Gilt::Apidoc::Reference::Api::V0::Clients::Organizations.new(self)
+                @organizations ||= ::Com::Bryzek::Apidoc::Reference::Api::V0::Clients::Organizations.new(self)
               end
 
               def users
-                @users ||= ::Com::Gilt::Apidoc::Reference::Api::V0::Clients::Users.new(self)
+                @users ||= ::Com::Bryzek::Apidoc::Reference::Api::V0::Clients::Users.new(self)
               end
 
               def groups
-                @groups ||= ::Com::Gilt::Apidoc::Reference::Api::V0::Clients::Groups.new(self)
+                @groups ||= ::Com::Bryzek::Apidoc::Reference::Api::V0::Clients::Groups.new(self)
               end
             end
 
@@ -80,7 +80,7 @@ module Com
               class Echoes
 
                 def initialize(client)
-                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Reference::Api::V0::Client)
+                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Reference::Api::V0::Client)
                 end
 
                 def get(incoming={})
@@ -109,13 +109,13 @@ module Com
               class Members
 
                 def initialize(client)
-                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Reference::Api::V0::Client)
+                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Reference::Api::V0::Client)
                 end
 
                 def post(hash)
                   HttpClient::Preconditions.assert_class('hash', hash, Hash)
                   r = @client.request("/members").with_json(hash.to_json).post
-                  ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(r)
+                  ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(r)
                 end
 
                 def get(incoming={})
@@ -127,27 +127,27 @@ module Com
                     :role => (x = opts.delete(:role); x.nil? ? nil : HttpClient::Preconditions.assert_class('role', x, String))
                   }.delete_if { |k, v| v.nil? }
                   r = @client.request("/members").with_query(query).get
-                  r.map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(x) }
+                  r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(x) }
                 end
 
                 def get_by_organization(organization)
                   HttpClient::Preconditions.assert_class('organization', organization, String)
                   r = @client.request("/members/#{organization}").get
-                  r.map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(x) }
+                  r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(x) }
                 end
 
                 def post_members_bulk_by_organization(organization, members)
                   HttpClient::Preconditions.assert_class('organization', organization, String)
-                  HttpClient::Preconditions.assert_collection_of_class('members', members, ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member)
+                  HttpClient::Preconditions.assert_collection_of_class('members', members, ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member)
                   r = @client.request("/members/#{organization}/members_bulk").with_json(members.map { |o| o.to_hash }.to_json).post
-                  r.map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(x) }
+                  r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(x) }
                 end
 
                 def post_members_map_by_organization(organization, members)
                   HttpClient::Preconditions.assert_class('organization', organization, String)
-                  HttpClient::Preconditions.assert_hash_of_class('members', members, ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member)
+                  HttpClient::Preconditions.assert_hash_of_class('members', members, ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member)
                   r = @client.request("/members/#{organization}/members_map").with_json(members.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : o[1].to_hash; hash }.to_json).post
-                  r.map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Member.new(x) }
+                  r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(x) }
                 end
 
               end
@@ -155,13 +155,13 @@ module Com
               class Organizations
 
                 def initialize(client)
-                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Reference::Api::V0::Client)
+                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Reference::Api::V0::Client)
                 end
 
                 def post(hash)
                   HttpClient::Preconditions.assert_class('hash', hash, Hash)
                   r = @client.request("/organizations").with_json(hash.to_json).post
-                  ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Organization.new(r)
+                  ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(r)
                 end
 
                 def get(incoming={})
@@ -171,13 +171,13 @@ module Com
                     :name => (x = opts.delete(:name); x.nil? ? nil : HttpClient::Preconditions.assert_class('name', x, String))
                   }.delete_if { |k, v| v.nil? }
                   r = @client.request("/organizations").with_query(query).get
-                  r.map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Organization.new(x) }
+                  r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(x) }
                 end
 
                 def get_by_guid(guid)
                   HttpClient::Preconditions.assert_class('guid', guid, String)
                   r = @client.request("/#{guid}").get
-                  ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Organization.new(r)
+                  ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(r)
                 end
 
               end
@@ -185,13 +185,13 @@ module Com
               class Users
 
                 def initialize(client)
-                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Reference::Api::V0::Client)
+                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Reference::Api::V0::Client)
                 end
 
                 def post(hash)
                   HttpClient::Preconditions.assert_class('hash', hash, Hash)
                   r = @client.request("/users").with_json(hash.to_json).post
-                  ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(r)
+                  ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(r)
                 end
 
                 def get(incoming={})
@@ -199,18 +199,18 @@ module Com
                   query = {
                     :guid => (x = opts.delete(:guid); x.nil? ? nil : HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(x), String)),
                     :organization_guids => (x = opts.delete(:organization_guids); x.nil? ? nil : HttpClient::Preconditions.assert_class('organization_guids', x, Array).map { |v| HttpClient::Preconditions.assert_class('organization_guids', v, Integer) }),
-                    :age_group => (x = opts.delete(:age_group); x.nil? ? nil : (x = x; x.is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup) ? x : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(x))),
+                    :age_group => (x = opts.delete(:age_group); x.nil? ? nil : (x = x; x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(x))),
                     :email => (x = opts.delete(:email); x.nil? ? nil : HttpClient::Preconditions.assert_class('email', x, String)),
                     :active => HttpClient::Preconditions.assert_boolean('active', (x = opts.delete(:active); x.nil? ? true : x))
                   }.delete_if { |k, v| v.nil? }
                   r = @client.request("/users").with_query(query).get
-                  r.map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(x) }
+                  r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x) }
                 end
 
                 def get_by_age_group(age_group)
-                  HttpClient::Preconditions.assert_class('age_group', age_group, ::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup)
+                  HttpClient::Preconditions.assert_class('age_group', age_group, ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup)
                   r = @client.request("/users/#{age_group.value}").get
-                  r.map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(x) }
+                  r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x) }
                 end
 
                 def post_noop(hash)
@@ -224,13 +224,13 @@ module Com
               class Groups
 
                 def initialize(client)
-                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Gilt::Apidoc::Reference::Api::V0::Client)
+                  @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Reference::Api::V0::Client)
                 end
 
                 def get_by_organization(organization)
                   HttpClient::Preconditions.assert_class('organization', organization, String)
                   r = @client.request("/groups/#{organization}").get
-                  r.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : x[1].map { |x| ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(x) }; hash }
+                  r.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : x[1].map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x) }; hash }
                 end
 
               end
@@ -409,8 +409,8 @@ module Com
                 def initialize(incoming={})
                   opts = HttpClient::Helper.symbolize_keys(incoming)
                   @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
-                  @organization = (x = opts.delete(:organization); x.is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::Organization) ? x : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::Organization.new(x))
-                  @user = (x = opts.delete(:user); x.is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::User) ? x : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(x))
+                  @organization = (x = opts.delete(:organization); x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(x))
+                  @user = (x = opts.delete(:user); x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x))
                   @role = HttpClient::Preconditions.assert_class('role', opts.delete(:role), String)
                 end
 
@@ -469,7 +469,7 @@ module Com
                   @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                   @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
                   @active = HttpClient::Preconditions.assert_boolean('active', opts.delete(:active))
-                  @age_group = (x = opts.delete(:age_group); x.is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup) ? x : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(x))
+                  @age_group = (x = opts.delete(:age_group); x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(x))
                   @tags = (x = opts.delete(:tags); x.nil? ? nil : HttpClient::Preconditions.assert_class('tags', x, Hash).inject({}) { |h, d| h[d[0]] = HttpClient::Preconditions.assert_class('tags', d[1], String); h })
                 end
 
@@ -500,7 +500,7 @@ module Com
 
                 def initialize(incoming={})
                   opts = HttpClient::Helper.symbolize_keys(incoming)
-                  @members = HttpClient::Preconditions.assert_class('members', opts.delete(:members), Array).map { |v| (x = v; x.is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::User) ? x : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(x)) }
+                  @members = HttpClient::Preconditions.assert_class('members', opts.delete(:members), Array).map { |v| (x = v; x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x)) }
                 end
 
                 def to_json
@@ -525,7 +525,7 @@ module Com
 
                 def initialize(incoming={})
                   opts = HttpClient::Helper.symbolize_keys(incoming)
-                  @users = HttpClient::Preconditions.assert_class('users', opts.delete(:users), Array).map { |v| (x = v; x.is_a?(::Com::Gilt::Apidoc::Reference::Api::V0::Models::User) ? x : ::Com::Gilt::Apidoc::Reference::Api::V0::Models::User.new(x)) }
+                  @users = HttpClient::Preconditions.assert_class('users', opts.delete(:users), Array).map { |v| (x = v; x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x)) }
                 end
 
                 def to_json
