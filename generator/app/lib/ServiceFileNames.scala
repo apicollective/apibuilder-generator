@@ -13,20 +13,26 @@ object ServiceFileNames {
   ): File = {
     val language = languages.map { toLanguages(_) }.getOrElse(Nil).headOption.getOrElse(Language.Default)
 
-    val name = Seq(
-      Text.underscoreAndDashToInitCap(organizationKey),
-      Text.underscoreAndDashToInitCap(applicationKey),
-      s"ApidocClient.${language.extension}"
-    ).mkString("")
+    val baseName = Seq(
+      organizationKey,
+      applicationKey,
+      s"client"
+    ).mkString("_")
+
+    val name = language.isCamelCased match {
+      case true => Text.underscoreAndDashToInitCap(baseName)
+      case false => baseName
+    }
 
     File(
-      name = name,
+      name = s"$name.${language.extension}",
       dir = Some(namespace.split("\\.").mkString("/")),
       contents = contents
     )
   }
 
   private[lib] sealed trait Language {
+    def isCamelCased: Boolean
     def name: String
     def extension: String
   }
@@ -35,36 +41,43 @@ object ServiceFileNames {
 
     val All = Seq(
       new Language {
+        override def isCamelCased = true
         override def name = "go"
         override def extension = "go"
       },
 
       new Language {
+        override def isCamelCased = true
         override def name = "java"
         override def extension = "java"
       },
 
       new Language {
+        override def isCamelCased = true
         override def name = "javascript"
         override def extension = "js"
       },
 
       new Language {
+        override def isCamelCased = false
         override def name = "ruby"
         override def extension = "rb"
       },
 
       new Language {
+        override def isCamelCased = true
         override def name = "scala"
         override def extension = "scala"
       },
 
       new Language {
+        override def isCamelCased = true
         override def name = "swift"
         override def extension = "swift"
       },
 
       new Language {
+        override def isCamelCased = false
         override def name = "text"
         override def extension = "txt"
       }
