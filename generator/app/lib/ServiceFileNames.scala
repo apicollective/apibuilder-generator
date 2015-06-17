@@ -5,6 +5,7 @@ import com.bryzek.apidoc.generator.v0.models.File
 object ServiceFileNames {
 
   def toFile(
+    namespace: String,
     organizationKey: String,
     applicationKey: String,
     contents: String
@@ -17,6 +18,7 @@ object ServiceFileNames {
 
     File(
       name = name,
+      dir = Some(namespace.split("\\.").mkString("/")),
       contents = contents
     )
   }

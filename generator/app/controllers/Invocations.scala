@@ -24,6 +24,7 @@ object Invocations extends Controller {
                       source = code, // backwards compatible
                       files = Seq(
                         ServiceFileNames.toFile(
+                          form.service.namespace,
                           form.service.organization.key,
                           form.service.application.key,
                           code
