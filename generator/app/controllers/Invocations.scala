@@ -10,7 +10,7 @@ object Invocations extends Controller {
 
   def postByKey(key: String) = Action(parse.json(maxLength = 1024 * 1024)) { request: Request[JsValue] =>
     Generators.findGenerator(key) match {
-      case Some((_, generator)) =>
+      case Some((target, generator)) =>
         request.body.validate[InvocationForm] match {
           case e: JsError => Conflict(Json.toJson(Validation.invalidJson(e)))
           case s: JsSuccess[InvocationForm] => {
@@ -27,7 +27,8 @@ object Invocations extends Controller {
                           form.service.namespace,
                           form.service.organization.key,
                           form.service.application.key,
-                          code
+                          code,
+                          target.metaData.language
                         )
                       )
                     )
