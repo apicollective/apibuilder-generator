@@ -1,4 +1,4 @@
-package lib
+package generator
 
 import com.bryzek.apidoc.generator.v0.models.File
 import org.scalatest.{FunSpec, ShouldMatchers}

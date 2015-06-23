@@ -2,9 +2,10 @@ package controllers
 
 import com.bryzek.apidoc.generator.v0.models.json._
 import com.bryzek.apidoc.generator.v0.models.{Invocation, InvocationForm, Generator}
-import lib.{ServiceFileNames, Validation}
+import lib.Validation
 import play.api.libs.json._
 import play.api.mvc._
+import generator.ServiceFileNames
 
 object Invocations extends Controller {
 
