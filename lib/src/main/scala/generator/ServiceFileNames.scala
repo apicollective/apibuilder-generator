@@ -22,7 +22,7 @@ object ServiceFileNames {
 
     val name = language.isCamelCased match {
       case true => Text.underscoreAndDashToInitCap(baseName)
-      case false => baseName
+      case false => Text.splitIntoWords(baseName).map(_.toLowerCase).mkString("_")
     }
 
     File(
