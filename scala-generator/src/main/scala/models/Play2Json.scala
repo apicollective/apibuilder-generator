@@ -16,7 +16,7 @@ case class Play2Json(
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
       PrimitiveWrapper(ssd).wrappers.map(w => readersAndWriters(w.model)).mkString("\n\n"),
       ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
-    ).filter(!_.trim.isEmpty).mkString("\n\n")
+    ).filter(!_.trim.isEmpty).mkString("\n\n")    
   }
 
   private def readersAndWriters(union: ScalaUnion): String = {

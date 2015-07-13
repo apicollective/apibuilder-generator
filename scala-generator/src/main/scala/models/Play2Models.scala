@@ -82,6 +82,6 @@ ${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
 $bindables
 """
 
-    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
   }
 }

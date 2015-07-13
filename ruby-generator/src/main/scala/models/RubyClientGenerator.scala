@@ -386,7 +386,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       ).mkString("\n")
     ).mkString("\n\n")
 
-    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Ruby")))
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Client", source, Some("Ruby")))
   }
 
   private def generateClient(): String = {

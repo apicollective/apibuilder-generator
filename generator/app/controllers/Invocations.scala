@@ -19,7 +19,7 @@ object Invocations extends Controller {
               case Left(errors) => Conflict(Json.toJson(Validation.errors(errors)))
               case Right(sourceFiles) =>
                 // Also send back single source for backwards compatibility
-                val singleSource = sourceFiles.map(_.contents).mkString("\n\n")
+                val singleSource = sourceFiles.map(_.contents).mkString("\n\n").trim
                 Ok(Json.toJson(Invocation(singleSource, sourceFiles)))
             }
           }

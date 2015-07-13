@@ -72,7 +72,7 @@ object ScalaCaseClasses extends CodeGenerator {
     ).mkString("\n").trim +
     s"\n\n}"
 
-    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
   }
 
   private def generateUnionTraits(models: Seq[ScalaModel], union: ScalaUnion): String = {

@@ -78,7 +78,7 @@ case class Play2ClientGenerator(
         client()
       ).mkString("\n\n")
 
-    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Client", source, Some("Scala")))
   }
 
   private def client(): String = {

@@ -51,7 +51,7 @@ case class NingClientGenerator(
         client()
       ).mkString("\n\n")
 
-    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, source, Some("Scala")))
+    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Client", source, Some("Scala")))
   }
 
   private[ning] def toJson(klass: String): String = {
