@@ -4,7 +4,7 @@ name := "apidoc-generator"
 
 organization := "com.bryzek.apidoc.generator"
 
-scalaVersion in ThisBuild := "2.11.6"
+scalaVersion in ThisBuild := "2.11.7"
 
 // TODO: lib will eventually be published as a jar if it turns out
 // that we need it. For now it is here mostly for reference - hoping
