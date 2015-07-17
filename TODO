@@ -1,1 +1,6 @@
 add tests for play 2.2 client with uuid type - stand alone and in a collection
+
+Play 2.4:
+  play.api.libs.ws.WSRequestHolder => play.api.libs.ws.WSRequest
+
+
