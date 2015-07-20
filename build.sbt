@@ -30,9 +30,10 @@ lazy val generator = project
   .enablePlugins(PlayScala)
   .settings(
     routesImport += "com.bryzek.apidoc.generator.v0.Bindables._",
+    routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus" %% "play" % "1.2.0" % "test"
+      "org.scalatestplus" %% "play" % "1.4.0-M3" % "test"
     )
   )
 
