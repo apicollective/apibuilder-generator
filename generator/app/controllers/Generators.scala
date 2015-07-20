@@ -130,6 +130,16 @@ object Generators {
       ),
       CodeGenTarget(
         metaData = Generator(
+          key = "java_models",
+          name = "Java models",
+          description = Some("Generate Java models from the API description."),
+          language = Some("Java")
+        ),
+        status = lib.generator.Status.InDevelopment,
+        codeGenerator = Some(models.generator.JavaClasses)
+      ),
+      CodeGenTarget(
+        metaData = Generator(
           key = "swagger_json",
           name = "Swagger JSON",
           description = Some("Generate a valid swagger 2.0 json description of a service."),

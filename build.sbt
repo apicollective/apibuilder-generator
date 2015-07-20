@@ -25,8 +25,8 @@ lazy val generated = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator)
-  .aggregate(scalaGenerator, rubyGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator)
   .enablePlugins(PlayScala)
   .settings(
     routesImport += "com.bryzek.apidoc.generator.v0.Bindables._",
@@ -47,12 +47,18 @@ lazy val rubyGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
 
+lazy val javaGenerator = project
+  .in(file("java-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("apidoc-" + _),
   organization := "com.bryzek.apidoc",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.1",
-    "org.scalatest" %% "scalatest" % "2.2.0" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.0" % "test",
+    "org.mockito" % "mockito-all" % "1.9.5" % "test"
   ),
   scalacOptions += "-feature"
 )
