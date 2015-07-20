@@ -6,14 +6,14 @@ import play.api.mvc._
 import play.api.libs.json._
 import lib.generator.{CodeGenerator, CodeGenTarget}
 
-object Generators extends Controller {
+class Generators extends Controller {
 
   def get(
     key: Option[String] = None,
     limit: Integer = 100,
     offset: Integer = 0
   ) = Action { request: Request[AnyContent] =>
-    val generators = targets.
+    val generators = Generators.targets.
       filter(t => t.codeGenerator.isDefined && t.status != lib.generator.Status.Proposal).
       filter(t => key.isEmpty || key == Some(t.metaData.key)).
       map(t => t.metaData)
@@ -22,11 +22,15 @@ object Generators extends Controller {
   }
 
   def getByKey(key: String) = Action { request: Request[AnyContent] =>
-    findGenerator(key) match {
+    Generators.findGenerator(key) match {
       case Some((target, _)) => Ok(Json.toJson(target.metaData))
       case _ => NotFound
     }
   }
+
+}
+
+object Generators {
 
   def findGenerator(key: String): Option[(CodeGenTarget, CodeGenerator)] = for {
     target <- targets.find(_.metaData.key == key)
@@ -78,11 +82,21 @@ object Generators extends Controller {
         metaData = Generator(
           key = "play_2_3_client",
           name = "Play 2.3 client",
-          description = Some("Play Framework 2.3 client based on  <a href='http://www.playframework.com/documentation/2.3.x/ScalaWS'>WS API</a>."),
+          description = Some("Play Framework 2.3 client based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaWS'>WS API</a>."),
           language = Some("Scala")
         ),
         status = lib.generator.Status.Beta,
         codeGenerator = Some(scala.models.Play23ClientGenerator)
+      ),
+      CodeGenTarget(
+        metaData = Generator(
+          key = "play_2_4_client",
+          name = "Play 2.4 client",
+          description = Some("Play Framework 2.4 client based on <a href='http://www.playframework.com/documentation/2.4.x/ScalaWS'>WS API</a>. Primary change from 2.3.x is WSRequestHolder has been deprecated (replaced by WSRequest)."),
+          language = Some("Scala")
+        ),
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.models.Play24ClientGenerator)
       ),
       CodeGenTarget(
         metaData = Generator(

@@ -3,10 +3,10 @@ code:
     apidoc-generator:
       version: latest
       generators:
-        play_2_3_client: generated/app/ApidocGeneratorClient.scala
+        play_2_4_client: generated/app/ApidocGeneratorClient.scala
         play_2_x_routes: generator/conf/routes
     apidoc-spec:
       version: latest
       generators:
-        play_2_3_client: generated/app/ApidocSpecClient.scala
+        play_2_4_client: generated/app/ApidocSpecClient.scala
   

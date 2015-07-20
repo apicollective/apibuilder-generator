@@ -46,6 +46,22 @@ object Play23ClientGenerator extends CodeGenerator {
   }
 }
 
+object Play24ClientGenerator extends CodeGenerator {
+
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+
+    val config = PlayFrameworkVersion(
+      name = "2.4.x",
+      config = ScalaClientMethodConfigs.Play24(Namespaces.quote(form.service.namespace)),
+      requestHolderClass = "play.api.libs.ws.WSRequest",
+      authSchemeClass = "play.api.libs.ws.WSAuthScheme",
+      supportsHttpPatch = true
+    )
+
+    Play2ClientGenerator.invoke(config, form)
+  }
+}
+
 object Play2ClientGenerator {
 
   def invoke(

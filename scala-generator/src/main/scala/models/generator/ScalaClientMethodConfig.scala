@@ -85,6 +85,12 @@ object ScalaClientMethodConfigs {
     override val canSerializeUuid = true
   }
 
+  case class Play24(namespace: String) extends Play {
+    override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestUriMethod = None
+    override val canSerializeUuid = true
+  }
+
   trait Ning extends ScalaClientMethodConfig {
     override val pathEncodingMethod = s"_root_.${namespace}.PathSegment.encode"
     override val responseStatusMethod = "getStatusCode"
