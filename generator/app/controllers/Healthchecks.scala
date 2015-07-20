@@ -4,7 +4,7 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 
-object Healthchecks extends Controller {
+class Healthchecks extends Controller {
 
   private[this] val Result = Json.toJson(Map("status" -> "healthy"))
 
