@@ -82,11 +82,21 @@ object Generators {
         metaData = Generator(
           key = "play_2_3_client",
           name = "Play 2.3 client",
-          description = Some("Play Framework 2.3 client based on  <a href='http://www.playframework.com/documentation/2.3.x/ScalaWS'>WS API</a>."),
+          description = Some("Play Framework 2.3 client based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaWS'>WS API</a>."),
           language = Some("Scala")
         ),
         status = lib.generator.Status.Beta,
         codeGenerator = Some(scala.models.Play23ClientGenerator)
+      ),
+      CodeGenTarget(
+        metaData = Generator(
+          key = "play_2_4_client",
+          name = "Play 2.4 client",
+          description = Some("Play Framework 2.4 client based on <a href='http://www.playframework.com/documentation/2.4.x/ScalaWS'>WS API</a>. Primary change from 2.3.x is WSRequestHolder has been deprecated (replaced by WSRequest)."),
+          language = Some("Scala")
+        ),
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.models.Play24ClientGenerator)
       ),
       CodeGenTarget(
         metaData = Generator(
