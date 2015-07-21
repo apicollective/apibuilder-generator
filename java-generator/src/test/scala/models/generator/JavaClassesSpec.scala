@@ -147,11 +147,11 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
           |package com.jkenny.test.models;
           |
           |public class TestModel {
-          |    private boolean required_field_with_default = false;
+          |    private boolean requiredFieldWithDefault = false;
           |
-          |    private boolean required_field;
+          |    private boolean requiredField;
           |
-          |    private boolean optional_field;
+          |    private boolean optionalField;
           |
           |    public TestModel() {}
           |}""".stripMargin
@@ -177,17 +177,17 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
           |    /**
           |     * Nice description for required_field_with_default
           |     */
-          |    private boolean required_field_with_default = false;
+          |    private boolean requiredFieldWithDefault = false;
           |
           |    /**
           |     * Nice description for required_field
           |     */
-          |    private boolean required_field;
+          |    private boolean requiredField;
           |
           |    /**
           |     * Nice description for optional_field
           |     */
-          |    private boolean optional_field;
+          |    private boolean optionalField;
           |
           |    public TestModel() {}
           |}""".stripMargin
@@ -207,11 +207,11 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
           |package com.jkenny.test.models;
           |
           |public class TestModel implements UnionOne, UnionTwo {
-          |    private boolean required_field_with_default = false;
+          |    private boolean requiredFieldWithDefault = false;
           |
-          |    private boolean required_field;
+          |    private boolean requiredField;
           |
-          |    private boolean optional_field;
+          |    private boolean optionalField;
           |
           |    public TestModel() {}
           |}""".stripMargin
