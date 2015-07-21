@@ -150,7 +150,7 @@ object JavaClasses extends CodeGenerator {
           sys.error(s"Unable to parse datatype ${field.`type`}")
         }
 
-        val javaDatatype = JavaDatatype(safeNamespace, datatype)
+        val javaDatatype = JavaDatatype(datatype)
 
         val defaultValue = field.default.fold("") { " = " + javaDatatype.valueFromString(_) }
 
