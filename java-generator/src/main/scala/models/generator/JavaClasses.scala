@@ -3,8 +3,8 @@ package models.generator
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models.{EnumValue, Union, Field, Service, Model, Enum}
 
+import lib.Text
 import lib.generator.{GeneratorUtil, CodeGenerator}
-
 import models.generator.JavaDatatypes.NativeDatatype
 
 /**
@@ -154,8 +154,12 @@ object JavaClasses extends CodeGenerator {
 
         val defaultValue = field.default.fold("") { " = " + javaDatatype.valueFromString(_) }
 
+        val name = JavaUtil.checkForReservedWord(
+          Text.snakeToCamelCase(field.name)
+        )
+
         commentFromOpt(field.description) +
-          s"private ${javaDatatype.name} ${JavaUtil.checkForReservedWord(field.name)}$defaultValue;"
+          s"private ${javaDatatype.name} ${name}$defaultValue;"
       }
 
       val className = JavaUtil.toClassName(model.name)
