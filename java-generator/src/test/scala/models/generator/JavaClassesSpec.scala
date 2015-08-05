@@ -14,7 +14,8 @@ import models.generator.JavaClasses.Generator
 class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
 
   val testHeader = """/** Test Header */"""
-  val testService = Service(mock[Apidoc], "test_service", mock[Organization], mock[Application], "com.jkenny.test", "", info = mock[Info])
+  val userDefinedModel = Model("user_defined", "", None, None, Seq.empty[Field])
+  val testService = Service(mock[Apidoc], "test_service", mock[Organization], mock[Application], "com.jkenny.test", "", info = mock[Info], models = Seq(userDefinedModel))
   val generator = new Generator(testService, Some(testHeader))
 
   describe("generateEnum") {
@@ -137,7 +138,8 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
       val source = generator.generateModel(Model("test_model", "", None, None, Seq(
         Field("required_field_with_default", "boolean", None, None, Some("false"), true),
         Field("required_field", "boolean", None, None, None, true),
-        Field("optional_field", "boolean", None, None, None, false)
+        Field("optional_field", "boolean", None, None, None, false),
+        Field("user_defined_field", "user_defined", None, None, None, true)
       )), Seq.empty[Union])
 
       source.name shouldBe "TestModel.java"
@@ -152,6 +154,8 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
           |    private boolean requiredField;
           |
           |    private boolean optionalField;
+          |
+          |    private UserDefined userDefinedField;
           |
           |    public TestModel() {}
           |}""".stripMargin

@@ -131,25 +131,22 @@ object JavaDatatypes {
 
   sealed trait UserDefinedDatatype extends JavaDatatype
 
-  case class Model(ns: String, override val shortName: String) extends UserDefinedDatatype {
+  case class Model(override val namespace: scala.Option[String], override val shortName: String) extends UserDefinedDatatype {
     override val apidocType = shortName
-    override val namespace = Some(ns)
 
     override val toVariableName = Text.initLowerCase(shortName)
   }
 
-  case class Enum(ns: String, override val shortName: String) extends UserDefinedDatatype {
+  case class Enum(override val namespace: scala.Option[String], override val shortName: String) extends UserDefinedDatatype {
     override val apidocType = shortName
-    override val namespace = Some(ns)
 
     override def valueFromString(value: String): String = s"$name.valueOf(${JsString(value)})"
 
     override val toVariableName = Text.initLowerCase(shortName)
   }
 
-  case class Union(ns: String, override val shortName: String) extends UserDefinedDatatype {
+  case class Union(override val namespace: scala.Option[String], override val shortName: String) extends UserDefinedDatatype {
     override val apidocType = shortName
-    override val namespace = Some(ns)
 
     override val toVariableName = Text.initLowerCase(shortName)
   }
@@ -205,7 +202,7 @@ object JavaDatatypes {
 
 object JavaDatatype {
 
-  def apply(defaultNamespace: String, datatype: Datatype): JavaDatatype = datatype match {
+  def apply(datatype: Datatype): JavaDatatype = datatype match {
     case Datatype.Primitive.Boolean => JavaDatatypes.Boolean
     case Datatype.Primitive.Decimal => JavaDatatypes.Decimal
     case Datatype.Primitive.Integer => JavaDatatypes.Integer
@@ -218,35 +215,35 @@ object JavaDatatype {
     case Datatype.Primitive.Uuid => JavaDatatypes.Uuid
     case Datatype.Primitive.Unit => JavaDatatypes.Unit
 
-    case Datatype.Container.List(inner) => JavaDatatypes.List(JavaDatatype(defaultNamespace, inner))
-    case Datatype.Container.Map(inner) => JavaDatatypes.Map(JavaDatatype(defaultNamespace, inner))
-    case Datatype.Container.Option(inner) => JavaDatatypes.Option(JavaDatatype(defaultNamespace, inner))
+    case Datatype.Container.List(inner) => JavaDatatypes.List(JavaDatatype(inner))
+    case Datatype.Container.Map(inner) => JavaDatatypes.Map(JavaDatatype(inner))
+    case Datatype.Container.Option(inner) => JavaDatatypes.Option(JavaDatatype(inner))
 
     case Datatype.UserDefined.Model(name) =>
-      val (ns, n) = parseQualifiedName(s"$defaultNamespace.models", name)
+      val (ns, n) = parseQualifiedName(name)
       JavaDatatypes.Model(ns, n)
 
     case Datatype.UserDefined.Enum(name) =>
-      val (ns, n) = parseQualifiedName(s"$defaultNamespace.models", name)
+      val (ns, n) = parseQualifiedName(name)
       JavaDatatypes.Enum(ns, n)
 
     case Datatype.UserDefined.Union(name) =>
-      val (ns, n) = parseQualifiedName(s"$defaultNamespace.models", name)
+      val (ns, n) = parseQualifiedName(name)
       JavaDatatypes.Union(ns, n)
   }
 
   /**
    * If name is a qualified name (as identified by having a dot),
    * parses the name and returns a tuple of (namespace,
-   * name). Otherwise, returns (defaultNamespace, name)
+   * name). Otherwise, returns (None, name)
    */
-  private def parseQualifiedName(defaultNamespace: String, name: String): (String, String) = {
+  private def parseQualifiedName(name: String): (Option[String], String) = {
     name.split("\\.").toList match {
-      case n :: Nil => (defaultNamespace, JavaUtil.toClassName(n))
+      case n :: Nil => (None, JavaUtil.toClassName(n))
       case multiple => 
         val n = multiple.last
         val ns = multiple.dropRight(1).mkString(".")
-        (ns, JavaUtil.toClassName(n))
+        (Some(ns), JavaUtil.toClassName(n))
     }
   }
 }
