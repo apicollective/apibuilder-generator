@@ -347,7 +347,7 @@ package com.bryzek.apidoc.reference.api.v0 {
           requiredMessages.map("required_messages" -> _)
 
         _executeRequest("GET", s"/echoes", queryParameters = queryParameters).map {
-          case r if r.getStatusCode == 204 => Unit
+          case r if r.getStatusCode == 204 => ()
           case r => throw new com.bryzek.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
       }
@@ -360,7 +360,7 @@ package com.bryzek.apidoc.reference.api.v0 {
           requiredMessages.map("required_messages" -> _)
 
         _executeRequest("GET", s"/echoes/arrays-only", queryParameters = queryParameters).map {
-          case r if r.getStatusCode == 204 => Unit
+          case r if r.getStatusCode == 204 => ()
           case r => throw new com.bryzek.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
       }
@@ -542,7 +542,7 @@ package com.bryzek.apidoc.reference.api.v0 {
 
       override def postNoop()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         _executeRequest("POST", s"/users/noop").map {
-          case r if r.getStatusCode == 200 => Unit
+          case r if r.getStatusCode == 200 => ()
           case r => throw new com.bryzek.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
