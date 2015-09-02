@@ -88,7 +88,7 @@ object JavaDatatypes {
 
   case object Decimal extends NativeDatatype {
     override val apidocType = "decimal"
-    override val namespace = Some("java.lang")
+    override val namespace = Some("java.math")
     override val shortName = "BigDecimal"
 
     override def valueFromJson(json: JsValue) = json.as[scala.BigDecimal].toString()
