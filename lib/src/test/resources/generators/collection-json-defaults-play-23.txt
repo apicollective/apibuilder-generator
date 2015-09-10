@@ -181,13 +181,11 @@ package com.gilt.test.v0 {
         "X-Apidoc-Version" -> Constants.Version,
         "X-Apidoc-Version-Major" -> Constants.VersionMajor.toString
       ).withHeaders(defaultHeaders : _*)
-      auth.fold(holder) { a =>
-        a match {
-          case Authorization.Basic(username, password) => {
-            holder.withAuth(username, password.getOrElse(""), play.api.libs.ws.WSAuthScheme.BASIC)
-          }
-          case _ => sys.error("Invalid authorization scheme[" + a.getClass + "]")
+      auth.fold(holder) {
+        case Authorization.Basic(username, password) => {
+          holder.withAuth(username, password.getOrElse(""), play.api.libs.ws.WSAuthScheme.BASIC)
         }
+        case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
     }
 

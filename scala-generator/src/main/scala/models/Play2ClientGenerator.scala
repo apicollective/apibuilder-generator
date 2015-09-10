@@ -130,13 +130,11 @@ ${methodGenerator.objects().indent(4)}
       import play.api.Play.current
 
       val holder = play.api.libs.ws.WS.url(apiUrl + path)$headerString
-      auth.fold(holder) { a =>
-        a match {
-          case Authorization.Basic(username, password) => {
-            holder.withAuth(username, password.getOrElse(""), ${version.authSchemeClass}.BASIC)
-          }
-          case _ => sys.error("Invalid authorization scheme[" + a.getClass + "]")
+      auth.fold(holder) {
+        case Authorization.Basic(username, password) => {
+          holder.withAuth(username, password.getOrElse(""), ${version.authSchemeClass}.BASIC)
         }
+        case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
     }
 
