@@ -159,7 +159,7 @@ object JavaClasses extends CodeGenerator {
         )
 
         commentFromOpt(field.description) +
-          s"private ${javaDatatype.name} ${name}$defaultValue;"
+          s"public ${javaDatatype.name} ${name}$defaultValue;"
       }
 
       val className = JavaUtil.toClassName(model.name)
