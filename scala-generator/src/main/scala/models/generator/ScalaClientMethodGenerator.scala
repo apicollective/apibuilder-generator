@@ -190,14 +190,14 @@ case class ScalaClientMethodGenerator(
               if (response.isSuccess) {
                 if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some(Unit)")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some(())")
                   } else {
                     val json = config.toJson("r", response.datatype.name)
                     Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($json)")
                   }
 
                 } else if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${response.datatype.name}")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ()")
 
                 } else {
                   val json = config.toJson("r", response.datatype.name)
