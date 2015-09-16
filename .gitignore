@@ -5,3 +5,5 @@ logs/
 *.downloaded.rb
 *.swp
 *.swo
+.idea/
+.idea_modules/
