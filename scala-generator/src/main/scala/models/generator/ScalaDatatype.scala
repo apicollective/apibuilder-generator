@@ -4,8 +4,10 @@ import java.util.UUID
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 
 import lib.Datatype
+import lib.generator.GeneratorUtil
 import lib.Text.initLowerCase
 import play.api.libs.json._
+import play.api.Logger
 
 sealed trait ScalaDatatype {
   def asString(originalVarName: String): String = {
@@ -277,9 +279,7 @@ object ScalaDatatype {
 
 }
 
-case class ScalaTypeResolver(
-  namespaces: Namespaces
-) {
+object ScalaTypeResolver {
 
   /**
    * If name is a qualified name (as identified by having a dot),
@@ -289,12 +289,23 @@ case class ScalaTypeResolver(
   private def parseQualifiedName(defaultNamespace: String, name: String): (String, String) = {
     name.split("\\.").toList match {
       case n :: Nil => (defaultNamespace, ScalaUtil.toClassName(name))
-      case multiple => 
+      case multiple =>
         val n = multiple.last
-        val ns = multiple.reverse.drop(1).reverse.mkString(".")
+        val objectType = GeneratorUtil.ObjectType.fromString(multiple.reverse.drop(1).reverse.last).getOrElse {
+          Logger.warn(s"Could not resolve object type[${multiple.reverse.drop(1).reverse.last}]. Defaults to models")
+          GeneratorUtil.ObjectType.Model
+        }
+        val baseNamespace = multiple.reverse.drop(2).reverse.mkString(".")
+        val ns = Namespaces(baseNamespace).get(objectType)
         (Namespaces.quote(ns), ScalaUtil.toClassName(n))
     }
   }
+
+}
+
+case class ScalaTypeResolver(
+  namespaces: Namespaces
+) {
 
   def scalaDatatype(datatype: Datatype): ScalaDatatype = {
     datatype match {
@@ -318,17 +329,17 @@ case class ScalaTypeResolver(
         name.split("\\.").toList match {
           case n :: Nil => ScalaPrimitive.Model(namespaces.models, ScalaUtil.toClassName(n))
           case multiple => {
-            val (ns, n) = parseQualifiedName(namespaces.models, name)
+            val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces.models, name)
             ScalaPrimitive.Model(ns, n)
           }
         }
       }
       case Datatype.UserDefined.Enum(name) => {
-        val (ns, n) = parseQualifiedName(namespaces.enums, name)
+        val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces.enums, name)
         ScalaPrimitive.Enum(ns, n)
       }
       case Datatype.UserDefined.Union(name) => {
-        val (ns, n) = parseQualifiedName(namespaces.unions, name)
+        val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces.unions, name)
         ScalaPrimitive.Union(ns, n)
       }
     }

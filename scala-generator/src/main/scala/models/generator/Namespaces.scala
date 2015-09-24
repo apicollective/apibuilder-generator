@@ -23,6 +23,14 @@ case class Namespaces(original: String) {
 
   val last: String = base.split("\\.").last
 
+  def get(objectType: GeneratorUtil.ObjectType): String = {
+    objectType match {
+      case GeneratorUtil.ObjectType.Enum => enums
+      case GeneratorUtil.ObjectType.Model => models
+      case GeneratorUtil.ObjectType.Union => unions
+    }
+  }
+
   def importStatements(service: Service): Seq[String] = {
     Seq(s"import ${models}._")
   }

@@ -12,6 +12,12 @@ object GeneratorUtil {
     case object Enum extends ObjectType { override def toString = "enums" }
     case object Union extends ObjectType { override def toString = "unions" }
     case object Model extends ObjectType { override def toString = "models" }
+
+    private val all = Seq(Enum, Union, Model)
+
+    def fromString(value: String): Option[ObjectType] = {
+      all.find(_.toString == value)
+    }
   }
 
 
