@@ -57,7 +57,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       val op = getScalaMethod(ssd, "Users", Method.Get, "/users/:age_group")
       val r = Play2Route(ssd, op, resource)
       r.method should be("controllers.Users.getByAgeGroup")
-      r.params.mkString("") should be("age_group: com.bryzek.apidoc.reference.api.v0.models.AgeGroup")
+      r.params.mkString("") should be("age_group: com.bryzek.apidoc.reference.api.v0.enums.AgeGroup")
     }
 
     it("supports multiple query parameters") {

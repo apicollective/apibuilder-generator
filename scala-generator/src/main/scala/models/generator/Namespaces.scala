@@ -1,6 +1,7 @@
 package scala.generator
 
 import lib.generator.GeneratorUtil
+import com.bryzek.apidoc.spec.v0.models.Service
 
 object Namespaces {
 
@@ -22,12 +23,26 @@ case class Namespaces(original: String) {
 
   val last: String = base.split("\\.").last
 
-  def importStatements(): Seq[String] = {
+  def importStatements(service: Service): Seq[String] = {
     Seq(
-      s"import ${models}._",
-      s"import ${enums}._",
-      s"import ${unions}._"
-    )
+      if (service.enums.isEmpty) {
+        None
+      } else {
+        Some(enums)
+      },
+
+      if (service.models.isEmpty) {
+        None
+      } else {
+        Some(models)
+      },
+
+      if (service.unions.isEmpty) {
+        None
+      } else {
+        Some(unions)
+      }
+).flatten.map { ns => s"import ${ns}._" }
   }
 
 }
