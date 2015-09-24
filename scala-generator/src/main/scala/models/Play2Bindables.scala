@@ -14,7 +14,7 @@ case class Play2Bindables(ssd: ScalaService) {
       "  import play.api.mvc.{PathBindable, QueryStringBindable}",
       "  import org.joda.time.{DateTime, LocalDate}",
       "  import org.joda.time.format.ISODateTimeFormat",
-      s"  import ${ssd.namespaces.models}._",
+      "  " + ssd.namespaces.importStatements.mkString("\n  "),
       "",
       buildDefaults().indent(2),
       "",

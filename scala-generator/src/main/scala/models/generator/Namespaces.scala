@@ -14,17 +14,20 @@ case class Namespaces(original: String) {
 
   val base = Namespaces.quote(original)
 
-  val models: String = GeneratorUtil.fullyQualifiedName(base)
-
-  /**
-    * We use a single namespace for models and enums to minimize
-    * number of imports that users will need.
-    */
-  val enums: String = models
-  val unions: String = models
+  val models: String = GeneratorUtil.fullyQualifiedName(base, GeneratorUtil.ObjectType.Model)
+  val enums: String = GeneratorUtil.fullyQualifiedName(base, GeneratorUtil.ObjectType.Enum)
+  val unions: String = GeneratorUtil.fullyQualifiedName(base, GeneratorUtil.ObjectType.Union)
 
   val errors: String = s"$base.errors"
 
   val last: String = base.split("\\.").last
+
+  def importStatements(): Seq[String] = {
+    Seq(
+      s"import ${models}._",
+      s"import ${enums}._",
+      s"import ${unions}._"
+    )
+  }
 
 }
