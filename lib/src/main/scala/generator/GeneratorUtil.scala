@@ -15,7 +15,27 @@ object GeneratorUtil {
   }
 
 
-  def fullyQualifiedName(
+  /**
+    * For convenience to the users of the clients, all generated
+    * clients stick all of the models into one namespace -
+    * models. This allows, for example, one import statement vs. 3 (1
+    * for models, 1 for unions, 1 for enums) when using the generated
+    * clients.
+    */
+  def fullyQualifiedInternalName(
+    namespace: String,
+    objectType: ObjectType
+  ): String = {
+    // API accepts object type parameter, but currently not used as we
+    // place all internal names into the models namespace for
+    // convenience.
+    fullyQualifiedExternalName(namespace, ObjectType.Model)
+  }
+
+  /**
+    * The external name is used to import these elements via the specified.
+    */
+  private[this] def fullyQualifiedExternalName(
     namespace: String,
     objectType: ObjectType,
     name: Option[String] = None
@@ -30,13 +50,13 @@ object GeneratorUtil {
   def datatypeResolver(service: Service): DatatypeResolver = {
     DatatypeResolver(
       enumNames = service.enums.map(_.name) ++ service.imports.flatMap { imp =>
-        imp.enums.map(n => fullyQualifiedName(imp.namespace, ObjectType.Enum, Some(n)))
+        imp.enums.map(n => fullyQualifiedExternalName(imp.namespace, ObjectType.Enum, Some(n)))
       },
       unionNames = service.unions.map(_.name) ++ service.imports.flatMap { imp =>
-        imp.unions.map(n => fullyQualifiedName(imp.namespace, ObjectType.Union, Some(n)))
+        imp.unions.map(n => fullyQualifiedExternalName(imp.namespace, ObjectType.Union, Some(n)))
       },
       modelNames = service.models.map(_.name) ++ service.imports.flatMap { imp =>
-        imp.models.map(n => fullyQualifiedName(imp.namespace, ObjectType.Model, Some(n)))
+        imp.models.map(n => fullyQualifiedExternalName(imp.namespace, ObjectType.Model, Some(n)))
       }
     )
   }
