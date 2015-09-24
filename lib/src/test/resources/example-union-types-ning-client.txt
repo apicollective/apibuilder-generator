@@ -16,7 +16,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
   case class RegisteredUser(
     guid: _root_.java.util.UUID,
     email: String,
-    preference: com.bryzek.apidoc.example.union.types.v0.models.Foobar
+    preference: com.bryzek.apidoc.example.union.types.v0.unions.Foobar
   ) extends User
 
   /**
@@ -169,7 +169,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       (
         (__ \ "guid").read[_root_.java.util.UUID] and
         (__ \ "email").read[String] and
-        (__ \ "preference").read[com.bryzek.apidoc.example.union.types.v0.models.Foobar]
+        (__ \ "preference").read[com.bryzek.apidoc.example.union.types.v0.unions.Foobar]
       )(RegisteredUser.apply _)
     }
 
@@ -177,7 +177,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       (
         (__ \ "guid").write[_root_.java.util.UUID] and
         (__ \ "email").write[String] and
-        (__ \ "preference").write[com.bryzek.apidoc.example.union.types.v0.models.Foobar]
+        (__ \ "preference").write[com.bryzek.apidoc.example.union.types.v0.unions.Foobar]
       )(unlift(RegisteredUser.unapply _))
     }
 
@@ -201,8 +201,8 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = new play.api.libs.json.Writes[Foobar] {
       def writes(obj: Foobar) = obj match {
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.enums.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.enums.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
       }
     }
@@ -256,29 +256,29 @@ package com.bryzek.apidoc.example.union.types.v0 {
     def users: Users = Users
 
     object Users extends Users {
-      override def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]] = {
+      override def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.unions.User]] = {
         _executeRequest("GET", s"/users").map {
-          case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("Seq[com.bryzek.apidoc.example.union.types.v0.models.User]", r, _.validate[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]])
+          case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("Seq[com.bryzek.apidoc.example.union.types.v0.unions.User]", r, _.validate[Seq[com.bryzek.apidoc.example.union.types.v0.unions.User]])
           case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
       override def getByGuid(
         guid: _root_.java.util.UUID
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.unions.User] = {
         _executeRequest("GET", s"/users/${guid}").map {
-          case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.models.User])
+          case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.unions.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.unions.User])
           case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
       override def post(
-        user: com.bryzek.apidoc.example.union.types.v0.models.User
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User] = {
+        user: com.bryzek.apidoc.example.union.types.v0.unions.User
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.unions.User] = {
         val payload = play.api.libs.json.Json.toJson(user)
 
         _executeRequest("POST", s"/users", body = Some(payload)).map {
-          case r if r.getStatusCode == 201 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.models.User])
+          case r if r.getStatusCode == 201 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.unions.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.unions.User])
           case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201", requestUri = Some(r.getUri))
         }
       }
@@ -374,15 +374,15 @@ package com.bryzek.apidoc.example.union.types.v0 {
   }
 
   trait Users {
-    def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]]
+    def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.unions.User]]
 
     def getByGuid(
       guid: _root_.java.util.UUID
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.unions.User]
 
     def post(
-      user: com.bryzek.apidoc.example.union.types.v0.models.User
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User]
+      user: com.bryzek.apidoc.example.union.types.v0.unions.User
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.unions.User]
   }
 
   package errors {

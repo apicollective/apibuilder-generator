@@ -59,7 +59,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
     guid: _root_.java.util.UUID,
     email: String,
     active: Boolean,
-    ageGroup: com.bryzek.apidoc.reference.api.v0.models.AgeGroup,
+    ageGroup: com.bryzek.apidoc.reference.api.v0.enums.AgeGroup,
     tags: _root_.scala.Option[Map[String, String]] = None
   )
 
@@ -256,7 +256,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
         (__ \ "guid").read[_root_.java.util.UUID] and
         (__ \ "email").read[String] and
         (__ \ "active").read[Boolean] and
-        (__ \ "age_group").read[com.bryzek.apidoc.reference.api.v0.models.AgeGroup] and
+        (__ \ "age_group").read[com.bryzek.apidoc.reference.api.v0.enums.AgeGroup] and
         (__ \ "tags").readNullable[Map[String, String]]
       )(User.apply _)
     }
@@ -266,7 +266,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
         (__ \ "guid").write[_root_.java.util.UUID] and
         (__ \ "email").write[String] and
         (__ \ "active").write[Boolean] and
-        (__ \ "age_group").write[com.bryzek.apidoc.reference.api.v0.models.AgeGroup] and
+        (__ \ "age_group").write[com.bryzek.apidoc.reference.api.v0.enums.AgeGroup] and
         (__ \ "tags").writeNullable[Map[String, String]]
       )(unlift(User.unapply _))
     }
@@ -485,7 +485,7 @@ package com.bryzek.apidoc.reference.api.v0 {
       override def get(
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
         organizationGuids: _root_.scala.Option[Seq[Long]] = None,
-        ageGroup: _root_.scala.Option[com.bryzek.apidoc.reference.api.v0.models.AgeGroup] = None,
+        ageGroup: _root_.scala.Option[com.bryzek.apidoc.reference.api.v0.enums.AgeGroup] = None,
         email: _root_.scala.Option[String] = None,
         active: Boolean = true
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.reference.api.v0.models.User]] = {
@@ -504,7 +504,7 @@ package com.bryzek.apidoc.reference.api.v0 {
       }
 
       override def getByAgeGroup(
-        ageGroup: com.bryzek.apidoc.reference.api.v0.models.AgeGroup
+        ageGroup: com.bryzek.apidoc.reference.api.v0.enums.AgeGroup
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.reference.api.v0.models.User]] = {
         _executeRequest("GET", s"/users/${_root_.com.bryzek.apidoc.reference.api.v0.PathSegment.encode(ageGroup.toString, "UTF-8")}").map {
           case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.reference.api.v0.Client.parseJson("Seq[com.bryzek.apidoc.reference.api.v0.models.User]", r, _.validate[Seq[com.bryzek.apidoc.reference.api.v0.models.User]])
@@ -677,13 +677,13 @@ package com.bryzek.apidoc.reference.api.v0 {
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       organizationGuids: _root_.scala.Option[Seq[Long]] = None,
-      ageGroup: _root_.scala.Option[com.bryzek.apidoc.reference.api.v0.models.AgeGroup] = None,
+      ageGroup: _root_.scala.Option[com.bryzek.apidoc.reference.api.v0.enums.AgeGroup] = None,
       email: _root_.scala.Option[String] = None,
       active: Boolean = true
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.reference.api.v0.models.User]]
 
     def getByAgeGroup(
-      ageGroup: com.bryzek.apidoc.reference.api.v0.models.AgeGroup
+      ageGroup: com.bryzek.apidoc.reference.api.v0.enums.AgeGroup
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.reference.api.v0.models.User]]
 
     def postNoop()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
