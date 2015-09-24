@@ -235,9 +235,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
     import play.api.mvc.{PathBindable, QueryStringBindable}
     import org.joda.time.{DateTime, LocalDate}
     import org.joda.time.format.ISODateTimeFormat
-    import com.bryzek.apidoc.example.union.types.v0.enums._
     import com.bryzek.apidoc.example.union.types.v0.models._
-    import com.bryzek.apidoc.example.union.types.v0.unions._
 
     // Type: date-time-iso8601
     implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](

@@ -24,25 +24,7 @@ case class Namespaces(original: String) {
   val last: String = base.split("\\.").last
 
   def importStatements(service: Service): Seq[String] = {
-    Seq(
-      if (service.enums.isEmpty) {
-        None
-      } else {
-        Some(enums)
-      },
-
-      if (service.models.isEmpty) {
-        None
-      } else {
-        Some(models)
-      },
-
-      if (service.unions.isEmpty) {
-        None
-      } else {
-        Some(unions)
-      }
-).flatten.map { ns => s"import ${ns}._" }
+    Seq(s"import ${models}._")
   }
 
 }

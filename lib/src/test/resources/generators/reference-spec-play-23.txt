@@ -306,7 +306,6 @@ package com.bryzek.apidoc.reference.api.v0 {
     import play.api.mvc.{PathBindable, QueryStringBindable}
     import org.joda.time.{DateTime, LocalDate}
     import org.joda.time.format.ISODateTimeFormat
-    import com.bryzek.apidoc.reference.api.v0.enums._
     import com.bryzek.apidoc.reference.api.v0.models._
 
     // Type: date-time-iso8601
