@@ -138,6 +138,18 @@ object Generators {
         status = lib.generator.Status.InDevelopment,
         codeGenerator = Some(models.generator.JavaClasses)
       ),
+
+    CodeGenTarget(
+      metaData = Generator(
+        key = "android_client",
+        name = "Android Client",
+        description = Some("Generate Android models and client from the API description."),
+        language = Some("Java")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.android.AndroidClasses)
+    ),
+
       CodeGenTarget(
         metaData = Generator(
           key = "swagger_json",
