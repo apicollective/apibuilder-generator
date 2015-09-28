@@ -14,6 +14,15 @@ import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import com.bryzek.apidoc.spec.v0.models.Model
 import com.bryzek.apidoc.spec.v0.models.Resource
 import com.bryzek.apidoc.spec.v0.models.Service
+import com.fasterxml.jackson.annotation._
+import com.bryzek.apidoc.spec.v0.models.Enum
+import com.bryzek.apidoc.spec.v0.models.Union
+import scala.Some
+import com.bryzek.apidoc.generator.v0.models.File
+import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models.Model
+import com.bryzek.apidoc.spec.v0.models.Resource
+import com.bryzek.apidoc.spec.v0.models.Service
 
 
 object AndroidClasses extends CodeGenerator {
@@ -35,7 +44,8 @@ object AndroidClasses extends CodeGenerator {
   class Generator(service: Service, header: Option[String]) {
 
     private val nameSpace = service.namespace.split("\\.").map { AndroidJavaUtil.checkForReservedWord }.mkString(".")
-    private val modelsDirectoryPath = createDirectoryPath(nameSpace)
+    private val modelsNameSpace = nameSpace + ".models"
+    private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -84,40 +94,64 @@ object AndroidClasses extends CodeGenerator {
         TypeSpec.classBuilder(className)
           .addModifiers(Modifier.PUBLIC)
 
+      val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown","true")
+      builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
+
       model.description.map(builder.addJavadoc(_))
 
-      val defaultConstructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC)
-      builder.addMethod(defaultConstructor.build)
-
       val constructorWithParams = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC)
+      constructorWithParams.addAnnotation(classOf[JsonCreator])
+
+      val equals = MethodSpec.methodBuilder("equals").addModifiers(Modifier.PUBLIC).addParameter(classOf[Object], "o").returns(classOf[Boolean]).addAnnotation(classOf[Override])
+      equals.addCode("if (this == o) return true;\n")
+      equals.addCode("if (o == null || getClass() != o.getClass()) return false;\n")
+      equals.addCode(s"${className} that = (${className}) o;\n")
+
+      val hashCode = MethodSpec.methodBuilder("hashCode").addModifiers(Modifier.PUBLIC).returns(classOf[Int]).addAnnotation(classOf[Override])
+      hashCode.addCode("int result = 0;")
 
       model.fields.foreach(field => {
 
+        val fieldSnakeCaseName = field.name
+        val fieldCamelCaseName = AndroidJavaUtil.toParamName(fieldSnakeCaseName, true)
+
         val javaDataType: TypeName = dataTypes.get(field.`type`).getOrElse{
-          val name = AndroidJavaUtil.toParamName(field.`type`)
+          val name = AndroidJavaUtil.toParamName(field.`type`, false)
           if(AndroidJavaUtil.isParameterArray(field.`type`))
-            ArrayTypeName.of(ClassName.get(nameSpace, name))
+            ArrayTypeName.of(ClassName.get(modelsNameSpace, name))
           else
-            ClassName.get(nameSpace, name)
+            ClassName.get(modelsNameSpace, name)
         }
 
-        val fieldBuilder = FieldSpec.builder(javaDataType, field.name)
-        fieldBuilder.addModifiers(Modifier.PRIVATE)
+        val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL)
         builder.addField(fieldBuilder.build)
 
-        val methodName = Text.snakeToCamelCase(s"get_${field.name}")
+        val methodName = Text.snakeToCamelCase(s"get_${fieldSnakeCaseName}")
 
-        val getterBuilder = MethodSpec.methodBuilder(methodName)
+        val getterBuilder = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC)
         getterBuilder.returns(javaDataType)
-        getterBuilder.addStatement(s"return ${field.name}")
+        getterBuilder.addStatement(s"return ${fieldCamelCaseName}")
         field.description.map(getterBuilder.addJavadoc(_))
         builder.addMethod(getterBuilder.build)
 
-        constructorWithParams.addParameter(javaDataType, field.name)
-        constructorWithParams.addStatement("this.$N = $N", field.name, field.name)
+        val constructorParameter = ParameterSpec.builder(javaDataType, fieldCamelCaseName)
+        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value","\""+fieldSnakeCaseName+"\"")
+        constructorParameter.addAnnotation(annotation.build)
+        constructorWithParams.addParameter(constructorParameter.build)
+        constructorWithParams.addStatement("this.$N = $N", fieldCamelCaseName, fieldCamelCaseName)
+
+        equals.addCode(s"if (${fieldCamelCaseName} != null ? !${fieldCamelCaseName}.equals(that.${fieldCamelCaseName}) : that.${fieldCamelCaseName} != null) return false;\n")
+
+        hashCode.addCode(s"result = 31 * result + (${fieldCamelCaseName} != null ? ${fieldCamelCaseName}.hashCode() : 0);\n")
       })
 
+      equals.addCode("return true;\n")
+
+      hashCode.addCode("return result;\n")
+
       builder.addMethod(constructorWithParams.build)
+      builder.addMethod(equals.build)
+      builder.addMethod(hashCode.build)
 
       makeFile(className, builder)
 
@@ -157,21 +191,22 @@ object AndroidClasses extends CodeGenerator {
 
 
     def makeFile(name: String, builder: TypeSpec.Builder): File = {
-      File(s"${name}.java", Some(modelsDirectoryPath), JavaFile.builder(nameSpace, builder.build).build.toString)
+      File(s"${name}.java", Some(modelsDirectoryPath), JavaFile.builder(modelsNameSpace, builder.build).build.toString)
     }
 
+    //TODO: we can use primitives as well, but then equal method needs to become smarter, this way is ok
 
     val dataTypes = Map[String, TypeName](
-      "boolean" -> TypeName.BOOLEAN,
+      "boolean" -> ClassName.get("java.lang", "Boolean"),
       "date-iso8601" -> ClassName.get("java.util","Date"),
       "date-time-iso8601" -> ClassName.get("java.util","Date"),
       "decimal" -> ClassName.get("java.math","BigDecimal"),
       "double" -> ClassName.get("java.lang","Double"),
-      "integer" -> TypeName.INT,
-      "long" -> TypeName.LONG,
+      "integer" -> ClassName.get("java.lang", "Integer"),
+      "long" -> ClassName.get("java.lang", "Long"),
       "object" -> ClassName.get("java.util","Map"),
       "string" -> ClassName.get("java.lang","String"),
-      "unit" -> TypeName.VOID,
+      "unit" -> ClassName.get("java.lang", "Void"),
       "uuid" -> ClassName.get("java.util","UUID"),
       "map[string]" -> ClassName.get("java.util","Map")
     )
