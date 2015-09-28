@@ -25,7 +25,9 @@ import com.bryzek.apidoc.spec.v0.models.Resource
 import com.bryzek.apidoc.spec.v0.models.Service
 
 
-object AndroidClasses extends CodeGenerator {
+object AndroidClasses
+  extends CodeGenerator
+  with AndroidJavaUtil{
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = invoke(form, addHeader = true)
 
@@ -43,7 +45,7 @@ object AndroidClasses extends CodeGenerator {
 
   class Generator(service: Service, header: Option[String]) {
 
-    private val nameSpace = service.namespace.split("\\.").map { AndroidJavaUtil.checkForReservedWord }.mkString(".")
+    private val nameSpace = service.namespace.split("\\.").map { checkForReservedWord }.mkString(".")
     private val modelsNameSpace = nameSpace + ".models"
     private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
 
@@ -60,15 +62,12 @@ object AndroidClasses extends CodeGenerator {
       val generatedResources = service.resources.map { generateResource }
 
       generatedEnums ++
-        generatedModels ++
-        generatedResources
-
-
+        generatedModels
     }
 
     def generateEnum(enum: Enum): File = {
 
-      val className = AndroidJavaUtil.toClassName(enum.name)
+      val className = toClassName(enum.name)
 
       val builder =
         TypeSpec.enumBuilder(className)
@@ -88,7 +87,7 @@ object AndroidClasses extends CodeGenerator {
     def generateModel(model: Model, relatedUnions: Seq[Union]): File = {
 
 
-      val className = AndroidJavaUtil.toClassName(model.name)
+      val className = toClassName(model.name)
 
       val builder =
         TypeSpec.classBuilder(className)
@@ -113,15 +112,9 @@ object AndroidClasses extends CodeGenerator {
       model.fields.foreach(field => {
 
         val fieldSnakeCaseName = field.name
-        val fieldCamelCaseName = AndroidJavaUtil.toParamName(fieldSnakeCaseName, true)
+        val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
-        val javaDataType: TypeName = dataTypes.get(field.`type`).getOrElse{
-          val name = AndroidJavaUtil.toParamName(field.`type`, false)
-          if(AndroidJavaUtil.isParameterArray(field.`type`))
-            ArrayTypeName.of(ClassName.get(modelsNameSpace, name))
-          else
-            ClassName.get(modelsNameSpace, name)
-        }
+        val javaDataType = dataTypeFromField(field.`type`)
 
         val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL)
         builder.addField(fieldBuilder.build)
@@ -159,11 +152,35 @@ object AndroidClasses extends CodeGenerator {
 
     def generateResource(resource: Resource): File = {
 
-      val className = AndroidJavaUtil.toClassName(resource.plural) + "Client"
+      val className = toClassName(resource.plural) + "Client"
 
       val builder =
         TypeSpec.interfaceBuilder(className)
           .addModifiers(Modifier.PUBLIC)
+
+
+      resource.operations.foreach{operation =>
+
+        val methodName =
+          if(operation.path == "/")
+            toParamName(operation.method.toString.toLowerCase, true)
+          else
+            toParamName(operation.method.toString.toLowerCase + "_" + operation.path.replaceAll("/","_"), true)
+
+        val method = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT)
+
+        operation.body.map(body => {
+          val bodyType = dataTypeFromField(body.`type`)
+          method.addParameter(bodyType, toParamName(body.`type`, true))
+        })
+
+        operation.parameters.foreach(parameter => {
+          val parameterType: TypeName = dataTypeFromField(parameter.`type`)
+          method.addParameter(parameterType, toParamName(parameter.name, true))
+        })
+
+        builder.addMethod(method.build)
+      }
 
       makeFile(className, builder)
 
@@ -177,7 +194,7 @@ object AndroidClasses extends CodeGenerator {
 
 
     private def commentFromOpt(opt: Option[String]) = {
-      opt.fold("") { s => AndroidJavaUtil.textToComment(s) + "\n" }
+      opt.fold("") { s => textToComment(s) + "\n" }
     }
 
     def camelToUnderscores(name: String): String = "[A-Z\\d]".r.replaceAllIn(name, {m =>
@@ -210,6 +227,16 @@ object AndroidClasses extends CodeGenerator {
       "uuid" -> ClassName.get("java.util","UUID"),
       "map[string]" -> ClassName.get("java.util","Map")
     )
+
+    def dataTypeFromField(`type`: String): TypeName = {
+      dataTypes.get(`type`).getOrElse{
+        val name = toParamName(`type`, false)
+        if(isParameterArray(`type`))
+          ArrayTypeName.of(ClassName.get(modelsNameSpace, name))
+        else
+          ClassName.get(modelsNameSpace, name)
+      }
+    }
 
   }
 }
