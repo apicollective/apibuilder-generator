@@ -39,12 +39,18 @@ object AndroidJavaUtil {
     modelName.startsWith("[") && modelName.endsWith("]")
   }
 
-  def toParamName(modelName: String): String = {
-    if (isParameterArray(modelName)){
+  def toParamName(modelName: String, startingWithLowercase: Boolean): String = {
+    val paramStartingWithUppercase = if (isParameterArray(modelName)){
       toClassName(modelName.tail.reverse.tail.reverse)
     } else {
       toClassName(modelName)
     }
+    if(startingWithLowercase){
+      paramStartingWithUppercase.head.toLower + paramStartingWithUppercase.tail
+    } else {
+      paramStartingWithUppercase
+    }
+
   }
 
 
