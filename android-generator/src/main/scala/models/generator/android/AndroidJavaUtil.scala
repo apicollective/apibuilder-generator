@@ -8,7 +8,7 @@ import com.squareup.javapoet.FieldSpec
  * Author: jkenny
  * Date: 28/05/2015
  */
-object AndroidJavaUtil {
+trait AndroidJavaUtil {
   private val ReservedWords = Set(
     "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
     "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto",
