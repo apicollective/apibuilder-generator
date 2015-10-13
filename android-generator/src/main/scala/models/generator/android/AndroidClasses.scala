@@ -6,23 +6,22 @@ import lib.generator.CodeGenerator
 
 import com.squareup.javapoet._
 import javax.lang.model.element.Modifier
-import com.bryzek.apidoc.spec.v0.models.Enum
-import com.bryzek.apidoc.spec.v0.models.Union
-import scala.Some
-import com.bryzek.apidoc.generator.v0.models.File
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import com.bryzek.apidoc.spec.v0.models.Model
-import com.bryzek.apidoc.spec.v0.models.Resource
-import com.bryzek.apidoc.spec.v0.models.Service
 import com.fasterxml.jackson.annotation._
+import com.fasterxml.jackson.databind._
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, JsonProcessingException, Version}
 import com.bryzek.apidoc.spec.v0.models.Enum
-import com.bryzek.apidoc.spec.v0.models.Union
 import scala.Some
-import com.bryzek.apidoc.generator.v0.models.File
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import com.bryzek.apidoc.spec.v0.models.Union
+import com.bryzek.apidoc.generator.v0.models.File
 import com.bryzek.apidoc.spec.v0.models.Model
 import com.bryzek.apidoc.spec.v0.models.Resource
 import com.bryzek.apidoc.spec.v0.models.Service
+import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import java.util.Locale
+import java.io.IOException
 
 
 object AndroidClasses
@@ -49,6 +48,14 @@ object AndroidClasses
     private val modelsNameSpace = nameSpace + ".models"
     private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
 
+    private val sharedJacksonSpace = "com.gilt.android.jackson"
+    private val sharedJacksonDirectoryPath = createDirectoryPath(sharedJacksonSpace)
+    private val sharedObjectMapperClassName = "ApidocObjectMapper"
+    private val dateTimeDeserializerClassName = "DateTimeDeserializer"
+    private val dateTimeSerializerClassName = "DateTimeSerializer"
+
+    val T = "$T" //this is a hack for substituting types, as "$" is used by scala to do string substitution, and $T is sued by javapoet to handle types
+
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
     def generateSourceFiles() = {
@@ -61,8 +68,76 @@ object AndroidClasses
 
       val generatedResources = service.resources.map { generateResource }
 
+      val generatedObjectMapper = Seq(generateObjectMapper)
+
       generatedEnums ++
-        generatedModels
+        generatedModels ++
+        generatedObjectMapper
+    }
+
+
+    def generateObjectMapper: File = {
+
+
+      def formatter: FieldSpec.Builder = {
+        FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PRIVATE, Modifier.STATIC)
+          .initializer("$T.forPattern(\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\").withLocale($T.US).withZoneUTC()", classOf[DateTimeFormat], classOf[Locale])
+      }
+
+      def deserializer: TypeSpec.Builder = {
+
+        val deserialize = MethodSpec.methodBuilder("deserialize").addAnnotation(classOf[Override]).addModifiers(Modifier.PUBLIC)
+          .addException(classOf[IOException])
+          .addException(classOf[JsonProcessingException])
+          .returns(classOf[DateTime])
+          .addParameter(classOf[JsonParser], "jsonParser")
+          .addParameter(classOf[DeserializationContext], "ctxt")
+          .addStatement("String value = jsonParser.getValueAsString()")
+          .addStatement("return formatter.parseDateTime(value)")
+
+        TypeSpec.anonymousClassBuilder("").superclass(classOf[JsonDeserializer[DateTime]])
+          .addMethod(deserialize.build)
+      }
+
+
+      def serializer: TypeSpec.Builder = {
+
+        val serialize = MethodSpec.methodBuilder("serialize").addAnnotation(classOf[Override]).addModifiers(Modifier.PUBLIC)
+          .addException(classOf[IOException])
+          .addException(classOf[JsonProcessingException])
+          .addParameter(classOf[DateTime], "value")
+          .addParameter(classOf[JsonGenerator], "jgen")
+          .addParameter(classOf[SerializerProvider], "provider")
+          .addStatement("jgen.writeString(value.toString(formatter))")
+
+        TypeSpec.anonymousClassBuilder("").superclass(classOf[JsonSerializer[DateTime]])
+          .addMethod(serialize.build)
+      }
+
+      val builder =
+        TypeSpec.classBuilder(sharedObjectMapperClassName).superclass(classOf[ObjectMapper]).addModifiers(Modifier.PUBLIC)
+
+      builder.addField(formatter.build)
+
+      val modifierField = FieldSpec.builder(classOf[ObjectMapper], "MAPPER").addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL).addModifiers(Modifier.STATIC)
+      builder.addField(modifierField.build)
+
+      builder.addStaticBlock(CodeBlock.builder
+        .addStatement("SimpleModule module = new $T(new $T(1, 0, 0, null, null, null))", classOf[SimpleModule], classOf[Version])
+        .addStatement("module.addDeserializer($T.class, $L)", classOf[DateTime], deserializer.build)
+        .addStatement("module.addSerializer($T.class, $L)", classOf[DateTime], serializer.build)
+        .addStatement("MAPPER = new ObjectMapper()")
+        .addStatement("MAPPER.setPropertyNamingStrategy($T.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)", classOf[PropertyNamingStrategy])
+        .addStatement("MAPPER.configure($T.FAIL_ON_UNKNOWN_PROPERTIES, false)", classOf[DeserializationFeature])
+        .addStatement("MAPPER.registerModule(module)")
+        .build)
+
+      val getterBuilder = MethodSpec.methodBuilder("getInstance").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC)
+      getterBuilder.returns(classOf[ObjectMapper])
+      getterBuilder.addStatement(s"return MAPPER")
+      builder.addMethod(getterBuilder.build)
+
+      File(s"${sharedObjectMapperClassName}.java", Some(sharedJacksonDirectoryPath), JavaFile.builder(sharedJacksonSpace, builder.build).build.toString)
     }
 
     def generateEnum(enum: Enum): File = {
@@ -102,16 +177,17 @@ object AndroidClasses
       constructorWithParams.addAnnotation(classOf[JsonCreator])
 
       val equals = MethodSpec.methodBuilder("equals").addModifiers(Modifier.PUBLIC).addParameter(classOf[Object], "o").returns(classOf[Boolean]).addAnnotation(classOf[Override])
-      equals.addCode("if (this == o) return true;\n")
-      equals.addCode("if (o == null || getClass() != o.getClass()) return false;\n")
-      equals.addCode(s"${className} that = (${className}) o;\n")
+      equals.addStatement("if (this == o) return true")
+      equals.addStatement("if (o == null || getClass() != o.getClass()) return false")
+      equals.addStatement(s"${className} that = (${className}) o")
 
       val hashCode = MethodSpec.methodBuilder("hashCode").addModifiers(Modifier.PUBLIC).returns(classOf[Int]).addAnnotation(classOf[Override])
-      hashCode.addCode("int result = 0;")
+      hashCode.addStatement("int result = 0")
 
       model.fields.foreach(field => {
 
         val fieldSnakeCaseName = field.name
+        val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
         val javaDataType = dataTypeFromField(field.`type`)
@@ -133,18 +209,31 @@ object AndroidClasses
         constructorWithParams.addParameter(constructorParameter.build)
         constructorWithParams.addStatement("this.$N = $N", fieldCamelCaseName, fieldCamelCaseName)
 
-        equals.addCode(s"if (${fieldCamelCaseName} != null ? !${fieldCamelCaseName}.equals(that.${fieldCamelCaseName}) : that.${fieldCamelCaseName} != null) return false;\n")
+        if (arrayParameter) {
+          equals.addStatement(s"if (!${T}.equals(${fieldCamelCaseName}, that.${fieldCamelCaseName})) return false", classOf[java.util.Arrays])
+        } else {
+          equals.addStatement(s"if (${fieldCamelCaseName} != null ? !${fieldCamelCaseName}.equals(that.${fieldCamelCaseName}) : that.${fieldCamelCaseName} != null) return false")
+        }
 
-        hashCode.addCode(s"result = 31 * result + (${fieldCamelCaseName} != null ? ${fieldCamelCaseName}.hashCode() : 0);\n")
+
+        hashCode.addStatement(s"result = 31 * result + (${fieldCamelCaseName} != null ? ${fieldCamelCaseName}.hashCode() : 0)")
       })
 
-      equals.addCode("return true;\n")
+      equals.addStatement("return true")
 
-      hashCode.addCode("return result;\n")
+      hashCode.addStatement("return result")
 
       builder.addMethod(constructorWithParams.build)
       builder.addMethod(equals.build)
       builder.addMethod(hashCode.build)
+
+      val toJsonString = MethodSpec.methodBuilder("toJsonString").addModifiers(Modifier.PUBLIC).returns(classOf[String]).addException(classOf[JsonProcessingException])
+      toJsonString.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.getInstance().writeValueAsString(this)")
+      builder.addMethod(toJsonString.build)
+
+      //      val constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC)
+      //      constructor.addParameter(classOf[String], "json")
+      //      builder.addMethod(constructor.build)
 
       makeFile(className, builder)
 
@@ -215,8 +304,8 @@ object AndroidClasses
 
     val dataTypes = Map[String, TypeName](
       "boolean" -> ClassName.get("java.lang", "Boolean"),
-      "date-iso8601" -> ClassName.get("java.util","Date"),
-      "date-time-iso8601" -> ClassName.get("java.util","Date"),
+      "date-iso8601" -> ClassName.get("org.joda.time", "DateTime"),
+      "date-time-iso8601" -> ClassName.get("org.joda.time", "DateTime"),
       "decimal" -> ClassName.get("java.math","BigDecimal"),
       "double" -> ClassName.get("java.lang","Double"),
       "integer" -> ClassName.get("java.lang", "Integer"),
