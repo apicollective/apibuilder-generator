@@ -78,10 +78,14 @@ object AndroidClasses
 
     def generateObjectMapper: File = {
 
+      def pattern: FieldSpec.Builder = {
+        FieldSpec.builder(classOf[String], "pattern", Modifier.PUBLIC, Modifier.STATIC)
+          .initializer("\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\"")
+      }
 
       def formatter: FieldSpec.Builder = {
-        FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PRIVATE, Modifier.STATIC)
-          .initializer("$T.forPattern(\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\").withLocale($T.US).withZoneUTC()", classOf[DateTimeFormat], classOf[Locale])
+        FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PUBLIC, Modifier.STATIC)
+          .initializer("$T.forPattern(pattern).withLocale($T.US).withZoneUTC()", classOf[DateTimeFormat], classOf[Locale])
       }
 
       def deserializer: TypeSpec.Builder = {
@@ -117,6 +121,7 @@ object AndroidClasses
       val builder =
         TypeSpec.classBuilder(sharedObjectMapperClassName).superclass(classOf[ObjectMapper]).addModifiers(Modifier.PUBLIC)
 
+      builder.addField(pattern.build)
       builder.addField(formatter.build)
 
       val modifierField = FieldSpec.builder(classOf[ObjectMapper], "MAPPER").addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL).addModifiers(Modifier.STATIC)
