@@ -5,9 +5,15 @@ import com.bryzek.apidoc.spec.v0.models.{Field, Model}
 object PrimitiveWrapper {
 
   def className(union: ScalaUnion, primitive: ScalaPrimitive): String = {
-    ScalaUtil.toClassName(union.name) + ScalaUtil.toClassName(primitive.shortName)
+    primitive match {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+        ScalaUtil.toClassName(union.name) + ScalaUtil.toClassName(primitive.shortName)
+      }
+      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+        ScalaUtil.toClassName(union.name)
+      }
+    }
   }
-
 }
 
 case class PrimitiveWrapper(ssd: ScalaService) {
