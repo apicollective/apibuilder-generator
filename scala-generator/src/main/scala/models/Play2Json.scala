@@ -7,9 +7,9 @@ case class Play2Json(
   ssd: ScalaService
 ) {
 
-  private case class ReadWrite(name: String)
-  private[this] val Reads = ReadWrite("Reads")
-  private[this] val Writes = ReadWrite("Writes")
+  private sealed trait ReadWrite
+  private case object Reads extends ReadWrite { override def toString = "Reads" }
+  private case object Writes extends ReadWrite { override def toString = "Writes" }
 
   def generate(): String = {
     Seq(
@@ -169,12 +169,12 @@ case class Play2Json(
     readWrite: ReadWrite
   ): String = {
     val method = methodName(name, readWrite)
-    s"implicit def $method: play.api.libs.json.${readWrite.name}[$name]"
+    s"implicit def $method: play.api.libs.json.$readWrite[$name]"
   }
 
   private def methodName(
     name: String,
     readWrite: ReadWrite
-  ): String = s"json${readWrite.name}${ssd.name}$name"
+  ): String = s"json$readWrite${ssd.name}$name"
 
 }
