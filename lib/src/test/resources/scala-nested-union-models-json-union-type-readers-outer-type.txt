@@ -1,0 +1,5 @@
+implicit def jsonReadsApiDocTestOuterType: play.api.libs.json.Reads[OuterType] = {
+  (
+    (__ \ "inner_type").read(jsonReadsApiDocTestOuterType).asInstanceOf[play.api.libs.json.Reads[OuterType]]
+  )
+}

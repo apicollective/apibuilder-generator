@@ -1,0 +1,5 @@
+implicit def jsonReadsApiDocTestInnerType: play.api.libs.json.Reads[InnerType] = {
+  (
+    (__ \ "string_model").read(jsonReadsApiDocTestStringModel).asInstanceOf[play.api.libs.json.Reads[InnerType]]
+  )
+}
