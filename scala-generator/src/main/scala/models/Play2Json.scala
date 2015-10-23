@@ -24,15 +24,14 @@ case class Play2Json(
   }
 
   private[models] def readers(union: ScalaUnion): String = {
-    val reads = union.types.map { scalaUnionType =>
-      s"""(__ \\ "${scalaUnionType.originalName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
-    } :+
-      s"play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]]"
-
     Seq(
       s"${identifier(union.name, Reads)} = {",
       s"  (",
-      reads.mkString("\norElse\n").indent(4),
+      union.types.map { scalaUnionType =>
+        s"""(__ \\ "${scalaUnionType.originalName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+      }.mkString("\norElse\n").indent(4),
+      s"    orElse",
+      s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]]",
       s"  )",
       s"}"
     ).mkString("\n")
