@@ -142,7 +142,7 @@ ${methodGenerator.objects().indent(4)}
       val queryComponents = for {
         (name, values) <- req.queryString
         value <- values
-      } yield s"$name=$value"
+      } yield s"$$name=$$value"
       val url = s"$${req.url}$${queryComponents.mkString("?", "&", "")}"
       auth.fold(logger.info(s"curl -X $$method $$url")) { _ =>
         logger.info(s"curl -X $$method -u '[REDACTED]:' $$url")
