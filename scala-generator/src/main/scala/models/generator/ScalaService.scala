@@ -126,6 +126,15 @@ object ScalaUnionType {
     }
   }
 
+  def typeName(union: ScalaUnion, unionType: ScalaUnionType): String = {
+    unionType.datatype match {
+      case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
+        p.name
+      }
+      case p: ScalaPrimitive => PrimitiveWrapper.className(union, p)
+      case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
+    }
+  }
 }
 
 class ScalaModel(val ssd: ScalaService, val model: Model) {

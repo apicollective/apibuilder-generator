@@ -13,13 +13,13 @@ class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
 
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get
-    val code = ScalaCaseClasses.generateCaseClass(model, Seq.empty)
+    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
     models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-case-class.txt", code)
   }
 
   it("user_patch case classes") {
     val model = ssd.models.find(_.name == "UserPatch").get
-    val code = ScalaCaseClasses.generateCaseClass(model, Seq.empty)
+    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
     models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-patch-case-class.txt", code)
   }
 

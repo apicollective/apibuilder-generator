@@ -135,11 +135,11 @@ case class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
       d: ScalaDatatype
     ): String = {
       d match {
-        case ScalaPrimitive.String => s"""${config.pathEncodingMethod}($name, "UTF-8")"""
+        case ScalaPrimitive.String => config.pathEncode(name)
         case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
-        case ScalaPrimitive.Enum(_, _) => s"""${config.pathEncodingMethod}($name.toString, "UTF-8")"""
+        case ScalaPrimitive.Enum(_, _) => config.pathEncode(s"$name.toString")
         case ScalaPrimitive.DateIso8601 => s"$name.toString"
-        case ScalaPrimitive.DateTimeIso8601 => s"""${config.pathEncodingMethod}(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name), "UTF-8")"""
+        case ScalaPrimitive.DateTimeIso8601 => config.pathEncode(s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name)")
         case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }

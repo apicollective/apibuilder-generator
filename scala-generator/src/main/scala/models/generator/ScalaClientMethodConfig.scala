@@ -8,9 +8,9 @@ trait ScalaClientMethodConfig {
   def namespace: String
 
   /**
-    * The name of the method to call to encode a variable into a path.
+    * The code to generate to encode a variable into a path.
     */
-  def pathEncodingMethod: String
+  def pathEncode(value: String): String
 
   /**
     * The name of the method on the response providing the status code.
@@ -33,11 +33,15 @@ trait ScalaClientMethodConfig {
   def responseClass: String
 
   /**
-    * true if we need to provide our own async http client (in which
-    * case we add a default shared executor and also expose the http
-    * client in the API directly to be overridden as necessary)
+    * Extra arguments that we need to provide to the Client, like e.g.
+    * our own async http client
     */
-  def requiresAsyncHttpClient: Boolean
+  def extraClientCtorArgs: Option[String]
+
+  /**
+    * Extra methods to add to the Client object
+    */
+  def extraClientObjectMethods: Option[String]
 
   /**
     * true if the native libraries can serialized UUID. False
@@ -45,6 +49,12 @@ trait ScalaClientMethodConfig {
     * generated code.
     */
   def canSerializeUuid: Boolean
+
+  /**
+    * If client methods require a second (implicit) parameter list,
+    * e.g. to pass in an ExecutionContext, this can be specified here.
+    */
+  def implicitArgs: Option[String]
 
   /**
     * Given a response and a class name, returns code to create an
@@ -67,10 +77,12 @@ trait ScalaClientMethodConfig {
 object ScalaClientMethodConfigs {
 
   trait Play extends ScalaClientMethodConfig {
-    override val pathEncodingMethod = "play.utils.UriEncoding.encodePathSegment"
+    override def pathEncode(value: String) = s"""play.utils.UriEncoding.encodePathSegment($value, "UTF-8")"""
     override val responseStatusMethod = "status"
     override val responseBodyMethod = "body"
-    override val requiresAsyncHttpClient = false
+    override val extraClientCtorArgs = None
+    override val extraClientObjectMethods = None
+    override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
   }
 
   case class Play22(namespace: String) extends Play {
@@ -92,12 +104,22 @@ object ScalaClientMethodConfigs {
   }
 
   trait Ning extends ScalaClientMethodConfig {
-    override val pathEncodingMethod = s"_root_.${namespace}.PathSegment.encode"
+    override def pathEncode(value: String) = s"""_root_.$namespace.PathSegment.encode($value, "UTF-8")"""
     override val responseStatusMethod = "getStatusCode"
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
     override val responseClass = "_root_.com.ning.http.client.Response"
-    override val requiresAsyncHttpClient = true
+    override val extraClientCtorArgs = Some(",\n  asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient")
+    override val extraClientObjectMethods = Some("""
+private lazy val defaultAsyncHttpClient = {
+  new AsyncHttpClient(
+    new AsyncHttpClientConfig.Builder()
+      .setExecutorService(java.util.concurrent.Executors.newCachedThreadPool())
+      .build()
+  )
+}
+""")
     override val canSerializeUuid = true
+    override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
 
     def addQueryParamMethod: String
   }

@@ -7,7 +7,9 @@ import lib.Text._
 import lib.generator.CodeGenerator
 import generator.ServiceFileNames
 
-object ScalaCaseClasses extends CodeGenerator {
+object ScalaCaseClasses extends ScalaCaseClasses
+
+trait ScalaCaseClasses extends CodeGenerator {
 
   private[this] val MaxNumberOfFields = 21
 
@@ -34,7 +36,8 @@ object ScalaCaseClasses extends CodeGenerator {
 
   def generateCode(
     form: InvocationForm,
-    addHeader: Boolean = true
+    addHeader: Boolean = true,
+    additionalImports: Seq[String] = Seq.empty
   ): Seq[File] = {
     val ssd = new ScalaService(form.service)
 
@@ -46,14 +49,14 @@ object ScalaCaseClasses extends CodeGenerator {
     val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
       case Nil => ""
       case wrappers => {
-        wrappers.map { w => generateCaseClass(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
+        wrappers.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
       }
     }
 
     val wrappers = PrimitiveWrapper(ssd).wrappers match {
       case Nil => ""
       case wrappers => {
-        wrappers.map { w => generateCaseClass(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
+        wrappers.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
       }
     }
 
@@ -64,31 +67,38 @@ object ScalaCaseClasses extends CodeGenerator {
 
     val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
-      ssd.unions.map { generateUnionTraits(ssd.models, _) }.mkString("\n\n").indent(2),
+      additionalImports.mkString("\n").indent(2),
+      ssd.unions.map { generateUnionTraitWithDoc }.mkString("\n\n").indent(2),
       "",
-      ssd.models.map { m => generateCaseClass(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
+      ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
       generatedClasses,
-      generatePlayEnums(ssd).indent(2)
+      ssd.enums.map { generateEnum(ssd, _) }.mkString("\n\n").indent(2)
     ).mkString("\n").trim +
     s"\n\n}"
 
     Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
   }
 
-  private def generateUnionTraits(models: Seq[ScalaModel], union: ScalaUnion): String = {
-    // TODO: handle primitive types
+  def generateUnionTraitWithDoc(union: ScalaUnion): String = {
+    generateScalaDoc(union.description) + generateUnionTrait(union)
+  }
 
-    union.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
+  def generateUnionTrait(union: ScalaUnion): String = {
+    // TODO: handle primitive types
     s"sealed trait ${union.name}"
   }
 
+  def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
+    generateScalaDoc(model.description) + generateCaseClass(model, unions)
+  }
+
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    model.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
     s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
   }
 
-  private def generatePlayEnums(ssd: ScalaService): String = {
-    ssd.enums.map { ScalaEnums(ssd, _).build }.mkString("\n\n")
+  def generateEnum(ssd: ScalaService, enum: ScalaEnum): String = {
+    ScalaEnums(ssd, enum).build
   }
 
+  def generateScalaDoc(description: Option[String]) = description.fold("")(d => ScalaUtil.textToComment(d) + "\n")
 }

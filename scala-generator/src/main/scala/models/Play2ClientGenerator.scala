@@ -99,7 +99,7 @@ case class Play2ClientGenerator(
 
   private def client(): String = {
 
-    val methodGenerator = ScalaClientMethodGenerator(version.config, ssd)
+    val methodGenerator = new ScalaClientMethodGenerator(version.config, ssd)
 
     val patchMethod = version.supportsHttpPatch match {
       case true => """_logRequest("PATCH", _requestHolder(path).withQueryString(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""

@@ -14,22 +14,14 @@ object ScalaClientObject {
   def apply(
     config: ScalaClientMethodConfig
   ): String = {
-    val executorService = config.requiresAsyncHttpClient match {
-      case true => """
-private lazy val defaultAsyncHttpClient = {
-  new AsyncHttpClient(
-    new AsyncHttpClientConfig.Builder()
-      .setExecutorService(java.util.concurrent.Executors.newCachedThreadPool())
-      .build()
-  )
-}
-""".indent(2) + "\n"
-      case false => ""
+    val extraMethods = config.extraClientObjectMethods match {
+      case Some(methods) => methods.indent(2) + "\n"
+      case _ => ""
     }
 
     s"""
 object Client {
-$executorService
+$extraMethods
   def parseJson[T](
     className: String,
     r: ${config.responseClass},
