@@ -10,6 +10,11 @@ import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, JsonProcessingException, Version}
+import com.bryzek.apidoc.spec.v0.models._
+import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import java.util.Locale
+import java.io.IOException
 import com.bryzek.apidoc.spec.v0.models.Enum
 import scala.Some
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
@@ -18,10 +23,6 @@ import com.bryzek.apidoc.generator.v0.models.File
 import com.bryzek.apidoc.spec.v0.models.Model
 import com.bryzek.apidoc.spec.v0.models.Resource
 import com.bryzek.apidoc.spec.v0.models.Service
-import org.joda.time.DateTime
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import java.util.Locale
-import java.io.IOException
 
 
 object AndroidClasses
@@ -72,7 +73,8 @@ object AndroidClasses
 
       generatedEnums ++
         generatedModels ++
-        generatedObjectMapper
+        generatedObjectMapper ++
+        generatedResources
     }
 
 
@@ -255,29 +257,100 @@ object AndroidClasses
 
       resource.operations.foreach{operation =>
 
-        val methodName =
-          if(operation.path == "/")
-            toParamName(operation.method.toString.toLowerCase, true)
-          else
-            toParamName(operation.method.toString.toLowerCase + "_" + operation.path.replaceAll("/","_"), true)
+        val maybeAnnotationClass = operation.method match {
+          case Method.Get => Some(classOf[retrofit.http.GET])
+          case Method.Post => Some(classOf[retrofit.http.POST])
+          case Method.Put => Some(classOf[retrofit.http.PUT])
+          case Method.Patch => Some(classOf[retrofit.http.PATCH])
+          case Method.Delete => Some(classOf[retrofit.http.DELETE])
+          case Method.Head => Some(classOf[retrofit.http.HEAD])
+          case Method.Connect => None
+          case Method.Options => None
+          case Method.Trace => None
+          case _ => None
+        }
 
-        val method = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT)
+        import RetrofitUtil._
 
-        operation.body.map(body => {
-          val bodyType = dataTypeFromField(body.`type`)
-          method.addParameter(bodyType, toParamName(body.`type`, true))
+        val retrofitPath = toRetrofitPath(operation.path)
+
+        maybeAnnotationClass.map(annotationClass => {
+
+          val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value", "\"" + retrofitPath + "\"").build()
+
+          val methodName =
+            if (operation.path == "/")
+              toParamName(operation.method.toString.toLowerCase, true)
+            else
+              toParamName(operation.method.toString.toLowerCase + "_" + operation.path.replaceAll("/", "_"), true)
+
+          val method = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT)
+
+          method.addAnnotation(methodAnnotation)
+
+          operation.body.map(body => {
+            val bodyType = dataTypeFromField(body.`type`)
+
+            val parameter = ParameterSpec.builder(bodyType, toParamName(body.`type`, true))
+            val annotation = AnnotationSpec.builder(classOf[retrofit.http.Body]).build
+            parameter.addAnnotation(annotation)
+            method.addParameter(parameter.build())
+          })
+
+          operation.parameters.foreach(parameter => {
+
+            val maybeAnnotationClass = parameter.location match {
+              case ParameterLocation.Path => Some(classOf[retrofit.http.Path])
+              case ParameterLocation.Query => Some(classOf[retrofit.http.Query])
+              case ParameterLocation.Form => Some(classOf[retrofit.http.Query])
+              case _ => None
+            }
+
+            maybeAnnotationClass.map(annotationClass => {
+              val parameterType: TypeName = dataTypeFromField(parameter.`type`)
+              val param = ParameterSpec.builder(parameterType, toParamName(parameter.name, true))
+              val annotation = AnnotationSpec.builder(annotationClass).addMember("value", "\"" + parameter.name + "\"").build
+              param.addAnnotation(annotation)
+              method.addParameter(param.build)
+            })
+          })
+
+          /*
+            this is where it gets a little ugly with apidoc/retrofit mapping.
+            apidoc says "map the response code to response type", for example:
+
+            "responses": {
+              "201": { "type": "checkout_session"},
+              "400": {"type": "error_response"},
+              "401": {"type": "error_response"},
+              "422": {"type": "error_response"}
+            }
+
+            retrofit, on the other hand, treats codes 200-299 as success and others as failure
+
+            I think in most cases we can find a single 200-299 result and map it as success, and for other
+            codes clients can do special handling based on response codes (without understanding the response object)
+
+           */
+
+          val maybeSuccessfulResponse = operation.responses.find(response => {
+            response.code.isInstanceOf[ResponseCodeInt] &&
+              response.code.asInstanceOf[ResponseCodeInt].value >= 200 &&
+              response.code.asInstanceOf[ResponseCodeInt].value < 299
+          })
+
+          maybeSuccessfulResponse.map(successfulResponse => {
+            val returnType = dataTypeFromField(successfulResponse.`type`)
+
+            //below, Void in "classOf[retrofit.Call[Void]" is ignored, what matters is returnType
+            val callTypeName = ParameterizedTypeName.get(ClassName.get(classOf[retrofit.Call[Void]]), returnType)
+            method.returns(callTypeName)
+          })
+          builder.addMethod(method.build)
         })
-
-        operation.parameters.foreach(parameter => {
-          val parameterType: TypeName = dataTypeFromField(parameter.`type`)
-          method.addParameter(parameterType, toParamName(parameter.name, true))
-        })
-
-        builder.addMethod(method.build)
       }
 
       makeFile(className, builder)
-
     }
 
     private def toMap(cc: AnyRef): Map[String,Any] =
