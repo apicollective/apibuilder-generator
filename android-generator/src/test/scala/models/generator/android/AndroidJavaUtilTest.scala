@@ -23,4 +23,9 @@ class AndroidJavaUtilTest
     toParamName("this.and.that", true) should be("thisAndThat")
   }
 
+  "makeNameSpace" should "respect reserved words" in {
+    makeNameSpace("com.gilt.public.api") should be("com.gilt.public_.api")
+    makeNameSpace("com.gilt.other.api") should be("com.gilt.other.api")
+  }
+
 }

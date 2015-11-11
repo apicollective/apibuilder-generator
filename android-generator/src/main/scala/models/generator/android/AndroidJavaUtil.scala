@@ -58,6 +58,8 @@ trait AndroidJavaUtil {
     toClassName(input).replaceAll(".","")
   }
 
-
+  def makeNameSpace(namespace: String): String = {
+    namespace.split("\\.").map { checkForReservedWord }.mkString(".")
+  }
 
 }

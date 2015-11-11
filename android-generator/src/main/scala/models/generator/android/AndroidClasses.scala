@@ -45,15 +45,13 @@ object AndroidClasses
 
   class Generator(service: Service, header: Option[String]) {
 
-    private val nameSpace = service.namespace.split("\\.").map { checkForReservedWord }.mkString(".")
+    private val nameSpace = makeNameSpace(service.namespace)
     private val modelsNameSpace = nameSpace + ".models"
     private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
 
     private val sharedJacksonSpace = "com.gilt.android.jackson"
     private val sharedJacksonDirectoryPath = createDirectoryPath(sharedJacksonSpace)
     private val sharedObjectMapperClassName = "ApidocObjectMapper"
-    private val dateTimeDeserializerClassName = "DateTimeDeserializer"
-    private val dateTimeSerializerClassName = "DateTimeSerializer"
 
     val T = "$T" //this is a hack for substituting types, as "$" is used by scala to do string substitution, and $T is sued by javapoet to handle types
 
@@ -81,12 +79,12 @@ object AndroidClasses
     def generateObjectMapper: File = {
 
       def pattern: FieldSpec.Builder = {
-        FieldSpec.builder(classOf[String], "pattern", Modifier.PUBLIC, Modifier.STATIC)
+        FieldSpec.builder(classOf[String], "pattern", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
           .initializer("\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\"")
       }
 
       def formatter: FieldSpec.Builder = {
-        FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PUBLIC, Modifier.STATIC)
+        FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
           .initializer("$T.forPattern(pattern).withLocale($T.US).withZoneUTC()", classOf[DateTimeFormat], classOf[Locale])
       }
 
@@ -158,7 +156,8 @@ object AndroidClasses
       enum.description.map(builder.addJavadoc(_))
 
       enum.values.foreach(value => {
-        builder.addEnumConstant(value.name)
+        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value","\""+value.name+"\"")
+        builder.addEnumConstant(value.name.toUpperCase(), TypeSpec.anonymousClassBuilder("").addAnnotation(annotation.build()).build())
       })
 
       makeFile(className, builder)
