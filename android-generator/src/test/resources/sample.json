@@ -1,0 +1,83 @@
+{
+    "base_url": "http://minimal",
+    "name": "Minimal Api",
+    "description": "Minimal Api Description",
+    "apidoc": {
+        "version": "0.0.1"
+    },
+    "enums": {
+        "car_type": {
+            "description": "on has originated",
+            "values": [
+                {
+                    "name": "sedan",
+                    "description": "most common"
+                },
+                {
+                    "name": "coupe"
+                },
+                {
+                    "name": "cabriolet",
+                    "description": "the coolest"
+                },
+                {
+                    "name": "wagon"
+                }
+            ]
+        }
+    },
+    "models": {
+        "model": {
+            "description": "Model of a car.",
+            "fields": [
+                {
+                    "name": "guid",
+                    "type": "uuid"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "type",
+                    "type": "car_type"
+                },
+                {
+                    "name": "curb_weight",
+                    "type": "integer"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "model": {
+            "path": "/model",
+            "operations": [
+                {
+                    "method": "GET",
+                    "description": "get all models",
+                    "responses": {
+                        "200": {
+                            "type": "[model]"
+                        },
+                        "404": {
+                            "type": "unit"
+                        }
+                    }
+                },
+                {
+                    "method": "GET",
+                    "path": "/:guid",
+                    "responses": {
+                        "200": {
+                            "type": "model"
+                        },
+                        "404": {
+                            "type": "unit"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
