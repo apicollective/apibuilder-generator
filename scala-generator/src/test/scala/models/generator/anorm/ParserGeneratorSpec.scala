@@ -27,6 +27,19 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     """)
   }
 
+  it("service with no models") {
+    val json = buildJsonFromModels("")
+    val form = InvocationForm(models.TestHelper.service(json))
+    ParserGenerator.invoke(form) match {
+      case Left(errors) => {
+        // Success
+      }
+      case Right(files) => {
+        fail("Expected an error message for a service w/ no models")
+      }
+    }
+  }
+
   it("model with one field") {
     val json = buildJsonFromModels("""
         {
