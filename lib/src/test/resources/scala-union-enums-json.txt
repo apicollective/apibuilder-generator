@@ -4,7 +4,7 @@ implicit def jsonReadsApiDocTestUserType: play.api.libs.json.Reads[UserType] = {
     orElse
     (__ \ "role_type").read(jsonReadsApiDocTestRoleType).asInstanceOf[play.api.libs.json.Reads[UserType]]
     orElse
-    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.UserTypeUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[UserType]]]
+    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.UserTypeUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[UserType]]
   )
 }
 
