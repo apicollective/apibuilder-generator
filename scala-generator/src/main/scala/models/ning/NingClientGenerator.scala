@@ -99,10 +99,11 @@ ${headerString.indent(8)}
       defaultHeaders.foreach { h => builder.addHeader(h._1, h._2) }
 
       auth.fold(builder) {
-        case Authorization.Basic(username, password) => {
+        case Authorization.Basic(username, passwordOpt) => {
           builder.setRealm(
             new Realm.RealmBuilder()
               .setPrincipal(username)
+              .setPassword(passwordOpt.getOrElse(""))
               .setUsePreemptiveAuth(true)
               .setScheme(Realm.AuthScheme.BASIC)
               .build()
