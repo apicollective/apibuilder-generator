@@ -30,10 +30,8 @@ case class Play2Json(
       union.types.map { scalaUnionType =>
         s"""(__ \\ "${scalaUnionType.originalName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indent(4),
-      // TODO: Figure out appropriate way to deserialize the undefined
-      // type. This example creates a runtime error
-      // s"    orElse",
-      // s"    ${union.undefinedType.shortName}(__.toString).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
+      s"    orElse",
+      s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]]",
       s"  )",
       s"}"
     ).mkString("\n")
