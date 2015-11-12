@@ -285,6 +285,18 @@ object AndroidClasses
 
           val method = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT)
 
+          operation.description.map(description => {
+            method.addJavadoc(description)
+          })
+
+          operation.deprecation.map(deprecation => {
+            val deprecationAnnotation = AnnotationSpec.builder(classOf[Deprecated]).build
+            method.addAnnotation(deprecationAnnotation)
+            deprecation.description.map(description => {
+                method.addJavadoc("\n@deprecated: "+description)
+            })
+          })
+
           method.addAnnotation(methodAnnotation)
 
           operation.body.map(body => {
