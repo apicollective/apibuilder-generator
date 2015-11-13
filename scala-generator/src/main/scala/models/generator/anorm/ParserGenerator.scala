@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import scala.generator.{ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
+import scala.generator.{ScalaDatatype, ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
@@ -100,6 +100,16 @@ object ParserGenerator extends CodeGenerator {
       case f @ ScalaPrimitive.String => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(field.name, f)
+      case f @ ScalaDatatype.List(inner) => {
+        s"SqlParser.get[${inner.name}].list($field)"
+      }
+      case f @ ScalaDatatype.Map(inner) => {
+        // TODO: is map even supported?
+        s"SqlParser.get[${inner.name}].map($field)"
+      }
+      case f @ ScalaDatatype.Option(inner) => {
+        s"SqlParser.get[Option[${inner.name}]].list($field)"
+      }
       // TODO: ScalaPrimitive. List, Map Option
       case ScalaPrimitive.Model(ns, name) => {
         """$ns.$name.parserByPrefix(todo, "_")"""
