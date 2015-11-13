@@ -1,6 +1,6 @@
 import anorm._
 
-package io.flow.common.v0.anorm {
+package test.apidoc.apidoctest.v0.anorm {
 
   object Reference {
 
@@ -10,7 +10,7 @@ package io.flow.common.v0.anorm {
 
     def parser(
       guid: String
-    ): RowParser[io.flow.common.v0.models.Reference] = {
+    ): RowParser[test.apidoc.apidoctest.v0.models.Reference] = {
       SqlParser.get[_root_.java.util.UUID](guid) map {
         case guid => {
           io.flow.common.v0.models.Reference(

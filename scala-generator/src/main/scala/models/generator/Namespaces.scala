@@ -19,6 +19,7 @@ case class Namespaces(original: String) {
   val enums: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Enum)
   val unions: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Union)
 
+  val anorm: String = s"$base.anorm"
   val errors: String = s"$base.errors"
 
   val last: String = base.split("\\.").last
