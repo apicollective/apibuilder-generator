@@ -13,12 +13,13 @@ package test.apidoc.apidoctest.v0.anorm {
     ): RowParser[test.apidoc.apidoctest.v0.models.Reference] = {
       SqlParser.get[_root_.java.util.UUID](guid) map {
         case guid => {
-          io.flow.common.v0.models.Reference(
+          test.apidoc.apidoctest.v0.models.Reference(
             guid = guid
           )
         }
       }
     }
+
   }
 
 }

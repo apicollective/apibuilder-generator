@@ -64,7 +64,6 @@ object ParserGenerator extends CodeGenerator {
   }
 
   private[this] def generateModelParser(model: ScalaModel): String = {
-    println(s"generateMoodelParser(${model.name})")
     Seq(
       "def parser(",
       model.fields.map { f => s"${f.name}: String" }.mkString(",\n").indent(2),
@@ -76,7 +75,7 @@ object ParserGenerator extends CodeGenerator {
           Seq(
             s"${model.qualifiedName}(",
             model.fields.map { f =>
-              generateInstance(f)
+              s"${f.name} = ${f.name}"
             }.mkString("\n").indent(2),
             ")"
           ).mkString("\n").indent(2),
@@ -101,22 +100,21 @@ object ParserGenerator extends CodeGenerator {
       case f @ ScalaPrimitive.String => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(field.name, f)
-      // TODO: case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+      // TODO: ScalaPrimitive. List, Map Option
+      case ScalaPrimitive.Model(ns, name) => {
+        """$ns.$name.parserByPrefix(todo, "_")"""
+      }
+      case ScalaPrimitive.Enum(ns, name) => {
+        """$ns.$name.parserByPrefix(todo, "_")"""
+      }
+      case ScalaPrimitive.Union(ns, name) => {
+        """$ns.$name.parserByPrefix(todo, "_")"""
+      }
     }
   }
 
   private[this] def generatePrimitiveRowParser(field: String, datatype: ScalaPrimitive) = {
     s"SqlParser.get[${datatype.fullName}]($field)"
-  }
-
-  private[this] def generateInstance(field: ScalaField) = {
-    println(s"generateInstance(field): name[${field.name}] type[${field.datatype}]")
-    field.datatype match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
-        s"${field.name} = ${field.name}"
-      }
-        // TODO: case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
-    }
   }
 
 }

@@ -15,15 +15,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       "unions": [],
       "resources": [],
 
-      "models": [
-        {
-          "name": "reference",
-          "plural": "references",
-          "fields": [
-            { "name": "guid", "type": "uuid", "required": true }
-          ]
-        }
-      ]
+      "models": [$value]
     """)
   }
 
@@ -35,7 +27,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         // Success
       }
       case Right(files) => {
-        fail("Expected an error message for a service w/ no models")
+        fail("Expected an error message for a service w/ no models: " + files.head.contents)
       }
     }
   }
