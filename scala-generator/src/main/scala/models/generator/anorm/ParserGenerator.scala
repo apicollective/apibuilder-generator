@@ -104,13 +104,11 @@ object ParserGenerator extends CodeGenerator {
         s"SqlParser.get[${inner.name}].list($field)"
       }
       case f @ ScalaDatatype.Map(inner) => {
-        // TODO: is map even supported?
-        s"SqlParser.get[${inner.name}].map($field)"
+        s"SqlParser.get[${inner.name}].list($field).sliding(2, 2).map { el => (el.head -> el.last) }.toMap"
       }
       case f @ ScalaDatatype.Option(inner) => {
         s"SqlParser.get[Option[${inner.name}]].list($field)"
       }
-      // TODO: ScalaPrimitive. List, Map Option
       case ScalaPrimitive.Model(ns, name) => {
         """$ns.$name.parserByPrefix(todo, "_")"""
       }
