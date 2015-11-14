@@ -8,6 +8,8 @@ package test.apidoc.apidoctest.v0.anorm {
 
       def newParser(name: String) = parser(name)
 
+      def parserByTable(table: String) = parser(s"$table.status")
+
       def parser(name: String): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
         SqlParser.str(name) map {
           case value => test.apidoc.apidoctest.v0.models.Status(value)

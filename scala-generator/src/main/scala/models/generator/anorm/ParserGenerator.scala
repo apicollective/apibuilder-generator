@@ -241,6 +241,8 @@ object ParserGenerator extends CodeGenerator {
     Seq(
       s"def newParser(name: String) = parser(name)",
       "",
+      "def parserByTable(table: String) = parser(s\"$table." + enum.enum.name + "\")",
+      "",
       s"def parser(name: String): RowParser[${enum.qualifiedName}] = {",
       s"  SqlParser.str(name) map {",
       s"    case value => ${enum.qualifiedName}(value)",
