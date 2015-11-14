@@ -38,22 +38,41 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   """
 
-  def buildJsonFromModels(value: String): String = {
-    models.TestHelper.buildJson(s"""
-      "imports": [],
-      "headers": [],
-      "info": [],
-      "models": [],
-      "enums": [],
-      "unions": [],
-      "resources": [],
+  case class ServiceBuilder(
+    models: Seq[String] = Nil,
+    enums: Seq[String] = Nil
+  ) {
 
-      "models": [$value]
-    """)
+    def addModel(model: String): ServiceBuilder = {
+      ServiceBuilder(
+        models = this.models ++ Seq(model),
+        enums = enums
+      )
+    }
+
+    def addEnum(enum: String): ServiceBuilder = {
+      ServiceBuilder(
+        models = this.models,
+        enums = this.enums ++ Seq(enum)
+      )
+    }
+
+    def build(): String = {
+      _root_.models.TestHelper.buildJson(s"""
+        "imports": [],
+        "headers": [],
+        "info": [],
+        "unions": [],
+        "resources": [],
+        "enums": [${enums.mkString(",\n")}],
+        "models": [${models.mkString(",\n")}]
+      """)
+    }
+
   }
 
   it("service with no models") {
-    val json = buildJsonFromModels("")
+    val json = ServiceBuilder().build()
     val form = InvocationForm(models.TestHelper.service(json))
     ParserGenerator.invoke(form) match {
       case Left(errors) => {
@@ -66,7 +85,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("model with one field") {
-    val json = buildJsonFromModels(referenceModel)
+    val json = ServiceBuilder(models = Seq(referenceModel)).build()
 
     val form = InvocationForm(models.TestHelper.service(json))
     ParserGenerator.invoke(form) match {
@@ -81,7 +100,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("model with multiple fields") {
-    val json = buildJsonFromModels(nameModel)
+    val json = ServiceBuilder(models = Seq(nameModel)).build()
 
     val form = InvocationForm(models.TestHelper.service(json))
     ParserGenerator.invoke(form) match {
@@ -96,9 +115,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("composite model") {
-    val json = buildJsonFromModels(
-      Seq(nameModel, userModel).mkString(",")
-    )
+    val json = ServiceBuilder(models = Seq(nameModel, userModel)).build()
 
     val form = InvocationForm(models.TestHelper.service(json))
     ParserGenerator.invoke(form) match {
