@@ -71,12 +71,12 @@ object ParserGenerator extends CodeGenerator {
       Seq(
         model.fields.map { generateRowParser(_) }.mkString(" ~\n") + " map {",
         Seq(
-          "case " + model.fields.map(_.name).mkString(" ") + " => {",
+          "case " + model.fields.map(_.name).mkString(" ~ ") + " => {",
           Seq(
             s"${model.qualifiedName}(",
             model.fields.map { f =>
               s"${f.name} = ${f.name}"
-            }.mkString("\n").indent(2),
+            }.mkString(",\n").indent(2),
             ")"
           ).mkString("\n").indent(2),
           "}"
@@ -101,13 +101,13 @@ object ParserGenerator extends CodeGenerator {
       case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaDatatype.List(inner) => {
-        s"SqlParser.get[${inner.name}].list($field)"
+        s"SqlParser.get[${inner.name}].list(${field.name})"
       }
       case f @ ScalaDatatype.Map(inner) => {
-        s"SqlParser.get[${inner.name}].list($field).sliding(2, 2).map { el => (el.head -> el.last) }.toMap"
+        s"SqlParser.get[${inner.name}].list(${field.name}).sliding(2, 2).map { el => (el.head -> el.last) }.toMap"
       }
       case f @ ScalaDatatype.Option(inner) => {
-        s"SqlParser.get[Option[${inner.name}]].list($field)"
+        s"SqlParser.get[Option[${inner.name}]](${field.name})"
       }
       case ScalaPrimitive.Model(ns, name) => {
         """$ns.$name.parserByPrefix(todo, "_")"""
@@ -121,8 +121,8 @@ object ParserGenerator extends CodeGenerator {
     }
   }
 
-  private[this] def generatePrimitiveRowParser(field: String, datatype: ScalaPrimitive) = {
-    s"SqlParser.get[${datatype.fullName}]($field)"
+  private[this] def generatePrimitiveRowParser(fieldName: String, datatype: ScalaPrimitive) = {
+    s"SqlParser.get[${datatype.fullName}]($fieldName)"
   }
 
 }
