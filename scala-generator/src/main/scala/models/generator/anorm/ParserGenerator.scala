@@ -38,7 +38,12 @@ object ParserGenerator extends CodeGenerator {
           Seq(
             "import anorm._",
             s"package ${ssd.namespaces.anorm} {",
-            models.mkString("\n").indent(2),
+            Seq(
+              "package parsers {",
+              models.mkString("\n").indent(2),
+              "}"
+            ).mkString("\n\n").indent(2),
+            AnormUtilPackage.format(ssd.namespaces.anorm).indent(2),
             "}"
           ).mkString("\n\n")
         )
@@ -49,16 +54,29 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModel(model: ScalaModel): String = {
     Seq(
       s"object ${model.name} {",
-      generateModelParserByPrefix(model).indent(2),
+      generateModelNewParser(model).indent(2),
+      generateModelParserByTable(model).indent(2),
       generateModelParser(model).indent(2),
       "}\n"
     ).mkString("\n\n")
   }
 
-  private[this] def generateModelParserByPrefix(model: ScalaModel): String = {
+  private[this] def generateModelNewParser(model: ScalaModel): String = {
     Seq(
-      """def parserByPrefix(prefix: String, separator: String = ".") = parser(""",
-      model.fields.map { f => f.name + """ = s"${prefix}${separator}""" + f.name + "\"" }.mkString(",\n").indent(2),
+      "def newParser(config: util.Config) = {",
+      "  config match {",
+      "    case util.Config.Prefix(prefix) => parser(",
+      model.fields.map { f => f.name + """ = s"${prefix}_""" + f.name + "\"" }.mkString(",\n").indent(6),
+      "    )",
+      "  }",
+      "}"
+    ).mkString("\n")
+  }
+
+  private[this] def generateModelParserByTable(model: ScalaModel): String = {
+    Seq(
+      """def parserByTable(table: String) = parser(""",
+      model.fields.map { f => f.name + """ = s"$table.""" + f.name + "\"" }.mkString(",\n").indent(2),
       ")"
     ).mkString("\n")
   }
@@ -87,8 +105,12 @@ object ParserGenerator extends CodeGenerator {
     ).mkString("\n")
   }
 
-  private[this] def generateRowParser(field: ScalaField) = {
-    field.datatype match {
+  private[this] def generateRowParser(field: ScalaField): String = {
+    generateRowParser(field, field.datatype)
+  }
+
+  private[this] def generateRowParser(field: ScalaField, datatype: ScalaDatatype): String = {
+    datatype match {
       case f @ ScalaPrimitive.Boolean => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Integer => generatePrimitiveRowParser(field.name, f)
@@ -101,22 +123,24 @@ object ParserGenerator extends CodeGenerator {
       case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaDatatype.List(inner) => {
+        // TODO recurse on inner.datatype
         s"SqlParser.get[${inner.name}].list(${field.name})"
       }
       case f @ ScalaDatatype.Map(inner) => {
-        s"SqlParser.get[${inner.name}].list(${field.name}).sliding(2, 2).map { el => (el.head -> el.last) }.toMap"
+        // TODO: pull out inner.datatype and turn el.last into that type
+        s"SqlParser.get[${inner.name}].list(${field.name}).sliding(2, 2).map { el => (el.head.toString -> el.last) }.toMap"
       }
       case f @ ScalaDatatype.Option(inner) => {
-        s"SqlParser.get[Option[${inner.name}]](${field.name})"
+        generateRowParser(field, inner) + ".?"
       }
       case ScalaPrimitive.Model(ns, name) => {
-        """$ns.$name.parserByPrefix(todo, "_")"""
+        s"""$ns.$name.parserByPrefix(todo, "_")"""
       }
       case ScalaPrimitive.Enum(ns, name) => {
-        """$ns.$name.parserByPrefix(todo, "_")"""
+        s"""$ns.$name.parserByPrefix(todo, "_")"""
       }
       case ScalaPrimitive.Union(ns, name) => {
-        """$ns.$name.parserByPrefix(todo, "_")"""
+        s"""$ns.$name.parserByPrefix(todo, "_")"""
       }
     }
   }
@@ -124,5 +148,21 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generatePrimitiveRowParser(fieldName: String, datatype: ScalaPrimitive) = {
     s"SqlParser.get[${datatype.fullName}]($fieldName)"
   }
+
+  private val AnormUtilPackage = """
+package %s.util {
+
+  sealed trait Config {
+    def name(column: String): String
+  }
+
+  object Config {
+    case class Prefix(prefix: String) extends Config {
+      override def name(column: String): String = s"${prefix}_$column"
+    }
+  }
+
+}
+""".trim
 
 }
