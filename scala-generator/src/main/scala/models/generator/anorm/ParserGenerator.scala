@@ -51,7 +51,7 @@ object ParserGenerator extends CodeGenerator {
       s"object ${model.name} {",
       generateModelParserByPrefix(model).indent(2),
       generateModelParser(model).indent(2),
-      "}"
+      "}\n"
     ).mkString("\n\n")
   }
 

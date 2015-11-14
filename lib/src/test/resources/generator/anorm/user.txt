@@ -1,0 +1,57 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm {
+
+  object Name {
+
+    def parserByPrefix(prefix: String, separator: String = ".") = parser(
+      first = s"${prefix}${separator}first",
+      last = s"${prefix}${separator}last"
+    )
+
+    def parser(
+      first: String,
+      last: String
+    ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
+      SqlParser.get[Option[String]](first) ~
+      SqlParser.get[Option[String]](last) map {
+        case first ~ last => {
+          test.apidoc.apidoctest.v0.models.Name(
+            first = first,
+            last = last
+          )
+        }
+      }
+    }
+
+  }
+
+  object User {
+
+    def parserByPrefix(prefix: String, separator: String = ".") = parser(
+      guid = s"${prefix}${separator}guid",
+      email = s"${prefix}${separator}email",
+      name = s"${prefix}${separator}name"
+    )
+
+    def parser(
+      guid: String,
+      email: String,
+      name: String
+    ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+      SqlParser.get[_root_.java.util.UUID](guid) ~
+      SqlParser.get[String](email) ~
+      SqlParser.get[Option[test.apidoc.apidoctest.v0.models.Name]](name) map {
+        case guid ~ email ~ name => {
+          test.apidoc.apidoctest.v0.models.User(
+            guid = guid,
+            email = email,
+            name = name
+          )
+        }
+      }
+    }
+
+  }
+
+}

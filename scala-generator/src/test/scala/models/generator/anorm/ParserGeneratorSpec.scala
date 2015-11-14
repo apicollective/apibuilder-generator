@@ -95,4 +95,21 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  it("composite model") {
+    val json = buildJsonFromModels(
+      Seq(nameModel, userModel).mkString(",")
+    )
+
+    val form = InvocationForm(models.TestHelper.service(json))
+    ParserGenerator.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(Seq("Parsers.scala"))
+        models.TestHelper.assertEqualsFile("/generator/anorm/user.txt", files.head.contents)
+      }
+    }
+  }
+
 }
