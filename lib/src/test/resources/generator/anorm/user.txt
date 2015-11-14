@@ -2,53 +2,90 @@ import anorm._
 
 package test.apidoc.apidoctest.v0.anorm {
 
-  object Name {
+  package parsers {
 
-    def parserByPrefix(prefix: String, separator: String = ".") = parser(
-      first = s"${prefix}${separator}first",
-      last = s"${prefix}${separator}last"
-    )
+    object Name {
 
-    def parser(
-      first: String,
-      last: String
-    ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
-      SqlParser.get[Option[String]](first) ~
-      SqlParser.get[Option[String]](last) map {
-        case first ~ last => {
-          test.apidoc.apidoctest.v0.models.Name(
-            first = first,
-            last = last
+      def newParser(config: util.Config) = {
+        config match {
+          case util.Config.Prefix(prefix) => parser(
+            first = s"${prefix}_first",
+            last = s"${prefix}_last"
           )
         }
       }
+
+      def parserByTable(table: String) = parser(
+        first = s"$table.first",
+        last = s"$table.last"
+      )
+
+      def parser(
+        first: String,
+        last: String
+      ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
+        SqlParser.get[Option[String]](first) ~
+        SqlParser.get[Option[String]](last) map {
+          case first ~ last => {
+            test.apidoc.apidoctest.v0.models.Name(
+              first = first,
+              last = last
+            )
+          }
+        }
+      }
+
+    }
+
+    object User {
+
+      def newParser(config: util.Config) = {
+        config match {
+          case util.Config.Prefix(prefix) => parser(
+            guid = s"${prefix}_guid",
+            email = s"${prefix}_email",
+            name = s"${prefix}_name"
+          )
+        }
+      }
+
+      def parserByTable(table: String) = parser(
+        guid = s"$table.guid",
+        email = s"$table.email",
+        name = util.Config.Prefix(s"${table}_name")
+      )
+
+      def parser(
+        guid: String,
+        email: String,
+        name: util.Config
+      ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+        SqlParser.get[_root_.java.util.UUID](guid) ~
+        SqlParser.get[String](email) ~
+        Name.newParser(name).? map {
+          case guid ~ email ~ name => {
+            test.apidoc.apidoctest.v0.models.User(
+              guid = guid,
+              email = email,
+              name = name
+            )
+          }
+        }
+      }
+
     }
 
   }
 
-  object User {
+  package test.apidoc.apidoctest.v0.anorm.util {
 
-    def parserByPrefix(prefix: String, separator: String = ".") = parser(
-      guid = s"${prefix}${separator}guid",
-      email = s"${prefix}${separator}email",
-      name = s"${prefix}${separator}name"
-    )
+    sealed trait Config {
+      def name(column: String): String
+    }
 
-    def parser(
-      guid: String,
-      email: String,
-      name: String
-    ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
-      SqlParser.get[_root_.java.util.UUID](guid) ~
-      SqlParser.get[String](email) ~
-      SqlParser.get[Option[test.apidoc.apidoctest.v0.models.Name]](name) map {
-        case guid ~ email ~ name => {
-          test.apidoc.apidoctest.v0.models.User(
-            guid = guid,
-            email = email,
-            name = name
-          )
-        }
+    object Config {
+      case class Prefix(prefix: String) extends Config {
+        override def name(column: String): String = s"${prefix}_$column"
       }
     }
 
