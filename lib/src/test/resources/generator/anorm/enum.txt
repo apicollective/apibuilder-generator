@@ -1,0 +1,66 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm {
+
+  package parsers {
+
+    object Status {
+
+      def parser(name: String): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
+        SqlParser.str(name) map {
+          case value => test.apidoc.apidoctest.v0.models.Status(value)
+        }
+      }
+
+    }
+
+    object User {
+
+      def newParser(config: util.Config) = {
+        config match {
+          case util.Config.Prefix(prefix) => parser(
+            guid = s"${prefix}_guid",
+            status = s"${prefix}_status"
+          )
+        }
+      }
+
+      def parserByTable(table: String) = parser(
+        guid = s"$table.guid",
+        status = s"$table.status"
+      )
+
+      def parser(
+        guid: String,
+        status: String
+      ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+        SqlParser.get[_root_.java.util.UUID](guid) ~
+        test.apidoc.apidoctest.v0.anorm.parsers.Status.newParser(status) map {
+          case guid ~ status => {
+            test.apidoc.apidoctest.v0.models.User(
+              guid = guid,
+              status = status
+            )
+          }
+        }
+      }
+
+    }
+
+  }
+
+  package util {
+
+    sealed trait Config {
+      def name(column: String): String
+    }
+
+    object Config {
+      case class Prefix(prefix: String) extends Config {
+        override def name(column: String): String = s"${prefix}_$column"
+      }
+    }
+
+  }
+
+}

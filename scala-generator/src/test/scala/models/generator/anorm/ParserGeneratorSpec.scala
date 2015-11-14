@@ -129,4 +129,37 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  it("enum model") {
+    val json = ServiceBuilder().addModel("""
+    {
+      "name": "user",
+      "plural": "users",
+      "fields": [
+        { "name": "guid", "type": "uuid", "required": true },
+        { "name": "status", "type": "status", "required": true }
+      ]
+    }
+    """).addEnum("""
+    {
+      "name": "status",
+      "plural": "statuses",
+      "values": [
+        { "name": "active" },
+        { "name": "inactive" }
+      ]
+    }
+    """).build()
+
+    val form = InvocationForm(models.TestHelper.service(json))
+    ParserGenerator.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(Seq("TestApidocTestV1Parsers.scala"))
+        models.TestHelper.assertEqualsFile("/generator/anorm/enum.txt", files.head.contents)
+      }
+    }
+  }
+
 }

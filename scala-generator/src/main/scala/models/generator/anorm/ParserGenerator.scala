@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import scala.generator.{Namespaces, ScalaDatatype, ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
+import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
@@ -35,26 +35,43 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateCode(service: Service): Option[String] = {
     val ssd = new ScalaService(service)
 
-    ssd.models.map(generateModel(_)) match {
-      case Nil => {
+    Seq(ssd.models, ssd.enums).flatten.isEmpty match {
+      case true => {
         None
       }
-      case models => {
+      case false => {
         Some(
           Seq(
             "import anorm._",
             s"package ${ssd.namespaces.anorm} {",
             Seq(
-              s"package ${Namespaces.Parsers} {",
-              models.mkString("\n").indent(2),
-              "}"
-            ).mkString("\n\n").indent(2),
+              Some(s"package ${Namespaces.Parsers} {"),
+              ssd.enums.map(generateEnum(_)) match {
+                case Nil => None
+                case els => Some(els.mkString("\n").indent(2))
+              },
+              ssd.models.map(generateModel(_)) match {
+                case Nil => None
+                case els => Some(els.mkString("\n").indent(2))
+              },
+              Some("}")
+            ).flatten.mkString("\n\n").indent(2),
             AnormUtilPackage.indent(2),
             "}"
           ).mkString("\n\n")
         )
       }
     }
+  }
+
+  private[this] def generateEnum(enum: ScalaEnum): String = {
+    Seq(
+      s"object ${enum.name} {",
+      Seq(
+        generateEnumParser(enum)
+      ).mkString("\n\n").indent(2),
+      "}\n"
+    ).mkString("\n\n")
   }
 
   private[this] def generateModel(model: ScalaModel): String = {
@@ -218,6 +235,16 @@ object ParserGenerator extends CodeGenerator {
 
   private[this] def generatePrimitiveRowParser(fieldName: String, datatype: ScalaPrimitive) = {
     s"SqlParser.get[${datatype.fullName}]($fieldName)"
+  }
+
+  private[this] def generateEnumParser(enum: ScalaEnum): String = {
+    Seq(
+      s"def parser(name: String): RowParser[${enum.qualifiedName}] = {",
+      s"  SqlParser.str(name) map {",
+      s"    case value => ${enum.qualifiedName}(value)",
+      s"  }",
+      s"}"
+    ).mkString("\n")
   }
 
   private val AnormUtilPackage = """

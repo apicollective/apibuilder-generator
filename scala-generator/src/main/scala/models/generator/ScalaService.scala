@@ -22,7 +22,7 @@ case class ScalaService(
 
   val models = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 
-  val enums = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(_) }
+  val enums = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(this, _) }
 
   val unions = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
 
@@ -155,9 +155,11 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
 
 }
 
-class ScalaEnum(val enum: Enum) {
+class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val name: String = ScalaUtil.toClassName(enum.name)
+
+  val qualifiedName = ssd.enumClassName(name)
 
   val description: Option[String] = enum.description
 
