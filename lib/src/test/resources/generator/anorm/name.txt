@@ -24,8 +24,8 @@ package test.apidoc.apidoctest.v0.anorm {
         first: String,
         last: String
       ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
-        SqlParser.get[Option[String]](first) ~
-        SqlParser.get[Option[String]](last) map {
+        SqlParser.str(first).? ~
+        SqlParser.str(last).? map {
           case first ~ last => {
             test.apidoc.apidoctest.v0.models.Name(
               first = first,

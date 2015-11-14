@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import scala.generator.{ScalaDatatype, ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
+import scala.generator.{Namespaces, ScalaDatatype, ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
@@ -39,7 +39,7 @@ object ParserGenerator extends CodeGenerator {
             "import anorm._",
             s"package ${ssd.namespaces.anorm} {",
             Seq(
-              "package parsers {",
+              s"package ${Namespaces.Parsers} {",
               models.mkString("\n").indent(2),
               "}"
             ).mkString("\n\n").indent(2),
@@ -84,10 +84,11 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModelParser(model: ScalaModel): String = {
     Seq(
       "def parser(",
+      // TODO: Type needs to be a primitive or a Config
       model.fields.map { f => s"${f.name}: String" }.mkString(",\n").indent(2),
       s"): RowParser[${model.qualifiedName}] = {",
       Seq(
-        model.fields.map { generateRowParser(_) }.mkString(" ~\n") + " map {",
+        model.fields.map { generateRowParser(model, _) }.mkString(" ~\n") + " map {",
         Seq(
           "case " + model.fields.map(_.name).mkString(" ~ ") + " => {",
           Seq(
@@ -105,21 +106,21 @@ object ParserGenerator extends CodeGenerator {
     ).mkString("\n")
   }
 
-  private[this] def generateRowParser(field: ScalaField): String = {
-    generateRowParser(field, field.datatype)
+  private[this] def generateRowParser(model: ScalaModel, field: ScalaField): String = {
+    generateRowParser(model, field, field.datatype)
   }
 
-  private[this] def generateRowParser(field: ScalaField, datatype: ScalaDatatype): String = {
+  private[this] def generateRowParser(model: ScalaModel, field: ScalaField, datatype: ScalaDatatype): String = {
     datatype match {
-      case f @ ScalaPrimitive.Boolean => generatePrimitiveRowParser(field.name, f)
+      case f @ ScalaPrimitive.Boolean => s"SqlParser.bool(${field.name})"
       case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.Integer => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.Long => generatePrimitiveRowParser(field.name, f)
+      case f @ ScalaPrimitive.Integer => s"SqlParser.int(${field.name})"
+      case f @ ScalaPrimitive.Long => s"SqlParser.long(${field.name})"
       case f @ ScalaPrimitive.DateIso8601 => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.DateTimeIso8601 => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Object => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.String => generatePrimitiveRowParser(field.name, f)
+      case f @ ScalaPrimitive.String => s"SqlParser.str(${field.name})"
       case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaDatatype.List(inner) => {
@@ -131,16 +132,16 @@ object ParserGenerator extends CodeGenerator {
         s"SqlParser.get[${inner.name}].list(${field.name}).sliding(2, 2).map { el => (el.head.toString -> el.last) }.toMap"
       }
       case f @ ScalaDatatype.Option(inner) => {
-        generateRowParser(field, inner) + ".?"
+        generateRowParser(model, field, inner) + ".?"
       }
-      case ScalaPrimitive.Model(ns, name) => {
-        s"""$ns.$name.parserByPrefix(todo, "_")"""
+      case ScalaPrimitive.Model(_, name) => {
+        model.ssd.namespaces.anormParsers + s""".$name.newParser(${field.name})"""
       }
-      case ScalaPrimitive.Enum(ns, name) => {
-        s"""$ns.$name.parserByPrefix(todo, "_")"""
+      case ScalaPrimitive.Enum(_, name) => {
+        model.ssd.namespaces.anormParsers + s""".$name.newParser(${field.name})"""
       }
-      case ScalaPrimitive.Union(ns, name) => {
-        s"""$ns.$name.parserByPrefix(todo, "_")"""
+      case ScalaPrimitive.Union(_, name) => {
+        model.ssd.namespaces.anormParsers + s""".$name.newParser(${field.name})"""
       }
     }
   }

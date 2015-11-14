@@ -5,6 +5,8 @@ import com.bryzek.apidoc.spec.v0.models.Service
 
 object Namespaces {
 
+  val Parsers = "parsers"
+
   def quote(ns: String): String = {
     ns.split("\\.").map(ScalaUtil.quoteNameIfKeyword(_)).mkString(".")
   }
@@ -19,8 +21,9 @@ case class Namespaces(original: String) {
   val enums: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Enum)
   val unions: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Union)
 
-  val anorm: String = s"$base.anorm"
-  val errors: String = s"$base.errors"
+  val anorm: String = Seq(base, "anorm").mkString(".")
+  val anormParsers: String = Seq(anorm, Namespaces.Parsers).mkString(".")
+  val errors: String = Seq(base, "errors").mkString(".")
 
   val last: String = base.split("\\.").last
 

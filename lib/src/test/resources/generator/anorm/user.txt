@@ -24,8 +24,8 @@ package test.apidoc.apidoctest.v0.anorm {
         first: String,
         last: String
       ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
-        SqlParser.get[Option[String]](first) ~
-        SqlParser.get[Option[String]](last) map {
+        SqlParser.str(first).? ~
+        SqlParser.str(last).? map {
           case first ~ last => {
             test.apidoc.apidoctest.v0.models.Name(
               first = first,
@@ -61,8 +61,8 @@ package test.apidoc.apidoctest.v0.anorm {
         name: util.Config
       ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
         SqlParser.get[_root_.java.util.UUID](guid) ~
-        SqlParser.get[String](email) ~
-        Name.newParser(name).? map {
+        SqlParser.str(email) ~
+	test.apidoc.apidoctest.v0.parsers.Name.newParser(name).? map {
           case guid ~ email ~ name => {
             test.apidoc.apidoctest.v0.models.User(
               guid = guid,
