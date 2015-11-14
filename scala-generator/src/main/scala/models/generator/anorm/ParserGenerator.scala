@@ -3,6 +3,7 @@ package scala.generator.anorm
 import scala.generator.{Namespaces, ScalaDatatype, ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text._
 
@@ -16,9 +17,14 @@ object ParserGenerator extends CodeGenerator {
       case Some(code) => {
         Right(
           Seq(
-            File(
-              name = "Parsers.scala",
-              contents = code
+            ServiceFileNames.toFile(
+              form.service.namespace,
+              form.service.organization.key,
+              form.service.application.key,
+              form.service.version,
+              "Parsers",
+              code,
+              Some("Scala")
             )
           )
         )
@@ -43,7 +49,7 @@ object ParserGenerator extends CodeGenerator {
               models.mkString("\n").indent(2),
               "}"
             ).mkString("\n\n").indent(2),
-            AnormUtilPackage.format(ssd.namespaces.anorm).indent(2),
+            AnormUtilPackage.indent(2),
             "}"
           ).mkString("\n\n")
         )
@@ -68,7 +74,7 @@ object ParserGenerator extends CodeGenerator {
       "def newParser(config: util.Config) = {",
       "  config match {",
       "    case util.Config.Prefix(prefix) => parser(",
-      model.fields.map { f => f.name + """ = s"${prefix}_""" + f.name + "\"" }.mkString(",\n").indent(6),
+      model.fields.map { f => f.name + " = " + modelFieldParameterNewParserDefault(f.datatype, f.name) }.mkString(",\n").indent(6),
       "    )",
       "  }",
       "}"
@@ -78,7 +84,7 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModelParserByTable(model: ScalaModel): String = {
     Seq(
       """def parserByTable(table: String) = parser(""",
-      model.fields.map { f => f.name + " = " + modelFieldParameterTableDefault(f.name, f.datatype) }.mkString(",\n").indent(2),
+      model.fields.map { f => f.name + " = " + modelFieldParameterTableDefault(f.datatype, f.name) }.mkString(",\n").indent(2),
       ")"
     ).mkString("\n")
   }
@@ -129,22 +135,43 @@ object ParserGenerator extends CodeGenerator {
   }
 
   @scala.annotation.tailrec
-  private[this] def modelFieldParameterTableDefault(name: String, datatype: ScalaDatatype): String = {
+  private[this] def modelFieldParameterTableDefault(datatype: ScalaDatatype, name: String): String = {
     datatype match {
       case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
         "s\"$table." + name + "\""
       }
       case ScalaDatatype.List(inner) => {
-        modelFieldParameterTableDefault(name, inner)
+        modelFieldParameterTableDefault(inner, name)
       }
       case ScalaDatatype.Map(inner) => {
-        modelFieldParameterTableDefault(name, inner)
+        modelFieldParameterTableDefault(inner, name)
       }
       case ScalaDatatype.Option(inner) => {
-        modelFieldParameterTableDefault(name, inner)
+        modelFieldParameterTableDefault(inner, name)
       }
       case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
         "util.Config.Prefix(s\"${table}_" + name + "\")"
+      }
+    }
+  }
+
+  @scala.annotation.tailrec
+  private[this] def modelFieldParameterNewParserDefault(datatype: ScalaDatatype, name: String): String = {
+    datatype match {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+        "s\"${prefix}_" + name + "\""
+      }
+      case ScalaDatatype.List(inner) => {
+        modelFieldParameterNewParserDefault(inner, name)
+      }
+      case ScalaDatatype.Map(inner) => {
+        modelFieldParameterNewParserDefault(inner, name)
+      }
+      case ScalaDatatype.Option(inner) => {
+        modelFieldParameterNewParserDefault(inner, name)
+      }
+      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
+        "util.Config.Prefix(s\"${prefix}_" + name + "\")"
       }
     }
   }
@@ -194,7 +221,7 @@ object ParserGenerator extends CodeGenerator {
   }
 
   private val AnormUtilPackage = """
-package %s.util {
+package util {
 
   sealed trait Config {
     def name(column: String): String

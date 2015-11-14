@@ -34,7 +34,7 @@ package test.apidoc.apidoctest.v0.anorm {
 
   }
 
-  package test.apidoc.apidoctest.v0.anorm.util {
+  package util {
 
     sealed trait Config {
       def name(column: String): String

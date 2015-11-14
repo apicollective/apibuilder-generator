@@ -74,7 +74,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
-        files.map(_.name) should be(Seq("Parsers.scala"))
+        files.map(_.name) should be(Seq("TestApidocTestV1Parsers.scala"))
         models.TestHelper.assertEqualsFile("/generator/anorm/reference.txt", files.head.contents)
       }
     }
@@ -89,7 +89,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
-        files.map(_.name) should be(Seq("Parsers.scala"))
+        files.map(_.name) should be(Seq("TestApidocTestV1Parsers.scala"))
         models.TestHelper.assertEqualsFile("/generator/anorm/name.txt", files.head.contents)
       }
     }
@@ -106,7 +106,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
-        files.map(_.name) should be(Seq("Parsers.scala"))
+        files.map(_.name) should be(Seq("TestApidocTestV1Parsers.scala"))
         models.TestHelper.assertEqualsFile("/generator/anorm/user.txt", files.head.contents)
       }
     }
