@@ -221,14 +221,14 @@ object ParserGenerator extends CodeGenerator {
       case f @ ScalaDatatype.Option(inner) => {
         generateRowParser(model, field, inner) + ".?"
       }
-      case ScalaPrimitive.Model(_, name) => {
-        model.ssd.namespaces.anormParsers + s""".$name.newParser(${field.name})"""
+      case ScalaPrimitive.Model(ns, name) => {
+        s"""${ns.anormParsers}.$name.newParser(${field.name})"""
       }
-      case ScalaPrimitive.Enum(_, name) => {
-        model.ssd.namespaces.anormParsers + s""".$name.newParser(${field.name})"""
+      case ScalaPrimitive.Enum(ns, name) => {
+        s"""${ns.anormParsers}.$name.newParser(${field.name})"""
       }
-      case ScalaPrimitive.Union(_, name) => {
-        model.ssd.namespaces.anormParsers + s""".$name.newParser(${field.name})"""
+      case ScalaPrimitive.Union(ns, name) => {
+        s"""${ns.anormParsers}.$name.newParser(${field.name})"""
       }
     }
   }
@@ -239,6 +239,8 @@ object ParserGenerator extends CodeGenerator {
 
   private[this] def generateEnumParser(enum: ScalaEnum): String = {
     Seq(
+      s"def newParser(name: String) = parser(name)",
+      "",
       s"def parser(name: String): RowParser[${enum.qualifiedName}] = {",
       s"  SqlParser.str(name) map {",
       s"    case value => ${enum.qualifiedName}(value)",

@@ -86,21 +86,21 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
     }
 
     it ("default: foo, datatype: enum") {
-      ScalaUtil.scalaDefault("foo", ScalaPrimitive.Enum("test", "test")) should be("""test.test("foo")""")
+      ScalaUtil.scalaDefault("foo", ScalaPrimitive.Enum(Namespaces("test"), "test")) should be("""test.models.test("foo")""")
     }
 
     it ("should fail for datatype: model") {
       val ex = intercept[Exception] {
-        ScalaUtil.scalaDefault("", ScalaPrimitive.Model("test", "test"))
+        ScalaUtil.scalaDefault("", ScalaPrimitive.Model(Namespaces("test"), "test"))
       }
-      ex.getMessage should be("parsing default `` for datatype Model(test,test)")
+      ex.getMessage should be("parsing default `` for datatype Model(Namespaces(test),test)")
     }
 
     it ("should fail for datatype: union") {
       val ex = intercept[Exception] {
-        ScalaUtil.scalaDefault("", ScalaPrimitive.Union("test", "test"))
+        ScalaUtil.scalaDefault("", ScalaPrimitive.Union(Namespaces("test"), "test"))
       }
-      ex.getMessage should be("parsing default `` for datatype Union(test,test)")
+      ex.getMessage should be("parsing default `` for datatype Union(Namespaces(test),test)")
     }
 
     it ("should fail for datatype: option") {

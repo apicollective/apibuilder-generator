@@ -10,7 +10,7 @@ import org.scalatest.{FunSpec, Matchers}
 class ScalaDatatypeSpec extends FunSpec with Matchers {
 
   it("should generate the right variable name when nested") {
-    val model = new Model("org.example", "User")
+    val model = new Model(Namespaces("org.example"), "User")
     val string = ScalaPrimitive.String
 
     @tailrec

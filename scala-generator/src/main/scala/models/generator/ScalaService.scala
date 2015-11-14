@@ -71,7 +71,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   // Include an undefined instance to nudge the developer to think
   // about what happens in the future when a new type is added to the
   // union type.
-  val undefinedType = ScalaPrimitive.Model(ssd.namespaces.models, name + "UndefinedType")
+  val undefinedType = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
 
   val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
 
@@ -100,7 +100,7 @@ object ScalaUnionType {
     }
     val dt:ScalaDatatype = ssd.scalaDatatype(`type`)
     dt match {
-      case ScalaPrimitive.Enum(ns, name) => {
+      case ScalaPrimitive.Enum(_, name) => {
         val enum = ssd.enums.find(_.name == name).getOrElse {
           sys.error(s"UnionType[$t] Failed to find enum[$name]")
         }
@@ -108,7 +108,7 @@ object ScalaUnionType {
         ScalaUnionType(t.`type`, dt, enum = Some(enum))
       }
 
-      case ScalaPrimitive.Model(ns, name) => {
+      case ScalaPrimitive.Model(_, name) => {
         val model = ssd.models.find(_.name == name).getOrElse {
           sys.error(s"UnionType[$t] Failed to find model[$name]")
         }
