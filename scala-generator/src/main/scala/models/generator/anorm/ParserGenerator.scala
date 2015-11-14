@@ -54,9 +54,11 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModel(model: ScalaModel): String = {
     Seq(
       s"object ${model.name} {",
-      generateModelNewParser(model).indent(2),
-      generateModelParserByTable(model).indent(2),
-      generateModelParser(model).indent(2),
+      Seq(
+        generateModelNewParser(model),
+        generateModelParserByTable(model),
+        generateModelParser(model)
+      ).mkString("\n\n").indent(2),
       "}\n"
     ).mkString("\n\n")
   }
@@ -76,7 +78,7 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModelParserByTable(model: ScalaModel): String = {
     Seq(
       """def parserByTable(table: String) = parser(""",
-      model.fields.map { f => f.name + """ = s"$table.""" + f.name + "\"" }.mkString(",\n").indent(2),
+      model.fields.map { f => f.name + " = " + modelFieldParameterTableDefault(f.name, f.datatype) }.mkString(",\n").indent(2),
       ")"
     ).mkString("\n")
   }
@@ -84,8 +86,7 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModelParser(model: ScalaModel): String = {
     Seq(
       "def parser(",
-      // TODO: Type needs to be a primitive or a Config
-      model.fields.map { f => s"${f.name}: String" }.mkString(",\n").indent(2),
+      model.fields.map { f => s"${f.name}: ${modelFieldParameterType(f.datatype)}" }.mkString(",\n").indent(2),
       s"): RowParser[${model.qualifiedName}] = {",
       Seq(
         model.fields.map { generateRowParser(model, _) }.mkString(" ~\n") + " map {",
@@ -104,6 +105,48 @@ object ParserGenerator extends CodeGenerator {
       ).mkString("\n").indent(2),
       "}"
     ).mkString("\n")
+  }
+
+  @scala.annotation.tailrec
+  private[this] def modelFieldParameterType(datatype: ScalaDatatype): String = {
+    datatype match {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+        "String"
+      }
+      case ScalaDatatype.List(inner) => {
+        modelFieldParameterType(inner)
+      }
+      case ScalaDatatype.Map(inner) => {
+        modelFieldParameterType(inner)
+      }
+      case ScalaDatatype.Option(inner) => {
+        modelFieldParameterType(inner)
+      }
+      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
+        "util.Config"
+      }
+    }
+  }
+
+  @scala.annotation.tailrec
+  private[this] def modelFieldParameterTableDefault(name: String, datatype: ScalaDatatype): String = {
+    datatype match {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+        "s\"$table." + name + "\""
+      }
+      case ScalaDatatype.List(inner) => {
+        modelFieldParameterTableDefault(name, inner)
+      }
+      case ScalaDatatype.Map(inner) => {
+        modelFieldParameterTableDefault(name, inner)
+      }
+      case ScalaDatatype.Option(inner) => {
+        modelFieldParameterTableDefault(name, inner)
+      }
+      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
+        "util.Config.Prefix(s\"${table}_" + name + "\")"
+      }
+    }
   }
 
   private[this] def generateRowParser(model: ScalaModel, field: ScalaField): String = {

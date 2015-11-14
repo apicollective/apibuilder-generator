@@ -62,7 +62,7 @@ package test.apidoc.apidoctest.v0.anorm {
       ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
         SqlParser.get[_root_.java.util.UUID](guid) ~
         SqlParser.str(email) ~
-	test.apidoc.apidoctest.v0.parsers.Name.newParser(name).? map {
+        test.apidoc.apidoctest.v0.anorm.parsers.Name.newParser(name).? map {
           case guid ~ email ~ name => {
             test.apidoc.apidoctest.v0.models.User(
               guid = guid,
