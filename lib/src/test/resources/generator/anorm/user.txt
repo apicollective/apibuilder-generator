@@ -4,6 +4,11 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Name {
 
+    case class Mappings(
+      first: String = "first",
+      last: String = "last"
+    )
+
     object Mappings {
 
       val base = prefix("", "")
@@ -17,7 +22,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
     }
 
-    def table(table: String) = parser(Mappings.prefix(table))
+    def table(table: String) = parser(Mappings.prefix(table, "."))
 
     def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
       SqlParser.str(mappings.first).? ~
@@ -35,6 +40,12 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
+    case class Mappings(
+      guid: String = "guid",
+      email: String = "email",
+      name: test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings
+    )
+
     object Mappings {
 
       val base = prefix("", "")
@@ -44,17 +55,17 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
       def prefix(prefix: String, sep: String) = Mappings(
         guid = s"${prefix}${sep}guid",
         email = s"${prefix}${sep}email",
-        name = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix(Seq(prefix, name).filter(!_.isEmpty).mkString(sep), "_")
+        name = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix(Seq(prefix, "name").filter(!_.isEmpty).mkString(sep), "_")
       )
 
     }
 
-    def table(table: String) = parser(Mappings.prefix(table))
+    def table(table: String) = parser(Mappings.prefix(table, "."))
 
     def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
       SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
       SqlParser.str(mappings.email) ~
-      test.apidoc.apidoctest.v0.anorm.parsers.Name.Parsers.parser(mappings.name).? map {
+      test.apidoc.apidoctest.v0.anorm.parsers.Name.parser(mappings.name).? map {
         case guid ~ email ~ name => {
           test.apidoc.apidoctest.v0.models.User(
             guid = guid,

@@ -85,6 +85,11 @@ object ParserGenerator extends CodeGenerator {
 
   private[this] def generateModelMappings(model: ScalaModel): String = {
     Seq(
+      Seq(
+        "case class Mappings(",
+        model.fields.map { f => s"${f.name}: ${modelFieldParameterType(f.name, f.datatype)}" }.mkString(",\n").indent(2),
+        ")"
+      ).mkString("\n"),
       "object Mappings {",
       """val base = prefix("", "")""".indent(2),
       """def table(table: String) = prefix(table, ".")""".indent(2),
@@ -99,7 +104,7 @@ object ParserGenerator extends CodeGenerator {
 
   private[this] def generateModelParser(model: ScalaModel): String = {
     Seq(
-      s"def table(table: String) = parser(Mappings.prefix(table))",
+      s"""def table(table: String) = parser(Mappings.prefix(table, "."))""",
       "",
       s"def parser(mappings: Mappings): RowParser[${model.qualifiedName}] = {",
       Seq(
@@ -137,10 +142,10 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterType(fieldName, inner)
       }
       case ScalaPrimitive.Model(namespaces, name) => {
-        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("$fieldName", "_")"""
+        s"${namespaces.anormParsers}.$name.Mappings"
       }
       case ScalaPrimitive.Union(namespaces, name) => {
-        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("$fieldName", "_")"""
+        s"${namespaces.anormParsers}.$name.Mappings"
       }
     }
   }
@@ -161,10 +166,10 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterDefault(inner, name)
       }
       case ScalaPrimitive.Model(ns, className) => {
-        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, $name).filter(!_.isEmpty).mkString(sep), "_")"""
+        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, "$name").filter(!_.isEmpty).mkString(sep), "_")"""
       }
       case ScalaPrimitive.Union(ns, className) => {
-        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, $name).filter(!_.isEmpty).mkString(sep), "_")"""
+        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, "$name").filter(!_.isEmpty).mkString(sep), "_")"""
       }
     }
   }
@@ -219,13 +224,13 @@ object ParserGenerator extends CodeGenerator {
         generateRowParser(model, field, inner) + ".?"
       }
       case ScalaPrimitive.Model(ns, name) => {
-        s"""${ns.anormParsers}.$name.Parsers.parser(mappings.${field.name})"""
+        s"""${ns.anormParsers}.$name.parser(mappings.${field.name})"""
       }
       case ScalaPrimitive.Enum(ns, name) => {
-        s"""${ns.anormParsers}.$name.Parsers.parser(mappings.${field.name})"""
+        s"""${ns.anormParsers}.$name.parser(mappings.${field.name})"""
       }
       case ScalaPrimitive.Union(ns, name) => {
-        s"""${ns.anormParsers}.$name.Parsers.parser(mappings.${field.name})"""
+        s"""${ns.anormParsers}.$name.parser(mappings.${field.name})"""
       }
     }
   }

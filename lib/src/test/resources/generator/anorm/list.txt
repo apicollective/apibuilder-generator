@@ -4,6 +4,11 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
+    case class Mappings(
+      guid: String = "guid",
+      emails: String = "emails"
+    )
+
     object Mappings {
 
       val base = prefix("", "")
@@ -17,7 +22,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
     }
 
-    def table(table: String) = parser(Mappings.prefix(table))
+    def table(table: String) = parser(Mappings.prefix(table, "."))
 
     def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
       SqlParser.get[_root_.java.util.UUID](mappings.guid) ~

@@ -4,6 +4,11 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Name {
 
+    case class Mappings(
+      first: String = "first",
+      last: String = "last"
+    )
+
     object Mappings {
 
       val base = prefix("", "")
@@ -17,7 +22,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
     }
 
-    def table(table: String) = parser(Mappings.prefix(table))
+    def table(table: String) = parser(Mappings.prefix(table, "."))
 
     def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
       SqlParser.str(mappings.first).? ~
