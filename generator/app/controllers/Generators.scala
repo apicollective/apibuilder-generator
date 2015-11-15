@@ -52,7 +52,7 @@ object Generators {
         metaData = Generator(
           key = "anorm_2_x_parsers",
           name = "Anorm 2.x parsers",
-          description = Some("Generates anorm parsers. See https://www.playframework.com/documentation/2.4.x/ScalaAnorm"),
+          description = Some("Generates anorm parsers. Depends on apidoc_0_x_libs generators. See https://www.playframework.com/documentation/2.4.x/ScalaAnorm"),
           language = Some("Scala")
         ),
         status = lib.generator.Status.Alpha,

@@ -1,0 +1,42 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm {
+
+  package parsers {
+
+    object User {
+
+      def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {
+        config match {
+          case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(
+            guid = s"${prefix}_guid",
+            emails = s"${prefix}_emails"
+          )
+        }
+      }
+
+      def parserByTable(table: String) = parser(
+        guid = s"$table.guid",
+        emails = s"$table.emails"
+      )
+
+      def parser(
+        guid: String,
+        emails: String
+      ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+        SqlParser.get[_root_.java.util.UUID](guid) ~
+        SqlParser.scalar[Array[String]](emails) map {
+          case guid ~ emails => {
+            test.apidoc.apidoctest.v0.models.User(
+              guid = guid,
+              emails = emails
+            )
+          }
+        }
+      }
+
+    }
+
+  }
+
+}

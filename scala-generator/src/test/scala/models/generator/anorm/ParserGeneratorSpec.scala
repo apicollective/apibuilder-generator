@@ -57,7 +57,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       )
     }
 
-    def build(): String = {
+    lazy val json: String = {
       _root_.models.TestHelper.buildJson(s"""
         "imports": [],
         "headers": [],
@@ -69,11 +69,13 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       """)
     }
 
+    lazy val service = _root_.models.TestHelper.service(json)
+    lazy val form = InvocationForm(service)
+
   }
 
   it("service with no models") {
-    val json = ServiceBuilder().build()
-    val form = InvocationForm(models.TestHelper.service(json))
+    val form = ServiceBuilder().form
     ParserGenerator.invoke(form) match {
       case Left(errors) => {
         // Success
@@ -85,9 +87,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("model with one field") {
-    val json = ServiceBuilder(models = Seq(referenceModel)).build()
-
-    val form = InvocationForm(models.TestHelper.service(json))
+    val form = ServiceBuilder(models = Seq(referenceModel)).form
     ParserGenerator.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
@@ -100,9 +100,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("model with multiple fields") {
-    val json = ServiceBuilder(models = Seq(nameModel)).build()
-
-    val form = InvocationForm(models.TestHelper.service(json))
+    val form = ServiceBuilder(models = Seq(nameModel)).form
     ParserGenerator.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
@@ -115,9 +113,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("composite model") {
-    val json = ServiceBuilder(models = Seq(nameModel, userModel)).build()
-
-    val form = InvocationForm(models.TestHelper.service(json))
+    val form = ServiceBuilder(models = Seq(nameModel, userModel)).form
     ParserGenerator.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
@@ -130,7 +126,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("enum model") {
-    val json = ServiceBuilder().addModel("""
+    val form = ServiceBuilder().addModel("""
     {
       "name": "user",
       "plural": "users",
@@ -148,9 +144,8 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         { "name": "inactive" }
       ]
     }
-    """).build()
+    """).form
 
-    val form = InvocationForm(models.TestHelper.service(json))
     ParserGenerator.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
@@ -158,6 +153,29 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       case Right(files) => {
         files.map(_.name) should be(Seq("TestApidocTestV1Parsers.scala"))
         models.TestHelper.assertEqualsFile("/generator/anorm/enum.txt", files.head.contents)
+      }
+    }
+  }
+
+  it("model with list field") {
+    val form = ServiceBuilder().addModel("""
+    {
+      "name": "user",
+      "plural": "users",
+      "fields": [
+        { "name": "guid", "type": "uuid", "required": true },
+        { "name": "emails", "type": "[string]", "required": true, "default": "[]" }
+      ]
+    }
+    """).form
+
+    ParserGenerator.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(Seq("TestApidocTestV1Parsers.scala"))
+        models.TestHelper.assertEqualsFile("/generator/anorm/list.txt", files.head.contents)
       }
     }
   }
