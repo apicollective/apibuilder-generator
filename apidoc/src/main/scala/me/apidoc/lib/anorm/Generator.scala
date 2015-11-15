@@ -9,14 +9,10 @@ object Generator extends CodeGenerator {
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     Right(
       Seq(
-        ServiceFileNames.toFile(
-          form.service.namespace,
-          form.service.organization.key,
-          form.service.application.key,
-          form.service.version,
-          "Anorm",
-          ParsersUtil,
-          Some("Scala")
+        File(
+          name = "MeApidocLibAnormParsersUtil.scala",
+          dir = Some("me/apidoc/lib"),
+          contents = ParsersUtil
         )
       )
     )
