@@ -161,10 +161,10 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterDefault(inner, name)
       }
       case ScalaPrimitive.Model(ns, className) => {
-        s"""${ns.anormParsers}.$className.Mappings.prefix(""" + "s\"${prefix}${sep}" + name + "\".trimLeft(sep), sep)"
+        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, $name).filter(!_.isEmpty).mkString(sep), "_")"""
       }
       case ScalaPrimitive.Union(ns, className) => {
-        s"""${ns.anormParsers}.$className.Mappings.prefix(""" + "s\"${prefix}${sep}" + name + "\".trimLeft(sep), sep)"
+        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, $name).filter(!_.isEmpty).mkString(sep), "_")"""
       }
     }
   }
