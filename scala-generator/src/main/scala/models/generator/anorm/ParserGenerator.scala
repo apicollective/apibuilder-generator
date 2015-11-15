@@ -85,11 +85,6 @@ object ParserGenerator extends CodeGenerator {
 
   private[this] def generateModelMappings(model: ScalaModel): String = {
     Seq(
-      Seq(
-        "case class Mappings(",
-        model.fields.map { f => s"${f.name}: ${modelFieldParameterType(f.name, f.datatype)}" }.mkString("\n").indent(2),
-        ")"
-      ).mkString("\n"),
       "object Mappings {",
       """def table(table: String) = prefix(Some(s"$table."))""".indent(2),
       Seq(
