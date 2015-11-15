@@ -1,40 +1,37 @@
 import anorm._
 
-package test.apidoc.apidoctest.v0.anorm {
+package test.apidoc.apidoctest.v0.anorm.parsers {
 
-  package parsers {
+  object Name {
 
-    object Name {
+    case class Mappings(
+      first: String = "first"
+      last: String = "last"
+    )
 
-      def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {
-        config match {
-          case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(
-            first = s"${prefix}_first",
-            last = s"${prefix}_last"
+    object Mappings {
+
+      def table(table: String) = prefix(Some(s"$table."))
+
+      def prefix(prefix: Option[String]) = Mappings(
+        first = s"${prefix.getOrElse("")}first",
+        last = s"${prefix.getOrElse("")}last"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
+      SqlParser.str(mappings.first).? ~
+      SqlParser.str(mappings.last).? map {
+        case first ~ last => {
+          test.apidoc.apidoctest.v0.models.Name(
+            first = first,
+            last = last
           )
         }
       }
-
-      def parserByTable(table: String) = parser(
-        first = s"$table.first",
-        last = s"$table.last"
-      )
-
-      def parser(
-        first: String,
-        last: String
-      ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
-        SqlParser.str(first).? ~
-        SqlParser.str(last).? map {
-          case first ~ last => {
-            test.apidoc.apidoctest.v0.models.Name(
-              first = first,
-              last = last
-            )
-          }
-        }
-      }
-
     }
 
   }

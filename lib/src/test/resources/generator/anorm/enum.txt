@@ -1,54 +1,54 @@
 import anorm._
 
-package test.apidoc.apidoctest.v0.anorm {
+package test.apidoc.apidoctest.v0.anorm.parsers {
 
-  package parsers {
+  object Status {
 
-    object Status {
+    TODO
 
-      def newParser(name: String) = parser(name)
+    def newParser(name: String) = parser(name)
 
-      def parserByTable(table: String) = parser(s"$table.status")
+    def parserByTable(table: String) = parser(s"$table.status")
 
-      def parser(name: String): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
-        SqlParser.str(name) map {
-          case value => test.apidoc.apidoctest.v0.models.Status(value)
-        }
+    def parser(name: String): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
+      SqlParser.str(name) map {
+        case value => test.apidoc.apidoctest.v0.models.Status(value)
       }
+    }
+
+  }
+
+
+  object User {
+
+    case class Mappings(
+      guid: String = "guid"
+      status: String = "status"
+    )
+
+    object Mappings {
+
+      def table(table: String) = prefix(Some(s"$table."))
+
+      def prefix(prefix: Option[String]) = Mappings(
+        guid = s"${prefix.getOrElse("")}guid",
+        status = s"${prefix.getOrElse("")}status"
+      )
 
     }
 
-    object User {
+    def table(table: String) = parser(Mappings.prefix(table))
 
-      def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {
-        config match {
-          case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(
-            guid = s"${prefix}_guid",
-            status = s"${prefix}_status"
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
+      test.apidoc.apidoctest.v0.anorm.parsers.Status.Parsers.parser(mappings.status) map {
+        case guid ~ status => {
+          test.apidoc.apidoctest.v0.models.User(
+            guid = guid,
+            status = status
           )
         }
       }
-
-      def parserByTable(table: String) = parser(
-        guid = s"$table.guid",
-        status = s"$table.status"
-      )
-
-      def parser(
-        guid: String,
-        status: String
-      ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
-        SqlParser.get[_root_.java.util.UUID](guid) ~
-        test.apidoc.apidoctest.v0.anorm.parsers.Status.newParser(status) map {
-          case guid ~ status => {
-            test.apidoc.apidoctest.v0.models.User(
-              guid = guid,
-              status = status
-            )
-          }
-        }
-      }
-
     }
 
   }

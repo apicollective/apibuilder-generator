@@ -1,40 +1,37 @@
 import anorm._
 
-package test.apidoc.apidoctest.v0.anorm {
+package test.apidoc.apidoctest.v0.anorm.parsers {
 
-  package parsers {
+  object User {
 
-    object User {
+    case class Mappings(
+      guid: String = "guid"
+      emails: String = "emails"
+    )
 
-      def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {
-        config match {
-          case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(
-            guid = s"${prefix}_guid",
-            emails = s"${prefix}_emails"
+    object Mappings {
+
+      def table(table: String) = prefix(Some(s"$table."))
+
+      def prefix(prefix: Option[String]) = Mappings(
+        guid = s"${prefix.getOrElse("")}guid",
+        emails = s"${prefix.getOrElse("")}emails"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
+      SqlParser.list[String](mappings.emails) map {
+        case guid ~ emails => {
+          test.apidoc.apidoctest.v0.models.User(
+            guid = guid,
+            emails = emails
           )
         }
       }
-
-      def parserByTable(table: String) = parser(
-        guid = s"$table.guid",
-        emails = s"$table.emails"
-      )
-
-      def parser(
-        guid: String,
-        emails: String
-      ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
-        SqlParser.get[_root_.java.util.UUID](guid) ~
-        SqlParser.list[String](emails) map {
-          case guid ~ emails => {
-            test.apidoc.apidoctest.v0.models.User(
-              guid = guid,
-              emails = emails
-            )
-          }
-        }
-      }
-
     }
 
   }

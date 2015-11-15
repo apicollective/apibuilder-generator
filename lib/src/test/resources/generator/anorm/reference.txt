@@ -10,13 +10,15 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
     object Mappings {
 
-      def table(table: String) = Mappings(
-        guid = s"$table.guid"
+      def table(table: String) = prefix(Some(s"$table."))
+
+      def prefix(prefix: Option[String]) = Mappings(
+        guid = s"${prefix.getOrElse("")}guid"
       )
 
     }
 
-    def table(table: String) = parser(Mappings.table(table))
+    def table(table: String) = parser(Mappings.prefix(table))
 
     def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Reference] = {
       SqlParser.get[_root_.java.util.UUID](mappings.guid) map {

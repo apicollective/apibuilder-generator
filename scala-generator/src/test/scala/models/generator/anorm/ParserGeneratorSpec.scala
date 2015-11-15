@@ -87,7 +87,6 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
-  /*
   it("model with multiple fields") {
     val form = ServiceBuilder(models = Seq(nameModel)).form
     ParserGenerator.invoke(form) match {
@@ -179,5 +178,5 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
     }
   }
-   */
+
 }

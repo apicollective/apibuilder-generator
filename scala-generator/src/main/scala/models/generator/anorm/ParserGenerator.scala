@@ -91,9 +91,10 @@ object ParserGenerator extends CodeGenerator {
         ")"
       ).mkString("\n"),
       "object Mappings {",
+      """def table(table: String) = prefix(Some(s"$table."))""".indent(2),
       Seq(
-        "def table(table: String) = Mappings(",
-        model.fields.map { f => f.name + " = " + modelFieldParameterTableDefault(f.datatype, f.originalName) }.mkString(",\n").indent(2),
+        "def prefix(prefix: Option[String]) = Mappings(",
+        model.fields.map { f => f.name + " = " + modelFieldParameterDefault(f.datatype, f.originalName) }.mkString(",\n").indent(2),
         ")"
       ).mkString("\n").indent(2),
       "}"
@@ -102,7 +103,7 @@ object ParserGenerator extends CodeGenerator {
 
   private[this] def generateModelParser(model: ScalaModel): String = {
     Seq(
-      s"def table(table: String) = parser(Mappings.table(table))",
+      s"def table(table: String) = parser(Mappings.prefix(table))",
       "",
       s"def parser(mappings: Mappings): RowParser[${model.qualifiedName}] = {",
       Seq(
@@ -140,31 +141,31 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterType(fieldName, inner)
       }
       case ScalaPrimitive.Model(namespaces, name) => {
-        s"""RowParser[${namespaces.models}.$name] = ${namespaces.anormParsers}.$name.prefix("${fieldName}_")"""
+        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("${fieldName}_")"""
       }
       case ScalaPrimitive.Union(namespaces, name) => {
-        s"""RowParser[${namespaces.models}.$name] = ${namespaces.anormParsers}.$name.prefix("${fieldName}_")"""
+        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("${fieldName}_")"""
       }
     }
   }
 
   @scala.annotation.tailrec
-  private[this] def modelFieldParameterTableDefault(datatype: ScalaDatatype, name: String): String = {
+  private[this] def modelFieldParameterDefault(datatype: ScalaDatatype, name: String): String = {
     datatype match {
       case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
-        "s\"$table." + name + "\""
+        "s\"${prefix.getOrElse(\"\")}" + name + "\""
       }
       case ScalaDatatype.List(inner) => {
-        modelFieldParameterTableDefault(inner, name)
+        modelFieldParameterDefault(inner, name)
       }
       case ScalaDatatype.Map(inner) => {
-        modelFieldParameterTableDefault(inner, name)
+        modelFieldParameterDefault(inner, name)
       }
       case ScalaDatatype.Option(inner) => {
-        modelFieldParameterTableDefault(inner, name)
+        modelFieldParameterDefault(inner, name)
       }
       case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
-        "TODO(s\"${table}_" + name + "\")"
+        "TODO(s\"${prefix.getOrElse(\"\")}" + name + "\")"
       }
     }
   }
