@@ -90,7 +90,7 @@ object ParserGenerator extends CodeGenerator {
       "def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {",
       "  config match {",
       "    case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(",
-      model.fields.map { f => f.name + " = " + modelFieldParameterNewParserDefault(f.datatype, f.name) }.mkString(",\n").indent(6),
+      model.fields.map { f => f.name + " = " + modelFieldParameterNewParserDefault(f.datatype, f.originalName) }.mkString(",\n").indent(6),
       "    )",
       "  }",
       "}"
@@ -100,7 +100,7 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModelParserByTable(model: ScalaModel): String = {
     Seq(
       """def parserByTable(table: String) = parser(""",
-      model.fields.map { f => f.name + " = " + modelFieldParameterTableDefault(f.datatype, f.name) }.mkString(",\n").indent(2),
+      model.fields.map { f => f.name + " = " + modelFieldParameterTableDefault(f.datatype, f.originalName) }.mkString(",\n").indent(2),
       ")"
     ).mkString("\n")
   }
