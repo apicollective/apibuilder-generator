@@ -40,8 +40,8 @@ object Generators {
   val targets = Seq(
       CodeGenTarget(
         metaData = Generator(
-          key = "apidoc_libs_0_x",
-          name = "Apidoc libraries - version 0.x",
+          key = "apidoc_0_x_libs",
+          name = "Apidoc 0.x libraries",
           description = Some("Libraries that are required by some of the apidoc generators"),
           language = Some("Scala")
         ),
