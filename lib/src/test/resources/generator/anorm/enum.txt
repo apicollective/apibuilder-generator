@@ -4,20 +4,29 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Status {
 
-    TODO
+    case class Mappings(value: String)
 
-    def newParser(name: String) = parser(name)
+    object Mappings {
 
-    def parserByTable(table: String) = parser(s"$table.status")
+      val base = prefix("", "")
 
-    def parser(name: String): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
-      SqlParser.str(name) map {
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        value = s"${prefix}${sep}value"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
+      SqlParser.str(mappings.value) map {
         case value => test.apidoc.apidoctest.v0.models.Status(value)
       }
     }
 
   }
-
 
   object User {
 

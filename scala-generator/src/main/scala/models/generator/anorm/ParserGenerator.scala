@@ -61,17 +61,6 @@ object ParserGenerator extends CodeGenerator {
     }
   }
 
-  private[this] def generateEnum(enum: ScalaEnum): String = {
-    Seq(
-      s"object ${enum.name} {",
-      Seq(
-        generateEnumMappings(enum),
-        generateEnumParser(enum)
-      ).mkString("\n\n").indent(2),
-      "}\n"
-    ).mkString("\n\n")
-  }
-
   private[this] def generateModel(model: ScalaModel): String = {
     Seq(
       s"object ${model.name} {",
@@ -91,13 +80,15 @@ object ParserGenerator extends CodeGenerator {
         ")"
       ).mkString("\n"),
       "object Mappings {",
-      """val base = prefix("", "")""".indent(2),
-      """def table(table: String) = prefix(table, ".")""".indent(2),
       Seq(
-        "def prefix(prefix: String, sep: String) = Mappings(",
-        model.fields.map { f => f.name + " = " + modelFieldParameterDefault(f.datatype, f.originalName) }.mkString(",\n").indent(2),
-        ")"
-      ).mkString("\n").indent(2),
+        """val base = prefix("", "")""",
+        """def table(table: String) = prefix(table, ".")""",
+        Seq(
+          "def prefix(prefix: String, sep: String) = Mappings(",
+          model.fields.map { f => f.name + " = " + modelFieldParameterDefault(f.datatype, f.originalName) }.mkString(",\n").indent(2),
+          ")"
+        ).mkString("\n")
+      ).mkString("\n\n").indent(2),
       "}"
     ).mkString("\n\n")
   }
@@ -239,22 +230,33 @@ object ParserGenerator extends CodeGenerator {
     s"SqlParser.get[${datatype.fullName}](mappings.$fieldName)"
   }
 
-  private[this] def generateEnumMappings(enum: ScalaEnum): String = {
-    "TODO"
-  }
-
-  private[this] def generateEnumParser(enum: ScalaEnum): String = {
+  private[this] def generateEnum(enum: ScalaEnum): String = {
     Seq(
-      s"def newParser(name: String) = parser(name)",
-      "",
-      "def parserByTable(table: String) = parser(s\"$table." + enum.enum.name + "\")",
-      "",
-      s"def parser(name: String): RowParser[${enum.qualifiedName}] = {",
-      s"  SqlParser.str(name) map {",
-      s"    case value => ${enum.qualifiedName}(value)",
-      s"  }",
-      s"}"
-    ).mkString("\n")
+      s"object ${enum.name} {",
+      Seq(
+        "case class Mappings(value: String)",
+        "object Mappings {",
+        Seq(
+          """val base = prefix("", "")""".indent(2),
+          """def table(table: String) = prefix(table, ".")""".indent(2),
+          Seq(
+            "def prefix(prefix: String, sep: String) = Mappings(",
+            """  value = s"${prefix}${sep}value"""",
+            ")"
+          ).mkString("\n").indent(2)
+        ).mkString("\n\n"),
+        "}",
+        """def table(table: String) = parser(Mappings.prefix(table, "."))""",
+        Seq(
+          s"def parser(mappings: Mappings): RowParser[${enum.qualifiedName}] = {",
+          s"  SqlParser.str(mappings.value) map {",
+          s"    case value => ${enum.qualifiedName}(value)",
+          s"  }",
+          s"}"
+        ).mkString("\n")
+      ).mkString("\n\n").indent(2),
+      "}"
+    ).mkString("\n\n")
   }
 
 }
