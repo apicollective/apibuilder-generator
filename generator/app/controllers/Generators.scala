@@ -46,7 +46,7 @@ object Generators {
           language = Some("Scala")
         ),
         status = lib.generator.Status.Alpha,
-        codeGenerator = Some(scala.apidoc.lib.anorm.Generator)
+        codeGenerator = Some(me.apidoc.lib.anorm.Generator)
       ),
       CodeGenTarget(
         metaData = Generator(
