@@ -56,7 +56,6 @@ object ParserGenerator extends CodeGenerator {
               },
               Some("}")
             ).flatten.mkString("\n\n").indent(2),
-            AnormUtilPackage.indent(2),
             "}"
           ).mkString("\n\n")
         )
@@ -88,9 +87,9 @@ object ParserGenerator extends CodeGenerator {
 
   private[this] def generateModelNewParser(model: ScalaModel): String = {
     Seq(
-      "def newParser(config: util.Config) = {",
+      "def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {",
       "  config match {",
-      "    case util.Config.Prefix(prefix) => parser(",
+      "    case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(",
       model.fields.map { f => f.name + " = " + modelFieldParameterNewParserDefault(f.datatype, f.name) }.mkString(",\n").indent(6),
       "    )",
       "  }",
@@ -146,7 +145,7 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterType(inner)
       }
       case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
-        "util.Config"
+        "me.apidoc.lib.anorm.parsers.util.Config"
       }
     }
   }
@@ -167,7 +166,7 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterTableDefault(inner, name)
       }
       case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
-        "util.Config.Prefix(s\"${table}_" + name + "\")"
+        "me.apidoc.lib.anorm.parsers.util.Config.Prefix(s\"${table}_" + name + "\")"
       }
     }
   }
@@ -188,7 +187,7 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterNewParserDefault(inner, name)
       }
       case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
-        "util.Config.Prefix(s\"${prefix}_" + name + "\")"
+        "me.apidoc.lib.anorm.parsers.util.Config.Prefix(s\"${prefix}_" + name + "\")"
       }
     }
   }

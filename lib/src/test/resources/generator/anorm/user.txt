@@ -6,9 +6,9 @@ package test.apidoc.apidoctest.v0.anorm {
 
     object Name {
 
-      def newParser(config: util.Config) = {
+      def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {
         config match {
-          case util.Config.Prefix(prefix) => parser(
+          case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(
             first = s"${prefix}_first",
             last = s"${prefix}_last"
           )
@@ -39,12 +39,12 @@ package test.apidoc.apidoctest.v0.anorm {
 
     object User {
 
-      def newParser(config: util.Config) = {
+      def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {
         config match {
-          case util.Config.Prefix(prefix) => parser(
+          case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(
             guid = s"${prefix}_guid",
             email = s"${prefix}_email",
-            name = util.Config.Prefix(s"${prefix}_name")
+            name = me.apidoc.lib.anorm.parsers.util.Config.Prefix(s"${prefix}_name")
           )
         }
       }
@@ -52,13 +52,13 @@ package test.apidoc.apidoctest.v0.anorm {
       def parserByTable(table: String) = parser(
         guid = s"$table.guid",
         email = s"$table.email",
-        name = util.Config.Prefix(s"${table}_name")
+        name = me.apidoc.lib.anorm.parsers.util.Config.Prefix(s"${table}_name")
       )
 
       def parser(
         guid: String,
         email: String,
-        name: util.Config
+        name: me.apidoc.lib.anorm.parsers.util.Config
       ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
         SqlParser.get[_root_.java.util.UUID](guid) ~
         SqlParser.str(email) ~
@@ -73,20 +73,6 @@ package test.apidoc.apidoctest.v0.anorm {
         }
       }
 
-    }
-
-  }
-
-  package util {
-
-    sealed trait Config {
-      def name(column: String): String
-    }
-
-    object Config {
-      case class Prefix(prefix: String) extends Config {
-        override def name(column: String): String = s"${prefix}_$column"
-      }
     }
 
   }

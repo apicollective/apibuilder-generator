@@ -6,9 +6,9 @@ package test.apidoc.apidoctest.v0.anorm {
 
     object Name {
 
-      def newParser(config: util.Config) = {
+      def newParser(config: me.apidoc.lib.anorm.parsers.util.Config) = {
         config match {
-          case util.Config.Prefix(prefix) => parser(
+          case me.apidoc.lib.anorm.parsers.util.Config.Prefix(prefix) => parser(
             first = s"${prefix}_first",
             last = s"${prefix}_last"
           )
@@ -35,20 +35,6 @@ package test.apidoc.apidoctest.v0.anorm {
         }
       }
 
-    }
-
-  }
-
-  package util {
-
-    sealed trait Config {
-      def name(column: String): String
-    }
-
-    object Config {
-      case class Prefix(prefix: String) extends Config {
-        override def name(column: String): String = s"${prefix}_$column"
-      }
     }
 
   }
