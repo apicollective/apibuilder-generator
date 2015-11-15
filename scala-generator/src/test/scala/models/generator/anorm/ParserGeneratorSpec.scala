@@ -26,18 +26,6 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   """
 
-  val userModel = """
-    {
-      "name": "user",
-      "plural": "users",
-      "fields": [
-        { "name": "guid", "type": "uuid", "required": true },
-        { "name": "email", "type": "string", "required": true },
-        { "name": "name", "type": "name", "required": false }
-      ]
-    }
-  """
-
   case class ServiceBuilder(
     models: Seq[String] = Nil,
     enums: Seq[String] = Nil
@@ -99,6 +87,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  /*
   it("model with multiple fields") {
     val form = ServiceBuilder(models = Seq(nameModel)).form
     ParserGenerator.invoke(form) match {
@@ -113,7 +102,18 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   }
 
   it("composite model") {
-    val form = ServiceBuilder(models = Seq(nameModel, userModel)).form
+    val form = ServiceBuilder(models = Seq(nameModel)).addModel("""
+      {
+        "name": "user",
+        "plural": "users",
+        "fields": [
+          { "name": "guid", "type": "uuid", "required": true },
+          { "name": "email", "type": "string", "required": true },
+          { "name": "name", "type": "name", "required": false }
+        ]
+      }
+    """).form
+
     ParserGenerator.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
@@ -179,5 +179,5 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
     }
   }
-
+   */
 }
