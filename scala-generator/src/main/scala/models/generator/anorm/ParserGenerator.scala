@@ -120,7 +120,7 @@ object ParserGenerator extends CodeGenerator {
   @scala.annotation.tailrec
   private[this] def modelFieldParameterType(fieldName: String, datatype: ScalaDatatype): String = {
     datatype match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
         s"""String = "$fieldName""""
       }
       case ScalaDatatype.List(inner) => {
@@ -131,9 +131,6 @@ object ParserGenerator extends CodeGenerator {
       }
       case ScalaDatatype.Option(inner) => {
         modelFieldParameterType(fieldName, inner)
-      }
-      case ScalaPrimitive.Enum(namespaces, name) => {
-        s"${namespaces.anormParsers}.$name.Mappings"
       }
       case ScalaPrimitive.Model(namespaces, name) => {
         s"${namespaces.anormParsers}.$name.Mappings"
@@ -147,7 +144,7 @@ object ParserGenerator extends CodeGenerator {
   @scala.annotation.tailrec
   private[this] def modelFieldParameterDefault(datatype: ScalaDatatype, name: String): String = {
     datatype match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
         "s\"${prefix}${sep}" + name + "\""
       }
       case ScalaDatatype.List(inner) => {
@@ -158,9 +155,6 @@ object ParserGenerator extends CodeGenerator {
       }
       case ScalaDatatype.Option(inner) => {
         modelFieldParameterDefault(inner, name)
-      }
-      case ScalaPrimitive.Enum(ns, className) => {
-        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, "$name").filter(!_.isEmpty).mkString("_"), "_")"""
       }
       case ScalaPrimitive.Model(ns, className) => {
         s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, "$name").filter(!_.isEmpty).mkString("_"), "_")"""
@@ -220,10 +214,10 @@ object ParserGenerator extends CodeGenerator {
       case f @ ScalaDatatype.Option(inner) => {
         generateRowParser(model, field, inner) + ".?"
       }
-      case ScalaPrimitive.Model(ns, name) => {
-        s"""${ns.anormParsers}.$name.parser(mappings.${field.name})"""
-      }
       case ScalaPrimitive.Enum(ns, name) => {
+        s"""${ns.anormParsers}.$name.parser(${ns.anormParsers}.$name.Mappings(mappings.${field.name}))"""
+      }
+      case ScalaPrimitive.Model(ns, name) => {
         s"""${ns.anormParsers}.$name.parser(mappings.${field.name})"""
       }
       case ScalaPrimitive.Union(ns, name) => {

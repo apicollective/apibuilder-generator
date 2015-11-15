@@ -32,7 +32,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
     case class Mappings(
       guid: String = "guid",
-      status: test.apidoc.apidoctest.v0.anorm.parsers.Status.Mappings
+      status: String = "status"
     )
 
     object Mappings {
@@ -43,7 +43,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
       def prefix(prefix: String, sep: String) = Mappings(
         guid = s"${prefix}${sep}guid",
-        status = test.apidoc.apidoctest.v0.anorm.parsers.Status.Mappings.prefix(Seq(prefix, "status").filter(!_.isEmpty).mkString("_"), "_")
+        status = s"${prefix}${sep}status"
       )
 
     }
@@ -52,7 +52,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
     def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
       SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
-      test.apidoc.apidoctest.v0.anorm.parsers.Status.parser(mappings.status) map {
+      test.apidoc.apidoctest.v0.anorm.parsers.Status.parser(test.apidoc.apidoctest.v0.anorm.parsers.Status.Mappings(mappings.status)) map {
         case guid ~ status => {
           test.apidoc.apidoctest.v0.models.User(
             guid = guid,
