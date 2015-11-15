@@ -55,7 +55,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
       def prefix(prefix: String, sep: String) = Mappings(
         guid = s"${prefix}${sep}guid",
         email = s"${prefix}${sep}email",
-        name = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix(Seq(prefix, "name").filter(!_.isEmpty).mkString(sep), "_")
+        name = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix(Seq(prefix, "name").filter(!_.isEmpty).mkString("_"), "_")
       )
 
     }

@@ -32,7 +32,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
     case class Mappings(
       guid: String = "guid",
-      status: String = "status"
+      status: test.apidoc.apidoctest.v0.anorm.parsers.Status.Mappings
     )
 
     object Mappings {
@@ -43,7 +43,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
       def prefix(prefix: String, sep: String) = Mappings(
         guid = s"${prefix}${sep}guid",
-        status = s"${prefix}${sep}status"
+        status = test.apidoc.apidoctest.v0.anorm.parsers.Status.Mappings.prefix(Seq(prefix, "status").filter(!_.isEmpty).mkString("_"), "_")
       )
 
     }
