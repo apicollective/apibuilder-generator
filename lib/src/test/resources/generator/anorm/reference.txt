@@ -1,39 +1,31 @@
 import anorm._
 
-package test.apidoc.apidoctest.v0.anorm {
+package test.apidoc.apidoctest.v0.anorm.parsers {
 
-  package parsers {
+  object Reference {
 
-    object Reference {
+    case class Mappings(
+      guid: String = "guid"
+    )
 
-      case class Mappings(
-        guid: String = "guid"
+    object Mappings {
+
+      def table(table: String) = Mappings(
+        guid = s"$table.guid"
       )
-
-      object Mappings {
-
-        def table(table: String) = Mappings(
-          guid = s"$table.guid"
-        )
-
-      }
 
     }
 
-    object Parsers {
+    def table(table: String) = parser(Mappings.table(table))
 
-      def table(table: String) = parser(Mappings.table(table))
-
-      def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Reference] = {
-        SqlParser.get[_root_.java.util.UUID](mappings.guid) map {
-          case guid => {
-            test.apidoc.apidoctest.v0.models.Reference(
-              guid = guid
-            )
-          }
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Reference] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) map {
+        case guid => {
+          test.apidoc.apidoctest.v0.models.Reference(
+            guid = guid
+          )
         }
       }
-
     }
 
   }
