@@ -4,18 +4,15 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Name {
 
-    case class Mappings(
-      first: String = "first"
-      last: String = "last"
-    )
-
     object Mappings {
 
-      def table(table: String) = prefix(Some(s"$table."))
+      val base = prefix("", "")
 
-      def prefix(prefix: Option[String]) = Mappings(
-        first = s"${prefix.getOrElse("")}first",
-        last = s"${prefix.getOrElse("")}last"
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        first = s"${prefix}${sep}first",
+        last = s"${prefix}${sep}last"
       )
 
     }

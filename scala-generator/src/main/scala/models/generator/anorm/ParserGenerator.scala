@@ -86,9 +86,10 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModelMappings(model: ScalaModel): String = {
     Seq(
       "object Mappings {",
-      """def table(table: String) = prefix(Some(s"$table."))""".indent(2),
+      """val base = prefix("", "")""".indent(2),
+      """def table(table: String) = prefix(table, ".")""".indent(2),
       Seq(
-        "def prefix(prefix: Option[String]) = Mappings(",
+        "def prefix(prefix: String, sep: String) = Mappings(",
         model.fields.map { f => f.name + " = " + modelFieldParameterDefault(f.datatype, f.originalName) }.mkString(",\n").indent(2),
         ")"
       ).mkString("\n").indent(2),
@@ -136,10 +137,10 @@ object ParserGenerator extends CodeGenerator {
         modelFieldParameterType(fieldName, inner)
       }
       case ScalaPrimitive.Model(namespaces, name) => {
-        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("${fieldName}_")"""
+        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("$fieldName", "_")"""
       }
       case ScalaPrimitive.Union(namespaces, name) => {
-        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("${fieldName}_")"""
+        s"""${namespaces.anormParsers}.$name.Mappings = ${namespaces.anormParsers}.$name.Mappings.prefix("$fieldName", "_")"""
       }
     }
   }
@@ -148,7 +149,7 @@ object ParserGenerator extends CodeGenerator {
   private[this] def modelFieldParameterDefault(datatype: ScalaDatatype, name: String): String = {
     datatype match {
       case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
-        "s\"${prefix.getOrElse(\"\")}" + name + "\""
+        "s\"${prefix}${sep}" + name + "\""
       }
       case ScalaDatatype.List(inner) => {
         modelFieldParameterDefault(inner, name)
@@ -159,8 +160,11 @@ object ParserGenerator extends CodeGenerator {
       case ScalaDatatype.Option(inner) => {
         modelFieldParameterDefault(inner, name)
       }
-      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
-        "TODO(s\"${prefix.getOrElse(\"\")}" + name + "\")"
+      case ScalaPrimitive.Model(ns, className) => {
+        s"""${ns.anormParsers}.$className.Mappings.prefix(""" + "s\"${prefix}${sep}" + name + "\".trimLeft(sep), sep)"
+      }
+      case ScalaPrimitive.Union(ns, className) => {
+        s"""${ns.anormParsers}.$className.Mappings.prefix(""" + "s\"${prefix}${sep}" + name + "\".trimLeft(sep), sep)"
       }
     }
   }

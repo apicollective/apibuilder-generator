@@ -21,18 +21,15 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
-    case class Mappings(
-      guid: String = "guid"
-      status: String = "status"
-    )
-
     object Mappings {
 
-      def table(table: String) = prefix(Some(s"$table."))
+      val base = prefix("", "")
 
-      def prefix(prefix: Option[String]) = Mappings(
-        guid = s"${prefix.getOrElse("")}guid",
-        status = s"${prefix.getOrElse("")}status"
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guid = s"${prefix}${sep}guid",
+        status = s"${prefix}${sep}status"
       )
 
     }

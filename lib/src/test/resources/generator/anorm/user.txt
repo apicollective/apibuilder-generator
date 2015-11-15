@@ -4,18 +4,15 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Name {
 
-    case class Mappings(
-      first: String = "first"
-      last: String = "last"
-    )
-
     object Mappings {
 
-      def table(table: String) = prefix(Some(s"$table."))
+      val base = prefix("", "")
 
-      def prefix(prefix: Option[String]) = Mappings(
-        first = s"${prefix.getOrElse("")}first",
-        last = s"${prefix.getOrElse("")}last"
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        first = s"${prefix}${sep}first",
+        last = s"${prefix}${sep}last"
       )
 
     }
@@ -38,20 +35,16 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
-    case class Mappings(
-      guid: String = "guid"
-      email: String = "email"
-      name: test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix("name_")
-    )
-
     object Mappings {
 
-      def table(table: String) = prefix(Some(s"$table."))
+      val base = prefix("", "")
 
-      def prefix(prefix: Option[String]) = Mappings(
-        guid = s"${prefix.getOrElse("")}guid",
-        email = s"${prefix.getOrElse("")}email",
-        name = TODO(s"${prefix.getOrElse("")}name")
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guid = s"${prefix}${sep}guid",
+        email = s"${prefix}${sep}email",
+        name = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix(s"${prefix}${sep}name".trimLeft(sep), sep)
       )
 
     }
