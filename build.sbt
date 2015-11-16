@@ -23,12 +23,6 @@ lazy val lib = project
   .dependsOn(generated)
   .settings(commonSettings: _*)
 
-// Core libraries that apidoc provides that other generators depend on.
-lazy val apidoc = project
-  .in(file("apidoc"))
-  .dependsOn(lib, lib % "test->test")
-  .settings(commonSettings: _*)
-
 lazy val generator = project
   .in(file("generator"))
   .dependsOn(apidoc, scalaGenerator, rubyGenerator, javaGenerator)

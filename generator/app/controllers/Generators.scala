@@ -40,16 +40,6 @@ object Generators {
   val targets = Seq(
       CodeGenTarget(
         metaData = Generator(
-          key = "apidoc_0_x_libs",
-          name = "Apidoc 0.x libraries",
-          description = Some("Libraries that are required by some of the apidoc generators"),
-          language = Some("Scala")
-        ),
-        status = lib.generator.Status.Alpha,
-        codeGenerator = Some(me.apidoc.lib.anorm.Generator)
-      ),
-      CodeGenTarget(
-        metaData = Generator(
           key = "anorm_2_x_parsers",
           name = "Anorm 2.x parsers",
           description = Some("Generates anorm parsers. Depends on apidoc_0_x_libs generators. See https://www.playframework.com/documentation/2.4.x/ScalaAnorm"),
