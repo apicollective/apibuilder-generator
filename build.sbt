@@ -25,8 +25,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(apidoc, scalaGenerator, rubyGenerator, javaGenerator)
-  .aggregate(apidoc, scalaGenerator, rubyGenerator, javaGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator)
   .enablePlugins(PlayScala)
   .settings(
     routesImport += "com.bryzek.apidoc.generator.v0.Bindables._",
