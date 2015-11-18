@@ -6,14 +6,6 @@ organization := "com.bryzek.apidoc.generator"
 
 scalaVersion in ThisBuild := "2.11.7"
 
-// TODO: lib will eventually be published as a jar if it turns out
-// that we need it. For now it is here mostly for reference - hoping
-// we end up not needing it.
-lazy val lib = project
-  .in(file("lib"))
-  .dependsOn(generated)
-  .settings(commonSettings: _*)
-
 lazy val generated = project
   .in(file("generated"))
   .enablePlugins(PlayScala)
@@ -22,6 +14,14 @@ lazy val generated = project
       ws
     )
   )
+
+// TODO: lib will eventually be published as a jar if it turns out
+// that we need it. For now it is here mostly for reference - hoping
+// we end up not needing it.
+lazy val lib = project
+  .in(file("lib"))
+  .dependsOn(generated)
+  .settings(commonSettings: _*)
 
 lazy val generator = project
   .in(file("generator"))

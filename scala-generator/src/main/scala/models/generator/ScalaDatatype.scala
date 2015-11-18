@@ -191,8 +191,8 @@ object ScalaPrimitive {
     }
   }
 
-  case class Model(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(ns)
+  case class Model(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
+    override def namespace = Some(namespaces.models)
     def apidocType = shortName
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -202,8 +202,8 @@ object ScalaPrimitive {
     override def toVariableName = initLowerCase(shortName)
   }
 
-  case class Enum(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(ns)
+  case class Enum(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
+    override def namespace = Some(namespaces.enums)
     def apidocType = shortName
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -217,8 +217,8 @@ object ScalaPrimitive {
     override def toVariableName = initLowerCase(shortName)
   }
 
-  case class Union(ns: String, shortName: String) extends ScalaPrimitive {
-    override def namespace = Some(ns)
+  case class Union(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
+    override def namespace = Some(namespaces.unions)
     def apidocType = shortName
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
@@ -284,11 +284,11 @@ object ScalaTypeResolver {
   /**
    * If name is a qualified name (as identified by having a dot),
    * parses the name and returns a tuple of (namespace,
-   * name). Otherwise, returns (defaultNamespace, name)
+   * name). Otherwise, returns (Namespaces object, class name)
    */
-  private def parseQualifiedName(defaultNamespace: String, name: String): (String, String) = {
+  private def parseQualifiedName(defaultNamespaces: Namespaces, name: String): (Namespaces, String) = {
     name.split("\\.").toList match {
-      case n :: Nil => (defaultNamespace, ScalaUtil.toClassName(name))
+      case n :: Nil => (defaultNamespaces, ScalaUtil.toClassName(name))
       case multiple =>
         val n = multiple.last
         val objectType = GeneratorUtil.ObjectType.fromString(multiple.reverse.drop(1).reverse.last).getOrElse {
@@ -296,8 +296,7 @@ object ScalaTypeResolver {
           GeneratorUtil.ObjectType.Model
         }
         val baseNamespace = multiple.reverse.drop(2).reverse.mkString(".")
-        val ns = Namespaces(baseNamespace).get(objectType)
-        (Namespaces.quote(ns), ScalaUtil.toClassName(n))
+        (Namespaces(baseNamespace), ScalaUtil.toClassName(n))
     }
   }
 
@@ -327,19 +326,19 @@ case class ScalaTypeResolver(
 
       case Datatype.UserDefined.Model(name) => {
         name.split("\\.").toList match {
-          case n :: Nil => ScalaPrimitive.Model(namespaces.models, ScalaUtil.toClassName(n))
+          case n :: Nil => ScalaPrimitive.Model(namespaces, ScalaUtil.toClassName(n))
           case multiple => {
-            val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces.models, name)
+            val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces, name)
             ScalaPrimitive.Model(ns, n)
           }
         }
       }
       case Datatype.UserDefined.Enum(name) => {
-        val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces.enums, name)
+        val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces, name)
         ScalaPrimitive.Enum(ns, n)
       }
       case Datatype.UserDefined.Union(name) => {
-        val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces.unions, name)
+        val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces, name)
         ScalaPrimitive.Union(ns, n)
       }
     }

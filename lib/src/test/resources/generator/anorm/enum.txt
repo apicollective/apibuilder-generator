@@ -1,0 +1,69 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm.parsers {
+
+  import test.apidoc.apidoctest.v0.anorm.conversions.Json._
+
+  object Status {
+
+    case class Mappings(value: String)
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        value = s"${prefix}${sep}value"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
+      SqlParser.str(mappings.value) map {
+        case value => test.apidoc.apidoctest.v0.models.Status(value)
+      }
+    }
+
+  }
+
+  object User {
+
+    case class Mappings(
+      guid: String = "guid",
+      status: String = "status"
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guid = s"${prefix}${sep}guid",
+        status = s"${prefix}${sep}status"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
+      test.apidoc.apidoctest.v0.anorm.parsers.Status.parser(test.apidoc.apidoctest.v0.anorm.parsers.Status.Mappings(mappings.status)) map {
+        case guid ~ status => {
+          test.apidoc.apidoctest.v0.models.User(
+            guid = guid,
+            status = status
+          )
+        }
+      }
+    }
+
+  }
+
+}

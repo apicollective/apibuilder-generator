@@ -1,0 +1,68 @@
+package test.apidoc.apidoctest.v0.anorm.conversions {
+
+  import anorm.{Column, MetaDataItem, TypeDoesNotMatch}
+  import play.api.libs.json.{JsArray, JsObject, JsValue}
+  import scala.util.{Failure, Success, Try}
+
+  /**
+    * Conversions to collections of objects using JSON.
+    */
+  object Json {
+
+    private[this] def parser[T](
+      f: play.api.libs.json.JsValue => T
+    ) = anorm.Column.nonNull1 { (value, meta) =>
+      val MetaDataItem(qualified, nullable, clazz) = meta
+      value match {
+        case json: org.postgresql.util.PGobject => {
+          Try {
+            f(
+              play.api.libs.json.Json.parse(
+                json.getValue
+              )
+            )
+          } match {
+            case Success(result) => Right(result)
+            case Failure(ex) => Left(
+              TypeDoesNotMatch(
+                s"Column[$qualified] error parsing json $value: $ex"
+              )
+            )
+          }
+        }
+        case _=> {
+          Left(
+            TypeDoesNotMatch(
+              s"Column[$qualified] error converting $value: ${value.asInstanceOf[AnyRef].getClass} to Json"
+            )
+          )
+        }
+
+
+      }
+    }
+
+    implicit val columnToSeqBoolean: Column[Seq[Boolean]] = parser { _.as[Seq[Boolean]] }
+    implicit val columnToMapBoolean: Column[Map[String, Boolean]] = parser { _.as[Map[String, Boolean]] }
+    implicit val columnToSeqDouble: Column[Seq[Double]] = parser { _.as[Seq[Double]] }
+    implicit val columnToMapDouble: Column[Map[String, Double]] = parser { _.as[Map[String, Double]] }
+    implicit val columnToSeqInt: Column[Seq[Int]] = parser { _.as[Seq[Int]] }
+    implicit val columnToMapInt: Column[Map[String, Int]] = parser { _.as[Map[String, Int]] }
+    implicit val columnToSeqLong: Column[Seq[Long]] = parser { _.as[Seq[Long]] }
+    implicit val columnToMapLong: Column[Map[String, Long]] = parser { _.as[Map[String, Long]] }
+    implicit val columnToSeqLocalDate: Column[Seq[_root_.org.joda.time.LocalDate]] = parser { _.as[Seq[_root_.org.joda.time.LocalDate]] }
+    implicit val columnToMapLocalDate: Column[Map[String, _root_.org.joda.time.LocalDate]] = parser { _.as[Map[String, _root_.org.joda.time.LocalDate]] }
+    implicit val columnToSeqDateTime: Column[Seq[_root_.org.joda.time.DateTime]] = parser { _.as[Seq[_root_.org.joda.time.DateTime]] }
+    implicit val columnToMapDateTime: Column[Map[String, _root_.org.joda.time.DateTime]] = parser { _.as[Map[String, _root_.org.joda.time.DateTime]] }
+    implicit val columnToSeqBigDecimal: Column[Seq[BigDecimal]] = parser { _.as[Seq[BigDecimal]] }
+    implicit val columnToMapBigDecimal: Column[Map[String, BigDecimal]] = parser { _.as[Map[String, BigDecimal]] }
+    implicit val columnToSeqJsObject: Column[Seq[_root_.play.api.libs.json.JsObject]] = parser { _.as[Seq[_root_.play.api.libs.json.JsObject]] }
+    implicit val columnToMapJsObject: Column[Map[String, _root_.play.api.libs.json.JsObject]] = parser { _.as[Map[String, _root_.play.api.libs.json.JsObject]] }
+    implicit val columnToSeqString: Column[Seq[String]] = parser { _.as[Seq[String]] }
+    implicit val columnToMapString: Column[Map[String, String]] = parser { _.as[Map[String, String]] }
+    implicit val columnToSeqUUID: Column[Seq[_root_.java.util.UUID]] = parser { _.as[Seq[_root_.java.util.UUID]] }
+    implicit val columnToMapUUID: Column[Map[String, _root_.java.util.UUID]] = parser { _.as[Map[String, _root_.java.util.UUID]] }
+
+  }
+
+}

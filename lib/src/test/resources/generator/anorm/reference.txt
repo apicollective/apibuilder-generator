@@ -1,0 +1,39 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm.parsers {
+
+  import test.apidoc.apidoctest.v0.anorm.conversions.Json._
+
+  object Reference {
+
+    case class Mappings(
+      guid: String = "guid"
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guid = s"${prefix}${sep}guid"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Reference] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) map {
+        case guid => {
+          test.apidoc.apidoctest.v0.models.Reference(
+            guid = guid
+          )
+        }
+      }
+    }
+
+  }
+
+}

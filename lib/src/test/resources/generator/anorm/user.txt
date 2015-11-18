@@ -1,0 +1,83 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm.parsers {
+
+  import test.apidoc.apidoctest.v0.anorm.conversions.Json._
+
+  object Name {
+
+    case class Mappings(
+      first: String = "first",
+      last: String = "last"
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        first = s"${prefix}${sep}first",
+        last = s"${prefix}${sep}last"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
+      SqlParser.str(mappings.first).? ~
+      SqlParser.str(mappings.last).? map {
+        case first ~ last => {
+          test.apidoc.apidoctest.v0.models.Name(
+            first = first,
+            last = last
+          )
+        }
+      }
+    }
+
+  }
+
+  object User {
+
+    case class Mappings(
+      guid: String = "guid",
+      email: String = "email",
+      name: test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guid = s"${prefix}${sep}guid",
+        email = s"${prefix}${sep}email",
+        name = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix(Seq(prefix, "name").filter(!_.isEmpty).mkString("_"), "_")
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
+      SqlParser.str(mappings.email) ~
+      test.apidoc.apidoctest.v0.anorm.parsers.Name.parser(mappings.name).? map {
+        case guid ~ email ~ name => {
+          test.apidoc.apidoctest.v0.models.User(
+            guid = guid,
+            email = email,
+            name = name
+          )
+        }
+      }
+    }
+
+  }
+
+}
