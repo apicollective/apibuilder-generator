@@ -204,12 +204,10 @@ object ParserGenerator extends CodeGenerator {
       case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(field.name, f)
       case f @ ScalaDatatype.List(inner) => {
-        // TODO recurse on inner.datatype
-        s"SqlParser.list[${inner.name}](mappings.${field.name})"
+        s"SqlParser.get[Seq[${inner.name}]](mappings.${field.name})"
       }
       case f @ ScalaDatatype.Map(inner) => {
-        // TODO: pull out inner.datatype and turn el.last into that type
-        s"SqlParser.list[${inner.name}](mappings.${field.name}).sliding(2, 2).map { el => (el.head.toString -> el.last) }.toMap"
+        s"SqlParser.get[Map[String, ${inner.name}]](mappings.${field.name})"
       }
       case f @ ScalaDatatype.Option(inner) => {
         generateRowParser(model, field, inner) + ".?"
