@@ -6,6 +6,7 @@ import com.bryzek.apidoc.spec.v0.models.Service
 object Namespaces {
 
   val Parsers = "parsers"
+  val Conversions = "conversions"
 
   def quote(ns: String): String = {
     ns.split("\\.").map(ScalaUtil.quoteNameIfKeyword(_)).mkString(".")
@@ -23,6 +24,7 @@ case class Namespaces(original: String) {
 
   val anorm: String = Seq(base, "anorm").mkString(".")
   val anormParsers: String = Seq(anorm, Namespaces.Parsers).mkString(".")
+  val anormConversions: String = Seq(anorm, Namespaces.Conversions).mkString(".")
   val errors: String = Seq(base, "errors").mkString(".")
 
   val last: String = base.split("\\.").last

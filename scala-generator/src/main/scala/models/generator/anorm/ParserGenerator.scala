@@ -10,13 +10,24 @@ import lib.Text._
 object ParserGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    generateCode(form.service) match {
+    val ssd = new ScalaService(form.service)
+
+    generateCode(ssd) match {
       case None => {
         Left(Seq("No models were found and thus no parsers were generated"))
       }
       case Some(code) => {
         Right(
           Seq(
+            ServiceFileNames.toFile(
+              form.service.namespace,
+              form.service.organization.key,
+              form.service.application.key,
+              form.service.version,
+              "Conversions",
+              Conversions.code(ssd.namespaces),
+              Some("Scala")
+            ),
             ServiceFileNames.toFile(
               form.service.namespace,
               form.service.organization.key,
@@ -32,9 +43,7 @@ object ParserGenerator extends CodeGenerator {
     }
   }
 
-  private[this] def generateCode(service: Service): Option[String] = {
-    val ssd = new ScalaService(service)
-
+  private[this] def generateCode(ssd: ScalaService): Option[String] = {
     Seq(ssd.models, ssd.enums).flatten.isEmpty match {
       case true => {
         None
