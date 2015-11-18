@@ -2,6 +2,8 @@ import anorm._
 
 package test.apidoc.apidoctest.v0.anorm.parsers {
 
+  import test.apidoc.apidoctest.v0.anorm.conversions.Json._
+
   object Reference {
 
     case class Mappings(
