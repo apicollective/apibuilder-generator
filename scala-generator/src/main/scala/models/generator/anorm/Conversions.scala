@@ -16,7 +16,6 @@ object Conversions {
     ScalaPrimitive.Decimal,
     ScalaPrimitive.Object,
     ScalaPrimitive.String,
-    ScalaPrimitive.Unit,
     ScalaPrimitive.Uuid
   )
 

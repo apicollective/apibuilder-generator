@@ -60,8 +60,6 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
     implicit val columnToMapJsObject: Column[Map[String, _root_.play.api.libs.json.JsObject]] = parser { _.as[Map[String, _root_.play.api.libs.json.JsObject]] }
     implicit val columnToSeqString: Column[Seq[String]] = parser { _.as[Seq[String]] }
     implicit val columnToMapString: Column[Map[String, String]] = parser { _.as[Map[String, String]] }
-    implicit val columnToSeqUnit: Column[Seq[Unit]] = parser { _.as[Seq[Unit]] }
-    implicit val columnToMapUnit: Column[Map[String, Unit]] = parser { _.as[Map[String, Unit]] }
     implicit val columnToSeqUUID: Column[Seq[_root_.java.util.UUID]] = parser { _.as[Seq[_root_.java.util.UUID]] }
     implicit val columnToMapUUID: Column[Map[String, _root_.java.util.UUID]] = parser { _.as[Map[String, _root_.java.util.UUID]] }
 

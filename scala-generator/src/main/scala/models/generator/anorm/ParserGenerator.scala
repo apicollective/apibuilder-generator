@@ -53,6 +53,7 @@ object ParserGenerator extends CodeGenerator {
           Seq(
             "import anorm._",
             s"package ${ssd.namespaces.anormParsers} {",
+            s"  import ${ssd.namespaces.anormConversions}.Json._",
             Seq(
               ssd.enums.map(generateEnum(_)) match {
                 case Nil => None
