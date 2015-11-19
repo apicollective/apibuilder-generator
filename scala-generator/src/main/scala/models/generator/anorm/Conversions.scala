@@ -31,7 +31,7 @@ package %s {
     */
   object Json {
 
-    private[this] def parser[T](
+    def parser[T](
       f: play.api.libs.json.JsValue => T
     ) = anorm.Column.nonNull1 { (value, meta) =>
       val MetaDataItem(qualified, nullable, clazz) = meta
@@ -66,9 +66,6 @@ package %s {
 """.trim
 
   private val Footer = "  }\n\n}"
-
-  //implicit val columnToSeqJsValue: Column[Seq[JsValue]] = parser { _.as[Seq[JsValue]] }
-  //implicit val columnToMapStringString: Column[Map[String, String]] = parser { _.as[Map[String, String]] }
 
   def code(namespaces: Namespaces): String = {
 
