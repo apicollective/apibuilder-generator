@@ -57,8 +57,8 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   organization := "com.bryzek.apidoc",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.1",
-    "org.scalatest" %% "scalatest" % "2.2.0" % "test",
-    "org.mockito" % "mockito-all" % "1.9.5" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+    "org.mockito" % "mockito-all" % "1.10.19" % "test"
   ),
   scalacOptions += "-feature"
 )
