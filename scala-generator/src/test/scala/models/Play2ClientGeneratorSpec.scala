@@ -6,7 +6,7 @@ import org.scalatest.{ShouldMatchers, FunSpec}
 
 class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play22("test.apidoc")
+  val clientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc")
 
   it("errorTypeClass") {
     val service = models.TestHelper.generatorApiService
@@ -68,4 +68,12 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
   }
 
+/*
+  it("model, enum and union use case - https://github.com/mbryzek/apidoc/issues/384") {
+    val json = models.TestHelper.readFile("lib/src/test/resources/generators/play-2-union-model-enum-service.json")
+    val ssd = ScalaService(models.TestHelper.service(json))
+    val contents = ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
+    models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
+  }
+ */
 }

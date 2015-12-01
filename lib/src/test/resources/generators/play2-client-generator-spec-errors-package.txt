@@ -4,7 +4,7 @@ package errors {
   import com.bryzek.apidoc.spec.v0.models.json._
 
   case class ErrorsResponse(
-    response: play.api.libs.ws.Response,
+    response: play.api.libs.ws.WSResponse,
     message: Option[String] = None
   ) extends Exception(message.getOrElse(response.status + ": " + response.body)){
     lazy val errors = _root_.test.apidoc.Client.parseJson("Seq[com.bryzek.apidoc.generator.v0.models.Error]", response, _.validate[Seq[com.bryzek.apidoc.generator.v0.models.Error]])
