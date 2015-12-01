@@ -1,0 +1,30 @@
+// TODO - this doesn't compile
+
+implicit def jsonReadsAmbiguousImplicitValuesTestModel: play.api.libs.json.Reads[Model] = {
+  (
+    (__ \ "name").read[com.bryzek.ambiguous.`implicit`.values.test.v0.models.Serializable] and
+    (__ \ "foo").read[String]
+  )(Model.apply _)
+}
+
+implicit def jsonWritesAmbiguousImplicitValuesTestModel: play.api.libs.json.Writes[Model] = {
+  (
+    (__ \ "name").write[com.bryzek.ambiguous.`implicit`.values.test.v0.models.Serializable] and
+    (__ \ "foo").write[String]
+  )(unlift(Model.unapply _))
+}
+
+implicit def jsonReadsAmbiguousImplicitValuesTestContainer: play.api.libs.json.Reads[Container] = {
+  (
+    (__ \ "serializable").read(jsonReadsAmbiguousImplicitValuesTestSerializable).asInstanceOf[play.api.libs.json.Reads[Container]]
+    orElse
+    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.ambiguous.`implicit`.values.test.v0.models.ContainerUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Container]]
+  )
+}
+
+implicit def jsonWritesAmbiguousImplicitValuesTestContainer: play.api.libs.json.Writes[Container] = new play.api.libs.json.Writes[Container] {
+  def writes(obj: Container) = obj match {
+    case x: com.bryzek.ambiguous.`implicit`.values.test.v0.models.Serializable => play.api.libs.json.Json.obj("serializable" -> jsonWritesAmbiguousImplicitValuesTestSerializable.writes(x))
+    case x: com.bryzek.ambiguous.`implicit`.values.test.v0.models.ContainerUndefinedType => sys.error(s"The type[com.bryzek.ambiguous.`implicit`.values.test.v0.models.ContainerUndefinedType] should never be serialized")
+  }
+}
