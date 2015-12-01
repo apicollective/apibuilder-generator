@@ -1,0 +1,54 @@
+{
+  "apidoc": {
+    "version": "0.9.40-dev"
+  },
+  "name": "ambiguous-implicit-values-test",
+  "organization": {
+    "key": "bryzek"
+  },
+  "application": {
+    "key": "ambiguous-implicit-values-test"
+  },
+  "namespace": "com.bryzek.ambiguous.implicit.values.test.v0",
+  "version": "0.0.1-dev",
+  "description": "ambiguous implicit values test",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [
+    {
+      "name": "serializable",
+      "plural": "serializables",
+      "values": [
+        {
+          "name": "CONSTANT"
+        }
+      ]
+    }
+  ],
+  "unions": [
+    {
+      "name": "container",
+      "plural": "containers",
+      "types": [
+        {
+          "type": "serializable"
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "model",
+      "plural": "models",
+      "fields": [
+        {
+          "name": "name",
+          "type": "serializable",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "resources": []
+}

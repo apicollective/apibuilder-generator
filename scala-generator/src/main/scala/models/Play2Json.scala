@@ -134,10 +134,15 @@ case class Play2Json(
   private[models] def writers(model: ScalaModel): String = {
     model.fields match {
       case field :: Nil => {
+        val writer = field.datatype match {
+          case ScalaPrimitive.Enum(_, _) => s"play.api.libs.json.JsString(x.${field.name}.toString)"
+          case _ => s"play.api.libs.json.Json.toJson(x.${field.name})"
+        }
+
         Seq(
           s"${identifier(model.name, Writes)} = new play.api.libs.json.Writes[${model.name}] {",
           s"  def writes(x: ${model.name}) = play.api.libs.json.Json.obj(",
-          s"""    "${field.originalName}" -> play.api.libs.json.Json.toJson(x.${field.name})""",
+          s"""    "${field.originalName}" -> $writer""",
           "  )",
           "}"
         ).mkString("\n")

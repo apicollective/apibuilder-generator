@@ -81,4 +81,12 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  it("model, enum and union use case - https://github.com/mbryzek/apidoc/issues/384") {
+    val json = models.TestHelper.readFile("lib/src/test/resources/generators/play-2-union-model-enum-service.json")
+    val ssd = ScalaService(models.TestHelper.service(json))
+    val contents = Play2Json(ssd).generate()
+    models.TestHelper.assertEqualsFile("/generators/play-2-union-model-enum-code.txt", contents)
+  }
+
+
 }
