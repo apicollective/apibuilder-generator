@@ -1,4 +1,4 @@
-// TODO - this doesn't compile
+implicit def convertSerializableToString(value: com.bryzek.ambiguous.`implicit`.values.test.v0.models.Serializable) = value.toString
 
 implicit def jsonReadsAmbiguousImplicitValuesTestModel: play.api.libs.json.Reads[Model] = {
   (
@@ -24,7 +24,7 @@ implicit def jsonReadsAmbiguousImplicitValuesTestContainer: play.api.libs.json.R
 
 implicit def jsonWritesAmbiguousImplicitValuesTestContainer: play.api.libs.json.Writes[Container] = new play.api.libs.json.Writes[Container] {
   def writes(obj: Container) = obj match {
-    case x: com.bryzek.ambiguous.`implicit`.values.test.v0.models.Serializable => play.api.libs.json.Json.obj("serializable" -> jsonWritesAmbiguousImplicitValuesTestSerializable.writes(x))
+
     case x: com.bryzek.ambiguous.`implicit`.values.test.v0.models.ContainerUndefinedType => sys.error(s"The type[com.bryzek.ambiguous.`implicit`.values.test.v0.models.ContainerUndefinedType] should never be serialized")
   }
 }

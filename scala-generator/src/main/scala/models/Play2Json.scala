@@ -1,7 +1,7 @@
 package scala.models
 
 import lib.Text._
-import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
 
 case class Play2Json(
   ssd: ScalaService
@@ -13,10 +13,15 @@ case class Play2Json(
 
   def generate(): String = {
     Seq(
+      ssd.enums.map(conversions(_)).mkString("\n\n"),
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
       PrimitiveWrapper(ssd).wrappers.map(w => readersAndWriters(w.model)).mkString("\n\n"),
       ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
     ).filter(!_.trim.isEmpty).mkString("\n\n")    
+  }
+
+  private def conversions(enum: ScalaEnum): String = {
+    s"implicit def convert${enum.name}ToString(value: ${enum.qualifiedName}) = value.toString"
   }
 
   private def readersAndWriters(union: ScalaUnion): String = {
