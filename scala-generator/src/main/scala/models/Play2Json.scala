@@ -41,7 +41,7 @@ case class Play2Json(
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       s"  def writes(obj: ${union.name}) = obj match {",
-      union.types.map { t =>
+      union.types.flatMap { t =>
         val typeName = t.datatype match {
           case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
             p.name
@@ -49,7 +49,9 @@ case class Play2Json(
           case p: ScalaPrimitive => PrimitiveWrapper.className(union, p)
           case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
         }
-        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
+        writer("x", union, t).map { writerMethod =>
+          s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> $writerMethod)"""
+        }
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -78,15 +80,25 @@ case class Play2Json(
     }
   }
 
-  private def writer(varName: String, union: ScalaUnion, ut: ScalaUnionType): String = {
+  private def writer(varName: String, union: ScalaUnion, ut: ScalaUnionType): Option[String] = {
     ut.model match {
-      case Some(model) => methodName(model.name, Writes) + ".writes(x)"
+      case Some(model) => {
+        Some(methodName(model.name, Writes) + ".writes(x)")
+      }
       case None => {
         ut.enum match {
-          case Some(enum) => methodName(enum.name, Writes) + ".writes(x)"
+          case Some(enum) => {
+            // No writer - we have an implicit enum => string conversion and
+            // then just use the native string json writer
+            None
+          }
           case None => ut.datatype match {
-            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(union, p), Writes) + ".writes(x)"
-            case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
+            case p: ScalaPrimitive => Some(
+              methodName(PrimitiveWrapper.className(union, p), Writes) + ".writes(x)"
+            )
+            case dt => {
+              None
+            }
           }
         }
       }

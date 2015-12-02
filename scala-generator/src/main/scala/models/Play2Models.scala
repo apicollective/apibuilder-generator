@@ -46,11 +46,17 @@ object Play2Models extends CodeGenerator {
       }
     }
 
+    // If we have an enum, we will have implicit converters
+    val implicitConverstions = ssd.enums match {
+      case Nil => ""
+      case atLeastOne => "\n    import scala.language.implicitConversions"
+    }
+
     val source = s"""$header$caseClasses
 
 package ${ssd.namespaces.models} {
 
-  package object json {
+  package object json {$implicitConverstions
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
