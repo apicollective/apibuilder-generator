@@ -116,6 +116,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 package com.bryzek.apidoc.example.union.types.v0.models {
 
   package object json {
+    import scala.language.implicitConversions
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
@@ -142,14 +143,12 @@ package com.bryzek.apidoc.example.union.types.v0.models {
     }
 
     implicit val jsonReadsApidocExampleUnionTypesBar = __.read[String].map(Bar.apply)
-    implicit val jsonWritesApidocExampleUnionTypesBar = new Writes[Bar] {
-      def writes(x: Bar) = JsString(x.toString)
-    }
 
     implicit val jsonReadsApidocExampleUnionTypesFoo = __.read[String].map(Foo.apply)
-    implicit val jsonWritesApidocExampleUnionTypesFoo = new Writes[Foo] {
-      def writes(x: Foo) = JsString(x.toString)
-    }
+
+    implicit def convertBarToString(value: com.bryzek.apidoc.example.union.types.v0.models.Bar) = value.toString
+
+    implicit def convertFooToString(value: com.bryzek.apidoc.example.union.types.v0.models.Foo) = value.toString
 
     implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[GuestUser] = {
       (
@@ -203,8 +202,8 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = new play.api.libs.json.Writes[Foobar] {
       def writes(obj: Foobar) = obj match {
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> x)
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> x)
         case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
       }
     }
