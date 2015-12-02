@@ -93,9 +93,8 @@ case class Play2Json(
       case None => {
         ut.enum match {
           case Some(enum) => {
-            // No writer - we have an implicit enum => string conversion and
-            // then just use the native string json writer
-            None
+            // depends on implicit enum => string conversion
+            Some("x")
           }
           case None => ut.datatype match {
             case p: ScalaPrimitive => Some(

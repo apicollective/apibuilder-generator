@@ -21,14 +21,13 @@ case class ScalaEnums(
   }
 
   /**
-    * Returns the implicits for json serialization.
+    * Returns the implicits for json serialization. Note that we only
+    * provide readers - writers are completed via the implicit
+    * conversion to string.
     */
   def buildJson(): String = {
     Seq(
-      s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)",
-      s"implicit val jsonWrites${ssd.name}${enum.name} = new Writes[${enum.name}] {",
-      s"  def writes(x: ${enum.name}) = JsString(x.toString)",
-      "}"
+      s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)"
     ).mkString("\n")
   }
 
