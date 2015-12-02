@@ -12,6 +12,10 @@ case class Play2Json(
   private case object Writes extends ReadWrite { override def toString = "Writes" }
 
   def generate(): String = {
+    PrimitiveWrapper(ssd).wrappers.foreach { wrapper =>
+      println("WRAPPER: " + wrapper.model.name)
+    }
+
     Seq(
       ssd.enums.map(conversions(_)).mkString("\n\n"),
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
@@ -93,9 +97,10 @@ case class Play2Json(
       case None => {
         ut.enum match {
           case Some(enum) => {
-            // No writer - we have an implicit enum => string conversion and
-            // then just use the native string json writer
-            None
+            // we have an implicit enum => string conversion
+            Some(
+              methodName(PrimitiveWrapper.className(union, ScalaPrimitive.String), Writes) + ".writes(x)"
+            )
           }
           case None => ut.datatype match {
             case p: ScalaPrimitive => Some(
