@@ -298,7 +298,7 @@ object ParserGenerator extends CodeGenerator {
         """def table(table: String) = prefix(table, ".")""",
         Seq(
           "def prefix(prefix: String, sep: String) = Mappings(",
-          union.types.map { t => t.name + " = " + modelFieldParameterType(t.name, t.datatype) + ".base" }.mkString(",\n").indent(2),
+          union.types.map { t => t.name + " = " + modelFieldParameterType(t.name, t.datatype) + ".prefix(prefix, sep)" }.mkString(",\n").indent(2),
           ")"
         ).mkString("\n")
       ).mkString("\n\n").indent(2),
