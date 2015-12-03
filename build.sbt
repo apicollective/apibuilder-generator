@@ -33,7 +33,7 @@ lazy val generator = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus" %% "play" % "1.4.0-M3" % "test"
+      "org.scalatestplus" %% "play" % "1.4.0-M4" % "test"
     )
   )
 
