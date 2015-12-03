@@ -90,7 +90,11 @@ case class ScalaUnionType(
   datatype: ScalaDatatype,
   enum: Option[ScalaEnum] = None,
   model: Option[ScalaModel] = None
-)
+) {
+
+  def name: String = ScalaUtil.quoteNameIfKeyword(Text.snakeToCamelCase(originalName))
+
+}
 
 object ScalaUnionType {
 

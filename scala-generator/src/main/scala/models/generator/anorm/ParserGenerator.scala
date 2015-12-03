@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUtil}
+import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUtil}
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
@@ -63,6 +63,10 @@ object ParserGenerator extends CodeGenerator {
               ssd.models.map(generateModel(_)) match {
                 case Nil => None
                 case els => Some(els.mkString("\n"))
+              },
+              ssd.unions.map(generateUnion(_)) match {
+                case Nil => None
+                case els => Some(els.mkString("\n"))
               }
             ).flatten.mkString("\n\n").indent(2),
             "}"
@@ -110,7 +114,7 @@ object ParserGenerator extends CodeGenerator {
       "",
       s"def parser(mappings: Mappings): RowParser[${model.qualifiedName}] = {",
       Seq(
-        model.fields.map { generateRowParser(model, _) }.mkString(" ~\n") + " map {",
+        model.fields.map { generateRowParser(_) }.mkString(" ~\n") + " map {",
         Seq(
           "case " + model.fields.map(parserName(_)).mkString(" ~ ") + " => {",
           Seq(
@@ -197,40 +201,40 @@ object ParserGenerator extends CodeGenerator {
     }
   }
 
-  private[this] def generateRowParser(model: ScalaModel, field: ScalaField): String = {
-    generateRowParser(model, field, field.datatype)
+  private[this] def generateRowParser(field: ScalaField): String = {
+    generateRowParser(field.name, field.datatype)
   }
 
-  private[this] def generateRowParser(model: ScalaModel, field: ScalaField, datatype: ScalaDatatype): String = {
+  private[this] def generateRowParser(fieldName: String, datatype: ScalaDatatype): String = {
     datatype match {
-      case f @ ScalaPrimitive.Boolean => s"SqlParser.bool(mappings.${field.name})"
-      case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.Integer => s"SqlParser.int(mappings.${field.name})"
-      case f @ ScalaPrimitive.Long => s"SqlParser.long(mappings.${field.name})"
-      case f @ ScalaPrimitive.DateIso8601 => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.DateTimeIso8601 => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.Object => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.String => s"SqlParser.str(mappings.${field.name})"
-      case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(field.name, f)
-      case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(field.name, f)
+      case f @ ScalaPrimitive.Boolean => s"SqlParser.bool(mappings.${fieldName})"
+      case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f)
+      case f @ ScalaPrimitive.Integer => s"SqlParser.int(mappings.${fieldName})"
+      case f @ ScalaPrimitive.Long => s"SqlParser.long(mappings.${fieldName})"
+      case f @ ScalaPrimitive.DateIso8601 => generatePrimitiveRowParser(fieldName, f)
+      case f @ ScalaPrimitive.DateTimeIso8601 => generatePrimitiveRowParser(fieldName, f)
+      case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(fieldName, f)
+      case f @ ScalaPrimitive.Object => generatePrimitiveRowParser(fieldName, f)
+      case f @ ScalaPrimitive.String => s"SqlParser.str(mappings.${fieldName})"
+      case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(fieldName, f)
+      case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(fieldName, f)
       case f @ ScalaDatatype.List(inner) => {
-        s"SqlParser.get[Seq[${inner.name}]](mappings.${field.name})"
+        s"SqlParser.get[Seq[${inner.name}]](mappings.${fieldName})"
       }
       case f @ ScalaDatatype.Map(inner) => {
-        s"SqlParser.get[Map[String, ${inner.name}]](mappings.${field.name})"
+        s"SqlParser.get[Map[String, ${inner.name}]](mappings.${fieldName})"
       }
       case f @ ScalaDatatype.Option(inner) => {
-        generateRowParser(model, field, inner) + ".?"
+        generateRowParser(fieldName, inner) + ".?"
       }
       case ScalaPrimitive.Enum(ns, name) => {
-        s"""${ns.anormParsers}.$name.parser(${ns.anormParsers}.$name.Mappings(mappings.${field.name}))"""
+        s"""${ns.anormParsers}.$name.parser(${ns.anormParsers}.$name.Mappings(mappings.${fieldName}))"""
       }
       case ScalaPrimitive.Model(ns, name) => {
-        s"""${ns.anormParsers}.$name.parser(mappings.${field.name})"""
+        s"""${ns.anormParsers}.$name.parser(mappings.${fieldName})"""
       }
       case ScalaPrimitive.Union(ns, name) => {
-        s"""${ns.anormParsers}.$name.parser(mappings.${field.name})"""
+        s"""${ns.anormParsers}.$name.parser(mappings.${fieldName})"""
       }
     }
   }
@@ -277,6 +281,56 @@ object ParserGenerator extends CodeGenerator {
       case true => Text.snakeToCamelCase(field.originalName) + "Instance"
       case false => field.name
     }
+  }
+
+  private[this] def generateUnion(union: ScalaUnion): String = {
+    Seq(
+      s"object ${union.name} {",
+      Seq(
+        generateUnionMappings(union),
+        generateUnionParser(union)
+      ).mkString("\n\n").indent(2),
+      "}\n"
+    ).mkString("\n\n")
+  }
+
+  private[this] def generateUnionMappings(union: ScalaUnion): String = {
+    Seq(
+      Seq(
+        "case class Mappings(",
+        union.types.map { t => s"${t.name}: ${modelFieldParameterType(t.name, t.datatype)}" }.mkString(",\n").indent(2),
+        ")"
+      ).mkString("\n"),
+      "object Mappings {",
+      Seq(
+        """val base = prefix("", "")""",
+        """def table(table: String) = prefix(table, ".")""",
+        Seq(
+          "def prefix(prefix: String, sep: String) = Mappings(",
+          union.types.map { t => t.name + " = " + modelFieldParameterType(t.name, t.datatype) + ".base" }.mkString(",\n").indent(2),
+          ")"
+        ).mkString("\n")
+      ).mkString("\n\n").indent(2),
+      "}"
+    ).mkString("\n\n")
+  }
+
+  private[this] def generateUnionParser(union: ScalaUnion): String = {
+    Seq(
+      s"""def table(table: String) = parser(Mappings.prefix(table, "."))""",
+      "",
+      s"def parser(mappings: Mappings): RowParser[${union.qualifiedName}] = {",
+      Seq(
+        union.types.map { t => generateRowParser(t.name, t.datatype) }.mkString(" |\n") + " map {",
+        Seq(
+          "case value => {",
+          "  value",
+          "}"
+        ).mkString("\n").indent(2),
+        "}"
+      ).mkString("\n").indent(2),
+      "}"
+    ).mkString("\n")
   }
 
 }

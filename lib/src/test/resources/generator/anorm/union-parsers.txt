@@ -1,0 +1,105 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm.parsers {
+
+  import test.apidoc.apidoctest.v0.anorm.conversions.Json._
+
+  object GuestUser {
+
+    case class Mappings(
+      guid: String = "guid"
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guid = s"${prefix}${sep}guid"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.GuestUser] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) map {
+        case guid => {
+          test.apidoc.apidoctest.v0.models.GuestUser(
+            guid = guid
+          )
+        }
+      }
+    }
+
+  }
+
+  object RegisteredUser {
+
+    case class Mappings(
+      guid: String = "guid"
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guid = s"${prefix}${sep}guid"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.RegisteredUser] = {
+      SqlParser.get[_root_.java.util.UUID](mappings.guid) map {
+        case guid => {
+          test.apidoc.apidoctest.v0.models.RegisteredUser(
+            guid = guid
+          )
+        }
+      }
+    }
+
+  }
+
+
+  object User {
+
+    case class Mappings(
+      guestUser: test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.Mappings,
+      registeredUser: test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.Mappings
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        guestUser = test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.Mappings.base,
+        registeredUser = test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.Mappings.base
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+      test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.parser(mappings.guestUser) |
+      test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.parser(mappings.registeredUser) map {
+        case value => {
+          value
+        }
+      }
+    }
+
+  }
+
+}

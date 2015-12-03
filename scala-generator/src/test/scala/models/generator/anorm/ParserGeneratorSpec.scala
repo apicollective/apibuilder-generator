@@ -29,12 +29,22 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
   """
 
   case class ServiceBuilder(
+    unions: Seq[String] = Nil,
     models: Seq[String] = Nil,
     enums: Seq[String] = Nil
   ) {
 
+    def addUnion(union: String): ServiceBuilder = {
+      ServiceBuilder(
+        unions = this.unions ++ Seq(union),
+        models = this.models,
+        enums = this.enums
+      )
+    }
+
     def addModel(model: String): ServiceBuilder = {
       ServiceBuilder(
+        unions = this.unions,
         models = this.models ++ Seq(model),
         enums = enums
       )
@@ -42,6 +52,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
 
     def addEnum(enum: String): ServiceBuilder = {
       ServiceBuilder(
+        unions = this.unions,
         models = this.models,
         enums = this.enums ++ Seq(enum)
       )
@@ -52,8 +63,8 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         "imports": [],
         "headers": [],
         "info": [],
-        "unions": [],
         "resources": [],
+        "unions": [${unions.mkString(",\n")}],
         "enums": [${enums.mkString(",\n")}],
         "models": [${models.mkString(",\n")}]
       """)
@@ -182,6 +193,45 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         files.map(_.name) should be(fileNames)
         models.TestHelper.assertEqualsFile("/generator/anorm/conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/list.txt", files.last.contents)
+      }
+    }
+  }
+
+  it("with union type") {
+    val form = ServiceBuilder().addModel("""
+    {
+      "name": "guest_user",
+      "plural": "guest_users",
+      "fields": [
+        { "name": "guid", "type": "uuid", "required": true }
+      ]
+    }
+    """).addModel("""
+    {
+      "name": "registered_user",
+      "plural": "registered_users",
+      "fields": [
+        { "name": "guid", "type": "uuid", "required": true }
+      ]
+    }
+    """).addUnion("""
+    {
+      "name": "user",
+      "plural": "users",
+      "types": [
+        { "type": "guest_user" },
+        { "type": "registered_user" }
+      ]
+    }
+    """).form
+
+    ParserGenerator.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(fileNames)
+        models.TestHelper.assertEqualsFile("/generator/anorm/union-parsers.txt", files.last.contents)
       }
     }
   }
