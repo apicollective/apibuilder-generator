@@ -1,10 +1,11 @@
 package scala.generator.anorm
 
-import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService}
+import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUtil}
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
+import lib.Text
 import lib.Text._
 
 object ParserGenerator extends CodeGenerator {
@@ -111,11 +112,11 @@ object ParserGenerator extends CodeGenerator {
       Seq(
         model.fields.map { generateRowParser(model, _) }.mkString(" ~\n") + " map {",
         Seq(
-          "case " + model.fields.map(_.name).mkString(" ~ ") + " => {",
+          "case " + model.fields.map(parserName(_)).mkString(" ~ ") + " => {",
           Seq(
             s"${model.qualifiedName}(",
             model.fields.map { f =>
-              s"${f.name} = ${f.name}"
+              s"${f.name} = ${parserName(f)}"
             }.mkString(",\n").indent(2),
             ")"
           ).mkString("\n").indent(2),
@@ -265,6 +266,17 @@ object ParserGenerator extends CodeGenerator {
       ).mkString("\n\n").indent(2),
       "}"
     ).mkString("\n\n")
+  }
+
+  /**
+    * Parsers require special quoting of keywords - if the field name
+    * is a keyword, we append Instance (back ticks will not compile)
+    */
+  private[this] def parserName(field: ScalaField): String = {
+    ScalaUtil.isKeyword(field.originalName) match {
+      case true => Text.snakeToCamelCase(field.originalName) + "Instance"
+      case false => field.name
+    }
   }
 
 }

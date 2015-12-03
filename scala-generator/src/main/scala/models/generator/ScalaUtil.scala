@@ -50,11 +50,14 @@ object ScalaUtil {
     }
   }
 
+  def isKeyword(value: String): Boolean = {
+    ReservedWords.contains(value)
+  }
+
   def quoteNameIfKeyword(name: String): String = {
-    if (ReservedWords.contains(name)) {
-      "`" + name + "`"
-    } else {
-      name
+    isKeyword(name) match {
+      case true => "`" + name + "`"
+      case false => name
     }
   }
 
