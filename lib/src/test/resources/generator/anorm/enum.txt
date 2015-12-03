@@ -29,7 +29,6 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
     }
 
   }
-
   object User {
 
     case class Mappings(

@@ -56,19 +56,10 @@ object ParserGenerator extends CodeGenerator {
             s"package ${ssd.namespaces.anormParsers} {",
             s"  import ${ssd.namespaces.anormConversions}.Json._",
             Seq(
-              ssd.enums.map(generateEnum(_)) match {
-                case Nil => None
-                case els => Some(els.mkString("\n"))
-              },
-              ssd.models.map(generateModel(_)) match {
-                case Nil => None
-                case els => Some(els.mkString("\n"))
-              },
-              ssd.unions.map(generateUnion(_)) match {
-                case Nil => None
-                case els => Some(els.mkString("\n"))
-              }
-            ).flatten.mkString("\n\n").indent(2),
+              ssd.enums.map(generateEnum(_)),
+              ssd.models.map(generateModel(_)),
+              ssd.unions.map(generateUnion(_))
+            ).filter(!_.isEmpty).flatten.mkString("\n").indent(2),
             "}"
           ).mkString("\n\n")
         )
