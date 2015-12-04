@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUtil}
+import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUtil}
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
@@ -26,7 +26,7 @@ object ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Conversions",
-              Conversions.code(ssd.namespaces),
+              Conversions.code(ssd.namespaces, ssd.unions),
               Some("Scala")
             ),
             ServiceFileNames.toFile(
@@ -57,8 +57,7 @@ object ParserGenerator extends CodeGenerator {
             s"  import ${ssd.namespaces.anormConversions}.Json._",
             Seq(
               ssd.enums.map(generateEnum(_)),
-              ssd.models.map(generateModel(_)),
-              ssd.unions.map(generateUnion(_))
+              ssd.models.map(generateModel(_))
             ).filter(!_.isEmpty).flatten.mkString("\n").indent(2),
             "}"
           ).mkString("\n\n")
@@ -126,7 +125,7 @@ object ParserGenerator extends CodeGenerator {
   @scala.annotation.tailrec
   private[this] def modelFieldParameterType(fieldName: String, datatype: ScalaDatatype): String = {
     datatype match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
         s"""String = "$fieldName""""
       }
       case ScalaDatatype.List(inner) => {
@@ -141,16 +140,13 @@ object ParserGenerator extends CodeGenerator {
       case ScalaPrimitive.Model(namespaces, name) => {
         s"${namespaces.anormParsers}.$name.Mappings"
       }
-      case ScalaPrimitive.Union(namespaces, name) => {
-        s"${namespaces.anormParsers}.$name.Mappings"
-      }
     }
   }
 
   @scala.annotation.tailrec
   private[this] def modelFieldParameterDefault(datatype: ScalaDatatype, name: String): String = {
     datatype match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
         "s\"${prefix}${sep}" + name + "\""
       }
       case ScalaDatatype.List(inner) => {
@@ -165,16 +161,13 @@ object ParserGenerator extends CodeGenerator {
       case ScalaPrimitive.Model(ns, className) => {
         s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, "$name").filter(!_.isEmpty).mkString("_"), "_")"""
       }
-      case ScalaPrimitive.Union(ns, className) => {
-        s"""${ns.anormParsers}.$className.Mappings.prefix(Seq(prefix, "$name").filter(!_.isEmpty).mkString("_"), "_")"""
-      }
     }
   }
 
   @scala.annotation.tailrec
   private[this] def modelFieldParameterNewParserDefault(datatype: ScalaDatatype, name: String): String = {
     datatype match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
         "s\"${prefix}_" + name + "\""
       }
       case ScalaDatatype.List(inner) => {
@@ -186,7 +179,7 @@ object ParserGenerator extends CodeGenerator {
       case ScalaDatatype.Option(inner) => {
         modelFieldParameterNewParserDefault(inner, name)
       }
-      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) => {
+      case ScalaPrimitive.Model(_, _) => {
         "TODO(s\"${prefix}_" + name + "\")"
       }
     }
@@ -225,7 +218,7 @@ object ParserGenerator extends CodeGenerator {
         s"""${ns.anormParsers}.$name.parser(mappings.${fieldName})"""
       }
       case ScalaPrimitive.Union(ns, name) => {
-        s"""${ns.anormParsers}.$name.parser(mappings.${fieldName})"""
+        s"SqlParser.get[${ns.unions}.$name](mappings.${fieldName})"
       }
     }
   }
@@ -272,56 +265,6 @@ object ParserGenerator extends CodeGenerator {
       case true => Text.snakeToCamelCase(field.originalName) + "Instance"
       case false => field.name
     }
-  }
-
-  private[this] def generateUnion(union: ScalaUnion): String = {
-    Seq(
-      s"object ${union.name} {",
-      Seq(
-        generateUnionMappings(union),
-        generateUnionParser(union)
-      ).mkString("\n\n").indent(2),
-      "}\n"
-    ).mkString("\n\n")
-  }
-
-  private[this] def generateUnionMappings(union: ScalaUnion): String = {
-    Seq(
-      Seq(
-        "case class Mappings(",
-        union.types.map { t => s"${t.name}: ${modelFieldParameterType(t.name, t.datatype)}" }.mkString(",\n").indent(2),
-        ")"
-      ).mkString("\n"),
-      "object Mappings {",
-      Seq(
-        """val base = prefix("", "")""",
-        """def table(table: String) = prefix(table, ".")""",
-        Seq(
-          "def prefix(prefix: String, sep: String) = Mappings(",
-          union.types.map { t => t.name + " = " + modelFieldParameterType(t.name, t.datatype) + ".prefix(prefix, sep)" }.mkString(",\n").indent(2),
-          ")"
-        ).mkString("\n")
-      ).mkString("\n\n").indent(2),
-      "}"
-    ).mkString("\n\n")
-  }
-
-  private[this] def generateUnionParser(union: ScalaUnion): String = {
-    Seq(
-      s"""def table(table: String) = parser(Mappings.prefix(table, "."))""",
-      "",
-      s"def parser(mappings: Mappings): RowParser[${union.qualifiedName}] = {",
-      Seq(
-        union.types.map { t => generateRowParser(t.name, t.datatype) }.mkString(" |\n") + " map {",
-        Seq(
-          "case value => {",
-          "  value",
-          "}"
-        ).mkString("\n").indent(2),
-        "}"
-      ).mkString("\n").indent(2),
-      "}"
-    ).mkString("\n")
   }
 
 }

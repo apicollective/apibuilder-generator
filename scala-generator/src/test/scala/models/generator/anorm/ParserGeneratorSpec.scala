@@ -231,6 +231,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
+        models.TestHelper.assertEqualsFile("/generator/anorm/union-conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/union-parsers.txt", files.last.contents)
       }
     }
