@@ -1,10 +1,9 @@
 package scala.models
 
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
-import lib.Text._
-import lib.generator.CodeGenerator
+import lib.generator.Text._
+import lib.generator.{CodeGenerator, ServiceFileNames}
 import scala.generator.{ScalaEnums, ScalaCaseClasses, ScalaService}
-import generator.ServiceFileNames
 
 object Play2Models extends CodeGenerator {
 

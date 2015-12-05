@@ -1,7 +1,6 @@
 package scala.generator
 
-import lib.VersionTag
-import lib.generator.GeneratorUtil
+import lib.generator.{GeneratorUtil, VersionTag}
 import scala.models.{FeatureMigration, JsonImports}
 import com.bryzek.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
@@ -10,8 +9,8 @@ case class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,
   ssd: ScalaService
 ) {
-  import lib.Text
-  import lib.Text._
+  import lib.generator.Text
+  import lib.generator.Text._
 
   private[this] val namespaces = Namespaces(config.namespace)
 
@@ -27,7 +26,7 @@ case class ScalaClientMethodGenerator(
 
   def accessors(): String = {
     sortedResources.map { resource =>
-      val methodName = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(resource.plural).toLowerCase)
+      val methodName = snakeToCamelCase(camelCaseToUnderscore(resource.plural).toLowerCase)
       config.accessor(methodName, resource.plural)
     }.mkString("\n\n")
   }
@@ -249,8 +248,8 @@ case class ScalaClientMethodGenerator(
     response: String,
     comments: Option[String]
   ) {
-    import lib.Text._
-    
+    import lib.generator.Text._
+
     private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
 
     val interface: String = {

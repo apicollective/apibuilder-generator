@@ -1,6 +1,6 @@
 package models.generator
 
-import lib.Constants
+import lib.generator.Constants
 
 /**
  *

@@ -6,14 +6,13 @@ import scala.util.Success
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models._
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-import lib.{Methods, Text, VersionTag}
-import lib.Text._
-import lib.generator.{CodeGenerator, Datatype, GeneratorUtil}
+import lib.generator.{Methods, Text, VersionTag}
+import lib.generator.Text._
+import lib.generator.{CodeGenerator, Datatype, GeneratorUtil, ServiceFileNames}
 
 import scala.collection.mutable.ListBuffer
 import play.api.Logger
 import play.api.libs.json._
-import generator.ServiceFileNames
 
 object RubyUtil {
 
@@ -54,8 +53,8 @@ object RubyUtil {
     name: String
   ): String = {
     quoteNameIfKeyword(
-      lib.Text.safeName(
-        lib.Text.initLowerCase(lib.Text.splitIntoWords(name).map(_.toLowerCase).mkString("_"))
+      safeName(
+        initLowerCase(splitIntoWords(name).map(_.toLowerCase).mkString("_"))
       )
     )
   }
@@ -64,15 +63,15 @@ object RubyUtil {
     name: String,
     multiple: Boolean = false
   ): String = {
-    val baseName =lib.Text.safeName(
+    val baseName = safeName(
       if (name == name.toUpperCase) {
-       lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")
+       initCap(splitIntoWords(name).map(_.toLowerCase)).mkString("")
       } else {
-       lib.Text.initCap(snakeToCamelCase(name))
+       initCap(snakeToCamelCase(name))
       }
     )
 
-    quoteNameIfKeyword(if (multiple) lib.Text.pluralize(baseName) else baseName)
+    quoteNameIfKeyword(if (multiple) pluralize(baseName) else baseName)
   }
 
   def toConstant(
@@ -105,7 +104,7 @@ object RubyUtil {
 
   def toVariable(datatype: Datatype): String = {
     datatype match {
-      case c: Datatype.Container => lib.Text.pluralize(toVariable(c.inner))
+      case c: Datatype.Container => pluralize(toVariable(c.inner))
       case u: Datatype.UserDefined => RubyUtil.toVariable(u.name)
       case _: Datatype.Primitive => RubyUtil.toDefaultVariable()
     }
@@ -115,9 +114,9 @@ object RubyUtil {
     name: String,
     multiple: Boolean = false
   ): String = {
-    val value = lib.Text.initLowerCase(lib.Text.camelCaseToUnderscore(name).toLowerCase)
+    val value = initLowerCase(camelCaseToUnderscore(name).toLowerCase)
     multiple match {
-      case true => lib.Text.pluralize(value)
+      case true => pluralize(value)
       case false => value
     }
   }
@@ -298,10 +297,10 @@ object RubyClientGenerator extends CodeGenerator {
     val formatted = if (value == value.toUpperCase) {
       value.toLowerCase
     } else {
-      lib.Text.camelCaseToUnderscore(value)
+      camelCaseToUnderscore(value)
     }
 
-    Text.splitIntoWords(formatted).map(lib.Text.initLowerCase(_)).mkString("_")
+    Text.splitIntoWords(formatted).map(initLowerCase(_)).mkString("_")
   }
 
 }
@@ -486,7 +485,7 @@ ${headers.rubyModuleConstants.indent(2)}
         }
       }.mkString("/")
 
-      val methodName =lib.Text.camelCaseToUnderscore(
+      val methodName = camelCaseToUnderscore(
         GeneratorUtil.urlToMethodName(
           resource.plural,
           op.method,

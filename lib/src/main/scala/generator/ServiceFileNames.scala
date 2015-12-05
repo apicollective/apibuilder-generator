@@ -1,7 +1,7 @@
-package generator
+package lib.generator
 
 import com.bryzek.apidoc.generator.v0.models.File
-import lib.{Text, VersionTag}
+import lib.generator.{Text, VersionTag}
 
 object ServiceFileNames {
 

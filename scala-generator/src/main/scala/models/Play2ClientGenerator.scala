@@ -1,11 +1,10 @@
 package scala.models
 
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
-import lib.Text._
-import lib.generator.CodeGenerator
+import lib.generator.{CodeGenerator, ServiceFileNames}
+import lib.generator.Text._
 import scala.generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, ScalaClientCommon}
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
-import generator.ServiceFileNames
 
 case class PlayFrameworkVersion(
   name: String,

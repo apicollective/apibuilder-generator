@@ -5,7 +5,7 @@ import java.util.UUID
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import play.api.libs.json._
 
-import lib.Text
+import lib.generator.Text
 import lib.generator.Datatype
 
 sealed trait JavaDatatype {

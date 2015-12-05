@@ -1,6 +1,6 @@
 package models.generator
 
-import lib.Text
+import lib.generator.Text
 
 /**
  *

@@ -1,7 +1,7 @@
 package scala.generator
 
 import com.bryzek.apidoc.spec.v0.models._
-import lib.{Methods, Text}
+import lib.generator.{Methods, Text}
 import lib.generator.{Datatype, DatatypeResolver, GeneratorUtil}
 import scala.models.Util
 
@@ -273,7 +273,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
       val variableName = datatype.toVariableName
       (
         Some(variableName),
-        lib.Text.initCap(variableName) + "Response"
+        Text.initCap(variableName) + "Response"
       )
     }
   }

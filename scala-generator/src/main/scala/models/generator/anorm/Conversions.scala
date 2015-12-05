@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import lib.Text._
+import lib.generator.Text._
 import scala.generator.{Namespaces, ScalaPrimitive, ScalaUnion}
 
 object Conversions {

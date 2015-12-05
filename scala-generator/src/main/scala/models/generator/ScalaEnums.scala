@@ -1,6 +1,6 @@
 package scala.generator
 
-import lib.Text
+import lib.generator.Text
 
 case class ScalaEnums(
   ssd: ScalaService,
@@ -10,7 +10,7 @@ case class ScalaEnums(
   private[this] val unions = ssd.unionsForEnum(enum)
 
   def build(): String = {
-    import lib.Text._
+    import lib.generator.Text._
     Seq(
       enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
       s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse(""),
@@ -33,7 +33,7 @@ case class ScalaEnums(
   }
 
   private def buildValues(): String = {
-    enum.values.map { value => 
+    enum.values.map { value =>
       Seq(
         value.description.map { desc => ScalaUtil.textToComment(desc) },
         Some(s"""case object ${value.name} extends ${enum.name} { override def toString = "${value.originalName}" }""")

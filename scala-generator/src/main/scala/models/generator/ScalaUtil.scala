@@ -2,8 +2,8 @@ package scala.generator
 
 import java.util.UUID
 
-import lib.Text._
 import lib.generator.{Datatype, GeneratorUtil}
+import lib.generator.Text._
 import play.api.libs.json._
 import org.joda.time.DateTime
 
@@ -61,11 +61,11 @@ object ScalaUtil {
   }
 
   def toClassName(name: String) = {
-    val baseName =lib.Text.safeName(
+    val baseName =safeName(
       if (name == name.toUpperCase) {
-       lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")
+       initCap(splitIntoWords(name).map(_.toLowerCase)).mkString("")
       } else {
-       lib.Text.initCap(snakeToCamelCase(name))
+       initCap(snakeToCamelCase(name))
       }
     )
 
