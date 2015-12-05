@@ -103,7 +103,7 @@ object JavaClasses extends CodeGenerator {
     }
 
     def generateUndefinedUnionType(union: Union): File = {
-      import lib.Datatype
+      import lib.generator.Datatype
 
       val className = JavaUtil.toClassName(union.name)
       val name = s"${className}UndefinedType"

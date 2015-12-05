@@ -2,9 +2,8 @@ package scala.generator
 
 import java.util.UUID
 
-import lib.Datatype
 import lib.Text._
-import lib.generator.GeneratorUtil
+import lib.generator.{Datatype, GeneratorUtil}
 import play.api.libs.json._
 import org.joda.time.DateTime
 

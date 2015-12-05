@@ -5,7 +5,8 @@ import java.util.UUID
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import play.api.libs.json._
 
-import lib.{Datatype, Text}
+import lib.Text
+import lib.generator.Datatype
 
 sealed trait JavaDatatype {
   def apidocType: String
@@ -240,7 +241,7 @@ object JavaDatatype {
   private def parseQualifiedName(name: String): (Option[String], String) = {
     name.split("\\.").toList match {
       case n :: Nil => (None, JavaUtil.toClassName(n))
-      case multiple => 
+      case multiple =>
         val n = multiple.last
         val ns = multiple.dropRight(1).mkString(".")
         (Some(ns), JavaUtil.toClassName(n))

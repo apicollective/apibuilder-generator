@@ -6,9 +6,9 @@ import scala.util.Success
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models._
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-import lib.{Datatype, Methods, Text, VersionTag}
+import lib.{Methods, Text, VersionTag}
 import lib.Text._
-import lib.generator.{CodeGenerator, GeneratorUtil}
+import lib.generator.{CodeGenerator, Datatype, GeneratorUtil}
 
 import scala.collection.mutable.ListBuffer
 import play.api.Logger
@@ -156,7 +156,7 @@ object RubyUtil {
   private def rubyDefault(json: JsValue, datatype: Datatype): String = {
     import Datatype._
     datatype match {
-      case Container.Option(inner) => 
+      case Container.Option(inner) =>
         sys.error(s"parsing default `${json}` for datatype ${datatype}")
       case Container.List(inner) => {
         val seq = json.as[Seq[JsValue]].map { value =>

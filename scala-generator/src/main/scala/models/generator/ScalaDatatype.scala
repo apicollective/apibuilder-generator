@@ -3,8 +3,7 @@ package scala.generator
 import java.util.UUID
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 
-import lib.Datatype
-import lib.generator.GeneratorUtil
+import lib.generator.{Datatype, GeneratorUtil}
 import lib.Text.initLowerCase
 import play.api.libs.json._
 import play.api.Logger

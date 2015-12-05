@@ -1,6 +1,6 @@
 package scala.generator
 
-import lib.Datatype
+import lib.generator.Datatype
 
 import com.bryzek.apidoc.spec.v0.models.{Field, Model}
 

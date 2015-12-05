@@ -1,8 +1,8 @@
 package scala.generator
 
 import com.bryzek.apidoc.spec.v0.models._
-import lib.{Datatype, DatatypeResolver, Methods, Text}
-import lib.generator.GeneratorUtil
+import lib.{Methods, Text}
+import lib.generator.{Datatype, DatatypeResolver, GeneratorUtil}
 import scala.models.Util
 
 case class ScalaService(
@@ -15,7 +15,7 @@ case class ScalaService(
   val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 
   val name = ScalaUtil.toClassName(service.name)
- 
+
   def unionClassName(name: String) = namespaces.unions + "." + ScalaUtil.toClassName(name)
   def modelClassName(name: String) = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String) = namespaces.enums + "." + ScalaUtil.toClassName(name)
