@@ -237,4 +237,27 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  it("model with fields that are composite names") {
+    val form = ServiceBuilder().addModel("""
+    {
+      "name": "location",
+      "plural": "locations",
+      "fields": [
+        { "name": "ip_address", "type": "string", "required": true }
+      ]
+    }
+    """).form
+
+    ParserGenerator.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(fileNames)
+        models.TestHelper.assertEqualsFile("/generator/anorm/location-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/location-parsers.txt", files.last.contents)
+      }
+    }
+  }
+
 }

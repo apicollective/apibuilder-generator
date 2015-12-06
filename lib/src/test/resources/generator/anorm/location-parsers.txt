@@ -1,0 +1,39 @@
+import anorm._
+
+package test.apidoc.apidoctest.v0.anorm.parsers {
+
+  import test.apidoc.apidoctest.v0.anorm.conversions.Json._
+
+  object Location {
+
+    case class Mappings(
+      ipAddress: String = "ip_address"
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        ipAddress = s"${prefix}${sep}ip_address"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Location] = {
+      SqlParser.str(mappings.ipAddress) map {
+        case ipAddress => {
+          test.apidoc.apidoctest.v0.models.Location(
+            ipAddress = ipAddress
+          )
+        }
+      }
+    }
+
+  }
+
+}

@@ -81,7 +81,7 @@ object ParserGenerator extends CodeGenerator {
     Seq(
       Seq(
         "case class Mappings(",
-        model.fields.map { f => s"${f.name}: ${modelFieldParameterType(f.name, f.datatype)}" }.mkString(",\n").indent(2),
+        model.fields.map { f => s"${f.name}: ${modelFieldParameterType(f.datatype, f.originalName)}" }.mkString(",\n").indent(2),
         ")"
       ).mkString("\n"),
       "object Mappings {",
@@ -123,19 +123,19 @@ object ParserGenerator extends CodeGenerator {
   }
 
   @scala.annotation.tailrec
-  private[this] def modelFieldParameterType(fieldName: String, datatype: ScalaDatatype): String = {
+  private[this] def modelFieldParameterType(datatype: ScalaDatatype, fieldName: String): String = {
     datatype match {
       case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
         s"""String = "$fieldName""""
       }
       case ScalaDatatype.List(inner) => {
-        modelFieldParameterType(fieldName, inner)
+        modelFieldParameterType(inner, fieldName)
       }
       case ScalaDatatype.Map(inner) => {
-        modelFieldParameterType(fieldName, inner)
+        modelFieldParameterType(inner, fieldName)
       }
       case ScalaDatatype.Option(inner) => {
-        modelFieldParameterType(fieldName, inner)
+        modelFieldParameterType(inner, fieldName)
       }
       case ScalaPrimitive.Model(namespaces, name) => {
         s"${namespaces.anormParsers}.$name.Mappings"
