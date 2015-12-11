@@ -1,6 +1,7 @@
 package scala.generator.anorm
 
 import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUtil}
+import scala.models.ApidocComments
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
@@ -12,6 +13,8 @@ object ParserGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val ssd = new ScalaService(form.service)
+
+    val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
 
     generateCode(ssd) match {
       case None => {
@@ -26,7 +29,7 @@ object ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Conversions",
-              Conversions.code(ssd.namespaces, ssd.unions),
+              header ++ Conversions.code(ssd.namespaces, ssd.unions),
               Some("Scala")
             ),
             ServiceFileNames.toFile(
@@ -35,7 +38,7 @@ object ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Parsers",
-              code,
+              header ++ code,
               Some("Scala")
             )
           )
