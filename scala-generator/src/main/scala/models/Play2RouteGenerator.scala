@@ -125,7 +125,7 @@ private[models] case class Play2Route(
     value: String
   ): String = primitive match {
     case ScalaPrimitive.String | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid => {
-      ScalaUtil.wrapInQuotes(value)
+      value
     }
     case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal => {
       value
