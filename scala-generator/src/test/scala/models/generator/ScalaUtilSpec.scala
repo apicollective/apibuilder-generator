@@ -165,7 +165,9 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
     }
 
     it ("default: 956169ba-d25e-11e4-8cf3-2bf83a2580ee, datatype: uuid") {
-      ScalaUtil.scalaDefault("956169ba-d25e-11e4-8cf3-2bf83a2580ee", ScalaPrimitive.Uuid) should be("new UUID(-7682743238203141660, -8290234143931531026)")
+      ScalaUtil.scalaDefault("956169ba-d25e-11e4-8cf3-2bf83a2580ee", ScalaPrimitive.Uuid) should be(
+        """_root_.java.util.UUID.fromString("956169ba-d25e-11e4-8cf3-2bf83a2580ee")"""
+      )
     }
 
     it ("""default: ["foo"], datatype: [string]""") {

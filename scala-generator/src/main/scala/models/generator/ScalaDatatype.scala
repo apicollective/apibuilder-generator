@@ -164,7 +164,7 @@ object ScalaPrimitive {
 
     override def default(value: String) = ScalaUtil.wrapInQuotes(value)
 
-    override protected def default(json: JsValue) = s""""$json.as[String]}""""
+    override protected def default(json: JsValue) = default(json.as[String])
   }
 
   case object Unit extends ScalaPrimitive {
@@ -186,10 +186,8 @@ object ScalaPrimitive {
 
     override def default(value: String) = "_root_.java.util.UUID.fromString(" + ScalaUtil.wrapInQuotes(value) + ")"
 
-    override protected def default(json: JsValue) = {
-      val uuid = json.as[UUID]
-      s"new _root_.java.util.UUID(${uuid.getMostSignificantBits}, ${uuid.getLeastSignificantBits})"
-    }
+    override protected def default(json: JsValue) = default(json.as[UUID].toString)
+
   }
 
   case class Model(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
