@@ -122,10 +122,11 @@ object ScalaPrimitive {
       s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
     }
 
-    override def default(value: String) = default(JsString(value))
+    override def default(value: String) = {
+      "_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(" + ScalaUtil.wrapInQuotes(value) + ")"
+    }
 
     override protected def default(json: JsValue) = {
-      val dt = dateTimeParser.parseDateTime(json.as[String])
       // TODO would like to use the constructor for DateTime, since that would
       // be faster code, but things get quite tricky because of time zones :(
       s"""_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${json})"""
@@ -161,9 +162,9 @@ object ScalaPrimitive {
       s"$varName"
     }
 
-    override def default(value: String) = default(JsString(value))
+    override def default(value: String) = ScalaUtil.wrapInQuotes(value)
 
-    override protected def default(json: JsValue) = s""""${json.as[String]}""""
+    override protected def default(json: JsValue) = default(json.as[String])
   }
 
   case object Unit extends ScalaPrimitive {
@@ -183,12 +184,10 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override def default(value: String) = default(JsString(value))
+    override def default(value: String) = "_root_.java.util.UUID.fromString(" + ScalaUtil.wrapInQuotes(value) + ")"
 
-    override protected def default(json: JsValue) = {
-      val uuid = json.as[UUID]
-      s"new UUID(${uuid.getMostSignificantBits}, ${uuid.getLeastSignificantBits})"
-    }
+    override protected def default(json: JsValue) = default(json.as[UUID].toString)
+
   }
 
   case class Model(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
