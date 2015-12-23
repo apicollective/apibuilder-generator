@@ -1,7 +1,7 @@
 package scala.models
 
 import lib.Text._
-import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
 
 case class Play2Json(
   ssd: ScalaService
@@ -13,10 +13,15 @@ case class Play2Json(
 
   def generate(): String = {
     Seq(
+      ssd.enums.map(conversions(_)).mkString("\n\n"),
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
       PrimitiveWrapper(ssd).wrappers.map(w => readersAndWriters(w.model)).mkString("\n\n"),
       ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
     ).filter(!_.trim.isEmpty).mkString("\n\n")    
+  }
+
+  private def conversions(enum: ScalaEnum): String = {
+    s"implicit def convert${enum.name}ToString(value: ${enum.qualifiedName}) = value.toString"
   }
 
   private def readersAndWriters(union: ScalaUnion): String = {
@@ -41,7 +46,7 @@ case class Play2Json(
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       s"  def writes(obj: ${union.name}) = obj match {",
-      union.types.map { t =>
+      union.types.flatMap { t =>
         val typeName = t.datatype match {
           case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
             p.name
@@ -49,7 +54,9 @@ case class Play2Json(
           case p: ScalaPrimitive => PrimitiveWrapper.className(union, p)
           case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
         }
-        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
+        writer("x", union, t).map { writerMethod =>
+          s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> $writerMethod)"""
+        }
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -78,15 +85,24 @@ case class Play2Json(
     }
   }
 
-  private def writer(varName: String, union: ScalaUnion, ut: ScalaUnionType): String = {
+  private def writer(varName: String, union: ScalaUnion, ut: ScalaUnionType): Option[String] = {
     ut.model match {
-      case Some(model) => methodName(model.name, Writes) + ".writes(x)"
+      case Some(model) => {
+        Some(methodName(model.name, Writes) + ".writes(x)")
+      }
       case None => {
         ut.enum match {
-          case Some(enum) => methodName(enum.name, Writes) + ".writes(x)"
+          case Some(enum) => {
+            // depends on implicit enum => string conversion
+            Some("x")
+          }
           case None => ut.datatype match {
-            case p: ScalaPrimitive => methodName(PrimitiveWrapper.className(union, p), Writes) + ".writes(x)"
-            case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
+            case p: ScalaPrimitive => Some(
+              methodName(PrimitiveWrapper.className(union, p), Writes) + ".writes(x)"
+            )
+            case dt => {
+              None
+            }
           }
         }
       }
@@ -134,10 +150,15 @@ case class Play2Json(
   private[models] def writers(model: ScalaModel): String = {
     model.fields match {
       case field :: Nil => {
+        val writer = field.datatype match {
+          case ScalaPrimitive.Enum(_, _) => s"play.api.libs.json.JsString(x.${field.name}.toString)"
+          case _ => s"play.api.libs.json.Json.toJson(x.${field.name})"
+        }
+
         Seq(
           s"${identifier(model.name, Writes)} = new play.api.libs.json.Writes[${model.name}] {",
           s"  def writes(x: ${model.name}) = play.api.libs.json.Json.obj(",
-          s"""    "${field.originalName}" -> play.api.libs.json.Json.toJson(x.${field.name})""",
+          s"""    "${field.originalName}" -> $writer""",
           "  )",
           "}"
         ).mkString("\n")

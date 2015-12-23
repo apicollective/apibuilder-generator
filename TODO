@@ -1,1 +1,7 @@
-add tests for play 2.2 client with uuid type - stand alone and in a collection
+  package object json {
+    import scala.language.implicitConversions
+
+    implicit def serializableToString(value: Serializable) = value.toString
+
+    remove enum writer
+  }

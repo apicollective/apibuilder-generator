@@ -1,9 +1,3 @@
 implicit val jsonReadsApiDocTestAgeGroup = __.read[String].map(AgeGroup.apply)
-implicit val jsonWritesApiDocTestAgeGroup = new Writes[AgeGroup] {
-  def writes(x: AgeGroup) = JsString(x.toString)
-}
 
 implicit val jsonReadsApiDocTestGenre = __.read[String].map(Genre.apply)
-implicit val jsonWritesApiDocTestGenre = new Writes[Genre] {
-  def writes(x: Genre) = JsString(x.toString)
-}

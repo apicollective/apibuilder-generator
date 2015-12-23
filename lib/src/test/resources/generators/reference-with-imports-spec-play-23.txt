@@ -112,6 +112,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
 package com.bryzek.apidoc.reference.api.v0.models {
 
   package object json {
+    import scala.language.implicitConversions
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
@@ -139,9 +140,8 @@ package com.bryzek.apidoc.reference.api.v0.models {
     }
 
     implicit val jsonReadsApidocReferenceApiAgeGroup = __.read[String].map(AgeGroup.apply)
-    implicit val jsonWritesApidocReferenceApiAgeGroup = new Writes[AgeGroup] {
-      def writes(x: AgeGroup) = JsString(x.toString)
-    }
+
+    implicit def convertAgeGroupToString(value: com.bryzek.apidoc.reference.api.v0.models.AgeGroup) = value.toString
 
     implicit def jsonReadsApidocReferenceApiBig: play.api.libs.json.Reads[Big] = {
       (
