@@ -1,4 +1,4 @@
-package lib
+package lib.generator
 
 import scala.util.Try
 import scala.util.Success
@@ -93,7 +93,7 @@ case class DatatypeResolver(
 
   /**
     * Parses a type string into an instance of a Datatype.
-    * 
+    *
     * @param value: Examples: "string", "uuid"
     */
   def parse(value: String, required: Boolean): Try[Datatype] = {

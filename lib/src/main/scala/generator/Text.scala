@@ -1,4 +1,4 @@
-package lib
+package lib.generator
 
 import scala.collection.immutable.StringOps
 
@@ -134,7 +134,7 @@ object Text {
   private[this] val WordDelimeterRx = "_|\\-|\\.|:".r
 
   def splitIntoWords(value: String): Seq[String] = {
-    WordDelimeterRx.split(lib.Text.camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
+    WordDelimeterRx.split(camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
   }
 
   def snakeToCamelCase(value: String) = {

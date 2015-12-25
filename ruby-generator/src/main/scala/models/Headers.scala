@@ -1,8 +1,8 @@
 package ruby.models
 
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import lib.VersionTag
-import lib.Text._
+import lib.generator.VersionTag
+import lib.generator.Text._
 
 case class Headers(
   form: InvocationForm

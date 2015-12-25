@@ -4,10 +4,8 @@ import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaM
 import scala.models.ApidocComments
 import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
-import generator.ServiceFileNames
-import lib.generator.CodeGenerator
-import lib.Text
-import lib.Text._
+import lib.generator.{CodeGenerator, ServiceFileNames, Text}
+import lib.generator.Text._
 
 object ParserGenerator extends CodeGenerator {
 

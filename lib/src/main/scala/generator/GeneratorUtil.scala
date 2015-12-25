@@ -1,9 +1,7 @@
 package lib.generator
 
 import com.bryzek.apidoc.spec.v0.models.{Method, ParameterLocation, Service}
-import lib.{Datatype, DatatypeResolver}
-import lib.Text
-import lib.Text._
+import lib.generator.Text._
 
 object GeneratorUtil {
 
@@ -85,11 +83,11 @@ object GeneratorUtil {
 
     val pieces = url.split("/").filter { !_.isEmpty }.filter { w => !pathsToSkip.contains(formatName(w)) }
 
-    val named = pieces.filter { _.startsWith(":") }.map { name =>lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name.slice(1, name.length)))) }
+    val named = pieces.filter { _.startsWith(":") }.map { name =>initCap(safeName(underscoreAndDashToInitCap(name.slice(1, name.length)))) }
     val notNamed = pieces.
       filter { !_.startsWith(":") }.
       filter { _ != resourcePlural.toLowerCase }.
-      map( name =>lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name))) )
+      map( name =>initCap(safeName(underscoreAndDashToInitCap(name))) )
 
     if (named.isEmpty && notNamed.isEmpty) {
       method.toString.toLowerCase
@@ -111,7 +109,7 @@ object GeneratorUtil {
     * membership_request
     */
   private def formatName(name: String): String = {
-    Text.splitIntoWords(Text.camelCaseToUnderscore(name)).mkString("_")
+    splitIntoWords(camelCaseToUnderscore(name)).mkString("_")
   }
 
   /**

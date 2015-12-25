@@ -1,6 +1,6 @@
 package scala.models
 
-import lib.generator.{CodeGenerator, GeneratorUtil}
+import lib.generator.{CodeGenerator, GeneratorUtil, Text}
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models._
 import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaOperation, ScalaParameter, ScalaResource, ScalaService, ScalaUtil}
@@ -92,7 +92,7 @@ private[models] case class Play2Route(
   )
 
   val method = "%s.%s".format(
-    "controllers." + lib.Text.underscoreAndDashToInitCap(resource.plural),
+    "controllers." + Text.underscoreAndDashToInitCap(resource.plural),
     GeneratorUtil.urlToMethodName(resource.plural, op.method, url)
   )
 

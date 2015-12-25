@@ -1,6 +1,6 @@
 package scala.generator
 
-import lib.Text._
+import lib.generator.Text._
 
 object ScalaClientObject {
 

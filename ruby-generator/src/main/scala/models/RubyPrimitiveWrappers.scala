@@ -2,7 +2,7 @@ package ruby.models
 
 import scala.util.Try
 
-import lib.Datatype.Primitive
+import lib.generator.Datatype.Primitive
 
 import com.bryzek.apidoc.spec.v0.models.{Field, Model, Service, Union}
 

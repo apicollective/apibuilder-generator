@@ -3,9 +3,8 @@ package scala.generator
 import java.util.UUID
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 
-import lib.Datatype
-import lib.generator.GeneratorUtil
-import lib.Text.initLowerCase
+import lib.generator.{Datatype, GeneratorUtil}
+import lib.generator.Text.{initLowerCase, pluralize}
 import play.api.libs.json._
 import play.api.Logger
 
@@ -233,7 +232,7 @@ object ScalaDatatype {
   sealed abstract class Container(inner: ScalaDatatype) extends ScalaDatatype {
     override def toVariableName = inner match {
       case _: Container => inner.toVariableName
-      case _ => lib.Text.pluralize(inner.toVariableName)
+      case _ => pluralize(inner.toVariableName)
     }
   }
 

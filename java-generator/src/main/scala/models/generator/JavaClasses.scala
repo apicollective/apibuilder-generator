@@ -3,8 +3,7 @@ package models.generator
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import com.bryzek.apidoc.spec.v0.models.{EnumValue, Union, Field, Service, Model, Enum}
 
-import lib.Text
-import lib.generator.{GeneratorUtil, CodeGenerator}
+import lib.generator.{GeneratorUtil, CodeGenerator, Text}
 import models.generator.JavaDatatypes.NativeDatatype
 
 /**
@@ -75,7 +74,7 @@ object JavaClasses extends CodeGenerator {
       val className = JavaUtil.toClassName(enum.name)
 
       val enumDeclaration = {
-        import lib.Text._
+        import lib.generator.Text._
 
         commentFromOpt(enum.description) +
           s"public enum $className {\n" +
@@ -103,7 +102,7 @@ object JavaClasses extends CodeGenerator {
     }
 
     def generateUndefinedUnionType(union: Union): File = {
-      import lib.Datatype
+      import lib.generator.Datatype
 
       val className = JavaUtil.toClassName(union.name)
       val name = s"${className}UndefinedType"
@@ -165,7 +164,7 @@ object JavaClasses extends CodeGenerator {
       val className = JavaUtil.toClassName(model.name)
 
       val classDeclaration = {
-        import lib.Text._
+        import lib.generator.Text._
 
         val noArgsConstructor = s"public $className() {}"
 

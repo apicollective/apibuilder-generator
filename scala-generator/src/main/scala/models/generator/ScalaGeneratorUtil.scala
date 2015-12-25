@@ -1,8 +1,8 @@
 package scala.generator
 
 import com.bryzek.apidoc.spec.v0.models.ParameterLocation
-import lib.Datatype
-import lib.Text._
+import lib.generator.Datatype
+import lib.generator.Text._
 
 case class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
 

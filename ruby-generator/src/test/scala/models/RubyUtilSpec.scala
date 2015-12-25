@@ -47,9 +47,9 @@ class RubyUtilSpec extends FunSpec with Matchers {
   }
 
   describe("rubyDefault") {
-    import lib.Datatype.Container
-    import lib.Datatype.Primitive
-    import lib.Datatype.UserDefined
+    import lib.generator.Datatype.Container
+    import lib.generator.Datatype.Primitive
+    import lib.generator.Datatype.UserDefined
 
     it ("should fail for datatype: object") {
       val ex = intercept[Exception] {

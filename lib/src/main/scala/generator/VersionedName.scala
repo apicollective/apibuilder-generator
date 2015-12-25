@@ -1,4 +1,4 @@
-package lib
+package lib.generator
 
 case class VersionedName(
   name: String,

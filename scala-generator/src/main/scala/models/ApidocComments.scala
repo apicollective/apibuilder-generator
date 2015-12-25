@@ -1,7 +1,7 @@
 package scala.models
 
 import scala.generator.ScalaUtil
-import lib.Constants
+import lib.generator.Constants
 
 /**
   * @param version e.g. 1.2.3 Used to inject headers on the full version and the major version number

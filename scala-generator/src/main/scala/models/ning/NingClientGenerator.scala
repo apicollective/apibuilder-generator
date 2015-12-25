@@ -3,9 +3,8 @@ package scala.models.ning
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import scala.generator._
 import scala.models._
-import lib.Text._
-import lib.generator.CodeGenerator
-import generator.ServiceFileNames
+import lib.generator.Text._
+import lib.generator.{CodeGenerator, ServiceFileNames}
 
 /**
  * Uses play JSON libraries for json
