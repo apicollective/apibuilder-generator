@@ -115,11 +115,15 @@ object RubyUtil {
     name: String,
     multiple: Boolean = false
   ): String = {
-    val value = lib.Text.initLowerCase(lib.Text.camelCaseToUnderscore(name).toLowerCase)
-    multiple match {
-      case true => lib.Text.pluralize(value)
-      case false => value
-    }
+    val value = lib.Text.safeName(
+      lib.Text.initLowerCase(lib.Text.splitIntoWords(name).map(_.toLowerCase).mkString("_"))
+    )
+    quoteNameIfKeyword(
+      multiple match {
+        case true => lib.Text.pluralize(value)
+        case false => value
+      }
+    )
   }
 
   def wrapInQuotes(value: String): String = {

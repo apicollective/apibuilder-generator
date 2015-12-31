@@ -16,7 +16,7 @@ class RubyUtilSpec extends FunSpec with Matchers {
     RubyUtil.Module("foo_bar").fullName should be("::FooBar")
   }
 
-  it("RubyUtil.toVariableName") {
+  it("RubyUtil.toVariable") {
     RubyUtil.toVariable("value", multiple = false) should be("value")
     RubyUtil.toVariable("value", multiple = true) should be("values")
 
@@ -25,6 +25,12 @@ class RubyUtilSpec extends FunSpec with Matchers {
 
     RubyUtil.toVariable("orgKey", multiple = false) should be("org_key")
     RubyUtil.toVariable("orgKey", multiple = true) should be("org_keys")
+
+    RubyUtil.toVariable("com.bryzek.foo", multiple = false) should be("com_bryzek_foo")
+    RubyUtil.toVariable("com.bryzek.foo", multiple = true) should be("com_bryzek_foos")
+
+    RubyUtil.toVariable("class", multiple = false) should be("class_")
+    RubyUtil.toVariable("class", multiple = true) should be("classes")
   }
 
   it("RubyUtil.wrapInQuotes") {
