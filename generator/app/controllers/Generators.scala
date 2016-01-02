@@ -120,6 +120,16 @@ object Generators {
       ),
       CodeGenTarget(
         metaData = Generator(
+          key = "play_2_x_standalone_json",
+          name = "Play 2.x standalone json",
+          description = Some("Generate case class with json serialization based on play-json, but do NOT include any other features that depend on the play framework (like QueryStringBindable)"),
+          language = Some("Scala")
+        ),
+        status = lib.generator.Status.Beta,
+        codeGenerator = Some(scala.models.Play2StandaloneModelsJson)
+      ),
+      CodeGenTarget(
+        metaData = Generator(
           key = "play_2_x_routes",
           name = "Play 2.x routes",
           description = Some("""Generate a routes file for play 2.x framework. See <a href="/doc/playRoutesFile">Play Routes File</a>."""),
