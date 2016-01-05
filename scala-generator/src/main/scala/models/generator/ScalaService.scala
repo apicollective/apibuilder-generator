@@ -66,6 +66,8 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val qualifiedName = ssd.unionClassName(name)
 
+  val discriminator: Option[String] = union.discriminator
+  
   val description: Option[String] = union.description
 
   // Include an undefined instance to nudge the developer to think

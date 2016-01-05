@@ -24,6 +24,13 @@ case class Play2Json(
   }
 
   private[models] def readers(union: ScalaUnion): String = {
+    union.discriminator match {
+      case None => readersWithoutDiscriminator(union)
+      case Some(discriminator) => readersWithDiscriminator(union, discriminator)
+    }
+  }
+
+  private[this] def readersWithoutDiscriminator(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Reads)} = {",
       s"  (",
@@ -37,7 +44,20 @@ case class Play2Json(
     ).mkString("\n")
   }
 
+  private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    Seq(
+      "TODO"
+    ).mkString("\n")
+  }
+
   private[models] def writers(union: ScalaUnion): String = {
+    union.discriminator match {
+      case None => writersWithoutDiscriminator(union)
+      case Some(discriminator) => writersWithDiscriminator(union, discriminator)
+    }
+  }
+
+  private[models] def writersWithoutDiscriminator(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       s"  def writes(obj: ${union.name}) = obj match {",
@@ -55,6 +75,10 @@ case class Play2Json(
       "  }",
       "}"
     ).mkString("\n")
+  }
+
+  private[this] def writersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    "TODO"
   }
 
   private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
