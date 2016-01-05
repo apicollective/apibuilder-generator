@@ -61,7 +61,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
 
   describe("generateUnionType") {
     it("should generate the correct source") {
-      val source = generator.generateUnionType(Union("test_union", "", None, None, Seq.empty[UnionType]))
+      val source = generator.generateUnionType(Union("test_union", "", None, None, None, Seq.empty[UnionType]))
 
       source.name shouldBe "TestUnion.java"
       source.dir shouldBe Some("com/jkenny/test/models")
@@ -73,7 +73,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     }
 
     it("should handle unions with descriptions") {
-      val source = generator.generateUnionType(Union("test_union", "", Some("A nice description"), None, Seq.empty[UnionType]))
+      val source = generator.generateUnionType(Union("test_union", "", None, Some("A nice description"), None, Seq.empty[UnionType]))
 
       source.name shouldBe "TestUnion.java"
       source.dir shouldBe Some("com/jkenny/test/models")
@@ -90,7 +90,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
 
   describe("generateUndefinedUnionType") {
     it("should generate the correct source") {
-      val source = generator.generateUndefinedUnionType(Union("test_union", "", None, None, Seq.empty[UnionType]))
+      val source = generator.generateUndefinedUnionType(Union("test_union", "", None, None, None, Seq.empty[UnionType]))
 
       source.name shouldBe "TestUnionUndefinedType.java"
       source.dir shouldBe Some("com/jkenny/test/models")
@@ -114,7 +114,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
 
   describe("generateNativeWrapper") {
     it("should generate the correct source") {
-      val source = generator.generateNativeWrapper(Union("test_union", "", None, None, Seq.empty[UnionType]), JavaDatatypes.Boolean)
+      val source = generator.generateNativeWrapper(Union("test_union", "", None, None, None, Seq.empty[UnionType]), JavaDatatypes.Boolean)
 
       source.name shouldBe "TestUnionBoolean.java"
       source.dir shouldBe Some("com/jkenny/test/models")
@@ -202,7 +202,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
         Field("required_field_with_default", "boolean", None, None, Some("false"), true),
         Field("required_field", "boolean", None, None, None, true),
         Field("optional_field", "boolean", None, None, None, false)
-      )), Seq(Union("union_one", "", None, None, Seq.empty[UnionType]), Union("union_two", "", None, None, Seq.empty[UnionType])))
+      )), Seq(Union("union_one", "", None, None, None, Seq.empty[UnionType]), Union("union_two", "", None, None, None, Seq.empty[UnionType])))
 
       source.name shouldBe "TestModel.java"
       source.dir shouldBe Some("com/jkenny/test/models")
