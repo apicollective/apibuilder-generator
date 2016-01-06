@@ -202,7 +202,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = new play.api.libs.json.Writes[Foobar] {
-      def writes(obj: Foobar) = obj match {
+      def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = obj match {
         case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
@@ -222,7 +222,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
-      def writes(obj: User) = obj match {
+      def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = obj match {
         case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
         case x: UserUuid => play.api.libs.json.Json.obj("uuid" -> jsonWritesApidocExampleUnionTypesUserUuid.writes(x))

@@ -80,7 +80,7 @@ case class Play2Json(
   private[models] def writersWithoutDiscriminator(union: ScalaUnion): String = {
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
-      s"  def writes(obj: ${union.name}) = obj match {",
+      s"  def writes(obj: ${union.qualifiedName}) = obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
         s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
       }.mkString("\n").indent(4),
@@ -91,16 +91,47 @@ case class Play2Json(
   }
 
   private[models] def writersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+  //  implicit val expandableUserWrites = new Writes[ExpandableUser] {
+  //    def writes(x: ExpandableUser) = {
+  //      x match {
+  //       case x: UserReference => Json.obj(
+  //         "discriminator" -> "user_reference",
+  //         "id" -> x.id
+  //       )
+  //       case x: User => Json.obj(
+  //         "discriminator" -> "user",
+  //         "id" -> x.id,
+  //         "email" -> x.email
+  //       )
+  //     }
+  //   }
+  // }
+
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
-      s"  def writes(obj: ${union.name}) = obj match {",
-      unionTypesWithNames(union).map { case (t, typeName) =>
-        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
-      }.mkString("\n").indent(4),
-      s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
-      "  }",
+      Seq(
+        s"def writes(obj: ${union.qualifiedName}) = obj match {",
+        s"obj match {",
+        Seq(
+          unionTypesWithNames(union).map { case (t, typeName) =>
+            s"""case x: ${typeName} => """ + toJsonObject(t, "x", discriminator)
+          }.mkString("\n").indent(1),
+          s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")"""
+        ).mkString("\n").indent(2),
+        "}"
+      ).mkString("\n"),
       "}"
     ).mkString("\n")
+  }
+
+  private def toJsonObject(t: ScalaUnionType, varName: String, discriminator: String): String = {
+    Seq(
+      "play.api.libs.json.Json.obj(",
+      Seq(
+        s""""$discriminator" -> "${t.originalName}""""
+      ).mkString(",\n").indent(2),
+      ")"
+    ).mkString("\n").indent(2)
   }
 
   private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
