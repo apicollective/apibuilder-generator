@@ -46,7 +46,27 @@ case class Play2Json(
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
     Seq(
-      "TODO"
+      s"${identifier(union.name, Reads)} = new play.api.libs.json.Reads[${union.name}] {",
+      Seq(s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${union.name}] = {",
+        Seq(s"""(js \\ "$discriminator").validate[String] match {""",
+          Seq(
+            """case play.api.libs.json.JsError(msg) => play.api.libs.json.JsError(msg)""",
+            """case play.api.libs.json.JsSuccess(discriminator, _) => {""",
+            Seq(
+              """discriminator match {""",
+              unionTypesWithNames(union).map { case (t, typeName) =>
+                s"""case "${t.originalName}" => js.validate[$typeName]"""
+              }.mkString("\n").indent(2),
+              s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indent(2),
+              "}"
+            ).mkString("\n").indent(2),
+            "}"
+          ).mkString("\n").indent(2),
+          "}"
+        ).mkString("\n").indent(2),
+        "}"
+      ).mkString("\n").indent(2),
+      "}"
     ).mkString("\n")
   }
 
@@ -77,8 +97,17 @@ case class Play2Json(
     ).mkString("\n")
   }
 
-  private[this] def writersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
-    "TODO"
+  private[models] def writersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    Seq(
+      s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
+      s"  def writes(obj: ${union.name}) = obj match {",
+      unionTypesWithNames(union).map { case (t, typeName) =>
+        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
+      }.mkString("\n").indent(4),
+      s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
+      "  }",
+      "}"
+    ).mkString("\n")
   }
 
   private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
@@ -197,6 +226,21 @@ case class Play2Json(
   private def methodName(
     name: String,
     readWrite: ReadWrite
-  ): String = s"json$readWrite${ssd.name}$name"
+  ): String = {
+    s"json$readWrite${ssd.name}$name"
+  }
 
+  private def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
+    union.types.map { t =>
+      (t,
+        t.datatype match {
+          case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
+            p.name
+          }
+          case p: ScalaPrimitive => PrimitiveWrapper.className(union, p)
+          case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
+        }
+      )
+    }
+  }
 }

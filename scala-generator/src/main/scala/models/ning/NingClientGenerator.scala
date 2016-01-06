@@ -81,6 +81,10 @@ ${ScalaClientCommon.clientSignature(config).indent(2)} {
     import org.slf4j.LoggerFactory
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
+    def closeAsyncHttpClient() {
+      asyncHttpClient.close()
+    }
+
     val logger = LoggerFactory.getLogger(getClass)
 
 ${methodGenerator.accessors().indent(4)}

@@ -1,0 +1,80 @@
+{
+    "name": "apidoc-example-union-types-discriminator",
+
+    "unions": {
+	"user": {
+	    "discriminator": "discriminator",
+	    "types": [
+		{
+		    "type": "registered_user"
+		},
+		{
+		    "type": "guest_user"
+		}
+	    ]
+	}
+    },
+
+    "models": {
+	"registered_user": {
+	    "fields": [
+		{
+		    "name": "id",
+		    "type": "string"
+		},
+		{
+		    "name": "email",
+		    "type": "string"
+		}
+	    ]
+	},
+	"guest_user": {
+	    "fields": [
+		{
+		    "name": "id",
+		    "type": "string",
+		    "description": "Internal unique identifier for this user."
+		},
+		{
+		    "name": "email",
+		    "type": "string", "required": false
+		}
+	    ]
+	}
+    },
+    
+    "resources": {
+	"user": {
+	    "operations": [
+		{
+		    "method": "GET",
+		    "responses": {
+			"200": {
+			    "type": "[user]"
+			}
+		    }
+		},
+		{
+		    "method": "GET",
+		    "path": "/:id",
+		    "responses": {
+			"200": {
+			    "type": "user"
+			}
+		    }
+		},
+		{
+		    "method": "POST",
+		    "body": {
+			"type": "user"
+		    },
+		    "responses": {
+			"201": {
+			    "type": "user"
+			}
+		    }
+		}
+	    ]
+	}
+    }
+}

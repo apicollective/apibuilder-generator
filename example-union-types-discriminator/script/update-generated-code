@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+server = "http://localhost:9000"
+project = "apidoc-example-union-types"
+
+data = {
+  "play_2_3_client" => "generated/app/ApidocExampleUnionTypesClient.scala",
+  "play_2_x_routes" => "api/conf/routes"
+}
+
+data.each do |target, path|
+  cmd = "curl --silent #{server}/gilt/#{project}/latest/#{target} > #{path}"
+  puts cmd
+  system(cmd)
+end

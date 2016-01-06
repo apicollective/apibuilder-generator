@@ -106,6 +106,10 @@ package com.gilt.test.v0 {
     import org.slf4j.LoggerFactory
     import com.gilt.test.v0.models.json._
 
+    def closeAsyncHttpClient() {
+      asyncHttpClient.close()
+    }
+
     val logger = LoggerFactory.getLogger(getClass)
 
     def users: Users = Users

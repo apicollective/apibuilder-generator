@@ -307,6 +307,10 @@ package com.bryzek.apidoc.reference.api.v0 {
     import com.bryzek.apidoc.reference.api.v0.models.json._
     import com.bryzek.apidoc.spec.v0.models.json._
 
+    def closeAsyncHttpClient() {
+      asyncHttpClient.close()
+    }
+
     val logger = LoggerFactory.getLogger(getClass)
 
     def echoes: Echoes = Echoes

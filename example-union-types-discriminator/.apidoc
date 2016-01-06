@@ -1,0 +1,7 @@
+code:
+  bryzek:
+    apidoc-example-union-types-discriminator:
+      version: latest
+      generators:
+        play_2_4_client: generated/app
+        play_2_x_routes: api/conf/routes

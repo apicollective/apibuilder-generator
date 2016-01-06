@@ -255,6 +255,10 @@ package com.bryzek.apidoc.example.union.types.v0 {
     import org.slf4j.LoggerFactory
     import com.bryzek.apidoc.example.union.types.v0.models.json._
 
+    def closeAsyncHttpClient() {
+      asyncHttpClient.close()
+    }
+
     val logger = LoggerFactory.getLogger(getClass)
 
     def users: Users = Users
