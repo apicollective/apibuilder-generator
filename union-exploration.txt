@@ -1,0 +1,81 @@
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
+object Main extends App {
+
+  sealed trait ExpandableUser
+  case class UserReference(id: String) extends ExpandableUser
+  case class User(id: String, email: String) extends ExpandableUser
+
+  implicit val expandableUserWrites = new Writes[ExpandableUser] {
+    def writes(x: ExpandableUser) = {
+      x match {
+        case x: UserReference => Json.obj(
+          "discriminator" -> "user_reference",
+          "id" -> x.id
+        )
+        case x: User => Json.obj(
+          "discriminator" -> "user",
+          "id" -> x.id,
+          "email" -> x.email
+        )
+      }
+    }
+  }
+
+  implicit val userReads: Reads[User] = (
+    (JsPath \ "id").read[String] and (JsPath \ "email").read[String]
+  )(User.apply _)
+
+  /*
+    Skip model writes for models that are part of a union type with a discriminator
+
+    implicit val userWrites = new Writes[User] {
+      def writes(x: User) = Json.obj(
+        "id" -> x.id,
+        "email" -> x.email
+      )
+    }
+   */
+
+  implicit val userReferenceReads = new Reads[UserReference] {
+    def reads(js: JsValue): JsResult[UserReference] = {
+      (js \ "id").validate[String] match {
+        case JsError(_) => sys.error("no id")
+        case JsSuccess(id, _) => JsSuccess(UserReference(id))
+      }
+    }
+  }
+
+
+  implicit val expandableUserReads = new Reads[ExpandableUser] {
+    def reads(js: JsValue): JsResult[ExpandableUser] = {
+      (js \ "discriminator").validate[String] match {
+        case JsError(_) => sys.error("Missing discriminator field in json object")
+        case JsSuccess(discriminator, _) => {
+          discriminator match {
+            case "user_reference" => js.validate[UserReference]
+            case "user" => js.validate[User]
+            case other => sys.error(s"UNDEFINED DISCRIMINATOR[$other]")
+          }
+        }
+      }
+    }
+  }
+
+  val user = User("1", "mike@flow.io")
+  val userReference = UserReference(user.id)
+
+  println("USER " + user)
+  println("Json user " + Json.toJson(user))
+  println("Json user reference " + Json.toJson(userReference))
+
+  println("Deserialize user " + Json.parse("""
+    {"discriminator":"user","id":"1","email":"mike@flow.io"}
+  """).as[ExpandableUser])
+
+  println("Deserialize user_reference " + Json.parse("""
+    {"discriminator":"user_reference","id":"1","email":"mike@flow.io"}
+  """).as[ExpandableUser])
+
+}
