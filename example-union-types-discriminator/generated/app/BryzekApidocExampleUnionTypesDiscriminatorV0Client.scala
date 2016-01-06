@@ -100,10 +100,20 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
-      def writes(obj: User) = obj match {
-        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesDiscriminatorRegisteredUser.writes(x))
-        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesDiscriminatorGuestUser.writes(x))
-        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType] should never be serialized")
+      def writes(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
+        obj match {
+           case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser =>   play.api.libs.json.Json.obj(
+               "discriminator" -> "registered_user",
+               "id" -> play.api.libs.json.Json.toJson(x.id),
+               "email" -> play.api.libs.json.Json.toJson(x.email)
+             )
+           case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser =>   play.api.libs.json.Json.obj(
+               "discriminator" -> "guest_user",
+               "id" -> play.api.libs.json.Json.toJson(x.id),
+               "email" -> play.api.libs.json.Json.toJson(x.email)
+             )
+              case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType] should never be serialized")
+        }
       }
     }
   }

@@ -110,26 +110,51 @@ case class Play2Json(
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       Seq(
-        s"def writes(obj: ${union.qualifiedName}) = obj match {",
-        s"obj match {",
+        s"def writes(obj: ${union.qualifiedName}) = {",
         Seq(
-          unionTypesWithNames(union).map { case (t, typeName) =>
-            s"""case x: ${typeName} => """ + toJsonObject(t, "x", discriminator)
-          }.mkString("\n").indent(1),
-          s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")"""
+          s"obj match {",
+          Seq(
+            unionTypesWithNames(union).map { case (t, typeName) =>
+              s"""case x: ${typeName} => """ + toJsonObject(union, t, "x", discriminator)
+            }.mkString("\n").indent(1),
+            s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")"""
+          ).mkString("\n").indent(2),
+          "}"
         ).mkString("\n").indent(2),
         "}"
-      ).mkString("\n"),
+      ).mkString("\n").indent(2),
       "}"
     ).mkString("\n")
   }
 
-  private def toJsonObject(t: ScalaUnionType, varName: String, discriminator: String): String = {
+  private def toJsonObject(union: ScalaUnion, t: ScalaUnionType, varName: String, discriminator: String): String = {
     Seq(
       "play.api.libs.json.Json.obj(",
       Seq(
-        s""""$discriminator" -> "${t.originalName}""""
-      ).mkString(",\n").indent(2),
+        s""""$discriminator" -> "${t.originalName}",""",
+        t.datatype match {
+          case ScalaPrimitive.Model(ns, name) => {
+            ssd.models.foreach { m =>
+              println(m.name)
+            }
+            val model = ssd.models.find(_.name == name).getOrElse {
+              sys.error(s"Could not find model[$name]")
+            }
+            model.fields.map { field =>
+              s""""${field.originalName}" -> play.api.libs.json.Json.toJson($varName.${field.name})"""
+            }.mkString(",\n")
+          }
+          case ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+            s""""${PrimitiveWrapper.FieldName}" -> play.api.libs.json.Json.toJson($varName)"""
+          }
+          case p: ScalaPrimitive => {
+            s""""${PrimitiveWrapper.FieldName}" -> play.api.libs.json.Json.toJson($varName)"""
+          }
+          case c: ScalaDatatype.Container => {
+            sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
+          }
+      }
+      ).mkString("\n").indent(2),
       ")"
     ).mkString("\n").indent(2)
   }

@@ -4,6 +4,8 @@ import com.bryzek.apidoc.spec.v0.models.{Field, Model}
 
 object PrimitiveWrapper {
 
+  val FieldName = "value"
+
   def className(union: ScalaUnion, primitive: ScalaPrimitive): String = {
     primitive match {
       case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
@@ -35,7 +37,7 @@ case class PrimitiveWrapper(ssd: ScalaService) {
         description = Some(s"Wrapper class to support the union types containing the datatype[${p.apidocType}]"),
         fields = Seq(
           Field(
-            name = "value",
+            name = PrimitiveWrapper.FieldName,
             `type` = p.apidocType,
             required = true
           )
