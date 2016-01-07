@@ -1,0 +1,158 @@
+{
+  "apidoc": {
+    "version": "0.9.52"
+  },
+  "name": "apidoc-example-union-types-discriminator",
+  "organization": {
+    "key": "bryzek"
+  },
+  "application": {
+    "key": "apidoc-example-union-types-discriminator"
+  },
+  "namespace": "com.bryzek.apidoc.example.union.types.discriminator.v0",
+  "version": "0.1.41",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [
+    {
+      "name": "system_user",
+      "plural": "system_users",
+      "values": [
+        {
+          "name": "system"
+        },
+        {
+          "name": "anonymous"
+        }
+      ]
+    }
+  ],
+  "unions": [
+    {
+      "name": "user",
+      "plural": "users",
+      "discriminator": "discriminator",
+      "types": [
+        {
+          "type": "registered_user"
+        },
+        {
+          "type": "guest_user"
+        },
+        {
+          "type": "system_user"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "guest_user",
+      "plural": "guest_users",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Internal unique identifier for this user.",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "registered_user",
+      "plural": "registered_users",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "type": "user",
+      "plural": "users",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/users",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[user]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/users/:id",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "user"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/users",
+          "body": {
+            "type": "user"
+          },
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 201
+                }
+              },
+              "type": "user"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
