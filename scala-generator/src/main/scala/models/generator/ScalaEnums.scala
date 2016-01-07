@@ -1,6 +1,6 @@
 package scala.generator
 
-import lib.Text
+import lib.Text._
 
 case class ScalaEnums(
   ssd: ScalaService,
@@ -26,22 +26,48 @@ case class ScalaEnums(
     * the enum as the implicit would interfere.
     */
   def buildJson(): String = {
-    // IF IN UNION TYPE WITH DISCRIMINATOR, DO NOT CREATE A WRITER:
-    //implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser = new play.api.libs.json.Reads[SystemUser] {
-    //  def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[SystemUser] = {
-    //     js match {
-    //       case v: JsString => play.api.libs.json.JsSuccess(SystemUser(v.value))
-    //       case _ => {
-    //         (js \ "value").validate[String] match {
-    //           case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(SystemUser(v))
-    //           case err: play.api.libs.json.JsError => err
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+    unions.find(!_.discriminator.isEmpty) match {
+      case None => buildJsonNoDiscriminator()
+      case Some(_) => buildJsonWithDiscriminator()
+    }
+  }
 
-    // IF NOT IN UNION TYPE WITH DISCRIMINATOR, OUTPUT ORIGINAL FORMAT:
+  /**
+    * If this enum is part of a union type with discrimator, we allow
+    * the enum to serialize the type. The reader must be able to
+    * handle an object where we pull the value out of the JSON
+    * Object. Note that we do not need to actually read the
+    * discriminator - we just need to hydrate the enum.
+    */
+  private def buildJsonWithDiscriminator(): String = {
+    Seq(
+      s"implicit val jsonReads${ssd.name}${enum.name} = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
+      Seq(
+        s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${enum.qualifiedName}] = {",
+        Seq(
+          "js match {",
+          Seq(
+            s"case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v.value))",
+            "case _ => {",
+            Seq(
+              """(js \ "value").validate[String] match {""",
+              Seq(
+                s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
+                "case err: play.api.libs.json.JsError => err"
+              ).mkString("\n").indent(2),
+              "}"
+            ).mkString("\n").indent(2),
+            "}"
+          ).mkString("\n").indent(2),
+          "}"
+        ).mkString("\n").indent(2),
+        "}"
+      ).mkString("\n").indent(2),
+      "}"
+    ).mkString("\n")
+  }
+
+  private def buildJsonNoDiscriminator(): String = {
     Seq(
       s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)",
       s"implicit val jsonWrites${ssd.name}${enum.name} = new Writes[${enum.name}] {",

@@ -98,31 +98,19 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       }
     }
 
-    /*
-    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Reads[SystemUser] = {
-      (__ \ "value").read[String].map { SystemUser(_) }
-    }
-     */
-
-    implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser = new play.api.libs.json.Reads[SystemUser] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[SystemUser] = {
+    implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser = new play.api.libs.json.Reads[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser] = {
         js match {
-          case v: JsString => play.api.libs.json.JsSuccess(SystemUser(v.value))
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser(v.value))
           case _ => {
             (js \ "value").validate[String] match {
-              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(SystemUser(v))
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser(v))
               case err: play.api.libs.json.JsError => err
             }
           }
         }
       }
     }
-
-    /*
-     implicit val jsonWritesApidocExampleUnionTypesDiscriminatorSystemUser = new Writes[SystemUser] {
-      def writes(x: SystemUser) = JsString(x.toString)
-    }
-     */
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Reads[GuestUser] = {
       (
