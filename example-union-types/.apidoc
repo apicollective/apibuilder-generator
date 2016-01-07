@@ -1,6 +1,7 @@
 code:
-  gilt:
+  bryzek:
     apidoc-example-union-types:
       version: latest
       generators:
-        play_2_3_client: generated/app/ApidocExampleUnionTypesClient.scala
+        play_2_4_client: generated/app
+        play_2_x_routes: api/conf/routes

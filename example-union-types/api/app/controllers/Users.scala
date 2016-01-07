@@ -1,6 +1,6 @@
 package controllers
 
-import com.bryzek.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
+import com.bryzek.apidoc.example.union.types.v0.models._
 import com.bryzek.apidoc.example.union.types.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._

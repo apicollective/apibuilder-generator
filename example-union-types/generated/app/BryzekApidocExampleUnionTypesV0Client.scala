@@ -5,17 +5,29 @@
  */
 package com.bryzek.apidoc.example.union.types.v0.models {
 
+  sealed trait Foobar
+
   sealed trait User
 
   case class GuestUser(
-    id: String,
-    email: _root_.scala.Option[String] = None
+    guid: _root_.java.util.UUID,
+    email: String
   ) extends User
 
   case class RegisteredUser(
-    id: String,
-    email: String
+    guid: _root_.java.util.UUID,
+    email: String,
+    preference: com.bryzek.apidoc.example.union.types.v0.models.Foobar
   ) extends User
+
+  /**
+   * Provides future compatibility in clients - in the future, when a type is added
+   * to the union Foobar, it will need to be handled in the client code. This
+   * implementation will deserialize these future types as an instance of this class.
+   */
+  case class FoobarUndefinedType(
+    description: String
+  ) extends Foobar
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -25,6 +37,80 @@ package com.bryzek.apidoc.example.union.types.v0.models {
   case class UserUndefinedType(
     description: String
   ) extends User
+
+
+  /**
+   * Wrapper class to support the union types containing the datatype[uuid]
+   */
+  case class UserUuid(
+    value: _root_.java.util.UUID
+  ) extends User
+
+  sealed trait Bar extends Foobar
+
+  object Bar {
+
+    case object B extends Bar { override def toString = "b" }
+
+    /**
+     * UNDEFINED captures values that are sent either in error or
+     * that were added by the server after this library was
+     * generated. We want to make it easy and obvious for users of
+     * this library to handle this case gracefully.
+     *
+     * We use all CAPS for the variable name to avoid collisions
+     * with the camel cased values above.
+     */
+    case class UNDEFINED(override val toString: String) extends Bar
+
+    /**
+     * all returns a list of all the valid, known values. We use
+     * lower case to avoid collisions with the camel cased values
+     * above.
+     */
+    val all = Seq(B)
+
+    private[this]
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def apply(value: String): Bar = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[Bar] = byName.get(value.toLowerCase)
+
+  }
+
+  sealed trait Foo extends Foobar
+
+  object Foo {
+
+    case object A extends Foo { override def toString = "a" }
+
+    /**
+     * UNDEFINED captures values that are sent either in error or
+     * that were added by the server after this library was
+     * generated. We want to make it easy and obvious for users of
+     * this library to handle this case gracefully.
+     *
+     * We use all CAPS for the variable name to avoid collisions
+     * with the camel cased values above.
+     */
+    case class UNDEFINED(override val toString: String) extends Foo
+
+    /**
+     * all returns a list of all the valid, known values. We use
+     * lower case to avoid collisions with the camel cased values
+     * above.
+     */
+    val all = Seq(A)
+
+    private[this]
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def apply(value: String): Foo = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[Foo] = byName.get(value.toLowerCase)
+
+  }
 
 }
 
@@ -56,32 +142,72 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       }
     }
 
+    implicit val jsonReadsApidocExampleUnionTypesBar = __.read[String].map(Bar.apply)
+    implicit val jsonWritesApidocExampleUnionTypesBar = new Writes[Bar] {
+      def writes(x: Bar) = JsString(x.toString)
+    }
+
+    implicit val jsonReadsApidocExampleUnionTypesFoo = __.read[String].map(Foo.apply)
+    implicit val jsonWritesApidocExampleUnionTypesFoo = new Writes[Foo] {
+      def writes(x: Foo) = JsString(x.toString)
+    }
+
     implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[GuestUser] = {
       (
-        (__ \ "id").read[String] and
-        (__ \ "email").readNullable[String]
+        (__ \ "guid").read[_root_.java.util.UUID] and
+        (__ \ "email").read[String]
       )(GuestUser.apply _)
     }
 
     implicit def jsonWritesApidocExampleUnionTypesGuestUser: play.api.libs.json.Writes[GuestUser] = {
       (
-        (__ \ "id").write[String] and
-        (__ \ "email").writeNullable[String]
+        (__ \ "guid").write[_root_.java.util.UUID] and
+        (__ \ "email").write[String]
       )(unlift(GuestUser.unapply _))
     }
 
     implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
       (
-        (__ \ "id").read[String] and
-        (__ \ "email").read[String]
+        (__ \ "guid").read[_root_.java.util.UUID] and
+        (__ \ "email").read[String] and
+        (__ \ "preference").read[com.bryzek.apidoc.example.union.types.v0.models.Foobar]
       )(RegisteredUser.apply _)
     }
 
     implicit def jsonWritesApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
       (
-        (__ \ "id").write[String] and
-        (__ \ "email").write[String]
+        (__ \ "guid").write[_root_.java.util.UUID] and
+        (__ \ "email").write[String] and
+        (__ \ "preference").write[com.bryzek.apidoc.example.union.types.v0.models.Foobar]
       )(unlift(RegisteredUser.unapply _))
+    }
+
+    implicit def jsonReadsApidocExampleUnionTypesUserUuid: play.api.libs.json.Reads[UserUuid] = {
+      (__ \ "value").read[_root_.java.util.UUID].map { x => new UserUuid(value = x) }
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesUserUuid: play.api.libs.json.Writes[UserUuid] = new play.api.libs.json.Writes[UserUuid] {
+      def writes(x: UserUuid) = play.api.libs.json.Json.obj(
+        "value" -> play.api.libs.json.Json.toJson(x.value)
+      )
+    }
+
+    implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[Foobar] = {
+      (
+        (__ \ "foo").read(jsonReadsApidocExampleUnionTypesFoo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        orElse
+        (__ \ "bar").read(jsonReadsApidocExampleUnionTypesBar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        orElse
+        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+      )
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = new play.api.libs.json.Writes[Foobar] {
+      def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = obj match {
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> jsonWritesApidocExampleUnionTypesFoo.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> jsonWritesApidocExampleUnionTypesBar.writes(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
+      }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = {
@@ -89,6 +215,8 @@ package com.bryzek.apidoc.example.union.types.v0.models {
         (__ \ "registered_user").read(jsonReadsApidocExampleUnionTypesRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
         (__ \ "guest_user").read(jsonReadsApidocExampleUnionTypesGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
+        orElse
+        (__ \ "uuid").read(jsonReadsApidocExampleUnionTypesUserUuid).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
         play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
       )
@@ -98,6 +226,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = obj match {
         case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApidocExampleUnionTypesRegisteredUser.writes(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApidocExampleUnionTypesGuestUser.writes(x))
+        case x: UserUuid => play.api.libs.json.Json.obj("uuid" -> jsonWritesApidocExampleUnionTypesUserUuid.writes(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
     }
@@ -131,7 +260,27 @@ package com.bryzek.apidoc.example.union.types.v0 {
       ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: Exception) => s"Error parsing date $key. Example: 2014-04-29"
     )
 
+    // Enum: Bar
+    private[this] val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Bar.all.mkString(", ")}"
 
+    implicit val pathBindableEnumBar = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Bar] (
+      Bar.fromString(_).get, _.toString, enumBarNotFound
+    )
+
+    implicit val queryStringBindableEnumBar = new QueryStringBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Bar](
+      Bar.fromString(_).get, _.toString, enumBarNotFound
+    )
+
+    // Enum: Foo
+    private[this] val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Foo.all.mkString(", ")}"
+
+    implicit val pathBindableEnumFoo = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Foo] (
+      Foo.fromString(_).get, _.toString, enumFooNotFound
+    )
+
+    implicit val queryStringBindableEnumFoo = new QueryStringBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Foo](
+      Foo.fromString(_).get, _.toString, enumFooNotFound
+    )
 
   }
 
@@ -169,12 +318,13 @@ package com.bryzek.apidoc.example.union.types.v0 {
         }
       }
 
-      override def getById(
-        id: String
+      override def getByGuid(
+        guid: _root_.java.util.UUID
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User] = {
-        _executeRequest("GET", s"/users/${play.utils.UriEncoding.encodePathSegment(id, "UTF-8")}").map {
+        _executeRequest("GET", s"/users/${guid}").map {
           case r if r.status == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.models.User])
-          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+          case r if r.status == 404 => throw new com.bryzek.apidoc.example.union.types.v0.errors.UnitResponse(r.status)
+          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
         }
       }
 
@@ -280,8 +430,8 @@ package com.bryzek.apidoc.example.union.types.v0 {
   trait Users {
     def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]]
 
-    def getById(
-      id: String
+    def getByGuid(
+      guid: _root_.java.util.UUID
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User]
 
     def post(
@@ -290,6 +440,10 @@ package com.bryzek.apidoc.example.union.types.v0 {
   }
 
   package errors {
+
+    import com.bryzek.apidoc.example.union.types.v0.models.json._
+
+    case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
     case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")
 

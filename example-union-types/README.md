@@ -6,4 +6,5 @@ types with the scala clients.
 
 Updating Code
 =============
-/web/apidoc-cli/bin/apidoc upload gilt apidoc-example-union-types ./api/api.json  --version 0.0.1-dev
+
+    apidoc upload bryzek apidoc-example-union-types apidoc-example-union-types.json  --version `sem-info tag latest`
