@@ -1,30 +1,27 @@
 package controllers
 
-import com.bryzek.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
-import com.bryzek.apidoc.example.union.types.v0.models.json._
+import com.bryzek.apidoc.example.union.types.discriminator.v0.models._
+import com.bryzek.apidoc.example.union.types.discriminator.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
-import java.util.UUID
 
 object Users extends Controller {
 
   private[this] val users: Seq[User] = Seq(
-    RegisteredUser(UUID.randomUUID(), "registered@test.apidoc.me", preference = Foo.A),
-    GuestUser(UUID.randomUUID(), "guest@test.apidoc.me"),
-    UserUuid(UUID.randomUUID())
+    RegisteredUser("usr-1", "registered@test.apidoc.me"),
+    GuestUser("usr-2")
   )
 
   def get() = Action {
     Ok(Json.toJson(users))
   }
 
-  def getByGuid(guid: UUID) = Action {
+  def getById(id: String) = Action {
     users.find { u =>
       u match {
-        case RegisteredUser(id, email, preference) => id == guid
-        case GuestUser(id, email) => id == guid
-        case UserUuid(value) => value == guid
-        case UserUndefinedType(name) => false
+        case RegisteredUser(userId, _) => userId == id
+        case GuestUser(userId, _) => userId == id
+        case UserUndefinedType(_) => false
       }
     } match {
       case None => {
@@ -40,7 +37,7 @@ object Users extends Controller {
 
   /**
    * Example:
-   * curl -X POST -H "Content-Type: application/json" -d "{ \"guest_user\": { \"guid\": \"893ac5c5-2ea3-4b0d-8f82-ca8d73a26211\", \"email\": \"testing@mailinator.com\" } }" http://localhost:7100/users
+   * curl -X POST -H "Content-Type: application/json" -d "{ \"discriminator\": \"user\", \"email\": \"testing@mailinator.com\" } }" http://localhost:7100/users
    */
   def post() = Action(parse.json) { request =>
     request.body.validate[User] match {
@@ -51,9 +48,8 @@ object Users extends Controller {
         val user = s.get
 
         user match {
-          case RegisteredUser(id, email, preference) => println(s"Received Registered User $id")
+          case RegisteredUser(id, email) => println(s"Received Registered User $id")
           case GuestUser(id, email) => println(s"Received Guest User $id")
-          case UserUuid(value) => println(s"Received UUID $value")
           case UserUndefinedType(name) => println(s"Received undefined type $name")
         }
 

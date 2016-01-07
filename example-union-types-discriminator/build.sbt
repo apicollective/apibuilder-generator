@@ -2,7 +2,7 @@ import play.PlayImport.PlayKeys._
 
 name := "apidoc-example-union-types"
 
-organization := "com.gilt.apidoc.generator"
+organization := "com.bryzek.apidoc.generator"
 
 scalaVersion in ThisBuild := "2.11.7"
 
@@ -21,9 +21,11 @@ lazy val api = project
   .aggregate(generated)
   .enablePlugins(PlayScala)
   .settings(
-    routesImport += "com.gilt.apidoc.example.union.types.v0.Bindables._",
+    routesImport += "com.bryzek.apidoc.example.union.types.discriminator.v0._",
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus" %% "play" % "1.4.0-M4" % "test"
+      specs2 % Test,
+      "org.scalatest" %% "scalatest" % "2.2.5" % Test,
+      "org.scalatestplus" %% "play" % "1.4.0-M4" % Test
     )
   )

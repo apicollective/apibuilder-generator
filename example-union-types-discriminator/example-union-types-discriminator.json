@@ -60,7 +60,8 @@
 		    "responses": {
 			"200": {
 			    "type": "user"
-			}
+			},
+			"404": { "type": "unit" }
 		    }
 		},
 		{

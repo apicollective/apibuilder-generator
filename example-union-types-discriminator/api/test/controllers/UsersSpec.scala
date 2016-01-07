@@ -1,110 +1,110 @@
 package controllers
 
-import com.bryzek.apidoc.example.union.types.v0.errors.UnitResponse
-import com.bryzek.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
-import com.bryzek.apidoc.example.union.types.v0.models.json._
+import com.bryzek.apidoc.example.union.types.discriminator.v0.Client
+import com.bryzek.apidoc.example.union.types.discriminator.v0.errors.UnitResponse
+import com.bryzek.apidoc.example.union.types.discriminator.v0.models._
+import com.bryzek.apidoc.example.union.types.discriminator.v0.models.json._
+
 import java.util.UUID
-
+import scala.util.{Failure, Success, Try}
+import play.api.libs.ws._
 import play.api.test._
-import play.api.test.Helpers._
-import org.scalatestplus.play._
 
-class UsersSpec extends PlaySpec with OneServerPerSuite {
+class UsersSpec extends PlaySpecification {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  implicit override lazy val port = 9010
-  implicit override lazy val app: FakeApplication = FakeApplication()
-  lazy val client = new com.bryzek.apidoc.example.union.types.v0.Client(s"http://localhost:$port")
+  val port = 9010
+  lazy val client = new Client(s"http://localhost:$port")
 
-  "POST /users with a guest user" in new WithServer {
-    val guid = UUID.randomUUID
-    val email = s"guest-$guid@test.apidoc.me"
+  "POST /users with a guest user" in new WithServer(port = port) {
+    val id = s"usr-${UUID.randomUUID}"
+    val email = s"guest-$id@test.apidoc.me"
 
     await(
       client.users.post(
         GuestUser(
-          guid = guid,
-          email = email
+          id = id,
+          email = Some(email)
         )
       )
     ) match {
       case user: GuestUser => {
-        user.guid must be(guid)
-        user.email must be(email)
+        user.id must beEqualTo(id)
+        user.email must beEqualTo(Some(email))
       }
       case user => {
-        fail("Creating a guest user returning a user w/ invalid type: " + user)
+        failure("Creating a guest user returning a user w/ invalid type: " + user)
       }
     }
   }
 
-  "POST /users with a registered user" in new WithServer {
-    val guid = UUID.randomUUID
-    val email = s"registered-$guid@test.apidoc.me"
+  "POST /users with a registered user" in new WithServer(port = port) {
+    val id = s"usr-${UUID.randomUUID}"
+    val email = s"registered-$id@test.apidoc.me"
 
     await(
       client.users.post(
         RegisteredUser(
-          guid = guid,
-          email = email,
-          preference = Foo.A
+          id = id,
+          email = email
         )
       )
     ) match {
       case user: RegisteredUser => {
-        user.guid must be(guid)
-        user.email must be(email)
+        user.id must beEqualTo(id)
+        user.email must beEqualTo(email)
       }
       case user => {
-        fail("Creating a registered user returning a user w/ invalid type: " + user)
+        failure("Creating a registered user returning a user w/ invalid type: " + user)
       }
     }
   }
 
-  "POST /users with a UUID" in new WithServer {
-    val guid = UUID.randomUUID
-
-    await(
-      client.users.post(UserUuid(guid))
-    ) match {
-      case wrapper: UserUuid => {
-        wrapper.value must be(guid)
-      }
-      case user => {
-        fail("Creating a uuid wrapper returning a user w/ invalid type: " + user)
-      }
-    }
+  "GET /users" in new WithServer(port = port) {
+    await(client.users.get()).size must beEqualTo(2)
   }
 
-  "GET /users" in new WithServer {
-    await(client.users.get()).size must be(3)
-  }
-
-  "GET /users/:guid" in new WithServer {
-    val userGuids = await(
+  "GET /users/:id" in new WithServer(port = port) {
+    val userIds = await(
       client.users.get()
     ).flatMap { user =>
       user match {
-        case RegisteredUser(id, email, preference) => Some(id)
+        case RegisteredUser(id, email) => Some(id)
         case GuestUser(id, email) => Some(id)
-        case UserUuid(value) => Some(value)
         case UserUndefinedType(name) => None
       }
     }
 
-    userGuids.foreach { userGuid =>
-      await(client.users.getByGuid(userGuid)) match {
-        case RegisteredUser(id, email, preference) => id must be(userGuid)
-        case GuestUser(id, email) => id must be(userGuid)
-        case UserUuid(value) => value must be(userGuid)
-        case UserUndefinedType(name) => fail("Should note have received undefined type")
+    userIds.foreach { userId =>
+      await(client.users.getById(userId)) match {
+        case RegisteredUser(id, email) => id must beEqualTo(userId)
+        case GuestUser(id, email) => id must beEqualTo(userId)
+        case UserUndefinedType(name) => failure("Should not have received undefined type")
       }
     }
 
-    intercept[UnitResponse] {
-      await(client.users.getByGuid(UUID.randomUUID))
-    }.status must be(404)
+    expectStatus(404) {
+      await(client.users.getById(s"usr-${UUID.randomUUID}"))
+    }
+  }
+
+  def expectStatus(code: Int)(f: => Unit) {
+    Try(
+      f
+    ) match {
+      case Success(response) => {
+        org.specs2.execute.Failure(s"Expected HTTP[$code] but got HTTP 2xx")
+      }
+      case Failure(ex) => ex match {
+        case UnitResponse(code) => {
+          org.specs2.execute.Success()
+        }
+        case e => {
+          org.specs2.execute.Failure(s"Unexpected error: $e")
+        }
+      }
+    }
   }
 
 }

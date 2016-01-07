@@ -189,7 +189,8 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.discriminator.v0.models.User] = {
         _executeRequest("GET", s"/users/${play.utils.UriEncoding.encodePathSegment(id, "UTF-8")}").map {
           case r if r.status == 200 => _root_.com.bryzek.apidoc.example.union.types.discriminator.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.discriminator.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.User])
-          case r => throw new com.bryzek.apidoc.example.union.types.discriminator.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+          case r if r.status == 404 => throw new com.bryzek.apidoc.example.union.types.discriminator.v0.errors.UnitResponse(r.status)
+          case r => throw new com.bryzek.apidoc.example.union.types.discriminator.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
         }
       }
 
@@ -305,6 +306,10 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0 {
   }
 
   package errors {
+
+    import com.bryzek.apidoc.example.union.types.discriminator.v0.models.json._
+
+    case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
     case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")
 
