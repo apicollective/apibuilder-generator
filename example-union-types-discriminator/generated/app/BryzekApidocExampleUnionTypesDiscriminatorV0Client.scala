@@ -26,6 +26,14 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
     description: String
   ) extends User
 
+
+  /**
+   * Wrapper class to support the union types containing the datatype[string]
+   */
+  case class UserString(
+    value: String
+  ) extends User
+
 }
 
 package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
@@ -84,6 +92,16 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       )(unlift(RegisteredUser.unapply _))
     }
 
+    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Reads[UserString] = {
+      (__ \ "value").read[String].map { x => new UserString(value = x) }
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Writes[UserString] = new play.api.libs.json.Writes[UserString] {
+      def writes(x: UserString) = play.api.libs.json.Json.obj(
+        "value" -> play.api.libs.json.Json.toJson(x.value)
+      )
+    }
+
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Reads[User] = new play.api.libs.json.Reads[User] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[User] = {
         (js \ "discriminator").validate[String] match {
@@ -92,6 +110,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
             discriminator match {
               case "registered_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser]
               case "guest_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser]
+              case "string" => js.validate[UserString]
               case other => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType(other))
             }
           }
@@ -102,17 +121,21 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
       def writes(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
         obj match {
-           case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser =>   play.api.libs.json.Json.obj(
-               "discriminator" -> "registered_user",
-               "id" -> play.api.libs.json.Json.toJson(x.id),
-               "email" -> play.api.libs.json.Json.toJson(x.email)
-             )
-           case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser =>   play.api.libs.json.Json.obj(
-               "discriminator" -> "guest_user",
-               "id" -> play.api.libs.json.Json.toJson(x.id),
-               "email" -> play.api.libs.json.Json.toJson(x.email)
-             )
-              case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType] should never be serialized")
+           case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => play.api.libs.json.Json.obj(
+             "discriminator" -> "registered_user",
+             "id" -> play.api.libs.json.Json.toJson(x.id),
+             "email" -> play.api.libs.json.Json.toJson(x.email)
+           )
+           case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => play.api.libs.json.Json.obj(
+             "discriminator" -> "guest_user",
+             "id" -> play.api.libs.json.Json.toJson(x.id),
+             "email" -> play.api.libs.json.Json.toJson(x.email)
+           )
+           case x: UserString => play.api.libs.json.Json.obj(
+             "discriminator" -> "string",
+             "value" -> play.api.libs.json.Json.toJson(x.value)
+           )
+            case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType] should never be serialized")
         }
       }
     }

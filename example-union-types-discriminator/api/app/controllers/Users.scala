@@ -9,7 +9,8 @@ object Users extends Controller {
 
   private[this] val users: Seq[User] = Seq(
     RegisteredUser("usr-1", "registered@test.apidoc.me"),
-    GuestUser("usr-2")
+    GuestUser("usr-2"),
+    UserString("usr-3")
   )
 
   def get() = Action {
@@ -21,6 +22,7 @@ object Users extends Controller {
       u match {
         case RegisteredUser(userId, _) => userId == id
         case GuestUser(userId, _) => userId == id
+        case UserString(userId) => userId == id
         case UserUndefinedType(_) => false
       }
     } match {
@@ -50,6 +52,7 @@ object Users extends Controller {
         user match {
           case RegisteredUser(id, email) => println(s"Received Registered User $id")
           case GuestUser(id, email) => println(s"Received Guest User $id")
+          case UserString(id) => println(s"Received User String $id")
           case UserUndefinedType(name) => println(s"Received undefined type $name")
         }
 

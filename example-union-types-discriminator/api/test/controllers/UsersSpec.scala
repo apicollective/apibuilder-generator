@@ -34,7 +34,24 @@ class UsersSpec extends PlaySpecification {
         user.email must beEqualTo(Some(email))
       }
       case user => {
-        failure("Creating a guest user returning a user w/ invalid type: " + user)
+        failure("Expected a GuestUser but got a[${user.getClass}]")
+      }
+    }
+  }
+
+  "POST /users with a UserString" in new WithServer(port = port) {
+    val id = s"usr-${UUID.randomUUID}"
+
+    await(
+      client.users.post(
+        UserString(id)
+      )
+    ) match {
+      case user: UserString => {
+        user.value must beEqualTo(id)
+      }
+      case user => {
+        failure("Expected a UserString but got a[${user.getClass}]")
       }
     }
   }
@@ -56,13 +73,13 @@ class UsersSpec extends PlaySpecification {
         user.email must beEqualTo(email)
       }
       case user => {
-        failure("Creating a registered user returning a user w/ invalid type: " + user)
+        failure("Expected a RegisteredUser but got a[${user.getClass}]")
       }
     }
   }
 
   "GET /users" in new WithServer(port = port) {
-    await(client.users.get()).size must beEqualTo(2)
+    await(client.users.get()).size must beEqualTo(3)
   }
 
   "GET /users/:id" in new WithServer(port = port) {
@@ -72,6 +89,7 @@ class UsersSpec extends PlaySpecification {
       user match {
         case RegisteredUser(id, email) => Some(id)
         case GuestUser(id, email) => Some(id)
+        case UserString(id) => Some(id)
         case UserUndefinedType(name) => None
       }
     }
@@ -80,6 +98,7 @@ class UsersSpec extends PlaySpecification {
       await(client.users.getById(userId)) match {
         case RegisteredUser(id, email) => id must beEqualTo(userId)
         case GuestUser(id, email) => id must beEqualTo(userId)
+        case UserString(id) => id must beEqualTo(userId)
         case UserUndefinedType(name) => failure("Should not have received undefined type")
       }
     }
