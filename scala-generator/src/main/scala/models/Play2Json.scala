@@ -117,7 +117,7 @@ case class Play2Json(
             unionTypesWithNames(union).map { case (t, typeName) =>
               s"""case x: ${typeName} => """ + toJsonObject(union, t, "x", discriminator)
             }.mkString("\n").indent(1),
-            s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")"""
+            s"""  case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")"""
           ).mkString("\n").indent(2),
           "}"
         ).mkString("\n").indent(2),
@@ -134,9 +134,6 @@ case class Play2Json(
         s""""$discriminator" -> "${t.originalName}",""",
         t.datatype match {
           case ScalaPrimitive.Model(ns, name) => {
-            ssd.models.foreach { m =>
-              println(m.name)
-            }
             val model = ssd.models.find(_.name == name).getOrElse {
               sys.error(s"Could not find model[$name]")
             }
@@ -148,7 +145,7 @@ case class Play2Json(
             s""""${PrimitiveWrapper.FieldName}" -> play.api.libs.json.Json.toJson($varName)"""
           }
           case p: ScalaPrimitive => {
-            s""""${PrimitiveWrapper.FieldName}" -> play.api.libs.json.Json.toJson($varName)"""
+            s""""${PrimitiveWrapper.FieldName}" -> play.api.libs.json.Json.toJson(${varName}.value)"""
           }
           case c: ScalaDatatype.Container => {
             sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
@@ -156,7 +153,7 @@ case class Play2Json(
       }
       ).mkString("\n").indent(2),
       ")"
-    ).mkString("\n").indent(2)
+    ).mkString("\n")
   }
 
   private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
