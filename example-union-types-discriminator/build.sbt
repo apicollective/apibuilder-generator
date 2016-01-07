@@ -1,6 +1,6 @@
 import play.PlayImport.PlayKeys._
 
-name := "apidoc-example-union-types"
+name := "apidoc-example-union-types-discriminator"
 
 organization := "com.bryzek.apidoc.generator"
 
