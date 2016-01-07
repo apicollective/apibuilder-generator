@@ -34,6 +34,40 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
     value: String
   ) extends User
 
+  sealed trait SystemUser extends User
+
+  object SystemUser {
+
+    case object System extends SystemUser { override def toString = "system" }
+    case object Anonymous extends SystemUser { override def toString = "anonymous" }
+
+    /**
+     * UNDEFINED captures values that are sent either in error or
+     * that were added by the server after this library was
+     * generated. We want to make it easy and obvious for users of
+     * this library to handle this case gracefully.
+     *
+     * We use all CAPS for the variable name to avoid collisions
+     * with the camel cased values above.
+     */
+    case class UNDEFINED(override val toString: String) extends SystemUser
+
+    /**
+     * all returns a list of all the valid, known values. We use
+     * lower case to avoid collisions with the camel cased values
+     * above.
+     */
+    val all = Seq(System, Anonymous)
+
+    private[this]
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def apply(value: String): SystemUser = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[SystemUser] = byName.get(value.toLowerCase)
+
+  }
+
 }
 
 package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
@@ -63,6 +97,32 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
         JsString(str)
       }
     }
+
+    /*
+    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Reads[SystemUser] = {
+      (__ \ "value").read[String].map { SystemUser(_) }
+    }
+     */
+
+    implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser = new play.api.libs.json.Reads[SystemUser] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[SystemUser] = {
+        js match {
+          case v: JsString => play.api.libs.json.JsSuccess(SystemUser(v.value))
+          case _ => {
+            (js \ "value").validate[String] match {
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(SystemUser(v))
+              case err: play.api.libs.json.JsError => err
+            }
+          }
+        }
+      }
+    }
+
+    /*
+     implicit val jsonWritesApidocExampleUnionTypesDiscriminatorSystemUser = new Writes[SystemUser] {
+      def writes(x: SystemUser) = JsString(x.toString)
+    }
+     */
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Reads[GuestUser] = {
       (
@@ -110,6 +170,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
             discriminator match {
               case "registered_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser]
               case "guest_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser]
+              case "system_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser]
               case "string" => js.validate[UserString]
               case other => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType(other))
             }
@@ -130,6 +191,10 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
             "discriminator" -> "guest_user",
             "id" -> play.api.libs.json.Json.toJson(x.id),
             "email" -> play.api.libs.json.Json.toJson(x.email)
+          )
+          case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser => play.api.libs.json.Json.obj(
+            "discriminator" -> "system_user",
+            "value" -> play.api.libs.json.JsString(x.toString)
           )
           case x: UserString => play.api.libs.json.Json.obj(
             "discriminator" -> "string",
@@ -171,7 +236,16 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0 {
       ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: Exception) => s"Error parsing date $key. Example: 2014-04-29"
     )
 
+    // Enum: SystemUser
+    private[this] val enumSystemUserNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser.all.mkString(", ")}"
 
+    implicit val pathBindableEnumSystemUser = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser] (
+      SystemUser.fromString(_).get, _.toString, enumSystemUserNotFound
+    )
+
+    implicit val queryStringBindableEnumSystemUser = new QueryStringBindable.Parsing[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser](
+      SystemUser.fromString(_).get, _.toString, enumSystemUserNotFound
+    )
 
   }
 

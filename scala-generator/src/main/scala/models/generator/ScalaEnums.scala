@@ -21,9 +21,27 @@ case class ScalaEnums(
   }
 
   /**
-    * Returns the implicits for json serialization.
+    * Returns the implicits for json serialization. Note that if the
+    * enum is part of a union type, we do NOT generate a writer for
+    * the enum as the implicit would interfere.
     */
   def buildJson(): String = {
+    // IF IN UNION TYPE WITH DISCRIMINATOR, DO NOT CREATE A WRITER:
+    //implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser = new play.api.libs.json.Reads[SystemUser] {
+    //  def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[SystemUser] = {
+    //     js match {
+    //       case v: JsString => play.api.libs.json.JsSuccess(SystemUser(v.value))
+    //       case _ => {
+    //         (js \ "value").validate[String] match {
+    //           case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(SystemUser(v))
+    //           case err: play.api.libs.json.JsError => err
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+
+    // IF NOT IN UNION TYPE WITH DISCRIMINATOR, OUTPUT ORIGINAL FORMAT:
     Seq(
       s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)",
       s"implicit val jsonWrites${ssd.name}${enum.name} = new Writes[${enum.name}] {",

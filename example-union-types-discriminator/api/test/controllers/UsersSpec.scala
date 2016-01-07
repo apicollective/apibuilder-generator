@@ -56,6 +56,17 @@ class UsersSpec extends PlaySpecification {
     }
   }
 
+  "POST /users with a SystemUser" in new WithServer(port = port) {
+    await(client.users.post(SystemUser.System)) match {
+      case SystemUser.System => {
+        // true
+      }
+      case user => {
+        failure("Expected a SystemUser.System but got a[${user.getClass}]")
+      }
+    }
+  }
+
   "POST /users with a registered user" in new WithServer(port = port) {
     val id = s"usr-${UUID.randomUUID}"
     val email = s"registered-$id@test.apidoc.me"
@@ -79,7 +90,7 @@ class UsersSpec extends PlaySpecification {
   }
 
   "GET /users" in new WithServer(port = port) {
-    await(client.users.get()).size must beEqualTo(3)
+    await(client.users.get()).size must beEqualTo(5)
   }
 
   "GET /users/:id" in new WithServer(port = port) {
@@ -91,6 +102,9 @@ class UsersSpec extends PlaySpecification {
         case GuestUser(id, email) => Some(id)
         case UserString(id) => Some(id)
         case UserUndefinedType(name) => None
+        case SystemUser.System => Some(SystemUser.System.toString)
+        case SystemUser.Anonymous => Some(SystemUser.Anonymous.toString)
+        case SystemUser.UNDEFINED(name) => None
       }
     }
 
@@ -100,6 +114,9 @@ class UsersSpec extends PlaySpecification {
         case GuestUser(id, email) => id must beEqualTo(userId)
         case UserString(id) => id must beEqualTo(userId)
         case UserUndefinedType(name) => failure("Should not have received undefined type")
+        case SystemUser.System => userId must beEqualTo(SystemUser.System.toString)
+        case SystemUser.Anonymous => userId must beEqualTo(SystemUser.Anonymous.toString)
+        case SystemUser.UNDEFINED(name) => failure(s"Should not have received SystemUser.UNDEFINED($name) type")
       }
     }
 

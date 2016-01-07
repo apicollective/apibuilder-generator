@@ -127,7 +127,10 @@ case class Play2Json(
               s""""${field.originalName}" -> play.api.libs.json.Json.toJson($varName.${field.name})"""
             }.mkString(",\n")
           }
-          case ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+          case ScalaPrimitive.Enum(_, _) => {
+            s""""${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(${varName}.toString)"""
+          }
+          case ScalaPrimitive.Union(_, _) => {
             s""""${PrimitiveWrapper.FieldName}" -> play.api.libs.json.Json.toJson($varName)"""
           }
           case p: ScalaPrimitive => {

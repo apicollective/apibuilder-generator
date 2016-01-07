@@ -1,6 +1,15 @@
 {
     "name": "apidoc-example-union-types-discriminator",
 
+    "enums": {
+	"system_user": {
+	    "values": [
+		{ "name": "system" },
+		{ "name": "anonymous" }
+	    ]
+	}
+    },
+    
     "unions": {
 	"user": {
 	    "discriminator": "discriminator",
@@ -10,6 +19,9 @@
 		},
 		{
 		    "type": "guest_user"
+		},
+		{
+		    "type": "system_user"
 		},
 		{
 		    "type": "string"

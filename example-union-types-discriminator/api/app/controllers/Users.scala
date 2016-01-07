@@ -10,7 +10,9 @@ object Users extends Controller {
   private[this] val users: Seq[User] = Seq(
     RegisteredUser("usr-1", "registered@test.apidoc.me"),
     GuestUser("usr-2"),
-    UserString("usr-3")
+    UserString("usr-3"),
+    SystemUser.System,
+    SystemUser.Anonymous
   )
 
   def get() = Action {
@@ -24,6 +26,9 @@ object Users extends Controller {
         case GuestUser(userId, _) => userId == id
         case UserString(userId) => userId == id
         case UserUndefinedType(_) => false
+        case SystemUser.System => SystemUser.System.toString == id
+        case SystemUser.Anonymous => SystemUser.Anonymous.toString == id
+        case SystemUser.UNDEFINED(name) => false
       }
     } match {
       case None => {
@@ -54,6 +59,9 @@ object Users extends Controller {
           case GuestUser(id, email) => println(s"Received Guest User $id")
           case UserString(id) => println(s"Received User String $id")
           case UserUndefinedType(name) => println(s"Received undefined type $name")
+          case SystemUser.System => println(s"Received SystemUser.System")
+          case SystemUser.Anonymous => println(s"Received SystemUser.Anonymous")
+          case SystemUser.UNDEFINED(name) => println(s"Received SystemUser.UNDEFINED($name)")
         }
 
         Created(Json.toJson(user))
