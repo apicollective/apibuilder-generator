@@ -91,22 +91,6 @@ case class Play2Json(
   }
 
   private[models] def writersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
-  //  implicit val expandableUserWrites = new Writes[ExpandableUser] {
-  //    def writes(x: ExpandableUser) = {
-  //      x match {
-  //       case x: UserReference => Json.obj(
-  //         "discriminator" -> "user_reference",
-  //         "id" -> x.id
-  //       )
-  //       case x: User => Json.obj(
-  //         "discriminator" -> "user",
-  //         "id" -> x.id,
-  //         "email" -> x.email
-  //       )
-  //     }
-  //   }
-  // }
-
     Seq(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       Seq(
@@ -116,8 +100,10 @@ case class Play2Json(
           Seq(
             unionTypesWithNames(union).map { case (t, typeName) =>
               s"""case x: ${typeName} => """ + toJsonObject(union, t, "x", discriminator)
-            }.mkString("\n").indent(1),
-            s"""  case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")"""
+            }.mkString("\n"),
+            s"case x: ${union.undefinedType.fullName} => {",
+            s"""  sys.error("The type[${union.undefinedType.fullName}] should never be serialized")""",
+            "}"
           ).mkString("\n").indent(2),
           "}"
         ).mkString("\n").indent(2),
