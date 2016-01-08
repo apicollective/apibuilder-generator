@@ -1,7 +1,7 @@
 package scala.models
 
 import lib.Text._
-import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
 
 case class Play2Json(
   ssd: ScalaService
@@ -96,25 +96,23 @@ case class Play2Json(
       Seq(
         s"def writes(obj: ${union.qualifiedName}) = {",
         Seq(
-          "val discriminator: String = obj match {",
+          "obj match {",
           Seq(
-            unionTypesWithNames(union).map { case (t, typeName) =>
-              s"""case x: $typeName => "${t.originalName}""""
+            union.types.map { t =>
+              val (typeName, jsonObjectMethod) = t.datatype match {
+                case ScalaPrimitive.Model(ns, name) => {
+                  (name, toJsonObjectMethodName(ns, name))
+                }
+                case p @ (ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
+                  (p.name, "play.api.libs.json.Json.toJson")
+                }
+                case p: ScalaPrimitive => (PrimitiveWrapper.className(union, p), "play.api.libs.json.Json.toJson")
+                case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
+              }
+              s"""case x: ${typeName} => $jsonObjectMethod(x) ++ play.api.libs.json.Json.obj("$discriminator" -> "${t.originalName}")"""
             }.mkString("\n"),
             s"case other => {",
             """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""",
-            "}"
-          ).mkString("\n").indent(2),
-          "}"
-        ).mkString("\n").indent(2),
-        Seq(
-          "play.api.libs.json.Json.toJson(obj) match {",
-          Seq(
-            "case js: play.api.libs.json.JsObject => {",
-            s"""  js ++ play.api.libs.json.Json.obj("discriminator" -> "$discriminator")""",
-            "}",
-            "case other => {",
-            s"""  sys.error(s"The type[${union.qualifiedName}] must serialize to a JSON Object and not""" + "[${other.getClass.getName}]" + """")""",
             "}"
           ).mkString("\n").indent(2),
           "}"
@@ -199,8 +197,18 @@ case class Play2Json(
     }
   }
 
+  private[models] def toJsonObjectMethodName(ns: Namespaces, modelName: String): String = {
+    ns.base == ssd.namespaces.base match {
+      case true => s"json${ssd.name}${modelName}ToJsonObject"
+      case false => {
+        // todo import
+        s"json${ssd.name}${modelName}ToJsonObject"
+      }
+    }
+  }
+
   private[models] def writers(model: ScalaModel): String = {
-    val method = s"json${ssd.name}${model.name}ToJsonObject"
+    val method = toJsonObjectMethodName(ssd.namespaces, model.name)
 
     Seq(
       Seq(
