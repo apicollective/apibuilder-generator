@@ -200,34 +200,30 @@ case class Play2Json(
   }
 
   private[models] def writers(model: ScalaModel): String = {
-    model.fields match {
-      case field :: Nil => {
-        Seq(
-          s"${identifier(model.name, Writes)} = new play.api.libs.json.Writes[${model.name}] {",
-          s"  def writes(x: ${model.name}) = play.api.libs.json.Json.obj(",
-          s"""    "${field.originalName}" -> play.api.libs.json.Json.toJson(x.${field.name})""",
-          "  )",
-          "}"
-        ).mkString("\n")
-      }
+    val method = s"json${ssd.name}${model.name}ToJsonObject"
 
-      case fields => {
+    Seq(
+      Seq(
+        s"def $method(obj: ${model.qualifiedName}) = {",
         Seq(
-          s"${identifier(model.name, Writes)} = {",
-          s"  (",
+          "play.api.libs.json.Json.obj(",
           model.fields.map { field =>
-            field.datatype match {
-              case ScalaDatatype.Option(inner) =>
-                s"""(__ \\ "${field.originalName}").writeNullable[${inner.name}]"""
-              case datatype =>
-                s"""(__ \\ "${field.originalName}").write[${datatype.name}]"""
-            }
-          }.mkString(" and\n").indent(4),
-          s"  )(unlift(${model.name}.unapply _))",
-          s"}"
-        ).mkString("\n")
-      }
-    }
+            s""""${field.originalName}" -> play.api.libs.json.Json.toJson(obj.${field.name})"""
+          }.mkString(",\n").indent(2),
+          ")"
+        ).mkString("\n").indent(2),
+        "}"
+      ).mkString("\n"),
+      Seq(
+        s"${identifier(model.name, Writes)} = {",
+        s"  new play.api.libs.json.Writes[${model.qualifiedName}] {",
+        s"    def writes(obj: ${model.qualifiedName}) = {",
+        s"      $method(obj)",
+        "    }",
+        "  }",
+        "}"
+      ).mkString("\n")
+    ).mkString("\n\n")
   }
 
   private[models] def identifier(
