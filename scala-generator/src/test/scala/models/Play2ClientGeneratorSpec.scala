@@ -19,7 +19,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     errorResponse.errorClassName should be("ErrorsResponse")
     errorResponse.datatype.name should be("Seq[com.bryzek.apidoc.generator.v0.models.Error]")
 
-    val contents = ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
+    val contents = new ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
     models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package.txt", contents)
   }
 
@@ -64,7 +64,7 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     """)
 
     val ssd = ScalaService(models.TestHelper.service(json))
-    val contents = ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
+    val contents = new ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
     models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
   }
 

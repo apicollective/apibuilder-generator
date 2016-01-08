@@ -6,20 +6,20 @@ import scala.models.{FeatureMigration, JsonImports}
 import com.bryzek.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
-case class ScalaClientMethodGenerator(
+class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,
   ssd: ScalaService
 ) {
   import lib.Text
   import lib.Text._
 
-  private[this] val namespaces = Namespaces(config.namespace)
+  protected val namespaces = Namespaces(config.namespace)
 
-  private[this] val generatorUtil = ScalaGeneratorUtil(config)
+  protected val generatorUtil = ScalaGeneratorUtil(config)
 
-  private[this] val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
+  protected val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
-  private[this] val featureMigration = FeatureMigration(ssd.service.apidoc.version)
+  protected val featureMigration = FeatureMigration(ssd.service.apidoc.version)
 
   def traitsAndErrors(): String = {
     (traits() + "\n\n" + errorPackage()).trim
@@ -77,7 +77,7 @@ case class ScalaClientMethodGenerator(
     }.distinct.sorted
   }
 
-  private[this] def errorTypeClass(response: ScalaResponse): String = {
+  protected def errorTypeClass(response: ScalaResponse): String = {
     require(!response.isSuccess)
 
     response.isUnit match {
@@ -96,7 +96,7 @@ case class ScalaClientMethodGenerator(
     }
   }
 
-  private[this] def exceptionClass(
+  protected def exceptionClass(
     className: String,
     body: Option[String] = None
   ): String = {
@@ -114,13 +114,13 @@ case class ScalaClientMethodGenerator(
 
   }
 
-  private[this] def unitExceptionClass(
+  protected def unitExceptionClass(
     className: String
   ): String = {
     s"case class $className(status: Int)" + """ extends Exception(s"HTTP $status")"""
   }
 
-  private[this] def methods(resource: ScalaResource): Seq[ClientMethod] = {
+  protected def methods(resource: ScalaResource): Seq[ClientMethod] = {
     resource.operations.map { op =>
       val path = generatorUtil.pathParams(op)
 
@@ -234,7 +234,8 @@ case class ScalaClientMethodGenerator(
         },
         methodCall = methodCall,
         response = matchResponse,
-        comments = op.description
+        comments = op.description,
+        implicitArgs = config.implicitArgs
       )
 
     }
@@ -247,18 +248,19 @@ case class ScalaClientMethodGenerator(
     returnType: String,
     methodCall: String,
     response: String,
-    comments: Option[String]
+    comments: Option[String],
+    implicitArgs: Option[String]
   ) {
     import lib.Text._
     
     private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
 
     val interface: String = {
-      s"""${commentString}def $name(${argList.getOrElse("")})(implicit ec: scala.concurrent.ExecutionContext): $returnType"""
+      s"""${commentString}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
     }
 
     val code: String = {
-      s"""override def $name(${argList.getOrElse("")})(implicit ec: scala.concurrent.ExecutionContext): $returnType = {
+      s"""override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
 ${methodCall.indent}.map {
 ${response.indent(4)}
   }

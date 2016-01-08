@@ -13,13 +13,13 @@ class ReferenceWithImportsSpec extends FunSpec with Matchers {
 
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get
-    val code = ScalaCaseClasses.generateCaseClass(model, Seq.empty)
+    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
     models.TestHelper.assertEqualsFile("/generators/reference-spec-user-case-class.txt", code)
   }
 
   it("member case classes") {
     val model = ssd.models.find(_.name == "Member").get
-    val code = ScalaCaseClasses.generateCaseClass(model, Seq.empty)
+    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
     models.TestHelper.assertEqualsFile("/generators/reference-spec-member-case-class.txt", code)
   }
 

@@ -69,7 +69,7 @@ case class NingClientGenerator(
       s".addHeader(${ScalaUtil.wrapInQuotes(name)}, $value)"
     }.mkString("\n")
 
-    val methodGenerator = ScalaClientMethodGenerator(config, ssd)
+    val methodGenerator = new ScalaClientMethodGenerator(config, ssd)
 
     s"""package ${ssd.namespaces.base} {
   import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, AsyncHttpClientConfig, Realm, Request, RequestBuilder, Response}
