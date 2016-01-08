@@ -96,10 +96,10 @@ case class Play2Json(
       Seq(
         s"def writes(obj: ${union.qualifiedName}) = {",
         Seq(
-          "val discriminator: String = obj.getClass.getName match {",
+          "val discriminator: String = obj match {",
           Seq(
             unionTypesWithNames(union).map { case (t, typeName) =>
-              s"""case "$typeName" => "${t.originalName}""""
+              s"""case x: $typeName => "${t.originalName}""""
             }.mkString("\n"),
             s"case other => {",
             """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""",
