@@ -80,9 +80,7 @@ case class ScalaEnums(
   private def buildJsonNoDiscriminator(): String = {
     Seq(
       s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)",
-      s"def $writerMethod(obj: ${enum.qualifiedName}) = {",
-      s"  def writes(x: ${enum.name}) = JsString(x.toString)",
-      s"}",
+      s"def $writerMethod(obj: ${enum.qualifiedName}) = JsString(obj.toString)",
       implicitWriter
     ).mkString("\n")
   }

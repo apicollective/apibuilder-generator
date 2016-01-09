@@ -70,6 +70,9 @@ case class Play2JsonCommon(ssd: ScalaService) {
   }
 
   def implicitReaderName(name: String): String = {
+    if (name.indexOf(".") > 0) {
+      sys.error(s"Invalid name[$name]")
+    }
     s"jsonReads${ssd.name}$name"
   }
 
@@ -161,7 +164,7 @@ case class Play2Json(
 
     Seq(
       s"def $method(obj: ${union.qualifiedName}) = {",
-      s"  def writes(obj: ${union.qualifiedName}) = obj match {",
+      s"  obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
         val json = play2JsonCommon.getJsonValueMethodName(t.datatype, "x")
         s"""case x: ${t.qualifiedName} => play.api.libs.json.Json.obj("${t.originalName}" -> $json)"""
@@ -220,10 +223,14 @@ case class Play2Json(
 
   private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
     ut.model match {
-      case Some(model) => play2JsonCommon.implicitReaderName(model.name)
+      case Some(model) => {
+        play2JsonCommon.implicitReaderName(model.name)
+      }
       case None => {
         ut.enum match {
-          case Some(enum) => play2JsonCommon.implicitReaderName(enum.name)
+          case Some(enum) => {
+            play2JsonCommon.implicitReaderName(enum.name)
+          }
           case None => ut.datatype match {
             // TODO enum representation should be refactored
             // so that the type can be read directly from
