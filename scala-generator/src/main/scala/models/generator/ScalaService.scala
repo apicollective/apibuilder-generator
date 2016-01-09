@@ -169,6 +169,8 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val name: String = ScalaUtil.toClassName(enum.name)
 
+  def datatype = ScalaPrimitive.Enum(ssd.namespaces, name)
+
   val qualifiedName = ssd.enumClassName(name)
 
   val description: Option[String] = enum.description

@@ -22,6 +22,8 @@ case class Namespaces(original: String) {
   val enums: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Enum)
   val unions: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Union)
 
+  val json: String = Seq(models, "json").mkString(".")
+
   val anorm: String = Seq(base, "anorm").mkString(".")
   val anormParsers: String = Seq(anorm, Namespaces.Parsers).mkString(".")
   val anormConversions: String = Seq(anorm, Namespaces.Conversions).mkString(".")

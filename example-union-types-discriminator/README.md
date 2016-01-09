@@ -7,5 +7,5 @@ types with the scala clients.
 Updating Code
 =============
 
-    PROFILE=localhost apidoc upload bryzek apidoc-example-union-types ./example-union-types-discriminator.json  --version `sem-info tag latest`
+    PROFILE=localhost apidoc upload bryzek apidoc-example-union-types-discriminator ./example-union-types-discriminator.json  --version `sem-info tag latest`
     PROFILE=localhost apidoc update

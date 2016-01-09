@@ -1,5 +1,6 @@
 package scala.generator
 
+import scala.models.Play2JsonCommon
 import lib.Text._
 
 case class ScalaEnums(
@@ -8,6 +9,9 @@ case class ScalaEnums(
 ) {
 
   private[this] val unions = ssd.unionsForEnum(enum)
+  private[this] val play2JsonCommon = Play2JsonCommon(ssd)
+  private[this] val writerMethod = play2JsonCommon.getJsonValueMethodName(enum.datatype)
+  private[this] val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, writerMethod)
 
   def build(): String = {
     import lib.Text._
@@ -26,9 +30,9 @@ case class ScalaEnums(
     * the enum as the implicit would interfere.
     */
   def buildJson(): String = {
-    unions.find(!_.discriminator.isEmpty) match {
-      case None => buildJsonNoDiscriminator()
-      case Some(_) => buildJsonWithDiscriminator()
+    unions.find(_.discriminator.isEmpty) match {
+      case None => buildJsonWithDiscriminator()
+      case Some(_) => buildJsonNoDiscriminator()
     }
   }
 
@@ -63,16 +67,23 @@ case class ScalaEnums(
         ).mkString("\n").indent(2),
         "}"
       ).mkString("\n").indent(2),
-      "}"
+      "}",
+      "",
+      s"def $writerMethod(obj: ${enum.qualifiedName}) = {",
+      s"""  play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(obj.toString))""",
+      s"}",
+      "",
+      implicitWriter
     ).mkString("\n")
   }
 
   private def buildJsonNoDiscriminator(): String = {
     Seq(
       s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)",
-      s"implicit val jsonWrites${ssd.name}${enum.name} = new Writes[${enum.name}] {",
+      s"def $writerMethod(obj: ${enum.qualifiedName}) = {",
       s"  def writes(x: ${enum.name}) = JsString(x.toString)",
-      "}"
+      s"}",
+      implicitWriter
     ).mkString("\n")
   }
 
