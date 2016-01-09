@@ -82,7 +82,7 @@ case class Play2Json(
       s"${identifier(union.name, Writes)} = new play.api.libs.json.Writes[${union.name}] {",
       s"  def writes(obj: ${union.qualifiedName}) = obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
-        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
+        s"""case x: ${t.qualifiedName} => play.api.libs.json.Json.obj("${t.originalName}" -> ${writer("x", union, t)})"""
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -198,12 +198,10 @@ case class Play2Json(
   }
 
   private[models] def toJsonObjectMethodName(ns: Namespaces, modelName: String): String = {
+    val method = s"json${ssd.name}${modelName}ToJsonObject"
     ns.base == ssd.namespaces.base match {
-      case true => s"json${ssd.name}${modelName}ToJsonObject"
-      case false => {
-        // todo import
-        s"json${ssd.name}${modelName}ToJsonObject"
-      }
+      case true => method
+      case false => s"${ns.base}.models.json.$method"
     }
   }
 
