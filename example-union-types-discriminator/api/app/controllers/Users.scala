@@ -54,6 +54,9 @@ object Users extends Controller {
       case s: JsSuccess[User] => {
         val user = s.get
 
+        println(s"json: "+ request.body.toString)
+        println(s"user: " +user)
+
         user match {
           case RegisteredUser(id, email) => println(s"Received Registered User $id")
           case GuestUser(id, email) => println(s"Received Guest User $id")

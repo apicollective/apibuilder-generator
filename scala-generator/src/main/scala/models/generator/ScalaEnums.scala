@@ -10,7 +10,7 @@ case class ScalaEnums(
 
   private[this] val unions = ssd.unionsForEnum(enum)
   private[this] val play2JsonCommon = Play2JsonCommon(ssd)
-  private[this] val writerMethod = play2JsonCommon.getJsonValueMethodName(enum.datatype)
+  private[this] val writerMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
   private[this] val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, writerMethod)
 
   def build(): String = {

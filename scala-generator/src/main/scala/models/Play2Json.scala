@@ -8,26 +8,33 @@ case class Play2JsonCommon(ssd: ScalaService) {
   /**
    * Name of method that converts this datatype to a JsValue
    */
-  def getJsonValueMethodName(datatype: ScalaDatatype): String = {
-    getJsonObjectMethodName(datatype).getOrElse(
-      "play.api.libs.json.Json.toJson"
-    )
+  def getJsonValueMethodName(datatype: ScalaDatatype, varName: String): String = {
+    getJsonObjectMethodName(datatype, varName).getOrElse {
+      datatype match {
+        case ScalaPrimitive.Enum(ns, name) => {
+          s"play.api.libs.json.JsString(${varName}.toString)"
+        }
+        case _ => {
+          s"play.api.libs.json.Json.toJson($varName)"
+        }
+      }
+    }
   }
 
   /**
    * Name of method that converts this datatype to a JsObject, if
    * possible.
    */
-  def getJsonObjectMethodName(datatype: ScalaDatatype): Option[String] = {
+  def getJsonObjectMethodName(datatype: ScalaDatatype, varName: String): Option[String] = {
     datatype match {
       case ScalaPrimitive.Model(ns, name) => {
-        Some(toJsonObjectMethodName(ns, name))
+        Some(toJsonObjectMethodName(ns, name) + s"($varName)")
       }
       case ScalaPrimitive.Union(ns, name) => {
-        Some(toJsonObjectMethodName(ns, name))
+        Some(toJsonObjectMethodName(ns, name) + s"($varName)")
       }
       case ScalaPrimitive.Enum(ns, name) => {
-        Some(toJsonObjectMethodName(ns, name))
+        None
       }
       case x: ScalaDatatype.Container => {
         None
@@ -81,7 +88,7 @@ case class Play2Json(
   def generate(): String = {
     Seq(
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
-      PrimitiveWrapper(ssd).wrappers.map(w => readersAndWriters(w.model)).mkString("\n\n"),
+      PrimitiveWrapper(ssd).wrappers.map(w => readers(w.model)).mkString("\n\n"),
       ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
     ).filter(!_.trim.isEmpty).mkString("\n\n")    
   }
@@ -156,8 +163,8 @@ case class Play2Json(
       s"def $method(obj: ${union.qualifiedName}) = {",
       s"  def writes(obj: ${union.qualifiedName}) = obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
-        val method = play2JsonCommon.getJsonValueMethodName(t.datatype)
-        s"""case x: ${t.qualifiedName} => play.api.libs.json.Json.obj("${t.originalName}" -> method(x))"""
+        val json = play2JsonCommon.getJsonValueMethodName(t.datatype, "x")
+        s"""case x: ${t.qualifiedName} => play.api.libs.json.Json.obj("${t.originalName}" -> $json)"""
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -174,16 +181,28 @@ case class Play2Json(
         "obj match {",
         Seq(
           unionTypesWithNames(union).map { case (t, typeName) =>
-            play2JsonCommon.getJsonObjectMethodName(t.datatype) match {
-              case Some(method) => {
-                s"""case x: ${typeName} => $method(x) ++ play.api.libs.json.Json.obj("$discriminator" -> "${t.originalName}")"""
+            play2JsonCommon.getJsonObjectMethodName(t.datatype, "x") match {
+              case Some(json) => {
+                s"""case x: ${typeName} => $json ++ play.api.libs.json.Json.obj("$discriminator" -> "${t.originalName}")"""
               }
               case None => {
-                val method = play2JsonCommon.getJsonValueMethodName(t.datatype)
+                val json = t.datatype match {
+                  case ScalaPrimitive.Enum(ns, name) => {
+                    s"play.api.libs.json.JsString(x.toString)"
+                  }
+                  case x: ScalaPrimitive => {
+                    // support wrapped primitives
+                    s"play.api.libs.json.Json.toJson(x.value)"
+                  }
+                  case _ => {
+                    play2JsonCommon.getJsonValueMethodName(t.datatype, "x")
+                  }
+                }
+
                 Seq(
                   s"case x: ${typeName} => play.api.libs.json.Json.obj(",
                   s"""  "$discriminator" -> "${t.originalName}",""",
-                  s"""  "${PrimitiveWrapper.FieldName}" -> $method(x)""",
+                  s"""  "${PrimitiveWrapper.FieldName}" -> $json""",
                   s")"
                 ).mkString("\n")
               }
@@ -261,21 +280,33 @@ case class Play2Json(
   private[models] def writers(model: ScalaModel): String = {
     val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, model.name)
 
-    Seq(
+    val base = Seq(
       Seq(
         s"def $method(obj: ${model.qualifiedName}) = {",
         Seq(
           "play.api.libs.json.Json.obj(",
           model.fields.map { field =>
-            val jsonObjectMethod = play2JsonCommon.getJsonValueMethodName(field.datatype)
-            s""""${field.originalName}" -> $jsonObjectMethod(obj.${field.name})"""
+            val json = play2JsonCommon.getJsonValueMethodName(field.datatype, s"obj.${field.name}")
+            s""""${field.originalName}" -> $json"""
           }.mkString(",\n").indent(2),
           ")"
         ).mkString("\n").indent(2),
         "}"
-      ).mkString("\n"),
-      play2JsonCommon.implicitWriter(model.name, model.qualifiedName, method)
+      ).mkString("\n")
     ).mkString("\n\n")
+
+    ssd.unionsForModel(model) match {
+      case Nil => {
+        Seq(
+          base,
+          play2JsonCommon.implicitWriter(model.name, model.qualifiedName, method)
+        ).mkString("\n\n")
+      }
+      case _ => {
+        // Let the implicit for the associated union handle the serialization
+        base
+      }
+    }
   }
 
   private def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
