@@ -238,7 +238,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       obj match {
         case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonApidocExampleUnionTypesRegisteredUserToJsonObject(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonApidocExampleUnionTypesGuestUserToJsonObject(x))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.UserUuid => play.api.libs.json.Json.obj("uuid" -> play.api.libs.json.JsString(x.toString))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.UserUuid => play.api.libs.json.Json.obj("uuid" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.value.toString)))
         case x: com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
     }

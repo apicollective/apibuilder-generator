@@ -6,45 +6,6 @@ import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaModel,
 case class Play2JsonCommon(ssd: ScalaService) {
 
   /**
-   * Name of method that converts this datatype to a JsValue
-   */
-  def getJsonValueMethodName(datatype: ScalaDatatype, varName: String): String = {
-    // Boolean, DateIso8601, DateTimeIso8601, Decimal, Double, Integer, List(_), Long, Map(_), Model(_, _), Object, Option(_), String, Union(_, _), Unit, Uuid
-    datatype match {
-      case ScalaPrimitive.Enum(ns, name) => {
-        s"play.api.libs.json.JsString(${varName}.toString)"
-      }
-      case ScalaPrimitive.Model(ns, name) => {
-        toJsonObjectMethodName(ns, name) + s"($varName)"
-      }
-      case ScalaPrimitive.Union(ns, name) => {
-        toJsonObjectMethodName(ns, name) + s"($varName)"
-      }
-      case ScalaPrimitive.Boolean => {
-        s"play.api.libs.json.JsBoolean(${varName})"
-      }
-      case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
-        s"play.api.libs.json.JsNumber($varName)"
-      }
-      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
-        s"play.api.libs.json.JsString(${varName}.toString)"
-      }
-      case ScalaPrimitive.String => {
-        s"play.api.libs.json.JsString($varName)"
-      }
-      case ScalaPrimitive.DateTimeIso8601 => {
-        s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))"
-      }
-      case ScalaPrimitive.Object => {
-        s"play.api.libs.json.Json.obj($varName)"
-      }
-      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) | ScalaPrimitive.Unit => {
-        s"play.api.libs.json.Json.toJson($varName)"
-      }
-    }
-  }
-
-  /**
    * Name of method that converts this datatype to a JsObject, if
    * possible.
    */
@@ -188,7 +149,7 @@ case class Play2Json(
       s"def $method(obj: ${union.qualifiedName}) = {",
       s"  obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
-        val json = play2JsonCommon.getJsonValueMethodName(t.datatype, "x")
+        val json = getJsonValueForUnion(t.datatype, "x")
         s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> $json)"""
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
@@ -211,19 +172,7 @@ case class Play2Json(
                 s"""case x: ${typeName} => $json ++ play.api.libs.json.Json.obj("$discriminator" -> "${t.originalName}")"""
               }
               case None => {
-                val json = t.datatype match {
-                  case ScalaPrimitive.Enum(ns, name) => {
-                    s"play.api.libs.json.JsString(x.toString)"
-                  }
-                  case x: ScalaPrimitive => {
-                    // support wrapped primitives
-                    s"play.api.libs.json.Json.toJson(x.value)"
-                  }
-                  case _ => {
-                    play2JsonCommon.getJsonValueMethodName(t.datatype, "x")
-                  }
-                }
-
+                val json = getJsonValueForUnion(t.datatype, "x")
                 Seq(
                   s"case x: ${typeName} => play.api.libs.json.Json.obj(",
                   s"""  "$discriminator" -> "${t.originalName}",""",
@@ -319,7 +268,7 @@ case class Play2Json(
         Seq(
           "play.api.libs.json.Json.obj(",
           model.fields.map { field =>
-            val json = play2JsonCommon.getJsonValueMethodName(field.datatype, s"obj.${field.name}")
+            val json = getJsonValue(field.datatype, s"obj.${field.name}")
             s""""${field.originalName}" -> $json"""
           }.mkString(",\n").indent(2),
           ")"
@@ -342,7 +291,7 @@ case class Play2Json(
     }
   }
 
-  private def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
+  private[this] def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
     union.types.map { t =>
       (t,
         t.datatype match {
@@ -355,4 +304,76 @@ case class Play2Json(
       )
     }
   }
+
+  /**
+   * Name of method that converts this datatype to a JsValue
+   */
+  private[this] def getJsonValue(datatype: ScalaDatatype, varName: String): String = {
+    datatype match {
+      case ScalaPrimitive.Enum(ns, name) => {
+        s"play.api.libs.json.JsString(${varName}.toString)"
+      }
+      case ScalaPrimitive.Model(ns, name) => {
+        play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
+      }
+      case ScalaPrimitive.Union(ns, name) => {
+        play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
+      }
+      case ScalaPrimitive.Boolean => {
+        s"play.api.libs.json.JsBoolean(${varName})"
+      }
+      case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
+        s"play.api.libs.json.JsNumber($varName)"
+      }
+      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
+        s"play.api.libs.json.JsString(${varName}.toString)"
+      }
+      case ScalaPrimitive.String => {
+        s"play.api.libs.json.JsString($varName)"
+      }
+      case ScalaPrimitive.DateTimeIso8601 => {
+        s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))"
+      }
+      case ScalaPrimitive.Object => {
+        s"play.api.libs.json.Json.obj($varName)"
+      }
+      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) | ScalaPrimitive.Unit => {
+        s"play.api.libs.json.Json.toJson($varName)"
+      }
+    }
+  }
+
+  /**
+   * Assumes all primitives are wrapped in primitive wrappers
+   */
+  private[this] def getJsonValueForUnion(datatype: ScalaDatatype, varName: String): String = {
+    datatype match {
+      case ScalaPrimitive.Boolean => {
+        wrapInObject(s"play.api.libs.json.JsBoolean(${varName}.value)")
+      }
+      case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
+        wrapInObject(s"play.api.libs.json.JsNumber(${varName}.value)")
+      }
+      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
+        wrapInObject(s"play.api.libs.json.JsString(${varName}.value.toString)")
+      }
+      case ScalaPrimitive.String => {
+        wrapInObject(s"play.api.libs.json.JsString(${varName}.value)")
+      }
+      case ScalaPrimitive.DateTimeIso8601 => {
+        wrapInObject(s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(${varName}.value))")
+      }
+      case ScalaPrimitive.Object => {
+        wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)")
+      }
+      case _ => {
+        getJsonValue(datatype, varName)
+      }
+    }
+  }
+
+  private[this] def wrapInObject(value: String): String = {
+    s"""play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> $value)"""
+  }
+
 }
