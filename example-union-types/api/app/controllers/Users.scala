@@ -14,6 +14,10 @@ object Users extends Controller {
     UserUuid(UUID.randomUUID())
   )
 
+  users.foreach { u =>
+    println(s"u: $u")
+  }
+
   def get() = Action {
     Ok(Json.toJson(users))
   }
@@ -43,6 +47,7 @@ object Users extends Controller {
    * curl -X POST -H "Content-Type: application/json" -d "{ \"guest_user\": { \"guid\": \"893ac5c5-2ea3-4b0d-8f82-ca8d73a26211\", \"email\": \"testing@mailinator.com\" } }" http://localhost:7100/users
    */
   def post() = Action(parse.json) { request =>
+    println("POST: " + request.body.toString)
     request.body.validate[User] match {
       case e: JsError => {
         BadRequest(Json.obj("message" -> s"invalid json: ${e}"))
@@ -54,7 +59,9 @@ object Users extends Controller {
           case RegisteredUser(id, email, preference) => println(s"Received Registered User $id")
           case GuestUser(id, email) => println(s"Received Guest User $id")
           case UserUuid(value) => println(s"Received UUID $value")
-          case UserUndefinedType(name) => println(s"Received undefined type $name")
+          case UserUndefinedType(name) => {
+            sys.error(s"Received undefined type $name")
+          }
         }
 
         Created(Json.toJson(user))

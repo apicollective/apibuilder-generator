@@ -171,8 +171,8 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
     def jsonApidocExampleUnionTypesGuestUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.GuestUser) = {
       play.api.libs.json.Json.obj(
-        "guid" -> play.api.libs.json.Json.toJson(obj.guid),
-        "email" -> play.api.libs.json.Json.toJson(obj.email)
+        "guid" -> play.api.libs.json.JsString(obj.guid.toString),
+        "email" -> play.api.libs.json.JsString(obj.email)
       )
     }
 
@@ -186,8 +186,8 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
     def jsonApidocExampleUnionTypesRegisteredUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser) = {
       play.api.libs.json.Json.obj(
-        "guid" -> play.api.libs.json.Json.toJson(obj.guid),
-        "email" -> play.api.libs.json.Json.toJson(obj.email),
+        "guid" -> play.api.libs.json.JsString(obj.guid.toString),
+        "email" -> play.api.libs.json.JsString(obj.email),
         "preference" -> jsonApidocExampleUnionTypesFoobarToJsonObject(obj.preference)
       )
     }
@@ -198,9 +198,9 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
     implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[Foobar] = {
       (
-        (__ \ "foo").read(jsonReadsApidocExampleUnionTypescom.bryzek.apidoc.example.union.types.v0.models.Foo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        (__ \ "foo").read(jsonReadsApidocExampleUnionTypesFoo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
         orElse
-        (__ \ "bar").read(jsonReadsApidocExampleUnionTypescom.bryzek.apidoc.example.union.types.v0.models.Bar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        (__ \ "bar").read(jsonReadsApidocExampleUnionTypesBar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
         orElse
         play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Foobar]]
       )
@@ -224,9 +224,9 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
     implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = {
       (
-        (__ \ "registered_user").read(jsonReadsApidocExampleUnionTypescom.bryzek.apidoc.example.union.types.v0.models.RegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
+        (__ \ "registered_user").read(jsonReadsApidocExampleUnionTypesRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
-        (__ \ "guest_user").read(jsonReadsApidocExampleUnionTypescom.bryzek.apidoc.example.union.types.v0.models.GuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
+        (__ \ "guest_user").read(jsonReadsApidocExampleUnionTypesGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
         (__ \ "uuid").read(jsonReadsApidocExampleUnionTypesUserUuid).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
@@ -238,7 +238,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       obj match {
         case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonApidocExampleUnionTypesRegisteredUserToJsonObject(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonApidocExampleUnionTypesGuestUserToJsonObject(x))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Uuid => play.api.libs.json.Json.obj("uuid" -> play.api.libs.json.Json.toJson(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.UserUuid => play.api.libs.json.Json.obj("uuid" -> play.api.libs.json.JsString(x.toString))
         case x: com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
     }

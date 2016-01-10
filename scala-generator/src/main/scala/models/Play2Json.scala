@@ -9,14 +9,37 @@ case class Play2JsonCommon(ssd: ScalaService) {
    * Name of method that converts this datatype to a JsValue
    */
   def getJsonValueMethodName(datatype: ScalaDatatype, varName: String): String = {
-    getJsonObjectMethodName(datatype, varName).getOrElse {
-      datatype match {
-        case ScalaPrimitive.Enum(ns, name) => {
-          s"play.api.libs.json.JsString(${varName}.toString)"
-        }
-        case _ => {
-          s"play.api.libs.json.Json.toJson($varName)"
-        }
+    // Boolean, DateIso8601, DateTimeIso8601, Decimal, Double, Integer, List(_), Long, Map(_), Model(_, _), Object, Option(_), String, Union(_, _), Unit, Uuid
+    datatype match {
+      case ScalaPrimitive.Enum(ns, name) => {
+        s"play.api.libs.json.JsString(${varName}.toString)"
+      }
+      case ScalaPrimitive.Model(ns, name) => {
+        toJsonObjectMethodName(ns, name) + s"($varName)"
+      }
+      case ScalaPrimitive.Union(ns, name) => {
+        toJsonObjectMethodName(ns, name) + s"($varName)"
+      }
+      case ScalaPrimitive.Boolean => {
+        s"play.api.libs.json.JsBoolean(${varName})"
+      }
+      case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
+        s"play.api.libs.json.JsNumber($varName)"
+      }
+      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
+        s"play.api.libs.json.JsString(${varName}.toString)"
+      }
+      case ScalaPrimitive.String => {
+        s"play.api.libs.json.JsString($varName)"
+      }
+      case ScalaPrimitive.DateTimeIso8601 => {
+        s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))"
+      }
+      case ScalaPrimitive.Object => {
+        s"play.api.libs.json.Json.obj($varName)"
+      }
+      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) | ScalaPrimitive.Unit => {
+        s"play.api.libs.json.Json.toJson($varName)"
       }
     }
   }
@@ -70,13 +93,12 @@ case class Play2JsonCommon(ssd: ScalaService) {
   }
 
   def implicitReaderName(name: String): String = {
-    if (name.indexOf(".") > 0) {
-      sys.error(s"Invalid name[$name]")
-    }
+    assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     s"jsonReads${ssd.name}$name"
   }
 
   def implicitWriterDef(name: String): String = {
+    assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     s"implicit def jsonWrites${ssd.name}$name: play.api.libs.json.Writes[$name]"
   }
   
@@ -167,7 +189,7 @@ case class Play2Json(
       s"  obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
         val json = play2JsonCommon.getJsonValueMethodName(t.datatype, "x")
-        s"""case x: ${t.qualifiedName} => play.api.libs.json.Json.obj("${t.originalName}" -> $json)"""
+        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> $json)"""
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -224,22 +246,26 @@ case class Play2Json(
   private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
     ut.model match {
       case Some(model) => {
-        play2JsonCommon.implicitReaderName(model.name)
+        play2JsonCommon.implicitReaderName(ut.name)
       }
       case None => {
         ut.enum match {
           case Some(enum) => {
-            play2JsonCommon.implicitReaderName(enum.name)
+            play2JsonCommon.implicitReaderName(ut.name)
           }
-          case None => ut.datatype match {
-            // TODO enum representation should be refactored
-            // so that the type can be read directly from
-            // the enum (not ut). The enum type is always
-            // a primitive, so this match is redundant,
-            // but necessary due to the way the data is currently
-            // structured
-            case p: ScalaPrimitive => play2JsonCommon.implicitReaderName(PrimitiveWrapper.className(union, p))
-            case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
+          case None => {
+            ut.datatype match {
+              // TODO enum representation should be refactored
+              // so that the type can be read directly from
+              // the enum (not ut). The enum type is always
+              // a primitive, so this match is redundant,
+              // but necessary due to the way the data is currently
+              // structured
+              case p: ScalaPrimitive => {
+                play2JsonCommon.implicitReaderName(PrimitiveWrapper.className(union, p))
+              }
+              case dt => sys.error(s"unsupported datatype[${dt}] in union ${ut}")
+            }
           }
         }
       }
@@ -323,7 +349,7 @@ case class Play2Json(
           case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
             p.name
           }
-          case p: ScalaPrimitive => PrimitiveWrapper.className(union, p)
+          case p: ScalaPrimitive => ssd.modelClassName(PrimitiveWrapper.className(union, p))
           case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
         }
       )

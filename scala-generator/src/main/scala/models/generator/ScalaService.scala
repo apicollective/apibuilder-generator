@@ -95,7 +95,7 @@ case class ScalaUnionType(
   model: Option[ScalaPrimitive.Model] = None
 ) {
 
-  def name: String = ScalaUtil.quoteNameIfKeyword(Text.snakeToCamelCase(originalName))
+  val name: String = ScalaUtil.toClassName(originalName)
 
   val qualifiedName = ssd.modelClassName(name)
 
