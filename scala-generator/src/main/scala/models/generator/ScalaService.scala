@@ -34,13 +34,13 @@ case class ScalaService(
 
   def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
     unions.filter { u =>
-      u.types.flatMap(_.model).contains(model)
+      u.types.flatMap(_.model.map(_.fullName)).contains(model.qualifiedName)
     }
   }
 
   def unionsForEnum(enum: ScalaEnum): Seq[ScalaUnion] = {
     unions.filter { u =>
-      u.types.flatMap(_.enum).contains(enum)
+      u.types.flatMap(_.enum.map(_.fullName)).contains(enum.qualifiedName)
     }
   }
 
@@ -75,7 +75,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   // union type.
   val undefinedType = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
 
-  val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
+  val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, union, _) }
 
 }
 
@@ -88,41 +88,36 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
  *        for each type.
  */
 case class ScalaUnionType(
+  val ssd: ScalaService,
   originalName: String,
   datatype: ScalaDatatype,
-  enum: Option[ScalaEnum] = None,
-  model: Option[ScalaModel] = None
+  enum: Option[ScalaPrimitive.Enum] = None,
+  model: Option[ScalaPrimitive.Model] = None
 ) {
 
-  def name: String = ScalaUtil.quoteNameIfKeyword(Text.snakeToCamelCase(originalName))
+  val name: String = ScalaUtil.toClassName(originalName)
+
+  val qualifiedName = ssd.modelClassName(name)
 
 }
 
 object ScalaUnionType {
 
-  def apply(ssd: ScalaService, t: UnionType): ScalaUnionType = {
+  def apply(ssd: ScalaService, union: Union, t: UnionType): ScalaUnionType = {
     val `type` = ssd.datatypeResolver.parse(t.`type`, true).getOrElse {
       sys.error(ssd.errorParsingType(t.`type`, s"union type[$t]"))
     }
-    val dt:ScalaDatatype = ssd.scalaDatatype(`type`)
+    val dt: ScalaDatatype = ssd.scalaDatatype(`type`)
     dt match {
-      case ScalaPrimitive.Enum(_, name) => {
-        val enum = ssd.enums.find(_.name == name).getOrElse {
-          sys.error(s"UnionType[$t] Failed to find enum[$name]")
-        }
-
-        ScalaUnionType(t.`type`, dt, enum = Some(enum))
+      case enum: ScalaPrimitive.Enum => {
+        ScalaUnionType(ssd, t.`type`, dt, enum = Some(enum))
       }
 
-      case ScalaPrimitive.Model(_, name) => {
-        val model = ssd.models.find(_.name == name).getOrElse {
-          sys.error(s"UnionType[$t] Failed to find model[$name]")
-        }
-
-        ScalaUnionType(t.`type`, dt, model = Some(model))
+      case model: ScalaPrimitive.Model => {
+        ScalaUnionType(ssd, t.`type`, dt, model = Some(model))
       }
       case p: ScalaPrimitive => {
-        ScalaUnionType(t.`type`, p)
+        ScalaUnionType(ssd, t.`type`, p)
       }
       case c: ScalaDatatype.Container => sys.error(s"illegal container type ${c} encountered in union ${t.`type`}")
     }
@@ -173,6 +168,8 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
 class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val name: String = ScalaUtil.toClassName(enum.name)
+
+  def datatype = ScalaPrimitive.Enum(ssd.namespaces, name)
 
   val qualifiedName = ssd.enumClassName(name)
 

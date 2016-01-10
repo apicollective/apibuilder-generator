@@ -40,7 +40,7 @@ class UsersSpec extends PlaySpecification {
   }
 
   "POST /users with a UserString" in new WithServer(port = port) {
-    val id = s"usr-${UUID.randomUUID}"
+    val id = s"usr-test"
 
     await(
       client.users.post(

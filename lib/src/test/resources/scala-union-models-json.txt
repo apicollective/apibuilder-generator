@@ -7,13 +7,13 @@ implicit def jsonReadsApiDocTestGuestUser: play.api.libs.json.Reads[GuestUser] =
   )(GuestUser.apply _)
 }
 
-implicit def jsonWritesApiDocTestGuestUser: play.api.libs.json.Writes[GuestUser] = {
-  (
-    (__ \ "id").write[Long] and
-    (__ \ "email").write[String] and
-    (__ \ "name").writeNullable[String] and
-    (__ \ "bar").write[String]
-  )(unlift(GuestUser.unapply _))
+def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser) = {
+  play.api.libs.json.Json.obj(
+    "id" -> play.api.libs.json.JsNumber(obj.id),
+    "email" -> play.api.libs.json.JsString(obj.email),
+    "name" -> play.api.libs.json.Json.toJson(obj.name),
+    "bar" -> play.api.libs.json.JsString(obj.bar)
+  )
 }
 
 implicit def jsonReadsApiDocTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
@@ -25,13 +25,13 @@ implicit def jsonReadsApiDocTestRegisteredUser: play.api.libs.json.Reads[Registe
   )(RegisteredUser.apply _)
 }
 
-implicit def jsonWritesApiDocTestRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
-  (
-    (__ \ "id").write[Long] and
-    (__ \ "email").write[String] and
-    (__ \ "name").writeNullable[String] and
-    (__ \ "foo").write[String]
-  )(unlift(RegisteredUser.unapply _))
+def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser) = {
+  play.api.libs.json.Json.obj(
+    "id" -> play.api.libs.json.JsNumber(obj.id),
+    "email" -> play.api.libs.json.JsString(obj.email),
+    "name" -> play.api.libs.json.Json.toJson(obj.name),
+    "foo" -> play.api.libs.json.JsString(obj.foo)
+  )
 }
 
 implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
@@ -44,10 +44,18 @@ implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
   )
 }
 
-implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
-  def writes(obj: test.apidoc.apidoctest.v0.models.User) = obj match {
-    case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonWritesApiDocTestRegisteredUser.writes(x))
-    case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonWritesApiDocTestGuestUser.writes(x))
+def jsObjectUser(obj: test.apidoc.apidoctest.v0.models.User) = {
+  obj match {
+    case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsObjectRegisteredUser(x))
+    case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsObjectGuestUser(x))
     case x: test.apidoc.apidoctest.v0.models.UserUndefinedType => sys.error(s"The type[test.apidoc.apidoctest.v0.models.UserUndefinedType] should never be serialized")
+  }
+}
+
+implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = {
+  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.User] {
+    def writes(obj: test.apidoc.apidoctest.v0.models.User) = {
+      jsObjectUser(obj)
+    }
   }
 }
