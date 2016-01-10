@@ -5,8 +5,13 @@ import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaModel,
 
 case class Play2JsonCommon(ssd: ScalaService) {
 
+  /**
+    * Never use the service name in the method name. We never import
+    * this method implicitly and we need to be able to reference
+    * method names defined for other services.
+    */
   def toJsonObjectMethodName(ns: Namespaces, name: String): String = {
-    val method = s"json${ssd.name}${name}ToJsonObject"
+    val method = s"jsObject${name}"
     ns.base == ssd.namespaces.base match {
       case true => method
       case false => Seq(ns.json, method).mkString(".")
