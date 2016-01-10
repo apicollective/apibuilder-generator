@@ -340,7 +340,14 @@ case class Play2Json(
         wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)", discriminator)
       }
       case ScalaPrimitive.Enum(ns, name) => {
-        wrapInObject(s"play.api.libs.json.JsString(${varName}.toString)", discriminator)
+        discriminator match {
+          case None => {
+            s"play.api.libs.json.JsString(${varName}.toString)"
+          }
+          case Some(_) => {
+            wrapInObject(s"play.api.libs.json.JsString(${varName}.toString)", discriminator)
+          }
+        }
       }
       case ScalaPrimitive.Model(ns, name) => {
         mergeDiscriminator(play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)", discriminator)
