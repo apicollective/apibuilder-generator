@@ -1,9 +1,51 @@
-implicit val jsonReadsApiDocTestAgeGroup = __.read[String].map(AgeGroup.apply)
-implicit val jsonWritesApiDocTestAgeGroup = new Writes[AgeGroup] {
-  def writes(x: AgeGroup) = JsString(x.toString)
+implicit val jsonReadsApiDocTestAgeGroup = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.AgeGroup] {
+  def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[test.apidoc.apidoctest.v0.models.AgeGroup] = {
+    js match {
+      case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.AgeGroup(v.value))
+      case _ => {
+        (js \ "value").validate[String] match {
+          case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.AgeGroup(v))
+          case err: play.api.libs.json.JsError => err
+        }
+      }
+    }
+  }
 }
 
-implicit val jsonReadsApiDocTestGenre = __.read[String].map(Genre.apply)
-implicit val jsonWritesApiDocTestGenre = new Writes[Genre] {
-  def writes(x: Genre) = JsString(x.toString)
+def jsObjectAgeGroup(obj: test.apidoc.apidoctest.v0.models.AgeGroup) = {
+  play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
+}
+
+implicit def jsonWritesApiDocTestAgeGroup: play.api.libs.json.Writes[AgeGroup] = {
+  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.AgeGroup] {
+    def writes(obj: test.apidoc.apidoctest.v0.models.AgeGroup) = {
+      jsObjectAgeGroup(obj)
+    }
+  }
+}
+
+implicit val jsonReadsApiDocTestGenre = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.Genre] {
+  def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[test.apidoc.apidoctest.v0.models.Genre] = {
+    js match {
+      case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.Genre(v.value))
+      case _ => {
+        (js \ "value").validate[String] match {
+          case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.Genre(v))
+          case err: play.api.libs.json.JsError => err
+        }
+      }
+    }
+  }
+}
+
+def jsObjectGenre(obj: test.apidoc.apidoctest.v0.models.Genre) = {
+  play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
+}
+
+implicit def jsonWritesApiDocTestGenre: play.api.libs.json.Writes[Genre] = {
+  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.Genre] {
+    def writes(obj: test.apidoc.apidoctest.v0.models.Genre) = {
+      jsObjectGenre(obj)
+    }
+  }
 }

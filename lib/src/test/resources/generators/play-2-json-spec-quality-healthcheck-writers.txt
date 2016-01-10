@@ -1,6 +1,13 @@
-implicit def jsonWritesQualityHealthcheck: play.api.libs.json.Writes[Healthcheck] = new play.api.libs.json.Writes[Healthcheck] {
-  def writes(x: Healthcheck) = play.api.libs.json.Json.obj(
-    "status" -> play.api.libs.json.Json.toJson(x.status)
+def jsObjectHealthcheck(obj: com.gilt.quality.v0.models.Healthcheck) = {
+  play.api.libs.json.Json.obj(
+    "status" -> play.api.libs.json.JsString(obj.status)
   )
 }
 
+implicit def jsonWritesQualityHealthcheck: play.api.libs.json.Writes[Healthcheck] = {
+  new play.api.libs.json.Writes[com.gilt.quality.v0.models.Healthcheck] {
+    def writes(obj: com.gilt.quality.v0.models.Healthcheck) = {
+      jsObjectHealthcheck(obj)
+    }
+  }
+}

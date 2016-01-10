@@ -8,10 +8,18 @@ implicit def jsonReadsApiDocTestUserType: play.api.libs.json.Reads[UserType] = {
   )
 }
 
-implicit def jsonWritesApiDocTestUserType: play.api.libs.json.Writes[UserType] = new play.api.libs.json.Writes[UserType] {
-  def writes(obj: test.apidoc.apidoctest.v0.models.UserType) = obj match {
-    case x: test.apidoc.apidoctest.v0.models.MemberType => play.api.libs.json.Json.obj("member_type" -> jsonWritesApiDocTestMemberType.writes(x))
-    case x: test.apidoc.apidoctest.v0.models.RoleType => play.api.libs.json.Json.obj("role_type" -> jsonWritesApiDocTestRoleType.writes(x))
+def jsObjectUserType(obj: test.apidoc.apidoctest.v0.models.UserType) = {
+  obj match {
+    case x: test.apidoc.apidoctest.v0.models.MemberType => play.api.libs.json.Json.obj("member_type" -> play.api.libs.json.JsString(x.toString))
+    case x: test.apidoc.apidoctest.v0.models.RoleType => play.api.libs.json.Json.obj("role_type" -> play.api.libs.json.JsString(x.toString))
     case x: test.apidoc.apidoctest.v0.models.UserTypeUndefinedType => sys.error(s"The type[test.apidoc.apidoctest.v0.models.UserTypeUndefinedType] should never be serialized")
+  }
+}
+
+implicit def jsonWritesApiDocTestUserType: play.api.libs.json.Writes[UserType] = {
+  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.UserType] {
+    def writes(obj: test.apidoc.apidoctest.v0.models.UserType) = {
+      jsObjectUserType(obj)
+    }
   }
 }

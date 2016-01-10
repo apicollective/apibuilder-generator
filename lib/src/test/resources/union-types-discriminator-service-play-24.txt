@@ -111,6 +111,18 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       }
     }
 
+    def jsObjectSystemUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser) = {
+      play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Writes[SystemUser] = {
+      new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser] {
+        def writes(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser) = {
+          jsObjectSystemUser(obj)
+        }
+      }
+    }
+
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Reads[GuestUser] = {
       (
         (__ \ "id").read[String] and
@@ -118,11 +130,11 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       )(GuestUser.apply _)
     }
 
-    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Writes[GuestUser] = {
-      (
-        (__ \ "id").write[String] and
-        (__ \ "email").writeNullable[String]
-      )(unlift(GuestUser.unapply _))
+    def jsObjectGuestUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser) = {
+      play.api.libs.json.Json.obj(
+        "id" -> play.api.libs.json.JsString(obj.id),
+        "email" -> play.api.libs.json.Json.toJson(obj.email)
+      )
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
@@ -132,21 +144,15 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       )(RegisteredUser.apply _)
     }
 
-    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
-      (
-        (__ \ "id").write[String] and
-        (__ \ "email").write[String]
-      )(unlift(RegisteredUser.unapply _))
+    def jsObjectRegisteredUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser) = {
+      play.api.libs.json.Json.obj(
+        "id" -> play.api.libs.json.JsString(obj.id),
+        "email" -> play.api.libs.json.JsString(obj.email)
+      )
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Reads[UserString] = {
       (__ \ "value").read[String].map { x => new UserString(value = x) }
-    }
-
-    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Writes[UserString] = new play.api.libs.json.Writes[UserString] {
-      def writes(x: UserString) = play.api.libs.json.Json.obj(
-        "value" -> play.api.libs.json.Json.toJson(x.value)
-      )
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Reads[User] = new play.api.libs.json.Reads[User] {
@@ -158,7 +164,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
               case "registered_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser]
               case "guest_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser]
               case "system_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser]
-              case "string" => js.validate[UserString]
+              case "string" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserString]
               case other => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType(other))
             }
           }
@@ -166,30 +172,22 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       }
     }
 
-    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = new play.api.libs.json.Writes[User] {
-      def writes(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
-        obj match {
-          case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => play.api.libs.json.Json.obj(
-            "discriminator" -> "registered_user",
-            "id" -> play.api.libs.json.Json.toJson(x.id),
-            "email" -> play.api.libs.json.Json.toJson(x.email)
-          )
-          case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => play.api.libs.json.Json.obj(
-            "discriminator" -> "guest_user",
-            "id" -> play.api.libs.json.Json.toJson(x.id),
-            "email" -> play.api.libs.json.Json.toJson(x.email)
-          )
-          case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser => play.api.libs.json.Json.obj(
-            "discriminator" -> "system_user",
-            "value" -> play.api.libs.json.JsString(x.toString)
-          )
-          case x: UserString => play.api.libs.json.Json.obj(
-            "discriminator" -> "string",
-            "value" -> play.api.libs.json.Json.toJson(x.value)
-          )
-          case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType => {
-            sys.error("The type[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType] should never be serialized")
-          }
+    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
+      obj match {
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => jsObjectRegisteredUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => jsObjectGuestUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser => play.api.libs.json.Json.obj("discriminator" -> "system_user", "value" -> play.api.libs.json.JsString(x.toString))
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserString => play.api.libs.json.Json.obj("discriminator" -> "string", "value" -> play.api.libs.json.JsString(x.value))
+        case other => {
+          sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
+        }
+      }
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = {
+      new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.discriminator.v0.models.User] {
+        def writes(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
+          jsObjectUser(obj)
         }
       }
     }

@@ -56,13 +56,21 @@ package com.gilt.test.v0.models {
       )(User.apply _)
     }
 
+    def jsObjectUser(obj: com.gilt.test.v0.models.User) = {
+      play.api.libs.json.Json.obj(
+        "email" -> play.api.libs.json.JsString(obj.email),
+        "role" -> play.api.libs.json.JsString(obj.role),
+        "groups" -> play.api.libs.json.Json.toJson(obj.groups),
+        "permissions" -> play.api.libs.json.Json.toJson(obj.permissions)
+      )
+    }
+
     implicit def jsonWritesTestUser: play.api.libs.json.Writes[User] = {
-      (
-        (__ \ "email").write[String] and
-        (__ \ "role").write[String] and
-        (__ \ "groups").write[Seq[String]] and
-        (__ \ "permissions").write[Seq[String]]
-      )(unlift(User.unapply _))
+      new play.api.libs.json.Writes[com.gilt.test.v0.models.User] {
+        def writes(obj: com.gilt.test.v0.models.User) = {
+          jsObjectUser(obj)
+        }
+      }
     }
 
     implicit def jsonReadsTestUserPatch: play.api.libs.json.Reads[UserPatch] = {
@@ -73,12 +81,20 @@ package com.gilt.test.v0.models {
       )(UserPatch.apply _)
     }
 
+    def jsObjectUserPatch(obj: com.gilt.test.v0.models.UserPatch) = {
+      play.api.libs.json.Json.obj(
+        "groups" -> play.api.libs.json.Json.toJson(obj.groups),
+        "permissions" -> play.api.libs.json.Json.toJson(obj.permissions),
+        "preferences" -> play.api.libs.json.Json.toJson(obj.preferences)
+      )
+    }
+
     implicit def jsonWritesTestUserPatch: play.api.libs.json.Writes[UserPatch] = {
-      (
-        (__ \ "groups").writeNullable[Seq[String]] and
-        (__ \ "permissions").write[Seq[String]] and
-        (__ \ "preferences").write[Seq[String]]
-      )(unlift(UserPatch.unapply _))
+      new play.api.libs.json.Writes[com.gilt.test.v0.models.UserPatch] {
+        def writes(obj: com.gilt.test.v0.models.UserPatch) = {
+          jsObjectUserPatch(obj)
+        }
+      }
     }
   }
 }
