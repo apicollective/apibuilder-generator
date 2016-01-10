@@ -112,14 +112,14 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       }
     }
 
-    def jsonApidocExampleUnionTypesDiscriminatorSystemUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser) = {
+    def jsObjectSystemUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Writes[SystemUser] = {
       new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser] {
         def writes(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser) = {
-          jsonApidocExampleUnionTypesDiscriminatorSystemUserToJsonObject(obj)
+          jsObjectSystemUser(obj)
         }
       }
     }
@@ -131,7 +131,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       )(GuestUser.apply _)
     }
 
-    def jsonApidocExampleUnionTypesDiscriminatorGuestUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser) = {
+    def jsObjectGuestUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser) = {
       play.api.libs.json.Json.obj(
         "id" -> play.api.libs.json.JsString(obj.id),
         "email" -> play.api.libs.json.Json.toJson(obj.email)
@@ -145,7 +145,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       )(RegisteredUser.apply _)
     }
 
-    def jsonApidocExampleUnionTypesDiscriminatorRegisteredUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser) = {
+    def jsObjectRegisteredUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser) = {
       play.api.libs.json.Json.obj(
         "id" -> play.api.libs.json.JsString(obj.id),
         "email" -> play.api.libs.json.JsString(obj.email)
@@ -173,10 +173,10 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       }
     }
 
-    def jsonApidocExampleUnionTypesDiscriminatorUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
+    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
       obj match {
-        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => jsonApidocExampleUnionTypesDiscriminatorRegisteredUserToJsonObject(x) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
-        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => jsonApidocExampleUnionTypesDiscriminatorGuestUserToJsonObject(x) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => jsObjectRegisteredUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => jsObjectGuestUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
         case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser => play.api.libs.json.Json.obj("discriminator" -> "system_user", "value" -> play.api.libs.json.JsString(x.toString))
         case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserString => play.api.libs.json.Json.obj("discriminator" -> "string", "value" -> play.api.libs.json.JsString(x.value))
         case other => {
@@ -188,7 +188,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = {
       new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.discriminator.v0.models.User] {
         def writes(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
-          jsonApidocExampleUnionTypesDiscriminatorUserToJsonObject(obj)
+          jsObjectUser(obj)
         }
       }
     }
