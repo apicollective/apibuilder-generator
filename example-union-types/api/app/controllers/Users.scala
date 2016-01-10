@@ -51,14 +51,13 @@ object Users extends Controller {
         val user = s.get
 
         user match {
-          case RegisteredUser(id, email, preference) => println(s"Received Registered User $id")
-          case GuestUser(id, email) => println(s"Received Guest User $id")
+          case RegisteredUser(id, email, preference) => println(s"Received Registered User $id email[$email] preference[$preference]")
+          case GuestUser(id, email) => println(s"Received Guest User $id email[$email]")
           case UserUuid(value) => println(s"Received UUID $value")
           case UserUndefinedType(name) => {
             sys.error(s"Received undefined type $name")
           }
         }
-
         Created(Json.toJson(user))
       }
     }
