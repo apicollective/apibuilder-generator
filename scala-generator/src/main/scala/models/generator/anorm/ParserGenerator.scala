@@ -57,7 +57,15 @@ object ParserGenerator extends CodeGenerator {
           Seq(
             "import anorm._",
             s"package ${ssd.namespaces.anormParsers} {",
-            s"  import ${ssd.namespaces.anormConversions}.Json._",
+            Seq(
+              Some(s"import ${ssd.namespaces.anormConversions}.Json._"),
+              ssd.service.imports.map { imp =>
+                s"import ${Namespaces(imp.namespace).anormConversions}.Json.Local._"
+              } match {
+                case Nil => None
+                case imports => Some(imports.mkString("\n"))
+              }
+            ).flatten.mkString("\n").indent(2),
             Seq(
               ssd.enums.map(generateEnum(_)),
               ssd.models.map(generateModel(_))

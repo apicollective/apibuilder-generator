@@ -86,11 +86,15 @@ package %s {
         case _ => {
           Some(
             Seq(
-              s"import ${namespaces.models}.json._",
-              unions.map { u =>
-                s"implicit val columnTo${u.name}: Column[${u.qualifiedName}] = parser { _.as[${u.qualifiedName}] }"
-              }.mkString("\n")
-            ).mkString("\n").indent(4)
+              s"object Local {",
+              Seq(
+                s"import ${namespaces.models}.json._",
+                unions.map { u =>
+                  s"implicit val columnTo${u.name}: Column[${u.qualifiedName}] = parser { _.as[${u.qualifiedName}] }"
+                }.mkString("\n")
+              ).mkString("\n").indent(2),
+              "}"
+            ).mkString("\n\n").indent(4)
           )
         }
       },
