@@ -5,30 +5,6 @@ import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaModel,
 
 case class Play2JsonCommon(ssd: ScalaService) {
 
-  /**
-   * Name of method that converts this datatype to a JsObject, if
-   * possible.
-   */
-  def getJsonObjectMethodName(datatype: ScalaDatatype, varName: String): Option[String] = {
-    datatype match {
-      case ScalaPrimitive.Model(ns, name) => {
-        Some(toJsonObjectMethodName(ns, name) + s"($varName)")
-      }
-      case ScalaPrimitive.Union(ns, name) => {
-        Some(toJsonObjectMethodName(ns, name) + s"($varName)")
-      }
-      case ScalaPrimitive.Enum(ns, name) => {
-        None
-      }
-      case x: ScalaDatatype.Container => {
-        None
-      }
-      case x: ScalaPrimitive => {
-        None
-      }
-    }
-  }
-
   def toJsonObjectMethodName(ns: Namespaces, name: String): String = {
     val method = s"json${ssd.name}${name}ToJsonObject"
     ns.base == ssd.namespaces.base match {
@@ -167,20 +143,8 @@ case class Play2Json(
         "obj match {",
         Seq(
           unionTypesWithNames(union).map { case (t, typeName) =>
-            play2JsonCommon.getJsonObjectMethodName(t.datatype, "x") match {
-              case Some(json) => {
-                s"""case x: ${typeName} => $json ++ play.api.libs.json.Json.obj("$discriminator" -> "${t.originalName}")"""
-              }
-              case None => {
-                val json = getJsonValueForUnion(t.datatype, "x")
-                Seq(
-                  s"case x: ${typeName} => play.api.libs.json.Json.obj(",
-                  s"""  "$discriminator" -> "${t.originalName}",""",
-                  s"""  "${PrimitiveWrapper.FieldName}" -> $json""",
-                  s")"
-                ).mkString("\n")
-              }
-            }
+            val json = getJsonValueForUnion(t.datatype, "x", Some(Discriminator(discriminator, t.originalName)))
+            s"case x: ${typeName} => $json"
           }.mkString("\n"),
           s"case other => {",
           """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""",
@@ -346,34 +310,73 @@ case class Play2Json(
   /**
    * Assumes all primitives are wrapped in primitive wrappers
    */
-  private[this] def getJsonValueForUnion(datatype: ScalaDatatype, varName: String): String = {
+  private[this] def getJsonValueForUnion(
+    datatype: ScalaDatatype,
+    varName: String,
+    discriminator: Option[Discriminator] = None
+  ): String = {
     datatype match {
       case ScalaPrimitive.Boolean => {
-        wrapInObject(s"play.api.libs.json.JsBoolean(${varName}.value)")
+        wrapInObject(s"play.api.libs.json.JsBoolean(${varName}.value)", discriminator)
       }
       case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
-        wrapInObject(s"play.api.libs.json.JsNumber(${varName}.value)")
+        wrapInObject(s"play.api.libs.json.JsNumber(${varName}.value)", discriminator)
       }
       case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
-        wrapInObject(s"play.api.libs.json.JsString(${varName}.value.toString)")
+        wrapInObject(s"play.api.libs.json.JsString(${varName}.value.toString)", discriminator)
       }
       case ScalaPrimitive.String => {
-        wrapInObject(s"play.api.libs.json.JsString(${varName}.value)")
+        wrapInObject(s"play.api.libs.json.JsString(${varName}.value)", discriminator)
       }
       case ScalaPrimitive.DateTimeIso8601 => {
-        wrapInObject(s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(${varName}.value))")
+        wrapInObject(s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(${varName}.value))", discriminator)
       }
       case ScalaPrimitive.Object => {
-        wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)")
+        wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)", discriminator)
       }
-      case _ => {
-        getJsonValue(datatype, varName)
+      case ScalaPrimitive.Enum(ns, name) => {
+        wrapInObject(s"play.api.libs.json.JsString(${varName}.toString)", discriminator)
+      }
+      case ScalaPrimitive.Model(ns, name) => {
+        mergeDiscriminator(play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)", discriminator)
+      }
+      case ScalaPrimitive.Union(ns, name) => {
+        mergeDiscriminator(play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)", discriminator)
+      }
+      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) | ScalaPrimitive.Unit => {
+        mergeDiscriminator(s"play.api.libs.json.Json.toJson($varName)", discriminator)
       }
     }
   }
 
-  private[this] def wrapInObject(value: String): String = {
-    s"""play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> $value)"""
+  private[this] def wrapInObject(
+    value: String,
+    discriminator: Option[Discriminator]
+  ): String = {
+    discriminator match {
+      case None => {
+        s"""play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> $value)"""
+      }
+      case Some(disc) => {
+        s"""play.api.libs.json.Json.obj("${disc.name}" -> "${disc.value}", "${PrimitiveWrapper.FieldName}" -> $value)"""
+      }
+    }
   }
+
+  private[this] def mergeDiscriminator(
+    value: String,
+    discriminator: Option[Discriminator]
+  ): String = {
+    discriminator match {
+      case None => {
+        value
+      }
+      case Some(disc) => {
+        s"""$value ++ play.api.libs.json.Json.obj("${disc.name}" -> "${disc.value}")"""
+      }
+    }
+  }
+
+  private[this] case class Discriminator(name: String, value: String)
 
 }

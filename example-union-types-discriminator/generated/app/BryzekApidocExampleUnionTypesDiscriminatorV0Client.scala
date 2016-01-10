@@ -133,7 +133,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
 
     def jsonApidocExampleUnionTypesDiscriminatorGuestUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser) = {
       play.api.libs.json.Json.obj(
-        "id" -> play.api.libs.json.Json.toJson(obj.id),
+        "id" -> play.api.libs.json.JsString(obj.id),
         "email" -> play.api.libs.json.Json.toJson(obj.email)
       )
     }
@@ -147,8 +147,8 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
 
     def jsonApidocExampleUnionTypesDiscriminatorRegisteredUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser) = {
       play.api.libs.json.Json.obj(
-        "id" -> play.api.libs.json.Json.toJson(obj.id),
-        "email" -> play.api.libs.json.Json.toJson(obj.email)
+        "id" -> play.api.libs.json.JsString(obj.id),
+        "email" -> play.api.libs.json.JsString(obj.email)
       )
     }
 
@@ -165,7 +165,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
               case "registered_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser]
               case "guest_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser]
               case "system_user" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser]
-              case "string" => js.validate[UserString]
+              case "string" => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserString]
               case other => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType(other))
             }
           }
@@ -177,14 +177,8 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       obj match {
         case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => jsonApidocExampleUnionTypesDiscriminatorRegisteredUserToJsonObject(x) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
         case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => jsonApidocExampleUnionTypesDiscriminatorGuestUserToJsonObject(x) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
-        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser => play.api.libs.json.Json.obj(
-          "discriminator" -> "system_user",
-          "value" -> play.api.libs.json.JsString(x.toString)
-        )
-        case x: UserString => play.api.libs.json.Json.obj(
-          "discriminator" -> "string",
-          "value" -> play.api.libs.json.Json.toJson(x.value)
-        )
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser => play.api.libs.json.Json.obj("discriminator" -> "system_user", "value" -> play.api.libs.json.JsString(x.toString))
+        case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserString => play.api.libs.json.Json.obj("discriminator" -> "string", "value" -> play.api.libs.json.JsString(x.value))
         case other => {
           sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
         }

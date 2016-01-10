@@ -208,8 +208,8 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
     def jsonApidocExampleUnionTypesFoobarToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = {
       obj match {
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.JsString(x.toString))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.JsString(x.toString))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.toString)))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.toString)))
         case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
       }
     }
