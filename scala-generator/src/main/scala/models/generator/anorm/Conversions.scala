@@ -95,7 +95,7 @@ package %s {
           }
         },
         Some("}")
-      ).flatten.mkString("\n"),
+      ).flatten.mkString("\n").indent(4),
       Footer
     ).mkString("\n\n")
 
