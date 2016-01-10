@@ -609,31 +609,68 @@ ${headers.rubyModuleConstants.indent(2)}
         "end"
       ).mkString("\n"),
 
-      Seq(
-        "def to_hash",
-        "  { @name => subtype_to_hash }",
-        "end"
-      ).mkString("\n"),
+      generateUnionClassToHash(union),
 
-      Seq(
-        s"def $className.from_json(hash)",
-        s"  HttpClient::Preconditions.assert_class('hash', hash, Hash)",
-        s"  hash.map do |union_type_name, data|",
-        s"    case union_type_name",
-        union.types.map { ut =>
-          Datatype.Primitive(ut.`type`) match {
-            case Failure(_) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(data)"
-            case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(data)"
-          }
-        }.mkString("\n").indent(6),
-        s"      else ${undefinedTypeClassName(union)}.new(:name => union_type_name)",
-        s"    end",
-        s"  end.first",
-        s"end"
-      ).mkString("\n")
+      generateUnionClassFromJson(union)
 
     ).mkString("\n\n").indent(2) +
     "\n\nend"
+  }
+
+  private[this] def generateUnionClassToHash(union: Union): String = {
+    Seq(
+      "def to_hash",
+      union.discriminator match {
+        case None => {
+          "  { @name => subtype_to_hash }"
+        }
+        case Some(disc) => {
+          s"""  subtype_to_hash.merge(:$disc => @name)"""
+        }
+      },
+      "end"
+    ).mkString("\n")
+  }
+
+  private[this] def generateUnionClassFromJson(union: Union): String = {
+    val className = RubyUtil.toClassName(union.name)
+
+    union.discriminator match {
+      case None => {
+        Seq(
+          s"def $className.from_json(hash)",
+          s"  HttpClient::Preconditions.assert_class('hash', hash, Hash)",
+          s"  hash.map do |union_type_name, data|",
+          s"    case union_type_name",
+          union.types.map { ut =>
+            Datatype.Primitive(ut.`type`) match {
+              case Failure(_) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(data)"
+              case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(data)"
+            }
+          }.mkString("\n").indent(6),
+          s"      else ${undefinedTypeClassName(union)}.new(:name => union_type_name)",
+          s"    end",
+          s"  end.first",
+          s"end"
+        ).mkString("\n")
+      }
+      case Some(disc) => {
+        Seq(
+          s"def $className.from_json(hash)",
+          s"  HttpClient::Preconditions.assert_class('hash', hash, Hash)",
+          s"  case HttpClient::Helper.symbolize_keys(hash)[:$disc]",
+          union.types.map { ut =>
+            Datatype.Primitive(ut.`type`) match {
+              case Failure(_) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(hash)"
+              case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(hash)"
+            }
+          }.mkString("\n").indent(4),
+          s"    else ${undefinedTypeClassName(union)}.new(:name => union_type_name)",
+          s"  end",
+          s"end"
+        ).mkString("\n")
+      }
+    }
   }
 
   def generateUnionUndefinedType(union: Union): String = {
