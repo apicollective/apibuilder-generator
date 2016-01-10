@@ -143,21 +143,21 @@ package com.bryzek.apidoc.example.union.types.v0.models {
     }
 
     implicit val jsonReadsApidocExampleUnionTypesBar = __.read[String].map(Bar.apply)
-    def jsonApidocExampleUnionTypesBarToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.Bar) = JsString(obj.toString)
+    def jsObjectBar(obj: com.bryzek.apidoc.example.union.types.v0.models.Bar) = JsString(obj.toString)
     implicit def jsonWritesApidocExampleUnionTypesBar: play.api.libs.json.Writes[Bar] = {
       new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.Bar] {
         def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Bar) = {
-          jsonApidocExampleUnionTypesBarToJsonObject(obj)
+          jsObjectBar(obj)
         }
       }
     }
 
     implicit val jsonReadsApidocExampleUnionTypesFoo = __.read[String].map(Foo.apply)
-    def jsonApidocExampleUnionTypesFooToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.Foo) = JsString(obj.toString)
+    def jsObjectFoo(obj: com.bryzek.apidoc.example.union.types.v0.models.Foo) = JsString(obj.toString)
     implicit def jsonWritesApidocExampleUnionTypesFoo: play.api.libs.json.Writes[Foo] = {
       new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.Foo] {
         def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Foo) = {
-          jsonApidocExampleUnionTypesFooToJsonObject(obj)
+          jsObjectFoo(obj)
         }
       }
     }
@@ -169,7 +169,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )(GuestUser.apply _)
     }
 
-    def jsonApidocExampleUnionTypesGuestUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.GuestUser) = {
+    def jsObjectGuestUser(obj: com.bryzek.apidoc.example.union.types.v0.models.GuestUser) = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email)
@@ -184,11 +184,11 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )(RegisteredUser.apply _)
     }
 
-    def jsonApidocExampleUnionTypesRegisteredUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser) = {
+    def jsObjectRegisteredUser(obj: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser) = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email),
-        "preference" -> jsonApidocExampleUnionTypesFoobarToJsonObject(obj.preference)
+        "preference" -> jsObjectFoobar(obj.preference)
       )
     }
 
@@ -206,10 +206,10 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )
     }
 
-    def jsonApidocExampleUnionTypesFoobarToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = {
+    def jsObjectFoobar(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = {
       obj match {
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.toString)))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.toString)))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.JsString(x.toString))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.JsString(x.toString))
         case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
       }
     }
@@ -217,7 +217,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = {
       new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.Foobar] {
         def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = {
-          jsonApidocExampleUnionTypesFoobarToJsonObject(obj)
+          jsObjectFoobar(obj)
         }
       }
     }
@@ -234,10 +234,10 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )
     }
 
-    def jsonApidocExampleUnionTypesUserToJsonObject(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = {
+    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = {
       obj match {
-        case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsonApidocExampleUnionTypesRegisteredUserToJsonObject(x))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsonApidocExampleUnionTypesGuestUserToJsonObject(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsObjectRegisteredUser(x))
+        case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsObjectGuestUser(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.UserUuid => play.api.libs.json.Json.obj("uuid" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.value.toString)))
         case x: com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
@@ -246,7 +246,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
     implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = {
       new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.User] {
         def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = {
-          jsonApidocExampleUnionTypesUserToJsonObject(obj)
+          jsObjectUser(obj)
         }
       }
     }
