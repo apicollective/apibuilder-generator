@@ -167,7 +167,9 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
 
 class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
-  val name: String = ScalaUtil.toClassName(enum.name)
+  val originalName: String = enum.name
+
+  val name: String = ScalaUtil.toClassName(originalName)
 
   def datatype = ScalaPrimitive.Enum(ssd.namespaces, name)
 
