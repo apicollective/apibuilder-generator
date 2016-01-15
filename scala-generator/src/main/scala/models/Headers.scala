@@ -11,10 +11,12 @@ case class Headers(
 
   private[this] val versionMajor: Option[Int] = VersionTag(form.service.version).major
 
+  private[this] val NamespaceName = "Namespace"
   private[this] val VersionMajorName = "VersionMajor"
   private[this] val VersionMajorHeaderName = "X-Apidoc-Version-Major"
 
   private[this] val constants = Seq(
+    Some("Namespace", form.service.namespace),
     Some("UserAgent", form.userAgent.getOrElse("apidoc:play_2x_client:unknown")),
     Some("Version", form.service.version),
     versionMajor.map { major => (VersionMajorName, major.toString) }
