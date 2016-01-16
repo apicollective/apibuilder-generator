@@ -7,30 +7,17 @@ import anorm._
 package test.apidoc.apidoctest.v0.anorm.parsers {
 
   import test.apidoc.apidoctest.v0.anorm.conversions.Json._
-  import test.apidoc.apidoctest.v0.anorm.conversions.Json.Local._
 
   object GuestUser {
 
-    case class Mappings(
-      guid: String = "guid"
+    def parserWithPrefix(prefix: String) = parser(
+      guid = s"${prefix}_guid"
     )
 
-    object Mappings {
-
-      val base = prefix("", "")
-
-      def table(table: String) = prefix(table, ".")
-
-      def prefix(prefix: String, sep: String) = Mappings(
-        guid = s"${prefix}${sep}guid"
-      )
-
-    }
-
-    def table(table: String) = parser(Mappings.prefix(table, "."))
-
-    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.GuestUser] = {
-      SqlParser.get[_root_.java.util.UUID](mappings.guid) map {
+    def parser(
+      guid: String = "guid"
+    ): RowParser[test.apidoc.apidoctest.v0.models.GuestUser] = {
+      SqlParser.get[_root_.java.util.UUID](guid) map {
         case guid => {
           test.apidoc.apidoctest.v0.models.GuestUser(
             guid = guid
@@ -43,32 +30,34 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object RegisteredUser {
 
-    case class Mappings(
-      guid: String = "guid"
+    def parserWithPrefix(prefix: String) = parser(
+      guid = s"${prefix}_guid"
     )
 
-    object Mappings {
-
-      val base = prefix("", "")
-
-      def table(table: String) = prefix(table, ".")
-
-      def prefix(prefix: String, sep: String) = Mappings(
-        guid = s"${prefix}${sep}guid"
-      )
-
-    }
-
-    def table(table: String) = parser(Mappings.prefix(table, "."))
-
-    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.RegisteredUser] = {
-      SqlParser.get[_root_.java.util.UUID](mappings.guid) map {
+    def parser(
+      guid: String = "guid"
+    ): RowParser[test.apidoc.apidoctest.v0.models.RegisteredUser] = {
+      SqlParser.get[_root_.java.util.UUID](guid) map {
         case guid => {
           test.apidoc.apidoctest.v0.models.RegisteredUser(
             guid = guid
           )
         }
       }
+    }
+
+  }
+
+  object User {
+
+    def parserWithPrefix(prefix: String) = {
+      test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.parserWithPrefix(prefix) |
+      test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.parserWithPrefix(prefix)
+    }
+
+    def parser() = {
+      test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.parser() |
+      test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.parser()
     }
 
   }

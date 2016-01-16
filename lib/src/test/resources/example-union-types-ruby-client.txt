@@ -24,6 +24,7 @@ module Com
 
                 module Constants
 
+                  NAMESPACE = 'com.bryzek.apidoc.example.union.types.v0' unless defined?(Constants::NAMESPACE)
                   USER_AGENT = 'apidoc:play_2x_client:unknown' unless defined?(Constants::USER_AGENT)
                   VERSION = '0.1.41' unless defined?(Constants::VERSION)
                   VERSION_MAJOR = 0 unless defined?(VERSION_MAJOR)

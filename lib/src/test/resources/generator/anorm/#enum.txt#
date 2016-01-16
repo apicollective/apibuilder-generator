@@ -19,7 +19,8 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
     }
 
   }
-  object User {
+
+diff /tmp/apidoc.tmp.expected.generatoranormlocationparserstxt ./lib/src/test/resources/generator/anorm/location-parsers.txt  object User {
 
     def parserWithPrefix(prefix: String) = parser(
       guid = s"${prefix}_guid",

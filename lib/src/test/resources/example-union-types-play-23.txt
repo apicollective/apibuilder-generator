@@ -310,6 +310,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
 
   object Constants {
 
+    val Namespace = "com.bryzek.apidoc.example.union.types.v0"
     val UserAgent = "apidoc:play_2x_client:unknown"
     val Version = "0.1.41"
     val VersionMajor = 0

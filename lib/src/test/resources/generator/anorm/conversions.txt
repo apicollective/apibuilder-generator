@@ -67,9 +67,6 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
     implicit val columnToSeqUUID: Column[Seq[_root_.java.util.UUID]] = parser { _.as[Seq[_root_.java.util.UUID]] }
     implicit val columnToMapUUID: Column[Map[String, _root_.java.util.UUID]] = parser { _.as[Map[String, _root_.java.util.UUID]] }
 
-    object Local {
-    }
-
   }
 
 }

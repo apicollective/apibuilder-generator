@@ -7,33 +7,20 @@ import anorm._
 package test.apidoc.apidoctest.v0.anorm.parsers {
 
   import test.apidoc.apidoctest.v0.anorm.conversions.Json._
-  import test.apidoc.apidoctest.v0.anorm.conversions.Json.Local._
 
   object Name {
 
-    case class Mappings(
-      first: String = "first",
-      last: String = "last"
+    def parserWithPrefix(prefix: String) = parser(
+      first = s"${prefix}_first",
+      last = s"${prefix}_last"
     )
 
-    object Mappings {
-
-      val base = prefix("", "")
-
-      def table(table: String) = prefix(table, ".")
-
-      def prefix(prefix: String, sep: String) = Mappings(
-        first = s"${prefix}${sep}first",
-        last = s"${prefix}${sep}last"
-      )
-
-    }
-
-    def table(table: String) = parser(Mappings.prefix(table, "."))
-
-    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
-      SqlParser.str(mappings.first).? ~
-      SqlParser.str(mappings.last).? map {
+    def parser(
+      first: String = "first",
+      last: String = "last"
+    ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
+      SqlParser.str(first).? ~
+      SqlParser.str(last).? map {
         case first ~ last => {
           test.apidoc.apidoctest.v0.models.Name(
             first = first,

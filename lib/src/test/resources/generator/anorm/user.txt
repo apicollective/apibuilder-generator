@@ -7,33 +7,20 @@ import anorm._
 package test.apidoc.apidoctest.v0.anorm.parsers {
 
   import test.apidoc.apidoctest.v0.anorm.conversions.Json._
-  import test.apidoc.apidoctest.v0.anorm.conversions.Json.Local._
 
   object Name {
 
-    case class Mappings(
-      first: String = "first",
-      last: String = "last"
+    def parserWithPrefix(prefix: String) = parser(
+      first = s"${prefix}_first",
+      last = s"${prefix}_last"
     )
 
-    object Mappings {
-
-      val base = prefix("", "")
-
-      def table(table: String) = prefix(table, ".")
-
-      def prefix(prefix: String, sep: String) = Mappings(
-        first = s"${prefix}${sep}first",
-        last = s"${prefix}${sep}last"
-      )
-
-    }
-
-    def table(table: String) = parser(Mappings.prefix(table, "."))
-
-    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
-      SqlParser.str(mappings.first).? ~
-      SqlParser.str(mappings.last).? map {
+    def parser(
+      first: String = "first",
+      last: String = "last"
+    ): RowParser[test.apidoc.apidoctest.v0.models.Name] = {
+      SqlParser.str(first).? ~
+      SqlParser.str(last).? map {
         case first ~ last => {
           test.apidoc.apidoctest.v0.models.Name(
             first = first,
@@ -47,32 +34,20 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
-    case class Mappings(
-      guid: String = "guid",
-      email: String = "email",
-      name: test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings
+    def parserWithPrefix(prefix: String) = parser(
+      guid = s"${prefix}_guid",
+      email = s"${prefix}_email",
+      namePrefix = s"${prefix}_name"
     )
 
-    object Mappings {
-
-      val base = prefix("", "")
-
-      def table(table: String) = prefix(table, ".")
-
-      def prefix(prefix: String, sep: String) = Mappings(
-        guid = s"${prefix}${sep}guid",
-        email = s"${prefix}${sep}email",
-        name = test.apidoc.apidoctest.v0.anorm.parsers.Name.Mappings.prefix(Seq(prefix, "name").filter(!_.isEmpty).mkString("_"), "_")
-      )
-
-    }
-
-    def table(table: String) = parser(Mappings.prefix(table, "."))
-
-    def parser(mappings: Mappings): RowParser[test.apidoc.apidoctest.v0.models.User] = {
-      SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
-      SqlParser.str(mappings.email) ~
-      test.apidoc.apidoctest.v0.anorm.parsers.Name.parser(mappings.name).? map {
+    def parser(
+      guid: String = "guid",
+      email: String = "email",
+      namePrefix: String = "name"
+    ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
+      SqlParser.get[_root_.java.util.UUID](guid) ~
+      SqlParser.str(email) ~
+      test.apidoc.apidoctest.v0.anorm.parsers.Name.parserWithPrefix(namePrefix).? map {
         case guid ~ email ~ name => {
           test.apidoc.apidoctest.v0.models.User(
             guid = guid,

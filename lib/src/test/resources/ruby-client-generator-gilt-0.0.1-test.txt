@@ -24,6 +24,7 @@ module Com
 
               module Constants
 
+                NAMESPACE = 'com.bryzek.apidoc.reference.api.v0' unless defined?(Constants::NAMESPACE)
                 USER_AGENT = 'gilt 0.0.1-test' unless defined?(Constants::USER_AGENT)
                 VERSION = '0.0.1-dev' unless defined?(Constants::VERSION)
                 VERSION_MAJOR = 0 unless defined?(VERSION_MAJOR)
