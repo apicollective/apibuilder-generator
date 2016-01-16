@@ -84,7 +84,7 @@ object ParserGenerator extends CodeGenerator {
         s"def parserWithPrefix(prefix: String) = parser(",
         model.fields.map { f =>
           val argName = parserFieldName(f.originalName, f.datatype)
-          s"""${ScalaUtil.quoteNameIfKeyword(argName)} = s"""" + "${prefix}_" + s"""${f.name}""""
+          s"""${ScalaUtil.quoteNameIfKeyword(argName)} = s"""" + "${prefix}_" + s"""${f.originalName}""""
         }.mkString(",\n").indent(2),
         ")"
       ).mkString("\n"),

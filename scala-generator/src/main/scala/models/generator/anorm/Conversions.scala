@@ -73,6 +73,7 @@ package %s {
 
     Seq(
       Header.format(namespaces.anormConversions),
+      s"    implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = parser { _.as[play.api.libs.json.JsObject] }",
       Types.map { t =>
         Seq(
           s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = parser { _.as[Seq[${t.fullName}]] }",

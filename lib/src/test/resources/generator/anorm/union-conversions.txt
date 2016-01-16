@@ -46,6 +46,8 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
       }
     }
 
+    implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = parser { _.as[play.api.libs.json.JsObject] }
+
     implicit val columnToSeqBoolean: Column[Seq[Boolean]] = parser { _.as[Seq[Boolean]] }
     implicit val columnToMapBoolean: Column[Map[String, Boolean]] = parser { _.as[Map[String, Boolean]] }
     implicit val columnToSeqDouble: Column[Seq[Double]] = parser { _.as[Seq[Double]] }
