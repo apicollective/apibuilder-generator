@@ -62,7 +62,7 @@ object ParserGenerator extends CodeGenerator {
               ssd.enums.map(generateEnum(_)),
               ssd.models.map(generateModel(_)),
               ssd.unions.map(generateUnion(_))
-            ).filter(!_.isEmpty).flatten.mkString("\n").indent(2),
+            ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n").indent(2),
             "}"
           ).mkString("\n\n")
         )
