@@ -524,6 +524,10 @@ package com.gilt.quality.v0.models {
       }
     }
 
+    def jsonWritesQualityExternalServiceName(obj: com.gilt.quality.v0.models.ExternalServiceName) = {
+      play.api.libs.json.JsString(obj.toString)
+    }
+
     def jsObjectExternalServiceName(obj: com.gilt.quality.v0.models.ExternalServiceName) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
@@ -531,7 +535,7 @@ package com.gilt.quality.v0.models {
     implicit def jsonWritesQualityExternalServiceName: play.api.libs.json.Writes[ExternalServiceName] = {
       new play.api.libs.json.Writes[com.gilt.quality.v0.models.ExternalServiceName] {
         def writes(obj: com.gilt.quality.v0.models.ExternalServiceName) = {
-          jsObjectExternalServiceName(obj)
+          jsonWritesQualityExternalServiceName(obj)
         }
       }
     }
@@ -550,6 +554,10 @@ package com.gilt.quality.v0.models {
       }
     }
 
+    def jsonWritesQualityPublication(obj: com.gilt.quality.v0.models.Publication) = {
+      play.api.libs.json.JsString(obj.toString)
+    }
+
     def jsObjectPublication(obj: com.gilt.quality.v0.models.Publication) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
@@ -557,7 +565,7 @@ package com.gilt.quality.v0.models {
     implicit def jsonWritesQualityPublication: play.api.libs.json.Writes[Publication] = {
       new play.api.libs.json.Writes[com.gilt.quality.v0.models.Publication] {
         def writes(obj: com.gilt.quality.v0.models.Publication) = {
-          jsObjectPublication(obj)
+          jsonWritesQualityPublication(obj)
         }
       }
     }
@@ -576,6 +584,10 @@ package com.gilt.quality.v0.models {
       }
     }
 
+    def jsonWritesQualityResponse(obj: com.gilt.quality.v0.models.Response) = {
+      play.api.libs.json.JsString(obj.toString)
+    }
+
     def jsObjectResponse(obj: com.gilt.quality.v0.models.Response) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
@@ -583,7 +595,7 @@ package com.gilt.quality.v0.models {
     implicit def jsonWritesQualityResponse: play.api.libs.json.Writes[Response] = {
       new play.api.libs.json.Writes[com.gilt.quality.v0.models.Response] {
         def writes(obj: com.gilt.quality.v0.models.Response) = {
-          jsObjectResponse(obj)
+          jsonWritesQualityResponse(obj)
         }
       }
     }
@@ -602,6 +614,10 @@ package com.gilt.quality.v0.models {
       }
     }
 
+    def jsonWritesQualitySeverity(obj: com.gilt.quality.v0.models.Severity) = {
+      play.api.libs.json.JsString(obj.toString)
+    }
+
     def jsObjectSeverity(obj: com.gilt.quality.v0.models.Severity) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
@@ -609,7 +625,7 @@ package com.gilt.quality.v0.models {
     implicit def jsonWritesQualitySeverity: play.api.libs.json.Writes[Severity] = {
       new play.api.libs.json.Writes[com.gilt.quality.v0.models.Severity] {
         def writes(obj: com.gilt.quality.v0.models.Severity) = {
-          jsObjectSeverity(obj)
+          jsonWritesQualitySeverity(obj)
         }
       }
     }
@@ -628,6 +644,10 @@ package com.gilt.quality.v0.models {
       }
     }
 
+    def jsonWritesQualityTask(obj: com.gilt.quality.v0.models.Task) = {
+      play.api.libs.json.JsString(obj.toString)
+    }
+
     def jsObjectTask(obj: com.gilt.quality.v0.models.Task) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
@@ -635,7 +655,7 @@ package com.gilt.quality.v0.models {
     implicit def jsonWritesQualityTask: play.api.libs.json.Writes[Task] = {
       new play.api.libs.json.Writes[com.gilt.quality.v0.models.Task] {
         def writes(obj: com.gilt.quality.v0.models.Task) = {
-          jsObjectTask(obj)
+          jsonWritesQualityTask(obj)
         }
       }
     }

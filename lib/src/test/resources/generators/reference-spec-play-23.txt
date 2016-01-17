@@ -158,6 +158,10 @@ package com.bryzek.apidoc.reference.api.v0.models {
       }
     }
 
+    def jsonWritesApidocReferenceApiAgeGroup(obj: com.bryzek.apidoc.reference.api.v0.models.AgeGroup) = {
+      play.api.libs.json.JsString(obj.toString)
+    }
+
     def jsObjectAgeGroup(obj: com.bryzek.apidoc.reference.api.v0.models.AgeGroup) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
@@ -165,7 +169,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
     implicit def jsonWritesApidocReferenceApiAgeGroup: play.api.libs.json.Writes[AgeGroup] = {
       new play.api.libs.json.Writes[com.bryzek.apidoc.reference.api.v0.models.AgeGroup] {
         def writes(obj: com.bryzek.apidoc.reference.api.v0.models.AgeGroup) = {
-          jsObjectAgeGroup(obj)
+          jsonWritesApidocReferenceApiAgeGroup(obj)
         }
       }
     }
