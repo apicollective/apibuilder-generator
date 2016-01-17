@@ -81,10 +81,10 @@ object ParserGenerator extends CodeGenerator {
   private[this] def generateModelParser(model: ScalaModel): String = {
     Seq(
       Seq(
-        s"def parserWithPrefix(prefix: String) = parser(",
+        s"""def parserWithPrefix(prefix: String, sep: String = "_") = parser(""",
         model.fields.map { f =>
           val argName = parserFieldName(f.originalName, f.datatype)
-          s"""${ScalaUtil.quoteNameIfKeyword(argName)} = s"""" + "${prefix}_" + s"""${f.originalName}""""
+          s"""${ScalaUtil.quoteNameIfKeyword(argName)} = s"""" + "$prefix${sep}" + s"""${f.originalName}""""
         }.mkString(",\n").indent(2),
         ")"
       ).mkString("\n"),

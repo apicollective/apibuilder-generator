@@ -10,9 +10,9 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Name {
 
-    def parserWithPrefix(prefix: String) = parser(
-      first = s"${prefix}_first",
-      last = s"${prefix}_last"
+    def parserWithPrefix(prefix: String, sep: String = "_") = parser(
+      first = s"$prefix${sep}first",
+      last = s"$prefix${sep}last"
     )
 
     def parser(

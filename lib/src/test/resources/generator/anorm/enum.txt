@@ -22,9 +22,9 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
-    def parserWithPrefix(prefix: String) = parser(
-      guid = s"${prefix}_guid",
-      status = s"${prefix}_status"
+    def parserWithPrefix(prefix: String, sep: String = "_") = parser(
+      guid = s"$prefix${sep}guid",
+      status = s"$prefix${sep}status"
     )
 
     def parser(
