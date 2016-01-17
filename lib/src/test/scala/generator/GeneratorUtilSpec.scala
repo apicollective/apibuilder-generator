@@ -34,6 +34,25 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
     GeneratorUtil.urlToMethodName(Nil, Method.Get, "/:key") should be("getByKey")
   }
 
+  it("urlToMethodName for a complete service w/ named parameters") {
+    val all = Seq(
+      "/:orgKey",
+      "/:orgKey/:applicationKey",
+      "/:orgKey/:applicationKey/move",
+      "/:orgKey/:applicationKey/:version/:generatorKey",
+      "/:orgKey/:applicationKey/:version"
+    )
+
+    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey") should be("get")
+    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey") should be("getByApplicationKey")
+    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/:version") should be("getByApplicationKeyAndVersion")
+    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/move") should be("getMoveByApplicationKey")
+    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/move/:id") should be("getMoveByApplicationKeyAndId")
+    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/:version/:generatorKey") should be(
+      "getByApplicationKeyAndVersionAndGeneratorKey"
+    )
+  }
+
   it("findLongestCommonPrefix") {
     GeneratorUtil.findLongestCommonPrefix(Seq("/foo", "/bar")) should be(Some("/"))
     GeneratorUtil.findLongestCommonPrefix(Seq("/users/foo", "/users/bar")) should be(Some("/users/"))
