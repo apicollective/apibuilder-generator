@@ -10,8 +10,9 @@ case class ScalaEnums(
 
   private[this] val unions = ssd.unionsForEnum(enum)
   private[this] val play2JsonCommon = Play2JsonCommon(ssd)
-  private[this] val writerMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
-  private[this] val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, writerMethod)
+  private[this] val jsObjectWriterMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
+  private[this] val jsValueWriterMethod = play2JsonCommon.implicitWriterName(enum.name)
+  private[this] val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethod)
 
   def build(): String = {
     import lib.Text._
@@ -25,25 +26,10 @@ case class ScalaEnums(
   }
 
   /**
-    * Returns the implicits for json serialization. Note that if the
-    * enum is part of a union type, we do NOT generate a writer for
-    * the enum as the implicit would interfere.
+    * Returns the implicits for json serialization, handling
+    * conversion both from the string and object representations.
     */
   def buildJson(): String = {
-    unions.find(_.discriminator.isEmpty) match {
-      case None => buildJsonWithDiscriminator()
-      case Some(_) => buildJsonNoDiscriminator()
-    }
-  }
-
-  /**
-    * If this enum is part of a union type with discrimator, we allow
-    * the enum to serialize the type. The reader must be able to
-    * handle an object where we pull the value out of the JSON
-    * Object. Note that we do not need to actually read the
-    * discriminator - we just need to hydrate the enum.
-    */
-  private def buildJsonWithDiscriminator(): String = {
     Seq(
       s"implicit val jsonReads${ssd.name}${enum.name} = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
       Seq(
@@ -69,18 +55,13 @@ case class ScalaEnums(
       ).mkString("\n").indent(2),
       "}",
       "",
-      s"def $writerMethod(obj: ${enum.qualifiedName}) = {",
-      s"""  play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(obj.toString))""",
+      s"def $jsValueWriterMethod(obj: ${enum.qualifiedName}) = {",
+      s"""  play.api.libs.json.JsString(obj.toString)""",
       s"}",
       "",
-      implicitWriter
-    ).mkString("\n")
-  }
-
-  private def buildJsonNoDiscriminator(): String = {
-    Seq(
-      s"implicit val jsonReads${ssd.name}${enum.name} = __.read[String].map(${enum.name}.apply)",
-      s"def $writerMethod(obj: ${enum.qualifiedName}) = JsString(obj.toString)",
+      s"def $jsObjectWriterMethod(obj: ${enum.qualifiedName}) = {",
+      s"""  play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(obj.toString))""",
+      s"}",
       implicitWriter
     ).mkString("\n")
   }

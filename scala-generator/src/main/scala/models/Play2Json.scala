@@ -39,9 +39,15 @@ case class Play2JsonCommon(ssd: ScalaService) {
     s"jsonReads${ssd.name}$name"
   }
 
+  def implicitWriterName(name: String): String = {
+    assert(name.indexOf(".") < 0, s"Invalid name[$name]")
+    s"jsonWrites${ssd.name}$name"
+  }
+
   def implicitWriterDef(name: String): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
-    s"implicit def jsonWrites${ssd.name}$name: play.api.libs.json.Writes[$name]"
+    val methodName = implicitWriterName(name)
+    s"implicit def $methodName: play.api.libs.json.Writes[$name]"
   }
   
 }
