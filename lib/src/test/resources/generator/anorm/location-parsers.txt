@@ -11,7 +11,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
   object Location {
 
     def parserWithPrefix(prefix: String) = parser(
-      ipAddress = s"${prefix}_ipAddress"
+      ipAddress = s"${prefix}_ip_address"
     )
 
     def parser(
