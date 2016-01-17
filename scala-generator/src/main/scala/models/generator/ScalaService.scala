@@ -221,7 +221,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
 
-  val name: String = GeneratorUtil.urlToMethodName(resource.plural, operation.method, path)
+  val name: String = GeneratorUtil.urlToMethodName(resource.resource.operations.map(_.path), operation.method, path)
 
   val argList: Option[String] = body match {
     case None => {

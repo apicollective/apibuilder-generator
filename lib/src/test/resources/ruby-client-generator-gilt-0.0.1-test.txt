@@ -178,7 +178,7 @@ module Com
 
                 def get_by_guid(guid)
                   HttpClient::Preconditions.assert_class('guid', guid, String)
-                  r = @client.request("/#{guid}").get
+                  r = @client.request("/organizations/#{guid}").get
                   ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(r)
                 end
 
@@ -229,7 +229,7 @@ module Com
                   @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Reference::Api::V0::Client)
                 end
 
-                def get_by_organization(organization)
+                def get(organization)
                   HttpClient::Preconditions.assert_class('organization', organization, String)
                   r = @client.request("/groups/#{organization}").get
                   r.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : x[1].map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x) }; hash }

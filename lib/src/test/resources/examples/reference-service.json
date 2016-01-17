@@ -827,7 +827,7 @@
         },
         {
           "method": "GET",
-          "path": "/:guid",
+          "path": "/organizations/:guid",
           "description": null,
           "body": null,
           "parameters": [

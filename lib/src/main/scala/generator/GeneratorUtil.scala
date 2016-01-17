@@ -68,28 +68,61 @@ object GeneratorUtil {
   }
 
   /**
+   * If the provided values share a common prefix, returns the longest
+   * string they share. Else None.
+   */
+  def findLongestCommonPrefix(values: Seq[String]): Option[String] = {
+    values match {
+      case Nil => None
+      case _ => {
+        internalFindLongestCommonPrefix("", values) match {
+          case "" => None
+          case value => Some(value)
+        }
+      }
+    }
+  }
+
+  @scala.annotation.tailrec
+  private[this] def internalFindLongestCommonPrefix(substring: String, values: Seq[String]): String = {
+    values.head.substring(substring.length) match {
+      case "" => substring
+      case value => {
+        val nextSubstring = substring + value(0)
+        values.forall(_.startsWith(nextSubstring)) match {
+          case true => internalFindLongestCommonPrefix(nextSubstring, values)
+          case false => substring
+        }
+      }
+    }
+  }
+
+  /**
    * Turns a URL path to a camelcased method name.
    */
   def urlToMethodName(
-    resourcePlural: String,
+    resourceOperationPaths: Seq[String],
     method: Method,
     url: String
   ): String = {
-    val pathsToSkip = Seq(
-      resourcePlural,
-      formatName(resourcePlural),
-      formatName(resourcePlural).toLowerCase
-    )
+    val operationPath = findLongestCommonPrefix(resourceOperationPaths) match {
+      case None => url
+      case Some(prefix) => url.substring(prefix.length)
+    }
 
-    val resourcePath = formatName(resourcePlural)
+    val pieces = operationPath.split("/").filter(!_.isEmpty)
 
-    val pieces = url.split("/").filter { !_.isEmpty }.filter { w => !pathsToSkip.contains(formatName(w)) }
+    val named = pieces.
+      filter { _.startsWith(":") }.
+      map { name =>
+        lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name.substring(1))))
+      }
 
-    val named = pieces.filter { _.startsWith(":") }.map { name =>lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name.slice(1, name.length)))) }
     val notNamed = pieces.
       filter { !_.startsWith(":") }.
-      filter { _ != resourcePlural.toLowerCase }.
-      map( name =>lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name))) )
+      map { name =>
+        lib.Text.initCap(lib.Text.safeName(lib.Text.underscoreAndDashToInitCap(name)))
+      }
 
     if (named.isEmpty && notNamed.isEmpty) {
       method.toString.toLowerCase

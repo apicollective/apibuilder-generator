@@ -93,7 +93,7 @@ private[models] case class Play2Route(
 
   val method = "%s.%s".format(
     "controllers." + lib.Text.underscoreAndDashToInitCap(resource.plural),
-    GeneratorUtil.urlToMethodName(resource.plural, op.method, url)
+    GeneratorUtil.urlToMethodName(resource.operations.map(_.path), op.method, url)
   )
 
   private def parametersWithTypesAndDefaults(params: Iterable[ScalaParameter]): Iterable[String] = {

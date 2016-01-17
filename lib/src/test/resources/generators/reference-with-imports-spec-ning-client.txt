@@ -542,7 +542,7 @@ package com.bryzek.apidoc.reference.api.v0 {
       override def getByGuid(
         guid: _root_.java.util.UUID
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.reference.api.v0.models.Organization] = {
-        _executeRequest("GET", s"/${guid}").map {
+        _executeRequest("GET", s"/organizations/${guid}").map {
           case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.reference.api.v0.Client.parseJson("com.bryzek.apidoc.reference.api.v0.models.Organization", r, _.validate[com.bryzek.apidoc.reference.api.v0.models.Organization])
           case r => throw new com.bryzek.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
