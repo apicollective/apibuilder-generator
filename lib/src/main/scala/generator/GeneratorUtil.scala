@@ -99,15 +99,26 @@ object GeneratorUtil {
 
   /**
    * Turns a URL path to a camelcased method name.
+   * 
+   * @param resourcePath The path to the resource itself, if known
+   * @param resourceOperationPaths The full set of paths to all operations. This is
+   *        used to compute a resource path (longest common string) if resource path
+   *        is not explicitly provided.
    */
   def urlToMethodName(
+    resourcePath: Option[String],
     resourceOperationPaths: Seq[String],
     method: Method,
     url: String
   ): String = {
-    val operationPath = findLongestCommonPrefix(resourceOperationPaths) match {
+    val prefix = resourcePath match {
+      case Some(path) => Some(path)
+      case None => findLongestCommonPrefix(resourceOperationPaths)
+    }
+
+    val operationPath = prefix match {
       case None => url
-      case Some(prefix) => url.substring(prefix.length)
+      case Some(p) => url.substring(p.length)
     }
 
     val pieces = operationPath.split("/").filter(!_.isEmpty)

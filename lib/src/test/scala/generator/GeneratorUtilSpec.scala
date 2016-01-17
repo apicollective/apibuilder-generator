@@ -18,20 +18,25 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
   }
 
   it("urlToMethodName") {
-    GeneratorUtil.urlToMethodName(Seq("/memberships"), Method.Get, "/memberships") should be("get")
-    GeneratorUtil.urlToMethodName(Seq("/memberships"), Method.Post, "/memberships") should be("post")
-    GeneratorUtil.urlToMethodName(Seq("/memberships"), Method.Get, "/memberships/:guid") should be("getByGuid")
-    GeneratorUtil.urlToMethodName(Seq("/memberships"), Method.Post, "/memberships/:guid/accept") should be("postAcceptByGuid")
+    GeneratorUtil.urlToMethodName(None, Seq("/memberships"), Method.Get, "/memberships") should be("get")
+    GeneratorUtil.urlToMethodName(None, Seq("/memberships"), Method.Post, "/memberships") should be("post")
+    GeneratorUtil.urlToMethodName(None, Seq("/memberships"), Method.Get, "/memberships/:guid") should be("getByGuid")
+    GeneratorUtil.urlToMethodName(None, Seq("/memberships"), Method.Post, "/memberships/:guid/accept") should be("postAcceptByGuid")
 
-    GeneratorUtil.urlToMethodName(Seq("/membership_requests"), Method.Get, "/membership_requests") should be("get")
-    GeneratorUtil.urlToMethodName(Seq("/membership_requests"), Method.Post, "/membership_requests") should be("post")
-    GeneratorUtil.urlToMethodName(Seq("/membership_requests"), Method.Get, "/membership_requests/:guid") should be("getByGuid")
+    GeneratorUtil.urlToMethodName(Some("/memberships"), Nil, Method.Get, "/memberships") should be("get")
+    GeneratorUtil.urlToMethodName(Some("/memberships"), Nil, Method.Post, "/memberships") should be("post")
+    GeneratorUtil.urlToMethodName(Some("/memberships"), Nil, Method.Get, "/memberships/:guid") should be("getByGuid")
+    GeneratorUtil.urlToMethodName(Some("/memberships"), Nil, Method.Post, "/memberships/:guid/accept") should be("postAcceptByGuid")
 
-    GeneratorUtil.urlToMethodName(Seq("/membership_requests"), Method.Get, "/membership-requests") should be("get")
-    GeneratorUtil.urlToMethodName(Seq("/membership_requests"), Method.Post, "/membership-requests") should be("post")
-    GeneratorUtil.urlToMethodName(Seq("/membership_requests"), Method.Get, "/membership-requests/:guid") should be("getByGuid")
+    GeneratorUtil.urlToMethodName(None, Seq("/membership_requests"), Method.Get, "/membership_requests") should be("get")
+    GeneratorUtil.urlToMethodName(None, Seq("/membership_requests"), Method.Post, "/membership_requests") should be("post")
+    GeneratorUtil.urlToMethodName(None, Seq("/membership_requests"), Method.Get, "/membership_requests/:guid") should be("getByGuid")
 
-    GeneratorUtil.urlToMethodName(Nil, Method.Get, "/:key") should be("getByKey")
+    GeneratorUtil.urlToMethodName(Some("/membership_requests"), Nil, Method.Get, "/membership_requests") should be("get")
+    GeneratorUtil.urlToMethodName(Some("/membership_requests"), Nil, Method.Post, "/membership_requests") should be("post")
+    GeneratorUtil.urlToMethodName(Some("/membership_requests"), Nil, Method.Get, "/membership_requests/:guid") should be("getByGuid")
+
+    GeneratorUtil.urlToMethodName(None, Nil, Method.Get, "/:key") should be("getByKey")
   }
 
   it("urlToMethodName for a complete service w/ named parameters") {
@@ -43,12 +48,20 @@ class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
       "/:orgKey/:applicationKey/:version"
     )
 
-    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey") should be("get")
-    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey") should be("getByApplicationKey")
-    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/:version") should be("getByApplicationKeyAndVersion")
-    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/move") should be("getMoveByApplicationKey")
-    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/move/:id") should be("getMoveByApplicationKeyAndId")
-    GeneratorUtil.urlToMethodName(all, Method.Get, "/:orgKey/:applicationKey/:version/:generatorKey") should be(
+
+    GeneratorUtil.urlToMethodName(None, all, Method.Get, "/:orgKey/:applicationKey") should be("getByApplicationKey")
+    GeneratorUtil.urlToMethodName(None, all, Method.Get, "/:orgKey/:applicationKey/:version") should be("getByApplicationKeyAndVersion")
+    GeneratorUtil.urlToMethodName(None, all, Method.Get, "/:orgKey/:applicationKey/move") should be("getMoveByApplicationKey")
+    GeneratorUtil.urlToMethodName(None, all, Method.Get, "/:orgKey/:applicationKey/move/:id") should be("getMoveByApplicationKeyAndId")
+    GeneratorUtil.urlToMethodName(None, all, Method.Get, "/:orgKey/:applicationKey/:version/:generatorKey") should be(
+      "getByApplicationKeyAndVersionAndGeneratorKey"
+    )
+
+    GeneratorUtil.urlToMethodName(Some("/:orgKey"), Nil, Method.Get, "/:orgKey") should be("get")
+    GeneratorUtil.urlToMethodName(Some("/:orgKey"), Nil, Method.Get, "/:orgKey/:applicationKey/:version") should be("getByApplicationKeyAndVersion")
+    GeneratorUtil.urlToMethodName(Some("/:orgKey"), Nil, Method.Get, "/:orgKey/:applicationKey/move") should be("getMoveByApplicationKey")
+    GeneratorUtil.urlToMethodName(Some("/:orgKey"), Nil, Method.Get, "/:orgKey/:applicationKey/move/:id") should be("getMoveByApplicationKeyAndId")
+    GeneratorUtil.urlToMethodName(Some("/:orgKey"), Nil, Method.Get, "/:orgKey/:applicationKey/:version/:generatorKey") should be(
       "getByApplicationKeyAndVersionAndGeneratorKey"
     )
   }
