@@ -118,7 +118,12 @@ object GeneratorUtil {
 
     val operationPath = prefix match {
       case None => url
-      case Some(p) => url.substring(p.length)
+      case Some(p) => {
+        url.startsWith(p) match {
+          case true => url.substring(p.length)
+          case false => url
+        }
+      }
     }
 
     val pieces = operationPath.split("/").filter(!_.isEmpty)
