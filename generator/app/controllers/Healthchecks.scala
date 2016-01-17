@@ -8,7 +8,7 @@ class Healthchecks extends Controller {
 
   private[this] val Result = Json.toJson(Map("status" -> "healthy"))
 
-  def getInternalAndHealthcheck() = Action { request =>
+  def get() = Action { request =>
     Ok(Result)
   }
 
