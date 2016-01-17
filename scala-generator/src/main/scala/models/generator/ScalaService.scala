@@ -193,6 +193,8 @@ class ScalaEnumValue(value: EnumValue) {
 
 class ScalaResource(ssd: ScalaService, val resource: Resource) {
 
+  val path = resource.path
+
   val plural: String = ScalaUtil.toClassName(resource.plural)
 
   val namespaces = ssd.namespaces
@@ -221,7 +223,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
 
-  val name: String = GeneratorUtil.urlToMethodName(resource.resource.operations.map(_.path), operation.method, path)
+  val name: String = GeneratorUtil.urlToMethodName(resource.path, resource.resource.operations.map(_.path), operation.method, path)
 
   val argList: Option[String] = body match {
     case None => {

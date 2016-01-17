@@ -492,6 +492,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
       val methodName =lib.Text.camelCaseToUnderscore(
         GeneratorUtil.urlToMethodName(
+          resource.path,
           resource.operations.map(_.path),
           op.method,
           op.path
