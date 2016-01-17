@@ -62,6 +62,7 @@ case class ScalaEnums(
       s"def $jsObjectWriterMethod(obj: ${enum.qualifiedName}) = {",
       s"""  play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(obj.toString))""",
       s"}",
+      "",
       implicitWriter
     ).mkString("\n")
   }
