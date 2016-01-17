@@ -162,7 +162,7 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
         val resource = getScalaResource(ssd, "Applications")
         val op = getScalaMethod(ssd, "Applications", Method.Get, "/:orgKey")
         val r = Play2Route(ssd, op, resource)
-        r.method should be("controllers.Applications.getByOrgKey")
+        r.method should be("controllers.Applications.get")
       }
     }
   }
