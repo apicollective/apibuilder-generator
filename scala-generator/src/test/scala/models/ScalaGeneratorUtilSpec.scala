@@ -29,7 +29,7 @@ class ScalaGeneratorUtilSpec extends FunSpec with ShouldMatchers {
       None, None, false, None, None, None, None
     )
     val operation = new Operation(Method.Get, "/models", None, None, None, Seq(q1, q2), Nil)
-    val resource = new Resource(model.name, model.plural, None, None, Seq(operation))
+    val resource = new Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
 
     it("should handle required and non-required params") {
       val scalaModel = new ScalaModel(ssd, model)

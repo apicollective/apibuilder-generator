@@ -19,7 +19,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("user")
     val model = new Model("user", "users", None, None, Nil)
     val operation = new Operation(Method.Get, "/users", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, None, None, Seq(operation))
+    val resource = new Resource(model.name, model.plural, Some("/users"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
@@ -34,7 +34,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("[user]", None)
     val model = new Model("user", "users", None, None, Nil)
     val operation = new Operation(Method.Get, "/users", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, None, None, Seq(operation))
+    val resource = new Resource(model.name, model.plural, Some("/users"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
@@ -49,7 +49,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("integer", None)
     val model = new Model("model", "models", None, None, Nil)
     val operation = new Operation(Method.Get, "/models", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, None, None, Seq(operation))
+    val resource = new Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
@@ -64,7 +64,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     val body = Body("[integer]", None)
     val model = new Model("model", "models", None, None, Nil)
     val operation = new Operation(Method.Get, "/models", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, None, None, Seq(operation))
+    val resource = new Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
