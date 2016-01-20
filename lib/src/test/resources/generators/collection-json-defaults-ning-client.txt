@@ -83,10 +83,12 @@ package com.gilt.test.v0.models {
 
     def jsObjectUserPatch(obj: com.gilt.test.v0.models.UserPatch) = {
       play.api.libs.json.Json.obj(
-        "groups" -> play.api.libs.json.Json.toJson(obj.groups),
         "permissions" -> play.api.libs.json.Json.toJson(obj.permissions),
         "preferences" -> play.api.libs.json.Json.toJson(obj.preferences)
-      )
+      ) ++ (obj.groups match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("groups" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesTestUserPatch: play.api.libs.json.Writes[UserPatch] = {

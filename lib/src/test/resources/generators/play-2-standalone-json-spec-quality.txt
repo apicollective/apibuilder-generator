@@ -665,9 +665,10 @@ package com.gilt.quality.v0.models {
     }
 
     def jsObjectAdjournForm(obj: com.gilt.quality.v0.models.AdjournForm) = {
-      play.api.libs.json.Json.obj(
-        "adjourned_at" -> play.api.libs.json.Json.toJson(obj.adjournedAt)
-      )
+      (obj.adjournedAt match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("adjourned_at" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityAdjournForm: play.api.libs.json.Writes[AdjournForm] = {
@@ -953,13 +954,24 @@ package com.gilt.quality.v0.models {
         "id" -> play.api.libs.json.JsNumber(obj.id),
         "organization" -> jsObjectOrganization(obj.organization),
         "summary" -> play.api.libs.json.JsString(obj.summary),
-        "description" -> play.api.libs.json.Json.toJson(obj.description),
-        "team" -> play.api.libs.json.Json.toJson(obj.team),
         "severity" -> play.api.libs.json.JsString(obj.severity.toString),
-        "tags" -> play.api.libs.json.Json.toJson(obj.tags),
-        "plan" -> play.api.libs.json.Json.toJson(obj.plan),
         "created_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.createdAt))
-      )
+      ) ++ (obj.description match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("description" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.team match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("team" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.tags match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("tags" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.plan match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("plan" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityIncident: play.api.libs.json.Writes[Incident] = {
@@ -982,12 +994,20 @@ package com.gilt.quality.v0.models {
 
     def jsObjectIncidentForm(obj: com.gilt.quality.v0.models.IncidentForm) = {
       play.api.libs.json.Json.obj(
-        "team_key" -> play.api.libs.json.Json.toJson(obj.teamKey),
         "severity" -> play.api.libs.json.JsString(obj.severity.toString),
-        "summary" -> play.api.libs.json.JsString(obj.summary),
-        "description" -> play.api.libs.json.Json.toJson(obj.description),
-        "tags" -> play.api.libs.json.Json.toJson(obj.tags)
-      )
+        "summary" -> play.api.libs.json.JsString(obj.summary)
+      ) ++ (obj.teamKey match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("team_key" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.description match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("description" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.tags match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("tags" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityIncidentForm: play.api.libs.json.Writes[IncidentForm] = {
@@ -1057,9 +1077,11 @@ package com.gilt.quality.v0.models {
       play.api.libs.json.Json.obj(
         "id" -> play.api.libs.json.JsNumber(obj.id),
         "organization" -> jsObjectOrganization(obj.organization),
-        "scheduled_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.scheduledAt)),
-        "adjourned_at" -> play.api.libs.json.Json.toJson(obj.adjournedAt)
-      )
+        "scheduled_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.scheduledAt))
+      ) ++ (obj.adjournedAt match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("adjourned_at" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityMeeting: play.api.libs.json.Writes[Meeting] = {
@@ -1098,10 +1120,15 @@ package com.gilt.quality.v0.models {
 
     def jsObjectMeetingPager(obj: com.gilt.quality.v0.models.MeetingPager) = {
       play.api.libs.json.Json.obj(
-        "meeting" -> jsObjectMeeting(obj.meeting),
-        "prior_incident" -> play.api.libs.json.Json.toJson(obj.priorIncident),
-        "next_incident" -> play.api.libs.json.Json.toJson(obj.nextIncident)
-      )
+        "meeting" -> jsObjectMeeting(obj.meeting)
+      ) ++ (obj.priorIncident match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("prior_incident" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.nextIncident match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("next_incident" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityMeetingPager: play.api.libs.json.Writes[MeetingPager] = {
@@ -1143,9 +1170,11 @@ package com.gilt.quality.v0.models {
 
     def jsObjectOrganizationForm(obj: com.gilt.quality.v0.models.OrganizationForm) = {
       play.api.libs.json.Json.obj(
-        "name" -> play.api.libs.json.JsString(obj.name),
-        "key" -> play.api.libs.json.Json.toJson(obj.key)
-      )
+        "name" -> play.api.libs.json.JsString(obj.name)
+      ) ++ (obj.key match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("key" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityOrganizationForm: play.api.libs.json.Writes[OrganizationForm] = {
@@ -1171,9 +1200,11 @@ package com.gilt.quality.v0.models {
         "id" -> play.api.libs.json.JsNumber(obj.id),
         "incident_id" -> play.api.libs.json.JsNumber(obj.incidentId),
         "body" -> play.api.libs.json.JsString(obj.body),
-        "grade" -> play.api.libs.json.Json.toJson(obj.grade),
         "created_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.createdAt))
-      )
+      ) ++ (obj.grade match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("grade" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityPlan: play.api.libs.json.Writes[Plan] = {
@@ -1222,12 +1253,17 @@ package com.gilt.quality.v0.models {
       play.api.libs.json.Json.obj(
         "team" -> jsObjectTeam(obj.team),
         "total_grades" -> play.api.libs.json.JsNumber(obj.totalGrades),
-        "average_grade" -> play.api.libs.json.Json.toJson(obj.averageGrade),
         "total_open_incidents" -> play.api.libs.json.JsNumber(obj.totalOpenIncidents),
         "total_incidents" -> play.api.libs.json.JsNumber(obj.totalIncidents),
-        "total_plans" -> play.api.libs.json.JsNumber(obj.totalPlans),
-        "plans" -> play.api.libs.json.Json.toJson(obj.plans)
-      )
+        "total_plans" -> play.api.libs.json.JsNumber(obj.totalPlans)
+      ) ++ (obj.averageGrade match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("average_grade" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.plans match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("plans" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityStatistic: play.api.libs.json.Writes[Statistic] = {
@@ -1301,9 +1337,11 @@ package com.gilt.quality.v0.models {
       play.api.libs.json.Json.obj(
         "organization" -> jsObjectOrganization(obj.organization),
         "key" -> play.api.libs.json.JsString(obj.key),
-        "email" -> play.api.libs.json.Json.toJson(obj.email),
         "icons" -> jsObjectIcons(obj.icons)
-      )
+      ) ++ (obj.email match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityTeam: play.api.libs.json.Writes[Team] = {
@@ -1325,11 +1363,19 @@ package com.gilt.quality.v0.models {
 
     def jsObjectTeamForm(obj: com.gilt.quality.v0.models.TeamForm) = {
       play.api.libs.json.Json.obj(
-        "key" -> play.api.libs.json.JsString(obj.key),
-        "email" -> play.api.libs.json.Json.toJson(obj.email),
-        "smiley_url" -> play.api.libs.json.Json.toJson(obj.smileyUrl),
-        "frowny_url" -> play.api.libs.json.Json.toJson(obj.frownyUrl)
-      )
+        "key" -> play.api.libs.json.JsString(obj.key)
+      ) ++ (obj.email match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.smileyUrl match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("smiley_url" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.frownyUrl match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("frowny_url" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityTeamForm: play.api.libs.json.Writes[TeamForm] = {
@@ -1393,11 +1439,18 @@ package com.gilt.quality.v0.models {
     }
 
     def jsObjectUpdateTeamForm(obj: com.gilt.quality.v0.models.UpdateTeamForm) = {
-      play.api.libs.json.Json.obj(
-        "email" -> play.api.libs.json.Json.toJson(obj.email),
-        "smiley_url" -> play.api.libs.json.Json.toJson(obj.smileyUrl),
-        "frowny_url" -> play.api.libs.json.Json.toJson(obj.frownyUrl)
-      )
+      (obj.email match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.smileyUrl match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("smiley_url" -> play.api.libs.json.Json.toJson(x))
+      }) ++
+      (obj.frownyUrl match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("frowny_url" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesQualityUpdateTeamForm: play.api.libs.json.Writes[UpdateTeamForm] = {
