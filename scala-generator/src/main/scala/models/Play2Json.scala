@@ -243,7 +243,7 @@ case class Play2Json(
         Seq(
           model.fields.map { field =>
             getJsonObject(field.originalName, field.datatype, s"obj.${field.name}")
-          }.mkString("(", ") ++ \n(", ")")
+          }.mkString("(", ") ++\n(", ")")
         ).mkString("\n").indent(2),
         "}"
       ).mkString("\n")
