@@ -211,7 +211,7 @@ object ParserGenerator extends CodeGenerator {
     Seq(
       s"object ${enum.name} {",
       Seq(
-        """def parserWithPrefix(prefix: String) = parser(s"""" + "${prefix}_name" + """")""",
+        """def parserWithPrefix(prefix: String, sep: String = "_") = parser(s"""" + "$prefix${sep}name" + """")""",
         Seq(
           s"""def parser(name: String = "${enum.originalName}"): RowParser[${enum.qualifiedName}] = {""",
           s"  SqlParser.str(name) map {",
@@ -240,9 +240,9 @@ object ParserGenerator extends CodeGenerator {
       s"object ${union.name} {",
 
       Seq(
-        "def parserWithPrefix(prefix: String) = {",
+        """def parserWithPrefix(prefix: String, sep: String = "_") = {""",
         union.types.map { t =>
-          s"${t.ssd.namespaces.anormParsers}.${t.name}.parserWithPrefix(prefix)"
+          s"${t.ssd.namespaces.anormParsers}.${t.name}.parserWithPrefix(prefix, sep)"
         }.mkString(" |\n").indent(2),
         "}"
       ).mkString("\n").indent(2),

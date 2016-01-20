@@ -10,7 +10,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Status {
 
-    def parserWithPrefix(prefix: String) = parser(s"${prefix}_name")
+    def parserWithPrefix(prefix: String, sep: String = "_") = parser(s"$prefix${sep}name")
 
     def parser(name: String = "status"): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
       SqlParser.str(name) map {

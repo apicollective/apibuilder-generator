@@ -50,9 +50,9 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
-    def parserWithPrefix(prefix: String) = {
-      test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.parserWithPrefix(prefix) |
-      test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.parserWithPrefix(prefix)
+    def parserWithPrefix(prefix: String, sep: String = "_") = {
+      test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.parserWithPrefix(prefix, sep) |
+      test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.parserWithPrefix(prefix, sep)
     }
 
     def parser() = {
