@@ -241,12 +241,9 @@ case class Play2Json(
       Seq(
         s"def $method(obj: ${model.qualifiedName}) = {",
         Seq(
-          "play.api.libs.json.Json.obj(",
           model.fields.map { field =>
-            val json = getJsonValue(field.datatype, s"obj.${field.name}")
-            s""""${field.originalName}" -> $json"""
-          }.mkString(",\n").indent(2),
-          ")"
+            getJsonObject(field.originalName, field.datatype, s"obj.${field.name}")
+          }.mkString("(", ") ++ \n(", ")")
         ).mkString("\n").indent(2),
         "}"
       ).mkString("\n")
@@ -281,41 +278,53 @@ case class Play2Json(
   }
 
   /**
-   * Name of method that converts this datatype to a JsValue
+   * Returns a JSON Object containing only this value
    */
-  private[this] def getJsonValue(datatype: ScalaDatatype, varName: String): String = {
+  private[this] def getJsonObject(originalName: String, datatype: ScalaDatatype, varName: String): String = {
     datatype match {
       case ScalaPrimitive.Enum(ns, name) => {
-        s"play.api.libs.json.JsString(${varName}.toString)"
+        createJsonObject(originalName, s"play.api.libs.json.JsString(${varName}.toString)")
       }
       case ScalaPrimitive.Model(ns, name) => {
-        play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
+        createJsonObject(originalName, play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)")
       }
       case ScalaPrimitive.Union(ns, name) => {
-        play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
+        createJsonObject(originalName, play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)")
       }
       case ScalaPrimitive.Boolean => {
-        s"play.api.libs.json.JsBoolean(${varName})"
+        createJsonObject(originalName, s"play.api.libs.json.JsBoolean(${varName})")
       }
       case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
-        s"play.api.libs.json.JsNumber($varName)"
+        createJsonObject(originalName, s"play.api.libs.json.JsNumber($varName)")
       }
       case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
-        s"play.api.libs.json.JsString(${varName}.toString)"
+        createJsonObject(originalName, s"play.api.libs.json.JsString(${varName}.toString)")
       }
       case ScalaPrimitive.String => {
-        s"play.api.libs.json.JsString($varName)"
+        createJsonObject(originalName, s"play.api.libs.json.JsString($varName)")
       }
       case ScalaPrimitive.DateTimeIso8601 => {
-        s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))"
+        createJsonObject(originalName, s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))")
       }
       case ScalaPrimitive.Object => {
-        s"play.api.libs.json.Json.obj($varName)"
+        createJsonObject(originalName, s"play.api.libs.json.Json.obj($varName)")
       }
-      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) | ScalaPrimitive.Unit => {
-        s"play.api.libs.json.Json.toJson($varName)"
+      case ScalaDatatype.Option(_) => {
+        Seq(
+          s"$varName match {",
+          "  case None => play.api.libs.json.Json.obj()",
+          "  case Some(x) => " + createJsonObject(originalName, "play.api.libs.json.Json.toJson(x)"),
+          "}"
+        ).mkString("\n")
+      }
+      case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaPrimitive.Unit => {
+        createJsonObject(originalName, s"play.api.libs.json.Json.toJson($varName)")
       }
     }
+  }
+
+  private[this] def createJsonObject(name: String, value: String): String = {
+    s"""play.api.libs.json.Json.obj("$name" -> $value)"""
   }
 
   /**
@@ -373,7 +382,7 @@ case class Play2Json(
   ): String = {
     discriminator match {
       case None => {
-        s"""play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> $value)"""
+        createJsonObject(PrimitiveWrapper.FieldName, value)
       }
       case Some(disc) => {
         s"""play.api.libs.json.Json.obj("${disc.name}" -> "${disc.value}", "${PrimitiveWrapper.FieldName}" -> $value)"""
@@ -390,7 +399,7 @@ case class Play2Json(
         value
       }
       case Some(disc) => {
-        s"""$value ++ play.api.libs.json.Json.obj("${disc.name}" -> "${disc.value}")"""
+        s"$value ++ " + createJsonObject(disc.name, s""""${disc.value}"""")
       }
     }
   }
