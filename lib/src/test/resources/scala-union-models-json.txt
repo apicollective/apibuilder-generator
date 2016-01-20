@@ -11,9 +11,11 @@ def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser) = {
   play.api.libs.json.Json.obj(
     "id" -> play.api.libs.json.JsNumber(obj.id),
     "email" -> play.api.libs.json.JsString(obj.email),
-    "name" -> play.api.libs.json.Json.toJson(obj.name),
     "bar" -> play.api.libs.json.JsString(obj.bar)
-  )
+  ) ++ (obj.name match {
+    case None => play.api.libs.json.Json.obj()
+    case Some(x) => play.api.libs.json.Json.obj("name" -> play.api.libs.json.Json.toJson(x))
+  })
 }
 
 implicit def jsonReadsApiDocTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
@@ -29,9 +31,11 @@ def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser)
   play.api.libs.json.Json.obj(
     "id" -> play.api.libs.json.JsNumber(obj.id),
     "email" -> play.api.libs.json.JsString(obj.email),
-    "name" -> play.api.libs.json.Json.toJson(obj.name),
     "foo" -> play.api.libs.json.JsString(obj.foo)
-  )
+  ) ++ (obj.name match {
+    case None => play.api.libs.json.Json.obj()
+    case Some(x) => play.api.libs.json.Json.obj("name" -> play.api.libs.json.Json.toJson(x))
+  })
 }
 
 implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {

@@ -136,9 +136,11 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
 
     def jsObjectGuestUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser) = {
       play.api.libs.json.Json.obj(
-        "id" -> play.api.libs.json.JsString(obj.id),
-        "email" -> play.api.libs.json.Json.toJson(obj.email)
-      )
+        "id" -> play.api.libs.json.JsString(obj.id)
+      ) ++ (obj.email match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {

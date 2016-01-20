@@ -355,9 +355,11 @@ package com.bryzek.apidoc.reference.api.v0.models {
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email),
         "active" -> play.api.libs.json.JsBoolean(obj.active),
-        "age_group" -> play.api.libs.json.JsString(obj.ageGroup.toString),
-        "tags" -> play.api.libs.json.Json.toJson(obj.tags)
-      )
+        "age_group" -> play.api.libs.json.JsString(obj.ageGroup.toString)
+      ) ++ (obj.tags match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("tags" -> play.api.libs.json.Json.toJson(x))
+      })
     }
 
     implicit def jsonWritesApidocReferenceApiUser: play.api.libs.json.Writes[User] = {
