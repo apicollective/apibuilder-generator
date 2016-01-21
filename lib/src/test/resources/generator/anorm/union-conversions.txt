@@ -69,6 +69,14 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
     implicit val columnToSeqUUID: Column[Seq[_root_.java.util.UUID]] = parser { _.as[Seq[_root_.java.util.UUID]] }
     implicit val columnToMapUUID: Column[Map[String, _root_.java.util.UUID]] = parser { _.as[Map[String, _root_.java.util.UUID]] }
 
+    import test.apidoc.apidoctest.v0.models.json._
+    implicit val columnToSeqApiDocTestGuestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] = parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
+    implicit val columnToMapApiDocTestGuestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] = parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
+    implicit val columnToSeqApiDocTestRegisteredUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
+    implicit val columnToMapApiDocTestRegisteredUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
+    implicit val columnToSeqApiDocTestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] = parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] }
+    implicit val columnToMapApiDocTestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] = parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] }
+
   }
 
 }
