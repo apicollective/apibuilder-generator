@@ -77,8 +77,7 @@ case class NingClientGenerator(
 ${headers.objectConstants.indent(2)}
 
 ${ScalaClientCommon.clientSignature(config).indent(2)} {
-    import org.slf4j.Logger
-    import org.slf4j.LoggerFactory
+    import org.slf4j.{Logger, LoggerFactory}
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     def closeAsyncHttpClient() {
