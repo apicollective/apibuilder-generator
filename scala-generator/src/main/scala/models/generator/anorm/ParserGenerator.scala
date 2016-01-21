@@ -29,7 +29,7 @@ object ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Conversions",
-              header ++ Conversions.code(ssd.namespaces, ssd.unions),
+              header ++ Conversions.code(ssd),
               Some("Scala")
             ),
             ServiceFileNames.toFile(
@@ -126,10 +126,10 @@ object ParserGenerator extends CodeGenerator {
         ScalaUtil.toVariable(s"${name}Prefix")
       }
       case ScalaDatatype.List(inner) => {
-        parserFieldName(name, inner)
+        ScalaUtil.toVariable(name)
       }
       case ScalaDatatype.Map(inner) => {
-        parserFieldName(name, inner)
+        ScalaUtil.toVariable(name)
       }
       case ScalaDatatype.Option(inner) => {
         parserFieldName(name, inner)
@@ -140,7 +140,7 @@ object ParserGenerator extends CodeGenerator {
   @scala.annotation.tailrec
   private[this] def parserFieldDeclaration(name: String, datatype: ScalaDatatype, originalName: String): String = {
     datatype match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaDatatype.List(_) | ScalaDatatype.Map(_) => {
         s"""$name: String = "$originalName""""
       }
       case ScalaPrimitive.Model(namespaces, name) => {
@@ -150,12 +150,6 @@ object ParserGenerator extends CodeGenerator {
       case ScalaPrimitive.Union(namespaces, name) => {
         val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
         s"""$varName: String = "$originalName""""
-      }
-      case ScalaDatatype.List(inner) => {
-        parserFieldDeclaration(name, inner, originalName)
-      }
-      case ScalaDatatype.Map(inner) => {
-        parserFieldDeclaration(name, inner, originalName)
       }
       case ScalaDatatype.Option(inner) => {
         parserFieldDeclaration(name, inner, originalName)
