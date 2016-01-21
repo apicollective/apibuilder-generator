@@ -19,7 +19,7 @@ class Client(
   apiUrl: String,
   auth: scala.Option[${config.namespace}.Authorization] = None,
   defaultHeaders: Seq[(String, String)] = Nil${config.extraClientCtorArgs.getOrElse("")}
-)
+) extends interfaces.Client
 """.trim
   }
 

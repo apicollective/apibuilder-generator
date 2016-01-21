@@ -22,14 +22,35 @@ class ScalaClientMethodGenerator(
   protected val featureMigration = FeatureMigration(ssd.service.apidoc.version)
 
   def traitsAndErrors(): String = {
-    (traits() + "\n\n" + errorPackage()).trim
+    Seq(
+      interfaces(),
+      traits(),
+      errorPackage()
+    ).mkString("\n\n").trim
+  }
+
+  private[this] def methodName(resource: ScalaResource): String = {
+    lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(resource.plural).toLowerCase)
   }
 
   def accessors(): String = {
     sortedResources.map { resource =>
-      val methodName = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(resource.plural).toLowerCase)
-      config.accessor(methodName, resource.plural)
+      config.accessor(methodName(resource), resource.plural)
     }.mkString("\n\n")
+  }
+
+  def interfaces(): String = {
+    Seq(
+      "package interfaces {",
+      Seq(
+        "trait Client {",
+        sortedResources.map { resource =>
+          s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}"
+        }.mkString("\n").indent(2),
+        "}"
+      ).mkString("\n").indent(2),
+      "}"
+    ).mkString("\n\n")
   }
 
   def traits(): String = {
