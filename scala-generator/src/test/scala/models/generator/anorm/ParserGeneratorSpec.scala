@@ -95,7 +95,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/reference-conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/reference.txt", files.last.contents)
       }
     }
@@ -109,7 +109,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/name-conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/name.txt", files.last.contents)
       }
     }
@@ -134,7 +134,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/user-conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/user.txt", files.last.contents)
       }
     }
@@ -167,7 +167,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/enum-conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/enum.txt", files.last.contents)
       }
     }
@@ -191,7 +191,7 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/list-conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/list.txt", files.last.contents)
       }
     }
