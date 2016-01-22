@@ -361,7 +361,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
     apiUrl: String,
     auth: scala.Option[com.bryzek.apidoc.example.union.types.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
-  ) {
+  ) extends interfaces.Client {
     import com.bryzek.apidoc.example.union.types.v0.models.json._
 
     private[this] val logger = play.api.Logger("com.bryzek.apidoc.example.union.types.v0.Client")
@@ -485,6 +485,14 @@ package com.bryzek.apidoc.example.union.types.v0 {
   sealed trait Authorization
   object Authorization {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
+  }
+
+  package interfaces {
+
+    trait Client {
+      def users: com.bryzek.apidoc.example.union.types.v0.Users
+    }
+
   }
 
   trait Users {

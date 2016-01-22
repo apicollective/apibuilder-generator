@@ -448,7 +448,7 @@ package com.bryzek.apidoc.reference.api.v0 {
     apiUrl: String,
     auth: scala.Option[com.bryzek.apidoc.reference.api.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
-  ) {
+  ) extends interfaces.Client {
     import com.bryzek.apidoc.reference.api.v0.models.json._
 
     private[this] val logger = play.api.Logger("com.bryzek.apidoc.reference.api.v0.Client")
@@ -764,6 +764,18 @@ package com.bryzek.apidoc.reference.api.v0 {
   sealed trait Authorization
   object Authorization {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
+  }
+
+  package interfaces {
+
+    trait Client {
+      def echoes: com.bryzek.apidoc.reference.api.v0.Echoes
+      def groups: com.bryzek.apidoc.reference.api.v0.Groups
+      def members: com.bryzek.apidoc.reference.api.v0.Members
+      def organizations: com.bryzek.apidoc.reference.api.v0.Organizations
+      def users: com.bryzek.apidoc.reference.api.v0.Users
+    }
+
   }
 
   trait Echoes {

@@ -150,7 +150,7 @@ package com.gilt.test.v0 {
     apiUrl: String,
     auth: scala.Option[com.gilt.test.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
-  ) {
+  ) extends interfaces.Client {
     import com.gilt.test.v0.models.json._
 
     private[this] val logger = play.api.Logger("com.gilt.test.v0.Client")
@@ -277,6 +277,14 @@ package com.gilt.test.v0 {
   sealed trait Authorization
   object Authorization {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
+  }
+
+  package interfaces {
+
+    trait Client {
+      def users: com.gilt.test.v0.Users
+    }
+
   }
 
   trait Users {

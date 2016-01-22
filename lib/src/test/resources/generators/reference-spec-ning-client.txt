@@ -409,9 +409,8 @@ package com.bryzek.apidoc.reference.api.v0 {
     auth: scala.Option[com.bryzek.apidoc.reference.api.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil,
     asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient
-  ) {
-    import org.slf4j.Logger
-    import org.slf4j.LoggerFactory
+  ) extends interfaces.Client {
+    import org.slf4j.{Logger, LoggerFactory}
     import com.bryzek.apidoc.reference.api.v0.models.json._
 
     def closeAsyncHttpClient() {
@@ -732,6 +731,18 @@ package com.bryzek.apidoc.reference.api.v0 {
   sealed trait Authorization
   object Authorization {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
+  }
+
+  package interfaces {
+
+    trait Client {
+      def echoes: com.bryzek.apidoc.reference.api.v0.Echoes
+      def groups: com.bryzek.apidoc.reference.api.v0.Groups
+      def members: com.bryzek.apidoc.reference.api.v0.Members
+      def organizations: com.bryzek.apidoc.reference.api.v0.Organizations
+      def users: com.bryzek.apidoc.reference.api.v0.Users
+    }
+
   }
 
   trait Echoes {
