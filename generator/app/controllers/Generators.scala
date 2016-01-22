@@ -187,6 +187,16 @@ object Generators {
         ),
         status = lib.generator.Status.Proposal,
         codeGenerator = None
-      )
+      ),
+       CodeGenTarget(
+        metaData = Generator(
+          key = "play_2_4_mock_client",
+          name = "Play 2.4 Mock Client",
+          description = Some("Provides a mock client with non functional, but compiling stubs, that can serve as a baseline for testing"),
+          language = Some("Java, Scala")
+        ),
+        status = lib.generator.Status.Alpha,
+        codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play24)
+      )    
   ).sortBy(_.metaData.key)
 }

@@ -6,7 +6,7 @@ import scala.models.{FeatureMigration, JsonImports}
 import com.bryzek.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
-class ScalaClientMethodGenerator(
+case class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,
   ssd: ScalaService
 ) {
@@ -29,13 +29,13 @@ class ScalaClientMethodGenerator(
     ).mkString("\n\n").trim
   }
 
-  private[this] def methodName(resource: ScalaResource): String = {
+  def methodName(resource: ScalaResource): String = {
     lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(resource.plural).toLowerCase)
   }
 
   def accessors(): String = {
     sortedResources.map { resource =>
-      config.accessor(methodName(resource), resource.plural)
+      s"def ${methodName(resource)}: ${resource.plural} = ${resource.plural}"
     }.mkString("\n\n")
   }
 
@@ -46,7 +46,7 @@ class ScalaClientMethodGenerator(
         "trait Client {",
         sortedResources.map { resource =>
           s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}"
-        }.mkString("\n").indent(2),
+       }.mkString("\n").indent(2),
         "}"
       ).mkString("\n").indent(2),
       "}"
@@ -141,7 +141,7 @@ class ScalaClientMethodGenerator(
     s"case class $className(status: Int)" + """ extends Exception(s"HTTP $status")"""
   }
 
-  protected def methods(resource: ScalaResource): Seq[ClientMethod] = {
+  def methods(resource: ScalaResource): Seq[ScalaClientMethod] = {
     resource.operations.map { op =>
       val path = generatorUtil.pathParams(op)
 
@@ -246,16 +246,14 @@ class ScalaClientMethodGenerator(
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
 
-      ClientMethod(
-        name = op.name,
-        argList = op.argList,
+      ScalaClientMethod(
+        operation = op,
         returnType = hasOptionResult match {
           case None => s"scala.concurrent.Future[${op.resultType}]"
           case Some(_) => s"scala.concurrent.Future[_root_.scala.Option[${op.resultType}]]"
         },
         methodCall = methodCall,
         response = matchResponse,
-        comments = op.description,
         implicitArgs = config.implicitArgs
       )
 
@@ -263,30 +261,32 @@ class ScalaClientMethodGenerator(
   }
 
 
-  case class ClientMethod(
-    name: String,
-    argList: Option[String],
-    returnType: String,
-    methodCall: String,
-    response: String,
-    comments: Option[String],
-    implicitArgs: Option[String]
-  ) {
-    import lib.Text._
-    
-    private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
+}
 
-    val interface: String = {
-      s"""${commentString}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
-    }
+case class ScalaClientMethod(
+  operation: ScalaOperation,
+  returnType: String,
+  methodCall: String,
+  response: String,
+  implicitArgs: Option[String]
+) {
+  import lib.Text._
 
-    val code: String = {
-      s"""override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
+  val name: String = operation.name
+  val argList: Option[String] = operation.argList
+  val comments: Option[String] = operation.description
+
+  private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
+
+  val interface: String = {
+    s"""${commentString}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
+  }
+
+  val code: String = {
+    s"""override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
 ${methodCall.indent}.map {
 ${response.indent(4)}
   }
 }"""
-    }
   }
-
 }

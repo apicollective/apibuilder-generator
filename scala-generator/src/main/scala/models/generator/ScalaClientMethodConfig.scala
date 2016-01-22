@@ -64,14 +64,6 @@ trait ScalaClientMethodConfig {
     s"""_root_.${namespace}.Client.parseJson("$className", $responseName, _.validate[$className])"""
   }
 
-  /**
-   * Given an accessor method name and a type, returns code to create an
-   * accessor var.
-   */
-  def accessor(methodName: String, typeName: String): String = {
-    s"def ${methodName}: ${typeName} = ${typeName}"
-  }
-
 }
 
 object ScalaClientMethodConfigs {
