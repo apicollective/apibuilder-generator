@@ -50,40 +50,42 @@ case class MockClientGenerator(
 
   private[this] def generateCode(ssd: ScalaService): String = {
     Seq(
-      Some(s"package ${ssd.namespaces.mock} {"),
-      ssd.resources match {
-        case Nil => None
-        case _ => Some(
+      s"package ${ssd.namespaces.mock} {",
+      Seq(
+        ssd.resources match {
+          case Nil => None
+          case _ => Some(
+            Seq(
+              s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
+              ssd.resources.map { resource =>
+                s"def ${generator.methodName(resource)} = Mock${resource.plural}"
+              }.mkString("\n").indent(2),
+              "}",
+              ssd.resources.map { resource =>
+                generateMockResource(resource)
+              }.mkString("\n\n")
+            ).mkString("\n\n")
+          )
+        },
+        Some(
           Seq(
-            s"class Client() extends ${ssd.namespaces.interfaces}.Client {",
-            ssd.resources.map { resource =>
-              s"def ${generator.methodName(resource)} = Mock${resource.plural}"
-            }.mkString("\n").indent(2),
-            "}",
-            ssd.resources.map { resource =>
-            generateMockResource(resource)
-            }.mkString("\n\n")
+            "object Factories {",
+            Seq(
+              "def randomString(): String = {",
+              """  "Test " + _root_.java.util.UUID.randomUUID.toString.replaceAll("-", " ")""",
+              "}"
+            ).mkString("\n").indent(2),
+            Seq(
+              ssd.enums.map { makeEnum(_) },
+              ssd.models.map { makeModel(_) },
+              ssd.unions.map { makeUnion(_) }
+            ).flatten.mkString("\n\n").indent(2),
+            "}"
           ).mkString("\n\n")
         )
-      },
-      Some(
-        Seq(
-          "object Factories {",
-          Seq(
-            "def randomString(): String = {",
-            """  "Test " + _root_.java.util.UUID.randomUUID.toString.replaceAll("-", " ")""",
-            "}"
-          ).mkString("\n").indent(2),
-          Seq(
-            ssd.enums.map { makeEnum(_) },
-            ssd.models.map { makeModel(_) },
-            ssd.unions.map { makeUnion(_) }
-          ).flatten.mkString("\n\n").indent(2),
-          "}"
-        ).mkString("\n\n").indent(2)
-      ),
-      Some("}")
-    ).flatten.mkString("\n\n")
+      ).flatten.mkString("\n\n").indent(2),
+      "}"
+    ).mkString("\n\n")
   }
 
   private[this] def makeEnum(enum: ScalaEnum): String = {
