@@ -70,6 +70,11 @@ case class MockClientGenerator(
         Seq(
           "object Factories {",
           Seq(
+            "def randomString(): String = {",
+            """  "Test " + _root_.java.util.UUID.randomUUID.toString.replaceAll("-", " ")""",
+            "}"
+          ).mkString("\n").indent(2),
+          Seq(
             ssd.enums.map { makeEnum(_) },
             ssd.models.map { makeModel(_) },
             ssd.unions.map { makeUnion(_) }
@@ -145,7 +150,7 @@ case class MockClientGenerator(
       case ScalaPrimitive.DateTimeIso8601 => "new org.joda.time.DateTime()"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
       case ScalaPrimitive.Object => "play.api.libs.json.Json.obj()"
-      case ScalaPrimitive.String => s""""Test ${java.util.UUID.randomUUID.toString.replaceAll("-", " ")}""""
+      case ScalaPrimitive.String => "randomString()"
       case ScalaPrimitive.Unit => "// unit type"
       case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
