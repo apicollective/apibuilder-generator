@@ -58,7 +58,7 @@ case class MockClientGenerator(
             Seq(
               s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
               ssd.resources.map { resource =>
-                s"def ${generator.methodName(resource)}: Mock${resource.plural} = Mock${resource.plural}Impl"
+                s"override def ${generator.methodName(resource)}: Mock${resource.plural} = Mock${resource.plural}Impl"
               }.mkString("\n").indent(2),
               "}",
               ssd.resources.map { resource =>
