@@ -18,7 +18,7 @@ object ParserGenerator extends CodeGenerator {
 
     generateCode(ssd) match {
       case None => {
-        Left(Seq("No models were found and thus no parsers were generated"))
+        Left(Seq("No enums, models, or unions were found and thus no parsers were generated"))
       }
       case Some(code) => {
         Right(
@@ -48,7 +48,7 @@ object ParserGenerator extends CodeGenerator {
   }
 
   private[this] def generateCode(ssd: ScalaService): Option[String] = {
-    Seq(ssd.models, ssd.enums).flatten.isEmpty match {
+    Seq(ssd.models, ssd.enums, ssd.unions).flatten.isEmpty match {
       case true => {
         None
       }

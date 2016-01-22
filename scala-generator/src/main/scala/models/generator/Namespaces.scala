@@ -29,6 +29,9 @@ case class Namespaces(original: String) {
   val anormConversions: String = Seq(anorm, Namespaces.Conversions).mkString(".")
   val errors: String = Seq(base, "errors").mkString(".")
 
+  val mock: String = Seq(base, "mock").mkString(".")
+  val interfaces: String = Seq(base, "interfaces").mkString(".")
+
   val last: String = base.split("\\.").last
 
   def get(objectType: GeneratorUtil.ObjectType): String = {
