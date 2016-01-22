@@ -58,7 +58,7 @@ case class MockClientGenerator(
             Seq(
               s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
               ssd.resources.map { resource =>
-                s"def ${generator.methodName(resource)} = Mock${resource.plural}"
+                s"def ${generator.methodName(resource)}: Mock${resource.plural} = Mock${resource.plural}Impl"
               }.mkString("\n").indent(2),
               "}",
               ssd.resources.map { resource =>
@@ -119,7 +119,8 @@ case class MockClientGenerator(
 
   private[this] def generateMockResource(resource: ScalaResource): String = {
     Seq(
-      s"object Mock${resource.plural} extends ${ssd.namespaces.base}.${resource.plural} {",
+      s"object Mock${resource.plural}Impl extends Mock${resource.plural}",
+      s"trait Mock${resource.plural} extends ${ssd.namespaces.base}.${resource.plural} {",
       generator.methods(resource).map { m =>
         Seq(
           m.interface + " = scala.concurrent.Future {",
