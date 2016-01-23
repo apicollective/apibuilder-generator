@@ -667,7 +667,7 @@ package com.gilt.quality.v0.models {
     def jsObjectAdjournForm(obj: com.gilt.quality.v0.models.AdjournForm) = {
       (obj.adjournedAt match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("adjourned_at" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("adjourned_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x)))
       })
     }
 
@@ -958,11 +958,11 @@ package com.gilt.quality.v0.models {
         "created_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.createdAt))
       ) ++ (obj.description match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("description" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("description" -> play.api.libs.json.JsString(x))
       }) ++
       (obj.team match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("team" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("team" -> jsObjectTeam(x))
       }) ++
       (obj.tags match {
         case None => play.api.libs.json.Json.obj()
@@ -970,7 +970,7 @@ package com.gilt.quality.v0.models {
       }) ++
       (obj.plan match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("plan" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("plan" -> jsObjectPlan(x))
       })
     }
 
@@ -998,11 +998,11 @@ package com.gilt.quality.v0.models {
         "summary" -> play.api.libs.json.JsString(obj.summary)
       ) ++ (obj.teamKey match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("team_key" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("team_key" -> play.api.libs.json.JsString(x))
       }) ++
       (obj.description match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("description" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("description" -> play.api.libs.json.JsString(x))
       }) ++
       (obj.tags match {
         case None => play.api.libs.json.Json.obj()
@@ -1080,7 +1080,7 @@ package com.gilt.quality.v0.models {
         "scheduled_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.scheduledAt))
       ) ++ (obj.adjournedAt match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("adjourned_at" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("adjourned_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x)))
       })
     }
 
@@ -1123,11 +1123,11 @@ package com.gilt.quality.v0.models {
         "meeting" -> jsObjectMeeting(obj.meeting)
       ) ++ (obj.priorIncident match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("prior_incident" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("prior_incident" -> jsObjectIncident(x))
       }) ++
       (obj.nextIncident match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("next_incident" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("next_incident" -> jsObjectIncident(x))
       })
     }
 
@@ -1173,7 +1173,7 @@ package com.gilt.quality.v0.models {
         "name" -> play.api.libs.json.JsString(obj.name)
       ) ++ (obj.key match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("key" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("key" -> play.api.libs.json.JsString(x))
       })
     }
 
@@ -1203,7 +1203,7 @@ package com.gilt.quality.v0.models {
         "created_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.createdAt))
       ) ++ (obj.grade match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("grade" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("grade" -> play.api.libs.json.JsNumber(x))
       })
     }
 
@@ -1258,7 +1258,7 @@ package com.gilt.quality.v0.models {
         "total_plans" -> play.api.libs.json.JsNumber(obj.totalPlans)
       ) ++ (obj.averageGrade match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("average_grade" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("average_grade" -> play.api.libs.json.JsNumber(x))
       }) ++
       (obj.plans match {
         case None => play.api.libs.json.Json.obj()
@@ -1340,7 +1340,7 @@ package com.gilt.quality.v0.models {
         "icons" -> jsObjectIcons(obj.icons)
       ) ++ (obj.email match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.JsString(x))
       })
     }
 
@@ -1366,15 +1366,15 @@ package com.gilt.quality.v0.models {
         "key" -> play.api.libs.json.JsString(obj.key)
       ) ++ (obj.email match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.JsString(x))
       }) ++
       (obj.smileyUrl match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("smiley_url" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("smiley_url" -> play.api.libs.json.JsString(x))
       }) ++
       (obj.frownyUrl match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("frowny_url" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("frowny_url" -> play.api.libs.json.JsString(x))
       })
     }
 
@@ -1441,15 +1441,15 @@ package com.gilt.quality.v0.models {
     def jsObjectUpdateTeamForm(obj: com.gilt.quality.v0.models.UpdateTeamForm) = {
       (obj.email match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.JsString(x))
       }) ++
       (obj.smileyUrl match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("smiley_url" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("smiley_url" -> play.api.libs.json.JsString(x))
       }) ++
       (obj.frownyUrl match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("frowny_url" -> play.api.libs.json.Json.toJson(x))
+        case Some(x) => play.api.libs.json.Json.obj("frowny_url" -> play.api.libs.json.JsString(x))
       })
     }
 

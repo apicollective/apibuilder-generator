@@ -14,7 +14,7 @@ def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser) = {
     "bar" -> play.api.libs.json.JsString(obj.bar)
   ) ++ (obj.name match {
     case None => play.api.libs.json.Json.obj()
-    case Some(x) => play.api.libs.json.Json.obj("name" -> play.api.libs.json.Json.toJson(x))
+    case Some(x) => play.api.libs.json.Json.obj("name" -> play.api.libs.json.JsString(x))
   })
 }
 
@@ -34,7 +34,7 @@ def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser)
     "foo" -> play.api.libs.json.JsString(obj.foo)
   ) ++ (obj.name match {
     case None => play.api.libs.json.Json.obj()
-    case Some(x) => play.api.libs.json.Json.obj("name" -> play.api.libs.json.Json.toJson(x))
+    case Some(x) => play.api.libs.json.Json.obj("name" -> play.api.libs.json.JsString(x))
   })
 }
 
