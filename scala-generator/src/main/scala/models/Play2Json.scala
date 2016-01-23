@@ -338,8 +338,8 @@ case class Play2Json(
       case ScalaPrimitive.Object => {
         toJsObjectResult(originalName, s"play.api.libs.json.Json.obj($varName)")
       }
-      case ScalaDatatype.Option(_) => {
-        val value = "play.api.libs.json.Json.toJson(x)"
+      case ScalaDatatype.Option(inner) => {
+        val value = getJsonObject(originalName, inner, "x").value
         JsObjectResult(
           Seq(
             s"$varName match {",

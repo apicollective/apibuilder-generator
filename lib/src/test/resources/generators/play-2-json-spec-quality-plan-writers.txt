@@ -6,7 +6,7 @@ def jsObjectPlan(obj: com.gilt.quality.v0.models.Plan) = {
     "created_at" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.createdAt))
   ) ++ (obj.grade match {
     case None => play.api.libs.json.Json.obj()
-    case Some(x) => play.api.libs.json.Json.obj("grade" -> play.api.libs.json.Json.toJson(x))
+    case Some(x) => play.api.libs.json.Json.obj("grade" -> play.api.libs.json.JsNumber(x))
   })
 }
 
