@@ -323,10 +323,10 @@ case class Play2Json(
       case ScalaPrimitive.Boolean => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsBoolean(${varName})")
       }
-      case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
+      case ScalaPrimitive.Decimal | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsNumber($varName)")
       }
-      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
+      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Uuid => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString(${varName}.toString)")
       }
       case ScalaPrimitive.String => {
