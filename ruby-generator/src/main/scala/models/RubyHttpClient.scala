@@ -224,32 +224,43 @@ module HttpClient
 
   end
 
+  class PreconditionException < Exception
+
+    attr_reader :message
+    
+    def initialize(message)
+      super(message)
+      @message = message
+    end
+
+  end
+          
   module Preconditions
 
     def Preconditions.check_argument(expression, error_message=nil)
       if !expression
-        raise error_message || "check_argument failed"
+        raise PreconditionException.new(error_message || "check_argument failed")
       end
       nil
     end
 
     def Preconditions.check_state(expression, error_message=nil)
       if !expression
-        raise error_message || "check_state failed"
+        raise PreconditionException.new(error_message || "check_state failed")
       end
       nil
     end
 
     def Preconditions.check_not_nil(field_name, reference, error_message=nil)
       if reference.nil?
-        raise error_message || "argument for %s cannot be nil" % field_name
+        raise PreconditionException.new(error_message || "argument for %s cannot be nil" % field_name)
       end
       reference
     end
 
     def Preconditions.check_not_blank(field_name, reference, error_message=nil)
       if reference.to_s.strip == ""
-        raise error_message || "argument for %s cannot be blank" % field_name
+        raise PreconditionException.new(error_message || "argument for %s cannot be blank" % field_name)
       end
       reference
     end
@@ -258,7 +269,17 @@ module HttpClient
     # arguments to a function
     def Preconditions.assert_empty_opts(opts)
       if !opts.empty?
-        raise "Invalid opts: #{opts.keys.inspect}\n#{opts.inspect}"
+        raise PreconditionException.new("Invalid opts: #{opts.keys.inspect}\n#{opts.inspect}")
+      end
+    end
+
+    # Requires that the provided hash has the specified keys.
+    # @param fields A list of symbols
+    def Preconditions.require_keys(hash, fields, error_prefix=nil)
+      missing = fields.select { |f| !hash.has_key?(f) }
+      if !missing.empty?
+        msg = "Missing required fields: " + missing.join(", ")
+        raise PreconditionException.new(error_prefix.empty? ? msg : "#{error_prefix}: #{msg}")
       end
     end
 
@@ -399,7 +420,7 @@ module HttpClient
       elsif FALSE_STRINGS.include?(string)
         false
       elsif string != ""
-        raise "Unsupported boolean value[#{string}]. For true, must be one of: #{TRUE_STRINGS.inspect}. For false, must be one of: #{FALSE_STRINGS.inspect}"
+        raise PreconditionException.new("Unsupported boolean value[#{string}]. For true, must be one of: #{TRUE_STRINGS.inspect}. For false, must be one of: #{FALSE_STRINGS.inspect}")
       else
         nil
       end

@@ -606,6 +606,7 @@ ${headers.rubyModuleConstants.indent(2)}
       Seq(
         "def initialize(incoming={})",
         "  opts = HttpClient::Helper.symbolize_keys(incoming)",
+        s"  HttpClient::Preconditions.require_keys(opts, [:name], '$className')",
         "  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)",
         "end"
       ).mkString("\n"),
@@ -731,6 +732,13 @@ ${headers.rubyModuleConstants.indent(2)}
     }
 
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
+
+    model.fields.filter(_.required) match {
+      case Nil => {}
+      case required => {
+        sb.append("    HttpClient::Preconditions.require_keys(opts, [" + required.map { f => s":${RubyUtil.quoteNameIfKeyword(f.name)}" }.mkString(", ") + s"], '$className')")
+      }
+    }
 
     model.fields.map { field =>
       val varName = RubyUtil.quoteNameIfKeyword(field.name)
