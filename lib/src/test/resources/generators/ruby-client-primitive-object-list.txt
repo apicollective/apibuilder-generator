@@ -4,6 +4,7 @@ class Content
 
   def initialize(incoming={})
     opts = HttpClient::Helper.symbolize_keys(incoming)
+    HttpClient::Preconditions.require_keys(opts, [:data], 'Content')
     @data = HttpClient::Preconditions.assert_class('data', opts.delete(:data), Array).map { |v| HttpClient::Preconditions.assert_class('data', HttpClient::Helper.to_object(v), Hash) }
   end
 
