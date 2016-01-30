@@ -1,12 +1,9 @@
-FROM giltarchitecture/ubuntu-jvm:0.6
+FROM flowcommerce/play:0.0.7
 
-MAINTAINER architecture@gilt.com
+MAINTAINER mbryzek@alum.mit.edu
 
-ADD . /usr/share/apidoc-generator
+ADD . /opt/play
 
-WORKDIR /usr/share/apidoc-generator
+WORKDIR /opt/play
 
-RUN sbt -Dsbt.ivy.home=.ivy2 clean stage
-
-RUN ln -s /usr/share/apidoc-generator/generator/target/universal/stage /usr/share/apidoc-generator-generator
-
+RUN sbt clean stage
