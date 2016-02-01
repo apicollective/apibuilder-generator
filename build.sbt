@@ -9,6 +9,7 @@ scalaVersion in ThisBuild := "2.11.7"
 lazy val generated = project
   .in(file("generated"))
   .enablePlugins(PlayScala)
+  .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
       ws
@@ -28,6 +29,7 @@ lazy val generator = project
   .dependsOn(scalaGenerator, rubyGenerator, javaGenerator)
   .aggregate(scalaGenerator, rubyGenerator, javaGenerator)
   .enablePlugins(PlayScala)
+  .settings(commonSettings: _*)
   .settings(
     routesImport += "com.bryzek.apidoc.generator.v0.Bindables._",
     routesGenerator := InjectedRoutesGenerator,
@@ -60,5 +62,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test"
   ),
-  scalacOptions += "-feature"
+  scalacOptions += "-feature",
+  sources in (Compile,doc) := Seq.empty,
+  publishArtifact in (Compile, packageDoc) := false
 )
