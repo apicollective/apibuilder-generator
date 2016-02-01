@@ -733,7 +733,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
 
-    model.fields.filter(_.required) match {
+    model.fields.filter( f => f.required && f.default.isEmpty ) match {
       case Nil => {}
       case required => {
         sb.append("    HttpClient::Preconditions.require_keys(opts, [" + required.map { f => s":${RubyUtil.quoteNameIfKeyword(f.name)}" }.mkString(", ") + s"], '$className')")
