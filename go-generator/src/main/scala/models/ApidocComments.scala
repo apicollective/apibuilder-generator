@@ -13,6 +13,6 @@ case class ApidocComments(version: String, userAgent: Option[String]) {
     userAgent
   ).flatten
 
-  val comments: String = GolangUtil.textToComment(elements)
+  val comments: String = GoUtil.textToComment(elements)
 
 }

@@ -2,7 +2,7 @@ package golang.models
 
 import lib.Text._
 
-object GolangUtil {
+object GoUtil {
 
   // TODO: this is the java list. Update for golang
   private val ReservedWords = Set(

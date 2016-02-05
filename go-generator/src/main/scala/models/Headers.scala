@@ -24,11 +24,11 @@ case class Headers(
   val code: String = {
     Seq(
       constants.map { pair =>
-        val name = GolangUtil.publicName(pair._1)
+        val name = GoUtil.publicName(pair._1)
         if (pair._1 == VersionMajorName) {
           s"const $name := ${pair._2}"
         } else {
-          s"const $name := ${GolangUtil.wrapInQuotes(pair._2)}"
+          s"const $name := ${GoUtil.wrapInQuotes(pair._2)}"
         }
       }.mkString("\n")
     ).mkString("\n\n")
@@ -39,7 +39,7 @@ case class Headers(
     Some("X-Apidoc-Version" -> s"Constants::VERSION"),
     versionMajor.map { major => VersionMajorHeaderName -> s"Constants::VERSION_MAJOR" }
   ).flatten ++ form.service.headers.filter(!_.default.isEmpty).map { h =>
-    (h.name -> GolangUtil.wrapInQuotes(h.default.get))
+    (h.name -> GoUtil.wrapInQuotes(h.default.get))
   }
 
 }
