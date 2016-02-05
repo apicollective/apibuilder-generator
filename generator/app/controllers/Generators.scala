@@ -188,6 +188,16 @@ object Generators {
         status = lib.generator.Status.Proposal,
         codeGenerator = None
       ),
+      CodeGenTarget(
+        metaData = Generator(
+          key = "go_1_5",
+          name = "go 1.5 client",
+          description = Some("Client based on native go 1.5 net/http libraries."),
+          language = Some("Go")
+        ),
+        status = lib.generator.Status.Alpha,
+        codeGenerator = Some(go.models.GoClientGenerator)
+      ),
        CodeGenTarget(
         metaData = Generator(
           key = "play_2_4_mock_client",
