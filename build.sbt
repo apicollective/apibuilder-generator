@@ -26,8 +26,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -51,6 +51,11 @@ lazy val rubyGenerator = project
 
 lazy val javaGenerator = project
   .in(file("java-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+
+lazy val goGenerator = project
+  .in(file("go-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
 
