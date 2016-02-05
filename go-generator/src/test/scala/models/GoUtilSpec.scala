@@ -1,4 +1,4 @@
-package golang.models
+package go.models
 
 import org.scalatest.{ FunSpec, Matchers }
 

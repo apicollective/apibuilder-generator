@@ -1,4 +1,4 @@
-package golang.models
+package go.models
 
 import lib.Text._
 

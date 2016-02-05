@@ -1,4 +1,4 @@
-package golang.models
+package go.models
 
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import lib.VersionTag

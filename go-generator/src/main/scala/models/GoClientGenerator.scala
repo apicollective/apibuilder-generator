@@ -1,4 +1,4 @@
-package golang.models
+package go.models
 
 import com.bryzek.apidoc.spec.v0.models.{Enum, Model, Service, Union}
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
