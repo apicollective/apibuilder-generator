@@ -15,7 +15,6 @@ case class Headers(
   private[this] val VersionMajorHeaderName = "X-Apidoc-Version-Major"
 
   private[this] val constants = Seq(
-    Some("Package", GoUtil.packageName(form.service.name)),
     Some("UserAgent", form.userAgent.getOrElse("apidoc:go_1_5_client:unknown")),
     Some("Version", form.service.version),
     versionMajor.map { major => (VersionMajorName, major.toString) }
@@ -33,9 +32,9 @@ case class Headers(
   }
 
   val all = Seq(
-    Some("User-Agent" -> s"Constants::USER_AGENT"),
-    Some("X-Apidoc-Version" -> s"Constants::VERSION"),
-    versionMajor.map { major => VersionMajorHeaderName -> s"Constants::VERSION_MAJOR" }
+    Some("User-Agent" -> s"UserAgent"),
+    Some("X-Apidoc-Version" -> s"Version"),
+    versionMajor.map { major => VersionMajorHeaderName -> VersionMajorName }
   ).flatten ++ form.service.headers.filter(!_.default.isEmpty).map { h =>
     (h.name -> GoUtil.wrapInQuotes(h.default.get))
   }

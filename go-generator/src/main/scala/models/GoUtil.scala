@@ -1,5 +1,6 @@
 package go.models
 
+import com.bryzek.apidoc.spec.v0.models.Resource
 import lib.Text._
 
 object GoUtil {
@@ -33,7 +34,7 @@ object GoUtil {
     * returns a safe variable name with leading letter in upper case
     */
   def publicName(name: String) = {
-    val baseName =safeName(
+    val baseName = safeName(
       if (name == name.toUpperCase) {
         initCap(splitIntoWords(name).map(_.toLowerCase)).mkString("")
       } else {
@@ -54,6 +55,11 @@ object GoUtil {
   def packageName(name: String): String = {
     publicName(name).toLowerCase
   }
+
+  def methodName(resource: Resource): String = {
+    publicName(resource.plural)
+  }
+
 
   
 }

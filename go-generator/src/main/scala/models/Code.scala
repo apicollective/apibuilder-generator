@@ -1,6 +1,6 @@
 package go.models
 
-import com.bryzek.apidoc.spec.v0.models.{Enum, Model, Service, Union}
+import com.bryzek.apidoc.spec.v0.models.{Enum, Model, ParameterLocation, Resource, Service, Union}
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.Datatype
 import lib.generator.GeneratorUtil
@@ -26,9 +26,10 @@ case class Code(form: InvocationForm) {
             Seq(
               service.enums.map(generateEnum(_)),
               service.models.map(generateModel(_)),
-              service.unions.map(generateUnion(_))
+              service.unions.map(generateUnion(_)),
+              service.resources.map(generateResource(_))
             ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n"),
-              BasicDefinitionBottom
+            BasicDefinitionBottom
           ).mkString("\n\n")
         )
       }
@@ -41,12 +42,6 @@ case class Code(form: InvocationForm) {
       "TODO: Finish enum implementation",
       "}"
     ).mkString("\n")
-  }
-
-  private[this] def datatype(typeName: String, required: Boolean): Datatype = {
-    datatypeResolver.parse(typeName, required).getOrElse {
-      sys.error(s"Unknown datatype[$typeName]")
-    }
   }
 
   private[this] def generateModel(model: Model): String = {
@@ -69,6 +64,61 @@ case class Code(form: InvocationForm) {
     ).mkString("\n")
   }
 
+  private[this] def datatype(typeName: String, required: Boolean): Datatype = {
+    datatypeResolver.parse(typeName, required).getOrElse {
+      sys.error(s"Unknown datatype[$typeName]")
+    }
+  }
+
+  private[this] case class MethodArgumentsType(name: String)
+
+  private[this] case class MethodResultsType(name: String)
+
+  private[this] def generateResource(resource: Resource): String = {
+    resource.operations.map { op =>
+      val name = GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
+
+      var methodParameters = scala.collection.mutable.ListBuffer[String]()
+      methodParameters += "client Client"
+
+      val argsType = op.parameters.filter(_.location == ParameterLocation.Query) match {
+        case Nil => {
+          None
+        }
+        case args => {
+          val argsType = MethodArgumentsType(GoUtil.publicName("${name}Args"))
+          methodParameters += s"args ${argsType.name}"
+          Some(argsType)
+        }
+      }
+
+      var pathArgs = scala.collection.mutable.ListBuffer[String]()
+      pathArgs += "client.baseUrl"
+
+      var path = op.path
+
+      op.parameters.filter(_.location == ParameterLocation.Path).map { arg =>
+        val varName = GoUtil.privateName(arg.name)
+        val typ = GoType(datatype(arg.`type`, true))
+        methodParameters += s"$varName ${typ.className}"
+        path = path.replace(s":${arg.name}", "%s")
+        pathArgs += typ.toEscapedString(varName)
+      }
+      
+      val resultsType = MethodResultsType(GoUtil.publicName(s"${name}Result"))
+
+
+
+      Seq(
+        s"func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
+        Seq(
+          s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""
+        ).mkString("\n").indent(2),
+        "}",
+        ""
+      ).mkString("\n")
+    }.mkString("\n\n")
+  }
 
   private[this] val AllHeaders = headers.all.map {
     case (name, value) => s"""		"$name":   {$value},"""
@@ -82,6 +132,7 @@ import (
 	"fmt"
 	"github.com/flowcommerce/tools/profile"
 	"io"
+	"net/html"
 	"net/http"
 	"net/url"
 	"strconv"
