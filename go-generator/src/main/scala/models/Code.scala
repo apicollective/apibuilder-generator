@@ -11,6 +11,7 @@ case class Code(form: InvocationForm) {
 
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
+  private[this] val headers = Headers(form)
 
   def generate(): Option[String] = {
     Seq(service.models, service.enums, service.unions).flatten.isEmpty match {
@@ -21,12 +22,13 @@ case class Code(form: InvocationForm) {
         Some(
           Seq(
             s"package ${GoUtil.packageName(service.name)}",
-            Headers(form).code,
+            BasicDefinitionTop,
             Seq(
               service.enums.map(generateEnum(_)),
               service.models.map(generateModel(_)),
               service.unions.map(generateUnion(_))
-            ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n")
+            ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n"),
+              BasicDefinitionBottom
           ).mkString("\n\n")
         )
       }
@@ -67,5 +69,53 @@ case class Code(form: InvocationForm) {
     ).mkString("\n")
   }
 
+
+  private[this] val AllHeaders = headers.all.map {
+    case (name, value) => s"""		"$name":   {$value},"""
+  }.mkString("\n")
+
+  private[this] val BasicDefinitionTop = s"""
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/flowcommerce/tools/profile"
+	"io"
+	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
+	"sync"
+)
+
+${headers.code}
+
+type Client struct {
+	httpClient                  *http.Client
+	username                    string
+	password                    string
+	baseUrl                     string
+}
+    """.trim
+
+  private[this] val BasicDefinitionBottom = s"""
+func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.Request, error) {
+	request, err := http.NewRequest(method, urlStr, body)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header = map[string][]string{
+$AllHeaders
+	}
+
+	if client.username != "" {
+		request.SetBasicAuth(client.username, client.password)
+	}
+
+	return request, nil
+}
+  """.trim
 
 }
