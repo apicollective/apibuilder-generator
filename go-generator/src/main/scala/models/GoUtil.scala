@@ -35,7 +35,7 @@ object GoUtil {
   def publicName(name: String) = {
     val baseName =safeName(
       if (name == name.toUpperCase) {
-       initCap(splitIntoWords(name).map(_.toLowerCase)).mkString("")
+        initCap(splitIntoWords(name).map(_.toLowerCase)).mkString("")
       } else {
         initCap(snakeToCamelCase(name))
       }
@@ -49,6 +49,10 @@ object GoUtil {
     */
   def privateName(name: String): String = {
     initLowerCase(publicName(name))
+  }
+
+  def packageName(name: String): String = {
+    publicName(name).toLowerCase
   }
 
   

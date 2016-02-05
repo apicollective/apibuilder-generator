@@ -10,28 +10,26 @@ case class Headers(
 
   private[this] val versionMajor: Option[Int] = VersionTag(form.service.version).major
 
-  private[this] val NamespaceName = "Namespace"
+  private[this] val PackageName = "Package"
   private[this] val VersionMajorName = "VersionMajor"
   private[this] val VersionMajorHeaderName = "X-Apidoc-Version-Major"
 
   private[this] val constants = Seq(
-    Some("Namespace", form.service.namespace),
-    Some("UserAgent", form.userAgent.getOrElse("apidoc:play_2x_client:unknown")),
+    Some("Package", GoUtil.packageName(form.service.name)),
+    Some("UserAgent", form.userAgent.getOrElse("apidoc:go_1_5_client:unknown")),
     Some("Version", form.service.version),
     versionMajor.map { major => (VersionMajorName, major.toString) }
   ).flatten
 
   val code: String = {
-    Seq(
-      constants.map { pair =>
-        val name = GoUtil.publicName(pair._1)
-        if (pair._1 == VersionMajorName) {
-          s"const $name := ${pair._2}"
-        } else {
-          s"const $name := ${GoUtil.wrapInQuotes(pair._2)}"
+    constants.map { pair =>
+      val name = GoUtil.publicName(pair._1)
+      if (pair._1 == VersionMajorName) {
+        s"const $name = ${pair._2}"
+      } else {
+        s"const $name = ${GoUtil.wrapInQuotes(pair._2)}"
         }
-      }.mkString("\n")
-    ).mkString("\n\n")
+    }.mkString("\n")
   }
 
   val all = Seq(
