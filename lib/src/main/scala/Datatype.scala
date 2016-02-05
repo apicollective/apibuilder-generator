@@ -115,7 +115,6 @@ case class DatatypeResolver(
       case MapDefaultRx() => Success(Datatype.Container.Map(Datatype.Primitive.String))
 
       case UserDefined(dt) => Success(dt)
-      case _ => Failure(new RuntimeException(s"cannot parse ${value} as datatype"))
     }
 
     if (required) dt else dt.map(Datatype.Container.Option)
