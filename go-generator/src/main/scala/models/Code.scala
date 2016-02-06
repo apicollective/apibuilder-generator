@@ -106,17 +106,6 @@ case class Code(form: InvocationForm) {
 
       var queryParameters = scala.collection.mutable.ListBuffer[String]()
 
-      val argsType = op.parameters.filter(_.location == ParameterLocation.Query) match {
-        case Nil => {
-          None
-        }
-        case params => {
-          val argsType = MethodArgumentsType(GoUtil.publicName(s"${name}Args"))
-          methodParameters += s"args ${argsType.name}"
-          Some(argsType)
-        }
-      }
-
       var pathArgs = scala.collection.mutable.ListBuffer[String]()
       pathArgs += "client.baseUrl"
 
@@ -130,6 +119,17 @@ case class Code(form: InvocationForm) {
         pathArgs += typ.toEscapedString(varName)
       }
       
+      val argsType = op.parameters.filter(_.location == ParameterLocation.Query) match {
+        case Nil => {
+          None
+        }
+        case params => {
+          val argsType = MethodArgumentsType(GoUtil.publicName(s"${name}Args"))
+          methodParameters += s"args ${argsType.name}"
+          Some(argsType)
+        }
+      }
+
       val resultsType = MethodResultsType(
         name = GoUtil.publicName(s"${name}Result")
       )
