@@ -2,7 +2,11 @@ package go.models
 
 import lib.{Datatype, Text}
 
-case class GoType(className: String, datatype: Datatype) {
+case class GoType(
+  importBuilder:ImportBuilder,
+  className: String,
+  datatype: Datatype
+) {
 
   /**
     * Based on the datatype, generates a variable name - e.g. if the
@@ -38,10 +42,22 @@ case class GoType(className: String, datatype: Datatype) {
 
   private[this] def toString(varName: String, dt: Datatype): String = {
     dt match {
-      case Datatype.Primitive.Boolean => s"strconv.FormatBool($varName)"
-      case Datatype.Primitive.Double => s"strconv.FormatFloat($varName, 'E', -1, 64)"
-      case Datatype.Primitive.Integer => s"strconv.FormatInt($varName, 10)"
-      case Datatype.Primitive.Long => s"strconv.FormatInt($varName, 10)"
+      case Datatype.Primitive.Boolean => {
+        importBuilder.ensureImport("strconv")
+        s"strconv.FormatBool($varName)"
+      }
+      case Datatype.Primitive.Double => {
+        importBuilder.ensureImport("strconv")
+        s"strconv.FormatFloat($varName, 'E', -1, 64)"
+      }
+      case Datatype.Primitive.Integer => {
+        importBuilder.ensureImport("strconv")
+        s"strconv.FormatInt($varName, 10)"
+      }
+      case Datatype.Primitive.Long => {
+        importBuilder.ensureImport("strconv")
+        s"strconv.FormatInt($varName, 10)"
+      }
       case Datatype.Primitive.DateIso8601 => varName     // TODO
       case Datatype.Primitive.DateTimeIso8601 => varName // TODO
       case Datatype.Primitive.Decimal => varName
@@ -97,9 +113,11 @@ case class GoType(className: String, datatype: Datatype) {
 object GoType {
 
   def apply(
+    importBuilder: ImportBuilder,
     dt: Datatype
   ): GoType = {
     GoType(
+      importBuilder = importBuilder,
       className = className(dt),
       datatype = dt
     )

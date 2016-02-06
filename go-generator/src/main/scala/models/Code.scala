@@ -7,12 +7,24 @@ import lib.Datatype
 import lib.generator.GeneratorUtil
 import lib.Text
 import lib.Text._
+import scala.collection.mutable
+
 
 case class Code(form: InvocationForm) {
 
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
   private[this] val headers = Headers(form)
+  private[this] val importBuilder = {
+    val builder = ImportBuilder()
+    builder.ensureImport("encoding/json")
+    builder.ensureImport("errors")
+    builder.ensureImport("fmt")
+    builder.ensureImport("io")
+    builder.ensureImport("html")
+    builder.ensureImport("net/http")
+    builder
+  }
 
   def generate(): Option[String] = {
     Seq(service.models, service.enums, service.unions).flatten.isEmpty match {
@@ -20,16 +32,19 @@ case class Code(form: InvocationForm) {
         None
       }
       case false => {
+        val code = Seq(
+          service.enums.map(generateEnum(_)),
+          service.models.map(generateModel(_)),
+          service.unions.map(generateUnion(_)),
+          service.resources.map(generateResource(_))
+        ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n")
+
         Some(
           Seq(
             s"package ${GoUtil.packageName(service.name)}",
+            importBuilder.generate(),
             BasicDefinitionTop,
-            Seq(
-              service.enums.map(generateEnum(_)),
-              service.models.map(generateModel(_)),
-              service.unions.map(generateUnion(_)),
-              service.resources.map(generateResource(_))
-            ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n"),
+            code,
             BasicDefinitionBottom
           ).mkString("\n\n")
         )
@@ -67,7 +82,7 @@ case class Code(form: InvocationForm) {
 
         Seq(
           Some(publicName),
-          Some(GoType(datatype(f.`type`, f.required)).className),
+          Some(GoType(importBuilder, datatype(f.`type`, f.required)).className),
           json
         ).flatten.mkString("    ")
       }.mkString("\n").indent(2),
@@ -79,7 +94,7 @@ case class Code(form: InvocationForm) {
     Seq(
       s"type ${GoUtil.publicName(union.name)} struct {",
       union.types.map { typ =>
-        GoUtil.publicName(typ.`type`) + " " + GoType(datatype(typ.`type`, true)).className
+        GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).className
       }.mkString("\n").indent(2),
       "}\n"
     ).mkString("\n")
@@ -108,19 +123,19 @@ case class Code(form: InvocationForm) {
         GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
       )
 
-      var methodParameters = scala.collection.mutable.ListBuffer[String]()
+      var methodParameters = mutable.ListBuffer[String]()
       methodParameters += "client Client"
 
-      var queryParameters = scala.collection.mutable.ListBuffer[String]()
+      var queryParameters = mutable.ListBuffer[String]()
 
-      var pathArgs = scala.collection.mutable.ListBuffer[String]()
+      var pathArgs = mutable.ListBuffer[String]()
       pathArgs += "client.BaseUrl"
 
       var path = op.path
 
       op.parameters.filter(_.location == ParameterLocation.Path).map { arg =>
         val varName = GoUtil.privateName(arg.name)
-        val typ = GoType(datatype(arg.`type`, true))
+        val typ = GoType(importBuilder, datatype(arg.`type`, true))
         methodParameters += s"$varName ${typ.className}"
         path = path.replace(s":${arg.name}", "%s")
         pathArgs += typ.toEscapedString(varName)
@@ -149,6 +164,7 @@ case class Code(form: InvocationForm) {
 
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
       val queryToUrl = queryString.map { _ =>
+        importBuilder.ensureImport("strings")
 	Seq(
           "",
           "if len(params) > 0 {",
@@ -162,7 +178,7 @@ case class Code(form: InvocationForm) {
           Seq(
             s"type ${typ.name} struct {",
             typ.params.map { param =>
-              val goType = GoType(datatype(param.`type`, true))
+              val goType = GoType(importBuilder, datatype(param.`type`, true))
               GoUtil.publicName(param.name) + "    " + goType.className
             }.mkString("\n").indent(4),
             "}",
@@ -204,7 +220,7 @@ case class Code(form: InvocationForm) {
                 case ResponseCodeInt(value) => {
                   value >= 200 && value < 300 match {
                     case true => {
-                      val goType = GoType(datatype(resp.`type`, true))
+                      val goType = GoType(importBuilder, datatype(resp.`type`, true))
                       successType = Some(goType)
                       successName = Some(GoUtil.publicName(goType.classVariableName()))
                       val varName = GoUtil.privateName(goType.classVariableName())
@@ -281,7 +297,7 @@ case class Code(form: InvocationForm) {
 
   private[this] def buildQueryString(param: Parameter, datatype: Datatype): String = {
     val fieldName = "args." + GoUtil.publicName(param.name)
-    val goType = GoType(datatype)
+    val goType = GoType(importBuilder, datatype)
 
     datatype match {
       case t: Datatype.Primitive => {
@@ -329,9 +345,12 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def toQuery(datatype: Datatype, varName: String): String = {
-    val expr = GoType(datatype).toString(varName)
+    val expr = GoType(importBuilder, datatype).toString(varName)
     expr == varName match {
-      case true => s"url.QueryEscape($varName)"
+      case true => {
+        importBuilder.ensureImport("net/url")
+        s"url.QueryEscape($varName)"
+      }
       case false => expr
     }
   }
@@ -340,20 +359,9 @@ case class Code(form: InvocationForm) {
     case (name, value) => s"""		"$name":   {$value},"""
   }.mkString("\n")
 
+
   // other: "bytes", "sync"
   private[this] val BasicDefinitionTop = s"""
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"html"
-	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
-)
-
 ${headers.code}
 
 type Client struct {
