@@ -49,7 +49,27 @@ case class Code(form: InvocationForm) {
     Seq(
       s"type ${GoUtil.publicName(model.name)} struct {",
       model.fields.map { f =>
-        GoUtil.publicName(f.name) + " " + GoType(datatype(f.`type`, f.required)).className
+        val publicName = GoUtil.publicName(f.name)
+
+        val json = Seq(
+          (publicName == f.name) match {
+            case true => None
+            case fasle => Some(f.name)
+          },
+          !(f.required && f.default.isEmpty) match {
+            case true => Some("omitempty")
+            case false => None
+          }
+        ).flatten match {
+          case Nil => None
+          case els => Some(s"""`json:"${els.mkString(",")}"`""")
+        }
+
+        Seq(
+          Some(publicName),
+          Some(GoType(datatype(f.`type`, f.required)).className),
+          json
+        ).flatten.mkString("   ")
       }.mkString("\n").indent(2),
       "}\n"
     ).mkString("\n")
