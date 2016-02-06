@@ -69,7 +69,7 @@ case class Code(form: InvocationForm) {
           Some(publicName),
           Some(GoType(datatype(f.`type`, f.required)).className),
           json
-        ).flatten.mkString("   ")
+        ).flatten.mkString("    ")
       }.mkString("\n").indent(2),
       "}\n"
     ).mkString("\n")
