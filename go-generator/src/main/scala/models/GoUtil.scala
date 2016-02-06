@@ -18,12 +18,18 @@ object GoUtil {
     value
   }
 
-  def textToComment(text: String): String = {
-    textToComment(Seq(text))
+  def textToComment(text: Option[String]): String = {
+    text match {
+      case None => ""
+      case Some(v) => textToComment(Seq(v))
+    }
   }
 
+  /**
+    * Returns comment, including a trailing newline
+    */
   def textToComment(text: Seq[String]): String = {
-    "/**\n * " + text.mkString("\n * ") + "\n */"
+    "/**\n * " + text.mkString("\n * ") + "\n */\n"
   }
 
   def wrapInQuotes(value: String) = {

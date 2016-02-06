@@ -38,6 +38,7 @@ case class Code(form: InvocationForm) {
         Some(
           Seq(
             s"package ${GoUtil.packageName(service.name)}",
+            ApidocComments(service.version: String, form.userAgent).comments.trim,
             importBuilder.generate(),
             headers.code,
             ClientStruct,
@@ -51,7 +52,7 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateEnum(enum: Enum): String = {
     Seq(
-      s"type ${GoUtil.publicName(enum.name)} struct {",
+      GoUtil.textToComment(enum.description) + s"type ${GoUtil.publicName(enum.name)} struct {",
       "TODO: Finish enum implementation",
       "}"
     ).mkString("\n")
@@ -59,7 +60,7 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateModel(model: Model): String = {
     Seq(
-      s"type ${GoUtil.publicName(model.name)} struct {",
+      GoUtil.textToComment(model.description) + s"type ${GoUtil.publicName(model.name)} struct {",
       model.fields.map { f =>
         val publicName = GoUtil.publicName(f.name)
 
@@ -89,7 +90,7 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateUnion(union: Union): String = {
     Seq(
-      s"type ${GoUtil.publicName(union.name)} struct {",
+      GoUtil.textToComment(union.description) + s"type ${GoUtil.publicName(union.name)} struct {",
       union.types.map { typ =>
         GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).className
       }.mkString("\n").indent(1),
