@@ -3,10 +3,10 @@ package go.models
 import com.bryzek.apidoc.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, Service, Union}
 import com.bryzek.apidoc.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import Formatter._
 import lib.Datatype
 import lib.generator.GeneratorUtil
 import lib.Text
-import lib.Text._
 import scala.collection.mutable
 
 
@@ -80,8 +80,8 @@ case class Code(form: InvocationForm) {
           Some(publicName),
           Some(GoType(importBuilder, datatype(f.`type`, f.required)).className),
           json
-        ).flatten.mkString("    ")
-      }.mkString("\n").indent(2),
+        ).flatten.mkString(" ")
+      }.mkString("\n").indent(1),
       "}\n"
     ).mkString("\n")
   }
@@ -91,7 +91,7 @@ case class Code(form: InvocationForm) {
       s"type ${GoUtil.publicName(union.name)} struct {",
       union.types.map { typ =>
         GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).className
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indent(1),
       "}\n"
     ).mkString("\n")
   }
@@ -165,7 +165,7 @@ case class Code(form: InvocationForm) {
 	Seq(
           "",
           "if len(params) > 0 {",
-          """  requestUrl += fmt.Sprintf("?%s", strings.Join(params, "&"))""",
+          """requestUrl += fmt.Sprintf("?%s", strings.Join(params, "&"))""".indent(1),
           "}"
         ).mkString("\n")
       }
@@ -179,8 +179,8 @@ case class Code(form: InvocationForm) {
             s"type ${typ.name} struct {",
             typ.params.map { param =>
               val goType = GoType(importBuilder, datatype(param.`type`, true))
-              GoUtil.publicName(param.name) + "    " + goType.className
-            }.mkString("\n").indent(4),
+              GoUtil.publicName(param.name) + " " + goType.className
+            }.mkString("\n").indent(2),
             "}",
             ""
           ).mkString("\n")
@@ -192,24 +192,24 @@ case class Code(form: InvocationForm) {
           Some(s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
           queryString,
           queryToUrl
-        ).flatten.mkString("\n").indent(2),
+        ).flatten.mkString("\n").indent(1),
 
         "",
         Seq(
           s"""request, err := buildRequest(client, "${op.method}", requestUrl, nil)""",
           s"if err != nil {",
-          s"  return ${resultsType.name}{Error: err}",
+          s"return ${resultsType.name}{Error: err}".indent(1),
           s"}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indent(1),
 
         "",
         Seq(
           s"resp, err := client.HttpClient.Do(request)",
           s"if err != nil {",
-          s"  return ${resultsType.name}{Error: err}",
+          s"return ${resultsType.name}{Error: err}".indent(1),
           s"}",
           "defer resp.Body.Close()"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indent(1),
 
         "",
 	Seq(
@@ -230,9 +230,11 @@ case class Code(form: InvocationForm) {
                       Some(
                         Seq(
                           s"case $value:",
-                          s"var $varName ${goType.className}",
-                          s"json.NewDecoder(resp.Body).Decode(&$varName)",
-		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
+                          Seq(
+                            s"var $varName ${goType.className}",
+                            s"json.NewDecoder(resp.Body).Decode(&$varName)",
+		            s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
+                          ).mkString("\n").indent(1)
                         ).mkString("\n")
                       )
                     }
@@ -243,7 +245,7 @@ case class Code(form: InvocationForm) {
                       Some(
                         Seq(
                           s"case $value:",
-                          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
+                          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
                         ).mkString("\n")
                       )
                     }
@@ -253,7 +255,7 @@ case class Code(form: InvocationForm) {
                   Some(
                     Seq(
                       s"case resp.StatusCode >= 200 && resp.StatusCode < 300:",
-                      s"// TODO"
+                      s"// TODO".indent(1)
                     ).mkString("\n")
                   )
                 }
@@ -264,12 +266,12 @@ case class Code(form: InvocationForm) {
             } ++ Seq(
               Seq(
                 "default:",
-                s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
+                s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
               ).mkString("\n")
             )
-          ).mkString("\n\n").indent(2),
+          ).mkString("\n\n"),
           "}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indent(1),
         "}",
 
         "",
@@ -281,7 +283,7 @@ case class Code(form: InvocationForm) {
 	      "Response     *http.Response",
 	      "Error        error",
 	      s"$name         ${successType.get.className}"
-            ).mkString("\n").indent(2),
+            ).mkString("\n").indent(1),
             "}"
           ).mkString("\n")
         }.mkString("\n")
@@ -308,16 +310,16 @@ case class Code(form: InvocationForm) {
           case None => {
             Seq(
               "if " + goType.notNil(fieldName) + " {",
-              "  " + addSingleParam(param.name, datatype, fieldName),
+              addSingleParam(param.name, datatype, fieldName).indent(1),
               "}"
             ).mkString("\n")
           }
           case Some(default) => {
             Seq(
               "if " + goType.nil(fieldName) + " {",
-              "  " + addSingleParam(param.name, datatype, GoUtil.wrapInQuotes(default)),
+              addSingleParam(param.name, datatype, GoUtil.wrapInQuotes(default)).indent(1),
               "} else {",
-              "  " + addSingleParam(param.name, datatype, fieldName),
+              addSingleParam(param.name, datatype, fieldName).indent(1),
               "}"
             ).mkString("\n")
 
@@ -327,7 +329,7 @@ case class Code(form: InvocationForm) {
       case Datatype.Container.List(inner) => {
         Seq(
           s"for _, value := range $fieldName {",
-          "  " + addSingleParam(param.name, inner, "value"),
+          addSingleParam(param.name, inner, "value").indent(1),
           "}"
         ).mkString("\n")
       }
@@ -360,7 +362,7 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] val AllHeaders = headers.all.map {
-    case (name, value) => s"""		"$name":   {$value},"""
+    case (name, value) => s""""$name": {$value},""".indent(1)
   }.mkString("\n")
 
 
@@ -384,7 +386,7 @@ func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.R
 	}
 
 	request.Header = map[string][]string{
-$AllHeaders
+${AllHeaders.indent(1)}
 	}
 
 	if client.Username != "" {
