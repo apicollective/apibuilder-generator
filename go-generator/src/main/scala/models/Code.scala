@@ -81,7 +81,7 @@ case class Code(form: InvocationForm) {
           Some(GoType(importBuilder, datatype(f.`type`, f.required)).className),
           json
         ).flatten.mkString(" ")
-      }.mkString("\n").indent(1),
+      }.mkString("\n").table().indent(1),
       "}\n"
     ).mkString("\n")
   }
@@ -180,7 +180,7 @@ case class Code(form: InvocationForm) {
             typ.params.map { param =>
               val goType = GoType(importBuilder, datatype(param.`type`, true))
               GoUtil.publicName(param.name) + " " + goType.className
-            }.mkString("\n").indent(2),
+            }.mkString("\n").table().indent(2),
             "}",
             ""
           ).mkString("\n")
@@ -279,11 +279,11 @@ case class Code(form: InvocationForm) {
           Seq(
             s"type ${resultsType.name} struct {",
             Seq(
-	      "StatusCode   int",
-	      "Response     *http.Response",
-	      "Error        error",
-	      s"$name         ${successType.get.className}"
-            ).mkString("\n").indent(1),
+	      "StatusCode int",
+	      "Response   *http.Response",
+	      "Error      error",
+	      s"$name     ${successType.get.className}"
+            ).mkString("\n").table().indent(1),
             "}"
           ).mkString("\n")
         }.mkString("\n")
@@ -386,7 +386,7 @@ func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.R
 	}
 
 	request.Header = map[string][]string{
-${AllHeaders.indent(1)}
+${AllHeaders.indent(1).table()}
 	}
 
 	if client.Username != "" {
