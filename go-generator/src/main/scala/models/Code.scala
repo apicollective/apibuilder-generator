@@ -157,7 +157,7 @@ case class Code(form: InvocationForm) {
           case Some(default) => {
             Seq(
               "if " + goType.nil(fieldName) + " {",
-              "  " + addSingleParam(param.name, datatype, default),
+              "  " + addSingleParam(param.name, datatype, GoUtil.wrapInQuotes(default)),
               "} else {",
               "  " + addSingleParam(param.name, datatype, fieldName),
               "}"
