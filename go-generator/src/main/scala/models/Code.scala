@@ -91,7 +91,12 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  private[this] case class MethodArgumentsType(name: String)
+  private[this] case class MethodArgumentsType(
+    name: String,
+    params: Seq[Parameter]
+  ) {
+    assert(!params.isEmpty, "Must have at least one parameter")
+  }
 
   private[this] case class MethodResultsType(
     name: String
@@ -124,7 +129,10 @@ case class Code(form: InvocationForm) {
           None
         }
         case params => {
-          val argsType = MethodArgumentsType(GoUtil.publicName(s"${name}Args"))
+          val argsType = MethodArgumentsType(
+            name = GoUtil.publicName(s"${name}Args"),
+            params = params
+          )
           methodParameters += s"args ${argsType.name}"
           Some(argsType)
         }
@@ -148,6 +156,26 @@ case class Code(form: InvocationForm) {
       }
 
       Seq(
+        argsType.map { typ =>
+          Seq(
+            s"type ${typ.name} struct {",
+            typ.params.map { param =>
+              val goType = GoType(datatype(param.`type`, true))
+              val varName = GoUtil.publicName(
+                if (goType.isMulti) {
+                  Text.pluralize(param.name)
+                } else {
+                  param.name
+                }
+              )
+
+              varName + "    " + goType.className
+            }.mkString("\n").indent(4),
+            "}",
+            ""
+          ).mkString("\n")
+        }.getOrElse(""),
+
         s"func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
 
         Seq(

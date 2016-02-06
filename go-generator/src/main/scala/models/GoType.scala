@@ -24,6 +24,25 @@ case class GoType(className: String, datatype: Datatype) {
     }
   }
 
+  /**
+    * True if this dataytpe returns multiple values
+    */
+  def isMulti(): Boolean = {
+    isMulti(datatype)
+  }
+
+  private[this] def isMulti(datatype: Datatype): Boolean = {
+    datatype match {
+      case p: Datatype.Primitive => false
+      case Datatype.UserDefined.Model(name) => false
+      case Datatype.UserDefined.Union(name) => false
+      case Datatype.UserDefined.Enum(name) => false
+      case Datatype.Container.Option(inner) => isMulti(inner)
+      case Datatype.Container.Map(inner) => true
+      case Datatype.Container.List(inner) => true
+    }
+  }
+
   def toEscapedString(varName: String): String = {
     val expr = toString(varName)
     expr == varName match {
