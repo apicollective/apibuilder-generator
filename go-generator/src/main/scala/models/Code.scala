@@ -39,9 +39,10 @@ case class Code(form: InvocationForm) {
           Seq(
             s"package ${GoUtil.packageName(service.name)}",
             importBuilder.generate(),
-            BasicDefinitionTop,
+            headers.code,
+            ClientStruct,
             code,
-            BasicDefinitionBottom
+            Footer
           ).mkString("\n\n") + "\n"
         )
       }
@@ -367,9 +368,7 @@ case class Code(form: InvocationForm) {
 
 
   // other: "bytes", "sync"
-  private[this] val BasicDefinitionTop = s"""
-${headers.code}
-
+  private[this] val ClientStruct = s"""
 type Client struct {
 	HttpClient *http.Client
 	Username   string
@@ -378,7 +377,7 @@ type Client struct {
 }
     """.trim
 
-  private[this] val BasicDefinitionBottom = s"""
+  private[this] val Footer = s"""
 func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.Request, error) {
 	request, err := http.NewRequest(method, urlStr, body)
 	if err != nil {
