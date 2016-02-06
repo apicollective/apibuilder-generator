@@ -1,6 +1,7 @@
 package go.models
 
 import com.bryzek.apidoc.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, Service, Union}
+import com.bryzek.apidoc.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.Datatype
 import lib.generator.GeneratorUtil
@@ -120,16 +121,98 @@ case class Code(form: InvocationForm) {
 
       Seq(
         s"func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
+
         Seq(
           Some(s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
           queryString,
           queryToUrl
         ).flatten.mkString("\n").indent(2),
+
+        "",
+        Seq(
+          s"""request, err := buildRequest(client, "${op.method}", requestUrl, nil)""",
+          s"if err != nil {",
+          s"  return ${resultsType.name}{Error: err}",
+          s"}"
+        ).mkString("\n").indent(2),
+
+        "",
+        Seq(
+          s"resp, err := client.httpClient.Do(request)",
+          s"if err != nil {",
+          s"  return ${resultsType.name}{Error: err}",
+          s"}",
+          "defer resp.Body.Close()"
+        ).mkString("\n").indent(2),
+
+        "",
+	Seq(
+          "switch resp.StatusCode {",
+          (
+            op.responses.flatMap { resp =>
+              resp.code match {
+                case ResponseCodeInt(value) => {
+                  value >= 200 && value < 300 match {
+                    case true => {
+                      println(resp)
+                      Some(
+                        Seq(
+                          s"case $value:",
+                          s"// TODO"
+                        ).mkString("\n")
+                      )
+                    }
+                    case false => {
+                      // TODO: Handle error types here
+                      Some(
+                        Seq(
+                          s"case $value:",
+                          "return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
+                        ).mkString("\n")
+                      )
+                    }
+                  }
+                }
+                case ResponseCodeOption.Default => {
+                  Some(
+                    Seq(
+                      s"case resp.StatusCode >= 200 && resp.StatusCode < 300:",
+                      s"// TODO"
+                    ).mkString("\n")
+                  )
+                }
+                case ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
+                  None // No-op. Let default case catch it
+                }
+              }
+            } ++ Seq(
+              Seq(
+                "case default:",
+                "return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
+              ).mkString("\n")
+            )
+          ).mkString("\n\n").indent(2),
+          "}"
+        ).mkString("\n").indent(2),
         "}",
         ""
       ).mkString("\n")
     }.mkString("\n\n")
   }
+
+/*
+
+	switch resp.StatusCode {
+	case 200:
+		var applications []Application
+		json.NewDecoder(resp.Body).Decode(&applications)
+		return GetResult{StatusCode: resp.StatusCode, Response: resp, Applications: applications}
+	case 401:
+		return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}
+	default:
+		return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}
+	}
+ */
 
   private[this] def buildQueryString(params: Seq[Parameter]): Option[String] = {
     params match {
