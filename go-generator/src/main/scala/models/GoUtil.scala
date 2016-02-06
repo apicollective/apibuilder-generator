@@ -34,15 +34,15 @@ object GoUtil {
     * returns a safe variable name with leading letter in upper case
     */
   def publicName(name: String) = {
-    val baseName = safeName(
-      if (name == name.toUpperCase) {
-        initCap(splitIntoWords(name).map(_.toLowerCase)).mkString("")
-      } else {
-        initCap(snakeToCamelCase(name))
-      }
+    quoteNameIfKeyword(
+      safeName(
+        if (name == name.toUpperCase) {
+          initCap(splitIntoWords(name).map(_.toLowerCase)).mkString("")
+        } else {
+          initCap(snakeToCamelCase(name))
+        }
+      )
     )
-
-    quoteNameIfKeyword(baseName)
   }
 
   /**
@@ -59,7 +59,5 @@ object GoUtil {
   def methodName(resource: Resource): String = {
     publicName(resource.plural)
   }
-
-
   
 }

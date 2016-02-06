@@ -1,8 +1,28 @@
 package go.models
 
-import lib.Datatype
+import lib.{Datatype, Text}
 
 case class GoType(className: String, datatype: Datatype) {
+
+  /**
+    * Based on the datatype, generates a variable name - e.g. if the
+    * type is 'tag', returns tag. If the type is []tag, returns tags
+    */
+  def classVariableName(): String = {
+    classVariableName(datatype)
+  }
+
+  private[this] def classVariableName(datatype: Datatype): String = {
+    datatype match {
+      case p: Datatype.Primitive => "value"
+      case Datatype.UserDefined.Model(name) => GoUtil.privateName(name)
+      case Datatype.UserDefined.Union(name) => GoUtil.privateName(name)
+      case Datatype.UserDefined.Enum(name) => "value"
+      case Datatype.Container.Option(inner) => classVariableName(inner)
+      case Datatype.Container.Map(inner) => GoUtil.privateName(Text.pluralize(classVariableName(inner)))
+      case Datatype.Container.List(inner) => GoUtil.privateName(Text.pluralize(classVariableName(inner)))
+    }
+  }
 
   def toEscapedString(varName: String): String = {
     val expr = toString(varName)

@@ -73,7 +73,9 @@ case class Code(form: InvocationForm) {
 
   private[this] case class MethodArgumentsType(name: String)
 
-  private[this] case class MethodResultsType(name: String)
+  private[this] case class MethodResultsType(
+    name: String
+  )
 
   private[this] def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
@@ -89,7 +91,7 @@ case class Code(form: InvocationForm) {
           None
         }
         case params => {
-          val argsType = MethodArgumentsType(GoUtil.publicName("${name}Args"))
+          val argsType = MethodArgumentsType(GoUtil.publicName(s"${name}Args"))
           methodParameters += s"args ${argsType.name}"
           Some(argsType)
         }
@@ -108,7 +110,13 @@ case class Code(form: InvocationForm) {
         pathArgs += typ.toEscapedString(varName)
       }
       
-      val resultsType = MethodResultsType(GoUtil.publicName(s"${name}Result"))
+      val resultsType = MethodResultsType(
+        name = GoUtil.publicName(s"${name}Result")
+      )
+
+      var successType: Option[GoType] = None
+      var successName: Option[String] = None
+
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
       val queryToUrl = queryString.map { _ =>
 	Seq(
@@ -154,20 +162,27 @@ case class Code(form: InvocationForm) {
                 case ResponseCodeInt(value) => {
                   value >= 200 && value < 300 match {
                     case true => {
-                      println(resp)
+                      val goType = GoType(datatype(resp.`type`, true))
+                      successType = Some(goType)
+                      successName = Some(GoUtil.publicName(goType.classVariableName()))
+                      val varName = GoUtil.privateName(goType.classVariableName())
+
                       Some(
                         Seq(
                           s"case $value:",
-                          s"// TODO"
+                          s"var $varName ${goType.className}",
+                          s"json.NewDecoder(resp.Body).Decode(&$varName)",
+		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
                         ).mkString("\n")
                       )
                     }
+
                     case false => {
                       // TODO: Handle error types here
                       Some(
                         Seq(
                           s"case $value:",
-                          "return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
+                          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
                         ).mkString("\n")
                       )
                     }
@@ -188,31 +203,30 @@ case class Code(form: InvocationForm) {
             } ++ Seq(
               Seq(
                 "case default:",
-                "return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
+                s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
               ).mkString("\n")
             )
           ).mkString("\n\n").indent(2),
           "}"
         ).mkString("\n").indent(2),
         "}",
-        ""
+
+        "",
+        successName.map { name =>
+          Seq(
+            s"type ${resultsType.name} struct {",
+            Seq(
+	      "StatusCode   int",
+	      "Response     *http.Response",
+	      "Error        error",
+	      s"$name         ${successType.get.className}"
+            ).mkString("\n").indent(2),
+            "}"
+          ).mkString("\n")
+        }.mkString("\n")
       ).mkString("\n")
     }.mkString("\n\n")
   }
-
-/*
-
-	switch resp.StatusCode {
-	case 200:
-		var applications []Application
-		json.NewDecoder(resp.Body).Decode(&applications)
-		return GetResult{StatusCode: resp.StatusCode, Response: resp, Applications: applications}
-	case 401:
-		return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}
-	default:
-		return GetResult{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}
-	}
- */
 
   private[this] def buildQueryString(params: Seq[Parameter]): Option[String] = {
     params match {
