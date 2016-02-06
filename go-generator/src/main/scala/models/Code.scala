@@ -1,6 +1,6 @@
 package go.models
 
-import com.bryzek.apidoc.spec.v0.models.{Enum, Model, ParameterLocation, Resource, Service, Union}
+import com.bryzek.apidoc.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, Service, Union}
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.Datatype
 import lib.generator.GeneratorUtil
@@ -81,11 +81,13 @@ case class Code(form: InvocationForm) {
       var methodParameters = scala.collection.mutable.ListBuffer[String]()
       methodParameters += "client Client"
 
+      var queryParameters = scala.collection.mutable.ListBuffer[String]()
+
       val argsType = op.parameters.filter(_.location == ParameterLocation.Query) match {
         case Nil => {
           None
         }
-        case args => {
+        case params => {
           val argsType = MethodArgumentsType(GoUtil.publicName("${name}Args"))
           methodParameters += s"args ${argsType.name}"
           Some(argsType)
@@ -106,18 +108,93 @@ case class Code(form: InvocationForm) {
       }
       
       val resultsType = MethodResultsType(GoUtil.publicName(s"${name}Result"))
-
-
+      val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
+      val queryToUrl = queryString.map { _ =>
+	Seq(
+          "",
+          "if len(params) > 0 {",
+          """  requestUrl += fmt.Sprintf("?%s", strings.Join(params, "&"))""",
+          "}"
+        ).mkString("\n")
+      }
 
       Seq(
         s"func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
         Seq(
-          s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""
-        ).mkString("\n").indent(2),
+          Some(s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
+          queryString,
+          queryToUrl
+        ).flatten.mkString("\n").indent(2),
         "}",
         ""
       ).mkString("\n")
     }.mkString("\n\n")
+  }
+
+  private[this] def buildQueryString(params: Seq[Parameter]): Option[String] = {
+    params match {
+      case Nil => None
+      case _ => Some(
+        "\nparams := []string{}\n\n" + params.map { p => buildQueryString(p, datatype(p.`type`, true))}.mkString("\n\n")
+      )
+    }
+  }
+
+  private[this] def buildQueryString(param: Parameter, datatype: Datatype): String = {
+    val fieldName = "args." + GoUtil.publicName(param.name)
+    val goType = GoType(datatype)
+
+    datatype match {
+      case t: Datatype.Primitive => {
+        param.default match {
+          case None => {
+            Seq(
+              "if " + goType.notNil(fieldName) + " {",
+              "  " + addSingleParam(param.name, datatype, fieldName),
+              "}"
+            ).mkString("\n")
+          }
+          case Some(default) => {
+            Seq(
+              "if " + goType.nil(fieldName) + " {",
+              "  " + addSingleParam(param.name, datatype, default),
+              "} else {",
+              "  " + addSingleParam(param.name, datatype, fieldName),
+              "}"
+            ).mkString("\n")
+
+          }
+        }
+      }
+      case Datatype.Container.List(inner) => {
+        Seq(
+          s"for _, value := range $fieldName {",
+          "  " + addSingleParam(param.name, inner, "value"),
+          "}"
+        ).mkString("\n")
+      }
+      case Datatype.Container.Option(inner) => {
+        buildQueryString(param, inner)
+      }
+      case Datatype.UserDefined.Enum(name) => {
+        buildQueryString(param, Datatype.Primitive.String)
+      }
+      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
+        sys.error(s"Parameter $param cannot be converted to query string")
+      }
+    }
+  }
+
+  private[this] def addSingleParam(name: String, datatype: Datatype, varName: String): String = {
+    s"""params = append(params, fmt.Sprintf("$name=%s", """ + toQuery(datatype, varName) + "))"
+  }
+
+  private[this] def toQuery(datatype: Datatype, varName: String): String = {
+    val expr = GoType(datatype).toString(varName)
+    expr == varName match {
+      case true => s"url.QueryEscape($varName)"
+      case false => expr
+    }
   }
 
   private[this] val AllHeaders = headers.all.map {

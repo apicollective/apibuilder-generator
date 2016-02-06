@@ -5,39 +5,73 @@ import lib.Datatype
 case class GoType(className: String, datatype: Datatype) {
 
   def toEscapedString(varName: String): String = {
-    toEscapedString(varName, datatype)
+    val expr = toString(varName)
+    expr == varName match {
+      case true => s"html.EscapeString($varName)"
+      case false => expr
     }
+  }
 
-  private[this] def toEscapedString(varName: String, dt: Datatype): String = {
+  def toString(varName: String): String = {
+    toString(varName, datatype)
+  }
+
+  private[this] def toString(varName: String, dt: Datatype): String = {
     dt match {
       case Datatype.Primitive.Boolean => s"strconv.FormatBool($varName)"
       case Datatype.Primitive.Double => s"strconv.FormatFloat($varName, 'E', -1, 64)"
       case Datatype.Primitive.Integer => s"strconv.iota($varName, 10)"
       case Datatype.Primitive.Long => s"strconv.iota($varName, 10)"
-      case Datatype.Primitive.DateIso8601 => s"html.EscapeString($varName)"     // TODO
-      case Datatype.Primitive.DateTimeIso8601 => s"html.EscapeString($varName)" // TODO
-      case Datatype.Primitive.Decimal => s"html.EscapeString($varName)"
+      case Datatype.Primitive.DateIso8601 => varName     // TODO
+      case Datatype.Primitive.DateTimeIso8601 => varName // TODO
+      case Datatype.Primitive.Decimal => varName
       case Datatype.Primitive.Object => sys.error("Object cannot be converted to escaped string")
-      case Datatype.Primitive.String => s"html.EscapeString($varName)"
+      case Datatype.Primitive.String => varName
       case Datatype.Primitive.Unit => "nil"
-      case Datatype.Primitive.Uuid => s"html.EscapeString($varName)"
+      case Datatype.Primitive.Uuid => varName
       case u: Datatype.UserDefined => {
         u match {
           case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
             sys.error("User defined type cannot be converted to escaped string")
           }
           case Datatype.UserDefined.Enum(name) => {
-            s"html.EscapeString($varName)"
+            varName
           }
         }
       }
-      case Datatype.Container.Option(inner) => toEscapedString(varName, inner)
+      case Datatype.Container.Option(inner) => toString(varName, inner)
       case Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         sys.error("Collections cannot be converted to escaped string")
       }
     }
   }
 
+  def nil(varName: String): String = {
+    compareToImplicitValue(varName, datatype, "==")
+  }
+
+  def notNil(varName: String): String = {
+    compareToImplicitValue(varName, datatype, "!=")
+  }
+
+  private[this] def compareToImplicitValue(varName: String, dt: Datatype, operator: String): String = {
+    dt match {
+      case Datatype.Primitive.Boolean => "false"
+      case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
+        s"$varName $operator 0"
+      }
+      case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.UserDefined.Enum(_) => {
+        s"""$varName $operator """""
+      }
+      case Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
+        s"""$varName $operator nil"""""
+      }
+      case Datatype.Container.Option(inner) => {
+        compareToImplicitValue(varName, inner, operator)
+      }
+    }
+  }
+  
 }
 
 object GoType {
