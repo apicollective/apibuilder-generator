@@ -42,7 +42,7 @@ case class Code(form: InvocationForm) {
             BasicDefinitionTop,
             code,
             BasicDefinitionBottom
-          ).mkString("\n\n")
+          ).mkString("\n\n") + "\n"
         )
       }
     }
@@ -371,10 +371,10 @@ case class Code(form: InvocationForm) {
 ${headers.code}
 
 type Client struct {
-	HttpClient                  *http.Client
-	Username                    string
-	Password                    string
-	BaseUrl                     string
+	HttpClient *http.Client
+	Username   string
+	Password   string
+	BaseUrl    string
 }
     """.trim
 
