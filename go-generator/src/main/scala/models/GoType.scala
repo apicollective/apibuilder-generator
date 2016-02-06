@@ -24,25 +24,6 @@ case class GoType(className: String, datatype: Datatype) {
     }
   }
 
-  /**
-    * True if this dataytpe returns multiple values
-    */
-  def isMulti(): Boolean = {
-    isMulti(datatype)
-  }
-
-  private[this] def isMulti(datatype: Datatype): Boolean = {
-    datatype match {
-      case p: Datatype.Primitive => false
-      case Datatype.UserDefined.Model(name) => false
-      case Datatype.UserDefined.Union(name) => false
-      case Datatype.UserDefined.Enum(name) => false
-      case Datatype.Container.Option(inner) => isMulti(inner)
-      case Datatype.Container.Map(inner) => true
-      case Datatype.Container.List(inner) => true
-    }
-  }
-
   def toEscapedString(varName: String): String = {
     val expr = toString(varName)
     expr == varName match {
@@ -59,8 +40,8 @@ case class GoType(className: String, datatype: Datatype) {
     dt match {
       case Datatype.Primitive.Boolean => s"strconv.FormatBool($varName)"
       case Datatype.Primitive.Double => s"strconv.FormatFloat($varName, 'E', -1, 64)"
-      case Datatype.Primitive.Integer => s"strconv.iota($varName, 10)"
-      case Datatype.Primitive.Long => s"strconv.iota($varName, 10)"
+      case Datatype.Primitive.Integer => s"strconv.FormatInt($varName, 10)"
+      case Datatype.Primitive.Long => s"strconv.FormatInt($varName, 10)"
       case Datatype.Primitive.DateIso8601 => varName     // TODO
       case Datatype.Primitive.DateTimeIso8601 => varName // TODO
       case Datatype.Primitive.Decimal => varName
@@ -137,7 +118,7 @@ object GoType {
       case Datatype.Primitive.String => "string"
       case Datatype.Primitive.Unit => "nil"
       case Datatype.Primitive.Uuid => "string"
-      case u: Datatype.UserDefined => u.name
+      case u: Datatype.UserDefined => GoUtil.publicName(u.name) // TODO: Imports
       case Datatype.Container.Option(inner) => className(inner)
       case Datatype.Container.Map(inner) => "map[string]" + className(inner)
       case Datatype.Container.List(inner) => "[]" + className(inner)

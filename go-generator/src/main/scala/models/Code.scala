@@ -104,7 +104,9 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
-      val name = GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
+      val name = GoUtil.publicName(
+        GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
+      )
 
       var methodParameters = scala.collection.mutable.ListBuffer[String]()
       methodParameters += "client Client"
@@ -112,7 +114,7 @@ case class Code(form: InvocationForm) {
       var queryParameters = scala.collection.mutable.ListBuffer[String]()
 
       var pathArgs = scala.collection.mutable.ListBuffer[String]()
-      pathArgs += "client.baseUrl"
+      pathArgs += "client.BaseUrl"
 
       var path = op.path
 
@@ -161,15 +163,7 @@ case class Code(form: InvocationForm) {
             s"type ${typ.name} struct {",
             typ.params.map { param =>
               val goType = GoType(datatype(param.`type`, true))
-              val varName = GoUtil.publicName(
-                if (goType.isMulti) {
-                  Text.pluralize(param.name)
-                } else {
-                  param.name
-                }
-              )
-
-              varName + "    " + goType.className
+              GoUtil.publicName(param.name) + "    " + goType.className
             }.mkString("\n").indent(4),
             "}",
             ""
@@ -194,7 +188,7 @@ case class Code(form: InvocationForm) {
 
         "",
         Seq(
-          s"resp, err := client.httpClient.Do(request)",
+          s"resp, err := client.HttpClient.Do(request)",
           s"if err != nil {",
           s"  return ${resultsType.name}{Error: err}",
           s"}",
@@ -250,7 +244,7 @@ case class Code(form: InvocationForm) {
               }
             } ++ Seq(
               Seq(
-                "case default:",
+                "default:",
                 s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}"
               ).mkString("\n")
             )
@@ -346,29 +340,27 @@ case class Code(form: InvocationForm) {
     case (name, value) => s"""		"$name":   {$value},"""
   }.mkString("\n")
 
+  // other: "bytes", "sync"
   private[this] val BasicDefinitionTop = s"""
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/flowcommerce/tools/profile"
 	"io"
-	"net/html"
+	"html"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 ${headers.code}
 
 type Client struct {
-	httpClient                  *http.Client
-	username                    string
-	password                    string
-	baseUrl                     string
+	HttpClient                  *http.Client
+	Username                    string
+	Password                    string
+	BaseUrl                     string
 }
     """.trim
 
@@ -383,8 +375,8 @@ func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.R
 $AllHeaders
 	}
 
-	if client.username != "" {
-		request.SetBasicAuth(client.username, client.password)
+	if client.Username != "" {
+		request.SetBasicAuth(client.Username, client.Password)
 	}
 
 	return request, nil
