@@ -17,11 +17,7 @@ case class Code(form: InvocationForm) {
   private[this] val headers = Headers(form)
   private[this] val importBuilder = {
     val builder = ImportBuilder()
-    builder.ensureImport("encoding/json")
-    builder.ensureImport("errors")
-    builder.ensureImport("fmt")
     builder.ensureImport("io")
-    builder.ensureImport("html")
     builder.ensureImport("net/http")
     builder
   }
@@ -165,6 +161,7 @@ case class Code(form: InvocationForm) {
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
       val queryToUrl = queryString.map { _ =>
         importBuilder.ensureImport("strings")
+        importBuilder.ensureImport("fmt")
 	Seq(
           "",
           "if len(params) > 0 {",
@@ -172,6 +169,9 @@ case class Code(form: InvocationForm) {
           "}"
         ).mkString("\n")
       }
+
+      importBuilder.ensureImport("fmt")
+      importBuilder.ensureImport("errors")
 
       Seq(
         argsType.map { typ =>
@@ -225,6 +225,8 @@ case class Code(form: InvocationForm) {
                       successName = Some(GoUtil.publicName(goType.classVariableName()))
                       val varName = GoUtil.privateName(goType.classVariableName())
 
+                      importBuilder.ensureImport("encoding/json")
+
                       Some(
                         Seq(
                           s"case $value:",
@@ -236,6 +238,7 @@ case class Code(form: InvocationForm) {
                     }
 
                     case false => {
+                      importBuilder.ensureImport("errors")
                       // TODO: Handle error types here
                       Some(
                         Seq(
@@ -341,6 +344,7 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def addSingleParam(name: String, datatype: Datatype, varName: String): String = {
+    importBuilder.ensureImport("fmt")
     s"""params = append(params, fmt.Sprintf("$name=%s", """ + toQuery(datatype, varName) + "))"
   }
 

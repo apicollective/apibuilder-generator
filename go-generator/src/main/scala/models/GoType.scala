@@ -31,7 +31,10 @@ case class GoType(
   def toEscapedString(varName: String): String = {
     val expr = toString(varName)
     expr == varName match {
-      case true => s"html.EscapeString($varName)"
+      case true => {
+        importBuilder.ensureImport("html")
+        s"html.EscapeString($varName)"
+      }
       case false => expr
     }
   }
