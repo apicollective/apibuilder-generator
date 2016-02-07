@@ -2,8 +2,41 @@ package go.models
 
 object Formatter {
 
-  object Tabulator {
-    def format(table: Seq[Seq[String]]): String = {
+  private[this] val LeadingWhitespace = """^(\s+)(.*)$""".r
+
+  implicit class Indentable(s: String) {
+
+    def table(): String = {
+      val table = s.split("\n").map { value =>
+        value match {
+          case LeadingWhitespace(spaces, text) => {
+            // Merge leading whitespace into a single first element -
+            // e.g. "  a" becomes a list with one element (instead of
+            // a two element list with the first element just being
+            // whitespace)
+            val values = text.split("\\s+").toList
+            Seq(s"$spaces${values(0)}") ++ values.drop(1)
+          }
+          case _ => {
+            value.split("\\s+").toSeq
+          }
+        }
+      }
+
+      formatTable(table.toSeq)
+    }
+
+    def indent(numberTabs: Int): String = {
+      s.split("\n").map { value =>
+        if (value.trim == "") {
+          ""
+        } else {
+          ("\t" * numberTabs) + value
+        }
+      }.mkString("\n")
+    }
+
+    private[this] def formatTable(table: Seq[Seq[String]]): String = {
       table match {
         case Nil => {
           ""
@@ -29,35 +62,7 @@ object Formatter {
           }.mkString("\n")
       }
     }
-
-  }
-
-  private[this] val WhitespacePattern = """^(\s*)([^\s]+)(.*)$""".r
-
-  implicit class Indentable(s: String) {
-
-    def table(): String = {
-      val table = s.split("\n").map { value => value.split("\\s+").toSeq }
-      val result = Tabulator.format(table.toSeq)
-
-      println("")
-      println(s)
-      println("")
-      println(result)
-      println("")
-      result
-      
-    }
-
-    def indent(numberTabs: Int): String = {
-      s.split("\n").map { value =>
-        if (value.trim == "") {
-          ""
-        } else {
-          ("\t" * numberTabs) + value
-        }
-      }.mkString("\n")
-    }
+    
   }
 
 }
