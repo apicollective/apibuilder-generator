@@ -9,9 +9,9 @@ import lib.generator.GeneratorUtil
 import lib.Text
 import scala.collection.mutable
 
-case class ResponseType(goType: GoType, name: String)
-
 case class Code(form: InvocationForm) {
+
+  private[this] case class ResponseType(goType: GoType, name: String)
 
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
