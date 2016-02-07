@@ -51,11 +51,33 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def generateEnum(enum: Enum): String = {
+    val enumName = GoUtil.publicName(enum.name)
+    val allEnumName = s"all$enumName"
+
     Seq(
-      GoUtil.textToComment(enum.description) + s"type ${GoUtil.publicName(enum.name)} struct {",
-      "TODO: Finish enum implementation",
-      "}"
-    ).mkString("\n")
+      GoUtil.textToComment(enum.description) + s"type $enumName int",
+
+      Seq(
+        "const (",
+        enum.values.zipWithIndex.map { case (value, i) =>
+          val text = GoUtil.textToSingleLineComment(value.description) + GoUtil.publicName(value.name)
+          i match {
+            case 0 => text + s" $enumName = iota"
+            case _ => text
+          }
+        }.mkString("\n").indent(1),
+        ")"
+      ).mkString("\n"),
+
+      Seq(
+        s"var $allEnumName = []string{",
+        enum.values.map { v => GoUtil.wrapInQuotes(v.name) }.mkString("", ",\n", ",").indent(1),
+        "}"
+      ).mkString("\n"),
+
+      s"func (value $enumName) String() string { return $allEnumName[value] }"
+
+    ).mkString("\n\n")
   }
 
   private[this] def generateModel(model: Model): String = {

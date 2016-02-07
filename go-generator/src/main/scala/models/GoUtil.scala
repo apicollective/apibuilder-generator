@@ -25,6 +25,13 @@ object GoUtil {
     }
   }
 
+  def textToSingleLineComment(text: Option[String]): String = {
+    text match {
+      case None => ""
+      case Some(v) => s"// ${v.trim}\n"
+    }
+  }
+
   /**
     * Returns comment, including a trailing newline
     */
