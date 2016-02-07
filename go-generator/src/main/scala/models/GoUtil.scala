@@ -19,7 +19,7 @@ object GoUtil {
   )
 
   def quoteNameIfKeyword(value: String): String = {
-    ReservedWords.contains(value.trim.toLowerCase) match {
+    ReservedWords.contains(value.trim) match {
       case false => value
       case true => s"${value}_"
     }

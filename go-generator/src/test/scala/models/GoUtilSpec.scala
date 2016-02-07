@@ -33,7 +33,7 @@ class GoUtilSpec extends FunSpec with Matchers {
     GoUtil.publicName("fooBar") should be("FooBar")
     GoUtil.publicName("foo_Bar") should be("FooBar")
     GoUtil.publicName("fooBar") should be("FooBar")
-    GoUtil.publicName("int") should be("Int_")
+    GoUtil.publicName("int") should be("Int")
   }
 
   it("privateName") {
