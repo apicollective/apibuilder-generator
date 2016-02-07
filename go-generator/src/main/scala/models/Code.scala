@@ -51,8 +51,8 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def generateEnum(enum: Enum): String = {
+    importBuilder.ensureImport("fmt")
     val enumName = GoUtil.publicName(enum.name)
-    val allEnumName = s"all$enumName"
 
     Seq(
       GoUtil.textToComment(enum.description) + s"type $enumName int",
@@ -70,12 +70,18 @@ case class Code(form: InvocationForm) {
       ).mkString("\n"),
 
       Seq(
-        s"var $allEnumName = []string{",
-        enum.values.map { v => GoUtil.wrapInQuotes(v.name) }.mkString("", ",\n", ",").indent(1),
+        s"func (value $enumName) String() string {",
+        Seq(
+          "switch value {",
+          (
+            enum.values.zipWithIndex.map { case (value, i) =>
+              s"case $i:\nreturn " + GoUtil.wrapInQuotes(value.name)
+            } ++ Seq("default:\nreturn fmt.Sprintf(" + GoUtil.wrapInQuotes(s"$enumName[%v]") + ", value)")
+          ).mkString("\n").indent(1),
+          "}"
+        ).mkString("\n").indent(1),
         "}"
-      ).mkString("\n"),
-
-      s"func (value $enumName) String() string { return $allEnumName[value] }"
+      ).mkString("\n")
 
     ).mkString("\n\n")
   }
