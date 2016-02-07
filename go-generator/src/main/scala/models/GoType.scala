@@ -9,6 +9,21 @@ case class GoType(
 ) {
 
   /**
+    * Returns true if this type represents the unit type
+    */
+  def isUnit(): Boolean = {
+    isUnit(datatype)
+  }
+
+  private[this] def isUnit(datatype: Datatype): Boolean = {
+    datatype match {
+      case Datatype.Primitive.Unit => true
+      case Datatype.Container.Option(inner) => isUnit(inner)
+      case _ => false
+    }
+  }
+
+  /**
     * Based on the datatype, generates a variable name - e.g. if the
     * type is 'tag', returns tag. If the type is []tag, returns tags
     */

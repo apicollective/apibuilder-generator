@@ -229,20 +229,28 @@ case class Code(form: InvocationForm) {
                 value >= 200 && value < 300 match {
                   case true => {
                     val goType = GoType(importBuilder, datatype(resp.`type`, true))
-                    successType = Some(goType)
                     successName = Some(GoUtil.publicName(goType.classVariableName()))
-                    val varName = GoUtil.privateName(goType.classVariableName())
 
-                    importBuilder.ensureImport("encoding/json")
-
-                    Some(
-                      Seq(
-                        s"case $value:",
+                    val responseExpr = goType.isUnit() match {
+                      case true => {
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}"
+                      }
+                      case false => {
+                        successType = Some(goType)
+                        val varName = GoUtil.privateName(goType.classVariableName())
+                        importBuilder.ensureImport("encoding/json")
                         Seq(
                           s"var $varName ${goType.className}",
                           s"json.NewDecoder(resp.Body).Decode(&$varName)",
 		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
-                        ).mkString("\n").indent(1)
+                        ).mkString("\n")
+                      }
+                    }
+
+                    Some(
+                      Seq(
+                        s"case $value:",
+                        responseExpr.indent(1)
                       ).mkString("\n")
                     )
                   }
@@ -285,11 +293,17 @@ case class Code(form: InvocationForm) {
         importBuilder.ensureImport("net/http")
         Seq(
           s"type ${resultsType.name} struct {",
-          Seq(
-	    "StatusCode int",
-	    "Response   *http.Response",
-	    "Error      error",
-	    s"$name     ${successType.get.className}"
+          (
+            Seq(
+	      "StatusCode int",
+  	      "Response   *http.Response",
+	      "Error      error"
+            ) ++ (
+              successType match {
+                case None => Nil
+                case Some(st) => Seq(s"$name ${st.className}")
+              }
+            )
           ).mkString("\n").table().indent(1),
           "}"
         ).mkString("\n")
