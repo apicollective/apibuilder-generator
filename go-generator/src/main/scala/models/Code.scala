@@ -9,6 +9,7 @@ import lib.generator.GeneratorUtil
 import lib.Text
 import scala.collection.mutable
 
+case class ResponseType(goType: GoType, name: String)
 
 case class Code(form: InvocationForm) {
 
@@ -187,8 +188,7 @@ case class Code(form: InvocationForm) {
         name = GoUtil.publicName(s"${functionName}Result")
       )
 
-      var successType: Option[GoType] = None
-      var successName: Option[String] = None
+      var responseTypes = mutable.ListBuffer[ResponseType]()
 
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
       val queryToUrl = queryString.map { _ =>
@@ -226,23 +226,24 @@ case class Code(form: InvocationForm) {
           op.responses.flatMap { resp =>
             resp.code match {
               case ResponseCodeInt(value) => {
-                value >= 200 && value < 300 match {
+                value >= 200 && value < 500 match {
                   case true => {
                     val goType = GoType(importBuilder, datatype(resp.`type`, true))
-                    successName = Some(GoUtil.publicName(goType.classVariableName()))
+                    val varName = GoUtil.publicName(goType.classVariableName())
+                    val responseType = ResponseType(goType, varName)
+                    responseTypes += responseType
 
                     val responseExpr = goType.isUnit() match {
                       case true => {
                         s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}"
                       }
                       case false => {
-                        successType = Some(goType)
-                        val varName = GoUtil.privateName(goType.classVariableName())
+                        val tmpVarName = GoUtil.privateName(goType.classVariableName())
                         importBuilder.ensureImport("encoding/json")
                         Seq(
-                          s"var $varName ${goType.className}",
-                          s"json.NewDecoder(resp.Body).Decode(&$varName)",
-		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
+                          s"var $tmpVarName ${goType.className}",
+                          s"json.NewDecoder(resp.Body).Decode(&$tmpVarName)",
+		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, $varName: $tmpVarName}"
                         ).mkString("\n")
                       }
                     }
@@ -257,7 +258,6 @@ case class Code(form: InvocationForm) {
 
                   case false => {
                     importBuilder.ensureImport("errors")
-                    // TODO: Handle error types here
                     Some(
                       Seq(
                         s"case $value:",
@@ -289,7 +289,9 @@ case class Code(form: InvocationForm) {
         "}"
       ).mkString("\n").indent(1)
 
-      val responseTypeCode = successName.map { name =>
+      val responseTypeCode = if (responseTypes.isEmpty) {
+        ""
+      } else {
         importBuilder.ensureImport("net/http")
         Seq(
           s"type ${resultsType.name} struct {",
@@ -298,18 +300,10 @@ case class Code(form: InvocationForm) {
 	      "StatusCode int",
   	      "Response   *http.Response",
 	      "Error      error"
-            ) ++ (
-              successType match {
-                case None => Nil
-                case Some(st) => Seq(s"$name ${st.className}")
-              }
-            )
+            ) ++ responseTypes.filter(!_.goType.isUnit()).map { t => s"${t.name} ${t.goType.className}" }
           ).mkString("\n").table().indent(1),
           "}"
-        ).mkString("\n")
-      } match {
-        case None => ""
-        case Some(code) => s"$code\n\n"
+        ).mkString("\n") + "\n\n"
       }
       
       Seq(
