@@ -449,7 +449,7 @@ func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.R
 	}
 
 	request.Header = map[string][]string{
-${AllHeaders.indent(1).table()}
+${AllHeaders.table().indent(1)}
 	}
 
 	if client.Username != "" {
