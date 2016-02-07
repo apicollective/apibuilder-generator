@@ -117,7 +117,7 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
-      val name = GoUtil.publicName(
+      val functionName = GoUtil.publicName(
         GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
       )
 
@@ -145,7 +145,7 @@ case class Code(form: InvocationForm) {
         }
         case params => {
           val argsType = MethodArgumentsType(
-            name = GoUtil.publicName(s"${name}Args"),
+            name = GoUtil.publicName(s"${functionName}Args"),
             params = params
           )
           methodParameters += s"args ${argsType.name}"
@@ -154,7 +154,7 @@ case class Code(form: InvocationForm) {
       }
 
       val resultsType = MethodResultsType(
-        name = GoUtil.publicName(s"${name}Result")
+        name = GoUtil.publicName(s"${functionName}Result")
       )
 
       var successType: Option[GoType] = None
@@ -190,8 +190,85 @@ case class Code(form: InvocationForm) {
         case Some(code) => s"$code\n"
       }
 
+      val processResponses = Seq(
+        "switch resp.StatusCode {",
+        (
+          op.responses.flatMap { resp =>
+            resp.code match {
+              case ResponseCodeInt(value) => {
+                value >= 200 && value < 300 match {
+                  case true => {
+                    val goType = GoType(importBuilder, datatype(resp.`type`, true))
+                    successType = Some(goType)
+                    successName = Some(GoUtil.publicName(goType.classVariableName()))
+                    val varName = GoUtil.privateName(goType.classVariableName())
+
+                    importBuilder.ensureImport("encoding/json")
+
+                    Some(
+                      Seq(
+                        s"case $value:",
+                        Seq(
+                          s"var $varName ${goType.className}",
+                          s"json.NewDecoder(resp.Body).Decode(&$varName)",
+		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
+                        ).mkString("\n").indent(1)
+                      ).mkString("\n")
+                    )
+                  }
+
+                  case false => {
+                    importBuilder.ensureImport("errors")
+                    // TODO: Handle error types here
+                    Some(
+                      Seq(
+                        s"case $value:",
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
+                      ).mkString("\n")
+                    )
+                  }
+                }
+              }
+              case ResponseCodeOption.Default => {
+                Some(
+                  Seq(
+                    s"case resp.StatusCode >= 200 && resp.StatusCode < 300:",
+                    s"// TODO".indent(1)
+                  ).mkString("\n")
+                )
+              }
+              case ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
+                None // No-op. Let default case catch it
+              }
+            }
+          } ++ Seq(
+            Seq(
+              "default:",
+              s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
+            ).mkString("\n")
+          )
+        ).mkString("\n\n"),
+        "}"
+      ).mkString("\n").indent(1)
+
+      val responseTypeCode = successName.map { name =>
+        Seq(
+          s"type ${resultsType.name} struct {",
+          Seq(
+	    "StatusCode int",
+	    "Response   *http.Response",
+	    "Error      error",
+	    s"$name     ${successType.get.className}"
+          ).mkString("\n").table().indent(1),
+          "}"
+        ).mkString("\n")
+      } match {
+        case None => ""
+        case Some(code) => s"$code\n\n"
+      }
+      
       Seq(
-        s"${argsTypeCode}func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
+        s"${argsTypeCode}${responseTypeCode}func $functionName(${methodParameters.mkString(", ")}) ${resultsType.name} {",
 
         Seq(
           Some(s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
@@ -199,7 +276,6 @@ case class Code(form: InvocationForm) {
           queryToUrl
         ).flatten.mkString("\n").indent(1),
 
-        "",
         Seq(
           s"""request, err := buildRequest(client, "${op.method}", requestUrl, nil)""",
           s"if err != nil {",
@@ -207,7 +283,6 @@ case class Code(form: InvocationForm) {
           s"}"
         ).mkString("\n").indent(1),
 
-        "",
         Seq(
           s"resp, err := client.HttpClient.Do(request)",
           s"if err != nil {",
@@ -216,83 +291,11 @@ case class Code(form: InvocationForm) {
           "defer resp.Body.Close()"
         ).mkString("\n").indent(1),
 
-        "",
-	Seq(
-          "switch resp.StatusCode {",
-          (
-            op.responses.flatMap { resp =>
-              resp.code match {
-                case ResponseCodeInt(value) => {
-                  value >= 200 && value < 300 match {
-                    case true => {
-                      val goType = GoType(importBuilder, datatype(resp.`type`, true))
-                      successType = Some(goType)
-                      successName = Some(GoUtil.publicName(goType.classVariableName()))
-                      val varName = GoUtil.privateName(goType.classVariableName())
+        processResponses,
 
-                      importBuilder.ensureImport("encoding/json")
+        "}"
 
-                      Some(
-                        Seq(
-                          s"case $value:",
-                          Seq(
-                            s"var $varName ${goType.className}",
-                            s"json.NewDecoder(resp.Body).Decode(&$varName)",
-		            s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
-                          ).mkString("\n").indent(1)
-                        ).mkString("\n")
-                      )
-                    }
-
-                    case false => {
-                      importBuilder.ensureImport("errors")
-                      // TODO: Handle error types here
-                      Some(
-                        Seq(
-                          s"case $value:",
-                          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
-                        ).mkString("\n")
-                      )
-                    }
-                  }
-                }
-                case ResponseCodeOption.Default => {
-                  Some(
-                    Seq(
-                      s"case resp.StatusCode >= 200 && resp.StatusCode < 300:",
-                      s"// TODO".indent(1)
-                    ).mkString("\n")
-                  )
-                }
-                case ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
-                  None // No-op. Let default case catch it
-                }
-              }
-            } ++ Seq(
-              Seq(
-                "default:",
-                s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
-              ).mkString("\n")
-            )
-          ).mkString("\n\n"),
-          "}"
-        ).mkString("\n").indent(1),
-        "}",
-
-        "",
-        successName.map { name =>
-          Seq(
-            s"type ${resultsType.name} struct {",
-            Seq(
-	      "StatusCode int",
-	      "Response   *http.Response",
-	      "Error      error",
-	      s"$name     ${successType.get.className}"
-            ).mkString("\n").table().indent(1),
-            "}"
-          ).mkString("\n")
-        }.mkString("\n")
-      ).mkString("\n")
+      ).mkString("\n\n")
     }.mkString("\n\n")
   }
 
