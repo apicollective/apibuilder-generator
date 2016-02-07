@@ -261,7 +261,7 @@ case class Code(form: InvocationForm) {
                     Some(
                       Seq(
                         s"case $value:",
-                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}".indent(1)
                       ).mkString("\n")
                     )
                   }
