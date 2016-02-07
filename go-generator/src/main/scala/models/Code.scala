@@ -15,12 +15,7 @@ case class Code(form: InvocationForm) {
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
   private[this] val headers = Headers(form)
-  private[this] val importBuilder = {
-    val builder = ImportBuilder()
-    builder.ensureImport("io")
-    builder.ensureImport("net/http")
-    builder
-  }
+  private[this] val importBuilder = ImportBuilder()
 
   def generate(): Option[String] = {
     Seq(service.models, service.enums, service.unions).flatten.isEmpty match {
@@ -35,16 +30,20 @@ case class Code(form: InvocationForm) {
           service.resources.map(generateResource(_))
         ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n")
 
+        // Generate all code here as we need to process imports
+        val client = generateClientStruct()
+        val footer = generateFooter()
+
         Some(
           Seq(
-            s"package ${GoUtil.packageName(service.name)}",
-            ApidocComments(service.version: String, form.userAgent).comments.trim,
-            importBuilder.generate(),
-            headers.code,
-            ClientStruct,
-            code,
-            Footer
-          ).mkString("\n\n") + "\n"
+            Some(s"package ${GoUtil.packageName(service.name)}"),
+            Some(ApidocComments(service.version: String, form.userAgent).comments.trim),
+            Some(importBuilder.generate()),
+            Some(headers.code),
+            client,
+            Some(code),
+            footer
+          ).flatten.mkString("\n\n") + "\n"
         )
       }
     }
@@ -75,9 +74,9 @@ case class Code(form: InvocationForm) {
           "switch value {",
           (
             enum.values.zipWithIndex.map { case (value, i) =>
-              s"case $i:\nreturn " + GoUtil.wrapInQuotes(value.name)
-            } ++ Seq("default:\nreturn fmt.Sprintf(" + GoUtil.wrapInQuotes(s"$enumName[%v]") + ", value)")
-          ).mkString("\n").indent(1),
+              s"case $i:\n" + "return ".indent(1) + GoUtil.wrapInQuotes(value.name)
+            } ++ Seq("default:\n" + "return fmt.Sprintf(".indent(1) + GoUtil.wrapInQuotes(s"$enumName[%v]") + ", value)")
+          ).mkString("\n"),
           "}"
         ).mkString("\n").indent(1),
         "}"
@@ -121,7 +120,7 @@ case class Code(form: InvocationForm) {
       GoUtil.textToComment(union.description) + s"type ${GoUtil.publicName(union.name)} struct {",
       union.types.map { typ =>
         GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).className
-      }.mkString("\n").indent(1),
+      }.mkString("\n").table().indent(1),
       "}\n"
     ).mkString("\n")
   }
@@ -283,6 +282,7 @@ case class Code(form: InvocationForm) {
       ).mkString("\n").indent(1)
 
       val responseTypeCode = successName.map { name =>
+        importBuilder.ensureImport("net/http")
         Seq(
           s"type ${resultsType.name} struct {",
           Seq(
@@ -406,16 +406,34 @@ case class Code(form: InvocationForm) {
 
 
   // other: "bytes", "sync"
-  private[this] val ClientStruct = s"""
+  private[this] def generateClientStruct(): Option[String] = {
+    service.resources match {
+      case Nil => {
+        None
+      }
+      case _ => {
+        importBuilder.ensureImport("net/http")
+        Some("""
 type Client struct {
 	HttpClient *http.Client
 	Username   string
 	Password   string
 	BaseUrl    string
 }
-    """.trim
+    """.trim)
+      }
+    }
+  }
 
-  private[this] val Footer = s"""
+  private[this] def generateFooter(): Option[String] = {
+    service.resources match {
+      case Nil => {
+        None
+      }
+      case _ => {
+        importBuilder.ensureImport("io")
+        importBuilder.ensureImport("net/http")
+        Some(s"""
 func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.Request, error) {
 	request, err := http.NewRequest(method, urlStr, body)
 	if err != nil {
@@ -432,6 +450,8 @@ ${AllHeaders.indent(1).table()}
 
 	return request, nil
 }
-  """.trim
-
+  """.trim)
+      }
+    }
+  }
 }
