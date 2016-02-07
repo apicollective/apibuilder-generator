@@ -8,8 +8,36 @@ class FormatterSpec extends FunSpec with Matchers {
   it("table") {
     "a".table() should be("a")
     "a b".table() should be("a b")
-    "a b\nc   d".table() should be("a b\nc d")
-    "a b\nfoo\nc   d".table() should be("a b\nfoo\nc d")
+
+    """
+a b
+c   d
+""".trim.table() should be("""
+a b
+c d
+""".trim)
+
+    """
+a           b
+foo
+c  d
+""".trim.table() should be("""
+a   b
+foo
+c   d
+""".trim)
+  }
+
+  it("table w/ 3 columns") {
+    """
+a b
+a   b   c
+apple bat cat
+""".trim.table() should be("""
+a     b
+a     b   c
+apple bat cat
+""".trim)
   }
 
   it("table preserves leading spaces") {
