@@ -175,20 +175,23 @@ case class Code(form: InvocationForm) {
       importBuilder.ensureImport("fmt")
       importBuilder.ensureImport("errors")
 
-      Seq(
-        argsType.map { typ =>
-          Seq(
-            s"type ${typ.name} struct {",
-            typ.params.map { param =>
-              val goType = GoType(importBuilder, datatype(param.`type`, true))
-              GoUtil.publicName(param.name) + " " + goType.className
-            }.mkString("\n").table().indent(2),
-            "}",
-            ""
-          ).mkString("\n")
-        }.getOrElse(""),
+      val argsTypeCode = argsType.map { typ =>
+        Seq(
+          s"type ${typ.name} struct {",
+          typ.params.map { param =>
+            val goType = GoType(importBuilder, datatype(param.`type`, true))
+            GoUtil.publicName(param.name) + " " + goType.className
+          }.mkString("\n").table().indent(1),
+          "}",
+          ""
+        ).mkString("\n")
+      } match {
+        case None => ""
+        case Some(code) => s"$code\n"
+      }
 
-        s"func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
+      Seq(
+        s"${argsTypeCode}func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
 
         Seq(
           Some(s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
