@@ -117,9 +117,12 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
-      val functionName = GoUtil.publicName(
-        GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
-      )
+      val functionName = Seq(
+        GoUtil.publicName(resource.plural),
+        GoUtil.publicName(
+          GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
+        )
+      ).mkString("")
 
       var methodParameters = mutable.ListBuffer[String]()
       methodParameters += "client Client"
