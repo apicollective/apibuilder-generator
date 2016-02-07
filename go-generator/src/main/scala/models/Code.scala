@@ -300,7 +300,7 @@ case class Code(form: InvocationForm) {
 	      "StatusCode int",
   	      "Response   *http.Response",
 	      "Error      error"
-            ) ++ responseTypes.filter(!_.goType.isUnit()).map { t => s"${t.name} ${t.goType.className}" }
+            ) ++ responseTypes.filter(!_.goType.isUnit()).map { t => s"${t.name} ${t.goType.className}" }.distinct.sorted
           ).mkString("\n").table().indent(1),
           "}"
         ).mkString("\n") + "\n\n"
