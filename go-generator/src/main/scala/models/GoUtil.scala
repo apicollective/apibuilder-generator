@@ -69,11 +69,13 @@ object GoUtil {
     * returns a safe variable name with leading letter in lower case
     */
   def privateName(name: String): String = {
-    initLowerCase(publicName(name))
+    quoteNameIfKeyword(
+      initLowerCase(publicName(name))
+    )
   }
 
   def packageName(name: String): String = {
-    publicName(name).toLowerCase
+    privateName(name).toLowerCase
   }
 
   def methodName(resource: Resource): String = {
