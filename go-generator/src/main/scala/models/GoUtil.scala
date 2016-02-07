@@ -5,23 +5,37 @@ import lib.Text._
 
 object GoUtil {
 
-  // TODO: this is the java list. Update for golang
-  private val ReservedWords = Set(
-    "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
-    "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto",
-    "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new",
-    "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized",
-    "this", "throw", "throws", "transient", "try", "void", "volatile", "while")
+  // See
+  //   https://golang.org/ref/spec#Keywords
+  //   https://golang.org/ref/spec#Predeclared_identifiers
+  private[this] val ReservedWords = Set(
+    "break", "default", "func", "interface", "select", "case", "defer", "go",
+    "map", "struct", "chan", "else", "goto", "package", "switch", "const", "fallthrough",
+    "if", "range", "type", "continue", "for", "import", "return", "var",
+    "bool", "byte", "complex64", "complex128", "error", "float32", "float64", "int", "int8",
+    "int16", "int32", "int64", "rune", "string", "uint", "uint8", "uint16", "uint32", "uint64",
+    "uintptr", "true", "false", "iota", "nil", "append", "cap", "close", "complex", "copy",
+    "delete", "imag", "len", "make", "new", "panic", "print", "println", "real", "recover"
+  )
 
   def quoteNameIfKeyword(value: String): String = {
-    // TODO
-    value
+    ReservedWords.contains(value.trim) match {
+      case false => value
+      case true => s"${value}_"
+    }
   }
 
   def textToComment(text: Option[String]): String = {
     text match {
       case None => ""
       case Some(v) => textToComment(Seq(v))
+    }
+  }
+
+  def textToSingleLineComment(text: Option[String]): String = {
+    text match {
+      case None => ""
+      case Some(v) => s"// ${v.trim}\n"
     }
   }
 
@@ -55,11 +69,13 @@ object GoUtil {
     * returns a safe variable name with leading letter in lower case
     */
   def privateName(name: String): String = {
-    initLowerCase(publicName(name))
+    quoteNameIfKeyword(
+      initLowerCase(publicName(name))
+    )
   }
 
   def packageName(name: String): String = {
-    publicName(name).toLowerCase
+    privateName(name).toLowerCase
   }
 
   def methodName(resource: Resource): String = {

@@ -2,54 +2,28 @@ package go.models
 
 object Formatter {
 
-  private[this] case class Row(prefix: Option[String], name: String, value: Option[String]) {
-
-    val start = prefix match {
-      case None => name
-      case Some(p) => s"$p$name"
-    }
-
-  }
-
-  private[this] val WhitespacePattern = """^(\s*)([^\s]+)(.*)$""".r
-
+  private[this] val LeadingWhitespace = """^(\s+)(.*)$""".r
 
   implicit class Indentable(s: String) {
 
-    private[this] def toOption(s: String): Option[String] = {
-      s == "" match {
-        case true => None
-        case false => Some(s)
-      }
-    }
-
     def table(): String = {
-      val rows = s.split("\n").map { value =>
+      val table = s.split("\n").map { value =>
         value match {
-          case WhitespacePattern(prefix, name, value) => {
-            Row(toOption(prefix), name, toOption(value.trim))
+          case LeadingWhitespace(spaces, text) => {
+            // Merge leading whitespace into a single first element -
+            // e.g. "  a" becomes a list with one element (instead of
+            // a two element list with the first element just being
+            // whitespace)
+            val values = text.split("\\s+").toList
+            Seq(s"$spaces${values(0)}") ++ values.drop(1)
           }
           case _ => {
-            Row(None, value, None)
+            value.split("\\s+").toSeq
           }
         }
       }
 
-      val maxLength = rows.filter(!_.value.isEmpty).map(_.start.length).toList match {
-        case Nil => 0
-        case els => els.max
-      }
-
-      rows.map { row =>
-        row.value match {
-          case None => row.start
-          case Some(v) => {
-            val numberSpaces = (maxLength - row.start.length + 1)
-            assert(numberSpaces>0, "Must have at least 1 space")
-            s"%s%s%s".format(row.start, " " * numberSpaces, v)
-          }
-        }
-      }.mkString("\n")
+      formatTable(table.toSeq)
     }
 
     def indent(numberTabs: Int): String = {
@@ -61,6 +35,34 @@ object Formatter {
         }
       }.mkString("\n")
     }
+
+    private[this] def formatTable(table: Seq[Seq[String]]): String = {
+      table match {
+        case Nil => {
+          ""
+        }
+        case _ =>
+          val numberColumns: Int = table.map { _.size }.max
+          val sizes: Seq[Seq[Int]] = table.map { columns =>
+            columns.map { _.length }
+          }
+          val maxSizes: Seq[Int] = 0.to(numberColumns).map { case i =>
+            sizes.map { _.lift(i).getOrElse(0) }.max
+          }
+
+          table.map { values =>
+            values.zipWithIndex.map { case (v, i) =>
+              // Don't leave trailing spaces
+              if (i >= values.length - 1) {
+                v
+              } else {
+                v + (" " * (maxSizes(i) - v.length))
+              }
+            }.mkString(" ")
+          }.mkString("\n")
+      }
+    }
+    
   }
 
 }

@@ -2,11 +2,48 @@ package go.models
 
 import lib.{Datatype, Text}
 
+sealed trait Klass {
+
+  def localName: String
+
+  def namespace: Option[String]
+
+}
+
+object Klass {
+
+  case class Root(name: String) extends Klass {
+    override def localName = name
+    override def namespace: Option[String] = None
+  }
+
+  case class Import(ns: String, alias: String, name: String) extends Klass {
+    override def localName = s"${alias}.$name"
+    override def namespace: Option[String] = Some(ns)
+  }
+
+}
+
 case class GoType(
   importBuilder:ImportBuilder,
-  className: String,
+  klass: Klass,
   datatype: Datatype
 ) {
+
+  /**
+    * Returns true if this type represents the unit type
+    */
+  def isUnit(): Boolean = {
+    isUnit(datatype)
+  }
+
+  private[this] def isUnit(datatype: Datatype): Boolean = {
+    datatype match {
+      case Datatype.Primitive.Unit => true
+      case Datatype.Container.Option(inner) => isUnit(inner)
+      case _ => false
+    }
+  }
 
   /**
     * Based on the datatype, generates a variable name - e.g. if the
@@ -32,8 +69,8 @@ case class GoType(
     val expr = toString(varName)
     expr == varName match {
       case true => {
-        importBuilder.ensureImport("html")
-        s"html.EscapeString($varName)"
+        val html = importBuilder.ensureImport("html")
+        s"${html}.EscapeString($varName)"
       }
       case false => expr
     }
@@ -46,20 +83,20 @@ case class GoType(
   private[this] def toString(varName: String, dt: Datatype): String = {
     dt match {
       case Datatype.Primitive.Boolean => {
-        importBuilder.ensureImport("strconv")
-        s"strconv.FormatBool($varName)"
+        val strconv = importBuilder.ensureImport("strconv")
+        s"${strconv}.FormatBool($varName)"
       }
       case Datatype.Primitive.Double => {
-        importBuilder.ensureImport("strconv")
-        s"strconv.FormatFloat($varName, 'E', -1, 64)"
+        val strconv = importBuilder.ensureImport("strconv")
+        s"${strconv}.FormatFloat($varName, 'E', -1, 64)"
       }
       case Datatype.Primitive.Integer => {
-        importBuilder.ensureImport("strconv")
-        s"strconv.FormatInt($varName, 10)"
+        val strconv = importBuilder.ensureImport("strconv")
+        s"${strconv}.FormatInt($varName, 10)"
       }
       case Datatype.Primitive.Long => {
-        importBuilder.ensureImport("strconv")
-        s"strconv.FormatInt($varName, 10)"
+        val strconv = importBuilder.ensureImport("strconv")
+        s"${strconv}.FormatInt($varName, 10)"
       }
       case Datatype.Primitive.DateIso8601 => varName     // TODO
       case Datatype.Primitive.DateTimeIso8601 => varName // TODO
@@ -121,29 +158,62 @@ object GoType {
   ): GoType = {
     GoType(
       importBuilder = importBuilder,
-      className = className(dt),
+      klass = klass(importBuilder, dt),
       datatype = dt
     )
   }
 
-  private[this] def className(dt: Datatype): String = {
+  private[this] def klass(importBuilder: ImportBuilder, dt: Datatype): Klass = {
     dt match {
-      case Datatype.Primitive.Boolean => "bool"
-      case Datatype.Primitive.Double => "float64"
-      case Datatype.Primitive.Integer => "int32"
-      case Datatype.Primitive.Long => "int64"
-      case Datatype.Primitive.DateIso8601 => "string"
-      case Datatype.Primitive.DateTimeIso8601 => "string"
-      case Datatype.Primitive.Decimal => "string"
-      case Datatype.Primitive.Object => "interface{}"
-      case Datatype.Primitive.String => "string"
-      case Datatype.Primitive.Unit => "nil"
-      case Datatype.Primitive.Uuid => "string"
-      case u: Datatype.UserDefined => GoUtil.publicName(u.name) // TODO: Imports
-      case Datatype.Container.Option(inner) => className(inner)
-      case Datatype.Container.Map(inner) => "map[string]" + className(inner)
-      case Datatype.Container.List(inner) => "[]" + className(inner)
+      case Datatype.Primitive.Boolean => Klass.Root("bool")
+      case Datatype.Primitive.Double => Klass.Root("float64")
+      case Datatype.Primitive.Integer => Klass.Root("int32")
+      case Datatype.Primitive.Long => Klass.Root("int64")
+      case Datatype.Primitive.DateIso8601 => Klass.Root("string")
+      case Datatype.Primitive.DateTimeIso8601 => Klass.Root("string")
+      case Datatype.Primitive.Decimal => Klass.Root("string")
+      case Datatype.Primitive.Object => Klass.Root("interface{}")
+      case Datatype.Primitive.String => Klass.Root("string")
+      case Datatype.Primitive.Unit => Klass.Root("nil")
+      case Datatype.Primitive.Uuid => Klass.Root("string")
+      case u: Datatype.UserDefined => {
+        val i = u.name.lastIndexOf(".")
+        (i > 0) match {
+          case true => {
+            val ns = u.name.substring(0, i)
+            val name = u.name.substring(i+1)
+
+            val alias = importBuilder.ensureImport(ns)
+            Klass.Import(ns, alias, GoUtil.publicName(name))
+          }
+          case false => {
+            Klass.Root(GoUtil.publicName(u.name))
+          }
+        }
+      }
+      case Datatype.Container.Option(inner) => klass(importBuilder, inner)
+      case Datatype.Container.Map(inner) => Klass.Root("map[string]" + klass(importBuilder, inner).localName)
+      case Datatype.Container.List(inner) => Klass.Root("[]" + klass(importBuilder, inner).localName)
     }
   }
 
+  def isNumeric(datatype: Datatype): Boolean = {
+    datatype match {
+      case Datatype.Primitive.Double => true
+      case Datatype.Primitive.Integer => true
+      case Datatype.Primitive.Long => true
+      case Datatype.Container.Option(inner) => isNumeric(inner)
+      case _ => false
+    }
+  }
+  
+  def isBoolean(datatype: Datatype): Boolean = {
+    datatype match {
+      case Datatype.Primitive.Boolean => true
+      case Datatype.Container.Option(inner) => isBoolean(inner)
+      case _ => false
+    }
+  }
+  
+ 
 }

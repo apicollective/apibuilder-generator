@@ -9,18 +9,14 @@ import lib.generator.GeneratorUtil
 import lib.Text
 import scala.collection.mutable
 
-
 case class Code(form: InvocationForm) {
+
+  private[this] case class ResponseType(goType: GoType, name: String)
 
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
   private[this] val headers = Headers(form)
-  private[this] val importBuilder = {
-    val builder = ImportBuilder()
-    builder.ensureImport("io")
-    builder.ensureImport("net/http")
-    builder
-  }
+  private[this] val importBuilder = ImportBuilder()
 
   def generate(): Option[String] = {
     Seq(service.models, service.enums, service.unions).flatten.isEmpty match {
@@ -35,27 +31,59 @@ case class Code(form: InvocationForm) {
           service.resources.map(generateResource(_))
         ).flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n")
 
+        // Generate all code here as we need to process imports
+        val client = generateClientStruct()
+        val footer = generateFooter()
+
         Some(
           Seq(
-            s"package ${GoUtil.packageName(service.name)}",
-            ApidocComments(service.version: String, form.userAgent).comments.trim,
-            importBuilder.generate(),
-            headers.code,
-            ClientStruct,
-            code,
-            Footer
-          ).mkString("\n\n") + "\n"
+            Some(s"package ${GoUtil.packageName(service.name)}"),
+            Some(ApidocComments(service.version: String, form.userAgent).comments.trim),
+            Some(importBuilder.generate()),
+            Some(headers.code),
+            client,
+            Some(code),
+            footer
+          ).flatten.mkString("\n\n") + "\n"
         )
       }
     }
   }
 
   private[this] def generateEnum(enum: Enum): String = {
+    val fmt = importBuilder.ensureImport("fmt")
+    val enumName = GoUtil.publicName(enum.name)
+
     Seq(
-      GoUtil.textToComment(enum.description) + s"type ${GoUtil.publicName(enum.name)} struct {",
-      "TODO: Finish enum implementation",
-      "}"
-    ).mkString("\n")
+      GoUtil.textToComment(enum.description) + s"type $enumName int",
+
+      Seq(
+        "const (",
+        enum.values.zipWithIndex.map { case (value, i) =>
+          val text = GoUtil.textToSingleLineComment(value.description) + GoUtil.publicName(value.name)
+          i match {
+            case 0 => text + s" $enumName = iota"
+            case _ => text
+          }
+        }.mkString("\n").indent(1),
+        ")"
+      ).mkString("\n"),
+
+      Seq(
+        s"func (value $enumName) String() string {",
+        Seq(
+          "switch value {",
+          (
+            enum.values.zipWithIndex.map { case (value, i) =>
+              s"case $i:\n" + "return ".indent(1) + GoUtil.wrapInQuotes(value.name)
+            } ++ Seq("default:\n" + s"return ${fmt}.Sprintf(".indent(1) + GoUtil.wrapInQuotes(s"$enumName[%v]") + ", value)")
+          ).mkString("\n"),
+          "}"
+        ).mkString("\n").indent(1),
+        "}"
+      ).mkString("\n")
+
+    ).mkString("\n\n")
   }
 
   private[this] def generateModel(model: Model): String = {
@@ -80,7 +108,7 @@ case class Code(form: InvocationForm) {
 
         Seq(
           Some(publicName),
-          Some(GoType(importBuilder, datatype(f.`type`, f.required)).className),
+          Some(GoType(importBuilder, datatype(f.`type`, f.required)).klass.localName),
           json
         ).flatten.mkString(" ")
       }.mkString("\n").table().indent(1),
@@ -92,8 +120,8 @@ case class Code(form: InvocationForm) {
     Seq(
       GoUtil.textToComment(union.description) + s"type ${GoUtil.publicName(union.name)} struct {",
       union.types.map { typ =>
-        GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).className
-      }.mkString("\n").indent(1),
+        GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
+      }.mkString("\n").table().indent(1),
       "}\n"
     ).mkString("\n")
   }
@@ -117,9 +145,12 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
-      val name = GoUtil.publicName(
-        GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
-      )
+      val functionName = Seq(
+        GoUtil.publicName(resource.plural),
+        GoUtil.publicName(
+          GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
+        )
+      ).mkString("")
 
       var methodParameters = mutable.ListBuffer[String]()
       methodParameters += "client Client"
@@ -134,7 +165,7 @@ case class Code(form: InvocationForm) {
       op.parameters.filter(_.location == ParameterLocation.Path).map { arg =>
         val varName = GoUtil.privateName(arg.name)
         val typ = GoType(importBuilder, datatype(arg.`type`, true))
-        methodParameters += s"$varName ${typ.className}"
+        methodParameters += s"$varName ${typ.klass.localName}"
         path = path.replace(s":${arg.name}", "%s")
         pathArgs += typ.toEscapedString(varName)
       }
@@ -145,7 +176,7 @@ case class Code(form: InvocationForm) {
         }
         case params => {
           val argsType = MethodArgumentsType(
-            name = GoUtil.publicName(s"${name}Args"),
+            name = GoUtil.publicName(s"${functionName}Args"),
             params = params
           )
           methodParameters += s"args ${argsType.name}"
@@ -154,49 +185,134 @@ case class Code(form: InvocationForm) {
       }
 
       val resultsType = MethodResultsType(
-        name = GoUtil.publicName(s"${name}Result")
+        name = GoUtil.publicName(s"${functionName}Result")
       )
 
-      var successType: Option[GoType] = None
-      var successName: Option[String] = None
+      val fmt = importBuilder.ensureImport("fmt")
+      val errors = importBuilder.ensureImport("errors")
+
+      var responseTypes = mutable.ListBuffer[ResponseType]()
 
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
       val queryToUrl = queryString.map { _ =>
-        importBuilder.ensureImport("strings")
-        importBuilder.ensureImport("fmt")
+        val strings = importBuilder.ensureImport("strings")
 	Seq(
           "",
           "if len(params) > 0 {",
-          """requestUrl += fmt.Sprintf("?%s", strings.Join(params, "&"))""".indent(1),
+          s"""requestUrl += ${fmt}.Sprintf("?%s", ${strings}.Join(params, "&"))""".indent(1),
           "}"
         ).mkString("\n")
       }
 
-      importBuilder.ensureImport("fmt")
-      importBuilder.ensureImport("errors")
+      val argsTypeCode = argsType.map { typ =>
+        Seq(
+          s"type ${typ.name} struct {",
+          typ.params.map { param =>
+            val goType = GoType(importBuilder, datatype(param.`type`, true))
+            GoUtil.publicName(param.name) + " " + goType.klass.localName
+          }.mkString("\n").table().indent(1),
+          "}",
+          ""
+        ).mkString("\n")
+      } match {
+        case None => ""
+        case Some(code) => s"$code\n"
+      }
 
+      val processResponses = Seq(
+        "switch resp.StatusCode {",
+        (
+          op.responses.flatMap { resp =>
+            resp.code match {
+              case ResponseCodeInt(value) => {
+                value >= 200 && value < 500 match {
+                  case true => {
+                    val goType = GoType(importBuilder, datatype(resp.`type`, true))
+                    val varName = GoUtil.publicName(goType.classVariableName())
+                    val responseType = ResponseType(goType, varName)
+                    responseTypes += responseType
+
+                    val responseExpr = goType.isUnit() match {
+                      case true => {
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}"
+                      }
+                      case false => {
+                        val tmpVarName = GoUtil.privateName(goType.classVariableName())
+                        val json = importBuilder.ensureImport("encoding/json")
+                        Seq(
+                          s"var $tmpVarName ${goType.klass.localName}",
+                          s"${json}.NewDecoder(resp.Body).Decode(&$tmpVarName)",
+		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, $varName: $tmpVarName}"
+                        ).mkString("\n")
+                      }
+                    }
+
+                    Some(
+                      Seq(
+                        s"case $value:",
+                        responseExpr.indent(1)
+                      ).mkString("\n")
+                    )
+                  }
+
+                  case false => {
+                    Some(
+                      Seq(
+                        s"case $value:",
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}".indent(1)
+                      ).mkString("\n")
+                    )
+                  }
+                }
+              }
+              case ResponseCodeOption.Default => {
+                Some(
+                  Seq(
+                    s"case resp.StatusCode >= 200 && resp.StatusCode < 300:",
+                    s"// TODO".indent(1)
+                  ).mkString("\n")
+                )
+              }
+              case ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
+                None // No-op. Let default case catch it
+              }
+            }
+          } ++ Seq(
+            Seq(
+              "default:",
+              s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: ${errors}.New(resp.Status)}".indent(1)
+            ).mkString("\n")
+          )
+        ).mkString("\n\n"),
+        "}"
+      ).mkString("\n").indent(1)
+
+      val responseTypeCode = if (responseTypes.isEmpty) {
+        ""
+      } else {
+        val http = importBuilder.ensureImport("net/http")
+        Seq(
+          s"type ${resultsType.name} struct {",
+          (
+            Seq(
+	      "StatusCode int",
+  	      s"Response   *${http}.Response",
+	      "Error      error"
+            ) ++ responseTypes.filter(!_.goType.isUnit()).map { t => s"${t.name} ${t.goType.klass.localName}" }.distinct.sorted
+          ).mkString("\n").table().indent(1),
+          "}"
+        ).mkString("\n") + "\n\n"
+      }
+      
       Seq(
-        argsType.map { typ =>
-          Seq(
-            s"type ${typ.name} struct {",
-            typ.params.map { param =>
-              val goType = GoType(importBuilder, datatype(param.`type`, true))
-              GoUtil.publicName(param.name) + " " + goType.className
-            }.mkString("\n").table().indent(2),
-            "}",
-            ""
-          ).mkString("\n")
-        }.getOrElse(""),
-
-        s"func $name(${methodParameters.mkString(", ")}) ${resultsType.name} {",
+        s"${argsTypeCode}${responseTypeCode}func $functionName(${methodParameters.mkString(", ")}) ${resultsType.name} {",
 
         Seq(
-          Some(s"""requestUrl := fmt.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
+          Some(s"""requestUrl := ${fmt}.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
           queryString,
           queryToUrl
         ).flatten.mkString("\n").indent(1),
 
-        "",
         Seq(
           s"""request, err := buildRequest(client, "${op.method}", requestUrl, nil)""",
           s"if err != nil {",
@@ -204,7 +320,6 @@ case class Code(form: InvocationForm) {
           s"}"
         ).mkString("\n").indent(1),
 
-        "",
         Seq(
           s"resp, err := client.HttpClient.Do(request)",
           s"if err != nil {",
@@ -213,83 +328,11 @@ case class Code(form: InvocationForm) {
           "defer resp.Body.Close()"
         ).mkString("\n").indent(1),
 
-        "",
-	Seq(
-          "switch resp.StatusCode {",
-          (
-            op.responses.flatMap { resp =>
-              resp.code match {
-                case ResponseCodeInt(value) => {
-                  value >= 200 && value < 300 match {
-                    case true => {
-                      val goType = GoType(importBuilder, datatype(resp.`type`, true))
-                      successType = Some(goType)
-                      successName = Some(GoUtil.publicName(goType.classVariableName()))
-                      val varName = GoUtil.privateName(goType.classVariableName())
+        processResponses,
 
-                      importBuilder.ensureImport("encoding/json")
+        "}"
 
-                      Some(
-                        Seq(
-                          s"case $value:",
-                          Seq(
-                            s"var $varName ${goType.className}",
-                            s"json.NewDecoder(resp.Body).Decode(&$varName)",
-		            s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, ${successName.get}: $varName}"
-                          ).mkString("\n").indent(1)
-                        ).mkString("\n")
-                      )
-                    }
-
-                    case false => {
-                      importBuilder.ensureImport("errors")
-                      // TODO: Handle error types here
-                      Some(
-                        Seq(
-                          s"case $value:",
-                          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
-                        ).mkString("\n")
-                      )
-                    }
-                  }
-                }
-                case ResponseCodeOption.Default => {
-                  Some(
-                    Seq(
-                      s"case resp.StatusCode >= 200 && resp.StatusCode < 300:",
-                      s"// TODO".indent(1)
-                    ).mkString("\n")
-                  )
-                }
-                case ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
-                  None // No-op. Let default case catch it
-                }
-              }
-            } ++ Seq(
-              Seq(
-                "default:",
-                s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: errors.New(resp.Status)}".indent(1)
-              ).mkString("\n")
-            )
-          ).mkString("\n\n"),
-          "}"
-        ).mkString("\n").indent(1),
-        "}",
-
-        "",
-        successName.map { name =>
-          Seq(
-            s"type ${resultsType.name} struct {",
-            Seq(
-	      "StatusCode int",
-	      "Response   *http.Response",
-	      "Error      error",
-	      s"$name     ${successType.get.className}"
-            ).mkString("\n").table().indent(1),
-            "}"
-          ).mkString("\n")
-        }.mkString("\n")
-      ).mkString("\n")
+      ).mkString("\n\n")
     }.mkString("\n\n")
   }
 
@@ -312,16 +355,16 @@ case class Code(form: InvocationForm) {
           case None => {
             Seq(
               "if " + goType.notNil(fieldName) + " {",
-              addSingleParam(param.name, datatype, fieldName).indent(1),
+              buildQueryParam(param.name, datatype, fieldName).indent(1),
               "}"
             ).mkString("\n")
           }
           case Some(default) => {
             Seq(
               "if " + goType.nil(fieldName) + " {",
-              addSingleParam(param.name, datatype, GoUtil.wrapInQuotes(default)).indent(1),
+              buildQueryParam(param.name, datatype, default).indent(1),
               "} else {",
-              addSingleParam(param.name, datatype, fieldName).indent(1),
+              buildQueryParam(param.name, datatype, fieldName).indent(1),
               "}"
             ).mkString("\n")
 
@@ -331,7 +374,7 @@ case class Code(form: InvocationForm) {
       case Datatype.Container.List(inner) => {
         Seq(
           s"for _, value := range $fieldName {",
-          addSingleParam(param.name, inner, "value").indent(1),
+          buildQueryParam(param.name, inner, "value").indent(1),
           "}"
         ).mkString("\n")
       }
@@ -347,17 +390,34 @@ case class Code(form: InvocationForm) {
     }
   }
 
+  private[this] def buildQueryParam(paramName: String, datatype: Datatype, value: String): String = {
+    GoType.isNumeric(datatype) match {
+      case true => addSingleParamValue(paramName, datatype, value, "%v")
+      case false => {
+        GoType.isBoolean(datatype) match {
+          case true => addSingleParamValue(paramName, datatype, value, "%b")
+          case false => addSingleParam(paramName, datatype, GoUtil.wrapInQuotes(value))
+        }
+      }
+    }
+  }
+
   private[this] def addSingleParam(name: String, datatype: Datatype, varName: String): String = {
-    importBuilder.ensureImport("fmt")
-    s"""params = append(params, fmt.Sprintf("$name=%s", """ + toQuery(datatype, varName) + "))"
+    val fmt = importBuilder.ensureImport("fmt")
+    s"""params = append(params, ${fmt}.Sprintf("$name=%s", """ + toQuery(datatype, varName) + "))"
+  }
+
+  private[this] def addSingleParamValue(name: String, datatype: Datatype, value: String, format: String): String = {
+    val fmt = importBuilder.ensureImport("fmt")
+    s"""params = append(params, ${fmt}.Sprintf("$name=$format", $value))"""
   }
 
   private[this] def toQuery(datatype: Datatype, varName: String): String = {
     val expr = GoType(importBuilder, datatype).toString(varName)
     expr == varName match {
       case true => {
-        importBuilder.ensureImport("net/url")
-        s"url.QueryEscape($varName)"
+        val url = importBuilder.ensureImport("net/url")
+        s"${url}.QueryEscape($varName)"
       }
       case false => expr
     }
@@ -369,24 +429,42 @@ case class Code(form: InvocationForm) {
 
 
   // other: "bytes", "sync"
-  private[this] val ClientStruct = s"""
+  private[this] def generateClientStruct(): Option[String] = {
+    service.resources match {
+      case Nil => {
+        None
+      }
+      case _ => {
+        val http = importBuilder.ensureImport("net/http")
+        Some(s"""
 type Client struct {
-	HttpClient *http.Client
+	HttpClient *${http}.Client
 	Username   string
 	Password   string
 	BaseUrl    string
 }
-    """.trim
+    """.trim)
+      }
+    }
+  }
 
-  private[this] val Footer = s"""
-func buildRequest(client Client, method, urlStr string, body io.Reader) (*http.Request, error) {
+  private[this] def generateFooter(): Option[String] = {
+    service.resources match {
+      case Nil => {
+        None
+      }
+      case _ => {
+        val io = importBuilder.ensureImport("io")
+        val http = importBuilder.ensureImport("net/http")
+        Some(s"""
+func buildRequest(client Client, method, urlStr string, body ${io}.Reader) (*${http}.Request, error) {
 	request, err := http.NewRequest(method, urlStr, body)
 	if err != nil {
 		return nil, err
 	}
 
 	request.Header = map[string][]string{
-${AllHeaders.indent(1).table()}
+${AllHeaders.table().indent(1)}
 	}
 
 	if client.Username != "" {
@@ -395,6 +473,8 @@ ${AllHeaders.indent(1).table()}
 
 	return request, nil
 }
-  """.trim
-
+  """.trim)
+      }
+    }
+  }
 }
