@@ -32,15 +32,38 @@ private[models] case class ImportBuilder() {
     val path = importPath(name)
     val alias = defaultAlias(name)
 
-    // TODO: Check uniqueness
-    println(s"$name => ($path, $alias)")
-
     imports.find(_.name == path) match {
-      case None => imports += Import(name = path, alias = alias)
+      case None => {
+        imports += Import(name = path, alias = uniqueAlias(path, alias))
+      }
       case Some(_) => //No-op
     }
 
     alias
+  }
+
+  private[this] def uniqueAlias(importPath: String, name: String, index: Int = 0): String = {
+    val target = index match {
+      case 0 => name
+      case 1 => {
+        importPath.split("/").toList match {
+          case host :: org :: app :: rest => {
+            // Ex: Turn github.com/flowcommerce/common into
+            // flowcommerceCommon alias
+            GoUtil.privateName(s"${org}_$name")
+          }
+          case _ => {
+            s"$name${index + 1}"
+          }
+        }
+      }
+      case _ => s"$name$index"
+    }
+
+    imports.find(_.name == target) match {
+      case None => target
+      case Some(_) => uniqueAlias(importPath, name, index + 1)
+    }
   }
 
   private[this] def defaultAlias(name: String): String = {
