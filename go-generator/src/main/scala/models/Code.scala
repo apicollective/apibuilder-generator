@@ -543,7 +543,7 @@ ${AllHeaders.indent(1)}
 	}
 
         if body != nil {
-		request.Header["Content-type"] = []string{ "application/json" }
+		request.Header["Content-type"] = []string{"application/json"}
 	}
 
 	if client.Username != "" {

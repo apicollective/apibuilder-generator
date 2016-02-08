@@ -52,11 +52,11 @@ case class GoType(
       case Datatype.Container.Option(inner) => declaration(value, inner)
       case Datatype.Container.Map(inner) => {
         // TODO: Parse value
-        s"${klass.localName}{ " + declaration(value, inner) + " }"
+        s"${klass.localName}{" + declaration(value, inner) + "}"
       }
       case Datatype.Container.List(inner) => {
         // TODO: Parse value
-        s"${klass.localName}{ " + declaration(value, inner) + " }"
+        s"${klass.localName}{" + declaration(value, inner) + "}"
       }
     }
   }
