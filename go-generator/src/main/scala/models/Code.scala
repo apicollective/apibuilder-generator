@@ -169,8 +169,8 @@ case class Code(form: InvocationForm) {
         path = path.replace(s":${arg.name}", "%s")
         pathArgs += typ.toEscapedString(varName)
       }
-      
-      val argsType = op.parameters.filter(_.location == ParameterLocation.Query) match {
+
+      val argsType = op.parameters.filter( p => p.location == ParameterLocation.Query || p.location == ParameterLocation.Form )  match {
         case Nil => {
           None
         }
@@ -194,6 +194,7 @@ case class Code(form: InvocationForm) {
       var responseTypes = mutable.ListBuffer[ResponseType]()
 
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
+      val formString = buildFormString(op.parameters.filter(_.location == ParameterLocation.Form))
       val queryToUrl = queryString.map { _ =>
         val strings = importBuilder.ensureImport("strings")
 	Seq(
@@ -310,6 +311,7 @@ case class Code(form: InvocationForm) {
         Seq(
           Some(s"""requestUrl := ${fmt}.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
           queryString,
+          formString,
           queryToUrl
         ).flatten.mkString("\n").indent(1),
 
@@ -345,6 +347,18 @@ case class Code(form: InvocationForm) {
     }
   }
 
+  private[this] def buildFormString(params: Seq[Parameter]): Option[String] = {
+    params match {
+      case Nil => None
+      case _ => Some(
+        Seq(
+          "// TODO: Handle form parameters",
+          params.map { p => s"// - ${p.name}: ${p.`type`}" }
+        ).mkString("\n")
+      )
+    }
+  }
+  
   private[this] def buildQueryString(param: Parameter, datatype: Datatype): String = {
     val fieldName = "params." + GoUtil.publicName(param.name)
     val goType = GoType(importBuilder, datatype)
