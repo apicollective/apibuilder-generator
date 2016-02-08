@@ -1,6 +1,8 @@
 package go.models
 
 import lib.{Datatype, Text}
+import Formatter._
+import play.api.libs.json._
 
 sealed trait Klass {
 
@@ -34,29 +36,54 @@ case class GoType(
     * Generates a declaration of the specified value for this datatype
     */
   def declaration(value: String): String = {
-    declaration(value, datatype)
+    declaration(Json.parse(value), datatype)
   }
 
-  private[this] def declaration(value: String, datatype: Datatype): String = {
+  private[this] def declaration(json: JsValue, datatype: Datatype): String = {
+    println("JSON: " + json)
+
     datatype match {
-      case Datatype.Primitive.Boolean | Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
-        value
+      case Datatype.Primitive.Boolean => {
+        json.as[scala.Boolean].toString
+      }
+      case Datatype.Primitive.Double => {
+        json.as[scala.Double].toString
+      }
+      case Datatype.Primitive.Integer => {
+        json.as[scala.Int].toString
+      }
+      case Datatype.Primitive.Long => {
+        json.as[scala.Long].toString
       }
       case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
-        GoUtil.wrapInQuotes(value)
+        GoUtil.wrapInQuotes(json.as[JsString].value)
       }
-      case Datatype.Primitive.Object => "interface{}"
-      case Datatype.Primitive.Unit => "nil"
-      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => "nil"
-      case Datatype.UserDefined.Enum(_) => value
-      case Datatype.Container.Option(inner) => declaration(value, inner)
+      case Datatype.Primitive.Object => {
+        // TODO: "interface{}"
+        throw new UnsupportedOperationException(s"default for object")
+      }
+      case Datatype.Primitive.Unit => {
+        "nil"
+      }
+      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
+        throw new UnsupportedOperationException(s"default for type $datatype")
+      }
+      case Datatype.UserDefined.Enum(name) => {
+        throw new UnsupportedOperationException(s"default for enum $name")
+      }
+      case Datatype.Container.Option(inner) => {
+        declaration(json, inner)
+      }
       case Datatype.Container.Map(inner) => {
-        // TODO: Parse value
-        s"${klass.localName}{" + declaration(value, inner) + "}"
+        val data = json.as[scala.collection.immutable.Map[String, JsValue]].map {
+          case (key, v) => GoUtil.wrapInQuotes(key) + ": " + declaration(v, inner)
+        }
+        data.mkString(s"map[string]{\n", ",\n", ",\n}").table()
       }
       case Datatype.Container.List(inner) => {
-        // TODO: Parse value
-        s"${klass.localName}{" + declaration(value, inner) + "}"
+        val arr = json.as[JsArray]
+        val elements = arr.value.map { v => declaration(v, inner) }
+        elements.mkString(s"${klass.localName}{", ",", "}")
       }
     }
   }
