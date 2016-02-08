@@ -564,34 +564,61 @@ type ClientRequestBody struct {
         None
       }
       case _ => {
-        val bodyArg = hasClientBody match {
-          case false => ""
-          case true => ", body ClientRequestBody"
+        val (bodyArg, bodyNewRequestArg) = hasClientBody match {
+          case false => ("", "nil")
+          case true => (", body ClientRequestBody", "body.bytes")
         }
 
         val http = importBuilder.ensureImport("net/http")
-        Some(s"""
-func buildRequest(client Client, method, urlStr string$bodyArg) (*${http}.Request, error) {
-	request, err := http.NewRequest(method, urlStr, body.bytes)
-	if err != nil {
-		return nil, err
-	}
+        Some(
 
-	request.Header = map[string][]string{
-${AllHeaders.indent(1)}
-	}
+          Seq(
+            s"func buildRequest(client Client, method, urlStr string$bodyArg) (*${http}.Request, error) {",
 
-	if body.contentType != "" {
-		request.Header["Content-type"] = []string{body.contentType}
-	}
+            Seq(
+              Some(
+                Seq(
+                  s"request, err := http.NewRequest(method, urlStr, $bodyNewRequestArg)",
+	          "if err != nil {",
+                  "return nil, err".indent(1),
+                  "}"
+                ).mkString("\n")
+              ),
 
-	if client.Username != "" {
-		request.SetBasicAuth(client.Username, client.Password)
-	}
+              Some(
+                Seq(
+                  "request.Header = map[string][]string{",
+                  AllHeaders,
+                  "}"
+                ).mkString("\n")
+              ),
 
-	return request, nil
-}
-  """.trim)
+              hasClientBody match {
+                case false => None
+                case true => Some(
+	          Seq(
+                    """if body.contentType != "" {""",
+                    """request.Header["Content-type"] = []string{body.contentType}""".indent(1),
+                    "}"
+                  ).mkString("\n")
+                )
+              },
+
+              Some(
+                Seq(
+                  """if client.Username != "" {""",
+                  "request.SetBasicAuth(client.Username, client.Password)".indent(1),
+                  "}"
+                ).mkString("\n")
+              ),
+
+              Some("return request, nil")
+            ).flatten.mkString("\n\n").indent(1),
+
+            "}"
+
+          ).mkString("\n\n")
+        )
       }
     }
   }
