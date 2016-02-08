@@ -213,15 +213,20 @@ case class Code(form: InvocationForm) {
       var responseTypes = mutable.ListBuffer[ResponseType]()
 
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
-      val formString = buildFormString(op.parameters.filter(_.location == ParameterLocation.Form))
-      val queryToUrl = queryString.map { _ =>
-        val strings = importBuilder.ensureImport("strings")
-	Seq(
-          "",
-          "if len(query) > 0 {",
-          s"""requestUrl += ${fmt}.Sprintf("?%s", ${strings}.Join(query, "&"))""".indent(1),
-          "}"
-        ).mkString("\n")
+      val formString: Option[String] = buildFormString(op.parameters.filter(_.location == ParameterLocation.Form))
+      val queryToUrl = queryString match {
+        case None => None
+        case Some(_) => {
+          val strings = importBuilder.ensureImport("strings")
+	  Some(
+            Seq(
+              "",
+              "if len(query) > 0 {",
+              s"""requestUrl += ${fmt}.Sprintf("?%s", ${strings}.Join(query, "&"))""".indent(1),
+              "}"
+            ).mkString("\n")
+          )
+        }
       }
 
       val argsTypeCode = argsType.map { typ =>
@@ -435,12 +440,20 @@ case class Code(form: InvocationForm) {
   private[this] def buildFormString(params: Seq[Parameter]): Option[String] = {
     params match {
       case Nil => None
-      case _ => Some(
-        Seq(
-          "// TODO: Handle form parameters",
-          params.map { p => s"// - ${p.name}: ${p.`type`}" }
-        ).mkString("\n")
-      )
+      case _ => {
+        val strings = importBuilder.ensureImport("strings")
+        Some(
+          Seq(
+	    "formData := url.Values{",
+            params.map { p =>
+              val varName = GoUtil.privateName(p.name)
+              GoUtil.wrapInQuotes(p.name) + s": {params.$varName}"
+            }.mkString("\n").table().indent(1),
+            "}",
+	    s"""body := ClientRequestBody{contentType: "application/x-www-form-urlencoded", bytes: ${strings}.NewReader(formData.Encode())}"""
+          ).mkString("\n")
+        )
+      }
     }
   }
   
