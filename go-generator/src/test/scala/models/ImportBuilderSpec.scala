@@ -38,7 +38,9 @@ import (
     val builder = ImportBuilder()
     builder.ensureImport("io.flow.common.v0.models")
     builder.generate() should be("""
-import common "github.com/flowcommerce/common"
+import (
+	common "github.com/flowcommerce/common"
+)
 """.trim)
   }
 
@@ -49,9 +51,8 @@ import common "github.com/flowcommerce/common"
     builder.generate() should be("""
 import (
 	"common"
+	common2 "net/common"
 )
-
-import common2 "net/common"
 """.trim)
   }
 
@@ -62,9 +63,8 @@ import common2 "net/common"
     builder.generate() should be("""
 import (
 	"common"
+	flowcommerceCommon "github.com/flowcommerce/common"
 )
-
-import flowcommerceCommon "github.com/flowcommerce/common"
 """.trim)
   }
 
