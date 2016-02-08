@@ -139,7 +139,7 @@ case class Code(form: InvocationForm) {
     assert(!params.isEmpty, "Must have at least one parameter")
   }
 
-  private[this] case class MethodResultsType(
+  private[this] case class MethodResponsesType(
     name: String
   )
 
@@ -176,16 +176,16 @@ case class Code(form: InvocationForm) {
         }
         case params => {
           val argsType = MethodArgumentsType(
-            name = GoUtil.publicName(s"${functionName}Args"),
+            name = GoUtil.publicName(s"${functionName}Params"),
             params = params
           )
-          methodParameters += s"args ${argsType.name}"
+          methodParameters += s"params ${argsType.name}"
           Some(argsType)
         }
       }
 
-      val resultsType = MethodResultsType(
-        name = GoUtil.publicName(s"${functionName}Result")
+      val resultsType = MethodResponsesType(
+        name = GoUtil.publicName(s"${functionName}Response")
       )
 
       val fmt = importBuilder.ensureImport("fmt")
@@ -198,8 +198,8 @@ case class Code(form: InvocationForm) {
         val strings = importBuilder.ensureImport("strings")
 	Seq(
           "",
-          "if len(params) > 0 {",
-          s"""requestUrl += ${fmt}.Sprintf("?%s", ${strings}.Join(params, "&"))""".indent(1),
+          "if len(query) > 0 {",
+          s"""requestUrl += ${fmt}.Sprintf("?%s", ${strings}.Join(query, "&"))""".indent(1),
           "}"
         ).mkString("\n")
       }
@@ -340,13 +340,13 @@ case class Code(form: InvocationForm) {
     params match {
       case Nil => None
       case _ => Some(
-        "\nparams := []string{}\n\n" + params.map { p => buildQueryString(p, datatype(p.`type`, true))}.mkString("\n\n")
+        "\nquery := []string{}\n\n" + params.map { p => buildQueryString(p, datatype(p.`type`, true))}.mkString("\n\n")
       )
     }
   }
 
   private[this] def buildQueryString(param: Parameter, datatype: Datatype): String = {
-    val fieldName = "args." + GoUtil.publicName(param.name)
+    val fieldName = "params." + GoUtil.publicName(param.name)
     val goType = GoType(importBuilder, datatype)
 
     datatype match {
@@ -355,16 +355,16 @@ case class Code(form: InvocationForm) {
           case None => {
             Seq(
               "if " + goType.notNil(fieldName) + " {",
-              buildQueryParam(param.name, datatype, fieldName).indent(1),
+              buildQueryParam(param.name, datatype, fieldName, fieldName).indent(1),
               "}"
             ).mkString("\n")
           }
           case Some(default) => {
             Seq(
               "if " + goType.nil(fieldName) + " {",
-              buildQueryParam(param.name, datatype, default).indent(1),
+              buildQueryParam(param.name, datatype, default, GoUtil.wrapInQuotes(default)).indent(1),
               "} else {",
-              buildQueryParam(param.name, datatype, fieldName).indent(1),
+              buildQueryParam(param.name, datatype, fieldName, fieldName).indent(1),
               "}"
             ).mkString("\n")
 
@@ -374,7 +374,7 @@ case class Code(form: InvocationForm) {
       case Datatype.Container.List(inner) => {
         Seq(
           s"for _, value := range $fieldName {",
-          buildQueryParam(param.name, inner, "value").indent(1),
+          buildQueryParam(param.name, inner, "value", "value").indent(1),
           "}"
         ).mkString("\n")
       }
@@ -390,13 +390,13 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  private[this] def buildQueryParam(paramName: String, datatype: Datatype, value: String): String = {
+  private[this] def buildQueryParam(paramName: String, datatype: Datatype, value: String, quotedValue: String): String = {
     GoType.isNumeric(datatype) match {
       case true => addSingleParamValue(paramName, datatype, value, "%v")
       case false => {
         GoType.isBoolean(datatype) match {
           case true => addSingleParamValue(paramName, datatype, value, "%b")
-          case false => addSingleParam(paramName, datatype, GoUtil.wrapInQuotes(value))
+          case false => addSingleParam(paramName, datatype, quotedValue)
         }
       }
     }
@@ -404,12 +404,12 @@ case class Code(form: InvocationForm) {
 
   private[this] def addSingleParam(name: String, datatype: Datatype, varName: String): String = {
     val fmt = importBuilder.ensureImport("fmt")
-    s"""params = append(params, ${fmt}.Sprintf("$name=%s", """ + toQuery(datatype, varName) + "))"
+    s"""query = append(query, ${fmt}.Sprintf("$name=%s", """ + toQuery(datatype, varName) + "))"
   }
 
   private[this] def addSingleParamValue(name: String, datatype: Datatype, value: String, format: String): String = {
     val fmt = importBuilder.ensureImport("fmt")
-    s"""params = append(params, ${fmt}.Sprintf("$name=$format", $value))"""
+    s"""query = append(query, ${fmt}.Sprintf("$name=$format", $value))"""
   }
 
   private[this] def toQuery(datatype: Datatype, varName: String): String = {
