@@ -87,31 +87,24 @@ private[models] case class ImportBuilder() {
   }
 
   def generate(): String = {
-    val (unaliased, aliased) = imports.partition { imp => defaultAlias(imp.name) == imp.alias }
+    imports.map { imp =>
+    }
 
-    Seq(
-      (
-        unaliased.toList match {
-          case Nil => None
-          case _ => Some(
-            Seq(
-              "import (",
-              unaliased.map(_.name).sorted.map(GoUtil.wrapInQuotes(_)).mkString("\n").indent(1),
-              ")"
-            ).mkString("\n")
-          )
-        }
-      ),
+    imports.toList match {
+      case Nil => ""
+      case _ => Seq(
+        "import (",
+        imports.sorted.map { imp =>
+          if (defaultAlias(imp.name) == imp.alias) {
+            GoUtil.wrapInQuotes(imp.name)
+          } else {
+            s"${imp.alias} ${GoUtil.wrapInQuotes(imp.name)}"
+          }
+        }.mkString("\n").indent(1),
+        ")"
+      ).mkString("\n")
+    }
 
-      (
-        aliased.toList match {
-          case Nil => None
-          case _ => Some(
-            aliased.sorted.map(imp => s"import ${imp.alias} " + GoUtil.wrapInQuotes(imp.name)).mkString("\n")
-          )
-        }
-      )
-    ).flatten.mkString("\n\n")
   }
 
 }
