@@ -132,15 +132,14 @@ case class GoType(
 
   private[this] def compareToImplicitValue(varName: String, dt: Datatype, operator: String): String = {
     dt match {
-      case Datatype.Primitive.Boolean => "false"
       case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
         s"0 $operator $varName"
       }
       case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.UserDefined.Enum(_) => {
         s""""" $operator $varName"""
       }
-      case Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
-        s"""$nil $operator $varName"""""
+      case Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
+        s"""nil $operator $varName"""""
       }
       case Datatype.Container.Option(inner) => {
         compareToImplicitValue(varName, inner, operator)
