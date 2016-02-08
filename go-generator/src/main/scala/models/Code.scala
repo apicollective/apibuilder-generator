@@ -152,6 +152,10 @@ case class Code(form: InvocationForm) {
         )
       ).mkString("")
 
+      val resultsType = MethodResponsesType(
+        name = GoUtil.publicName(s"${functionName}Response")
+      )
+
       var methodParameters = mutable.ListBuffer[String]()
       methodParameters += "client Client"
 
@@ -170,7 +174,15 @@ case class Code(form: InvocationForm) {
         pathArgs += typ.toEscapedString(varName)
       }
 
-      val argsType = op.parameters.filter( p => p.location == ParameterLocation.Query || p.location == ParameterLocation.Form )  match {
+      val bodyString: Option[String] = op.body.map { body =>
+        // TODO: val comments = GoUtil.textToComment(body.description)
+        val varName = GoUtil.privateName(body.`type`)
+        val typ = GoType(importBuilder, datatype(body.`type`, true))
+        methodParameters += s"$varName ${typ.klass.localName}"
+        "\n" + buildBody(varName, typ, resultsType)
+      }
+      
+      val argsType: Option[MethodArgumentsType] = op.parameters.filter( p => p.location == ParameterLocation.Query || p.location == ParameterLocation.Form )  match {
         case Nil => {
           None
         }
@@ -183,10 +195,6 @@ case class Code(form: InvocationForm) {
           Some(argsType)
         }
       }
-
-      val resultsType = MethodResponsesType(
-        name = GoUtil.publicName(s"${functionName}Response")
-      )
 
       val fmt = importBuilder.ensureImport("fmt")
       val errors = importBuilder.ensureImport("errors")
@@ -305,18 +313,27 @@ case class Code(form: InvocationForm) {
         ).mkString("\n") + "\n\n"
       }
       
+      val bodyParam = bodyString match {
+        case None => "nil"
+        case Some(_) => {
+          val bytes = importBuilder.ensureImport("bytes")
+          s"${bytes}.NewReader(body)"
+        }
+      }
+
       Seq(
         s"${argsTypeCode}${responseTypeCode}func $functionName(${methodParameters.mkString(", ")}) ${resultsType.name} {",
 
         Seq(
           Some(s"""requestUrl := ${fmt}.Sprintf("%s$path", ${pathArgs.mkString(", ")})"""),
+          bodyString,
           queryString,
           formString,
           queryToUrl
         ).flatten.mkString("\n").indent(1),
 
         Seq(
-          s"""request, err := buildRequest(client, "${op.method}", requestUrl, nil)""",
+          s"""request, err := buildRequest(client, "${op.method}", requestUrl, $bodyParam)""",
           s"if err != nil {",
           s"return ${resultsType.name}{Error: err}".indent(1),
           s"}"
@@ -336,6 +353,20 @@ case class Code(form: InvocationForm) {
 
       ).mkString("\n\n")
     }.mkString("\n\n")
+  }
+
+  private[this] def buildBody(varName: String, typ: GoType, responseType: MethodResponsesType): String = {
+    // TODO: Defaults
+    val json = importBuilder.ensureImport("encoding/json")
+
+    Seq(
+      s"body, err := ${json}.Marshal($varName)",
+      Seq(
+        "if err != nil {",
+	s"return ${responseType.name}{Error: err}".indent(1),
+        "}"
+      ).mkString("\n")
+    ).mkString("\n")
   }
 
   private[this] def buildQueryString(params: Seq[Parameter]): Option[String] = {
@@ -437,11 +468,6 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  private[this] val AllHeaders = headers.all.map {
-    case (name, value) => s""""$name": {$value},""".indent(1)
-  }.mkString("\n")
-
-
   // other: "bytes", "sync"
   private[this] def generateClientStruct(): Option[String] = {
     service.resources match {
@@ -478,7 +504,7 @@ func buildRequest(client Client, method, urlStr string, body ${io}.Reader) (*${h
 	}
 
 	request.Header = map[string][]string{
-${AllHeaders.table().indent(1)}
+${AllHeaders.indent(1)}
 	}
 
 	if client.Username != "" {
@@ -491,4 +517,9 @@ ${AllHeaders.table().indent(1)}
       }
     }
   }
+
+  private[this] val AllHeaders = headers.all.map {
+    case (name, value) => s""""$name": {$value},""".indent(1)
+  }.mkString("\n").table()
+
 }
