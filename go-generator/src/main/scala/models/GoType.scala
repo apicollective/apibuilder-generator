@@ -40,8 +40,6 @@ case class GoType(
   }
 
   private[this] def declaration(json: JsValue, datatype: Datatype): String = {
-    println("JSON: " + json)
-
     datatype match {
       case Datatype.Primitive.Boolean => {
         json.as[scala.Boolean].toString

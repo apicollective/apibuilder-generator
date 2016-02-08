@@ -377,7 +377,6 @@ case class Code(form: InvocationForm) {
                 val fieldName = GoUtil.publicName(field.name)
                 val fullName = s"${varName}.$fieldName"
 
-                println(s"MODEL[${m.name}] field[${field.name}] fieldName[$fieldName] default[${field.default}] fullName[$fullName]")
                 Seq(
                   "if " + fieldGoType.nil(fullName) + " {",
                   s"$fullName = ${fieldGoType.declaration(field.default.get)}".indent(1),
