@@ -283,7 +283,7 @@ case class Code(form: InvocationForm) {
                 )
               }
               case ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => {
-                None // No-op. Let default case catch it
+                None // Intentional no-op. Let default case catch it
               }
             }
           } ++ Seq(
@@ -358,20 +358,50 @@ case class Code(form: InvocationForm) {
   private[this] def buildBody(varName: String, typ: GoType, responseType: MethodResponsesType): String = {
     val json = importBuilder.ensureImport("encoding/json")
 
-	if nil == applicationForm.Dependency {
-		applicationForm.Dependency = []string{}
-	}
+    //if nil == applicationForm.Dependency {
+    //  applicationForm.Dependency = []string{}
+    //}
 
-zzz
+    val bodyDefaults: Option[String] = typ.datatype match {
+      case Datatype.UserDefined.Model(name) => {
+        service.models.find(_.name == name) match {
+          case None => {
+            // TODO: How do we set defaults for imported models?
+            println("WARNING: Could not find model named[$name]")
+            None
+          }
+          case Some(m) => {
+            Some(
+              m.fields.filter(!_.default.isEmpty).map { field =>
+                val fieldGoType = GoType(importBuilder, datatype(field.`type`, true))
+                val fieldName = GoUtil.publicName(field.name)
+                val fullName = s"${varName}.$fieldName"
+
+                println(s"MODEL[${m.name}] field[${field.name}] fieldName[$fieldName] default[${field.default}] fullName[$fullName]")
+                Seq(
+                  "if " + fieldGoType.nil(fullName) + " {",
+                  s"$fullName = ${fieldGoType.declaration(field.default.get)}".indent(1),
+                  "}"
+                ).mkString("\n")
+              }.mkString("\n\n")
+            )
+          }
+        }
+      }
+      case _ => None
+    }
 
     Seq(
-      s"body, err := ${json}.Marshal($varName)",
-      Seq(
-        "if err != nil {",
-	s"return ${responseType.name}{Error: err}".indent(1),
-        "}"
-      ).mkString("\n")
-    ).mkString("\n")
+      Some(s"body, err := ${json}.Marshal($varName)"),
+      Some(
+        Seq(
+          "if err != nil {",
+	  s"return ${responseType.name}{Error: err}".indent(1),
+          "}"
+        ).mkString("\n")
+      ),
+      bodyDefaults.map { code => s"\n$code\n" }
+    ).flatten.mkString("\n")
   }
 
   private[this] def buildQueryString(params: Seq[Parameter]): Option[String] = {

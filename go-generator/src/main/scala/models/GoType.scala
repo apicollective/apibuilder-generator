@@ -31,6 +31,37 @@ case class GoType(
 ) {
 
   /**
+    * Generates a declaration of the specified value for this datatype
+    */
+  def declaration(value: String): String = {
+    declaration(value, datatype)
+  }
+
+  private[this] def declaration(value: String, datatype: Datatype): String = {
+    datatype match {
+      case Datatype.Primitive.Boolean | Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
+        value
+      }
+      case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
+        GoUtil.wrapInQuotes(value)
+      }
+      case Datatype.Primitive.Object => "interface{}"
+      case Datatype.Primitive.Unit => "nil"
+      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => "nil"
+      case Datatype.UserDefined.Enum(_) => value
+      case Datatype.Container.Option(inner) => declaration(value, inner)
+      case Datatype.Container.Map(inner) => {
+        // TODO: Parse value
+        s"${klass.localName}{ " + declaration(value, inner) + " }"
+      }
+      case Datatype.Container.List(inner) => {
+        // TODO: Parse value
+        s"${klass.localName}{ " + declaration(value, inner) + " }"
+      }
+    }
+  }
+
+  /**
     * Returns true if this type represents the unit type
     */
   def isUnit(): Boolean = {
@@ -139,7 +170,7 @@ case class GoType(
         s""""" $operator $varName"""
       }
       case Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
-        s"""nil $operator $varName"""""
+        s"""nil $operator $varName"""
       }
       case Datatype.Container.Option(inner) => {
         compareToImplicitValue(varName, inner, operator)
