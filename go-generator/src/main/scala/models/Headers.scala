@@ -35,7 +35,7 @@ case class Headers(
   val all = Seq(
     Some("User-Agent" -> s"UserAgent"),
     Some("X-Apidoc-Version" -> s"Version"),
-    versionMajor.map { major => VersionMajorHeaderName -> GoUtil.wrapInQuotes(VersionMajorName) }
+    versionMajor.map { _ => VersionMajorHeaderName -> s"string($VersionMajorName)" }
   ).flatten ++ form.service.headers.filter(!_.default.isEmpty).map { h =>
     (h.name -> GoUtil.wrapInQuotes(h.default.get))
   }

@@ -18,6 +18,15 @@ case class Code(form: InvocationForm) {
   private[this] val headers = Headers(form)
   private[this] val importBuilder = ImportBuilder()
 
+  private[this] val hasClientBody: Boolean = {
+    service.resources.map(_.operations).flatten.find { op =>
+      !op.body.isEmpty || !op.parameters.find { _.location == ParameterLocation.Form }.isEmpty
+    } match {
+      case None => false
+      case Some(_) => true
+    }
+  }
+
   def generate(): Option[String] = {
     Seq(service.models, service.enums, service.unions).flatten.isEmpty match {
       case true => {
@@ -33,6 +42,7 @@ case class Code(form: InvocationForm) {
 
         // Generate all code here as we need to process imports
         val client = generateClientStruct()
+        val clientBody = generateClientBodyStruct()
         val footer = generateFooter()
 
         Some(
@@ -42,6 +52,7 @@ case class Code(form: InvocationForm) {
             Some(importBuilder.generate()),
             Some(headers.code),
             client,
+            clientBody,
             Some(code),
             footer
           ).flatten.mkString("\n\n") + "\n"
@@ -313,11 +324,20 @@ case class Code(form: InvocationForm) {
         ).mkString("\n") + "\n\n"
       }
       
-      val bodyParam = bodyString match {
-        case None => "nil"
-        case Some(_) => {
-          val bytes = importBuilder.ensureImport("bytes")
-          s"${bytes}.NewReader(body)"
+      val bodyParam: String = hasClientBody match {
+        case false => {
+          ""
+        }
+        case true => {
+          bodyString match {
+            case None => {
+              ", ClientRequestBody{}"
+            }
+            case Some(_) => {
+              val bytes = importBuilder.ensureImport("bytes")
+              s""", ClientRequestBody{contentType: "application/json", bytes: ${bytes}.NewReader(body)}"""
+            }
+          }
         }
       }
 
@@ -333,7 +353,7 @@ case class Code(form: InvocationForm) {
         ).flatten.mkString("\n").indent(1),
 
         Seq(
-          s"""request, err := buildRequest(client, "${op.method}", requestUrl, $bodyParam)""",
+          s"""request, err := buildRequest(client, "${op.method}", requestUrl$bodyParam)""",
           s"if err != nil {",
           s"return ${resultsType.name}{Error: err}".indent(1),
           s"}"
@@ -502,7 +522,6 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  // other: "bytes", "sync"
   private[this] def generateClientStruct(): Option[String] = {
     service.resources match {
       case Nil => {
@@ -522,17 +541,38 @@ type Client struct {
     }
   }
 
+  def generateClientBodyStruct(): Option[String] = {
+    hasClientBody match {
+      case false => {
+        None
+      }
+      case true => {
+        val io = importBuilder.ensureImport("io")
+        Some(s"""
+type ClientRequestBody struct {
+	contentType string
+	bytes       ${io}.Reader
+}
+""".trim)
+      }
+    }
+  }
+
   private[this] def generateFooter(): Option[String] = {
     service.resources match {
       case Nil => {
         None
       }
       case _ => {
-        val io = importBuilder.ensureImport("io")
+        val bodyArg = hasClientBody match {
+          case false => ""
+          case true => ", body ClientRequestBody"
+        }
+
         val http = importBuilder.ensureImport("net/http")
         Some(s"""
-func buildRequest(client Client, method, urlStr string, body ${io}.Reader) (*${http}.Request, error) {
-	request, err := http.NewRequest(method, urlStr, body)
+func buildRequest(client Client, method, urlStr string$bodyArg) (*${http}.Request, error) {
+	request, err := http.NewRequest(method, urlStr, body.bytes)
 	if err != nil {
 		return nil, err
 	}
@@ -541,8 +581,8 @@ func buildRequest(client Client, method, urlStr string, body ${io}.Reader) (*${h
 ${AllHeaders.indent(1)}
 	}
 
-        if body != nil {
-		request.Header["Content-type"] = []string{"application/json"}
+	if body.contentType != "" {
+		request.Header["Content-type"] = []string{body.contentType}
 	}
 
 	if client.Username != "" {
