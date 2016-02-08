@@ -356,8 +356,13 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def buildBody(varName: String, typ: GoType, responseType: MethodResponsesType): String = {
-    // TODO: Defaults
     val json = importBuilder.ensureImport("encoding/json")
+
+	if nil == applicationForm.Dependency {
+		applicationForm.Dependency = []string{}
+	}
+
+zzz
 
     Seq(
       s"body, err := ${json}.Marshal($varName)",
