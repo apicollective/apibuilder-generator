@@ -106,7 +106,7 @@ case class GoType(
       case p: Datatype.Primitive => "value"
       case Datatype.UserDefined.Model(name) => GoUtil.privateName(name)
       case Datatype.UserDefined.Union(name) => GoUtil.privateName(name)
-      case Datatype.UserDefined.Enum(name) => "value"
+      case Datatype.UserDefined.Enum(name) => GoUtil.privateName(name)
       case Datatype.Container.Option(inner) => classVariableName(inner)
       case Datatype.Container.Map(inner) => GoUtil.privateName(Text.pluralize(classVariableName(inner)))
       case Datatype.Container.List(inner) => GoUtil.privateName(Text.pluralize(classVariableName(inner)))
@@ -256,14 +256,5 @@ object GoType {
       case _ => false
     }
   }
-  
-  def isBoolean(datatype: Datatype): Boolean = {
-    datatype match {
-      case Datatype.Primitive.Boolean => true
-      case Datatype.Container.Option(inner) => isBoolean(inner)
-      case _ => false
-    }
-  }
-  
  
 }

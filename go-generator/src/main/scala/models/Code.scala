@@ -18,6 +18,7 @@ case class Code(form: InvocationForm) {
   private[this] val importBuilder = ImportBuilder()
   private[this] val headers = Headers(importBuilder, form)
   private[this] val urlValues = UrlValues(importBuilder, datatypeResolver)
+  private[this] val responseBuilder = ResponseBuilder(importBuilder, datatypeResolver)
 
   private[this] val hasClientBody: Boolean = {
     service.resources.map(_.operations).flatten.find { op =>
@@ -277,25 +278,10 @@ case class Code(form: InvocationForm) {
                     val responseType = ResponseType(goType, varName)
                     responseTypes += responseType
 
-                    val responseExpr = goType.isUnit() match {
-                      case true => {
-                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}"
-                      }
-                      case false => {
-                        val tmpVarName = GoUtil.privateName(goType.classVariableName())
-                        val json = importBuilder.ensureImport("encoding/json")
-                        Seq(
-                          s"var $tmpVarName ${goType.klass.localName}",
-                          s"${json}.NewDecoder(resp.Body).Decode(&$tmpVarName)",
-		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, $varName: $tmpVarName}"
-                        ).mkString("\n")
-                      }
-                    }
-
                     Some(
                       Seq(
                         s"case $value:",
-                        responseExpr.indent(1)
+                        responseBuilder.generate(resultsType.name, goType).indent(1)
                       ).mkString("\n")
                     )
                   }
