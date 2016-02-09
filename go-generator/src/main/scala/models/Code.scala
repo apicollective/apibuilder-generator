@@ -402,10 +402,6 @@ case class Code(form: InvocationForm) {
   private[this] def buildBody(varName: String, typ: GoType, responseType: MethodResponsesType): String = {
     val json = importBuilder.ensureImport("encoding/json")
 
-    //if nil == applicationForm.Dependency {
-    //  applicationForm.Dependency = []string{}
-    //}
-
     val bodyDefaults: Option[String] = typ.datatype match {
       case Datatype.UserDefined.Model(name) => {
         service.models.find(_.name == name) match {
