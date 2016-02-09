@@ -5,6 +5,28 @@ import Formatter._
 
 class FormatterSpec extends FunSpec with Matchers {
 
+  it("assignment") {
+    """
+CalendarWeekdays Calendar = "Weekdays"
+CalendarEveryday = "Everyday"
+""".trim.table() should be("""
+CalendarWeekdays Calendar  = "Weekdays"
+CalendarEveryday           = "Everyday"
+""".trim)
+  }
+
+  it("leaves comments alone") {
+    """
+// This is a comment
+CalendarWeekdays Calendar = "Weekdays"
+CalendarEveryday = "Everyday"
+""".trim.table() should be("""
+// This is a comment
+CalendarWeekdays Calendar  = "Weekdays"
+CalendarEveryday           = "Everyday"
+""".trim)
+  }
+
   it("table") {
     "a".table() should be("a")
     "a b".table() should be("a b")
