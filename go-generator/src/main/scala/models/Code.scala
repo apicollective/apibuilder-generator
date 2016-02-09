@@ -63,32 +63,41 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def generateEnum(enum: Enum): String = {
-    val fmt = importBuilder.ensureImport("fmt")
+    val strings = importBuilder.ensureImport("strings")
     val enumName = GoUtil.publicName(enum.name)
 
     Seq(
-      GoUtil.textToComment(enum.description) + s"type $enumName int",
+      GoUtil.textToComment(enum.description) + s"type $enumName string",
 
       Seq(
         "const (",
-        enum.values.zipWithIndex.map { case (value, i) =>
-          val text = GoUtil.textToSingleLineComment(value.description) + GoUtil.publicName(value.name)
-          i match {
-            case 0 => text + s" $enumName = iota"
-            case _ => text
-          }
-        }.mkString("\n").indent(1),
+        (
+          enum.values.zipWithIndex.map { case (value, i) =>
+            val comments = GoUtil.textToSingleLineComment(value.description)
+            val name = enumName + GoUtil.publicName(value.name)
+            val quotedValue = GoUtil.wrapInQuotes(value.name)
+
+            i match {
+              case 0 => comments + name + s" $enumName = $quotedValue"
+              case _ => comments + name + s" = $quotedValue"
+            }
+          } ++ Seq(
+            s"""${enumName}UNDEFINED = "UNDEFINED""""
+          )
+        ).mkString("\n").indent(1),
         ")"
       ).mkString("\n"),
 
       Seq(
-        s"func (value $enumName) String() string {",
+        s"func ${enumName}FromString(value string) $enumName {",
         Seq(
-          "switch value {",
+          s"switch ${strings}.TrimSpace(${strings}.ToLower(value)) {",
           (
-            enum.values.zipWithIndex.map { case (value, i) =>
-              s"case $i:\n" + "return ".indent(1) + GoUtil.wrapInQuotes(value.name)
-            } ++ Seq("default:\n" + s"return ${fmt}.Sprintf(".indent(1) + GoUtil.wrapInQuotes(s"$enumName[%v]") + ", value)")
+            enum.values.map { value =>
+              val name = enumName + GoUtil.publicName(value.name)
+              val key = GoUtil.wrapInQuotes(value.name.trim.toLowerCase)
+              s"case $key:\n" + s"return $name".indent(1)
+            } ++ Seq("default:\n" + s"return ${enumName}UNDEFINED".indent(1))
           ).mkString("\n"),
           "}"
         ).mkString("\n").indent(1),
