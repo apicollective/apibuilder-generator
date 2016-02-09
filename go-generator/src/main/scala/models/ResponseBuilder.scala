@@ -84,18 +84,18 @@ case class ResponseBuilder(
       }
 
       case Datatype.UserDefined.Model(name) => {
-        Some(s"${GoUtil.publicName(name)}$deserializer($readerName)")
+        Some(s"${importBuilder.publicName(name)}$deserializer($readerName)")
       }
 
       case Datatype.UserDefined.Union(name) => {
-        Some(s"${GoUtil.publicName(name)}$deserializer($readerName)")
+        Some(s"${importBuilder.publicName(name)}$deserializer($readerName)")
       }
 
       case Datatype.UserDefined.Enum(name) => {
         Some(
           deserializer match {
-            case ResponseBuilder.FromJson => s"${GoUtil.publicName(name)}FromString(string($readerName))"
-            case ResponseBuilder.FromMap => s"""${GoUtil.publicName(name)}FromString($readerName["value"].(string))"""
+            case ResponseBuilder.FromJson => s"${importBuilder.publicName(name)}FromString(string($readerName))"
+            case ResponseBuilder.FromMap => s"""${importBuilder.publicName(name)}FromString($readerName["value"].(string))"""
           }
         )
       }

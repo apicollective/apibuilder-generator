@@ -65,7 +65,7 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateEnum(enum: Enum): String = {
     val strings = importBuilder.ensureImport("strings")
-    val enumName = GoUtil.publicName(enum.name)
+    val enumName = importBuilder.publicName(enum.name)
 
     Seq(
       GoUtil.textToComment(enum.description) + s"type $enumName string",
@@ -78,7 +78,7 @@ case class Code(form: InvocationForm) {
               case "" => ""
               case text => s" $text"
             }
-            val name = enumName + GoUtil.publicName(value.name)
+            val name = enumName + importBuilder.publicName(value.name)
             val quotedValue = GoUtil.wrapInQuotes(value.name)
 
             i match {
@@ -98,7 +98,7 @@ case class Code(form: InvocationForm) {
           s"switch ${strings}.TrimSpace(${strings}.ToLower(value)) {",
           (
             enum.values.map { value =>
-              val name = enumName + GoUtil.publicName(value.name)
+              val name = enumName + importBuilder.publicName(value.name)
               val key = GoUtil.wrapInQuotes(value.name.trim.toLowerCase)
               s"case $key:\n" + s"return $name".indent(1)
             } ++ Seq("default:\n" + s"return ${enumName}UNDEFINED".indent(1))
@@ -115,13 +115,13 @@ case class Code(form: InvocationForm) {
     val io = importBuilder.ensureImport("io")
     val json = importBuilder.ensureImport("encoding/json")
     val bytes = importBuilder.ensureImport("bytes")
-    val publicName = GoUtil.publicName(model.name)
+    val publicName = importBuilder.publicName(model.name)
     val privateName = GoUtil.privateName(model.name)
 
     Seq(
       GoUtil.textToComment(model.description) + s"type $publicName struct {",
       model.fields.map { f =>
-        val publicName = GoUtil.publicName(f.name)
+        val publicName = importBuilder.publicName(f.name)
 
         val json = Seq(
           (publicName == f.name) match {
@@ -180,7 +180,7 @@ case class Code(form: InvocationForm) {
     val io = importBuilder.ensureImport("io")
     val json = importBuilder.ensureImport("encoding/json")
     val bytes = importBuilder.ensureImport("bytes")
-    val unionName = GoUtil.publicName(union.name)
+    val unionName = importBuilder.publicName(union.name)
 
     Seq(
 
@@ -188,7 +188,7 @@ case class Code(form: InvocationForm) {
         GoUtil.textToComment(union.description) + s"type $unionName struct {",
         (
           union.types.map { typ =>
-            GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
+            importBuilder.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
           } ++ Seq(
             s"Undefined string"
           )
@@ -224,7 +224,7 @@ case class Code(form: InvocationForm) {
 
               (
                 union.types.map { t =>
-                  val typeName = GoUtil.publicName(t.`type`)
+                  val typeName = importBuilder.publicName(t.`type`)
                   val dt = datatype(t.`type`, true)
 
                   Seq(
@@ -253,7 +253,7 @@ case class Code(form: InvocationForm) {
                         }
 
                         case Datatype.UserDefined.Enum(name) => {
-                          val enumName = GoUtil.publicName(name)
+                          val enumName = importBuilder.publicName(name)
                           s"""return $unionName{$typeName: ${enumName}FromString(el["value"].(string))}"""
                         }
 
@@ -307,14 +307,14 @@ case class Code(form: InvocationForm) {
   private[this] def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
       val functionName = Seq(
-        GoUtil.publicName(resource.plural),
-        GoUtil.publicName(
+        importBuilder.publicName(resource.plural),
+        importBuilder.publicName(
           GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
         )
       ).mkString("")
 
       val resultsType = MethodResponsesType(
-        name = GoUtil.publicName(s"${functionName}Response")
+        name = importBuilder.publicName(s"${functionName}Response")
       )
 
       var methodParameters = mutable.ListBuffer[String]()
@@ -349,7 +349,7 @@ case class Code(form: InvocationForm) {
         }
         case params => {
           val argsType = MethodArgumentsType(
-            name = GoUtil.publicName(s"${functionName}Params"),
+            name = importBuilder.publicName(s"${functionName}Params"),
             params = params
           )
           methodParameters += s"params ${argsType.name}"
@@ -391,7 +391,7 @@ case class Code(form: InvocationForm) {
           s"type ${typ.name} struct {",
           typ.params.map { param =>
             val goType = GoType(importBuilder, datatype(param.`type`, true))
-            GoUtil.publicName(param.name) + " " + goType.klass.localName
+            importBuilder.publicName(param.name) + " " + goType.klass.localName
           }.mkString("\n").table().indent(1),
           "}",
           ""
@@ -410,13 +410,13 @@ case class Code(form: InvocationForm) {
                 value >= 200 && value < 500 match {
                   case true => {
                     val goType = GoType(importBuilder, datatype(resp.`type`, true))
-                    val varName = GoUtil.publicName(goType.classVariableName())
+                    val varName = importBuilder.publicName(goType.classVariableName())
                     val responseType = ResponseType(goType, varName)
                     responseTypes += responseType
 
                     val responseCode = responseBuilder.generate("resp.Body", goType.datatype, ResponseBuilder.FromJson) match {
                       case None => ""
-                      case Some(c) => s", ${GoUtil.publicName(goType.classVariableName())}: $c"
+                      case Some(c) => s", ${importBuilder.publicName(goType.classVariableName())}: $c"
                     }
 
                     Some(
@@ -549,7 +549,7 @@ case class Code(form: InvocationForm) {
                 Some(
                   fields.map { field =>
                     val fieldGoType = GoType(importBuilder, datatype(field.`type`, field.required))
-                    val fieldName = GoUtil.publicName(field.name)
+                    val fieldName = importBuilder.publicName(field.name)
                     val fullName = s"${varName}.$fieldName"
 
                     Seq(

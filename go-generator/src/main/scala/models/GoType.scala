@@ -57,8 +57,7 @@ case class GoType(
         throw new UnsupportedOperationException(s"default for type $datatype")
       }
       case Datatype.UserDefined.Enum(name) => {
-        // TODO: Handle imports
-        val method = GoUtil.publicName(name) + "FromString"
+        val method = importBuilder.publicName(name) + "FromString"
         s"$method(%s)".format(GoUtil.wrapInQuotes(value))
       }
       case Datatype.Container.Option(inner) => {
@@ -104,12 +103,12 @@ case class GoType(
   private[this] def classVariableName(datatype: Datatype): String = {
     datatype match {
       case p: Datatype.Primitive => "value"
-      case Datatype.UserDefined.Model(name) => GoUtil.privateName(name)
-      case Datatype.UserDefined.Union(name) => GoUtil.privateName(name)
-      case Datatype.UserDefined.Enum(name) => GoUtil.privateName(name)
+      case Datatype.UserDefined.Model(name) => importBuilder.privateName(name)
+      case Datatype.UserDefined.Union(name) => importBuilder.privateName(name)
+      case Datatype.UserDefined.Enum(name) => importBuilder.privateName(name)
       case Datatype.Container.Option(inner) => classVariableName(inner)
-      case Datatype.Container.Map(inner) => GoUtil.privateName(Text.pluralize(classVariableName(inner)))
-      case Datatype.Container.List(inner) => GoUtil.privateName(Text.pluralize(classVariableName(inner)))
+      case Datatype.Container.Map(inner) => Text.pluralize(classVariableName(inner))
+      case Datatype.Container.List(inner) => Text.pluralize(classVariableName(inner))
     }
   }
 
@@ -226,11 +225,11 @@ object GoType {
         val i = u.name.lastIndexOf(".")
         (i > 0) match {
           case true => {
-            val ns = u.name.substring(0, i)
-            val name = u.name.substring(i+1)
-
-            val alias = importBuilder.ensureImport(ns)
-            Klass.Import(ns, alias, GoUtil.publicName(name))
+            Klass.Root(importBuilder.publicName(u.name))
+            // val ns = u.name.substring(0, i)
+            // val name = u.name.substring(i+1)
+            // val alias = importBuilder.ensureImport(ns)
+            // Klass.Import(ns, alias, GoUtil.publicName(name))
           }
           case false => {
             Klass.Root(GoUtil.publicName(u.name))
