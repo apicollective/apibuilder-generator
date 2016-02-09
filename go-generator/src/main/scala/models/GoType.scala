@@ -36,25 +36,16 @@ case class GoType(
     * Generates a declaration of the specified value for this datatype
     */
   def declaration(value: String): String = {
-    declaration(Json.parse(value), datatype)
+    declaration(value, datatype)
   }
 
-  private[this] def declaration(json: JsValue, datatype: Datatype): String = {
+  private[this] def declaration(value: String, datatype: Datatype): String = {
     datatype match {
-      case Datatype.Primitive.Boolean => {
-        json.as[scala.Boolean].toString
-      }
-      case Datatype.Primitive.Double => {
-        json.as[scala.Double].toString
-      }
-      case Datatype.Primitive.Integer => {
-        json.as[scala.Int].toString
-      }
-      case Datatype.Primitive.Long => {
-        json.as[scala.Long].toString
+      case Datatype.Primitive.Boolean | Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
+        value
       }
       case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
-        GoUtil.wrapInQuotes(json.as[JsString].value)
+        GoUtil.wrapInQuotes(value)
       }
       case Datatype.Primitive.Object => {
         "nil"
@@ -66,20 +57,22 @@ case class GoType(
         throw new UnsupportedOperationException(s"default for type $datatype")
       }
       case Datatype.UserDefined.Enum(name) => {
-        "nil"
+        // TODO: Handle imports
+        val method = GoUtil.publicName(name) + "FromString"
+        s"$method(%s)".format(GoUtil.wrapInQuotes(value))
       }
       case Datatype.Container.Option(inner) => {
-        declaration(json, inner)
+        declaration(value, inner)
       }
       case Datatype.Container.Map(inner) => {
-        val data = json.as[scala.collection.immutable.Map[String, JsValue]].map {
-          case (key, v) => GoUtil.wrapInQuotes(key) + ": " + declaration(v, inner)
+        val data = Json.parse(value).as[scala.collection.immutable.Map[String, JsValue]].map {
+          case (key, v) => GoUtil.wrapInQuotes(key) + ": " + declaration(v.toString, inner)
         }
         data.mkString(s"map[string]{\n", ",\n", ",\n}").table()
       }
       case Datatype.Container.List(inner) => {
-        val arr = json.as[JsArray]
-        val elements = arr.value.map { v => declaration(v, inner) }
+        val arr = Json.parse(value).as[JsArray]
+        val elements = arr.value.map { v => declaration(v.toString, inner) }
         elements.mkString(s"${klass.localName}{", ",", "}")
       }
     }
@@ -193,7 +186,7 @@ case class GoType(
       case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
         s""""" $operator $varName"""
       }
-      case Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
+      case Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         s"""nil $operator $varName"""
       }
       case Datatype.Primitive.Boolean => {
