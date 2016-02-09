@@ -30,10 +30,10 @@ case class UrlValues(
                 }
                 case Some(default) => {
                   Seq(
-                    "if " + goType.notNil(varName) + " {",
-                    build(p.name, varName, goType).indent(1),
-                    "} else {",
+                    "if " + goType.nil(varName) + " {",
                     ("urlValues.Add(" + GoUtil.wrapInQuotes(p.name) + s", " + goType.toString(default) + ")").indent(1),
+                    "} else {",
+                    build(p.name, varName, goType).indent(1),
                     "}"
                   ).mkString("\n")
                 }
