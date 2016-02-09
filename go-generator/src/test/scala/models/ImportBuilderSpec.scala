@@ -9,6 +9,20 @@ class ImportBuilderSpec extends FunSpec with Matchers {
     builder.generate() should be("")
   }
 
+  it("prefixes with package name") {
+    val builder = ImportBuilder()
+    builder.ensureImport("json")
+    builder.ensureImport("encoding/json")
+    builder.ensureImport("other/json")
+    builder.generate() should be("""
+import (
+	encodingJson "encoding/json"
+	"json"
+	otherJson "other/json"
+)
+""".trim)
+  }
+
   it("idempotent") {
     val builder = ImportBuilder()
     builder.ensureImport("io")
@@ -51,7 +65,7 @@ import (
     builder.generate() should be("""
 import (
 	"common"
-	common2 "net/common"
+	netCommon "net/common"
 )
 """.trim)
   }

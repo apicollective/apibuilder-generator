@@ -1,6 +1,7 @@
 package go.models
 
 import scala.collection.mutable
+import lib.Text
 import Formatter._
 
 /**
@@ -52,8 +53,8 @@ private[models] case class ImportBuilder() {
             // flowcommerceCommon alias
             GoUtil.privateName(s"${org}_$name")
           }
-          case _ => {
-            s"$name${index + 1}"
+          case parts => {
+            Text.snakeToCamelCase(parts.mkString("_"))
           }
         }
       }
