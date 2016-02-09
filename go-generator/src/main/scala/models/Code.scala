@@ -15,8 +15,8 @@ case class Code(form: InvocationForm) {
 
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
-  private[this] val headers = Headers(form)
   private[this] val importBuilder = ImportBuilder()
+  private[this] val headers = Headers(importBuilder, form)
   private[this] val urlValues = UrlValues(importBuilder, datatypeResolver)
 
   private[this] val hasClientBody: Boolean = {
