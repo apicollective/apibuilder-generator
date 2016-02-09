@@ -204,21 +204,7 @@ object GoType {
       case Datatype.Primitive.String => Klass("string")
       case Datatype.Primitive.Unit => Klass("nil")
       case Datatype.Primitive.Uuid => Klass("string")
-      case u: Datatype.UserDefined => {
-        val i = u.name.lastIndexOf(".")
-        (i > 0) match {
-          case true => {
-            Klass(importBuilder.publicName(u.name))
-            // val ns = u.name.substring(0, i)
-            // val name = u.name.substring(i+1)
-            // val alias = importBuilder.ensureImport(ns)
-            // Klass.Import(ns, alias, GoUtil.publicName(name))
-          }
-          case false => {
-            Klass(GoUtil.publicName(u.name))
-          }
-        }
-      }
+      case u: Datatype.UserDefined => Klass(importBuilder.publicName(u.name))
       case Datatype.Container.Option(inner) => klass(importBuilder, inner)
       case Datatype.Container.Map(inner) => Klass("map[string]" + klass(importBuilder, inner).localName)
       case Datatype.Container.List(inner) => Klass("[]" + klass(importBuilder, inner).localName)
