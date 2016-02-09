@@ -1,6 +1,7 @@
 package go.models
 
 import com.bryzek.apidoc.spec.v0.models.Resource
+import lib.generator.GeneratorUtil
 import lib.Text._
 
 object GoUtil {
@@ -28,7 +29,7 @@ object GoUtil {
   def textToComment(text: Option[String]): String = {
     text match {
       case None => ""
-      case Some(v) => textToComment(Seq(v))
+      case Some(v) => textToComment(GeneratorUtil.splitIntoLines(v))
     }
   }
 
