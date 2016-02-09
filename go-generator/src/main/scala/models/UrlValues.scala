@@ -17,19 +17,27 @@ case class UrlValues(
           Seq(
 	    "urlValues := url.Values{}",
             params.map { p =>
-              val paramGoType = GoType(importBuilder, datatype(p.`type`, p.required))
+              val goType = GoType(importBuilder, datatype(p.`type`, p.required))
               val varName = s"${prefix}." + GoUtil.publicName(p.name)
 
-              val declaration = p.default match {
+              p.default match {
                 case None => {
-                  build(varName, paramGoType)
+                  Seq(
+                    "if " + goType.notNil(varName) + " {",
+                    build(p.name, varName, goType).indent(1),
+                    "}"
+                  ).mkString("\n")
                 }
                 case Some(default) => {
-                  build(varName, paramGoType)
+                  Seq(
+                    "if " + goType.notNil(varName) + " {",
+                    build(p.name, varName, goType).indent(1),
+                    "} else {",
+                    ("urlValues.Add(" + GoUtil.wrapInQuotes(p.name) + s", " + goType.toString(default) + ")").indent(1),
+                    "}"
+                  ).mkString("\n")
                 }
               }
-
-              "urlValues.Add(" + GoUtil.wrapInQuotes(p.name) + s", " + declaration + ")"
             }.mkString("\n")
           ).mkString("\n")
         )
@@ -38,11 +46,21 @@ case class UrlValues(
   }
 
   private[this] def build(
+    keyName: String,
+    varName: String,
+    goType: GoType
+  ): String = {
+    "urlValues.Add(" + GoUtil.wrapInQuotes(keyName) + s", " + buildValue(varName, goType) + ")"
+  }
+
+  private[this] def buildValue(
     varName: String,
     goType: GoType
   ): String = {
     goType.datatype match {
-      case v: Datatype.Primitive => goType.toString(varName)
+      case v: Datatype.Primitive => {
+        goType.toString(varName)
+      }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
         sys.error("Cannot serialize model or union to parameter")
       }
@@ -50,10 +68,10 @@ case class UrlValues(
         goType.toString(varName)
       }
       case Datatype.Container.Option(inner) => {
-        build(varName, GoType(importBuilder, inner))
+        buildValue(varName, GoType(importBuilder, inner))
       }
       case Datatype.Container.List(inner) => {
-        build(varName, GoType(importBuilder, inner))
+        buildValue(varName, GoType(importBuilder, inner))
       }
     }
   }
