@@ -109,9 +109,9 @@ case class Code(form: InvocationForm) {
             case true => None
             case fasle => Some(f.name)
           },
-          !(f.required && f.default.isEmpty) match {
-            case true => Some("omitempty")
-            case false => None
+          f.required match {
+            case true => None
+            case false => Some("omitempty")
           }
         ).flatten match {
           case Nil => None
@@ -436,6 +436,7 @@ case class Code(form: InvocationForm) {
     val bytes = importBuilder.ensureImport("bytes")
 
     Seq(
+      bodyDefaults.map { code => s"\n$code\n" },
       Some(s"bodyDocument, err := ${json}.Marshal($varName)"),
       Some(
         Seq(
@@ -444,7 +445,6 @@ case class Code(form: InvocationForm) {
           "}"
         ).mkString("\n")
       ),
-      bodyDefaults.map { code => s"\n$code\n" },
       Some(s"""body := ClientRequestBody{contentType: "application/json", bytes: ${bytes}.NewReader(bodyDocument)}""")
     ).flatten.mkString("\n")
   }
