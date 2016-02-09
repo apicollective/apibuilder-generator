@@ -52,7 +52,7 @@ case class Code(form: InvocationForm) {
             Some(s"package ${GoUtil.packageName(service.name)}"),
             Some(ApidocComments(service.version: String, form.userAgent).comments.trim),
             Some(importBuilder.generate()),
-            Some(headers.code),
+            Some(headers.generate()),
             client,
             clientBody,
             Some(code),
@@ -233,23 +233,19 @@ case class Code(form: InvocationForm) {
                       dt match {
 
                         case Datatype.Primitive.Boolean => {
-                          val strconv = importBuilder.ensureImport("strconv")
-                          s"""return $unionName{$typeName: ${strconv}.ParseBool(el["value"].(string))}"""
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseBool(el["value"].(string))}"""
                         }
 
                         case Datatype.Primitive.Double => {
-                          val strconv = importBuilder.ensureImport("strconv")
-                          s"""return $unionName{$typeName: ${strconv}.ParseFloat(el["value"].(string), 64)}"""
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseFloat(el["value"].(string), 64)}"""
                         }
 
                         case Datatype.Primitive.Integer => {
-                          val strconv = importBuilder.ensureImport("strconv")
-                          s"""return $unionName{$typeName: ${strconv}.ParseInt(el["value"].(string), 10, 32)}"""
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseInt(el["value"].(string), 10, 32)}"""
                         }
 
                         case Datatype.Primitive.Long => {
-                          val strconv = importBuilder.ensureImport("strconv")
-                          s"""return $unionName{$typeName: ${strconv}.ParseInt(el["value"].(string), 10, 64)}"""
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseInt(el["value"].(string), 10, 64)}"""
                         }
 
                         case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
@@ -291,6 +287,10 @@ case class Code(form: InvocationForm) {
     datatypeResolver.parse(typeName, required).getOrElse {
       sys.error(s"Unknown datatype[$typeName]")
     }
+  }
+
+  private[this] def imp(name: String): String = {
+    importBuilder.ensureImport(name)
   }
 
   private[this] case class MethodArgumentsType(
@@ -649,7 +649,9 @@ type ClientRequestBody struct {
               Some(
                 Seq(
                   "request.Header = map[string][]string{",
-                  AllHeaders,
+                  headers.all.map {
+                    case (name, value) => s""""$name": {$value},""".indent(1)
+                  }.mkString("\n").table(),
                   "}"
                 ).mkString("\n")
               ),
@@ -682,10 +684,7 @@ type ClientRequestBody struct {
         )
       }
     }
-  }
 
-  private[this] val AllHeaders = headers.all.map {
-    case (name, value) => s""""$name": {$value},""".indent(1)
-  }.mkString("\n").table()
+  }
 
 }

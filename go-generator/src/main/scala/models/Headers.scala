@@ -22,7 +22,7 @@ case class Headers(
     versionMajor.map { major => (VersionMajorName, major.toString) }
   ).flatten
 
-  val code: String = {
+  def generate(): String = {
     constants.map { pair =>
       val name = GoUtil.publicName(pair._1)
       if (pair._1 == VersionMajorName) {
@@ -33,12 +33,11 @@ case class Headers(
     }.mkString("\n")
   }
 
-  val all = Seq(
+  def all() = Seq(
     Some("User-Agent" -> s"UserAgent"),
     Some("X-Apidoc-Version" -> s"Version"),
     versionMajor.map { _ =>
-      val strconv = importBuilder.ensureImport("strconv")
-      VersionMajorHeaderName -> s"${strconv}.Itoa($VersionMajorName)"
+      VersionMajorHeaderName -> s"${importBuilder.ensureImport("strconv")}.Itoa($VersionMajorName)"
     }
   ).flatten ++ form.service.headers.filter(!_.default.isEmpty).map { h =>
     (h.name -> GoUtil.wrapInQuotes(h.default.get))

@@ -131,20 +131,16 @@ case class GoType(
   private[this] def toString(varName: String, dt: Datatype): String = {
     dt match {
       case Datatype.Primitive.Boolean => {
-        val strconv = importBuilder.ensureImport("strconv")
-        s"${strconv}.FormatBool($varName)"
+        s"${importBuilder.ensureImport("strconv")}.FormatBool($varName)"
       }
       case Datatype.Primitive.Double => {
-        val strconv = importBuilder.ensureImport("strconv")
-        s"${strconv}.FormatFloat($varName, 'E', -1, 64)"
+        s"${importBuilder.ensureImport("strconv")}.FormatFloat($varName, 'E', -1, 64)"
       }
       case Datatype.Primitive.Integer => {
-        val strconv = importBuilder.ensureImport("strconv")
-        s"${strconv}.FormatInt($varName, 10)"
+        s"${importBuilder.ensureImport("strconv")}.FormatInt($varName, 10)"
       }
       case Datatype.Primitive.Long => {
-        val strconv = importBuilder.ensureImport("strconv")
-        s"${strconv}.FormatInt($varName, 10)"
+        s"${importBuilder.ensureImport("strconv")}.FormatInt($varName, 10)"
       }
       case Datatype.Primitive.DateIso8601 => varName     // TODO
       case Datatype.Primitive.DateTimeIso8601 => varName // TODO
