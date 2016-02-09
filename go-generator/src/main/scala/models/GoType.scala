@@ -66,7 +66,7 @@ case class GoType(
         throw new UnsupportedOperationException(s"default for type $datatype")
       }
       case Datatype.UserDefined.Enum(name) => {
-        throw new UnsupportedOperationException(s"default for enum $name")
+        "nil"
       }
       case Datatype.Container.Option(inner) => {
         declaration(json, inner)
@@ -190,10 +190,10 @@ case class GoType(
       case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
         s"0 $operator $varName"
       }
-      case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.UserDefined.Enum(_) => {
+      case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
         s""""" $operator $varName"""
       }
-      case Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
+      case Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         s"""nil $operator $varName"""
       }
       case Datatype.Primitive.Boolean => {

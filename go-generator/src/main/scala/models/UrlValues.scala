@@ -31,7 +31,7 @@ case class UrlValues(
     val varName = s"${prefix}." + GoUtil.publicName(param.name)
 
     goType.datatype match {
-      case t: Datatype.Primitive => {
+      case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) => {
         param.default match {
           case None => {
             Seq(
@@ -67,9 +67,6 @@ case class UrlValues(
       }
       case Datatype.Container.Option(inner) => {
         buildParam(prefix, param, inner)
-      }
-      case Datatype.UserDefined.Enum(name) => {
-        sys.error("Enums not yet supported")
       }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
         sys.error(s"Parameter $param cannot be converted to query string")
