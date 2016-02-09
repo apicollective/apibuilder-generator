@@ -84,7 +84,7 @@ case class Code(form: InvocationForm) {
           } ++ Seq(
             s"""${enumName}UNDEFINED = "UNDEFINED""""
           )
-        ).mkString("\n").indent(1),
+        ).mkString("\n").table().indent(1),
         ")"
       ).mkString("\n"),
 
@@ -100,7 +100,7 @@ case class Code(form: InvocationForm) {
             } ++ Seq("default:\n" + s"return ${enumName}UNDEFINED".indent(1))
           ).mkString("\n"),
           "}"
-        ).mkString("\n").indent(1),
+        ).mkString("\n").table().indent(1),
         "}"
       ).mkString("\n")
 
