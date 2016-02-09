@@ -213,7 +213,8 @@ case class Code(form: InvocationForm) {
 
       var responseTypes = mutable.ListBuffer[ResponseType]()
 
-      val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
+      //val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
+      val queryString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Query))
       val formString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Form)).map { c =>
         val strings = importBuilder.ensureImport("strings")
         Seq(
@@ -225,12 +226,12 @@ case class Code(form: InvocationForm) {
       val queryToUrl = queryString match {
         case None => None
         case Some(_) => {
-          val strings = importBuilder.ensureImport("strings")
 	  Some(
             Seq(
               "",
-              "if len(query) > 0 {",
-              s"""requestUrl += ${fmt}.Sprintf("?%s", ${strings}.Join(query, "&"))""".indent(1),
+              "encodedValues := urlValues.Encode()",
+              """if encodedValues != "" {""",
+              s"""requestUrl += "?" + encodedValues""".indent(1),
               "}"
             ).mkString("\n")
           )
