@@ -17,6 +17,7 @@ case class Code(form: InvocationForm) {
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
   private[this] val headers = Headers(form)
   private[this] val importBuilder = ImportBuilder()
+  private[this] val urlValues = UrlValues(importBuilder, datatypeResolver)
 
   private[this] val hasClientBody: Boolean = {
     service.resources.map(_.operations).flatten.find { op =>
@@ -213,7 +214,14 @@ case class Code(form: InvocationForm) {
       var responseTypes = mutable.ListBuffer[ResponseType]()
 
       val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
-      val formString: Option[String] = buildFormString(op.parameters.filter(_.location == ParameterLocation.Form))
+      val formString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Form)).map { c =>
+        val strings = importBuilder.ensureImport("strings")
+        Seq(
+          c,
+         s"""body := ClientRequestBody{contentType: "application/x-www-form-urlencoded", bytes: ${strings}.NewReader(urlValues.Encode())}"""
+        ).mkString("\n")
+      }
+
       val queryToUrl = queryString match {
         case None => None
         case Some(_) => {
@@ -398,19 +406,26 @@ case class Code(form: InvocationForm) {
             None
           }
           case Some(m) => {
-            Some(
-              m.fields.filter(!_.default.isEmpty).map { field =>
-                val fieldGoType = GoType(importBuilder, datatype(field.`type`, field.required))
-                val fieldName = GoUtil.publicName(field.name)
-                val fullName = s"${varName}.$fieldName"
+            m.fields.filter(!_.default.isEmpty).toList match {
+              case Nil => {
+                None
+              }
+              case fields => {
+                Some(
+                  fields.map { field =>
+                    val fieldGoType = GoType(importBuilder, datatype(field.`type`, field.required))
+                    val fieldName = GoUtil.publicName(field.name)
+                    val fullName = s"${varName}.$fieldName"
 
-                Seq(
-                  "if " + fieldGoType.nil(fullName) + " {",
-                  s"$fullName = ${fieldGoType.declaration(field.default.get)}".indent(1),
-                  "}"
-                ).mkString("\n")
-              }.mkString("\n\n")
-            )
+                    Seq(
+                      "if " + fieldGoType.nil(fullName) + " {",
+                      s"$fullName = ${fieldGoType.declaration(field.default.get)}".indent(1),
+                      "}"
+                    ).mkString("\n")
+                  }.mkString("\n\n").trim
+                )
+              }
+            }
           }
         }
       }
@@ -442,36 +457,6 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  private[this] def buildFormString(params: Seq[Parameter]): Option[String] = {
-    params match {
-      case Nil => None
-      case _ => {
-        val strings = importBuilder.ensureImport("strings")
-        Some(
-          Seq(
-	    "urlValues := url.Values{}",
-            params.map { p =>
-              val paramDatatype = datatype(p.`type`, p.required)
-              val varName = GoUtil.publicName(p.name)
-
-              val valueCode = paramDatatype match {
-                case Datatype.Container.List(inner) => {
-                  s"params.$varName"
-                }
-                case _ => {
-                  s"{params.$varName}"
-                }
-              }
-
-              "urlValues[" + GoUtil.wrapInQuotes(p.name) + s"] = " + valueCode
-            }.mkString("\n"),
-	    s"""body := ClientRequestBody{contentType: "application/x-www-form-urlencoded", bytes: ${strings}.NewReader(urlValues.Encode())}"""
-          ).mkString("\n")
-        )
-      }
-    }
-  }
-  
   private[this] def buildQueryString(param: Parameter, datatype: Datatype): String = {
     val fieldName = "params." + GoUtil.publicName(param.name)
     val goType = GoType(importBuilder, datatype)
