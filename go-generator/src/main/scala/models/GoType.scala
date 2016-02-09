@@ -57,8 +57,7 @@ case class GoType(
         GoUtil.wrapInQuotes(json.as[JsString].value)
       }
       case Datatype.Primitive.Object => {
-        // TODO: "interface{}"
-        throw new UnsupportedOperationException(s"default for object")
+        "nil"
       }
       case Datatype.Primitive.Unit => {
         "nil"
@@ -196,6 +195,9 @@ case class GoType(
       }
       case Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         s"""nil $operator $varName"""
+      }
+      case Datatype.Primitive.Boolean => {
+        s"""bool $operator $varName"""
       }
       case Datatype.Container.Option(inner) => {
         compareToImplicitValue(varName, inner, operator)
