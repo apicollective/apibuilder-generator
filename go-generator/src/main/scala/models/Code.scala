@@ -18,6 +18,7 @@ case class Code(form: InvocationForm) {
   private[this] val importBuilder = ImportBuilder()
   private[this] val headers = Headers(importBuilder, form)
   private[this] val urlValues = UrlValues(importBuilder, datatypeResolver)
+  private[this] val responseBuilder = ResponseBuilder(importBuilder, datatypeResolver)
 
   private[this] val hasClientBody: Boolean = {
     service.resources.map(_.operations).flatten.find { op =>
@@ -51,7 +52,7 @@ case class Code(form: InvocationForm) {
             Some(s"package ${GoUtil.packageName(service.name)}"),
             Some(ApidocComments(service.version: String, form.userAgent).comments.trim),
             Some(importBuilder.generate()),
-            Some(headers.code),
+            Some(headers.generate()),
             client,
             clientBody,
             Some(code),
@@ -64,7 +65,7 @@ case class Code(form: InvocationForm) {
 
   private[this] def generateEnum(enum: Enum): String = {
     val strings = importBuilder.ensureImport("strings")
-    val enumName = GoUtil.publicName(enum.name)
+    val enumName = importBuilder.publicName(enum.name)
 
     Seq(
       GoUtil.textToComment(enum.description) + s"type $enumName string",
@@ -77,7 +78,7 @@ case class Code(form: InvocationForm) {
               case "" => ""
               case text => s" $text"
             }
-            val name = enumName + GoUtil.publicName(value.name)
+            val name = enumName + importBuilder.publicName(value.name)
             val quotedValue = GoUtil.wrapInQuotes(value.name)
 
             i match {
@@ -97,7 +98,7 @@ case class Code(form: InvocationForm) {
           s"switch ${strings}.TrimSpace(${strings}.ToLower(value)) {",
           (
             enum.values.map { value =>
-              val name = enumName + GoUtil.publicName(value.name)
+              val name = enumName + importBuilder.publicName(value.name)
               val key = GoUtil.wrapInQuotes(value.name.trim.toLowerCase)
               s"case $key:\n" + s"return $name".indent(1)
             } ++ Seq("default:\n" + s"return ${enumName}UNDEFINED".indent(1))
@@ -111,10 +112,16 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def generateModel(model: Model): String = {
+    val io = importBuilder.ensureImport("io")
+    val json = importBuilder.ensureImport("encoding/json")
+    val bytes = importBuilder.ensureImport("bytes")
+    val publicName = importBuilder.publicName(model.name)
+    val privateName = GoUtil.privateName(model.name)
+
     Seq(
-      GoUtil.textToComment(model.description) + s"type ${GoUtil.publicName(model.name)} struct {",
+      GoUtil.textToComment(model.description) + s"type $publicName struct {",
       model.fields.map { f =>
-        val publicName = GoUtil.publicName(f.name)
+        val publicName = importBuilder.publicName(f.name)
 
         val json = Seq(
           (publicName == f.name) match {
@@ -136,24 +143,154 @@ case class Code(form: InvocationForm) {
           json
         ).flatten.mkString(" ")
       }.mkString("\n").table().indent(1),
-      "}\n"
+      "}",
+
+      "",
+      Seq(
+        s"func ${publicName}FromMap(data interface{}) $publicName {",
+	Seq(
+          "b, err := json.Marshal(data)",
+	  "if err == nil {",
+          s"return ${publicName}FromJson(${bytes}.NewReader(b))".indent(1),
+          "} else {",
+          "panic(err)".indent(1),
+          "}"
+        ).mkString("\n").indent(1),
+        "}"
+      ).mkString("\n"),
+
+      "",
+      Seq(
+        s"func ${publicName}FromJson(bytes ${io}.Reader) $publicName {",
+        Seq(
+          s"var $privateName $publicName",
+          s"${json}.NewDecoder(bytes).Decode(&$privateName)",
+          s"return $privateName"
+        ).mkString("\n").indent(1),
+        "}"
+      ).mkString("\n")
+
     ).mkString("\n")
   }
 
   private[this] def generateUnion(union: Union): String = {
+    // TODO: Make sure there is no other union type is named 'Undefined'
+    // TODO: Handle case w/out discriminator
+
+    val io = importBuilder.ensureImport("io")
+    val json = importBuilder.ensureImport("encoding/json")
+    val bytes = importBuilder.ensureImport("bytes")
+    val unionName = importBuilder.publicName(union.name)
+
     Seq(
-      GoUtil.textToComment(union.description) + s"type ${GoUtil.publicName(union.name)} struct {",
-      union.types.map { typ =>
-        GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
-      }.mkString("\n").table().indent(1),
-      "}\n"
-    ).mkString("\n")
+
+      Seq(
+        GoUtil.textToComment(union.description) + s"type $unionName struct {",
+        (
+          union.types.map { typ =>
+            importBuilder.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
+          } ++ Seq(
+            s"Undefined string"
+          )
+        ).mkString("\n").table().indent(1),
+        "}"
+      ).mkString("\n"),
+
+      Seq(
+        s"func ${unionName}FromMap(data interface{}) $unionName {",
+	Seq(
+          "b, err := json.Marshal(data)",
+	  "if err == nil {",
+          s"return ${unionName}FromJson(${bytes}.NewReader(b))".indent(1),
+          "} else {",
+          "panic(err)".indent(1),
+          "}"
+        ).mkString("\n").indent(1),
+        "}"
+      ).mkString("\n"),
+
+      Seq(
+        s"func ${unionName}FromJson(bytes ${io}.Reader) $unionName {",
+
+        union.discriminator match {
+          case None => {
+            "// TODO: Not yet supported"
+          }
+          case Some(discriminator) => {
+            Seq(
+	      s"var el map[string]interface{}",
+	      s"${json}.NewDecoder(bytes).Decode(&el)",
+              s"""switch el["$discriminator"] {""",
+
+              (
+                union.types.map { t =>
+                  val typeName = importBuilder.publicName(t.`type`)
+                  val dt = datatype(t.`type`, true)
+
+                  Seq(
+                    "case " + GoUtil.wrapInQuotes(t.`type`) + ":",
+                    (
+                      dt match {
+
+                        case Datatype.Primitive.Boolean => {
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseBool(el["value"].(string))}"""
+                        }
+
+                        case Datatype.Primitive.Double => {
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseFloat(el["value"].(string), 64)}"""
+                        }
+
+                        case Datatype.Primitive.Integer => {
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseInt(el["value"].(string), 10, 32)}"""
+                        }
+
+                        case Datatype.Primitive.Long => {
+                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseInt(el["value"].(string), 10, 64)}"""
+                        }
+
+                        case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
+                          s"""return $unionName{$typeName: el["value"].(string)}"""
+                        }
+
+                        case Datatype.UserDefined.Enum(name) => {
+                          val enumName = importBuilder.publicName(name)
+                          s"""return $unionName{$typeName: ${enumName}FromString(el["value"].(string))}"""
+                        }
+
+                        case _ => {
+                          responseBuilder.generate("el", dt, ResponseBuilder.FromMap) match {
+                            case None => "return nil"
+                            case Some(resp) => s"return $unionName{$typeName: $resp}"
+                          }
+                        }
+                      }
+                    ).indent(1)
+
+                  ).mkString("\n")
+                } ++ Seq(
+                  "default:\n" + s"""return $unionName{Undefined: el["$discriminator"].(string)}""".indent(1)
+                )
+              ).mkString("\n"),
+
+              "}"
+            ).mkString("\n").indent(1)
+          }
+        },
+
+        "}"
+      ).mkString("\n")
+
+    ).mkString("\n\n")
   }
 
   private[this] def datatype(typeName: String, required: Boolean): Datatype = {
     datatypeResolver.parse(typeName, required).getOrElse {
       sys.error(s"Unknown datatype[$typeName]")
     }
+  }
+
+  private[this] def imp(name: String): String = {
+    importBuilder.ensureImport(name)
   }
 
   private[this] case class MethodArgumentsType(
@@ -170,14 +307,14 @@ case class Code(form: InvocationForm) {
   private[this] def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
       val functionName = Seq(
-        GoUtil.publicName(resource.plural),
-        GoUtil.publicName(
+        importBuilder.publicName(resource.plural),
+        importBuilder.publicName(
           GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, op.path)
         )
       ).mkString("")
 
       val resultsType = MethodResponsesType(
-        name = GoUtil.publicName(s"${functionName}Response")
+        name = importBuilder.publicName(s"${functionName}Response")
       )
 
       var methodParameters = mutable.ListBuffer[String]()
@@ -212,7 +349,7 @@ case class Code(form: InvocationForm) {
         }
         case params => {
           val argsType = MethodArgumentsType(
-            name = GoUtil.publicName(s"${functionName}Params"),
+            name = importBuilder.publicName(s"${functionName}Params"),
             params = params
           )
           methodParameters += s"params ${argsType.name}"
@@ -254,7 +391,7 @@ case class Code(form: InvocationForm) {
           s"type ${typ.name} struct {",
           typ.params.map { param =>
             val goType = GoType(importBuilder, datatype(param.`type`, true))
-            GoUtil.publicName(param.name) + " " + goType.klass.localName
+            importBuilder.publicName(param.name) + " " + goType.klass.localName
           }.mkString("\n").table().indent(1),
           "}",
           ""
@@ -273,29 +410,19 @@ case class Code(form: InvocationForm) {
                 value >= 200 && value < 500 match {
                   case true => {
                     val goType = GoType(importBuilder, datatype(resp.`type`, true))
-                    val varName = GoUtil.publicName(goType.classVariableName())
+                    val varName = importBuilder.publicName(goType.classVariableName())
                     val responseType = ResponseType(goType, varName)
                     responseTypes += responseType
 
-                    val responseExpr = goType.isUnit() match {
-                      case true => {
-                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}"
-                      }
-                      case false => {
-                        val tmpVarName = GoUtil.privateName(goType.classVariableName())
-                        val json = importBuilder.ensureImport("encoding/json")
-                        Seq(
-                          s"var $tmpVarName ${goType.klass.localName}",
-                          s"${json}.NewDecoder(resp.Body).Decode(&$tmpVarName)",
-		          s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, $varName: $tmpVarName}"
-                        ).mkString("\n")
-                      }
+                    val responseCode = responseBuilder.generate("resp.Body", goType.datatype, ResponseBuilder.FromJson) match {
+                      case None => ""
+                      case Some(c) => s", ${importBuilder.publicName(goType.classVariableName())}: $c"
                     }
 
                     Some(
                       Seq(
                         s"case $value:",
-                        responseExpr.indent(1)
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp$responseCode}".indent(1)
                       ).mkString("\n")
                     )
                   }
@@ -422,7 +549,7 @@ case class Code(form: InvocationForm) {
                 Some(
                   fields.map { field =>
                     val fieldGoType = GoType(importBuilder, datatype(field.`type`, field.required))
-                    val fieldName = GoUtil.publicName(field.name)
+                    val fieldName = importBuilder.publicName(field.name)
                     val fullName = s"${varName}.$fieldName"
 
                     Seq(
@@ -522,7 +649,9 @@ type ClientRequestBody struct {
               Some(
                 Seq(
                   "request.Header = map[string][]string{",
-                  AllHeaders,
+                  headers.all.map {
+                    case (name, value) => s""""$name": {$value},""".indent(1)
+                  }.mkString("\n").table(),
                   "}"
                 ).mkString("\n")
               ),
@@ -555,10 +684,7 @@ type ClientRequestBody struct {
         )
       }
     }
-  }
 
-  private[this] val AllHeaders = headers.all.map {
-    case (name, value) => s""""$name": {$value},""".indent(1)
-  }.mkString("\n").table()
+  }
 
 }

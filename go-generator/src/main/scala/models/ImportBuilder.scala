@@ -43,6 +43,35 @@ private[models] case class ImportBuilder() {
     alias
   }
 
+  /**
+    * Returns the public name for the specified object. If this is an
+    * imported object, adds it to the import list and returns a name
+    * w/ the proper prefix from the import alias
+    */
+  def publicName(name: String): String = {
+    val i = name.lastIndexOf(".")
+    (i > 0) match {
+      case false => {
+        GoUtil.publicName(name)
+      }
+      case true => {
+        val ns = name.substring(0, i)
+        val className = name.substring(i+1)
+        val alias = ensureImport(ns)
+        alias + "." + GoUtil.publicName(className)
+      }
+    }
+  }
+
+  /**
+    * Returns the public name for the specified object. If this is an
+    * imported object, adds it to the import list and returns a name
+    * w/ the proper prefix from the import alias
+    */
+  def privateName(name: String): String = {
+    GoUtil.privateName(publicName(name))
+  }
+
   private[this] def uniqueAlias(importPath: String, name: String, index: Int = 0): String = {
     val target = index match {
       case 0 => name
