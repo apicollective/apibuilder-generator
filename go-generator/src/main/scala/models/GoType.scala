@@ -222,7 +222,7 @@ object GoType {
       case Datatype.Primitive.DateIso8601 => Klass.Root("string")
       case Datatype.Primitive.DateTimeIso8601 => Klass.Root("string")
       case Datatype.Primitive.Decimal => Klass.Root("string")
-      case Datatype.Primitive.Object => Klass.Root("interface{}")
+      case Datatype.Primitive.Object => Klass.Root("map[string]interface{}")
       case Datatype.Primitive.String => Klass.Root("string")
       case Datatype.Primitive.Unit => Klass.Root("nil")
       case Datatype.Primitive.Uuid => Klass.Root("string")

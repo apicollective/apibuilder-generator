@@ -8,62 +8,65 @@ case class ResponseBuilder(
   datatypeResolver: DatatypeResolver
 ) {
 
-  def generate(resultsClassName: String, goType: GoType): String = {
-    generate(resultsClassName, goType, goType.datatype)
-  }
-
-  private[this] def generate(resultsClassName: String, goType: GoType, datatype: Datatype): String = {
-    val classVariableName = GoUtil.publicName(goType.classVariableName())
-    val base = s"return $resultsClassName{StatusCode: resp.StatusCode, Response: resp%s}"
-    val body = "resp.body"
+  def generate(readerName: String, datatype: Datatype): Option[String] = {
+    val goType = GoType(importBuilder, datatype)
 
     datatype match {
       case Datatype.Primitive.Unit => {
-        base.format("")
+        None
       }
-      case Datatype.Primitive.Boolean | Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
-        base.format(s", $classVariableName: $body")
-      }
-      case Datatype.Primitive.Object => {
-        val tmpVarName = GoUtil.privateName(classVariableName)
-        val json = importBuilder.ensureImport("encoding/json")
-        Seq(
-          s"var $tmpVarName map[string]${goType.klass.localName}",
-          s"${json}.NewDecoder(resp.Body).Decode(&$tmpVarName)",
-          base.format(s", $classVariableName: $tmpVarName")
-        ).mkString("\n")
-      }
-      case Datatype.UserDefined.Model(_) | Datatype.Container.Map(_) | Datatype.Container.List(_)=> {
-        val tmpVarName = GoUtil.privateName(classVariableName)
-        val json = importBuilder.ensureImport("encoding/json")
-        Seq(
-          s"var $tmpVarName ${goType.klass.localName}",
-          s"${json}.NewDecoder(resp.Body).Decode(&$tmpVarName)",
-          base.format(s", $classVariableName: $tmpVarName")
-        ).mkString("\n")
-      }
-      case Datatype.UserDefined.Union(name) => {
-        s"TODO UNION $name"
-      }
-      case Datatype.UserDefined.Enum(name) => {
-        val method = GoUtil.publicName(name) + "FromString"
-        base.format(s", $classVariableName: $name($body)")
-      }
-      case Datatype.Container.Option(inner) => {
-        generate(resultsClassName, goType, inner)
-      }
-    }
 
-    /*
-        val tmpVarName = GoUtil.privateName(goType.classVariableName())
+      case Datatype.Primitive.Object => {
         val json = importBuilder.ensureImport("encoding/json")
-        Seq(
-          s"var $tmpVarName ${goType.klass.localName}",
-          s"${json}.NewDecoder(resp.Body).Decode(&$tmpVarName)",
-	  s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, $body: $tmpVarName}"
-        ).mkString("\n")
+        Some(
+          Seq(
+            s"var tmp ${goType.klass.localName}",
+            s"${json}.NewDecoder($readerName).Decode(&tmp)",
+            "tmp"
+          ).mkString("\n")
+        )
       }
-     */
+
+      case t: Datatype.Primitive => {
+        // TODO: need to handle each type here
+        Some(readerName)
+      }
+
+      case Datatype.Container.List(inner) => {
+        val json = importBuilder.ensureImport("encoding/json")
+        Some(
+          Seq(
+            s"var tmp ${goType.klass.localName}",
+            s"${json}.NewDecoder($readerName).Decode(&tmp)",
+            s"var all ${goType.klass.localName}",
+            s"for _, el := range tmp {",
+            s"append(all, ${generate(readerName, inner)})".indent(1),
+            "}"
+          ).mkString("\n")
+        )
+      }
+
+      case Datatype.Container.Map(inner) => {
+        None
+      }
+
+      case Datatype.UserDefined.Model(name) => {
+        Some(s"${GoUtil.publicName(name)}FromJson($readerName)")
+      }
+
+      case Datatype.UserDefined.Union(name) => {
+        Some(s"${GoUtil.publicName(name)}FromJson($readerName)")
+      }
+
+      case Datatype.UserDefined.Enum(name) => {
+        Some(s"${GoUtil.publicName(name)}FromString($readerName)")
+      }
+
+      case Datatype.Container.Option(inner) => {
+        generate(readerName, inner)
+      }
+
+    }
   }
 
 }

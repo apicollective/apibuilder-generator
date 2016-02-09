@@ -112,8 +112,13 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def generateModel(model: Model): String = {
+    val io = importBuilder.ensureImport("io")
+    val json = importBuilder.ensureImport("encoding/json")
+    val publicName = GoUtil.publicName(model.name)
+    val privateName = GoUtil.privateName(model.name)
+
     Seq(
-      GoUtil.textToComment(model.description) + s"type ${GoUtil.publicName(model.name)} struct {",
+      GoUtil.textToComment(model.description) + s"type $publicName struct {",
       model.fields.map { f =>
         val publicName = GoUtil.publicName(f.name)
 
@@ -137,24 +142,72 @@ case class Code(form: InvocationForm) {
           json
         ).flatten.mkString(" ")
       }.mkString("\n").table().indent(1),
-      "}\n"
+      "}",
+
+      "",
+      Seq(
+        s"func ${publicName}FromJson(bytes ${io}.Reader) $publicName {",
+        Seq(
+          s"var $privateName $publicName",
+          s"${json}.NewDecoder(bytes).Decode(&$privateName)",
+          s"return $privateName"
+        ).mkString("\n").indent(1),
+        "}"
+      ).mkString("\n")
+
     ).mkString("\n")
   }
 
   private[this] def generateUnion(union: Union): String = {
     // TODO: Make sure there is no other union type is named 'Undefined'
+    val io = importBuilder.ensureImport("io")
+    val json = importBuilder.ensureImport("encoding/json")
     val unionName = GoUtil.publicName(union.name)
     Seq(
-      GoUtil.textToComment(union.description) + s"type $unionName struct {",
-      (
-        union.types.map { typ =>
-          GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
-        } ++ Seq(
-          s"Undefined string"
-        )
-      ).mkString("\n").table().indent(1),
-      "}\n"
-    ).mkString("\n")
+
+      Seq(
+        GoUtil.textToComment(union.description) + s"type $unionName struct {",
+        (
+          union.types.map { typ =>
+            GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
+          } ++ Seq(
+            s"Undefined string"
+          )
+        ).mkString("\n").table().indent(1),
+        "}"
+      ).mkString("\n"),
+
+      // TODO: Handle case w/out discriminator
+      Seq(
+        s"func ${unionName}FromJson(bytes ${io}.Reader) $unionName {",
+
+        union.discriminator match {
+          case None => {
+            "// TODO: Not yet supported"
+          }
+          case Some(discriminator) => {
+            Seq(
+	      s"var el map[string]interface{}",
+	      s"${json}.NewDecoder(bytes).Decode(&el)",
+              s"""switch el["$discriminator"] {""",
+
+              union.types.map { t =>
+                val dt = datatype(t.`type`, true)
+                Seq(
+                  "case " + GoUtil.wrapInQuotes(t.`type`) + ":",
+                  ("return " + responseBuilder.generate("bytes", dt).getOrElse("nil")).indent(1)
+                ).mkString("\n")
+              }.mkString("\n"),
+
+              "}"
+            ).mkString("\n").indent(1)
+          }
+        },
+
+        "}"
+      ).mkString("\n")
+
+    ).mkString("\n\n")
   }
 
   private[this] def datatype(typeName: String, required: Boolean): Datatype = {
@@ -284,10 +337,15 @@ case class Code(form: InvocationForm) {
                     val responseType = ResponseType(goType, varName)
                     responseTypes += responseType
 
+                    val responseCode = responseBuilder.generate("resp.body", goType.datatype) match {
+                      case None => ""
+                      case Some(c) => s", ${GoUtil.publicName(goType.classVariableName())}: $c"
+                    }
+
                     Some(
                       Seq(
                         s"case $value:",
-                        responseBuilder.generate(resultsType.name, goType).indent(1)
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp$responseCode}".indent(1)
                       ).mkString("\n")
                     )
                   }
