@@ -213,7 +213,6 @@ case class Code(form: InvocationForm) {
 
       var responseTypes = mutable.ListBuffer[ResponseType]()
 
-      //val queryString = buildQueryString(op.parameters.filter(_.location == ParameterLocation.Query))
       val queryString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Query))
       val formString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Form)).map { c =>
         val strings = importBuilder.ensureImport("strings")
@@ -447,93 +446,6 @@ case class Code(form: InvocationForm) {
       ),
       Some(s"""body := ClientRequestBody{contentType: "application/json", bytes: ${bytes}.NewReader(bodyDocument)}""")
     ).flatten.mkString("\n")
-  }
-
-  private[this] def buildQueryString(params: Seq[Parameter]): Option[String] = {
-    params match {
-      case Nil => None
-      case _ => Some(
-        "\nquery := []string{}\n\n" + params.map { p => buildQueryString(p, datatype(p.`type`, true))}.mkString("\n\n")
-      )
-    }
-  }
-
-  private[this] def buildQueryString(param: Parameter, datatype: Datatype): String = {
-    val fieldName = "params." + GoUtil.publicName(param.name)
-    val goType = GoType(importBuilder, datatype)
-
-    datatype match {
-      case t: Datatype.Primitive => {
-        param.default match {
-          case None => {
-            Seq(
-              "if " + goType.notNil(fieldName) + " {",
-              buildQueryParam(param.name, datatype, fieldName, fieldName).indent(1),
-              "}"
-            ).mkString("\n")
-          }
-          case Some(default) => {
-            Seq(
-              "if " + goType.nil(fieldName) + " {",
-              buildQueryParam(param.name, datatype, default, GoUtil.wrapInQuotes(default)).indent(1),
-              "} else {",
-              buildQueryParam(param.name, datatype, fieldName, fieldName).indent(1),
-              "}"
-            ).mkString("\n")
-
-          }
-        }
-      }
-      case Datatype.Container.List(inner) => {
-        Seq(
-          s"for _, value := range $fieldName {",
-          buildQueryParam(param.name, inner, "value", "value").indent(1),
-          "}"
-        ).mkString("\n")
-      }
-      case Datatype.Container.Option(inner) => {
-        buildQueryString(param, inner)
-      }
-      case Datatype.UserDefined.Enum(name) => {
-        buildQueryString(param, Datatype.Primitive.String)
-      }
-      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
-        sys.error(s"Parameter $param cannot be converted to query string")
-      }
-    }
-  }
-
-  private[this] def buildQueryParam(paramName: String, datatype: Datatype, value: String, quotedValue: String): String = {
-    GoType.isNumeric(datatype) match {
-      case true => addSingleParamValue(paramName, datatype, value, "%v")
-      case false => {
-        GoType.isBoolean(datatype) match {
-          case true => addSingleParamValue(paramName, datatype, value, "%b")
-          case false => addSingleParam(paramName, datatype, quotedValue)
-        }
-      }
-    }
-  }
-
-  private[this] def addSingleParam(name: String, datatype: Datatype, varName: String): String = {
-    val fmt = importBuilder.ensureImport("fmt")
-    s"""query = append(query, ${fmt}.Sprintf("$name=%s", """ + toQuery(datatype, varName) + "))"
-  }
-
-  private[this] def addSingleParamValue(name: String, datatype: Datatype, value: String, format: String): String = {
-    val fmt = importBuilder.ensureImport("fmt")
-    s"""query = append(query, ${fmt}.Sprintf("$name=$format", $value))"""
-  }
-
-  private[this] def toQuery(datatype: Datatype, varName: String): String = {
-    val expr = GoType(importBuilder, datatype).toString(varName)
-    expr == varName match {
-      case true => {
-        val url = importBuilder.ensureImport("net/url")
-        s"${url}.QueryEscape($varName)"
-      }
-      case false => expr
-    }
   }
 
   private[this] def generateClientStruct(): Option[String] = {
