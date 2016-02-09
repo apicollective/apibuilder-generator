@@ -142,11 +142,17 @@ case class Code(form: InvocationForm) {
   }
 
   private[this] def generateUnion(union: Union): String = {
+    // TODO: Make sure there is no other union type is named 'Undefined'
+    val unionName = GoUtil.publicName(union.name)
     Seq(
-      GoUtil.textToComment(union.description) + s"type ${GoUtil.publicName(union.name)} struct {",
-      union.types.map { typ =>
-        GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
-      }.mkString("\n").table().indent(1),
+      GoUtil.textToComment(union.description) + s"type $unionName struct {",
+      (
+        union.types.map { typ =>
+          GoUtil.publicName(typ.`type`) + " " + GoType(importBuilder, datatype(typ.`type`, true)).klass.localName
+        } ++ Seq(
+          s"Undefined string"
+        )
+      ).mkString("\n").table().indent(1),
       "}\n"
     ).mkString("\n")
   }
