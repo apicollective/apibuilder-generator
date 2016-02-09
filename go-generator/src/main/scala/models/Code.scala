@@ -73,13 +73,16 @@ case class Code(form: InvocationForm) {
         "const (",
         (
           enum.values.zipWithIndex.map { case (value, i) =>
-            val comments = GoUtil.textToSingleLineComment(value.description)
+            val comments = GoUtil.textToSingleLineComment(value.description).trim match {
+              case "" => ""
+              case text => s" $text"
+            }
             val name = enumName + GoUtil.publicName(value.name)
             val quotedValue = GoUtil.wrapInQuotes(value.name)
 
             i match {
-              case 0 => comments + name + s" $enumName = $quotedValue"
-              case _ => comments + name + s" = $quotedValue"
+              case 0 => name + s" $enumName = $quotedValue" + comments
+              case _ => name + s" = $quotedValue" + comments
             }
           } ++ Seq(
             s"""${enumName}UNDEFINED = "UNDEFINED""""
@@ -100,7 +103,7 @@ case class Code(form: InvocationForm) {
             } ++ Seq("default:\n" + s"return ${enumName}UNDEFINED".indent(1))
           ).mkString("\n"),
           "}"
-        ).mkString("\n").table().indent(1),
+        ).mkString("\n").indent(1),
         "}"
       ).mkString("\n")
 
