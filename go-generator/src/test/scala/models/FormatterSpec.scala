@@ -18,12 +18,12 @@ CalendarEveryday           = "Everyday"
   it("leaves comments alone") {
     """
 // This is a comment
-CalendarWeekdays Calendar = "Weekdays"
-CalendarEveryday = "Everyday"
+a b
+c   d
 """.trim.table() should be("""
 // This is a comment
-CalendarWeekdays Calendar  = "Weekdays"
-CalendarEveryday           = "Everyday"
+a b
+c d
 """.trim)
   }
 

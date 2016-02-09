@@ -8,17 +8,24 @@ object Formatter {
 
     def table(): String = {
       val table = s.split("\n").map { value =>
-        value match {
-          case LeadingWhitespace(spaces, text) => {
-            // Merge leading whitespace into a single first element -
-            // e.g. "  a" becomes a list with one element (instead of
-            // a two element list with the first element just being
-            // whitespace)
-            val values = text.split("\\s+").toList
-            Seq(s"$spaces${values(0)}") ++ values.drop(1)
+        isComment(value) match {
+          case true => {
+            Seq(value)
           }
-          case _ => {
-            value.split("\\s+").toSeq
+          case false => {
+            value match {
+              case LeadingWhitespace(spaces, text) => {
+                // Merge leading whitespace into a single first element -
+                // e.g. "  a" becomes a list with one element (instead of
+                // a two element list with the first element just being
+                // whitespace)
+                val values = text.split("\\s+").toList
+                Seq(s"$spaces${values(0)}") ++ values.drop(1)
+              }
+              case _ => {
+                value.split("\\s+").toSeq
+              }
+            }
           }
         }
       }
@@ -36,6 +43,10 @@ object Formatter {
       }.mkString("\n")
     }
 
+    private[this] def isComment(value: String): Boolean = {
+      value.trim.startsWith("//")
+    }
+
     private[this] def formatTable(table: Seq[Seq[String]]): String = {
       table match {
         case Nil => {
@@ -44,7 +55,12 @@ object Formatter {
         case _ =>
           val numberColumns: Int = table.map { _.size }.max
           val sizes: Seq[Seq[Int]] = table.map { columns =>
-            columns.map { _.length }
+            columns.map { value =>
+              isComment(value) match {
+                case true => 0
+                case false => value.length
+              }
+            }
           }
           val maxSizes: Seq[Int] = 0.to(numberColumns).map { case i =>
             sizes.map { _.lift(i).getOrElse(0) }.max
