@@ -58,9 +58,7 @@ private[models] case class ImportBuilder() {
         val ns = name.substring(0, i)
         val className = name.substring(i+1)
         val alias = ensureImport(ns)
-        val public = alias + "." + GoUtil.publicName(className)
-        println(s"className[$className] alias[$alias] public[$public]")
-        public
+        alias + "." + GoUtil.publicName(className)
       }
     }
   }

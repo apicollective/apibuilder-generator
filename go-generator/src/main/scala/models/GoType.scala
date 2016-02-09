@@ -4,26 +4,9 @@ import lib.{Datatype, Text}
 import Formatter._
 import play.api.libs.json._
 
-sealed trait Klass {
-
-  def localName: String
-
-  def namespace: Option[String]
-
-}
-
-object Klass {
-
-  case class Root(name: String) extends Klass {
-    override def localName = name
-    override def namespace: Option[String] = None
-  }
-
-  case class Import(ns: String, alias: String, name: String) extends Klass {
-    override def localName = s"${alias}.$name"
-    override def namespace: Option[String] = Some(ns)
-  }
-
+case class Klass(name: String) {
+  def localName = name
+  def namespace: Option[String] = None
 }
 
 case class GoType(
@@ -210,35 +193,35 @@ object GoType {
 
   private[this] def klass(importBuilder: ImportBuilder, dt: Datatype): Klass = {
     dt match {
-      case Datatype.Primitive.Boolean => Klass.Root("bool")
-      case Datatype.Primitive.Double => Klass.Root("float64")
-      case Datatype.Primitive.Integer => Klass.Root("int32")
-      case Datatype.Primitive.Long => Klass.Root("int64")
-      case Datatype.Primitive.DateIso8601 => Klass.Root("string")
-      case Datatype.Primitive.DateTimeIso8601 => Klass.Root("string")
-      case Datatype.Primitive.Decimal => Klass.Root("string")
-      case Datatype.Primitive.Object => Klass.Root("map[string]interface{}")
-      case Datatype.Primitive.String => Klass.Root("string")
-      case Datatype.Primitive.Unit => Klass.Root("nil")
-      case Datatype.Primitive.Uuid => Klass.Root("string")
+      case Datatype.Primitive.Boolean => Klass("bool")
+      case Datatype.Primitive.Double => Klass("float64")
+      case Datatype.Primitive.Integer => Klass("int32")
+      case Datatype.Primitive.Long => Klass("int64")
+      case Datatype.Primitive.DateIso8601 => Klass("string")
+      case Datatype.Primitive.DateTimeIso8601 => Klass("string")
+      case Datatype.Primitive.Decimal => Klass("string")
+      case Datatype.Primitive.Object => Klass("map[string]interface{}")
+      case Datatype.Primitive.String => Klass("string")
+      case Datatype.Primitive.Unit => Klass("nil")
+      case Datatype.Primitive.Uuid => Klass("string")
       case u: Datatype.UserDefined => {
         val i = u.name.lastIndexOf(".")
         (i > 0) match {
           case true => {
-            Klass.Root(importBuilder.publicName(u.name))
+            Klass(importBuilder.publicName(u.name))
             // val ns = u.name.substring(0, i)
             // val name = u.name.substring(i+1)
             // val alias = importBuilder.ensureImport(ns)
             // Klass.Import(ns, alias, GoUtil.publicName(name))
           }
           case false => {
-            Klass.Root(GoUtil.publicName(u.name))
+            Klass(GoUtil.publicName(u.name))
           }
         }
       }
       case Datatype.Container.Option(inner) => klass(importBuilder, inner)
-      case Datatype.Container.Map(inner) => Klass.Root("map[string]" + klass(importBuilder, inner).localName)
-      case Datatype.Container.List(inner) => Klass.Root("[]" + klass(importBuilder, inner).localName)
+      case Datatype.Container.Map(inner) => Klass("map[string]" + klass(importBuilder, inner).localName)
+      case Datatype.Container.List(inner) => Klass("[]" + klass(importBuilder, inner).localName)
     }
   }
 
