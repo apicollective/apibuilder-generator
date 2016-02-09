@@ -336,11 +336,13 @@ case class Code(form: InvocationForm) {
         case true => {
           bodyString match {
             case None => {
-              ", ClientRequestBody{}"
+              formString match {
+                case None => ", ClientRequestBody{}"
+                case Some(_) => ", body"
+              }
             }
             case Some(_) => {
-              val bytes = importBuilder.ensureImport("bytes")
-              s""", ClientRequestBody{contentType: "application/json", bytes: ${bytes}.NewReader(body)}"""
+              s", body"
             }
           }
         }
@@ -398,7 +400,7 @@ case class Code(form: InvocationForm) {
           case Some(m) => {
             Some(
               m.fields.filter(!_.default.isEmpty).map { field =>
-                val fieldGoType = GoType(importBuilder, datatype(field.`type`, true))
+                val fieldGoType = GoType(importBuilder, datatype(field.`type`, field.required))
                 val fieldName = GoUtil.publicName(field.name)
                 val fullName = s"${varName}.$fieldName"
 
@@ -415,8 +417,10 @@ case class Code(form: InvocationForm) {
       case _ => None
     }
 
+    val bytes = importBuilder.ensureImport("bytes")
+
     Seq(
-      Some(s"body, err := ${json}.Marshal($varName)"),
+      Some(s"bodyDocument, err := ${json}.Marshal($varName)"),
       Some(
         Seq(
           "if err != nil {",
@@ -424,7 +428,8 @@ case class Code(form: InvocationForm) {
           "}"
         ).mkString("\n")
       ),
-      bodyDefaults.map { code => s"\n$code\n" }
+      bodyDefaults.map { code => s"\n$code\n" },
+      Some(s"""body := ClientRequestBody{contentType: "application/json", bytes: ${bytes}.NewReader(bodyDocument)}""")
     ).flatten.mkString("\n")
   }
 
@@ -444,13 +449,23 @@ case class Code(form: InvocationForm) {
         val strings = importBuilder.ensureImport("strings")
         Some(
           Seq(
-	    "formData := url.Values{",
+	    "urlValues := url.Values{}",
             params.map { p =>
-              val varName = GoUtil.privateName(p.name)
-              GoUtil.wrapInQuotes(p.name) + s": {params.$varName}"
-            }.mkString("\n").table().indent(1),
-            "}",
-	    s"""body := ClientRequestBody{contentType: "application/x-www-form-urlencoded", bytes: ${strings}.NewReader(formData.Encode())}"""
+              val paramDatatype = datatype(p.`type`, p.required)
+              val varName = GoUtil.publicName(p.name)
+
+              val valueCode = paramDatatype match {
+                case Datatype.Container.List(inner) => {
+                  s"params.$varName"
+                }
+                case _ => {
+                  s"{params.$varName}"
+                }
+              }
+
+              "urlValues[" + GoUtil.wrapInQuotes(p.name) + s"] = " + valueCode
+            }.mkString("\n"),
+	    s"""body := ClientRequestBody{contentType: "application/x-www-form-urlencoded", bytes: ${strings}.NewReader(urlValues.Encode())}"""
           ).mkString("\n")
         )
       }
