@@ -19,11 +19,11 @@ object Formatter {
                 // e.g. "  a" becomes a list with one element (instead of
                 // a two element list with the first element just being
                 // whitespace)
-                val values = text.split("\\s+").toList
+                val values = splitLine(text)
                 Seq(s"$spaces${values(0)}") ++ values.drop(1)
               }
               case _ => {
-                value.split("\\s+").toSeq
+                splitLine(value)
               }
             }
           }
@@ -31,6 +31,14 @@ object Formatter {
       }
 
       formatTable(table.toSeq)
+    }
+
+    private[this] def splitLine(line: String): Seq[String] = {
+      line.split("\\=").toList match {
+        case Nil => Nil
+        case one :: Nil => one.split("\\s+")
+        case one :: rest => Seq(one) ++ Seq("=") ++ splitLine(rest.mkString("=").trim)
+      }
     }
 
     def indent(numberTabs: Int): String = {
