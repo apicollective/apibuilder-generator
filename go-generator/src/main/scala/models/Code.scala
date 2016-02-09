@@ -114,6 +114,7 @@ case class Code(form: InvocationForm) {
   private[this] def generateModel(model: Model): String = {
     val io = importBuilder.ensureImport("io")
     val json = importBuilder.ensureImport("encoding/json")
+    val bytes = importBuilder.ensureImport("bytes")
     val publicName = GoUtil.publicName(model.name)
     val privateName = GoUtil.privateName(model.name)
 
@@ -143,6 +144,20 @@ case class Code(form: InvocationForm) {
         ).flatten.mkString(" ")
       }.mkString("\n").table().indent(1),
       "}",
+
+      "",
+      Seq(
+        s"func ${publicName}FromMap(data interface{}) $publicName {",
+	Seq(
+          "b, err := json.Marshal(data)",
+	  "if err == nil {",
+          s"return ${publicName}FromJson(${bytes}.NewReader(b))".indent(1),
+          "} else {",
+          "panic(err)".indent(1),
+          "}"
+        ).mkString("\n").indent(1),
+        "}"
+      ).mkString("\n"),
 
       "",
       Seq(
@@ -182,7 +197,7 @@ case class Code(form: InvocationForm) {
       ).mkString("\n"),
 
       Seq(
-        s"func ${unionName}FromMap(data map[string]interface{}) $unionName {",
+        s"func ${unionName}FromMap(data interface{}) $unionName {",
 	Seq(
           "b, err := json.Marshal(data)",
 	  "if err == nil {",
@@ -247,7 +262,7 @@ case class Code(form: InvocationForm) {
                         }
 
                         case _ => {
-                          responseBuilder.generate("bytes", dt) match {
+                          responseBuilder.generate("el", dt, ResponseBuilder.FromMap) match {
                             case None => "return nil"
                             case Some(resp) => s"return $unionName{$typeName: $resp}"
                           }
@@ -399,7 +414,7 @@ case class Code(form: InvocationForm) {
                     val responseType = ResponseType(goType, varName)
                     responseTypes += responseType
 
-                    val responseCode = responseBuilder.generate("resp.Body", goType.datatype) match {
+                    val responseCode = responseBuilder.generate("resp.Body", goType.datatype, ResponseBuilder.FromJson) match {
                       case None => ""
                       case Some(c) => s", ${GoUtil.publicName(goType.classVariableName())}: $c"
                     }
