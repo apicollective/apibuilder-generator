@@ -76,7 +76,7 @@ import (
     builder.ensureImport("io.flow.common.v0.models")
     builder.generate() should be("""
 import (
-	common "github.com/flowcommerce/apidoc/common"
+	"github.com/flowcommerce/apidoc/common"
 )
 """.trim)
   }
@@ -110,13 +110,25 @@ import (
 
     builder.ensureImport("io.flow.carrier.account.v0.unions.expandable_carrier_account")
 
-    println("")
-    println(builder.generate())
-    println("")
-
     builder.generate() should be("""
 import (
 	carrierAccount "github.com/flowcommerce/apidoc/carrier/account"
+)
+""".trim)
+  }
+  
+  it("squashes underscores") {
+    val builder = ImportBuilder(Nil)
+
+    builder.ensureImport("io.flow.service_level.v0.models.service_level")
+    builder.ensureImport("io.flow.service.level.v0.models.service_level")
+    builder.ensureImport("io.flow.servicelevel.v0.models.service_level")
+
+    builder.generate() should be("""
+import (
+	flowcommerceServiceLevel "github.com/flowcommerce/apidoc/service/level"
+	serviceLevel "github.com/flowcommerce/apidoc/service_level"
+	"github.com/flowcommerce/apidoc/servicelevel"
 )
 """.trim)
   }

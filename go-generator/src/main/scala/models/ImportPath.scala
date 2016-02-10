@@ -17,7 +17,7 @@ case class ImportPath(url: String, alias: String) extends Ordered[ImportPath] {
 object ImportPath {
 
   // Ex: io.flow.carrier.account.v0.unions.expandable_carrier_account
-  private[this] val ApidocUrlPattern = """^(.+)\.v\d+\.\w+\.([^\.]+)$""".r
+  private[this] val ApidocUrlPattern = """^(.+)\.v\d+\.\w+\.?([^\.]*)$""".r
 
   // TODO: Figure out where we get the data from for the paths to
   // remove the Domains map

@@ -73,6 +73,18 @@ private[models] case class ImportBuilder(imports: Seq[Import]) {
   private[this] def uniqueAlias(path: ImportPath, index: Int = 0): String = {
     val target = index match {
       case 0 => path.alias
+      case 1 => {
+        path.url.split("/").toList match {
+          case host :: org :: app :: rest => {
+            // Ex: Turn github.com/flowcommerce/common into
+            // flowcommerceCommon alias
+            GoUtil.privateName(s"${org}_${path.alias}")
+          }
+          case parts => {
+            GoUtil.privateName(parts.mkString("_"))
+          }
+        }
+      }
       case _ => s"${path.alias}$index"
     }
 
