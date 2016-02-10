@@ -1,8 +1,29 @@
 package go.models
 
+import com.bryzek.apidoc.spec.v0.models.{Application, Import, Organization}
 import org.scalatest.{FunSpec, Matchers}
 
 class ImportBuilderSpec extends FunSpec with Matchers {
+
+  def buildImports(
+    namespace: String,
+    enums: Seq[String] = Nil,
+    unions: Seq[String] = Nil,
+    models: Seq[String] = Nil
+  ): Seq[Import] = {
+    Seq(
+      Import(
+        uri = "http://apidoc.me/test/app/0.0.1/service.json",
+        namespace = namespace,
+        organization = Organization("test"),
+        application = Application("app"),
+        version = "0.0.1",
+        enums = enums,
+        unions = unions,
+        models = models
+      )
+    )
+  }
 
   it("empty if no imports") {
     val builder = ImportBuilder()
@@ -11,9 +32,11 @@ class ImportBuilderSpec extends FunSpec with Matchers {
 
   it("prefixes with package name") {
     val builder = ImportBuilder()
+
     builder.ensureImport("json")
     builder.ensureImport("encoding/json")
     builder.ensureImport("other/json")
+
     builder.generate() should be("""
 import (
 	encodingJson "encoding/json"
@@ -53,7 +76,7 @@ import (
     builder.ensureImport("io.flow.common.v0.models")
     builder.generate() should be("""
 import (
-	common "github.com/flowcommerce/apidoc/common"
+	"github.com/flowcommerce/apidoc/common"
 )
 """.trim)
   }
@@ -82,4 +105,32 @@ import (
 """.trim)
   }
 
+  it("resolves multi package imports") {
+    val builder = ImportBuilder()
+
+    builder.ensureImport("io.flow.carrier.account.v0.unions.expandable_carrier_account")
+
+    builder.generate() should be("""
+import (
+	carrierAccount "github.com/flowcommerce/apidoc/carrier/account"
+)
+""".trim)
+  }
+  
+  it("squashes underscores") {
+    val builder = ImportBuilder()
+
+    builder.ensureImport("io.flow.service_level.v0.models.service_level")
+    builder.ensureImport("io.flow.service.level.v0.models.service_level")
+    builder.ensureImport("io.flow.servicelevel.v0.models.service_level")
+
+    builder.generate() should be("""
+import (
+	flowcommerceServiceLevel "github.com/flowcommerce/apidoc/service/level"
+	serviceLevel "github.com/flowcommerce/apidoc/service_level"
+	"github.com/flowcommerce/apidoc/servicelevel"
+)
+""".trim)
+  }
+  
 }
