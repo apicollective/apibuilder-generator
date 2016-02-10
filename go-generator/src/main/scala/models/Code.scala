@@ -335,14 +335,6 @@ case class Code(form: InvocationForm) {
         pathArgs += typ.toEscapedString(varName)
       }
 
-      val bodyString: Option[String] = op.body.map { body =>
-        // TODO: val comments = GoUtil.textToComment(body.description)
-        val varName = GoUtil.privateName(body.`type`)
-        val typ = GoType(importBuilder, datatype(body.`type`, true))
-        methodParameters += s"$varName ${typ.klass.localName}"
-        "\n" + buildBody(varName, typ, resultsType)
-      }
-      
       val argsType: Option[MethodArgumentsType] = op.parameters.filter( p => p.location == ParameterLocation.Query || p.location == ParameterLocation.Form )  match {
         case Nil => {
           None
@@ -363,12 +355,29 @@ case class Code(form: InvocationForm) {
       var responseTypes = mutable.ListBuffer[ResponseType]()
 
       val queryString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Query))
-      val formString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Form)).map { c =>
-        val strings = importBuilder.ensureImport("strings")
-        Seq(
-          c,
-         s"""body := ClientRequestBody{contentType: "application/x-www-form-urlencoded", bytes: ${strings}.NewReader(urlValues.Encode())}"""
-        ).mkString("\n")
+
+      // Body and form are mutually exclusive
+      val (bodyString, formString) = op.body match {
+        case None => {
+          (
+            None,
+            urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Form)).map { c =>
+              val strings = importBuilder.ensureImport("strings")
+              Seq(
+                c,
+                s"""body := ClientRequestBody{contentType: "application/x-www-form-urlencoded", bytes: ${strings}.NewReader(urlValues.Encode())}"""
+              ).mkString("\n")
+            }
+          )
+        }
+        case Some(body) => {
+          // TODO: val comments = GoUtil.textToComment(body.description)
+          val varName = GoUtil.privateName(body.`type`)
+          val typ = GoType(importBuilder, datatype(body.`type`, true))
+          methodParameters += s"$varName ${typ.klass.localName}"
+          val code = "\n" + buildBody(varName, typ, resultsType)
+          (Some(code), None)
+        }
       }
 
       val queryToUrl = queryString match {
