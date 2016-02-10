@@ -232,10 +232,6 @@ case class Code(form: InvocationForm) {
                     (
                       dt match {
 
-                        case Datatype.Primitive.Boolean => {
-                          s"""return $unionName{$typeName: ${imp("strconv")}.ParseBool(el["value"].(string))}"""
-                        }
-
                         case Datatype.Primitive.Double => {
                           s"""return $unionName{$typeName: ${imp("strconv")}.ParseFloat(el["value"].(string), 64)}"""
                         }
@@ -248,7 +244,7 @@ case class Code(form: InvocationForm) {
                           s"""return $unionName{$typeName: ${imp("strconv")}.ParseInt(el["value"].(string), 10, 64)}"""
                         }
 
-                        case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
+                        case Datatype.Primitive.Boolean | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
                           s"""return $unionName{$typeName: el["value"].(string)}"""
                         }
 

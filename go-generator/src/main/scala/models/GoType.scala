@@ -24,10 +24,12 @@ case class GoType(
 
   private[this] def declaration(value: String, datatype: Datatype): String = {
     datatype match {
-      case Datatype.Primitive.Boolean | Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
+      case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
         value
       }
-      case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
+      case Datatype.Primitive.Boolean | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
+        // Note we treat booleans as strings so we can differentiate
+        // between true, false, and not set
         GoUtil.wrapInQuotes(value)
       }
       case Datatype.Primitive.Object => {
@@ -113,7 +115,7 @@ case class GoType(
   private[this] def toString(varName: String, dt: Datatype): String = {
     dt match {
       case Datatype.Primitive.Boolean => {
-        s"${importBuilder.ensureImport("strconv")}.FormatBool($varName)"
+        varName
       }
       case Datatype.Primitive.Double => {
         s"${importBuilder.ensureImport("strconv")}.FormatFloat($varName, 'E', -1, 64)"
@@ -161,14 +163,11 @@ case class GoType(
       case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
         s"0 $operator $varName"
       }
-      case Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
+      case Datatype.Primitive.Boolean | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
         s""""" $operator $varName"""
       }
       case Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         s"""nil $operator $varName"""
-      }
-      case Datatype.Primitive.Boolean => {
-        s"""bool $operator $varName"""
       }
       case Datatype.Container.Option(inner) => {
         compareToImplicitValue(varName, inner, operator)
@@ -193,7 +192,7 @@ object GoType {
 
   private[this] def klass(importBuilder: ImportBuilder, dt: Datatype): Klass = {
     dt match {
-      case Datatype.Primitive.Boolean => Klass("bool")
+      case Datatype.Primitive.Boolean => Klass("string")
       case Datatype.Primitive.Double => Klass("float64")
       case Datatype.Primitive.Integer => Klass("int32")
       case Datatype.Primitive.Long => Klass("int64")
