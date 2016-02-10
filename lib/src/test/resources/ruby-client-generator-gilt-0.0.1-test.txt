@@ -24,6 +24,7 @@ module Com
 
               module Constants
 
+                BASE_URL = 'http://localhost:9000' unless defined?(Constants::BASE_URL)
                 NAMESPACE = 'com.bryzek.apidoc.reference.api.v0' unless defined?(Constants::NAMESPACE)
                 USER_AGENT = 'gilt 0.0.1-test' unless defined?(Constants::USER_AGENT)
                 VERSION = '0.0.1-dev' unless defined?(Constants::VERSION)
@@ -39,6 +40,11 @@ module Com
                 @default_headers = HttpClient::Preconditions.assert_class('default_headers', opts.delete(:default_headers) || {}, Hash)
                 HttpClient::Preconditions.assert_empty_opts(opts)
                 HttpClient::Preconditions.check_state(url.match(/http.+/i), "URL[%s] must start with http" % url)
+              end
+
+              # Creates an instance of the client using the base url specified in the API spec.
+              def Client.base_url(opts={})
+                Client.new(Constants::BASE_URL, opts)
               end
 
               def request(path=nil)

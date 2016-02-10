@@ -395,13 +395,23 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private def generateClient(): String = {
     val sb = ListBuffer[String]()
-    val url = service.baseUrl
 
     val headers = Headers(form)
 
     val headerString = headers.ruby.map { case (name, value) =>
       s"with_header(${RubyUtil.wrapInQuotes(name)}, $value)"
     }.mkString(".", ".", "")
+
+    val defaultClient = service.baseUrl.map { _ =>
+      Seq(
+        "",
+        "",
+        "# Creates an instance of the client using the base url specified in the API spec.",
+        "def Client.base_url(opts={})",
+        "Client.new(Constants::BASE_URL, opts)".indent(2),
+        "end"
+      ).mkString("\n").indent(2)
+    }
 
     sb.append(s"""
 class Client
@@ -416,7 +426,7 @@ ${headers.rubyModuleConstants.indent(2)}
     @default_headers = HttpClient::Preconditions.assert_class('default_headers', opts.delete(:default_headers) || {}, Hash)
     HttpClient::Preconditions.assert_empty_opts(opts)
     HttpClient::Preconditions.check_state(url.match(/http.+/i), "URL[%s] must start with http" % url)
-  end
+  end${defaultClient.getOrElse("")}
 
   def request(path=nil)
     HttpClient::Preconditions.assert_class_or_nil('path', path, String)
