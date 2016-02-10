@@ -65,12 +65,31 @@ case class UrlValues(
           "}"
         ).mkString("\n")
       }
+
       case Datatype.Container.Option(inner) => {
         buildParam(prefix, param, inner)
       }
-      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
-        sys.error(s"Parameter $param cannot be converted to query string")
+
+      case Datatype.UserDefined.Model(name) => {
+        val publicName = importBuilder.publicName(name)
+        val privateName = GoUtil.privateName(name)
+        Seq(
+          s"$privateName, err := ${importBuilder.ensureImport("encoding/json")}.Marshal($varName)",
+          "if (err != nil) {",
+          "panic(err)".indent(1),
+          "}",
+          "urlValues.Add(" + GoUtil.wrapInQuotes(param.name) + s", string($privateName))"
+        ).mkString("\n")
       }
+
+      case Datatype.UserDefined.Union(name) => {
+        sys.error("TODO")
+      }
+
+      case Datatype.Container.Map(inner) => {
+        sys.error("TODO")
+      }
+
     }
   }
 
@@ -91,7 +110,7 @@ case class UrlValues(
         goType.toString(varName)
       }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
-        sys.error("Cannot serialize model or union to parameter")
+        sys.error("Cannot serialize model, union or map to parameter")
       }
       case Datatype.UserDefined.Enum(name) => {
         goType.toString(varName)
