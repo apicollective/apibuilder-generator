@@ -3,50 +3,42 @@ package go.models
 import scala.collection.mutable
 import lib.Text
 import Formatter._
+import com.bryzek.apidoc.spec.v0.models.Import
 
 /**
   * Keeps track of imports that we use to build a list of imports for
   * only the packages actually used in the client.
   */
-private[models] case class ImportBuilder() {
+private[models] case class ImportBuilder(imports: Seq[Import]) {
 
-  // TODO: Figure out where we get the data from for the paths to
-  // remove the Domains map
-  private[this] val Domains = Map(
-    "io.flow" -> "github.com/flowcommerce/apidoc"
-  )
-
-  private[this] case class Import(name: String, alias: String) extends Ordered[Import] {
-
-    def compare(other: Import) = {
-      name == other.name match {
-        case false => name.compare(other.name)
-        case true => alias.compare(other.alias)
-      }
-    }
-
+  println("IMPORTS:")
+  imports.map { imp =>
+    println(s" - ${imp.namespace}")
   }
 
   // Build a list of go imports as we use them so we only import
   // libraries we actually use
-  private[this] var imports = mutable.ListBuffer[Import]()
+  private[this] var importPaths = mutable.ListBuffer[ImportPath]()
 
   /**
     * Ensures that this library is being imported, returning the alias
     * used to reference this package
+    * 
+    * @param name e.g. "os", "net/http", "io.flow.common.v0.models.change_type", etc.
     */
   def ensureImport(name: String): String = {
-    val path = importPath(name)
-    val alias = defaultAlias(name)
+    val path = ImportPath(name)
 
-    imports.find(_.name == path) match {
+    importPaths.find(_.url == path.url) match {
       case None => {
-        imports += Import(name = path, alias = uniqueAlias(path, alias))
+        val alias = uniqueAlias(path)
+        importPaths += path.copy(alias = alias)
+        alias
       }
-      case Some(_) => //No-op
+      case Some(existing) => {
+        existing.alias
+      }
     }
-
-    alias
   }
 
   /**
@@ -78,73 +70,28 @@ private[models] case class ImportBuilder() {
     GoUtil.privateName(publicName(name))
   }
 
-  private[this] def uniqueAlias(importPath: String, name: String, index: Int = 0): String = {
+  private[this] def uniqueAlias(path: ImportPath, index: Int = 0): String = {
     val target = index match {
-      case 0 => name
-      case 1 => {
-        importPath.split("/").toList match {
-          case host :: org :: app :: rest => {
-            // Ex: Turn github.com/flowcommerce/common into
-            // flowcommerceCommon alias
-            GoUtil.privateName(s"${org}_$name")
-          }
-          case parts => {
-            Text.snakeToCamelCase(parts.mkString("_"))
-          }
-        }
-      }
-      case _ => s"$name$index"
+      case 0 => path.alias
+      case _ => s"${path.alias}$index"
     }
 
-    imports.find(_.name == target) match {
+    importPaths.find(_.alias == target) match {
       case None => target
-      case Some(_) => uniqueAlias(importPath, name, index + 1)
-    }
-  }
-
-  private[this] def defaultAlias(name: String): String = {
-    name.split("\\.").toList match {
-      case Nil => ""
-      case one :: Nil => one.split("/").last
-      case one :: two :: Nil => two
-      case one :: two :: three :: rest => three
-    }
-  }
-
-  private[this] def importPath(name: String): String = {
-    name.split("\\.").toList match {
-      case Nil => ""
-      case one :: Nil => one
-      case one :: two :: Nil => {
-        // Ex: io.flow
-        Domains.get(s"${one}.$two") match {
-          case None => s"${one}/$two"
-          case Some(d) => d
-        }
-      }
-      case one :: two :: three :: rest => {
-        // Ex: io.flow.common
-        Domains.get(s"${one}.$two") match {
-          case None => Seq(one, two, three).mkString("/")
-          case Some(d) => Seq(d, three).mkString("/")
-        }
-      }
+      case Some(_) => uniqueAlias(path, index + 1)
     }
   }
 
   def generate(): String = {
-    imports.map { imp =>
-    }
-
-    imports.toList match {
+    importPaths.toList match {
       case Nil => ""
       case _ => Seq(
         "import (",
-        imports.sorted.map { imp =>
-          if (defaultAlias(imp.name) == imp.alias) {
-            GoUtil.wrapInQuotes(imp.name)
+        importPaths.sorted.map { imp =>
+          if (ImportPath.defaultAlias(imp.url) == imp.alias) {
+            GoUtil.wrapInQuotes(imp.url)
           } else {
-            s"${imp.alias} ${GoUtil.wrapInQuotes(imp.name)}"
+            s"${imp.alias} ${GoUtil.wrapInQuotes(imp.url)}"
           }
         }.mkString("\n").indent(1),
         ")"
