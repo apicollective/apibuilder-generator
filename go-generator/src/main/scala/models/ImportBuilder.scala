@@ -3,18 +3,12 @@ package go.models
 import scala.collection.mutable
 import lib.Text
 import Formatter._
-import com.bryzek.apidoc.spec.v0.models.Import
 
 /**
   * Keeps track of imports that we use to build a list of imports for
   * only the packages actually used in the client.
   */
-private[models] case class ImportBuilder(imports: Seq[Import]) {
-
-  println("IMPORTS:")
-  imports.map { imp =>
-    println(s" - ${imp.namespace}")
-  }
+private[models] case class ImportBuilder() {
 
   // Build a list of go imports as we use them so we only import
   // libraries we actually use
