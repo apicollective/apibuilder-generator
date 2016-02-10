@@ -133,15 +133,11 @@ case class GoType(
       case Datatype.Primitive.String => varName
       case Datatype.Primitive.Unit => "nil"
       case Datatype.Primitive.Uuid => varName
-      case u: Datatype.UserDefined => {
-        u match {
-          case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
-            sys.error("User defined type cannot be converted to escaped string")
-          }
-          case Datatype.UserDefined.Enum(name) => {
-            varName
-          }
-        }
+      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
+        sys.error("User defined type cannot be converted to escaped string")
+      }
+      case Datatype.UserDefined.Enum(name) => {
+        s"string($varName)"
       }
       case Datatype.Container.Option(inner) => toString(varName, inner)
       case Datatype.Container.Map(_) | Datatype.Container.List(_) => {
