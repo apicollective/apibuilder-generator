@@ -437,6 +437,7 @@ package com.bryzek.apidoc.reference.api.v0 {
 
   object Constants {
 
+    val BaseUrl = "http://localhost:9000"
     val Namespace = "com.bryzek.apidoc.reference.api.v0"
     val UserAgent = "apidoc:play_2x_client:unknown"
     val Version = "0.0.1-dev"
@@ -445,7 +446,7 @@ package com.bryzek.apidoc.reference.api.v0 {
   }
 
   class Client(
-    apiUrl: String,
+    apiUrl: String = "http://localhost:9000",
     auth: scala.Option[com.bryzek.apidoc.reference.api.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {

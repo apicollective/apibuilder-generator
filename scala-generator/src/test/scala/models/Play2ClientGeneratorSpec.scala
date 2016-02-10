@@ -6,7 +6,7 @@ import org.scalatest.{ShouldMatchers, FunSpec}
 
 class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc")
+  val clientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", None)
 
   it("errorTypeClass") {
     val service = models.TestHelper.generatorApiService

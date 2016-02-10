@@ -15,7 +15,7 @@ object MockClientGenerator {
 
     override def invoke(form: InvocationForm) = {
       val ssd = new ScalaService(form.service)
-      MockClientGenerator(form, ScalaClientMethodConfigs.Play24(ssd.namespaces.base)).invoke()
+      MockClientGenerator(form, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
     }
 
   }

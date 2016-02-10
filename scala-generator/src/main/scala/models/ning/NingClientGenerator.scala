@@ -15,7 +15,7 @@ import generator.ServiceFileNames
 object Ning18ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val config = ScalaClientMethodConfigs.Ning18(Namespaces.quote(form.service.namespace))
+    val config = ScalaClientMethodConfigs.Ning18(Namespaces.quote(form.service.namespace), form.service.baseUrl)
     NingClientGenerator(config, form).invoke()
   }
 
@@ -24,7 +24,7 @@ object Ning18ClientGenerator extends CodeGenerator {
 object Ning19ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val config = ScalaClientMethodConfigs.Ning19(Namespaces.quote(form.service.namespace))
+    val config = ScalaClientMethodConfigs.Ning19(Namespaces.quote(form.service.namespace), form.service.baseUrl)
     NingClientGenerator(config, form).invoke()
   }
 

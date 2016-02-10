@@ -8,6 +8,11 @@ trait ScalaClientMethodConfig {
   def namespace: String
 
   /**
+    * Base URL for the service if provided
+    */
+  def baseUrl: Option[String]
+
+  /**
     * The code to generate to encode a variable into a path.
     */
   def pathEncode(value: String): String
@@ -77,19 +82,19 @@ object ScalaClientMethodConfigs {
     override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
   }
 
-  case class Play22(namespace: String) extends Play {
+  case class Play22(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.Response"
     override val requestUriMethod = Some("ahcResponse.getUri")
     override val canSerializeUuid = false
   }
 
-  case class Play23(namespace: String) extends Play {
+  case class Play23(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod = None
     override val canSerializeUuid = true
   }
 
-  case class Play24(namespace: String) extends Play {
+  case class Play24(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod = None
     override val canSerializeUuid = true
@@ -116,12 +121,12 @@ private lazy val defaultAsyncHttpClient = {
     def addQueryParamMethod: String
   }
 
-  case class Ning18(namespace: String) extends Ning {
+  case class Ning18(namespace: String, baseUrl: Option[String]) extends Ning {
     override def addQueryParamMethod: String = "addQueryParameter"
     override val requestUriMethod = Some("getUri")
   }
 
-  case class Ning19(namespace: String) extends Ning {
+  case class Ning19(namespace: String, baseUrl: Option[String]) extends Ning {
     override def addQueryParamMethod: String = "addQueryParam"
     override val requestUriMethod = Some("getUri.toJavaNetURI")
   }

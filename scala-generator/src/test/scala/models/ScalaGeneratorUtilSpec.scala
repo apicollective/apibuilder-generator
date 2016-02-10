@@ -11,7 +11,7 @@ class ScalaGeneratorUtilSpec extends FunSpec with ShouldMatchers {
   private lazy val ssd = new ScalaService(service)
 
   private[this] val play2Util = ScalaGeneratorUtil(
-    ScalaClientMethodConfigs.Play22("test.apidoc")
+    ScalaClientMethodConfigs.Play22("test.apidoc", None)
   )
 
   describe("params") {

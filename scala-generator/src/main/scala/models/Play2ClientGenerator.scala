@@ -20,7 +20,7 @@ object Play22ClientGenerator extends CodeGenerator {
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val config = PlayFrameworkVersion(
       name = "2.2.x",
-      config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace)),
+      config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace), form.service.baseUrl),
       requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
       authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
       supportsHttpPatch = false
@@ -36,7 +36,7 @@ object Play23ClientGenerator extends CodeGenerator {
 
     val config = PlayFrameworkVersion(
       name = "2.3.x",
-      config = ScalaClientMethodConfigs.Play23(Namespaces.quote(form.service.namespace)),
+      config = ScalaClientMethodConfigs.Play23(Namespaces.quote(form.service.namespace), form.service.baseUrl),
       requestHolderClass = "play.api.libs.ws.WSRequestHolder",
       authSchemeClass = "play.api.libs.ws.WSAuthScheme",
       supportsHttpPatch = true
@@ -52,7 +52,7 @@ object Play24ClientGenerator extends CodeGenerator {
 
     val config = PlayFrameworkVersion(
       name = "2.4.x",
-      config = ScalaClientMethodConfigs.Play24(Namespaces.quote(form.service.namespace)),
+      config = ScalaClientMethodConfigs.Play24(Namespaces.quote(form.service.namespace), form.service.baseUrl),
       requestHolderClass = "play.api.libs.ws.WSRequest",
       authSchemeClass = "play.api.libs.ws.WSAuthScheme",
       supportsHttpPatch = true

@@ -14,9 +14,14 @@ object ScalaClientCommon {
   def clientSignature(
     config: ScalaClientMethodConfig
   ): String = {
+    val defaultUrl = config.baseUrl match {
+      case None => ""
+      case Some(url) => s" = ${ScalaUtil.wrapInQuotes(url)}"
+    }
+
     s"""
 class Client(
-  apiUrl: String,
+  apiUrl: String$defaultUrl,
   auth: scala.Option[${config.namespace}.Authorization] = None,
   defaultHeaders: Seq[(String, String)] = Nil${config.extraClientCtorArgs.getOrElse("")}
 ) extends interfaces.Client

@@ -7,7 +7,7 @@ import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc")
+  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", None)
 
   describe("for a field with an object field") {
 
