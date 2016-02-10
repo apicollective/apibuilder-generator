@@ -53,7 +53,7 @@ import (
     builder.ensureImport("io.flow.common.v0.models")
     builder.generate() should be("""
 import (
-	common "github.com/flowcommerce/common"
+	common "github.com/flowcommerce/apidoc/common"
 )
 """.trim)
   }
@@ -77,7 +77,7 @@ import (
     builder.generate() should be("""
 import (
 	"common"
-	flowcommerceCommon "github.com/flowcommerce/common"
+	flowcommerceCommon "github.com/flowcommerce/apidoc/common"
 )
 """.trim)
   }
