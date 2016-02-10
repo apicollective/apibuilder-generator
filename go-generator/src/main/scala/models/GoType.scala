@@ -133,15 +133,11 @@ case class GoType(
       case Datatype.Primitive.String => varName
       case Datatype.Primitive.Unit => "nil"
       case Datatype.Primitive.Uuid => varName
-      case u: Datatype.UserDefined => {
-        u match {
-          case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
-            sys.error("User defined type cannot be converted to escaped string")
-          }
-          case Datatype.UserDefined.Enum(name) => {
-            varName
-          }
-        }
+      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
+        sys.error("User defined type cannot be converted to escaped string")
+      }
+      case Datatype.UserDefined.Enum(name) => {
+        s"string($varName)"
       }
       case Datatype.Container.Option(inner) => toString(varName, inner)
       case Datatype.Container.Map(_) | Datatype.Container.List(_) => {
@@ -163,10 +159,10 @@ case class GoType(
       case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
         s"0 $operator $varName"
       }
-      case Datatype.Primitive.Boolean | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid => {
+      case Datatype.Primitive.Boolean | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.UserDefined.Enum(_) => {
         s""""" $operator $varName"""
       }
-      case Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
+      case Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         s"""nil $operator $varName"""
       }
       case Datatype.Container.Option(inner) => {

@@ -10,6 +10,12 @@ import Formatter._
   */
 private[models] case class ImportBuilder() {
 
+  // TODO: Figure out where we get the data from for the paths to
+  // remove the Domains map
+  private[this] val Domains = Map(
+    "io.flow" -> "github.com/flowcommerce/apidoc"
+  )
+
   private[this] case class Import(name: String, alias: String) extends Ordered[Import] {
 
     def compare(other: Import) = {
@@ -105,14 +111,24 @@ private[models] case class ImportBuilder() {
     }
   }
 
-  // TODO: Figure out where we get the data from for the paths to
-  // remove the 'commerce' hack
   private[this] def importPath(name: String): String = {
     name.split("\\.").toList match {
       case Nil => ""
       case one :: Nil => one
-      case one :: two :: Nil => s"github.com/${one}commerce/$two"
-      case one :: two :: three :: rest => s"github.com/${two}commerce/$three"
+      case one :: two :: Nil => {
+        // Ex: io.flow
+        Domains.get(s"${one}.$two") match {
+          case None => s"${one}/$two"
+          case Some(d) => d
+        }
+      }
+      case one :: two :: three :: rest => {
+        // Ex: io.flow.common
+        Domains.get(s"${one}.$two") match {
+          case None => Seq(one, two, three).mkString("/")
+          case Some(d) => Seq(d, three).mkString("/")
+        }
+      }
     }
   }
 
