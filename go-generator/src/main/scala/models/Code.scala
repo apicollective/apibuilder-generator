@@ -16,7 +16,7 @@ case class Code(form: InvocationForm) {
 
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
-  private[this] val importBuilder = ImportBuilder(service.namespace, form.attributes.find(_.name == GoImportBaseUrl).map(_.value))
+  private[this] val importBuilder = ImportBuilder(form.attributes.find(_.name == GoImportBaseUrl).map(_.value))
   private[this] val headers = Headers(importBuilder, form)
   private[this] val urlValues = UrlValues(importBuilder, datatypeResolver)
   private[this] val responseBuilder = ResponseBuilder(importBuilder, datatypeResolver)
