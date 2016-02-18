@@ -193,7 +193,8 @@ object Generators {
           key = "go_1_5_client",
           name = "go 1.5 client",
           description = Some("Client based on native go 1.5 net/http libraries."),
-          language = Some("Go")
+          language = Some("Go"),
+          attributes = Seq("go_import_base_url")
         ),
         status = lib.generator.Status.Alpha,
         codeGenerator = Some(go.models.GoClientGenerator)

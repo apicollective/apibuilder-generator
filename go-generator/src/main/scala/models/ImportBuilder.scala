@@ -4,11 +4,39 @@ import scala.collection.mutable
 import lib.Text
 import Formatter._
 
+object ImportBuilder {
+
+  /**
+    * Parses the value of the go_import_mappings attribute and returns
+    *a map */
+  def parseMappings(importMappings: Option[String]): Map[String, String] = {
+    var map = scala.collection.mutable.Map[String, String]()
+
+    importMappings.map { mappings =>
+      mappings.trim.split("\\s").foreach { el =>
+        el.split(":").toList match {
+          case one :: two :: Nil => {
+            map += (one.trim -> two.trim)
+          }
+          case _ => // intentional no-op
+        }
+      }
+    }
+
+    map.toMap
+  }
+
+}
+
 /**
   * Keeps track of imports that we use to build a list of imports for
   * only the packages actually used in the client.
+  * 
+  * @param importMappings: See http://apidoc.me/attributes/go_import_mappings
   */
-private[models] case class ImportBuilder() {
+private[models] case class ImportBuilder(importMappings: Option[String]) {
+
+  private[this] val mappings = ImportBuilder.parseMappings(importMappings)
 
   // Build a list of go imports as we use them so we only import
   // libraries we actually use
@@ -21,8 +49,7 @@ private[models] case class ImportBuilder() {
     * @param name e.g. "os", "net/http", "io.flow.common.v0.models.change_type", etc.
     */
   def ensureImport(name: String): String = {
-    val path = ImportPath(name)
-
+    val path = ImportPath(name, mappings)
     importPaths.find(_.url == path.url) match {
       case None => {
         val alias = uniqueAlias(path)

@@ -25,13 +25,24 @@ class ImportBuilderSpec extends FunSpec with Matchers {
     )
   }
 
+  it("parseMappings") {
+    ImportBuilder.parseMappings(None) should be(Map())
+    ImportBuilder.parseMappings(Some("")) should be(Map())
+    ImportBuilder.parseMappings(Some("io.flow:github.com/flowcommerce/apidoc")) should be(
+      Map("io.flow" -> "github.com/flowcommerce/apidoc")
+    )
+    ImportBuilder.parseMappings(Some("io.flow:bar me.apidoc:github.com/flowcommerce/go")) should be(
+      Map("io.flow" -> "bar", "me.apidoc" -> "github.com/flowcommerce/go")
+    )
+  }
+
   it("empty if no imports") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(None)
     builder.generate() should be("")
   }
 
   it("prefixes with package name") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(None)
 
     builder.ensureImport("json")
     builder.ensureImport("encoding/json")
@@ -47,7 +58,7 @@ import (
   }
 
   it("idempotent") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(None)
     builder.ensureImport("io")
     builder.ensureImport("io")
     builder.generate() should be("""
@@ -58,7 +69,7 @@ import (
   }
 
   it("alphabetizes") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(None)
     builder.ensureImport("io")
     builder.ensureImport("fmt")
     builder.ensureImport("net/http")
@@ -72,7 +83,7 @@ import (
   }
 
   it("aliases if needed") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(Some("io.flow:github.com/flowcommerce/apidoc"))
     builder.ensureImport("io.flow.common.v0.models")
     builder.generate() should be("""
 import (
@@ -81,8 +92,20 @@ import (
 """.trim)
   }
 
+  it("builds proper import paths") {
+    val builder = ImportBuilder(Some("io.flow:github.com/flowcommerce/apidoc"))
+    builder.ensureImport("io.flow.common.v0.models")
+    builder.ensureImport("me.apidoc.spec.v0.models")
+    builder.generate() should be("""
+import (
+	"github.com/flowcommerce/apidoc/common"
+	"me/apidoc/spec"
+)
+""".trim)
+  }
+
   it("aliases duplicate imports") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(Some("io.flow:github.com/flowcommerce/apidoc"))
     builder.ensureImport("common")
     builder.ensureImport("net/common")
     builder.generate() should be("""
@@ -94,7 +117,7 @@ import (
   }
 
   it("aliases duplicate imports with org name when available") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(Some("io.flow:github.com/flowcommerce/apidoc"))
     builder.ensureImport("common")
     builder.ensureImport("io.flow.common.v0.models")
     builder.generate() should be("""
@@ -106,7 +129,7 @@ import (
   }
 
   it("resolves multi package imports") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(Some("io.flow:github.com/flowcommerce/apidoc"))
 
     builder.ensureImport("io.flow.carrier.account.v0.unions.expandable_carrier_account")
 
@@ -118,7 +141,7 @@ import (
   }
   
   it("squashes underscores") {
-    val builder = ImportBuilder()
+    val builder = ImportBuilder(Some("io.flow:github.com/flowcommerce/apidoc"))
 
     builder.ensureImport("io.flow.service_level.v0.models.service_level")
     builder.ensureImport("io.flow.service.level.v0.models.service_level")

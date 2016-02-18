@@ -19,26 +19,21 @@ object ImportPath {
   // Ex: io.flow.carrier.account.v0.unions.expandable_carrier_account
   private[this] val ApidocUrlPattern = """^(.+)\.v\d+\.\w+\.?([^\.]*)$""".r
 
-  // TODO: Figure out where we get the data from for the paths to
-  // remove the Domains map
-  private[this] val Domains = Map(
-    "io.flow" -> "github.com/flowcommerce/apidoc"
-  )
-
-  def apply(value: String): ImportPath = {
+  def apply(value: String, mappings: Map[String, String]): ImportPath = {
     value match {
       case ApidocUrlPattern(pkg, app) => {
 
-        Domains.keys.toSeq.sortBy(_.length).reverse.find { key =>
+        mappings.keys.toSeq.sortBy(_.length).reverse.find { key =>
           pkg.startsWith(s"${key}.")
         } match {
           case None => {
-            ImportPath(value, defaultAlias(value))
+            val defaultUrl = pkg.split("\\.").mkString("/")
+            ImportPath(defaultUrl, defaultAlias(defaultUrl))
           }
 
           case Some(domain) => {
             val p = pkg.replace(s"${domain}.", "")  // Ex: carrier.account
-            val url = Domains(domain) + "/" + p.split("\\.").mkString("/")
+            val url = mappings(domain) + "/" + p.split("\\.").mkString("/")
             val alias = Text.snakeToCamelCase(p)
             ImportPath(url, alias)
           }
