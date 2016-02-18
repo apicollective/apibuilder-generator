@@ -7,8 +7,11 @@ import Formatter._
 /**
   * Keeps track of imports that we use to build a list of imports for
   * only the packages actually used in the client.
+  * 
+  * @param namespace The organization's namespace
+  * @param goImportBaseUrl: See http://apidoc.me/attributes/go_import_base_url
   */
-private[models] case class ImportBuilder() {
+private[models] case class ImportBuilder(namespace: String, goImportBaseUrl: Option[String]) {
 
   // Build a list of go imports as we use them so we only import
   // libraries we actually use
@@ -21,7 +24,7 @@ private[models] case class ImportBuilder() {
     * @param name e.g. "os", "net/http", "io.flow.common.v0.models.change_type", etc.
     */
   def ensureImport(name: String): String = {
-    val path = ImportPath(name)
+    val path = ImportPath(name, namespace, goImportBaseUrl)
 
     importPaths.find(_.url == path.url) match {
       case None => {

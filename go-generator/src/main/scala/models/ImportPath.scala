@@ -16,8 +16,6 @@ case class ImportPath(url: String, alias: String) extends Ordered[ImportPath] {
 
 object ImportPath {
 
-  // Ex: io.flow.carrier.account.v0.unions.expandable_carrier_account
-  private[this] val ApidocUrlPattern = """^(.+)\.v\d+\.\w+\.?([^\.]*)$""".r
 
   // TODO: Figure out where we get the data from for the paths to
   // remove the Domains map
@@ -25,22 +23,39 @@ object ImportPath {
     "io.flow" -> "github.com/flowcommerce/apidoc"
   )
 
-  def apply(value: String): ImportPath = {
+
+  // Ex: io.flow.carrier.account.v0.unions.expandable_carrier_account
+  private[this] val ApidocUrlPattern = """^(.+)\.v\d+\.\w+\.?([^\.]*)$""".r
+
+  /**
+    * @param namespace The organization's namespace
+    * @param goImportBaseUrl If provided, the base URL to use for imports.
+    *        Example: github.com/flowcommerce/apidoc
+    *        See http://apidoc.me/attributes/go_import_base_url
+    */
+  def apply(value: String, namespace: String, goImportBaseUrl: Option[String]): ImportPath = {
     value match {
       case ApidocUrlPattern(pkg, app) => {
+        val defaultImportUrl = pkg.split("\\.").mkString("/")
 
-        Domains.keys.toSeq.sortBy(_.length).reverse.find { key =>
-          pkg.startsWith(s"${key}.")
-        } match {
+        goImportBaseUrl match {
           case None => {
-            ImportPath(value, defaultAlias(value))
+            ImportPath(defaultImportUrl, defaultAlias(defaultImportUrl))
           }
 
-          case Some(domain) => {
-            val p = pkg.replace(s"${domain}.", "")  // Ex: carrier.account
-            val url = Domains(domain) + "/" + p.split("\\.").mkString("/")
-            val alias = Text.snakeToCamelCase(p)
-            ImportPath(url, alias)
+          case Some(baseUrl) => {
+            pkg.startsWith(s"${namespace}.") match {
+              case false => {
+                ImportPath(defaultImportUrl, defaultAlias(defaultImportUrl))
+              }
+
+              case true => {
+                val p = pkg.replace(s"${namespace}.", "")  // Ex: carrier.account
+                val url = baseUrl + "/" + p.split("\\.").mkString("/")
+                val alias = Text.snakeToCamelCase(p)
+                ImportPath(url, alias)
+              }
+            }
           }
         }
       }
