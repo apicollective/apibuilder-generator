@@ -11,12 +11,12 @@ import scala.collection.mutable
 
 case class Code(form: InvocationForm) {
 
-  private[this] val GoImportBaseUrl = "go_import_base_url"
+  private[this] val GoImportMappings = "go_import_mappings"
   private[this] case class ResponseType(goType: GoType, name: String)
 
   private[this] val service = form.service
   private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
-  private[this] val importBuilder = ImportBuilder(form.attributes.find(_.name == GoImportBaseUrl).map(_.value))
+  private[this] val importBuilder = ImportBuilder(form.attributes.find(_.name == GoImportMappings).map(_.value))
   private[this] val headers = Headers(importBuilder, form)
   private[this] val urlValues = UrlValues(importBuilder, datatypeResolver)
   private[this] val responseBuilder = ResponseBuilder(importBuilder, datatypeResolver)
