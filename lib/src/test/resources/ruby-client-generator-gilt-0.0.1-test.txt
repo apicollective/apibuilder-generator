@@ -43,7 +43,7 @@ module Com
               end
 
               # Creates an instance of the client using the base url specified in the API spec.
-              def Client.base_url(opts={})
+              def Client.at_base_url(opts={})
                 Client.new(Constants::BASE_URL, opts)
               end
 
@@ -207,7 +207,7 @@ module Com
                   query = {
                     :guid => (x = opts.delete(:guid); x.nil? ? nil : HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(x), String)),
                     :organization_guids => (x = opts.delete(:organization_guids); x.nil? ? nil : HttpClient::Preconditions.assert_class('organization_guids', x, Array).map { |v| HttpClient::Preconditions.assert_class('organization_guids', v, Integer) }),
-                    :age_group => (x = opts.delete(:age_group); x.nil? ? nil : (x = x; x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(x))),
+                    :age_group => (x = opts.delete(:age_group); x.nil? ? nil : (x = x; x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(x)).value),
                     :email => (x = opts.delete(:email); x.nil? ? nil : HttpClient::Preconditions.assert_class('email', x, String)),
                     :active => HttpClient::Preconditions.assert_boolean('active', (x = opts.delete(:active); x.nil? ? true : x))
                   }.delete_if { |k, v| v.nil? }

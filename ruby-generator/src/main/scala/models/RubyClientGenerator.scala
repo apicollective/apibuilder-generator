@@ -145,7 +145,7 @@ object RubyUtil {
         Primitive.DateTimeIso8601 |
         Primitive.Uuid => rubyDefault(JsString(value), datatype)
       case _: Primitive => rubyDefault(Json.parse(value), datatype)
-      case _: Datatype.UserDefined.Enum => {
+      case Datatype.UserDefined.Enum(name) => {
         rubyDefault(JsString(value), datatype)
       }
       case _ => rubyDefault(Json.parse(value), datatype)
@@ -192,8 +192,7 @@ object RubyUtil {
       }
       case Primitive.Uuid => s"""UUID.new("${json.as[UUID]}")"""
       case Datatype.UserDefined.Enum(name)  => {
-        val value = json.as[String]
-        s"""${toClassName(name)}.apply("${value}")"""
+        s""""${json.as[String]}""""
       }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) |
         Primitive.Object | Primitive.Unit => {
@@ -407,7 +406,7 @@ case class RubyClientGenerator(form: InvocationForm) {
         "",
         "",
         "# Creates an instance of the client using the base url specified in the API spec.",
-        "def Client.base_url(opts={})",
+        "def Client.at_base_url(opts={})",
         "Client.new(Constants::BASE_URL, opts)".indent(2),
         "end"
       ).mkString("\n").indent(2)
@@ -542,7 +541,7 @@ ${headers.rubyModuleConstants.indent(2)}
         val paramBuilder = ListBuffer[String]()
 
         queryParams.foreach { param =>
-          paramBuilder.append(s":${param.name} => ${parseArgument(param.name, param.`type`, param.required, param.default)}")
+          paramBuilder.append(s":${param.name} => ${parseArgument(param.name, param.`type`, param.required, param.default, enumAsString = true)}")
         }
 
         sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")
@@ -752,7 +751,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
     model.fields.map { field =>
       val varName = RubyUtil.quoteNameIfKeyword(field.name)
-      sb.append(s"    @$varName = ${parseArgument(field.name, field.`type`, field.required, field.default)}")
+      sb.append(s"    @$varName = ${parseArgument(field.name, field.`type`, field.required, field.default, enumAsString = false)}")
     }
 
     sb.append("  end\n")
@@ -792,19 +791,23 @@ ${headers.rubyModuleConstants.indent(2)}
     fieldName: String,
     `type`: String,
     required: Boolean,
-    rawDefault: Option[String]
+    rawDefault: Option[String],
+    enumAsString: Boolean
   ): String = {
     val dt = datatypeResolver.parse(`type`, required).getOrElse {
       sys.error("Invalid type[" + `type` + "]")
     }
     val default = rawDefault.map(RubyUtil.rubyDefault(_, dt))
-    parseArgument(fieldName, s"opts.delete(:${fieldName})", dt, default)
+    parseArgument(fieldName, s"opts.delete(:${fieldName})", dt, default, enumAsString = enumAsString)
   }
 
   // TODO should be encapsulated in the RubyDatatype model
   private def parseArgument(
-    name: String, rawExpr: String,
-    dt: Datatype, default: Option[String]
+    name: String,
+    rawExpr: String,
+    dt: Datatype,
+    default: Option[String],
+    enumAsString: Boolean
   ): String = {
     import Datatype._
     def expr = default.fold(rawExpr)(d => s"(x = ${rawExpr}; x.nil? ? ${d} : x)")
@@ -845,20 +848,24 @@ ${headers.rubyModuleConstants.indent(2)}
 
       case e: UserDefined.Enum =>
         val className = qualifiedClassName(e.name)
-        s"(x = ${expr}; x.is_a?(${className}) ? x : ${className}.apply(x))"
+        val data = s"(x = ${expr}; x.is_a?(${className}) ? x : ${className}.apply(x))"
+        enumAsString match {
+          case true => s"${data}.value"
+          case false => data
+        }
 
       case u: UserDefined.Union =>
         val className = qualifiedClassName(u.name)
         s"(x = ${expr}; x.is_a?(${className}) ? x : ${className}.from_json(x))"
 
       case Container.List(inner) =>
-        s"HttpClient::Preconditions.assert_class('$name', ${expr}, Array).map { |v| ${parseArgument(name, "v", inner, None)} }"
+        s"HttpClient::Preconditions.assert_class('$name', ${expr}, Array).map { |v| ${parseArgument(name, "v", inner, None, enumAsString)} }"
 
       case Container.Map(inner) =>
-        s"HttpClient::Preconditions.assert_class('$name', ${expr}, Hash).inject({}) { |h, d| h[d[0]] = ${parseArgument(name, "d[1]", inner, None)}; h }"
+        s"HttpClient::Preconditions.assert_class('$name', ${expr}, Hash).inject({}) { |h, d| h[d[0]] = ${parseArgument(name, "d[1]", inner, None, enumAsString)}; h }"
 
       case Container.Option(inner) =>
-        s"(x = ${expr}; x.nil? ? nil : ${parseArgument(name, "x", inner, None)})"
+        s"(x = ${expr}; x.nil? ? nil : ${parseArgument(name, "x", inner, None, enumAsString)})"
     }
   }
 
