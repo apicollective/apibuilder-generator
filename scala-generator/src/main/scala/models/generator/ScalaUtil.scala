@@ -64,14 +64,13 @@ object ScalaUtil {
   def toClassName(name: String) = {
     val baseName =lib.Text.safeName(
       if (name == name.toUpperCase) {
-       lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")
+        lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")
       } else {
-       lib.Text.initCap(snakeToCamelCase(name))
+        lib.Text.initCap(snakeToCamelCase(name))
       }
     )
 
     ScalaUtil.quoteNameIfKeyword(baseName)
-
   }
 
   def toVariable(name: String): String = {

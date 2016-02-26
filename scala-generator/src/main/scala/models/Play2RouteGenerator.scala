@@ -124,7 +124,7 @@ private[models] case class Play2Route(
     primitive: ScalaPrimitive,
     value: String
   ): String = primitive match {
-    case ScalaPrimitive.String | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid => {
+    case ScalaPrimitive.String | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
       value
     }
     case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal => {
@@ -132,9 +132,6 @@ private[models] case class Play2Route(
     }
     case ScalaPrimitive.Object => {
       "play.api.libs.json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
-    }
-    case ScalaPrimitive.Enum(_, _) => {
-      "%s(%s)".format(primitive.fullName, ScalaUtil.wrapInQuotes(value))
     }
     case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Unit => {
       sys.error(s"Unsupported type[$primitive] for default values")
