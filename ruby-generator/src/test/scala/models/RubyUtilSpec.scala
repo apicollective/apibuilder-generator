@@ -72,7 +72,7 @@ class RubyUtilSpec extends FunSpec with Matchers {
     }
 
     it ("default: foo, datatype: enum") {
-      RubyUtil.rubyDefault("foo", UserDefined.Enum("test")) should be("""Test.apply("foo")""")
+      RubyUtil.rubyDefault("foo", UserDefined.Enum("test")) should be(""""foo"""")
     }
 
     it ("should fail for datatype: model") {
