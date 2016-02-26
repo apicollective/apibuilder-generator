@@ -209,9 +209,13 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override def default(value: String): String = default(JsString(value))
+    override def default(value: String): String = {
+      fullName + "." + ScalaUtil.toClassName(value)
+    }
 
-    override protected def default(json: JsValue) = s"${fullName}(${json})"
+    override protected def default(json: JsValue) = {
+      default(json.as[String])
+    }
 
     override def toVariableName = initLowerCase(shortName)
   }

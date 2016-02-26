@@ -86,7 +86,7 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
     }
 
     it ("default: foo, datatype: enum") {
-      ScalaUtil.scalaDefault("foo", ScalaPrimitive.Enum(Namespaces("test"), "test")) should be("""test.models.test("foo")""")
+      ScalaUtil.scalaDefault("foo", ScalaPrimitive.Enum(Namespaces("test"), "test")) should be("test.models.test.Foo")
     }
 
     it ("should fail for datatype: model") {
