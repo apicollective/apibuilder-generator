@@ -336,7 +336,7 @@ case class Play2Json(
         toJsObjectResult(originalName, s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))")
       }
       case ScalaPrimitive.Object => {
-        toJsObjectResult(originalName, s"play.api.libs.json.Json.obj($varName)")
+        toJsObjectResult(originalName, varName)
       }
       case ScalaDatatype.Option(inner) => {
         val value = getJsonObject(originalName, inner, "x").value
