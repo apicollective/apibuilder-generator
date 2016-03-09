@@ -4,7 +4,7 @@ name := "apidoc-generator"
 
 organization := "com.bryzek.apidoc.generator"
 
-scalaVersion in ThisBuild := "2.11.7"
+scalaVersion in ThisBuild := "2.11.8"
 
 lazy val generated = project
   .in(file("generated"))
