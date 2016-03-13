@@ -25,9 +25,31 @@ object RubyUtil {
     "__FILE__", "__LINE__"
   ).toSet
 
-  case class Module(namespace: String) {
-    val parts = namespace.split("\\.").map(toClassName(_))
-    val fullName = "::" + parts.mkString("::")
+  case class Module(
+    name: String
+  ) {
+
+    val parts = name.split("\\.").map(toClassName(_))
+
+    val fullName = "::" + (parts.toList match {
+      case Nil => sys.error(s"Invalid module name[$name]")
+      case one :: Nil => parts.mkString("::")
+      case one :: two :: Nil => parts.mkString("::")
+      case multiple => {
+        val klassName = multiple.last
+        val typ = multiple.dropRight(1).last
+
+        typ match {
+          case "Models" | "Enums" | "Unions" => {
+            multiple.dropRight(2).mkString("::") ++ s"::Models::$klassName"
+          }
+          case _ => {
+            multiple.mkString("::")
+          }
+        }
+      }
+    })
+
   }
 
   def textToComment(text: Seq[String]): String = {

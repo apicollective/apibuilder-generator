@@ -10,10 +10,13 @@ import org.scalatest.{ FunSpec, Matchers }
 class RubyUtilSpec extends FunSpec with Matchers {
 
   it("RubyUtil.Module") {
-    RubyUtil.Module("com.bryzek.apidoc.v0").parts should be(Seq("Com", "Bryzek", "Apidoc", "V0"))
-    RubyUtil.Module("com.bryzek.apidoc.v0").fullName should be("::Com::Bryzek::Apidoc::V0")
     RubyUtil.Module("foobar").fullName should be("::Foobar")
     RubyUtil.Module("foo_bar").fullName should be("::FooBar")
+    RubyUtil.Module("com.bryzek.apidoc.v0").parts should be(Seq("Com", "Bryzek", "Apidoc", "V0"))
+    RubyUtil.Module("com.bryzek.apidoc.v0").fullName should be("::Com::Bryzek::Apidoc::V0")
+    RubyUtil.Module("com.bryzek.apidoc.v0.models.change_type").fullName should be("::Com::Bryzek::Apidoc::V0::Models::ChangeType")
+    RubyUtil.Module("com.bryzek.apidoc.v0.enums.change_type").fullName should be("::Com::Bryzek::Apidoc::V0::Models::ChangeType")
+    RubyUtil.Module("com.bryzek.apidoc.v0.unions.change_type").fullName should be("::Com::Bryzek::Apidoc::V0::Models::ChangeType")
   }
 
   it("RubyUtil.toVariable") {
