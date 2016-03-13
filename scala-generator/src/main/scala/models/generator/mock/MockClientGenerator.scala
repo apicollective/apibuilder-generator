@@ -114,7 +114,7 @@ case class MockClientGenerator(
     val typ = union.types.headOption.getOrElse {
       sys.error("Union type[${union.qualifiedName}] does not have any times")
     }
-    s"def make${union.name} = ${mockValue(typ.datatype)}"
+    s"def make${union.name}() = ${mockValue(typ.datatype)}"
   }
 
   private[this] def generateMockResource(resource: ScalaResource): String = {
