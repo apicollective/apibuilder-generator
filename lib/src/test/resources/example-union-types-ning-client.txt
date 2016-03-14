@@ -307,7 +307,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
   }
 
   class Client(
-    apiUrl: String,
+    val baseUrl: String,
     auth: scala.Option[com.bryzek.apidoc.example.union.types.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil,
     asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient
@@ -359,7 +359,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
 
     def _requestBuilder(method: String, path: String): RequestBuilder = {
       val builder = new RequestBuilder(method)
-        .setUrl(apiUrl + path)
+        .setUrl(baseUrl + path)
         .addHeader("User-Agent", Constants.UserAgent)
         .addHeader("X-Apidoc-Version", Constants.Version)
         .addHeader("X-Apidoc-Version-Major", Constants.VersionMajor.toString)
@@ -446,6 +446,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
   package interfaces {
 
     trait Client {
+      def baseUrl: String
       def users: com.bryzek.apidoc.example.union.types.v0.Users
     }
 

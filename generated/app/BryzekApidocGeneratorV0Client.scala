@@ -312,7 +312,7 @@ package com.bryzek.apidoc.generator.v0 {
   }
 
   class Client(
-    apiUrl: String = "http://www.apidoc.me",
+    baseUrl: String = "http://www.apidoc.me",
     auth: scala.Option[com.bryzek.apidoc.generator.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {
@@ -322,7 +322,7 @@ package com.bryzek.apidoc.generator.v0 {
 
     private[this] val logger = play.api.Logger("com.bryzek.apidoc.generator.v0.Client")
 
-    logger.info(s"Initializing com.bryzek.apidoc.generator.v0.Client for url $apiUrl")
+    logger.info(s"Initializing com.bryzek.apidoc.generator.v0.Client for url $baseUrl")
 
     def generators: Generators = Generators
 
@@ -386,7 +386,7 @@ package com.bryzek.apidoc.generator.v0 {
     def _requestHolder(path: String): play.api.libs.ws.WSRequest = {
       import play.api.Play.current
 
-      val holder = play.api.libs.ws.WS.url(apiUrl + path).withHeaders(
+      val holder = play.api.libs.ws.WS.url(baseUrl + path).withHeaders(
         "User-Agent" -> Constants.UserAgent,
         "X-Apidoc-Version" -> Constants.Version,
         "X-Apidoc-Version-Major" -> Constants.VersionMajor.toString

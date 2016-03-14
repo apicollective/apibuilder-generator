@@ -57,6 +57,7 @@ case class MockClientGenerator(
           case _ => Some(
             Seq(
               s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
+              """  val baseUrl = "http://mock.localhost"""",
               ssd.resources.map { resource =>
                 s"override def ${generator.methodName(resource)}: Mock${resource.plural} = Mock${resource.plural}Impl"
               }.mkString("\n").indent(2),

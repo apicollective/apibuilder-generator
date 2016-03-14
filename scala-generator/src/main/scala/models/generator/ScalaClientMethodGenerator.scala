@@ -44,6 +44,7 @@ case class ScalaClientMethodGenerator(
       "package interfaces {",
       Seq(
         "trait Client {",
+        "  def baseUrl: String",
         sortedResources.map { resource =>
           s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}"
        }.mkString("\n").indent(2),
