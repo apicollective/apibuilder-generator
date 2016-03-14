@@ -21,7 +21,7 @@ object ScalaClientCommon {
 
     s"""
 class Client(
-  baseUrl: String$defaultUrl,
+  val baseUrl: String$defaultUrl,
   auth: scala.Option[${config.namespace}.Authorization] = None,
   defaultHeaders: Seq[(String, String)] = Nil${config.extraClientCtorArgs.getOrElse("")}
 ) extends interfaces.Client

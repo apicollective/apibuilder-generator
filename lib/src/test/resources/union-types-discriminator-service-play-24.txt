@@ -255,7 +255,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0 {
   }
 
   class Client(
-    baseUrl: String,
+    val baseUrl: String,
     auth: scala.Option[com.bryzek.apidoc.example.union.types.discriminator.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {
@@ -387,6 +387,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0 {
   package interfaces {
 
     trait Client {
+      def baseUrl: String
       def users: com.bryzek.apidoc.example.union.types.discriminator.v0.Users
     }
 

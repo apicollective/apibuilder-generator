@@ -446,7 +446,7 @@ package com.bryzek.apidoc.reference.api.v0 {
   }
 
   class Client(
-    baseUrl: String = "http://localhost:9000",
+    val baseUrl: String = "http://localhost:9000",
     auth: scala.Option[com.bryzek.apidoc.reference.api.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {
@@ -770,6 +770,7 @@ package com.bryzek.apidoc.reference.api.v0 {
   package interfaces {
 
     trait Client {
+      def baseUrl: String
       def echoes: com.bryzek.apidoc.reference.api.v0.Echoes
       def groups: com.bryzek.apidoc.reference.api.v0.Groups
       def members: com.bryzek.apidoc.reference.api.v0.Members

@@ -116,7 +116,7 @@ package com.gilt.test.v0 {
   }
 
   class Client(
-    baseUrl: String,
+    val baseUrl: String,
     auth: scala.Option[com.gilt.test.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil,
     asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient
@@ -258,6 +258,7 @@ package com.gilt.test.v0 {
   package interfaces {
 
     trait Client {
+      def baseUrl: String
       def users: com.gilt.test.v0.Users
     }
 
