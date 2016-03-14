@@ -116,7 +116,7 @@ package com.gilt.test.v0 {
   }
 
   class Client(
-    apiUrl: String,
+    baseUrl: String,
     auth: scala.Option[com.gilt.test.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil,
     asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient
@@ -171,7 +171,7 @@ package com.gilt.test.v0 {
 
     def _requestBuilder(method: String, path: String): RequestBuilder = {
       val builder = new RequestBuilder(method)
-        .setUrl(apiUrl + path)
+        .setUrl(baseUrl + path)
         .addHeader("User-Agent", Constants.UserAgent)
         .addHeader("X-Apidoc-Version", Constants.Version)
         .addHeader("X-Apidoc-Version-Major", Constants.VersionMajor.toString)

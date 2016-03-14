@@ -120,7 +120,7 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
 
     private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
-    logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$apiUrl")
+    logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$baseUrl")
 
 ${methodGenerator.accessors().indent(4)}
 
@@ -129,7 +129,7 @@ ${methodGenerator.objects().indent(4)}
     def _requestHolder(path: String): ${version.requestHolderClass} = {
       import play.api.Play.current
 
-      val holder = play.api.libs.ws.WS.url(apiUrl + path)$headerString
+      val holder = play.api.libs.ws.WS.url(baseUrl + path)$headerString
       auth.fold(holder) {
         case Authorization.Basic(username, password) => {
           holder.withAuth(username, password.getOrElse(""), ${version.authSchemeClass}.BASIC)

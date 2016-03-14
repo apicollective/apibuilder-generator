@@ -96,7 +96,7 @@ ${methodGenerator.objects().indent(4)}
 
     def _requestBuilder(method: String, path: String): RequestBuilder = {
       val builder = new RequestBuilder(method)
-        .setUrl(apiUrl + path)
+        .setUrl(baseUrl + path)
 ${headerString.indent(8)}
 
       defaultHeaders.foreach { h => builder.addHeader(h._1, h._2) }

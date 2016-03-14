@@ -1233,7 +1233,7 @@ package com.bryzek.apidoc.spec.v0 {
   }
 
   class Client(
-    apiUrl: String,
+    baseUrl: String,
     auth: scala.Option[com.bryzek.apidoc.spec.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {
@@ -1241,7 +1241,7 @@ package com.bryzek.apidoc.spec.v0 {
 
     private[this] val logger = play.api.Logger("com.bryzek.apidoc.spec.v0.Client")
 
-    logger.info(s"Initializing com.bryzek.apidoc.spec.v0.Client for url $apiUrl")
+    logger.info(s"Initializing com.bryzek.apidoc.spec.v0.Client for url $baseUrl")
 
 
 
@@ -1250,7 +1250,7 @@ package com.bryzek.apidoc.spec.v0 {
     def _requestHolder(path: String): play.api.libs.ws.WSRequest = {
       import play.api.Play.current
 
-      val holder = play.api.libs.ws.WS.url(apiUrl + path).withHeaders(
+      val holder = play.api.libs.ws.WS.url(baseUrl + path).withHeaders(
         "User-Agent" -> Constants.UserAgent,
         "X-Apidoc-Version" -> Constants.Version,
         "X-Apidoc-Version-Major" -> Constants.VersionMajor.toString
