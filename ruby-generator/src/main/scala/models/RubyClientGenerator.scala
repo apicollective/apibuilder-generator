@@ -914,7 +914,7 @@ ${headers.rubyModuleConstants.indent(2)}
     pt match {
       case Primitive.Boolean => "String"
       case Primitive.Decimal => "BigDecimal"
-      case Primitive.Double => "Float"
+      case Primitive.Double => "Numeric"
       case Primitive.Integer => "Integer"
       case Primitive.Long => "Integer"
       case Primitive.DateIso8601 => "Date"
