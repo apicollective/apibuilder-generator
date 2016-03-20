@@ -274,7 +274,12 @@ case class ScalaClientMethod(
   import lib.Text._
 
   val name: String = operation.name
-  val argList: Option[String] = operation.argList
+
+  val argList: Option[String] = operation.parameters.find(_.name.toLowerCase == "requestheaders") match {
+    case Some(_) => operation.argList()
+    case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
+  }
+
   val comments: Option[String] = operation.description
 
   private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")

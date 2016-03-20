@@ -225,17 +225,19 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   val name: String = GeneratorUtil.urlToMethodName(resource.path, resource.resource.operations.map(_.path), operation.method, path)
 
-  val argList: Option[String] = body match {
+  def argList(addlArgs: Seq[String] = Nil): Option[String] = body match {
     case None => {
-      ScalaUtil.fieldsToArgList(parameters.map(_.definition()))
+      ScalaUtil.fieldsToArgList(parameters.map(_.definition()) ++ addlArgs)
     }
+
     case Some(body) => {
       val bodyVarName = body.datatype.toVariableName
 
       ScalaUtil.fieldsToArgList(
         parameters.filter(_.param.required).map(_.definition()) ++
         Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), body.datatype.name)) ++
-        parameters.filter(!_.param.required).map(_.definition())
+        parameters.filter(!_.param.required).map(_.definition()) ++
+        addlArgs
       )
     }
   }
