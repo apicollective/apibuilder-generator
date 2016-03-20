@@ -94,12 +94,13 @@ ${methodGenerator.objects().indent(4)}
       logger.info("_logRequest: " + request)
     }
 
-    def _requestBuilder(method: String, path: String): RequestBuilder = {
+    def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): RequestBuilder = {
       val builder = new RequestBuilder(method)
         .setUrl(baseUrl + path)
 ${headerString.indent(8)}
 
       defaultHeaders.foreach { h => builder.addHeader(h._1, h._2) }
+      requestHeaders.foreach { h => builder.addHeader(h._1, h._2) }
 
       auth.fold(builder) {
         case Authorization.Basic(username, passwordOpt) => {
@@ -119,10 +120,11 @@ ${headerString.indent(8)}
     def _executeRequest(
       method: String,
       path: String,
-      queryParameters: Seq[(String, String)] = Seq.empty,
+      queryParameters: Seq[(String, String)] = Nil,
+      requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.ning.http.client.Response] = {
-      val request = _requestBuilder(method, path)
+      val request = _requestBuilder(method, path, requestHeaders)
 
       queryParameters.foreach { pair =>
         request.${config.addQueryParamMethod}(pair._1, pair._2)

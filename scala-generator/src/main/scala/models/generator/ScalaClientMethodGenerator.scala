@@ -160,9 +160,10 @@ case class ScalaClientMethodGenerator(
         code.append(v)
         args.append("queryParameters = queryParameters")
       }
+      args.append("requestHeaders = requestHeaders")
 
       val methodCall = code.toList match {
-        case Nil => s"""_executeRequest("${op.method}", $path)"""
+        case Nil => s"""_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
         case v => s"""${v.mkString("\n\n")}\n\n_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
       }
 
