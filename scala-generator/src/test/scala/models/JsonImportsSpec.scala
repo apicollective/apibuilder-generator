@@ -14,8 +14,10 @@ class JsonImportsSpec extends FunSpec with ShouldMatchers {
   }
 
   it("includes imports") {
+    println(JsonImports(models.TestHelper.generatorApiService))
     JsonImports(models.TestHelper.generatorApiService) should be(
       Seq(
+        "import com.bryzek.apidoc.common.v0.models.json._",
         "import com.bryzek.apidoc.generator.v0.models.json._",
         "import com.bryzek.apidoc.spec.v0.models.json._"
       )
