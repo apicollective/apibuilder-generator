@@ -18,13 +18,15 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
       "enums": [],
       "unions": [],
       "resources": [],
+      "attributes": [],
 
       "models": [
         {
           "name": "content",
           "plural": "contents",
+          "attributes": [],
           "fields": [
-            { "name": "data", "type": "%s", "required": true }
+            { "name": "data", "type": "%s", "required": true, "attributes": [] }
           ]
         }
       ]
@@ -98,13 +100,15 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
       "info": [],
       "enums": [],
       "unions": [],
+      "attributes": [],
 
       "models": [
         {
           "name": "content",
           "plural": "contents",
+          "attributes": [],
           "fields": [
-            { "name": "id", "type": "long", "required": true }
+            { "name": "id", "type": "long", "required": true, "attributes": [] }
           ]
         }
       ],
@@ -113,12 +117,14 @@ class ScalaPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
         {
           "type": "content",
           "plural": "contents",
+          "attributes": [],
 
           "operations": [
             {
               "method": "GET",
               "path": "/contents/data",
               "parameters": [],
+              "attributes": [],
               "responses": [
                 { "code": { "integer": { "value": 200 } }, "type": "%s" }
               ]

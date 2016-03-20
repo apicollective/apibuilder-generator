@@ -1,6 +1,8 @@
 object Contents extends Contents {
-  override def get()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, _root_.play.api.libs.json.JsObject]] = {
-    _executeRequest("GET", s"/contents/data").map {
+  override def get(
+    requestHeaders: Seq[(String, String)] = Nil
+  )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, _root_.play.api.libs.json.JsObject]] = {
+    _executeRequest("GET", s"/contents/data", requestHeaders = requestHeaders).map {
       case r if r.status == 200 => _root_.test.apidoc.Client.parseJson("Map[String, _root_.play.api.libs.json.JsObject]", r, _.validate[Map[String, _root_.play.api.libs.json.JsObject]])
       case r => throw new test.apidoc.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
     }
