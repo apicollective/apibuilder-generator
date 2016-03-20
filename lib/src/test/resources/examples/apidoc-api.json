@@ -1,31 +1,80 @@
 {
   "apidoc": {
-    "version": "0.9.6"
+    "version": "0.11.17"
   },
   "name": "apidoc api",
   "organization": {
-    "key": "gilt"
+    "key": "bryzek"
   },
   "application": {
     "key": "apidoc-api"
   },
   "namespace": "com.bryzek.apidoc.api.v0",
-  "version": "0.9.6",
-  "base_url": "http://api.apidoc.me",
-  "description": "Host API documentation for applications providing REST APIs, facilitating the design of good resource first APIs.",
+  "version": "0.11.17",
+  "info": {
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "contact": {
+      "name": "Michael Bryzek",
+      "url": "http://twitter.com/mbryzek",
+      "email": "mbryzek@alum.mit.edu"
+    }
+  },
   "headers": [],
-  "info": [],
   "imports": [
     {
-      "uri": "http://localhost:9000/gilt/apidoc-spec/0.9.6/service.json",
+      "uri": "http://www.apidoc.me/bryzek/apidoc-common/0.11.17/service.json",
+      "namespace": "com.bryzek.apidoc.common.v0",
+      "organization": {
+        "key": "bryzek"
+      },
+      "application": {
+        "key": "apidoc-common"
+      },
+      "version": "0.11.17",
+      "enums": [],
+      "unions": [],
+      "models": [
+        "audit",
+        "healthcheck",
+        "reference",
+        "reference_guid"
+      ]
+    },
+    {
+      "uri": "http://www.apidoc.me/bryzek/apidoc-generator/0.11.17/service.json",
+      "namespace": "com.bryzek.apidoc.generator.v0",
+      "organization": {
+        "key": "bryzek"
+      },
+      "application": {
+        "key": "apidoc-generator"
+      },
+      "version": "0.11.17",
+      "enums": [],
+      "unions": [],
+      "models": [
+        "attribute",
+        "error",
+        "file",
+        "generator",
+        "healthcheck",
+        "invocation",
+        "invocation_form"
+      ]
+    },
+    {
+      "uri": "http://www.apidoc.me/bryzek/apidoc-spec/0.11.17/service.json",
       "namespace": "com.bryzek.apidoc.spec.v0",
       "organization": {
-        "key": "gilt"
+        "key": "bryzek"
       },
       "application": {
         "key": "apidoc-spec"
       },
-      "version": "0.9.6",
+      "version": "0.11.17",
       "enums": [
         "method",
         "parameter_location",
@@ -37,13 +86,17 @@
       "models": [
         "apidoc",
         "application",
+        "attribute",
         "body",
+        "contact",
         "deprecation",
         "enum",
         "enum_value",
         "field",
         "header",
         "import",
+        "info",
+        "license",
         "model",
         "operation",
         "organization",
@@ -63,103 +116,161 @@
       "values": [
         {
           "name": "api_json",
+          "attributes": [],
           "description": "The original is in the api.json format"
         },
         {
           "name": "swagger_json",
+          "attributes": [],
           "description": "The original in the swagger.json format"
         },
         {
           "name": "avro_idl",
+          "attributes": [],
           "description": "The original is in Avro Idl format"
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "publication",
       "plural": "publications",
-      "description": "A publication represents something that a user can subscribe to. An example would be subscribing to an email alert whenever a new version of an application is created.",
       "values": [
         {
           "name": "membership_requests.create",
+          "attributes": [],
           "description": "For organizations for which I am an administrator, email me whenever a user applies to join the org."
         },
         {
           "name": "memberships.create",
+          "attributes": [],
           "description": "For organizations for which I am a member, email me whenever a user joins the org."
         },
         {
           "name": "applications.create",
+          "attributes": [],
           "description": "For organizations for which I am a member, email me whenever an application is created."
         },
         {
           "name": "versions.create",
+          "attributes": [],
           "description": "For applications that I watch, email me whenever a version is created."
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "A publication represents something that a user can subscribe to. An example would be subscribing to an email alert whenever a new version of an application is created."
     },
     {
       "name": "visibility",
       "plural": "visibilities",
-      "description": "Controls who is able to view this version",
       "values": [
         {
           "name": "user",
+          "attributes": [],
           "description": "Only the creator can view this application"
         },
         {
           "name": "organization",
+          "attributes": [],
           "description": "Any member of the organization can view this application"
         },
         {
           "name": "public",
+          "attributes": [],
           "description": "Anybody, including non logged in users, can view this application"
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Controls who is able to view this version"
     }
   ],
-  "unions": [],
+  "unions": [
+    {
+      "name": "diff",
+      "plural": "diffs",
+      "types": [
+        {
+          "type": "diff_breaking",
+          "attributes": []
+        },
+        {
+          "type": "diff_non_breaking",
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "discriminator": "type",
+      "description": "Represents a single diff in an application"
+    },
+    {
+      "name": "item_detail",
+      "plural": "item_details",
+      "types": [
+        {
+          "type": "application_summary",
+          "attributes": [],
+          "description": "Represents that the item indexed was an application"
+        }
+      ],
+      "attributes": [],
+      "discriminator": "type",
+      "description": "Identifies the specific type of item that was indexed by search"
+    }
+  ],
   "models": [
     {
       "name": "application",
       "plural": "applications",
-      "description": "An application has a name and multiple versions of its API.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this application.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this application."
         },
         {
           "name": "organization",
-          "type": "reference",
-          "required": true
+          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "required": true,
+          "attributes": []
         },
         {
           "name": "name",
           "type": "string",
-          "description": "The unique name for this application.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The unique name for this application."
         },
         {
           "name": "key",
           "type": "string",
-          "description": "Used as a unique key in the URL path. Key is automatically derived from the application name.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Used as a unique key in the URL path. Key is automatically derived from the application name."
         },
         {
           "name": "visibility",
           "type": "visibility",
-          "description": "Controls who is able to view this application",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Controls who is able to view this application"
         },
         {
           "name": "description",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "An application has a name and multiple versions of its API."
     },
     {
       "name": "application_form",
@@ -168,108 +279,368 @@
         {
           "name": "name",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "key",
           "type": "string",
-          "description": "Defaults to a key generated from the application name",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "Defaults to a key generated from the application name"
         },
         {
           "name": "description",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "visibility",
           "type": "visibility",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     },
     {
-      "name": "audit",
-      "plural": "audits",
+      "name": "application_summary",
+      "plural": "application_summaries",
       "fields": [
         {
-          "name": "created_at",
-          "type": "date-time-iso8601",
-          "required": true
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": []
         },
         {
-          "name": "created_by",
-          "type": "reference_guid",
-          "required": true
+          "name": "organization",
+          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "required": true,
+          "attributes": []
         },
         {
-          "name": "updated_at",
-          "type": "date-time-iso8601",
-          "required": true
-        },
-        {
-          "name": "updated_by",
-          "type": "reference_guid",
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "cleartext_token",
-      "plural": "cleartext_tokens",
-      "description": "Separate resource used only for the few actions that require the full token.",
-      "fields": [
-        {
-          "name": "token",
+          "name": "key",
           "type": "string",
-          "description": "The actual token. Guaranteed to be globally unique.",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Summary of an application sufficient for display and links"
     },
     {
-      "name": "code",
-      "plural": "code",
-      "description": "Generated source code.",
+      "name": "attribute",
+      "plural": "attributes",
       "fields": [
         {
-          "name": "generator",
-          "type": "generator",
-          "required": true
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this attribute."
         },
         {
-          "name": "source",
+          "name": "name",
           "type": "string",
-          "description": "The actual source code.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The name of the attribute. Globally unique and an 'identifier' (lower case, url safe, etc.)"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "attributes": [],
+          "description": "Optional description - a good description here will indicate which code generators it applies to and what effect it will have on those code generators."
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Attributes are globally unique key which allow users to specify additional content to pass in to the code generators."
     },
     {
-      "name": "domain",
-      "plural": "domains",
-      "description": "Represents a single domain name (e.g. www.apidoc.me). When a new user registers and confirms their email, we automatically associate that user with a member of the organization associated with their domain. For example, if you confirm your account with an email address of foo@gilt.com, we will automatically create a membership request on your behalf to join the organization with domain gilt.com.",
+      "name": "attribute_form",
+      "plural": "attribute_forms",
       "fields": [
         {
           "name": "name",
           "type": "string",
-          "description": "The domain name",
           "required": true,
-          "example": "www.apidoc.me"
+          "attributes": []
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     },
     {
-      "name": "email_verification_confirmation_form",
-      "plural": "email_verification_confirmation_forms",
-      "description": "Data used to confirm an email address. The token is an internal unique identifier used to lookup the specific email address and user account for which we sent an email verification email.",
+      "name": "attribute_summary",
+      "plural": "attribute_summaries",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this attribute."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "The name of the attribute. Globally unique and an 'identifier' (lower case, url safe, etc.)"
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "attribute_value",
+      "plural": "attribute_values",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this attribute value."
+        },
+        {
+          "name": "attribute",
+          "type": "attribute_summary",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "Attribute values can be set at different levels. Initially we support setting organization wide attributes, but in the future plan to support setting attribute values with each version of the application."
+    },
+    {
+      "name": "attribute_value_form",
+      "plural": "attribute_value_forms",
+      "fields": [
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "change",
+      "plural": "changes",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "organization",
+          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "application",
+          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "from_version",
+          "type": "change_version",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "to_version",
+          "type": "change_version",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "diff",
+          "type": "diff",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "changed_at",
+          "type": "date-time-iso8601",
+          "required": true,
+          "attributes": [],
+          "description": "Records the timestamp of when the actual change occurred (vs. when we created the changed record)"
+        },
+        {
+          "name": "changed_by",
+          "type": "user_summary",
+          "required": true,
+          "attributes": [],
+          "description": "Records who made the actual change"
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "Represents a single change from one version of a service to another"
+    },
+    {
+      "name": "change_version",
+      "plural": "change_versions",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "version",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "Represents a simpler model of a version specifically for the use case of displaying changes"
+    },
+    {
+      "name": "cleartext_token",
+      "plural": "cleartext_tokens",
       "fields": [
         {
           "name": "token",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The actual token. Guaranteed to be globally unique."
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Separate resource used only for the few actions that require the full token."
+    },
+    {
+      "name": "code",
+      "plural": "code",
+      "fields": [
+        {
+          "name": "generator",
+          "type": "generator_with_service",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "The actual source code.",
+          "deprecation": {
+            "description": "Use files instead"
+          }
+        },
+        {
+          "name": "files",
+          "type": "[com.bryzek.apidoc.generator.v0.models.file]",
+          "required": true,
+          "attributes": [],
+          "description": "A collection of source files",
+          "default": "[]"
+        }
+      ],
+      "attributes": [],
+      "description": "Generated source code."
+    },
+    {
+      "name": "diff_breaking",
+      "plural": "diff_breakings",
+      "fields": [
+        {
+          "name": "description",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "example": "model removed: user"
+        }
+      ],
+      "attributes": [],
+      "description": "Represents a single breaking diff of an application version. A breaking diff indicates that it is possible for an existing client to now experience an error or invalid data due to the diff."
+    },
+    {
+      "name": "diff_non_breaking",
+      "plural": "diff_non_breakings",
+      "fields": [
+        {
+          "name": "description",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "example": "name diffd from foo to bar"
+        }
+      ],
+      "attributes": [],
+      "description": "Represents a single NON breaking diff of an application version."
+    },
+    {
+      "name": "domain",
+      "plural": "domains",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "The domain name",
+          "example": "www.apidoc.me"
+        }
+      ],
+      "attributes": [],
+      "description": "Represents a single domain name (e.g. www.apidoc.me). When a new user registers and confirms their email, we automatically associate that user with a member of the organization associated with their domain. For example, if you confirm your account with an email address of foo@bryzek.com, we will automatically create a membership request on your behalf to join the organization with domain bryzek.com."
+    },
+    {
+      "name": "email_verification_confirmation_form",
+      "plural": "email_verification_confirmation_forms",
+      "fields": [
+        {
+          "name": "token",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "Data used to confirm an email address. The token is an internal unique identifier used to lookup the specific email address and user account for which we sent an email verification email."
     },
     {
       "name": "error",
@@ -278,229 +649,282 @@
         {
           "name": "code",
           "type": "string",
-          "description": "Machine readable code for this specific error message",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Machine readable code for this specific error message"
         },
         {
           "name": "message",
           "type": "string",
-          "description": "Description of the error",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Description of the error"
         }
-      ]
+      ],
+      "attributes": []
     },
     {
-      "name": "generator",
-      "plural": "generators",
-      "description": "An apidoc generator",
+      "name": "generator_form",
+      "plural": "generator_forms",
+      "fields": [
+        {
+          "name": "service_guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "generator",
+          "type": "com.bryzek.apidoc.generator.v0.models.generator",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "generator_service",
+      "plural": "generator_services",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this generator.",
-          "required": true
-        },
-        {
-          "name": "key",
-          "type": "string",
-          "description": "A human readable key identifying this generator.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "uri",
           "type": "string",
-          "description": "The uri of the generator",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
-          "name": "name",
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "Defines a service that provides one or more code generators"
+    },
+    {
+      "name": "generator_service_form",
+      "plural": "generator_service_forms",
+      "fields": [
+        {
+          "name": "uri",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "generator_with_service",
+      "plural": "generator_with_services",
+      "fields": [
+        {
+          "name": "service",
+          "type": "generator_service",
+          "required": true,
+          "attributes": []
         },
         {
-          "name": "language",
+          "name": "generator",
+          "type": "com.bryzek.apidoc.generator.v0.models.generator",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "Wraps a service and a generator providing easier access for applications."
+    },
+    {
+      "name": "item",
+      "plural": "items",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": [],
+          "description": "Unique identifer for this item. By using a UUID, you can combine with the type to figure out the URI for the resource"
+        },
+        {
+          "name": "detail",
+          "type": "item_detail",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "label",
           "type": "string",
-          "required": false
+          "required": true,
+          "attributes": []
         },
         {
           "name": "description",
           "type": "string",
-          "required": false
-        },
-        {
-          "name": "visibility",
-          "type": "visibility",
-          "required": true
+          "required": false,
+          "attributes": []
         }
-      ]
-    },
-    {
-      "name": "generator_create_form",
-      "plural": "generator_create_forms",
-      "description": "Form to create a new generator",
-      "fields": [
-        {
-          "name": "key",
-          "type": "string",
-          "required": true
-        },
-        {
-          "name": "uri",
-          "type": "string",
-          "required": true
-        },
-        {
-          "name": "visibility",
-          "type": "visibility",
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "generator_org_form",
-      "plural": "generator_org_forms",
-      "description": "Form to enable or disable a generator for an organization",
-      "fields": [
-        {
-          "name": "enabled",
-          "type": "boolean",
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "generator_update_form",
-      "plural": "generator_update_forms",
-      "description": "Form to update a generator",
-      "fields": [
-        {
-          "name": "visibility",
-          "type": "visibility",
-          "description": "Used to change the visibility of the generator. If present on the request, the visibility is set to the specified value.",
-          "required": false
-        },
-        {
-          "name": "enabled",
-          "type": "boolean",
-          "description": "Used to enable or disable the generator for this user. If present on the request, the enabled flag is set to the specified value (true/false).",
-          "required": false
-        }
-      ]
-    },
-    {
-      "name": "healthcheck",
-      "plural": "healthchecks",
-      "fields": [
-        {
-          "name": "status",
-          "type": "string",
-          "required": true,
-          "example": "healthy"
-        }
-      ]
+      ],
+      "attributes": [],
+      "description": "When searching for content, the results of the search will be a list of items. Each item will have enough information to render for the user, including a type and item_guid to enable creating the appropriate link."
     },
     {
       "name": "membership",
       "plural": "memberships",
-      "description": "A membership represents a user in a specific role to an organization. Memberships cannot be created directly. Instead you first create a membership request, then that request is either accepted or declined.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this membership.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this membership."
         },
         {
           "name": "user",
           "type": "user",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization",
           "type": "organization",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "role",
           "type": "string",
-          "description": "The role this user plays for this organization. Typically member or admin.",
           "required": true,
+          "attributes": [],
+          "description": "The role this user plays for this organization. Typically member or admin.",
           "example": "member"
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "A membership represents a user in a specific role to an organization. Memberships cannot be created directly. Instead you first create a membership request, then that request is either accepted or declined."
     },
     {
       "name": "membership_request",
       "plural": "membership_requests",
-      "description": "A membership request represents a user requesting to join an organization with a specific role (e.g. as a member or an admin). Membership requests can be reviewed by any current admin of the organization who can either accept or decline the request.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this membership request.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this membership request."
         },
         {
           "name": "user",
           "type": "user",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization",
           "type": "organization",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "role",
           "type": "string",
-          "description": "The requested role for membership to this organization. Typically member or admin.",
           "required": true,
+          "attributes": [],
+          "description": "The requested role for membership to this organization. Typically member or admin.",
           "example": "member"
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "A membership request represents a user requesting to join an organization with a specific role (e.g. as a member or an admin). Membership requests can be reviewed by any current admin of the organization who can either accept or decline the request."
+    },
+    {
+      "name": "move_form",
+      "plural": "move_forms",
+      "fields": [
+        {
+          "name": "org_key",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "The key of the organization to which we are moving this item"
+        }
+      ],
+      "attributes": []
     },
     {
       "name": "organization",
       "plural": "organizations",
-      "description": "An organization is used to group a set of applications together.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this organization.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this organization."
         },
         {
           "name": "key",
           "type": "string",
-          "description": "Used as a unique key in the URL path. Key is automatically derived from the organization name.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Used as a unique key in the URL path. Key is automatically derived from the organization name."
         },
         {
           "name": "name",
           "type": "string",
-          "description": "The name of this organization.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The name of this organization."
         },
         {
           "name": "namespace",
           "type": "string",
-          "description": "Global namespace for this organization.",
           "required": true,
-          "example": "com.gilt"
+          "attributes": [],
+          "description": "Global namespace for this organization.",
+          "example": "com.bryzek"
         },
         {
           "name": "visibility",
           "type": "visibility",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "domains",
           "type": "[domain]",
-          "default": "[]",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "default": "[]"
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "An organization is used to group a set of applications together."
     },
     {
       "name": "organization_form",
@@ -509,52 +933,61 @@
         {
           "name": "name",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "key",
           "type": "string",
-          "description": "Defaults to a url friendy version of the name",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "Defaults to a url friendy version of the name"
         },
         {
           "name": "namespace",
           "type": "string",
-          "description": "Global namespace for this organization.",
           "required": true,
-          "example": "com.gilt"
+          "attributes": [],
+          "description": "Global namespace for this organization.",
+          "example": "com.bryzek"
         },
         {
           "name": "visibility",
           "type": "visibility",
+          "required": true,
+          "attributes": [],
           "description": "Public organizations will be listed in apidoc directory. Organizations with visibility organization will only be visible to members of that org.",
-          "default": "organization",
-          "required": true
+          "default": "organization"
         },
         {
           "name": "domains",
           "type": "[string]",
           "required": false,
+          "attributes": [],
           "example": "apidoc.me"
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "original",
       "plural": "originals",
-      "description": "Represents the original input used to create an application version",
       "fields": [
         {
           "name": "type",
           "type": "original_type",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "data",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Represents the original input used to create an application version"
     },
     {
       "name": "original_form",
@@ -563,114 +996,107 @@
         {
           "name": "type",
           "type": "original_type",
-          "description": "If not specified, we set the type by inspecting the data",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "If not specified, we set the type by inspecting the data"
         },
         {
           "name": "data",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "password_reset",
       "plural": "password_resets",
-      "description": "Allows a user to change their password with authentication from a token.",
       "fields": [
         {
           "name": "token",
           "type": "string",
-          "description": "Unique one time use token to change a password",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Unique one time use token to change a password"
         },
         {
           "name": "password",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Allows a user to change their password with authentication from a token."
     },
     {
       "name": "password_reset_request",
       "plural": "password_reset_requests",
-      "description": "Create a password reset request - e.g. an email containing a one time URL to change a password",
       "fields": [
         {
           "name": "email",
           "type": "string",
-          "description": "The email address for which we generate the password reset.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The email address for which we generate the password reset."
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Create a password reset request - e.g. an email containing a one time URL to change a password"
     },
     {
       "name": "password_reset_success",
       "plural": "password_reset_successes",
-      "description": "On a successful password reset, return some metadata about the user modified.",
       "fields": [
         {
           "name": "user_guid",
           "type": "uuid",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
-    },
-    {
-      "name": "reference",
-      "plural": "references",
-      "description": "Represents a reference to another model.",
-      "fields": [
-        {
-          "name": "guid",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "key",
-          "type": "string",
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "reference_guid",
-      "plural": "reference_guids",
-      "fields": [
-        {
-          "name": "guid",
-          "type": "uuid",
-          "required": true
-        }
-      ]
+      ],
+      "attributes": [],
+      "description": "On a successful password reset, return some metadata about the user modified."
     },
     {
       "name": "subscription",
       "plural": "subscriptions",
-      "description": "Represents a user that is currently subscribed to a publication",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this subscription record",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this subscription record"
         },
         {
           "name": "organization",
           "type": "organization",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "user",
           "type": "user",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "publication",
           "type": "publication",
-          "required": true
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Represents a user that is currently subscribed to a publication"
     },
     {
       "name": "subscription_form",
@@ -679,55 +1105,65 @@
         {
           "name": "organization_key",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "user_guid",
           "type": "uuid",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "publication",
           "type": "publication",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "token",
       "plural": "tokens",
-      "description": "A token gives a user access to the API.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this token.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this token."
         },
         {
           "name": "user",
           "type": "user",
-          "description": "The user to which this token belongs.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The user to which this token belongs."
         },
         {
           "name": "masked_token",
           "type": "string",
-          "description": "The masked from of the token.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The masked from of the token."
         },
         {
           "name": "description",
           "type": "string",
-          "description": "optional description to help the user manage the token.",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "optional description to help the user manage the token."
         },
         {
           "name": "audit",
-          "type": "audit",
-          "required": true
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "A token gives a user access to the API."
     },
     {
       "name": "token_form",
@@ -736,44 +1172,58 @@
         {
           "name": "user_guid",
           "type": "uuid",
-          "description": "The user for which we are creating the token.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "The user for which we are creating the token."
         },
         {
           "name": "description",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "user",
       "plural": "users",
-      "description": "A user is a top level person interacting with the api doc server.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this user.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this user."
         },
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "nickname",
           "type": "string",
-          "description": "Public unique identifier for this user.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Public unique identifier for this user."
         },
         {
           "name": "name",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "A user is a top level person interacting with the api doc server."
     },
     {
       "name": "user_form",
@@ -782,25 +1232,50 @@
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "password",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "nickname",
           "type": "string",
-          "description": "Defaults to a unique identifier based on email address",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "Defaults to a unique identifier based on email address"
         },
         {
           "name": "name",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
+    },
+    {
+      "name": "user_summary",
+      "plural": "user_summaries",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "nickname",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "Summary of a user sufficient for display"
     },
     {
       "name": "user_update_form",
@@ -809,81 +1284,101 @@
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "nickname",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "name",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "validation",
       "plural": "validations",
-      "description": "Used only to validate json files - used as a resource where http status code defines success",
       "fields": [
         {
           "name": "valid",
           "type": "boolean",
-          "description": "If true, the json schema is valid. If false, there is at least one validation error.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "If true, the json schema is valid. If false, there is at least one validation error."
         },
         {
           "name": "errors",
           "type": "[string]",
+          "required": true,
+          "attributes": [],
           "description": "Contains any validation errors that result from parsing the json document. If empty, the document is valid.",
-          "default": "[]",
-          "required": true
+          "default": "[]"
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Used only to validate json files - used as a resource where http status code defines success"
     },
     {
       "name": "version",
       "plural": "versions",
-      "description": "Represents a unique version of the application.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this version.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this version."
         },
         {
           "name": "organization",
-          "type": "reference",
-          "required": true
+          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "required": true,
+          "attributes": []
         },
         {
           "name": "application",
-          "type": "reference",
-          "required": true
+          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "required": true,
+          "attributes": []
         },
         {
           "name": "version",
           "type": "string",
-          "description": "The tag for this version. Can be anything, but if semver style version number is used, we automatically correctly sort by version number to find latest. Otherwise latest version is considered to be the most recently created.",
           "required": true,
+          "attributes": [],
+          "description": "The tag for this version. Can be anything, but if semver style version number is used, we automatically correctly sort by version number to find latest. Otherwise latest version is considered to be the most recently created.",
           "example": "1.0.0"
         },
         {
           "name": "original",
           "type": "original",
-          "description": "The original uploaded file describing this version, if available",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "The original uploaded file describing this version, if available"
         },
         {
           "name": "service",
           "type": "com.bryzek.apidoc.spec.v0.models.service",
-          "description": "spec/service.json description of this API",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "spec/spec.json description of this API"
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Represents a unique version of the application."
     },
     {
       "name": "version_form",
@@ -892,43 +1387,57 @@
         {
           "name": "original_form",
           "type": "original_form",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "visibility",
           "type": "visibility",
-          "description": "If provided, updates the visibility for all versions of this application",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "If provided, updates the visibility for all versions of this application"
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "watch",
       "plural": "watches",
-      "description": "Users can watch individual applications which enables features like receiving an email notification when there is a new version of an application.",
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
-          "description": "Internal unique identifier for this watch",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this watch"
         },
         {
           "name": "user",
           "type": "user",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization",
           "type": "organization",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "application",
           "type": "application",
-          "required": true
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "audit",
+          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "Users can watch individual applications which enables features like receiving an email notification when there is a new version of an application."
     },
     {
       "name": "watch_form",
@@ -937,19 +1446,23 @@
         {
           "name": "user_guid",
           "type": "uuid",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization_key",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "application_key",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     }
   ],
   "resources": [
@@ -960,42 +1473,48 @@
         {
           "method": "GET",
           "path": "/:orgKey",
-          "description": "Search all applications. Results are always paginated.",
           "parameters": [
             {
               "name": "orgKey",
               "type": "string",
               "location": "Path",
-              "description": "The organization key for which to search applications",
-              "required": true
+              "required": true,
+              "description": "The organization key for which to search applications"
             },
             {
               "name": "name",
               "type": "string",
               "location": "Query",
-              "description": "The name of an application. Case in-sensitive. Exact match",
-              "required": false
+              "required": false,
+              "description": "The name of an application. Case in-sensitive. Exact match"
+            },
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Query",
+              "required": false,
+              "description": "The guid of an application. Exact match"
             },
             {
               "name": "key",
               "type": "string",
               "location": "Query",
-              "description": "The key of an application. Case in-sensitive. Exact match",
-              "required": false
+              "required": false,
+              "description": "The key of an application. Case in-sensitive. Exact match"
             },
             {
               "name": "has_version",
               "type": "boolean",
               "location": "Query",
-              "description": "If true, we return applications that have at least one version. If false, we return applications that have no versions in the system",
-              "required": false
+              "required": false,
+              "description": "If true, we return applications that have at least one version. If false, we return applications that have no versions in the system"
             },
             {
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
               "maximum": 100
             },
@@ -1003,8 +1522,8 @@
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -1018,15 +1537,13 @@
               },
               "type": "[application]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search all applications. Results are always paginated."
         },
         {
           "method": "POST",
           "path": "/:orgKey",
-          "description": "Create an application.",
-          "body": {
-            "type": "application_form"
-          },
           "parameters": [
             {
               "name": "orgKey",
@@ -1052,15 +1569,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create an application.",
+          "body": {
+            "type": "application_form",
+            "attributes": []
+          }
         },
         {
           "method": "PUT",
           "path": "/:orgKey/:applicationKey",
-          "description": "Updates an application.",
-          "body": {
-            "type": "application_form"
-          },
           "parameters": [
             {
               "name": "orgKey",
@@ -1092,12 +1611,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Updates an application.",
+          "body": {
+            "type": "application_form",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
           "path": "/:orgKey/:applicationKey",
-          "description": "Deletes a specific application and its associated versions.",
           "parameters": [
             {
               "name": "orgKey",
@@ -1121,9 +1645,281 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Deletes a specific application and its associated versions."
+        },
+        {
+          "method": "POST",
+          "path": "/:orgKey/:applicationKey/move",
+          "parameters": [
+            {
+              "name": "orgKey",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "applicationKey",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "application"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 409
+                }
+              },
+              "type": "[error]"
+            }
+          ],
+          "attributes": [],
+          "description": "Moves application to a new organization.",
+          "body": {
+            "type": "move_form",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/:orgKey"
+    },
+    {
+      "type": "attribute",
+      "plural": "attributes",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/attributes",
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Query",
+              "required": false,
+              "description": "Find the watch with this guid."
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "Find attributes with this name. Case in-sensitive. Exact match"
+            },
+            {
+              "name": "limit",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "The number of records to return",
+              "default": "25",
+              "minimum": 1,
+              "maximum": 100
+            },
+            {
+              "name": "offset",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "Used to paginate. First page of results is 0.",
+              "default": "0",
+              "minimum": 0
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[attribute]"
+            }
+          ],
+          "attributes": [],
+          "description": "Search all attributes. Results are always paginated."
+        },
+        {
+          "method": "GET",
+          "path": "/attributes/:name",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "attribute"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            }
+          ],
+          "attributes": [],
+          "description": "Returns the attribute with this name."
+        },
+        {
+          "method": "POST",
+          "path": "/attributes",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 201
+                }
+              },
+              "type": "attribute"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 401
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 409
+                }
+              },
+              "type": "[error]"
+            }
+          ],
+          "attributes": [],
+          "description": "Create a new attribute.",
+          "body": {
+            "type": "attribute_form",
+            "attributes": []
+          }
+        },
+        {
+          "method": "DELETE",
+          "path": "/attributes/:name",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 401
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            }
+          ],
+          "attributes": [],
+          "description": "Deletes the attribute with this name. Only the user who created an attribute can delete it."
+        }
+      ],
+      "attributes": [],
+      "path": "/attributes"
+    },
+    {
+      "type": "change",
+      "plural": "changes",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/changes",
+          "parameters": [
+            {
+              "name": "org_key",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "Filter changes to those made for the organization with this key."
+            },
+            {
+              "name": "application_key",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "Filter changes to those made for the application with this key."
+            },
+            {
+              "name": "limit",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "The number of records to return",
+              "default": "25",
+              "minimum": 1,
+              "maximum": 100
+            },
+            {
+              "name": "offset",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "Used to paginate. First page of results is 0.",
+              "default": "0",
+              "minimum": 0
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[change]"
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/changes"
     },
     {
       "type": "code",
@@ -1132,35 +1928,34 @@
         {
           "method": "GET",
           "path": "/:orgKey/:applicationKey/:version/:generatorKey",
-          "description": "Generate code for a specific version of an application.",
           "parameters": [
             {
               "name": "orgKey",
               "type": "string",
               "location": "Path",
-              "description": "The organization key for which to generate code",
-              "required": true
+              "required": true,
+              "description": "The organization key for which to generate code"
             },
             {
               "name": "applicationKey",
               "type": "string",
               "location": "Path",
-              "description": "The application key for which to generate code",
-              "required": true
+              "required": true,
+              "description": "The application key for which to generate code"
             },
             {
               "name": "version",
               "type": "string",
               "location": "Path",
-              "description": "The version of this application. Can be 'latest'",
-              "required": true
+              "required": true,
+              "description": "The version of this application. Can be 'latest'"
             },
             {
               "name": "generatorKey",
               "type": "string",
               "location": "Path",
-              "description": "The key of the generator to invoke",
-              "required": true
+              "required": true,
+              "description": "The key of the generator to invoke"
             }
           ],
           "responses": [
@@ -1175,15 +1970,67 @@
             {
               "code": {
                 "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
                   "value": 409
                 }
               },
               "type": "[error]",
               "description": "If the target, version, and/or generator are invalid."
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Generate code for a specific version of an application."
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/:orgKey/:applicationKey/:version/:generatorKey"
+    },
+    {
+      "type": "com.bryzek.apidoc.generator.v0.models.healthcheck",
+      "plural": "healthchecks",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/_internal_/healthcheck",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "com.bryzek.apidoc.generator.v0.models.healthcheck"
+            }
+          ],
+          "attributes": []
+        },
+        {
+          "method": "GET",
+          "path": "/_internal_/migrate",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "map[string]"
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/_internal_"
     },
     {
       "type": "domain",
@@ -1192,10 +2039,6 @@
         {
           "method": "POST",
           "path": "/domains/:orgKey",
-          "description": "Add a domain to this organization",
-          "body": {
-            "type": "domain"
-          },
           "parameters": [
             {
               "name": "orgKey",
@@ -1221,12 +2064,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Add a domain to this organization",
+          "body": {
+            "type": "domain",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
           "path": "/domains/:orgKey/:name",
-          "description": "Remove this domain from this organization",
           "parameters": [
             {
               "name": "orgKey",
@@ -1250,9 +2098,13 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Remove this domain from this organization"
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/domains/:orgKey"
     },
     {
       "type": "email_verification_confirmation_form",
@@ -1261,10 +2113,6 @@
         {
           "method": "POST",
           "path": "/email_verification_confirmations",
-          "description": "Validate an email address using a token.",
-          "body": {
-            "type": "email_verification_confirmation_form"
-          },
           "parameters": [],
           "responses": [
             {
@@ -1283,49 +2131,60 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Validate an email address using a token.",
+          "body": {
+            "type": "email_verification_confirmation_form",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/email_verification_confirmations"
     },
     {
-      "type": "generator",
-      "plural": "generators",
+      "type": "generator_service",
+      "plural": "generator_services",
       "operations": [
         {
           "method": "GET",
-          "path": "/generators",
-          "description": "List all generators visible by this user",
+          "path": "/generator_services",
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Query",
-              "description": "Filter to generator with this uuid",
               "required": false
             },
             {
-              "name": "key",
+              "name": "uri",
               "type": "string",
               "location": "Query",
-              "description": "Filter to generator with this key",
+              "required": false
+            },
+            {
+              "name": "generator_key",
+              "type": "string",
+              "location": "Query",
               "required": false
             },
             {
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "100",
-              "minimum": 0,
+              "minimum": 1,
               "maximum": 100
             },
             {
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -1337,17 +2196,19 @@
                   "value": 200
                 }
               },
-              "type": "[generator]"
+              "type": "[generator_service]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "List all generator services"
         },
         {
           "method": "GET",
-          "path": "/generators/:key",
+          "path": "/generator_services/:guid",
           "parameters": [
             {
-              "name": "key",
-              "type": "string",
+              "name": "guid",
+              "type": "uuid",
               "location": "Path",
               "required": true
             }
@@ -1359,16 +2220,22 @@
                   "value": 200
                 }
               },
-              "type": "generator"
+              "type": "generator_service"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         },
         {
           "method": "POST",
-          "path": "/generators",
-          "body": {
-            "type": "generator_create_form"
-          },
+          "path": "/generator_services",
           "parameters": [],
           "responses": [
             {
@@ -1377,7 +2244,7 @@
                   "value": 200
                 }
               },
-              "type": "generator"
+              "type": "generator_service"
             },
             {
               "code": {
@@ -1386,50 +2253,21 @@
                 }
               },
               "type": "[error]"
-            }
-          ]
-        },
-        {
-          "method": "PUT",
-          "path": "/generators/:key",
-          "body": {
-            "type": "generator_update_form"
-          },
-          "parameters": [
-            {
-              "name": "key",
-              "type": "string",
-              "location": "Path",
-              "required": true
             }
           ],
-          "responses": [
-            {
-              "code": {
-                "integer": {
-                  "value": 200
-                }
-              },
-              "type": "generator"
-            },
-            {
-              "code": {
-                "integer": {
-                  "value": 409
-                }
-              },
-              "type": "[error]"
-            }
-          ]
+          "attributes": [],
+          "body": {
+            "type": "generator_service_form",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
-          "path": "/generators/:key",
-          "description": "Deletes a generator.",
+          "path": "/generator_services/:guid",
           "parameters": [
             {
-              "name": "key",
-              "type": "string",
+              "name": "guid",
+              "type": "uuid",
               "location": "Path",
               "required": true
             }
@@ -1441,20 +2279,98 @@
                   "value": 204
                 }
               },
-              "type": "unit"
+              "type": "unit",
+              "description": "Service successfully deleted"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit",
+              "description": "Service not found"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 403
+                }
+              },
+              "type": "unit",
+              "description": "Request is not authorized"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Deletes a generator service."
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/generator_services"
     },
     {
-      "type": "healthcheck",
-      "plural": "healthchecks",
+      "type": "generator_with_service",
+      "plural": "generator_with_services",
       "operations": [
         {
           "method": "GET",
-          "path": "/_internal_/healthcheck",
-          "parameters": [],
+          "path": "/generators",
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Query",
+              "required": false,
+              "description": "Filter to generator with this guid"
+            },
+            {
+              "name": "service_guid",
+              "type": "uuid",
+              "location": "Query",
+              "required": false,
+              "description": "Filter to generator from this service"
+            },
+            {
+              "name": "service_uri",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "Filter to generator from this service URI"
+            },
+            {
+              "name": "attribute_name",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "Filter to generators that use this attribute"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "Filter to generator with this key"
+            },
+            {
+              "name": "limit",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "The number of records to return",
+              "default": "100",
+              "minimum": 1,
+              "maximum": 100
+            },
+            {
+              "name": "offset",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "Used to paginate. First page of results is 0.",
+              "default": "0",
+              "minimum": 0
+            }
+          ],
           "responses": [
             {
               "code": {
@@ -1462,14 +2378,23 @@
                   "value": 200
                 }
               },
-              "type": "healthcheck"
+              "type": "[generator_with_service]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "List all available generators"
         },
         {
           "method": "GET",
-          "path": "/_internal_/migrate",
-          "parameters": [],
+          "path": "/generators/:key",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
           "responses": [
             {
               "code": {
@@ -1477,11 +2402,104 @@
                   "value": 200
                 }
               },
-              "type": "map[string]"
+              "type": "generator_with_service"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/generators"
+    },
+    {
+      "type": "item",
+      "plural": "items",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/items",
+          "parameters": [
+            {
+              "name": "q",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "The search query. At the moment, we do case insensitive exact match search."
+            },
+            {
+              "name": "limit",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "The number of records to return",
+              "default": "25",
+              "minimum": 1,
+              "maximum": 100
+            },
+            {
+              "name": "offset",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "Used to paginate. First page of results is 0.",
+              "default": "0",
+              "minimum": 0
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[item]"
+            }
+          ],
+          "attributes": []
+        },
+        {
+          "method": "GET",
+          "path": "/items/:guid",
+          "parameters": [
+            {
+              "name": "guid",
+              "type": "uuid",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "item"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/items"
     },
     {
       "type": "membership",
@@ -1490,7 +2508,6 @@
         {
           "method": "GET",
           "path": "/memberships",
-          "description": "Search all memberships. Results are always paginated.",
           "parameters": [
             {
               "name": "org_guid",
@@ -1520,18 +2537,18 @@
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
-              "minimum": 0,
+              "minimum": 1,
               "maximum": 100
             },
             {
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -1545,7 +2562,9 @@
               },
               "type": "[membership]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search all memberships. Results are always paginated."
         },
         {
           "method": "GET",
@@ -1566,8 +2585,17 @@
                 }
               },
               "type": "membership"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         },
         {
           "method": "DELETE",
@@ -1589,9 +2617,12 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/memberships"
     },
     {
       "type": "membership_request",
@@ -1600,7 +2631,6 @@
         {
           "method": "GET",
           "path": "/membership_requests",
-          "description": "Search all membership requests. Results are always paginated.",
           "parameters": [
             {
               "name": "org_guid",
@@ -1630,18 +2660,18 @@
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
-              "minimum": 0,
+              "minimum": 1,
               "maximum": 100
             },
             {
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -1655,12 +2685,13 @@
               },
               "type": "[membership_request]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search all membership requests. Results are always paginated."
         },
         {
           "method": "POST",
           "path": "/membership_requests",
-          "description": "Create a membership request",
           "parameters": [
             {
               "name": "org_guid",
@@ -1698,12 +2729,13 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a membership request"
         },
         {
           "method": "POST",
           "path": "/membership_requests/:guid/accept",
-          "description": "Accepts this membership request. User will become a member of the specified organization.",
           "parameters": [
             {
               "name": "guid",
@@ -1729,12 +2761,13 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Accepts this membership request. User will become a member of the specified organization."
         },
         {
           "method": "POST",
           "path": "/membership_requests/:guid/decline",
-          "description": "Declines this membership request. User will NOT become a member of the specified organization.",
           "parameters": [
             {
               "name": "guid",
@@ -1760,9 +2793,13 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Declines this membership request. User will NOT become a member of the specified organization."
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/membership_requests"
     },
     {
       "type": "organization",
@@ -1771,59 +2808,58 @@
         {
           "method": "GET",
           "path": "/organizations",
-          "description": "Search all organizations. Results are always paginated.",
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Query",
-              "description": "Finds the organization with this guid, if any",
-              "required": false
+              "required": false,
+              "description": "Finds the organization with this guid, if any"
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
-              "description": "If specified, restricts to organizations that this user is specifically a member of (e.g. will exclude public organizations with which the user does not have a direct membership).",
-              "required": false
+              "required": false,
+              "description": "If specified, restricts to organizations that this user is specifically a member of (e.g. will exclude public organizations with which the user does not have a direct membership)."
             },
             {
               "name": "key",
               "type": "string",
               "location": "Query",
-              "description": "Find organizations with this key. Case in-sensitive. Exact match",
-              "required": false
+              "required": false,
+              "description": "Find organizations with this key. Case in-sensitive. Exact match"
             },
             {
               "name": "name",
               "type": "string",
               "location": "Query",
-              "description": "Find organizations with this name. Case in-sensitive. Exact match",
-              "required": false
+              "required": false,
+              "description": "Find organizations with this name. Case in-sensitive. Exact match"
             },
             {
               "name": "namespace",
               "type": "string",
               "location": "Query",
-              "description": "Find organizations with this namespace. Case in-sensitive. Exact match",
-              "required": false
+              "required": false,
+              "description": "Find organizations with this namespace. Case in-sensitive. Exact match"
             },
             {
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
-              "minimum": 0,
+              "minimum": 1,
               "maximum": 100
             },
             {
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -1837,12 +2873,13 @@
               },
               "type": "[organization]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search all organizations. Results are always paginated."
         },
         {
           "method": "GET",
           "path": "/organizations/:key",
-          "description": "Returns the organization with this key.",
           "parameters": [
             {
               "name": "key",
@@ -1859,16 +2896,22 @@
                 }
               },
               "type": "organization"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Returns the organization with this key."
         },
         {
           "method": "POST",
           "path": "/organizations",
-          "description": "Create a new organization.",
-          "body": {
-            "type": "organization_form"
-          },
           "parameters": [],
           "responses": [
             {
@@ -1887,15 +2930,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a new organization.",
+          "body": {
+            "type": "organization_form",
+            "attributes": []
+          }
         },
         {
           "method": "PUT",
           "path": "/organizations/:key",
-          "description": "Update an organization.",
-          "body": {
-            "type": "organization_form"
-          },
           "parameters": [
             {
               "name": "key",
@@ -1921,12 +2966,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Update an organization.",
+          "body": {
+            "type": "organization_form",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
           "path": "/organizations/:key",
-          "description": "Deletes an organization and all of its associated applications.",
           "parameters": [
             {
               "name": "key",
@@ -1944,9 +2994,205 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Deletes an organization and all of its associated applications."
+        },
+        {
+          "method": "GET",
+          "path": "/organizations/:key/attributes",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Query",
+              "required": false,
+              "description": "Find the values for the attribute with this name."
+            },
+            {
+              "name": "limit",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "The number of records to return",
+              "default": "25",
+              "minimum": 1,
+              "maximum": 100
+            },
+            {
+              "name": "offset",
+              "type": "long",
+              "location": "Query",
+              "required": true,
+              "description": "Used to paginate. First page of results is 0.",
+              "default": "0",
+              "minimum": 0
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[attribute_value]"
+            }
+          ],
+          "attributes": [],
+          "description": "Returns all attribute values for this organization. Results are always paginated."
+        },
+        {
+          "method": "GET",
+          "path": "/organizations/:key/attributes/:name",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "attribute_value"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            }
+          ],
+          "attributes": [],
+          "description": "Returns the attribute value with this name."
+        },
+        {
+          "method": "PUT",
+          "path": "/organizations/:key/attributes/:name",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "attribute_value"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 201
+                }
+              },
+              "type": "attribute_value"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 409
+                }
+              },
+              "type": "[error]"
+            }
+          ],
+          "attributes": [],
+          "description": "Create or update a new attribute value.",
+          "body": {
+            "type": "attribute_value_form",
+            "attributes": []
+          }
+        },
+        {
+          "method": "DELETE",
+          "path": "/organizations/:key/attributes/:name",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 401
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
+            }
+          ],
+          "attributes": [],
+          "description": "Deletes the attribute value with the specified name. Only the user who created an attribute value can delete it."
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/organizations"
     },
     {
       "type": "password_reset",
@@ -1955,10 +3201,6 @@
         {
           "method": "POST",
           "path": "/password_resets",
-          "description": "Change the password for this token. If the token is invalid, has been used, or otherwise no longer can be applied, errors will be returned as 409s. A 204 represents that the user has successfully changed their password.",
-          "body": {
-            "type": "password_reset"
-          },
           "parameters": [],
           "responses": [
             {
@@ -1977,9 +3219,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Change the password for this token. If the token is invalid, has been used, or otherwise no longer can be applied, errors will be returned as 409s. A 204 represents that the user has successfully changed their password.",
+          "body": {
+            "type": "password_reset",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/password_resets"
     },
     {
       "type": "password_reset_request",
@@ -1988,10 +3238,6 @@
         {
           "method": "POST",
           "path": "/password_reset_requests",
-          "description": "Create a new password reset. This will send the user an email with a link to reset their password.",
-          "body": {
-            "type": "password_reset_request"
-          },
           "parameters": [],
           "responses": [
             {
@@ -2010,9 +3256,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a new password reset. This will send the user an email with a link to reset their password.",
+          "body": {
+            "type": "password_reset_request",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/password_reset_requests"
     },
     {
       "type": "subscription",
@@ -2021,52 +3275,51 @@
         {
           "method": "GET",
           "path": "/subscriptions",
-          "description": "Search subscriptions. Always paginated.",
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Query",
-              "description": "Find the subscription with this guid.",
-              "required": false
+              "required": false,
+              "description": "Find the subscription with this guid."
             },
             {
               "name": "organization_key",
               "type": "string",
               "location": "Query",
-              "description": "Find subscriptions for this organization.",
-              "required": false
+              "required": false,
+              "description": "Find subscriptions for this organization."
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
-              "description": "Find subscriptions for this user.",
-              "required": false
+              "required": false,
+              "description": "Find subscriptions for this user."
             },
             {
               "name": "publication",
               "type": "publication",
               "location": "Query",
-              "description": "Find subscriptions for this publication.",
-              "required": false
+              "required": false,
+              "description": "Find subscriptions for this publication."
             },
             {
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
-              "minimum": 0,
+              "minimum": 1,
               "maximum": 100
             },
             {
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -2080,12 +3333,13 @@
               },
               "type": "[subscription]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search subscriptions. Always paginated."
         },
         {
           "method": "GET",
           "path": "/subscriptions/:guid",
-          "description": "Returns information about a specific subscription.",
           "parameters": [
             {
               "name": "guid",
@@ -2102,16 +3356,22 @@
                 }
               },
               "type": "subscription"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Returns information about a specific subscription."
         },
         {
           "method": "POST",
           "path": "/subscriptions",
-          "description": "Create a new subscription.",
-          "body": {
-            "type": "subscription_form"
-          },
           "parameters": [],
           "responses": [
             {
@@ -2130,7 +3390,13 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a new subscription.",
+          "body": {
+            "type": "subscription_form",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
@@ -2152,9 +3418,12 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/subscriptions"
     },
     {
       "type": "token",
@@ -2180,18 +3449,18 @@
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
-              "minimum": 0,
+              "minimum": 1,
               "maximum": 100
             },
             {
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -2205,12 +3474,12 @@
               },
               "type": "[token]"
             }
-          ]
+          ],
+          "attributes": []
         },
         {
           "method": "GET",
           "path": "/tokens/:guid/cleartext",
-          "description": "Used to fetch the clear text token.",
           "parameters": [
             {
               "name": "guid",
@@ -2227,16 +3496,22 @@
                 }
               },
               "type": "cleartext_token"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Used to fetch the clear text token."
         },
         {
           "method": "POST",
           "path": "/tokens",
-          "description": "Create a new API token for this user",
-          "body": {
-            "type": "token_form"
-          },
           "parameters": [],
           "responses": [
             {
@@ -2255,7 +3530,13 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a new API token for this user",
+          "body": {
+            "type": "token_form",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
@@ -2277,9 +3558,12 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/tokens"
     },
     {
       "type": "user",
@@ -2288,28 +3572,27 @@
         {
           "method": "GET",
           "path": "/users",
-          "description": "Search for a specific user. You must specify at least 1 parameter - either a guid, email or token - and will receive back either 0 or 1 users.",
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Query",
-              "description": "Find user with this guid. Exact match",
-              "required": false
+              "required": false,
+              "description": "Find user with this guid. Exact match"
             },
             {
               "name": "email",
               "type": "string",
               "location": "Query",
-              "description": "Find user with this email address. Case in-sensitive. Exact match",
-              "required": false
+              "required": false,
+              "description": "Find user with this email address. Case in-sensitive. Exact match"
             },
             {
               "name": "token",
               "type": "string",
               "location": "Query",
-              "description": "Find the user with this API token. Exact match",
-              "required": false
+              "required": false,
+              "description": "Find the user with this API token. Exact match"
             }
           ],
           "responses": [
@@ -2321,12 +3604,13 @@
               },
               "type": "[user]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search for a specific user. You must specify at least 1 parameter - either a guid, email or token - and will receive back either 0 or 1 users."
         },
         {
           "method": "GET",
           "path": "/users/:guid",
-          "description": "Returns information about the user with this guid.",
           "parameters": [
             {
               "name": "guid",
@@ -2343,13 +3627,22 @@
                 }
               },
               "type": "user"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Returns information about the user with this guid."
         },
         {
           "method": "POST",
           "path": "/users/authenticate",
-          "description": "Used to authenticate a user with an email address and password. Successful authentication returns an instance of the user model. Failed authorizations of any kind are returned as a generic error with code user_authorization_failed.",
           "parameters": [
             {
               "name": "email",
@@ -2381,15 +3674,13 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Used to authenticate a user with an email address and password. Successful authentication returns an instance of the user model. Failed authorizations of any kind are returned as a generic error with code user_authorization_failed."
         },
         {
           "method": "POST",
           "path": "/users",
-          "description": "Create a new user.",
-          "body": {
-            "type": "user_form"
-          },
           "parameters": [],
           "responses": [
             {
@@ -2408,15 +3699,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a new user.",
+          "body": {
+            "type": "user_form",
+            "attributes": []
+          }
         },
         {
           "method": "PUT",
           "path": "/users/:guid",
-          "description": "Updates information about the user with the specified guid.",
-          "body": {
-            "type": "user_update_form"
-          },
           "parameters": [
             {
               "name": "guid",
@@ -2442,21 +3735,25 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Updates information about the user with the specified guid.",
+          "body": {
+            "type": "user_update_form",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/users"
     },
     {
       "type": "validation",
       "plural": "validations",
-      "description": "Public resource that can accept JSON input and returns a validation object describing any validation errors.",
       "operations": [
         {
           "method": "POST",
           "path": "/validations",
-          "body": {
-            "type": "string"
-          },
           "parameters": [],
           "responses": [
             {
@@ -2467,9 +3764,17 @@
               },
               "type": "validation"
             }
-          ]
+          ],
+          "attributes": [],
+          "body": {
+            "type": "string",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/validations",
+      "description": "Public resource that can accept JSON input and returns a validation object describing any validation errors."
     },
     {
       "type": "version",
@@ -2478,28 +3783,27 @@
         {
           "method": "GET",
           "path": "/:orgKey/:applicationKey",
-          "description": "Search all versions of this application. Results are always paginated.",
           "parameters": [
             {
               "name": "orgKey",
               "type": "string",
               "location": "Path",
-              "description": "The organization key for which to search versions",
-              "required": true
+              "required": true,
+              "description": "The organization key for which to search versions"
             },
             {
               "name": "applicationKey",
               "type": "string",
               "location": "Path",
-              "description": "The application key for which to search versions",
-              "required": true
+              "required": true,
+              "description": "The application key for which to search versions"
             },
             {
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
               "maximum": 100
             },
@@ -2507,8 +3811,8 @@
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -2522,12 +3826,13 @@
               },
               "type": "[version]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search all versions of this application. Results are always paginated."
         },
         {
           "method": "GET",
           "path": "/:orgKey/:applicationKey/:version",
-          "description": "Retrieve a specific version of an application.",
           "parameters": [
             {
               "name": "orgKey",
@@ -2545,7 +3850,9 @@
               "name": "version",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "description": "The version of tthis application to download, or the keyword latest to get the latest version",
+              "example": "latest"
             }
           ],
           "responses": [
@@ -2556,16 +3863,22 @@
                 }
               },
               "type": "version"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Retrieve a specific version of an application."
         },
         {
           "method": "POST",
           "path": "/:orgKey/:version",
-          "description": "Create a new version for an application",
-          "body": {
-            "type": "version_form"
-          },
           "parameters": [
             {
               "name": "orgKey",
@@ -2597,15 +3910,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a new version for an application",
+          "body": {
+            "type": "version_form",
+            "attributes": []
+          }
         },
         {
           "method": "PUT",
           "path": "/:orgKey/:applicationKey/:version",
-          "description": "Upsert a version of an application",
-          "body": {
-            "type": "version_form"
-          },
           "parameters": [
             {
               "name": "orgKey",
@@ -2643,12 +3958,17 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Upsert a version of an application",
+          "body": {
+            "type": "version_form",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
           "path": "/:orgKey/:applicationKey/:version",
-          "description": "Deletes a specific version.",
           "parameters": [
             {
               "name": "orgKey",
@@ -2678,9 +3998,13 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Deletes a specific version."
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/:orgKey"
     },
     {
       "type": "watch",
@@ -2689,52 +4013,51 @@
         {
           "method": "GET",
           "path": "/watches",
-          "description": "Search watches. Always paginated.",
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Query",
-              "description": "Find the watch with this guid.",
-              "required": false
+              "required": false,
+              "description": "Find the watch with this guid."
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
-              "description": "Find watches for this user.",
-              "required": false
+              "required": false,
+              "description": "Find attributes for this user."
             },
             {
               "name": "organization_key",
               "type": "string",
               "location": "Query",
-              "description": "Find watches for this organization.",
-              "required": false
+              "required": false,
+              "description": "Find attributes for this organization."
             },
             {
               "name": "application_key",
               "type": "string",
               "location": "Query",
-              "description": "Find watches for this application.",
-              "required": false
+              "required": false,
+              "description": "Find attributes for this application."
             },
             {
               "name": "limit",
               "type": "long",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "25",
-              "minimum": 0,
+              "minimum": 1,
               "maximum": 100
             },
             {
               "name": "offset",
               "type": "long",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -2748,12 +4071,13 @@
               },
               "type": "[watch]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Search attributes. Always paginated."
         },
         {
           "method": "GET",
           "path": "/watches/:guid",
-          "description": "Returns information about a specific watch.",
           "parameters": [
             {
               "name": "guid",
@@ -2770,20 +4094,29 @@
                 }
               },
               "type": "watch"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Returns information about a specific watch."
         },
         {
           "method": "GET",
           "path": "/watches/check",
-          "description": "Quick check if a user is watching a specific application.",
           "parameters": [
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
-              "description": "The user for which we are checking. API returns false if the user guid is not provided",
-              "required": false
+              "required": false,
+              "description": "The user for which we are checking. API returns false if the user guid is not provided"
             },
             {
               "name": "organization_key",
@@ -2807,15 +4140,13 @@
               },
               "type": "boolean"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Quick check if a user is watching a specific application."
         },
         {
           "method": "POST",
           "path": "/watches",
-          "description": "Create a new watch.",
-          "body": {
-            "type": "watch_form"
-          },
           "parameters": [],
           "responses": [
             {
@@ -2834,7 +4165,13 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Create a new watch.",
+          "body": {
+            "type": "watch_form",
+            "attributes": []
+          }
         },
         {
           "method": "DELETE",
@@ -2856,9 +4193,15 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/watches"
     }
-  ]
+  ],
+  "attributes": [],
+  "base_url": "http://api.apidoc.me",
+  "description": "Host API documentation for applications providing REST APIs, facilitating the design of good resource first APIs."
 }

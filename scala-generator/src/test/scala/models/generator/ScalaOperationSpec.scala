@@ -30,7 +30,7 @@ class ScalaOperationSpec extends FunSpec with ShouldMatchers {
     scalaOperation.argList().map(_.trim) shouldEqual Some("user: com.bryzek.apidoc.reference.api.v0.models.User,\n  q1: _root_.scala.Option[Double] = None")
 
     // Test extra args
-    scalaOperation.argList(Seq("value: Option[String] = None")).map(_.trim) shouldEqual Some("user: com.bryzek.apidoc.reference.api.v0.models.User,\n  q1: _root_.scala.Option[Double] = None\n  value: Option[String] = None")    
+    scalaOperation.argList(Seq("value: Option[String] = None")).map(_.trim) shouldEqual Some("user: com.bryzek.apidoc.reference.api.v0.models.User,\n  q1: _root_.scala.Option[Double] = None,\n  value: Option[String] = None")
   }
 
   it("array of models as a parameter in the body should pluralize model name") {
