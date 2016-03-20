@@ -7,18 +7,25 @@ import org.scalatest.{FunSpec, Matchers}
 
 class IllegalNonRequiredWithDefaultSpec extends FunSpec with Matchers {
 
-  val json = buildJson("""
+  val json = models.TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "info": [],
+      "enums": [],
+      "unions": [],
+      "resources": [],
+      "attributes": [],
 
       "models": [
         {
           "name": "user",
           "plural": "users",
+          "attributes": [],
           "fields": [
-            { "name": "age_group", "type": "age_group", "required": false, "default": "21-25" }
+            { "name": "age", "type": "string", "required": false, "default": "21", "attributes": [] }
           ]
         }
       ]
-
   """)
 
   it("fails, because a non-required field has a default") {
@@ -26,7 +33,7 @@ class IllegalNonRequiredWithDefaultSpec extends FunSpec with Matchers {
     val ex = intercept[Exception] {
       new ScalaService(service)
     }
-    ex.getMessage should be(s"""parsing default `["foo"]` for datatype Option(List(String))""")
+    ex.getMessage should be(s"""parsing default `21` for datatype Option(String)""")
   }
 
 }

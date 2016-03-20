@@ -14,22 +14,25 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
       "info": [],
       "unions": [],
       "resources": [],
+      "attributes": [],
 
       "enums": [
         {
           "name": "age_group",
           "plural": "age_groups",
+          "attributes": [],
           "values": [
-            { "name": "twenties" },
-            { "name": "thirties" }
+            { "name": "twenties", "attributes": [] },
+            { "name": "thirties", "attributes": [] }
           ]
         },
         {
           "name": "genre",
           "plural": "genres",
+          "attributes": [],
           "values": [
-            { "name": "Classical" },
-            { "name": "Jazz" }
+            { "name": "Classical", "attributes": [] },
+            { "name": "Jazz", "attributes": [] }
           ]
         }
       ],
@@ -38,9 +41,10 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
         {
           "name": "user",
           "plural": "users",
+          "attributes": [],
           "fields": [
-            { "name": "age_group", "type": "age_group", "required": true },
-            { "name": "music", "type": "genre", "required": true }
+            { "name": "age_group", "type": "age_group", "required": true, "attributes": [] },
+            { "name": "music", "type": "genre", "required": true, "attributes": [] }
           ]
         }
       ]
