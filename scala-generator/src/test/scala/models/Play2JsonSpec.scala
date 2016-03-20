@@ -14,14 +14,16 @@ class Play2JsonSpec extends FunSpec with ShouldMatchers {
       "unions": [],
       "enums": [],
       "resources": [],
+      "attributes": [],
       "models": [
         {
           "name": "content",
           "plural": "contents",
+          "attributes": [],
           "fields": [
-            { "name": "required_tags", "type": "[string]", "required": true },
-            { "name": "optional_tags", "type": "[string]", "required": false },
-            { "name": "data", "type": "map[long]", "required": false }
+            { "name": "required_tags", "type": "[string]", "required": true, "attributes": [] },
+            { "name": "optional_tags", "type": "[string]", "required": false, "attributes": [] },
+            { "name": "data", "type": "map[long]", "required": false, "attributes": [] }
           ]
         }
       ]
