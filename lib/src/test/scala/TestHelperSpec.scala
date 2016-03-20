@@ -9,6 +9,7 @@ class TestHelperSpec extends FunSpec with Matchers {
     val errors = Seq(
       "apidoc-api.json",
       "apidoc-generator.json",
+      "collection-json-defaults.json",
       "reference-service.json",
       "reference-with-imports.json",
       "response-with-unit-type.json"

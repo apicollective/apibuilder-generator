@@ -18,12 +18,14 @@
   "imports": [],
   "enums": [],
   "unions": [],
+  "attributes": [],
   "models": [
     {
       "name": "user",
       "plural": "users",
       "description": null,
       "deprecation": null,
+      "attributes": [],
       "fields": [
         {
           "name": "email",
@@ -34,7 +36,8 @@
           "required": true,
           "minimum": null,
           "maximum": null,
-          "example": null
+          "example": null,
+          "attributes": []          
         },
         {
           "name": "role",
@@ -45,7 +48,8 @@
           "required": true,
           "minimum": null,
           "maximum": null,
-          "example": null
+          "example": null,
+          "attributes": []
         },
         {
           "name": "groups",
@@ -56,7 +60,8 @@
           "required": true,
           "minimum": null,
           "maximum": null,
-          "example": null
+          "example": null,
+          "attributes": []
         },
         {
           "name": "permissions",
@@ -67,7 +72,8 @@
           "required": true,
           "minimum": null,
           "maximum": null,
-          "example": null
+          "example": null,
+          "attributes": []
         }
       ]
     },
@@ -76,6 +82,7 @@
       "plural": "user_patches",
       "description": null,
       "deprecation": null,
+      "attributes": [],
       "fields": [
         {
           "name": "groups",
@@ -86,7 +93,8 @@
           "required": false,
           "minimum": null,
           "maximum": null,
-          "example": null
+          "example": null,
+          "attributes": []
         },
         {
           "name": "permissions",
@@ -97,7 +105,8 @@
           "required": true,
           "minimum": null,
           "maximum": null,
-          "example": null
+          "example": null,
+          "attributes": []
         },
         {
           "name": "preferences",
@@ -108,7 +117,8 @@
           "required": true,
           "minimum": null,
           "maximum": null,
-          "example": null
+          "example": null,
+          "attributes": []
         }
       ]
     }
@@ -119,16 +129,19 @@
       "plural": "users",
       "description": null,
       "deprecation": null,
+      "attributes": [],
       "operations": [
         {
           "method": "POST",
           "path": "/users",
           "description": null,
           "deprecation": null,
+          "attributes": [],
           "body": {
             "type": "user",
             "description": null,
-            "deprecation": null
+            "deprecation": null,
+            "attributes": []
           },
           "parameters": [],
           "responses": [
@@ -146,6 +159,7 @@
           "description": null,
           "deprecation": null,
           "body": null,
+          "attributes": [],
           "parameters": [
             {
               "name": "email",
@@ -157,7 +171,8 @@
               "default": null,
               "minimum": null,
               "maximum": null,
-              "example": null
+              "example": null,
+              "attributes": []
             }
           ],
           "responses": [
@@ -174,10 +189,12 @@
           "path": "/users",
           "description": null,
           "deprecation": null,
+          "attributes": [],
           "body": {
             "type": "user_patch",
             "description": null,
-            "deprecation": null
+            "deprecation": null,
+            "attributes": []
           },
           "parameters": [],
           "responses": [
