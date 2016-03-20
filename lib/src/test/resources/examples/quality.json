@@ -16,15 +16,18 @@
   "headers": [],
   "info": [],
   "imports": [],
+  "attributes": [],
   "enums": [
     {
       "name": "external_service_name",
       "plural": "external_service_names",
       "description": "An external service with which an organization can integrate.",
+      "attributes": [],
       "values": [
         {
           "name": "jira",
-          "description": "Atlassian JIRA. If integration is enabled, an incident can be created by listing the jira ISSUE number directly."
+          "description": "Atlassian JIRA. If integration is enabled, an incident can be created by listing the jira ISSUE number directly.",
+          "attributes": []
         }
       ]
     },
@@ -32,57 +35,71 @@
       "name": "publication",
       "plural": "publications",
       "description": "A publication represents something that a user can subscribe to. An example would be subscribing via email to the publication of all new incidents.",
+      "attributes": [],
       "values": [
         {
           "name": "incidents.create",
-          "description": "Email notification whenever an incident is created."
+          "description": "Email notification whenever an incident is created.",
+          "attributes": []
         },
         {
           "name": "incidents.update",
-          "description": "Email notification whenever an incident is updated."
+          "description": "Email notification whenever an incident is updated.",
+          "attributes": []
         },
         {
           "name": "plans.create",
-          "description": "Email notification whenever a plan is created."
+          "description": "Email notification whenever a plan is created.",
+          "attributes": []
         },
         {
           "name": "plans.update",
-          "description": "Email notification whenever a plan is updated."
+          "description": "Email notification whenever a plan is updated.",
+          "attributes": []
         },
         {
           "name": "meetings.adjourned",
-          "description": "Email notification whenever a meeting is adjourned."
+          "description": "Email notification whenever a meeting is adjourned.",
+          "attributes": []
         },
         {
           "name": "incidents.team_update",
-          "description": "Email notification whenever a team that you are on is assigned to an incident."
+          "description": "Email notification whenever a team that you are on is assigned to an incident.",
+          "attributes": []
         }
       ]
     },
     {
       "name": "response",
       "plural": "responses",
+      "attributes": [],
       "values": [
         {
-          "name": "Complete"
+          "name": "Complete",
+          "attributes": []
         },
         {
-          "name": "Not Yet"
+          "name": "Not Yet",
+          "attributes": []
         },
         {
-          "name": "Will not complete"
+          "name": "Will not complete",
+          "attributes": []
         }
       ]
     },
     {
       "name": "severity",
       "plural": "severities",
+      "attributes": [],
       "values": [
         {
-          "name": "low"
+          "name": "low",
+          "attributes": []
         },
         {
-          "name": "high"
+          "name": "high",
+          "attributes": []
         }
       ]
     },
@@ -90,126 +107,149 @@
       "name": "task",
       "plural": "tasks",
       "description": "Describes what needs to be reviewed about a specific incident",
+      "attributes": [],
       "values": [
         {
           "name": "review_team",
-          "description": "Used in meetings to indicate that a team should be assigned to the incident or that the group should review the team assignment to make sure it is correct."
+          "description": "Used in meetings to indicate that a team should be assigned to the incident or that the group should review the team assignment to make sure it is correct.",
+          "attributes": []
         },
         {
           "name": "review_plan",
-          "description": "Indicates that the incident plan should be reviewed and rated"
+          "description": "Indicates that the incident plan should be reviewed and rated",
+          "attributes": []
         }
       ]
     }
   ],
   "unions": [],
+  "attributes": [],
   "models": [
     {
       "name": "adjourn_form",
       "plural": "adjourn_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "adjourned_at",
           "type": "date-time-iso8601",
           "description": "Defaults to the time of the request",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
     {
       "name": "agenda_item",
       "plural": "agenda_items",
+      "attributes": [],
       "description": "Describe an agenda item for a meeting. Currently the only agenda items we have are that a particular incident needs to be reviewed.",
       "fields": [
         {
           "name": "id",
           "type": "long",
           "description": "Internal unique identifier for this record.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "meeting",
           "type": "meeting",
           "description": "The meeting to which this agenda item belongs",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "incident",
           "type": "incident",
           "description": "Summary of the incident to review.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "task",
           "type": "task",
           "description": "What needs to be reviewed at this meeting for this incident.",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "agenda_item_form",
       "plural": "agenda_item_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "meeting_id",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "incident_id",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "task",
           "type": "task",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "authentication_form",
       "plural": "authentication_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "email_message",
       "plural": "email_messages",
+      "attributes": [],
       "fields": [
         {
           "name": "subject",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "body",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "error",
       "plural": "errors",
+      "attributes": [],
       "fields": [
         {
           "name": "code",
           "type": "string",
           "description": "Machine readable code for this specific error message",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "message",
           "type": "string",
           "description": "Description of the error",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -217,57 +257,68 @@
       "name": "external_service",
       "plural": "external_services",
       "description": "Stores metadata about external services that can be integrated with the quality app",
+      "attributes": [],
       "fields": [
         {
           "name": "id",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization",
           "type": "organization",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "name",
           "type": "external_service_name",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "url",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "username",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "external_service_form",
       "plural": "external_service_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "name",
           "type": "external_service_name",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "url",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "username",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "password",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -275,22 +326,26 @@
       "name": "followup",
       "plural": "followups",
       "description": "Every n days (e.g. 30) we follow up to see if a given plan has been implemented. This gives teams the ability to say: Yes, completed. Not yet. or No, won't do. After 3 consecutive no replies, we assume not doing.",
+      "attributes": [],
       "fields": [
         {
           "name": "key",
           "type": "string",
           "description": "Unique token identifying this response",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "plan",
           "type": "plan",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "sent_at",
           "type": "date-time-iso8601",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -298,32 +353,38 @@
       "name": "followup_response",
       "plural": "followup_responses",
       "description": "Every n days (e.g. 30) we follow up to see if a given plan has been implemented. This gives teams the ability to say: Yes, completed. Not yet. or No, won't do. After 3 consecutive no replies, we assume not doing.",
+      "attributes": [],
       "fields": [
         {
           "name": "followup",
           "type": "followup",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "response",
           "type": "response",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "created_at",
           "type": "date-time-iso8601",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "created_by",
           "type": "user",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "healthcheck",
       "plural": "healthchecks",
+      "attributes": [],
       "fields": [
         {
           "name": "status",
@@ -332,7 +393,8 @@
             "description": "please use audience.label instead"
           },
           "required": true,
-          "example": "healthy"
+          "example": "healthy",
+          "attributes": []
         }
       ]
     },
@@ -340,18 +402,21 @@
       "name": "icons",
       "plural": "iconses",
       "description": "URLs to key icons used through the application",
+      "attributes": [],
       "fields": [
         {
           "name": "smiley_url",
           "type": "string",
           "description": "URL for the smiley icon",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "frowny_url",
           "type": "string",
           "description": "URL for the frowny icon",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -359,92 +424,108 @@
       "name": "incident",
       "plural": "incidents",
       "description": "A bug or error that affected public or internal users in a negative way",
+      "attributes": [],
       "fields": [
         {
           "name": "id",
           "type": "long",
           "description": "Internal unique identifier for this incident.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization",
           "type": "organization",
           "description": "Organization to which this incident belongs",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "summary",
           "type": "string",
           "description": "Summary of the incident.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "description",
           "type": "string",
           "description": "Full description of the incident",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "team",
           "type": "team",
           "description": "Team responsible for resolution of this incident",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "severity",
           "type": "severity",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "tags",
           "type": "[string]",
           "description": "Optional list of tags to apply to this incident",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "plan",
           "type": "plan",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "created_at",
           "type": "date-time-iso8601",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "incident_form",
       "plural": "incident_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "team_key",
           "type": "string",
           "description": "Team responsible for resolution of this incident",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "severity",
           "type": "severity",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "summary",
           "type": "string",
           "description": "Summary of the incident.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "description",
           "type": "string",
           "description": "Full description of the incident",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "tags",
           "type": "[string]",
           "description": "Optional list of tags to apply to this incident",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
@@ -452,37 +533,44 @@
       "name": "incident_organization_change",
       "plural": "incident_organization_changes",
       "description": "Used to move an incident to another organization",
+      "attributes": [],
       "fields": [
         {
           "name": "incident_id",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization_key",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "incident_summary",
       "plural": "incident_summaries",
+      "attributes": [],
       "fields": [
         {
           "name": "id",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "severity",
           "type": "severity",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "summary",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -490,41 +578,48 @@
       "name": "meeting",
       "plural": "meetings",
       "description": "Meetings happen on a regular schedule (e.g. thursdays from 11-12 EST). As incidents are created, they are automatically assigned to the next meeting. Incidents can then be reviewed from the context of a meeting, facilitating online navigation. Incidents within a meeting can require one of two actions - team assignment or plan review.",
+      "attributes": [],
       "fields": [
         {
           "name": "id",
           "type": "long",
           "description": "Internal unique identifier for this meeting.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization",
           "type": "organization",
           "description": "Organization to which this meeting belongs",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "scheduled_at",
           "type": "date-time-iso8601",
           "description": "The date and time for which this meeting is scheduled.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "adjourned_at",
           "type": "date-time-iso8601",
           "description": "The date and time at which this meeting was adjourned. This can be done explicitly by a person, or will automatically occur a few hours after the meeting's scheduled time.",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
     {
       "name": "meeting_form",
       "plural": "meeting_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "scheduled_at",
           "type": "date-time-iso8601",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -532,21 +627,25 @@
       "name": "meeting_pager",
       "plural": "meeting_pagers",
       "description": "Used to enable pagination when walking through the issues in a particular meeting. General idea is given a meeting id and an incident id, returns the previous and next incident IDs, if any",
+      "attributes": [],
       "fields": [
         {
           "name": "meeting",
           "type": "meeting",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "prior_incident",
           "type": "incident",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "next_incident",
           "type": "incident",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
@@ -554,35 +653,41 @@
       "name": "organization",
       "plural": "organizations",
       "description": "Top level organization for which we are managing quality. Key entities like teams and meetings are scoped to the organization.",
+      "attributes": [],
       "fields": [
         {
           "name": "key",
           "type": "string",
           "description": "Used as a unique key for this organization that is URL safe.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "name",
           "type": "string",
           "description": "The name of this organization.",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "organization_form",
       "plural": "organization_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "name",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "key",
           "type": "string",
           "description": "Defaults to a url friendy version of the name",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
@@ -590,23 +695,27 @@
       "name": "plan",
       "plural": "plans",
       "description": "Details for how an incident will be resolved",
+      "attributes": [],
       "fields": [
         {
           "name": "id",
           "type": "long",
           "description": "Internal unique identifier for this incident.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "incident_id",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "body",
           "type": "string",
           "description": "Full description of the incident",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "grade",
@@ -614,28 +723,33 @@
           "description": "Grade given to this plan on a scale of 0 (bad) to 100 (good)",
           "required": false,
           "minimum": 0,
-          "maximum": 100
+          "maximum": 100,
+          "attributes": []
         },
         {
           "name": "created_at",
           "type": "date-time-iso8601",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "plan_form",
       "plural": "plan_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "incident_id",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "body",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -643,48 +757,56 @@
       "name": "statistic",
       "plural": "statistics",
       "description": "Statistics on each team's quality metrics, number of issues",
+      "attributes": [],
       "fields": [
         {
           "name": "team",
           "type": "team",
           "description": "Team for statistics.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "total_grades",
           "type": "long",
           "description": "Number of graded plans given time span requested.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "average_grade",
           "type": "integer",
           "description": "Average grade for graded plans given time span requested.",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "total_open_incidents",
           "type": "long",
           "description": "Number of incidents without a plan for this team.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "total_incidents",
           "type": "long",
           "description": "Number of incidents reported in the time span requested.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "total_plans",
           "type": "long",
           "description": "Number of plans attached to reported incidents in the time span requested.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "plans",
           "type": "[plan]",
           "description": "Last plans to display grades for.",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
@@ -692,48 +814,57 @@
       "name": "subscription",
       "plural": "subscriptions",
       "description": "Represents a user that is currently subscribed to a publication",
+      "attributes": [],
       "fields": [
         {
           "name": "id",
           "type": "long",
           "description": "Internal unique identifier for this subscription record",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "organization",
           "type": "organization",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "user",
           "type": "user",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "publication",
           "type": "publication",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "subscription_form",
       "plural": "subscription_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "organization_key",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "user_guid",
           "type": "uuid",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "publication",
           "type": "publication",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -741,73 +872,86 @@
       "name": "team",
       "plural": "teams",
       "description": "A team is the main actor in the system. Teams have a unique key and own incidents",
+      "attributes": [],
       "fields": [
         {
           "name": "organization",
           "type": "organization",
           "description": "Organization to which this team belongs",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "key",
           "type": "string",
           "description": "Unique identifier for this team",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "email",
           "type": "string",
           "description": "Email address for members of this team. If provided, used to send updates on new incidents, meetings, etc.",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "icons",
           "type": "icons",
           "description": "Set of icons used on the site for this team (e.g. smiley and frowney faces). Teams inherit a default set of icons if not otherwise provided.",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "team_form",
       "plural": "team_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "key",
           "type": "string",
           "description": "Unique identifier for this team",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "email",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "smiley_url",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "frowny_url",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
     {
       "name": "team_member",
       "plural": "team_members",
+      "attributes": [],
       "fields": [
         {
           "name": "team",
           "type": "team",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "user",
           "type": "user",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
@@ -815,37 +959,44 @@
       "name": "team_member_summary",
       "plural": "team_member_summaries",
       "description": "Statistics on each team's quality metrics, number of issues",
+      "attributes": [],
       "fields": [
         {
           "name": "team",
           "type": "team",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "number_members",
           "type": "long",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "update_team_form",
       "plural": "update_team_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "email",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "smiley_url",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         },
         {
           "name": "frowny_url",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         }
       ]
     },
@@ -853,28 +1004,33 @@
       "name": "user",
       "plural": "users",
       "description": "A user is a top level person.",
+      "attributes": [],
       "fields": [
         {
           "name": "guid",
           "type": "uuid",
           "description": "Internal unique identifier for this user.",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     },
     {
       "name": "user_form",
       "plural": "user_forms",
+      "attributes": [],
       "fields": [
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
       ]
     }
@@ -883,66 +1039,76 @@
     {
       "type": "agenda_item",
       "plural": "agenda_items",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/agenda_items",
           "description": "Search agenda items for a given meeting. Results are always paginated.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Query",
               "description": "Find agenda items with this id",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "meeting_id",
               "type": "long",
               "location": "Query",
               "description": "Find agenda items for this meeting",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "incident_id",
               "type": "long",
               "location": "Query",
               "description": "Find agenda items for this incident",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "team_key",
               "type": "string",
               "location": "Query",
               "description": "Find agenda items for this team",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
               "description": "Find agenda items filtered by the teams this user is on.",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "is_adjourned",
               "type": "boolean",
               "location": "Query",
               "description": "If false, limit to agenda items for meetings that have not yet been adjourned. If true, limit to agenda items for meetings that have been adjourned",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "task",
               "type": "task",
               "location": "Query",
               "description": "Find agenda items with this task",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "limit",
@@ -952,7 +1118,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+              "attributes": []
             },
             {
               "name": "offset",
@@ -961,7 +1128,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+              "attributes": []
             }
           ],
           "responses": [
@@ -978,18 +1146,21 @@
         {
           "method": "GET",
           "path": "/:org/agenda_items/:id",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -1007,15 +1178,18 @@
           "method": "POST",
           "path": "/:org/agenda_items",
           "description": "Creates an agenda item for this meeting.",
+          "attributes": [],
           "body": {
-            "type": "agenda_item_form"
+            "type": "agenda_item_form",
+              "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -1040,18 +1214,21 @@
         {
           "method": "DELETE",
           "path": "/:org/agenda_items/:id",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -1070,22 +1247,26 @@
     {
       "type": "email_message",
       "plural": "email_messages",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/email_messages/meeting_adjourned/:meeting_id",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "meeting_id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -1104,28 +1285,33 @@
     {
       "type": "external_service",
       "plural": "external_services",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/external_services",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Query",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "name",
               "type": "external_service_name",
               "location": "Query",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "limit",
@@ -1135,7 +1321,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+              "attributes": []
             },
             {
               "name": "offset",
@@ -1144,7 +1331,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+              "attributes": []
             }
           ],
           "responses": [
@@ -1161,18 +1349,21 @@
         {
           "method": "GET",
           "path": "/:org/external_services/:id",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -1189,15 +1380,18 @@
         {
           "method": "POST",
           "path": "/:org/external_services",
+          "attributes": [],
           "body": {
-            "type": "external_service_form"
+            "type": "external_service_form",
+            "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -1227,13 +1421,15 @@
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1245,18 +1441,21 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+            "attributes": []
         }
       ]
     },
     {
       "type": "healthcheck",
       "plural": "healthchecks",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/_internal_/healthcheck",
           "parameters": [],
+          "attributes": [],
           "responses": [
             {
               "code": {
@@ -1273,52 +1472,60 @@
     {
       "type": "incident",
       "plural": "incidents",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/incidents",
           "description": "Search all incidents. Results are always paginated.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Query",
               "description": "Find incident with this id. Exact match",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "team_key",
               "type": "string",
               "location": "Query",
               "description": "Find incidents for which this team is responsible. Exact match",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "has_team",
               "type": "boolean",
               "location": "Query",
               "description": "If true, find incidents with a team assigned to them. If false, find incidents w/out a team",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "has_plan",
               "type": "boolean",
               "location": "Query",
               "description": "If true, find incidents with a plan. If false, find incidents w/out a plan",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "has_grade",
               "type": "boolean",
               "location": "Query",
               "description": "If true, find incidents with a grade. If false, find incidents w/out a grade",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "limit",
@@ -1328,7 +1535,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+            "attributes": []
             },
             {
               "name": "offset",
@@ -1337,7 +1545,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1355,18 +1564,21 @@
           "method": "GET",
           "path": "/:org/incidents/:id",
           "description": "Returns information about the incident with this specific id.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1384,15 +1596,18 @@
           "method": "POST",
           "path": "/:org/incidents",
           "description": "Create a new incident.",
+          "attributes": [],
           "body": {
-            "type": "incident_form"
+            "type": "incident_form",
+            "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1418,21 +1633,25 @@
           "method": "PUT",
           "path": "/:org/incidents/:id",
           "description": "Updates an incident.",
+          "attributes": [],
           "body": {
-            "type": "incident_form"
+            "type": "incident_form",
+            "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1457,18 +1676,21 @@
         {
           "method": "DELETE",
           "path": "/:org/incidents/:id",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1487,12 +1709,15 @@
     {
       "type": "incident_organization_change",
       "plural": "incident_organization_changes",
+      "attributes": [],
       "operations": [
         {
           "method": "POST",
           "path": "/incident_organization_changes",
+          "attributes": [],
           "body": {
-            "type": "incident_organization_change"
+            "type": "incident_organization_change",
+            "attributes": []
           },
           "parameters": [],
           "responses": [
@@ -1519,59 +1744,68 @@
     {
       "type": "meeting",
       "plural": "meetings",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/meetings",
           "description": "Search all meetings. Results are always paginated.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Query",
               "description": "Find meeting with this id. Exact match",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "incident_id",
               "type": "long",
               "location": "Query",
               "description": "Find meetings where this incident_id is on the agenda",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "agenda_item_id",
               "type": "long",
               "location": "Query",
               "description": "Find meeting based on this agenda item",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "is_adjourned",
               "type": "boolean",
               "location": "Query",
               "description": "Find meetings that have or have not been adjourned",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "is_upcoming",
               "type": "boolean",
               "location": "Query",
               "description": "Find meetings that are upcoming (true) or have passed (false)",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "order_by",
               "type": "string",
               "location": "Query",
               "description": "field_name:direction",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "limit",
@@ -1581,7 +1815,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+            "attributes": []
             },
             {
               "name": "offset",
@@ -1590,7 +1825,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1607,12 +1843,14 @@
         {
           "method": "GET",
           "path": "/:org/meetings/:id",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
@@ -1636,15 +1874,18 @@
           "method": "POST",
           "path": "/:org/meetings",
           "description": "Creates a meeting. In general meetings are created automatically",
+          "attributes": [],
           "body": {
-            "type": "meeting_form"
+            "type": "meeting_form",
+            "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1670,21 +1911,25 @@
           "method": "POST",
           "path": "/:org/meetings/:id/adjourn",
           "description": "Records that a meeting has been adjourned. Will return a validation error if the meeting had previously been adjourned",
+          "attributes": [],
           "body": {
-            "type": "adjourn_form"
+            "type": "adjourn_form",
+            "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1709,18 +1954,21 @@
         {
           "method": "DELETE",
           "path": "/:org/meetings/:id",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1738,25 +1986,29 @@
           "method": "GET",
           "path": "/:org/meetings/:id/pager/:incident_id",
           "description": "Get information on paging through incidents (e.g. the prior or next incident in a given meeting)",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "incident_id",
               "type": "long",
               "location": "Path",
               "description": "The incident ID that you are looking at. Pager information will be returned including the incident prior to and after this incident, if available.",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1775,25 +2027,29 @@
     {
       "type": "organization",
       "plural": "organizations",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/organizations",
           "description": "Search all organizations. Results are always paginated.",
+          "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "long",
               "location": "Query",
               "description": "Find organization with this id",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Query",
               "description": "Find organization with this key",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "limit",
@@ -1803,7 +2059,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+            "attributes": []
             },
             {
               "name": "offset",
@@ -1812,7 +2069,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1829,12 +2087,14 @@
         {
           "method": "GET",
           "path": "/organizations/:key",
+          "attributes": [],
           "parameters": [
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1851,8 +2111,10 @@
         {
           "method": "POST",
           "path": "/organizations",
+          "attributes": [],
           "body": {
-            "type": "organization_form"
+            "type": "organization_form",
+            "attributes": []
           },
           "parameters": [],
           "responses": [
@@ -1877,12 +2139,14 @@
         {
           "method": "DELETE",
           "path": "/organizations/:key",
+          "attributes": [],
           "parameters": [
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1901,38 +2165,44 @@
     {
       "type": "plan",
       "plural": "plans",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/plans",
           "description": "Search all plans. Results are always paginated.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Query",
               "description": "Find plan with this id. Exact match",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "incident_id",
               "type": "long",
               "location": "Query",
               "description": "Find plan for this incident_id",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "team_key",
               "type": "string",
               "location": "Query",
               "description": "Find all plans for requested team",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "limit",
@@ -1942,7 +2212,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+            "attributes": []
             },
             {
               "name": "offset",
@@ -1951,7 +2222,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+            "attributes": []
             }
           ],
           "responses": [
@@ -1969,15 +2241,18 @@
           "method": "POST",
           "path": "/:org/plans",
           "description": "Create a plan.",
+          "attributes": [],
           "body": {
-            "type": "plan_form"
+            "type": "plan_form",
+            "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -2003,21 +2278,25 @@
           "method": "PUT",
           "path": "/:org/plans/:id",
           "description": "Update a plan.",
+          "attributes": [],
           "body": {
-            "type": "plan_form"
+            "type": "plan_form",
+            "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -2043,24 +2322,28 @@
           "method": "PUT",
           "path": "/:org/plans/:id/grade",
           "description": "Update the grade assigned to a plan.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "grade",
               "type": "integer",
               "location": "Form",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -2086,18 +2369,21 @@
           "method": "GET",
           "path": "/:org/plans/:id",
           "description": "Get a single plan.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -2115,18 +2401,21 @@
           "method": "DELETE",
           "path": "/:org/plans/:id",
           "description": "Delete a plan.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             }
           ],
           "responses": [
@@ -2145,24 +2434,28 @@
     {
       "type": "statistic",
       "plural": "statistics",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/statistics",
           "description": "Retrieve team statistics for all or one team.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+            "attributes": []
             },
             {
               "name": "team_key",
               "type": "string",
               "location": "Query",
               "description": "Find stats for this team. Leave blank to retrieve all teams",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "number_hours",
@@ -2170,7 +2463,8 @@
               "location": "Query",
               "description": "Number of hours in the past to retrieve requested statistics. Default is 1 week.",
               "required": true,
-              "default": "168"
+              "default": "168",
+              "attributes": []
             }
           ],
           "responses": [
@@ -2189,39 +2483,45 @@
     {
       "type": "subscription",
       "plural": "subscriptions",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/subscriptions",
           "description": "Search for a specific subscription.",
+          "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "long",
               "location": "Query",
               "description": "Find the subscription with this id.",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "organization_key",
               "type": "string",
               "location": "Query",
               "description": "Find subscriptions for this organization.",
-              "required": false
+              "required": false,
+            "attributes": []
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
               "description": "Find subscriptions for this user.",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "publication",
               "type": "publication",
               "location": "Query",
               "description": "Find subscriptions for this publication.",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "limit",
@@ -2231,7 +2531,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+              "attributes": []
             },
             {
               "name": "offset",
@@ -2240,7 +2541,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2258,12 +2560,14 @@
           "method": "GET",
           "path": "/subscriptions/:id",
           "description": "Returns information about this subscription.",
+          "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2281,8 +2585,10 @@
           "method": "POST",
           "path": "/subscriptions",
           "description": "Create a new subscription.",
+          "attributes": [],
           "body": {
-            "type": "subscription_form"
+            "type": "subscription_form",
+            "attributes": []
           },
           "parameters": [],
           "responses": [
@@ -2307,12 +2613,14 @@
         {
           "method": "DELETE",
           "path": "/subscriptions/:id",
+          "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "long",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2331,38 +2639,44 @@
     {
       "type": "team",
       "plural": "teams",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/:org/teams",
           "description": "Search all teams. Results are always paginated.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Query",
               "description": "Find team with this key. Exact match",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
               "description": "Find teams that this user is a member of.",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "exclude_user_guid",
               "type": "uuid",
               "location": "Query",
               "description": "Find teams that this user is NOT a member of.",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "limit",
@@ -2372,7 +2686,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+              "attributes": []
             },
             {
               "name": "offset",
@@ -2381,7 +2696,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2399,18 +2715,21 @@
           "method": "GET",
           "path": "/:org/teams/:key",
           "description": "Returns information about the team with this specific key.",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2428,15 +2747,18 @@
           "method": "POST",
           "path": "/:org/teams",
           "description": "Create a new team.",
+          "attributes": [],
           "body": {
-            "type": "team_form"
+            "type": "team_form",
+              "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2462,21 +2784,25 @@
           "method": "PUT",
           "path": "/:org/teams/:key",
           "description": "Update a team.",
+          "attributes": [],
           "body": {
-            "type": "update_team_form"
+            "type": "update_team_form",
+              "attributes": []
           },
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2501,18 +2827,21 @@
         {
           "method": "DELETE",
           "path": "/:org/teams/:key",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2530,18 +2859,21 @@
           "method": "GET",
           "path": "/:org/teams/:key/member_summary",
           "description": "Summary information about this teams members",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2559,24 +2891,28 @@
           "method": "GET",
           "path": "/:org/teams/:key/members",
           "description": "Lists the members of this team",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Query",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "limit",
@@ -2586,7 +2922,8 @@
               "required": true,
               "default": "25",
               "minimum": 0,
-              "maximum": 100
+              "maximum": 100,
+              "attributes": []
             },
             {
               "name": "offset",
@@ -2595,7 +2932,8 @@
               "description": "Used to paginate. First page of results is 0.",
               "required": true,
               "default": "0",
-              "minimum": 0
+              "minimum": 0,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2613,24 +2951,28 @@
           "method": "PUT",
           "path": "/:org/teams/:key/members/:user_guid",
           "description": "Adds the specified user to this team",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2656,24 +2998,28 @@
           "method": "DELETE",
           "path": "/:org/teams/:key/members/:user_guid",
           "description": "Removes this user from this team",
+          "attributes": [],
           "parameters": [
             {
               "name": "org",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "key",
               "type": "string",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             },
             {
               "name": "user_guid",
               "type": "uuid",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2692,25 +3038,29 @@
     {
       "type": "user",
       "plural": "users",
+      "attributes": [],
       "operations": [
         {
           "method": "GET",
           "path": "/users",
           "description": "Search for a specific user. You must specify at least 1 parameter - either a guid or email - and will receive back either 0 or 1 users.",
+          "attributes": [],
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Query",
               "description": "Find user with this guid. Exact match",
-              "required": false
+              "required": false,
+              "attributes": []
             },
             {
               "name": "email",
               "type": "string",
               "location": "Query",
               "description": "Find user with this email address. Case in-sensitive. Exact match",
-              "required": false
+              "required": false,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2728,12 +3078,14 @@
           "method": "GET",
           "path": "/users/:guid",
           "description": "Returns information about the user with this guid.",
+          "attributes": [],
           "parameters": [
             {
               "name": "guid",
               "type": "uuid",
               "location": "Path",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ],
           "responses": [
@@ -2751,8 +3103,10 @@
           "method": "POST",
           "path": "/users/authenticate",
           "description": "Used to authenticate a user with an email address and password. Successful authentication returns an instance of the user model. Failed authorizations of any kind are returned as a generic error with code user_authorization_failed.",
+          "attributes": [],
           "body": {
-            "type": "authentication_form"
+            "type": "authentication_form",
+              "attributes": []
           },
           "parameters": [],
           "responses": [
@@ -2778,8 +3132,10 @@
           "method": "POST",
           "path": "/users",
           "description": "Create a new user.",
+          "attributes": [],
           "body": {
-            "type": "user_form"
+            "type": "user_form",
+              "attributes": []
           },
           "parameters": [],
           "responses": [

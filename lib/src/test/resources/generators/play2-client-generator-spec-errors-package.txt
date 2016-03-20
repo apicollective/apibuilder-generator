@@ -1,5 +1,6 @@
 package errors {
 
+  import com.bryzek.apidoc.common.v0.models.json._
   import com.bryzek.apidoc.generator.v0.models.json._
   import com.bryzek.apidoc.spec.v0.models.json._
 
@@ -9,6 +10,8 @@ package errors {
   ) extends Exception(message.getOrElse(response.status + ": " + response.body)){
     lazy val errors = _root_.test.apidoc.Client.parseJson("Seq[com.bryzek.apidoc.generator.v0.models.Error]", response, _.validate[Seq[com.bryzek.apidoc.generator.v0.models.Error]])
   }
+
+  case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
   case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")
 

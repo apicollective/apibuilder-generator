@@ -1,6 +1,6 @@
 {
   "apidoc": {
-    "version": "0.9.52"
+    "version": "0.11.17"
   },
   "name": "apidoc-example-union-types-discriminator",
   "organization": {
@@ -10,7 +10,7 @@
     "key": "apidoc-example-union-types-discriminator"
   },
   "namespace": "com.bryzek.apidoc.example.union.types.discriminator.v0",
-  "version": "0.1.41",
+  "version": "0.3.46",
   "info": {},
   "headers": [],
   "imports": [],
@@ -20,33 +20,41 @@
       "plural": "system_users",
       "values": [
         {
-          "name": "system"
+          "name": "system",
+          "attributes": []
         },
         {
-          "name": "anonymous"
+          "name": "anonymous",
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     }
   ],
   "unions": [
     {
       "name": "user",
       "plural": "users",
-      "discriminator": "discriminator",
       "types": [
         {
-          "type": "registered_user"
+          "type": "registered_user",
+          "attributes": []
         },
         {
-          "type": "guest_user"
+          "type": "guest_user",
+          "attributes": []
         },
         {
-          "type": "system_user"
+          "type": "system_user",
+          "attributes": []
         },
         {
-          "type": "string"
+          "type": "string",
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "discriminator": "discriminator"
     }
   ],
   "models": [
@@ -57,15 +65,18 @@
         {
           "name": "id",
           "type": "string",
-          "description": "Internal unique identifier for this user.",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Internal unique identifier for this user."
         },
         {
           "name": "email",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "registered_user",
@@ -74,14 +85,17 @@
         {
           "name": "id",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     }
   ],
   "resources": [
@@ -102,7 +116,8 @@
               },
               "type": "[user]"
             }
-          ]
+          ],
+          "attributes": []
         },
         {
           "method": "GET",
@@ -132,14 +147,12 @@
               },
               "type": "unit"
             }
-          ]
+          ],
+          "attributes": []
         },
         {
           "method": "POST",
           "path": "/users",
-          "body": {
-            "type": "user"
-          },
           "parameters": [],
           "responses": [
             {
@@ -150,9 +163,17 @@
               },
               "type": "user"
             }
-          ]
+          ],
+          "attributes": [],
+          "body": {
+            "type": "user",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/users"
     }
-  ]
+  ],
+  "attributes": []
 }

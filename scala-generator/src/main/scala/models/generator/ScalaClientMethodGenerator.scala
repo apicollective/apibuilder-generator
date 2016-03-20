@@ -160,9 +160,10 @@ case class ScalaClientMethodGenerator(
         code.append(v)
         args.append("queryParameters = queryParameters")
       }
+      args.append("requestHeaders = requestHeaders")
 
       val methodCall = code.toList match {
-        case Nil => s"""_executeRequest("${op.method}", $path)"""
+        case Nil => s"""_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
         case v => s"""${v.mkString("\n\n")}\n\n_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
       }
 
@@ -274,7 +275,12 @@ case class ScalaClientMethod(
   import lib.Text._
 
   val name: String = operation.name
-  val argList: Option[String] = operation.argList
+
+  val argList: Option[String] = operation.parameters.find(_.name.toLowerCase == "requestheaders") match {
+    case Some(_) => operation.argList()
+    case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
+  }
+
   val comments: Option[String] = operation.description
 
   private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")

@@ -16,14 +16,16 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
       "info": [],
       "enums": [],
       "resources": [],
+      "attributes": [],
 
       "unions": [
         {
           "name": "user",
           "plural": "users",
+          "attributes": [],
           "types": [
-            { "type": "registered_user" },
-            { "type": "guest_user" }
+            { "type": "registered_user", "attributes": [] },
+            { "type": "guest_user", "attributes": [] }
           ]
         }
       ],
@@ -32,21 +34,23 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
         {
           "name": "registered_user",
           "plural": "registered_users",
+          "attributes": [],
           "fields": [
-            { "name": "id", "type": "long", "required": true },
-            { "name": "email", "type": "string", "required": true },
-            { "name": "name", "type": "string", "required": false },
-            { "name": "foo", "type": "string", "required": true }
+            { "name": "id", "type": "long", "required": true, "attributes": [] },
+            { "name": "email", "type": "string", "required": true, "attributes": [] },
+            { "name": "name", "type": "string", "required": false, "attributes": [] },
+            { "name": "foo", "type": "string", "required": true, "attributes": [] }
           ]
         },
         {
           "name": "guest_user",
           "plural": "guest_users",
+          "attributes": [],
           "fields": [
-            { "name": "id", "type": "long", "required": true },
-            { "name": "email", "type": "string", "required": true },
-            { "name": "name", "type": "string", "required": false },
-            { "name": "bar", "type": "string", "required": true }
+            { "name": "id", "type": "long", "required": true, "attributes": [] },
+            { "name": "email", "type": "string", "required": true, "attributes": [] },
+            { "name": "name", "type": "string", "required": false, "attributes": [] },
+            { "name": "bar", "type": "string", "required": true, "attributes": [] }
           ]
         }
       ]
@@ -91,21 +95,24 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
       "info": [],
       "models": [],
       "resources": [],
+      "attributes": [],
 
       "enums": [
         {
           "name": "member_type",
           "plural": "member_types",
+          "attributes": [],
           "values": [
-            { "name": "Registered" },
-            { "name": "Guest" }
+            { "name": "Registered", "attributes": [] },
+            { "name": "Guest", "attributes": [] }
           ]
         },
         {
           "name": "role_type",
           "plural": "role_types",
+          "attributes": [],
           "values": [
-            { "name": "Admin" }
+            { "name": "Admin", "attributes": [] }
           ]
         }
       ],
@@ -114,9 +121,10 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
         {
           "name": "user_type",
           "plural": "user_types",
+          "attributes": [],
           "types": [
-            { "type": "member_type" },
-            { "type": "role_type" }
+            { "type": "member_type", "attributes": [] },
+            { "type": "role_type", "attributes": [] }
           ]
         }
       ]

@@ -11,8 +11,9 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     {
       "name": "reference",
       "plural": "references",
+      "attributes": [],
       "fields": [
-        { "name": "guid", "type": "uuid", "required": true }
+        { "name": "guid", "type": "uuid", "required": true, "attributes": [] }
       ]
     }
   """
@@ -21,9 +22,10 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     {
       "name": "name",
       "plural": "names",
+      "attributes": [],
       "fields": [
-        { "name": "first", "type": "string", "required": false },
-        { "name": "last", "type": "string", "required": false }
+        { "name": "first", "type": "string", "required": false, "attributes": [] },
+        { "name": "last", "type": "string", "required": false, "attributes": [] }
       ]
     }
   """
@@ -66,7 +68,8 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         "resources": [],
         "unions": [${unions.mkString(",\n")}],
         "enums": [${enums.mkString(",\n")}],
-        "models": [${models.mkString(",\n")}]
+        "models": [${models.mkString(",\n")}],
+        "attributes": []
       """)
     }
 
@@ -120,10 +123,11 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
       {
         "name": "user",
         "plural": "users",
+        "attributes": [],
         "fields": [
-          { "name": "guid", "type": "uuid", "required": true },
-          { "name": "email", "type": "string", "required": true },
-          { "name": "name", "type": "name", "required": false }
+          { "name": "guid", "type": "uuid", "required": true, "attributes": [] },
+          { "name": "email", "type": "string", "required": true, "attributes": [] },
+          { "name": "name", "type": "name", "required": false, "attributes": [] }
         ]
       }
     """).form
@@ -145,18 +149,20 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     {
       "name": "user",
       "plural": "users",
+      "attributes": [],
       "fields": [
-        { "name": "guid", "type": "uuid", "required": true },
-        { "name": "status", "type": "status", "required": true }
+        { "name": "guid", "type": "uuid", "required": true, "attributes": [] },
+        { "name": "status", "type": "status", "required": true, "attributes": [] }
       ]
     }
     """).addEnum("""
     {
       "name": "status",
       "plural": "statuses",
+      "attributes": [],
       "values": [
-        { "name": "active" },
-        { "name": "inactive" }
+        { "name": "active", "attributes": [] },
+        { "name": "inactive", "attributes": [] }
       ]
     }
     """).form
@@ -178,9 +184,10 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     {
       "name": "user",
       "plural": "users",
+      "attributes": [],
       "fields": [
-        { "name": "guid", "type": "uuid", "required": true },
-        { "name": "emails", "type": "[string]", "required": true, "default": "[]" }
+        { "name": "guid", "type": "uuid", "required": true, "attributes": [] },
+        { "name": "emails", "type": "[string]", "required": true, "default": "[]", "attributes": [] }
       ]
     }
     """).form
@@ -202,25 +209,28 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     {
       "name": "guest_user",
       "plural": "guest_users",
+      "attributes": [],
       "fields": [
-        { "name": "guid", "type": "uuid", "required": true }
+        { "name": "guid", "type": "uuid", "required": true, "attributes": [] }
       ]
     }
     """).addModel("""
     {
       "name": "registered_user",
       "plural": "registered_users",
+      "attributes": [],
       "fields": [
-        { "name": "guid", "type": "uuid", "required": true }
+        { "name": "guid", "type": "uuid", "required": true, "attributes": [] }
       ]
     }
     """).addUnion("""
     {
       "name": "user",
       "plural": "users",
+      "attributes": [],
       "types": [
-        { "type": "guest_user" },
-        { "type": "registered_user" }
+        { "type": "guest_user", "attributes": [] },
+        { "type": "registered_user", "attributes": [] }
       ]
     }
     """).form
@@ -242,8 +252,9 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
     {
       "name": "location",
       "plural": "locations",
+      "attributes": [],
       "fields": [
-        { "name": "ip_address", "type": "string", "required": true }
+        { "name": "ip_address", "type": "string", "required": true, "attributes": [] }
       ]
     }
     """).form

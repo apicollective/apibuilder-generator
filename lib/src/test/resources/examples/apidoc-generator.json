@@ -1,31 +1,58 @@
 {
   "apidoc": {
-    "version": "0.9.6"
+    "version": "0.11.17"
   },
   "name": "apidoc generator",
   "organization": {
-    "key": "gilt"
+    "key": "bryzek"
   },
   "application": {
     "key": "apidoc-generator"
   },
   "namespace": "com.bryzek.apidoc.generator.v0",
-  "version": "0.9.6",
-  "base_url": "http://localhost:9000",
-  "description": "Documentation for an apidoc code generator API",
+  "version": "0.11.17",
+  "info": {
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "contact": {
+      "name": "Michael Bryzek",
+      "url": "http://twitter.com/mbryzek",
+      "email": "mbryzek@alum.mit.edu"
+    }
+  },
   "headers": [],
-  "info": [],
   "imports": [
     {
-      "uri": "http://localhost:9000/gilt/apidoc-spec/0.9.6/service.json",
+      "uri": "http://www.apidoc.me/bryzek/apidoc-common/0.11.17/service.json",
+      "namespace": "com.bryzek.apidoc.common.v0",
+      "organization": {
+        "key": "bryzek"
+      },
+      "application": {
+        "key": "apidoc-common"
+      },
+      "version": "0.11.17",
+      "enums": [],
+      "unions": [],
+      "models": [
+        "audit",
+        "healthcheck",
+        "reference",
+        "reference_guid"
+      ]
+    },
+    {
+      "uri": "http://www.apidoc.me/bryzek/apidoc-spec/0.11.17/service.json",
       "namespace": "com.bryzek.apidoc.spec.v0",
       "organization": {
-        "key": "gilt"
+        "key": "bryzek"
       },
       "application": {
         "key": "apidoc-spec"
       },
-      "version": "0.9.6",
+      "version": "0.11.17",
       "enums": [
         "method",
         "parameter_location",
@@ -37,13 +64,17 @@
       "models": [
         "apidoc",
         "application",
+        "attribute",
         "body",
+        "contact",
         "deprecation",
         "enum",
         "enum_value",
         "field",
         "header",
         "import",
+        "info",
+        "license",
         "model",
         "operation",
         "organization",
@@ -60,49 +91,118 @@
   "unions": [],
   "models": [
     {
+      "name": "attribute",
+      "plural": "attributes",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "description": "An attribute represents a key/value pair that is optionally used to provide additional instructions / data to the code generator. An example could be an attribute to specify the root import path for a go client.."
+    },
+    {
       "name": "error",
       "plural": "errors",
       "fields": [
         {
           "name": "code",
           "type": "string",
-          "description": "Machine readable code for this specific error message",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Machine readable code for this specific error message"
         },
         {
           "name": "message",
           "type": "string",
-          "description": "Description of the error",
-          "required": true
+          "required": true,
+          "attributes": [],
+          "description": "Description of the error"
         }
-      ]
+      ],
+      "attributes": []
+    },
+    {
+      "name": "file",
+      "plural": "files",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "The recommended name for the file.",
+          "example": "BryzekApidocApiClient.scala"
+        },
+        {
+          "name": "dir",
+          "type": "string",
+          "required": false,
+          "attributes": [],
+          "description": "The recommended directory path for the file where appropriate.",
+          "example": "com/bryzek/apidoc"
+        },
+        {
+          "name": "contents",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "The actual source code."
+        }
+      ],
+      "attributes": [],
+      "description": "Represents a source file"
     },
     {
       "name": "generator",
       "plural": "generators",
-      "description": "The generator metadata.",
       "fields": [
         {
           "name": "key",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "name",
           "type": "string",
-          "required": true
+          "required": true,
+          "attributes": []
         },
         {
           "name": "language",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": [],
+          "description": "A comma separate list of the programming language(s) that this generator produces",
+          "example": "scala"
         },
         {
           "name": "description",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "attributes",
+          "type": "[string]",
+          "required": true,
+          "attributes": [],
+          "description": "The list of attributes that this code generator can use. You can find the full list of available attributes and their descriptions at http://apidoc.me/doc/attributes",
+          "default": "[]"
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "The generator metadata."
     },
     {
       "name": "healthcheck",
@@ -112,22 +212,36 @@
           "name": "status",
           "type": "string",
           "required": true,
+          "attributes": [],
           "example": "healthy"
         }
-      ]
+      ],
+      "attributes": []
     },
     {
       "name": "invocation",
       "plural": "invocations",
-      "description": "The result of invoking a generator.",
       "fields": [
         {
           "name": "source",
           "type": "string",
+          "required": true,
+          "attributes": [],
           "description": "The actual source code.",
-          "required": true
+          "deprecation": {
+            "description": "Use files instead"
+          }
+        },
+        {
+          "name": "files",
+          "type": "[file]",
+          "required": true,
+          "attributes": [],
+          "description": "A collection of source files"
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "The result of invoking a generator."
     },
     {
       "name": "invocation_form",
@@ -136,14 +250,25 @@
         {
           "name": "service",
           "type": "com.bryzek.apidoc.spec.v0.models.service",
-          "required": true
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "attributes",
+          "type": "[attribute]",
+          "required": true,
+          "attributes": [],
+          "default": "[]"
         },
         {
           "name": "user_agent",
           "type": "string",
-          "required": false
+          "required": false,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "description": "The invocation form is the payload send to the code generators when requesting generation of client code."
     }
   ],
   "resources": [
@@ -154,21 +279,20 @@
         {
           "method": "GET",
           "path": "/generators",
-          "description": "Get all available generators",
           "parameters": [
             {
               "name": "key",
               "type": "string",
               "location": "Query",
-              "description": "Filter generators with this key",
-              "required": false
+              "required": false,
+              "description": "Filter generators with this key"
             },
             {
               "name": "limit",
               "type": "integer",
               "location": "Query",
-              "description": "The number of records to return",
               "required": true,
+              "description": "The number of records to return",
               "default": "100",
               "minimum": 0
             },
@@ -176,8 +300,8 @@
               "name": "offset",
               "type": "integer",
               "location": "Query",
-              "description": "Used to paginate. First page of results is 0.",
               "required": true,
+              "description": "Used to paginate. First page of results is 0.",
               "default": "0",
               "minimum": 0
             }
@@ -191,12 +315,13 @@
               },
               "type": "[generator]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Get all available generators"
         },
         {
           "method": "GET",
           "path": "/generators/:key",
-          "description": "Get generator with this key",
           "parameters": [
             {
               "name": "key",
@@ -213,10 +338,22 @@
                 }
               },
               "type": "generator"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 404
+                }
+              },
+              "type": "unit"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Get generator with this key"
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/generators"
     },
     {
       "type": "healthcheck",
@@ -235,9 +372,12 @@
               },
               "type": "healthcheck"
             }
-          ]
+          ],
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/_internal_/healthcheck"
     },
     {
       "type": "invocation",
@@ -246,10 +386,6 @@
         {
           "method": "POST",
           "path": "/invocations/:key",
-          "description": "Invoke a generator",
-          "body": {
-            "type": "invocation_form"
-          },
           "parameters": [
             {
               "name": "key",
@@ -275,9 +411,20 @@
               },
               "type": "[error]"
             }
-          ]
+          ],
+          "attributes": [],
+          "description": "Invoke a generator",
+          "body": {
+            "type": "invocation_form",
+            "attributes": []
+          }
         }
-      ]
+      ],
+      "attributes": [],
+      "path": "/invocations"
     }
-  ]
+  ],
+  "attributes": [],
+  "base_url": "http://www.apidoc.me",
+  "description": "Documentation for an apidoc code generator API"
 }

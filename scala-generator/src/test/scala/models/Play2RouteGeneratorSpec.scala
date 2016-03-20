@@ -32,7 +32,8 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
       "enums": [],
       "unions": [],
       "models": [],
-      "resources": []
+      "resources": [],
+      "attributes": []
     """))
 
     Play2RouteGenerator(InvocationForm(service)).invoke() match {

@@ -14,22 +14,27 @@ class ScalaNestedUnionSpec extends FunSpec with ShouldMatchers {
       "info": [],
       "enums": [],
       "resources": [],
+      "attributes": [],
       "unions": [
         {
           "name": "inner_type",
           "plural": "inner_types",
+          "attributes": [],
           "types": [
             {
-              "type": "string_model"
+              "type": "string_model",
+              "attributes": []
             }
           ]
         },
         {
           "name": "outer_type",
           "plural": "outer_types",
+          "attributes": [],
           "types": [
             {
-              "type": "inner_type"
+              "type": "inner_type",
+              "attributes": []
             }
           ]
         }
@@ -38,11 +43,13 @@ class ScalaNestedUnionSpec extends FunSpec with ShouldMatchers {
         {
           "name": "string_model",
           "plural": "string_models",
+          "attributes": [],
           "fields": [
             {
               "name": "name",
               "type": "string",
-              "required": true
+              "required": true,
+              "attributes": []
             }
           ]
         }

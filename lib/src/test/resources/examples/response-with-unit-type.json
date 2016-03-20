@@ -16,6 +16,8 @@
   "imports": [],
   "enums": [],
   "unions": [],
+  "attributes": [],
+
   "models": [
     {
       "name": "user",
@@ -25,19 +27,23 @@
           "name": "guid",
           "type": "uuid",
           "description": "Internal unique identifier for this user.",
-          "required": true
+          "required": true,
+          "attributes": []
         }
-      ]
+      ],
+      "attributes": []
     }
   ],
   "resources": [
     {
       "type": "user",
       "plural": "users",
+      "attributes": [],
       "operations": [
         {
           "method": "POST",
           "path": "/users",
+          "attributes": [],
           "parameters": [],
           "responses": [
             {
