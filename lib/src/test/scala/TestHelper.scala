@@ -13,7 +13,6 @@ import java.io.File
 object TestHelper {
 
   lazy val collectionJsonDefaultsService = parseFile("/examples/collection-json-defaults.json")
-  lazy val illegalNonRequiredWithDefaultService = parseFile("/examples/illegal-non-required-with-default.json")
   lazy val referenceApiService = parseFile(s"/examples/reference-service.json")
   lazy val referenceWithImportsApiService = parseFile(s"/examples/reference-with-imports.json")
   lazy val generatorApiService = parseFile(s"/examples/apidoc-generator.json")
@@ -79,7 +78,7 @@ object TestHelper {
 
       val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
       TestHelper.writeToFile(expectedPath, contents.trim)
-      // TestHelper.writeToFile(actualPath, contents.trim)
+      TestHelper.writeToFile(actualPath, contents.trim)
       
       val cmd = s"diff $expectedPath $actualPath"
       println(cmd)
