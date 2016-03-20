@@ -635,7 +635,7 @@
         },
         {
           "method": "GET",
-          "path": "/:guid",
+          "path": "/organizations/:guid",
           "parameters": [
             {
               "name": "guid",
@@ -658,7 +658,7 @@
         }
       ],
       "attributes": [],
-      "path": "/"
+      "path": "/organizations"
     },
     {
       "type": "user",

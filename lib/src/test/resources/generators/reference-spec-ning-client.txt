@@ -551,7 +551,7 @@ package com.bryzek.apidoc.reference.api.v0 {
           "organization" -> play.api.libs.json.Json.toJson(organization)
         )
 
-        _executeRequest("POST", s"/organizations", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/organizationsorganizations", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 201 => _root_.com.bryzek.apidoc.reference.api.v0.Client.parseJson("com.bryzek.apidoc.reference.api.v0.models.Organization", r, _.validate[com.bryzek.apidoc.reference.api.v0.models.Organization])
           case r if r.getStatusCode == 409 => throw new com.bryzek.apidoc.reference.api.v0.errors.ErrorsResponse(r)
           case r => throw new com.bryzek.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
@@ -568,7 +568,7 @@ package com.bryzek.apidoc.reference.api.v0 {
           name.map("name" -> _)
         ).flatten
 
-        _executeRequest("GET", s"/organizations", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/organizationsorganizations", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.reference.api.v0.Client.parseJson("Seq[com.bryzek.apidoc.reference.api.v0.models.Organization]", r, _.validate[Seq[com.bryzek.apidoc.reference.api.v0.models.Organization]])
           case r => throw new com.bryzek.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -578,7 +578,7 @@ package com.bryzek.apidoc.reference.api.v0 {
         guid: _root_.java.util.UUID,
         requestHeaders: Seq[(String, String)] = Nil
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.reference.api.v0.models.Organization] = {
-        _executeRequest("GET", s"/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/${guid}izations:guid", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.com.bryzek.apidoc.reference.api.v0.Client.parseJson("com.bryzek.apidoc.reference.api.v0.models.Organization", r, _.validate[com.bryzek.apidoc.reference.api.v0.models.Organization])
           case r => throw new com.bryzek.apidoc.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
