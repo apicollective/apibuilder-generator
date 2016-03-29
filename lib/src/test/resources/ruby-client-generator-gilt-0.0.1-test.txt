@@ -173,13 +173,13 @@ module Com
                   @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Reference::Api::V0::Client)
                 end
 
-                def post_organizations(hash)
+                def post(hash)
                   HttpClient::Preconditions.assert_class('hash', hash, Hash)
                   r = @client.request("/organizations").with_json(hash.to_json).post
                   ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(r)
                 end
 
-                def get_organizations(incoming={})
+                def get(incoming={})
                   opts = HttpClient::Helper.symbolize_keys(incoming)
                   query = {
                     :guid => (x = opts.delete(:guid); x.nil? ? nil : HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(x), String)),
@@ -191,7 +191,7 @@ module Com
 
                 def get_by_guid(guid)
                   HttpClient::Preconditions.assert_class('guid', guid, String)
-                  r = @client.request("/#{guid}").get
+                  r = @client.request("/organizations/#{guid}").get
                   ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(r)
                 end
 
