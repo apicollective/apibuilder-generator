@@ -124,7 +124,12 @@ ${headerString.indent(8)}
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.ning.http.client.Response] = {
-      val request = _requestBuilder(method, path, requestHeaders)
+      val allHeaders = body match {
+        case None => requestHeaders
+        case Some(_) => _withJsonContentType(requestHeaders)
+      }
+
+      val request = _requestBuilder(method, path, allHeaders)
 
       queryParameters.foreach { pair =>
         request.${config.addQueryParamMethod}(pair._1, pair._2)
@@ -132,7 +137,7 @@ ${headerString.indent(8)}
 
       val requestWithParamsAndBody = body.fold(request) { b =>
         val serialized = play.api.libs.json.Json.stringify(b)
-        request.setBody(serialized).addHeader("Content-type", "application/json; charset=UTF-8")
+        request.setBody(serialized)
       }
 
       val finalRequest = requestWithParamsAndBody.build()
@@ -146,6 +151,17 @@ ${headerString.indent(8)}
         }
       )
       result.future
+    }
+
+    /**
+     * Adds a Content-Type: application/json header unless the specified requestHeaders
+     * already contain a Content-Type header
+     */
+    def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
+      headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
+        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case Some(_) => headers
+      }
     }
 
   }
