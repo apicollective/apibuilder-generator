@@ -162,10 +162,10 @@ ${methodGenerator.objects().indent(4)}
           _logRequest("GET", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*)).get()
         }
         case "POST" => {
-          _logRequest("POST", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*).withHeaders("Content-Type" -> "application/json; charset=UTF-8")).post(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("POST", _requestHolder(path).withHeaders(_withJsonContentType(requestHeaders):_*).withQueryString(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PUT" => {
-          _logRequest("PUT", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*).withHeaders("Content-Type" -> "application/json; charset=UTF-8")).put(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("PUT", _requestHolder(path).withHeaders(_withJsonContentType(requestHeaders):_*).withQueryString(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PATCH" => {
           $patchMethod
@@ -183,6 +183,17 @@ ${methodGenerator.objects().indent(4)}
           _logRequest(method, _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*))
           sys.error("Unsupported method[%s]".format(method))
         }
+      }
+    }
+
+    /**
+     * Adds a Content-Type: application/json header unless the specified requestHeaders
+     * already contain a Content-Type header
+     */
+    def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
+      headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
+        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case Some(_) => headers
       }
     }
 
