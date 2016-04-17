@@ -78,7 +78,7 @@ object TestHelper {
 
       val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
       TestHelper.writeToFile(expectedPath, contents.trim)
-      TestHelper.writeToFile(actualPath, contents.trim)
+      // TestHelper.writeToFile(actualPath, contents.trim)
       
       val cmd = s"diff $expectedPath $actualPath"
       println(cmd)
