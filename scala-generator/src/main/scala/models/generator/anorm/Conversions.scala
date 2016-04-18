@@ -32,7 +32,7 @@ package %s {
 
     def parser[T](
       f: play.api.libs.json.JsValue => T
-    ) = anorm.Column.nonNull1 { (value, meta) =>
+    ) = anorm.Column.nonNull { (value, meta) =>
       val MetaDataItem(qualified, nullable, clazz) = meta
       value match {
         case json: org.postgresql.util.PGobject => {
