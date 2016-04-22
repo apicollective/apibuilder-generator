@@ -72,21 +72,27 @@ package %s {
 
     Seq(
       Some(Header.format(ssd.namespaces.anormConversions)),
-      Some(s"    implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = parser { _.as[play.api.libs.json.JsObject] }"),
-      Some(
-        Types.map { t =>
-          Seq(
-            s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = parser { _.as[Seq[${t.fullName}]] }",
-            s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = parser { _.as[Map[String, ${t.fullName}]] }"
-          ).mkString("\n").indent(2)
-        }.mkString("\n").indent(2)
-      ),
+      Some(standardTypes().indent(4)),
       buildCollectionConversions(ssd).map(_.indent(4)),
       Some(Footer)
     ).flatten.mkString("\n\n")
 
   }
 
+  def standardTypes(): String = {
+    (
+      Seq(
+        Seq(
+          s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = parser { _.as[play.api.libs.json.JsObject] }"
+        )
+      ) ++ Types.map { t =>
+        Seq(
+          s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = parser { _.as[Seq[${t.fullName}]] }",
+          s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = parser { _.as[Map[String, ${t.fullName}]] }"
+        )
+      }
+    ).flatten.mkString("\n")
+  }
 
   private[this] case class Name(shortName: String, qualifiedName: String)
 
