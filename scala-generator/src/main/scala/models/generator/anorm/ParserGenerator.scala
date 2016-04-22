@@ -48,20 +48,23 @@ object ParserGenerator extends CodeGenerator {
   }
 
   private[this] def generateCode(ssd: ScalaService): Option[String] = {
-    Seq(ssd.models, ssd.enums, ssd.unions).flatten.isEmpty match {
-      case true => {
+    Seq(ssd.models, ssd.enums, ssd.unions).flatten.toList match {
+      case Nil => {
         None
       }
-      case false => {
+      case _ => {
         Some(
           Seq(
             "import anorm._",
             s"package ${ssd.namespaces.anormParsers} {",
+            s"import ${ssd.namespaces.anormConversions}.Standard._".indent(2),
             (
-              Seq(s"import ${ssd.namespaces.anormConversions}.Json._") ++
+              Seq(
+                s"import ${ssd.namespaces.anormConversions}.Types._"
+              ) ++
                 ssd.service.imports.map { imp =>
                   val svc = Namespaces(imp.namespace)
-                  s"import ${svc.anormConversions}.Json._"
+                  s"import ${svc.anormConversions}.Types._"
                 }
             ).sorted.mkString("\n").indent(2),
             Seq(

@@ -28,7 +28,7 @@ package %s {
   /**
     * Conversions to collections of objects using JSON.
     */
-  object Json {
+  object Util {
 
     def parser[T](
       f: play.api.libs.json.JsValue => T
@@ -62,33 +62,39 @@ package %s {
 
       }
     }
-""".trim
 
-  private val Footer = "  }\n\n}"
+  }
+""".trim
 
   def code(
     ssd: ScalaService
   ): String = {
-
     Seq(
-      Some(Header.format(ssd.namespaces.anormConversions)),
-      Some(standardTypes().indent(4)),
-      buildCollectionConversions(ssd).map(_.indent(4)),
-      Some(Footer)
-    ).flatten.mkString("\n\n")
-
+      Header.format(ssd.namespaces.anormConversions),
+      Seq(
+        Some("object Types {"),
+        buildCollectionConversions(ssd).map(_.indent(2)),
+        Some("}")
+      ).flatten.mkString("\n").indent(2),
+      Seq(
+        "object Standard {",
+        coreTypes().indent(2),
+        "}"
+      ).mkString("\n").indent(2),
+      "}"
+    ).mkString("\n\n")
   }
 
-  def standardTypes(): String = {
+  def coreTypes(): String = {
     (
       Seq(
         Seq(
-          s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = parser { _.as[play.api.libs.json.JsObject] }"
+          s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }"
         )
       ) ++ Types.map { t =>
         Seq(
-          s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = parser { _.as[Seq[${t.fullName}]] }",
-          s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = parser { _.as[Map[String, ${t.fullName}]] }"
+          s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }",
+          s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }"
         )
       }
     ).flatten.mkString("\n")
@@ -110,8 +116,8 @@ package %s {
             names.map { name =>
               val safe = ssd.name + name.shortName
               Seq(
-                s"implicit val columnToSeq${safe}: Column[Seq[_root_.${name.qualifiedName}]] = parser { _.as[Seq[_root_.${name.qualifiedName}]] }",
-                s"implicit val columnToMap${safe}: Column[Map[String, _root_.${name.qualifiedName}]] = parser { _.as[Map[String, _root_.${name.qualifiedName}]] }"
+                s"implicit val columnToSeq${safe}: Column[Seq[_root_.${name.qualifiedName}]] = Util.parser { _.as[Seq[_root_.${name.qualifiedName}]] }",
+                s"implicit val columnToMap${safe}: Column[Map[String, _root_.${name.qualifiedName}]] = Util.parser { _.as[Map[String, _root_.${name.qualifiedName}]] }"
               ).mkString("\n")
             }.mkString("\n")
           ).mkString("\n")
