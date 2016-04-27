@@ -6,7 +6,9 @@ import anorm._
 
 package test.apidoc.apidoctest.v0.anorm.parsers {
 
-  import test.apidoc.apidoctest.v0.anorm.conversions.Json._
+  import test.apidoc.apidoctest.v0.anorm.conversions.Standard._
+
+  import test.apidoc.apidoctest.v0.anorm.conversions.Types._
 
   object User {
 

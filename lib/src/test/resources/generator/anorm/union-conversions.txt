@@ -11,7 +11,7 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
   /**
     * Conversions to collections of objects using JSON.
     */
-  object Json {
+  object Util {
 
     def parser[T](
       f: play.api.libs.json.JsValue => T
@@ -46,37 +46,40 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
       }
     }
 
-    implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = parser { _.as[play.api.libs.json.JsObject] }
+  }
 
-    implicit val columnToSeqBoolean: Column[Seq[Boolean]] = parser { _.as[Seq[Boolean]] }
-    implicit val columnToMapBoolean: Column[Map[String, Boolean]] = parser { _.as[Map[String, Boolean]] }
-    implicit val columnToSeqDouble: Column[Seq[Double]] = parser { _.as[Seq[Double]] }
-    implicit val columnToMapDouble: Column[Map[String, Double]] = parser { _.as[Map[String, Double]] }
-    implicit val columnToSeqInt: Column[Seq[Int]] = parser { _.as[Seq[Int]] }
-    implicit val columnToMapInt: Column[Map[String, Int]] = parser { _.as[Map[String, Int]] }
-    implicit val columnToSeqLong: Column[Seq[Long]] = parser { _.as[Seq[Long]] }
-    implicit val columnToMapLong: Column[Map[String, Long]] = parser { _.as[Map[String, Long]] }
-    implicit val columnToSeqLocalDate: Column[Seq[_root_.org.joda.time.LocalDate]] = parser { _.as[Seq[_root_.org.joda.time.LocalDate]] }
-    implicit val columnToMapLocalDate: Column[Map[String, _root_.org.joda.time.LocalDate]] = parser { _.as[Map[String, _root_.org.joda.time.LocalDate]] }
-    implicit val columnToSeqDateTime: Column[Seq[_root_.org.joda.time.DateTime]] = parser { _.as[Seq[_root_.org.joda.time.DateTime]] }
-    implicit val columnToMapDateTime: Column[Map[String, _root_.org.joda.time.DateTime]] = parser { _.as[Map[String, _root_.org.joda.time.DateTime]] }
-    implicit val columnToSeqBigDecimal: Column[Seq[BigDecimal]] = parser { _.as[Seq[BigDecimal]] }
-    implicit val columnToMapBigDecimal: Column[Map[String, BigDecimal]] = parser { _.as[Map[String, BigDecimal]] }
-    implicit val columnToSeqJsObject: Column[Seq[_root_.play.api.libs.json.JsObject]] = parser { _.as[Seq[_root_.play.api.libs.json.JsObject]] }
-    implicit val columnToMapJsObject: Column[Map[String, _root_.play.api.libs.json.JsObject]] = parser { _.as[Map[String, _root_.play.api.libs.json.JsObject]] }
-    implicit val columnToSeqString: Column[Seq[String]] = parser { _.as[Seq[String]] }
-    implicit val columnToMapString: Column[Map[String, String]] = parser { _.as[Map[String, String]] }
-    implicit val columnToSeqUUID: Column[Seq[_root_.java.util.UUID]] = parser { _.as[Seq[_root_.java.util.UUID]] }
-    implicit val columnToMapUUID: Column[Map[String, _root_.java.util.UUID]] = parser { _.as[Map[String, _root_.java.util.UUID]] }
-
+  object Types {
     import test.apidoc.apidoctest.v0.models.json._
-    implicit val columnToSeqApiDocTestGuestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] = parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
-    implicit val columnToMapApiDocTestGuestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] = parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
-    implicit val columnToSeqApiDocTestRegisteredUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
-    implicit val columnToMapApiDocTestRegisteredUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
-    implicit val columnToSeqApiDocTestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] = parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] }
-    implicit val columnToMapApiDocTestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] = parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] }
+    implicit val columnToSeqApiDocTestGuestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
+    implicit val columnToMapApiDocTestGuestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
+    implicit val columnToSeqApiDocTestRegisteredUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
+    implicit val columnToMapApiDocTestRegisteredUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
+    implicit val columnToSeqApiDocTestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] }
+    implicit val columnToMapApiDocTestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] }
+  }
 
+  object Standard {
+    implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }
+    implicit val columnToSeqBoolean: Column[Seq[Boolean]] = Util.parser { _.as[Seq[Boolean]] }
+    implicit val columnToMapBoolean: Column[Map[String, Boolean]] = Util.parser { _.as[Map[String, Boolean]] }
+    implicit val columnToSeqDouble: Column[Seq[Double]] = Util.parser { _.as[Seq[Double]] }
+    implicit val columnToMapDouble: Column[Map[String, Double]] = Util.parser { _.as[Map[String, Double]] }
+    implicit val columnToSeqInt: Column[Seq[Int]] = Util.parser { _.as[Seq[Int]] }
+    implicit val columnToMapInt: Column[Map[String, Int]] = Util.parser { _.as[Map[String, Int]] }
+    implicit val columnToSeqLong: Column[Seq[Long]] = Util.parser { _.as[Seq[Long]] }
+    implicit val columnToMapLong: Column[Map[String, Long]] = Util.parser { _.as[Map[String, Long]] }
+    implicit val columnToSeqLocalDate: Column[Seq[_root_.org.joda.time.LocalDate]] = Util.parser { _.as[Seq[_root_.org.joda.time.LocalDate]] }
+    implicit val columnToMapLocalDate: Column[Map[String, _root_.org.joda.time.LocalDate]] = Util.parser { _.as[Map[String, _root_.org.joda.time.LocalDate]] }
+    implicit val columnToSeqDateTime: Column[Seq[_root_.org.joda.time.DateTime]] = Util.parser { _.as[Seq[_root_.org.joda.time.DateTime]] }
+    implicit val columnToMapDateTime: Column[Map[String, _root_.org.joda.time.DateTime]] = Util.parser { _.as[Map[String, _root_.org.joda.time.DateTime]] }
+    implicit val columnToSeqBigDecimal: Column[Seq[BigDecimal]] = Util.parser { _.as[Seq[BigDecimal]] }
+    implicit val columnToMapBigDecimal: Column[Map[String, BigDecimal]] = Util.parser { _.as[Map[String, BigDecimal]] }
+    implicit val columnToSeqJsObject: Column[Seq[_root_.play.api.libs.json.JsObject]] = Util.parser { _.as[Seq[_root_.play.api.libs.json.JsObject]] }
+    implicit val columnToMapJsObject: Column[Map[String, _root_.play.api.libs.json.JsObject]] = Util.parser { _.as[Map[String, _root_.play.api.libs.json.JsObject]] }
+    implicit val columnToSeqString: Column[Seq[String]] = Util.parser { _.as[Seq[String]] }
+    implicit val columnToMapString: Column[Map[String, String]] = Util.parser { _.as[Map[String, String]] }
+    implicit val columnToSeqUUID: Column[Seq[_root_.java.util.UUID]] = Util.parser { _.as[Seq[_root_.java.util.UUID]] }
+    implicit val columnToMapUUID: Column[Map[String, _root_.java.util.UUID]] = Util.parser { _.as[Map[String, _root_.java.util.UUID]] }
   }
 
 }

@@ -303,24 +303,24 @@ package com.bryzek.apidoc.example.union.types.v0 {
 
     // Type: date-time-iso8601
     implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](
-      ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
+      ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
     )
 
     implicit val queryStringBindableTypeDateTimeIso8601 = new QueryStringBindable.Parsing[org.joda.time.DateTime](
-      ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
+      ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
     )
 
     // Type: date-iso8601
     implicit val pathBindableTypeDateIso8601 = new PathBindable.Parsing[org.joda.time.LocalDate](
-      ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: Exception) => s"Error parsing date $key. Example: 2014-04-29"
+      ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date $key. Example: 2014-04-29"
     )
 
     implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsing[org.joda.time.LocalDate](
-      ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: Exception) => s"Error parsing date $key. Example: 2014-04-29"
+      ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date $key. Example: 2014-04-29"
     )
 
     // Enum: Bar
-    private[this] val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Bar.all.mkString(", ")}"
+    private[this] val enumBarNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Bar.all.mkString(", ")}"
 
     implicit val pathBindableEnumBar = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Bar] (
       Bar.fromString(_).get, _.toString, enumBarNotFound
@@ -331,7 +331,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
     )
 
     // Enum: Foo
-    private[this] val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Foo.all.mkString(", ")}"
+    private[this] val enumFooNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Foo.all.mkString(", ")}"
 
     implicit val pathBindableEnumFoo = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Foo] (
       Foo.fromString(_).get, _.toString, enumFooNotFound
@@ -534,7 +534,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
 
     case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")
+    case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
 
   }
 

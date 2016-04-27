@@ -1,5 +1,5 @@
 // Enum: AgeGroup
-private[this] val enumAgeGroupNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.reference.api.v0.models.AgeGroup.all.mkString(", ")}"
+private[this] val enumAgeGroupNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.reference.api.v0.models.AgeGroup.all.mkString(", ")}"
 
 implicit val pathBindableEnumAgeGroup = new PathBindable.Parsing[com.bryzek.apidoc.reference.api.v0.models.AgeGroup] (
   AgeGroup.fromString(_).get, _.toString, enumAgeGroupNotFound
