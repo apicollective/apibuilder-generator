@@ -85,7 +85,7 @@ case class ScalaClientMethodGenerator(
   }
 
   private def failedRequestClass(): String = {
-    """case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends Exception(s"HTTP $responseCode: $message")"""
+    """case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")"""
   }
 
   /**
