@@ -174,6 +174,36 @@ object ParserGenerator extends CodeGenerator {
       requiredImports += s"import ${ns.anormConversions}.Types._"
     }
 
+    /**
+      * Recursively adds anorm parser imports for any
+      * datatype that is from an imported application.
+      */
+    private[this] def addImports(datatype: ScalaDatatype) {
+      datatype match {
+        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+          // no-op
+        }
+        case f @ ScalaDatatype.List(inner) => {
+          addImports(inner)
+        }
+        case f @ ScalaDatatype.Map(inner) => {
+          addImports(inner)
+        }
+        case f @ ScalaDatatype.Option(inner) => {
+          addImports(inner)
+        }
+        case ScalaPrimitive.Enum(ns, name) => {
+          addImports(ns)
+        }
+        case ScalaPrimitive.Model(ns, name) => {
+          addImports(ns)
+        }
+        case ScalaPrimitive.Union(ns, name) => {
+          addImports(ns)
+        }
+      }
+    }
+
     private[this] def generateRowParser(fieldName: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
         case f @ ScalaPrimitive.Boolean => s"SqlParser.bool($fieldName)"
@@ -188,12 +218,15 @@ object ParserGenerator extends CodeGenerator {
         case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaDatatype.List(inner) => {
+          addImports(inner)
           s"SqlParser.get[Seq[${inner.name}]]($fieldName)"
         }
         case f @ ScalaDatatype.Map(inner) => {
+          addImports(inner)
           s"SqlParser.get[Map[String, ${inner.name}]]($fieldName)"
         }
         case f @ ScalaDatatype.Option(inner) => {
+          addImports(inner)
           generateRowParser(fieldName, inner, originalName) + ".?"
         }
         case ScalaPrimitive.Enum(ns, name) => {
