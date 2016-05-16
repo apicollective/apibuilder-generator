@@ -29,6 +29,10 @@ object AndroidClasses
   extends CodeGenerator
   with AndroidJavaUtil{
 
+  val JAVADOC_CLASS_MESSAGE = "WARNING: not all features (notably unions) and data types work with android generator yet.  " +
+    "Android generator is designed to be used in an android application, but should work in any java codebase as long as you import jackson and retrofit2 libraries.  " +
+    "If you are considering using this library, would like to request/discuss features, or would like to share how you're using it, please contact android-feedback@gilt.com"
+
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = invoke(form, addHeader = true)
 
   def invoke(form: InvocationForm, addHeader: Boolean = false): Either[Seq[String], Seq[File]] = Right(generateCode(form, addHeader))
@@ -65,9 +69,9 @@ object AndroidClasses
         generateModel(model, Seq.empty)
       }
 
-      val generatedResources = service.resources.map { generateResource }
-
       val generatedObjectMapper = Seq(generateObjectMapper)
+
+      val generatedResources = service.resources.map { generateResource }
 
       generatedEnums ++
         generatedModels ++
@@ -119,7 +123,10 @@ object AndroidClasses
       }
 
       val builder =
-        TypeSpec.classBuilder(sharedObjectMapperClassName).superclass(classOf[ObjectMapper]).addModifiers(Modifier.PUBLIC)
+        TypeSpec.classBuilder(sharedObjectMapperClassName)
+          .superclass(classOf[ObjectMapper])
+          .addModifiers(Modifier.PUBLIC)
+          .addJavadoc(JAVADOC_CLASS_MESSAGE)
 
       builder.addField(pattern.build)
       builder.addField(formatter.build)
@@ -153,6 +160,7 @@ object AndroidClasses
       val builder =
         TypeSpec.enumBuilder(className)
         .addModifiers(Modifier.PUBLIC)
+        .addJavadoc(JAVADOC_CLASS_MESSAGE)
 
       enum.description.map(builder.addJavadoc(_))
 
@@ -174,6 +182,7 @@ object AndroidClasses
       val builder =
         TypeSpec.classBuilder(className)
           .addModifiers(Modifier.PUBLIC)
+          .addJavadoc(JAVADOC_CLASS_MESSAGE)
 
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown","true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
@@ -253,6 +262,7 @@ object AndroidClasses
       val builder =
         TypeSpec.interfaceBuilder(className)
           .addModifiers(Modifier.PUBLIC)
+          .addJavadoc(JAVADOC_CLASS_MESSAGE)
 
 
       resource.operations.foreach{operation =>
