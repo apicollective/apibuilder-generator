@@ -29,9 +29,9 @@ object AndroidClasses
   extends CodeGenerator
   with AndroidJavaUtil{
 
-  val JAVADOC_CLASS_MESSAGE = "WARNING: not all features (notably unions) and data types work with android generator yet.  " +
-    "Android generator is designed to be used in an android application, but should work in any java codebase as long as you import jackson and retrofit2 libraries.  " +
-    "If you are considering using this library, would like to request/discuss features, or would like to share how you're using it, please contact android-feedback@gilt.com"
+  val JAVADOC_CLASS_MESSAGE = "WARNING: not all features (notably unions) and data types work with android generator yet.  \n" +
+    "Android generator is designed to be used in an android application, but should work in any java codebase as long as you import jackson and retrofit2 libraries.  \n" +
+    "If you are considering using this library, would like to request/discuss features, or would like to share how you're using it, please contact android-feedback@gilt.com \n"
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = invoke(form, addHeader = true)
 
