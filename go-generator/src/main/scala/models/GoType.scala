@@ -194,7 +194,7 @@ object GoType {
       case Datatype.Primitive.Long => Klass("int64")
       case Datatype.Primitive.DateIso8601 => Klass("string")
       case Datatype.Primitive.DateTimeIso8601 => Klass("string")
-      case Datatype.Primitive.Decimal => Klass("string")
+      case Datatype.Primitive.Decimal => Klass("float64") // TODO. Should we use big/math/Float
       case Datatype.Primitive.Object => Klass("map[string]interface{}")
       case Datatype.Primitive.String => Klass("string")
       case Datatype.Primitive.Unit => Klass("nil")
