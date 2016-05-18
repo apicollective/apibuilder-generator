@@ -34,6 +34,10 @@ case class ResponseBuilder(
         )
       }
 
+      case Datatype.Primitive.String => {
+        Some(s"$readerName.(string)")
+      }
+
       case t: Datatype.Primitive => {
         // TODO: need to handle all the primitive types here
         Some(s"string($readerName)")
