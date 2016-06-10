@@ -31,7 +31,7 @@ case class Code(form: InvocationForm) {
   }
 
   def generate(): Option[String] = {
-    Seq(service.models, service.enums, service.unions).flatten.isEmpty match {
+    Seq(service.models, service.enums, service.unions, service.resources).flatten.isEmpty match {
       case true => {
         None
       }
