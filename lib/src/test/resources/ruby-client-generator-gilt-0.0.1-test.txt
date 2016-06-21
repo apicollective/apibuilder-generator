@@ -621,13 +621,13 @@ module Com
                   client
                 end
 
-                # If HTTP is required, this method accepts an HTTP Client and configures SSL
-                def configure_ssl(client)
-                  Preconditions.assert_class('client', client, Net::HTTP)
-                  client.use_ssl = true
-                  client.verify_mode = OpenSSL::SSL::VERIFY_PEER
-                  client.cert_store = OpenSSL::X509::Store.new
-                  client.cert_store.set_default_paths
+                # If HTTPS is required, this method accepts an HTTP Client and configures SSL
+                def configure_ssl(http)
+                  Preconditions.assert_class('http', http, Net::HTTP)
+                  http.use_ssl = true
+                  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+                  http.cert_store = OpenSSL::X509::Store.new
+                  http.cert_store.set_default_paths
                 end
 
                 def get(&block)
