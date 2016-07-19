@@ -62,6 +62,22 @@ object Play24ClientGenerator extends CodeGenerator {
   }
 }
 
+object Play25ClientGenerator extends CodeGenerator {
+
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+
+    val config = PlayFrameworkVersion(
+      name = "2.5.x",
+      config = ScalaClientMethodConfigs.Play25(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+      requestHolderClass = "play.api.libs.ws.WSRequest",
+      authSchemeClass = "play.api.libs.ws.WSAuthScheme",
+      supportsHttpPatch = true
+    )
+
+    Play2ClientGenerator.invoke(config, form)
+  }
+}
+
 object Play2ClientGenerator {
 
   def invoke(
@@ -127,9 +143,8 @@ ${methodGenerator.accessors().indent(4)}
 ${methodGenerator.objects().indent(4)}
 
     def _requestHolder(path: String): ${version.requestHolderClass} = {
-      import play.api.Play.current
-
-      val holder = play.api.libs.ws.WS.url(baseUrl + path)$headerString
+      ${if (version.config.expectsInjectedWsClient) "" else "import play.api.Play.current\n"}
+      val holder = ${if (version.config.expectsInjectedWsClient) "ws" else "play.api.libs.ws.WS"}.url(baseUrl + path)$headerString
       auth.fold(holder) {
         case Authorization.Basic(username, password) => {
           holder.withAuth(username, password.getOrElse(""), ${version.authSchemeClass}.BASIC)
