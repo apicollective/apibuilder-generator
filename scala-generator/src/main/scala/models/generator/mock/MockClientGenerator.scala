@@ -1,21 +1,19 @@
 package scala.generator.mock
 
-import com.bryzek.apidoc.spec.v0.models.Service
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
-import lib.{Datatype, Text}
 import lib.Text._
 import scala.models.ApidocComments
 import scala.generator._
 
 object MockClientGenerator {
 
-  object Play24 extends CodeGenerator {
+  object Play25 extends CodeGenerator {
 
     override def invoke(form: InvocationForm) = {
       val ssd = new ScalaService(form.service)
-      MockClientGenerator(form, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
+      MockClientGenerator(form, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
     }
 
   }

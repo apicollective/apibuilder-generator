@@ -21,7 +21,7 @@ object ScalaClientCommon {
 
     s"""
 class Client(
-  val baseUrl: String$defaultUrl,
+  ${if (config.expectsInjectedWsClient) "ws: play.api.libs.ws.WSClient,\n  "}val baseUrl: String$defaultUrl,
   auth: scala.Option[${config.namespace}.Authorization] = None,
   defaultHeaders: Seq[(String, String)] = Nil${config.extraClientCtorArgs.getOrElse("")}
 ) extends interfaces.Client
