@@ -53,17 +53,21 @@ trait Play2Models extends CodeGenerator {
 package ${ssd.namespaces.models} {
 
   package object json {
-    import play.api.libs.functional.syntax._
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
-    import play.api.libs.json.Reads.DefaultJodaDateReads
+    import play.api.libs.functional.syntax._
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     private[${ssd.namespaces.last}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
     private[${ssd.namespaces.last}] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
       def writes(x: java.util.UUID) = JsString(x.toString)
+    }
+
+    private[${ssd.namespaces.last}] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
+      import org.joda.time.format.ISODateTimeFormat.dateTimeParser
+      dateTimeParser.parseDateTime(str)
     }
 
     private[${ssd.namespaces.last}] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
