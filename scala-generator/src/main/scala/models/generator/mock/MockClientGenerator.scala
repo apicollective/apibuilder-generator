@@ -9,6 +9,15 @@ import scala.generator._
 
 object MockClientGenerator {
 
+  object Play24 extends CodeGenerator {
+
+    override def invoke(form: InvocationForm) = {
+      val ssd = new ScalaService(form.service)
+      MockClientGenerator(form, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
+    }
+
+  }
+
   object Play25 extends CodeGenerator {
 
     override def invoke(form: InvocationForm) = {
