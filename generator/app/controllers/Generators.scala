@@ -108,6 +108,16 @@ object Generators {
         status = lib.generator.Status.Beta,
         codeGenerator = Some(scala.models.Play24ClientGenerator)
       ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "play_2_5_client",
+        name = "Play 2.5 client",
+        description = Some("Play Framework 2.5 client based on <a href='http://www.playframework.com/documentation/2.5.x/ScalaWS'>WS API</a>. Primary change from 2.3.x is WSRequestHolder has been deprecated (replaced by WSRequest)."),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Beta,
+      codeGenerator = Some(scala.models.Play25ClientGenerator)
+    ),
       CodeGenTarget(
         metaData = Generator(
           key = "play_2_x_json",
@@ -201,13 +211,13 @@ object Generators {
       ),
        CodeGenTarget(
         metaData = Generator(
-          key = "play_2_4_mock_client",
-          name = "Play 2.4 Mock Client",
+          key = "play_2_5_mock_client",
+          name = "Play 2.5 Mock Client",
           description = Some("Provides a mock client with non functional, but compiling stubs, that can serve as a baseline for testing"),
           language = Some("Java, Scala")
         ),
         status = lib.generator.Status.Alpha,
-        codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play24)
-      )    
+        codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play25)
+      )
   ).sortBy(_.metaData.key)
 }

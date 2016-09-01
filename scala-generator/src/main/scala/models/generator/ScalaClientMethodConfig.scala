@@ -37,6 +37,11 @@ trait ScalaClientMethodConfig {
     */
   def responseClass: String
 
+  /** Whether or not play.api.libs.ws.WS exists as a static object, or if
+    * play.api.libs.ws.WSClient is expected to be passed in.
+   */
+  def expectsInjectedWsClient: Boolean
+
   /**
     * Extra arguments that we need to provide to the Client, like e.g.
     * our own async http client
@@ -77,6 +82,7 @@ object ScalaClientMethodConfigs {
     override def pathEncode(value: String) = s"""play.utils.UriEncoding.encodePathSegment($value, "UTF-8")"""
     override val responseStatusMethod = "status"
     override val responseBodyMethod = "body"
+    override val expectsInjectedWsClient = false
     override val extraClientCtorArgs = None
     override val extraClientObjectMethods = None
     override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
@@ -85,18 +91,28 @@ object ScalaClientMethodConfigs {
   case class Play22(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.Response"
     override val requestUriMethod = Some("ahcResponse.getUri")
+    override val expectsInjectedWsClient = false
     override val canSerializeUuid = false
   }
 
   case class Play23(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod = None
+    override val expectsInjectedWsClient = false
     override val canSerializeUuid = true
   }
 
   case class Play24(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod = None
+    override val expectsInjectedWsClient = false
+    override val canSerializeUuid = true
+  }
+
+  case class Play25(namespace: String, baseUrl: Option[String]) extends Play {
+    override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestUriMethod = None
+    override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
   }
 
@@ -124,11 +140,13 @@ private lazy val defaultAsyncHttpClient = {
   case class Ning18(namespace: String, baseUrl: Option[String]) extends Ning {
     override def addQueryParamMethod: String = "addQueryParameter"
     override val requestUriMethod = Some("getUri")
+    override val expectsInjectedWsClient = false
   }
 
   case class Ning19(namespace: String, baseUrl: Option[String]) extends Ning {
     override def addQueryParamMethod: String = "addQueryParam"
     override val requestUriMethod = Some("getUri.toJavaNetURI")
+    override val expectsInjectedWsClient = false
   }
 
 }
