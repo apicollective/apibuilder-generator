@@ -110,6 +110,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_5_client",
+        name = "Play 2.5 client",
+        description = Some("Play Framework 2.5 client based on <a href='http://www.playframework.com/documentation/2.5.x/ScalaWS'>WS API</a>. Primary change from 2.4.x is to explicit accept the WSClient as it is now injected."),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Beta,
+      codeGenerator = Some(scala.models.Play24ClientGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "play_2_x_json",
         name = "Play 2.x json",
         description = Some("Generate play 2.x case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
