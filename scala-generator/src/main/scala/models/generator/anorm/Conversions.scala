@@ -33,7 +33,7 @@ package %s {
     def parser[T](
       f: play.api.libs.json.JsValue => T
     ) = anorm.Column.nonNull { (value, meta) =>
-      val MetaDataItem(qualified, nullable, clazz) = meta
+      val MetaDataItem(columnName, nullable, clazz) = meta
       value match {
         case json: org.postgresql.util.PGobject => {
           Try {
@@ -46,15 +46,16 @@ package %s {
             case Success(result) => Right(result)
             case Failure(ex) => Left(
               TypeDoesNotMatch(
-                s"Column[$qualified] error parsing json $value: $ex"
+                s"Column[${columnName.qualified}] error parsing json $value: $ex"
               )
             )
           }
         }
+
         case _=> {
           Left(
             TypeDoesNotMatch(
-              s"Column[$qualified] error converting $value: ${value.asInstanceOf[AnyRef].getClass} to Json"
+              s"Column[${columnName.qualified}] error converting $value to Json. Expected instance of type[org.postgresql.util.PGobject] and not[${value.asInstanceOf[AnyRef].getClass}]"
             )
           )
         }
