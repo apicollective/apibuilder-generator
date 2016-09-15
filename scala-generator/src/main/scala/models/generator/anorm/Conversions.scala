@@ -35,23 +35,8 @@ package %s {
     ) = anorm.Column.nonNull { (value, meta) =>
       val MetaDataItem(columnName, nullable, clazz) = meta
       value match {
-        case json: org.postgresql.util.PGobject => {
-          Try {
-            f(
-              play.api.libs.json.Json.parse(
-                json.getValue
-              )
-            )
-          } match {
-            case Success(result) => Right(result)
-            case Failure(ex) => Left(
-              TypeDoesNotMatch(
-                s"Column[${columnName.qualified}] error parsing json $value: $ex"
-              )
-            )
-          }
-        }
-
+        case json: org.postgresql.util.PGobject => parseJson(f, columnName.qualified, json.getValue)
+        case json: java.lang.String => parseJson(f, columnName.qualified, json)
         case _=> {
           Left(
             TypeDoesNotMatch(
@@ -61,6 +46,21 @@ package %s {
         }
 
 
+      }
+    }
+
+    private[this] def parseJson[T](f: play.api.libs.json.JsValue => T, columnName: String, value: String) = {
+      Try {
+        f(
+          play.api.libs.json.Json.parse(value)
+        )
+      } match {
+        case Success(result) => Right(result)
+        case Failure(ex) => Left(
+          TypeDoesNotMatch(
+            s"Column[$columnName] error parsing json $value: $ex"
+          )
+        )
       }
     }
 
