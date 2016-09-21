@@ -46,9 +46,9 @@ trait AndroidJavaUtil {
       toClassName(modelName)
     }
     if(startingWithLowercase){
-      paramStartingWithUppercase.head.toLower + paramStartingWithUppercase.tail
+      checkForReservedWord(paramStartingWithUppercase.head.toLower + paramStartingWithUppercase.tail)
     } else {
-      paramStartingWithUppercase
+      checkForReservedWord(paramStartingWithUppercase)
     }
 
   }
