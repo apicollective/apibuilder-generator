@@ -74,7 +74,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.atteo" % "evo-inflector" % "1.2.1",
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
-    "com.squareup" % "javapoet" % "1.3.0"
+    "com.squareup" % "javapoet" % "1.3.0",
     "com.squareup.retrofit" % "retrofit" % "2.0.0-beta2"
   ),
   scalacOptions += "-feature",
