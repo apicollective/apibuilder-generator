@@ -268,12 +268,12 @@ object AndroidClasses
       resource.operations.foreach{operation =>
 
         val maybeAnnotationClass = operation.method match {
-          case Method.Get => Some(classOf[retrofit.http.GET])
-          case Method.Post => Some(classOf[retrofit.http.POST])
-          case Method.Put => Some(classOf[retrofit.http.PUT])
-          case Method.Patch => Some(classOf[retrofit.http.PATCH])
-          case Method.Delete => Some(classOf[retrofit.http.DELETE])
-          case Method.Head => Some(classOf[retrofit.http.HEAD])
+          case Method.Get => Some(classOf[retrofit2.http.GET])
+          case Method.Post => Some(classOf[retrofit2.http.POST])
+          case Method.Put => Some(classOf[retrofit2.http.PUT])
+          case Method.Patch => Some(classOf[retrofit2.http.PATCH])
+          case Method.Delete => Some(classOf[retrofit2.http.DELETE])
+          case Method.Head => Some(classOf[retrofit2.http.HEAD])
           case Method.Connect => None
           case Method.Options => None
           case Method.Trace => None
@@ -314,7 +314,7 @@ object AndroidClasses
             val bodyType = dataTypeFromField(body.`type`)
 
             val parameter = ParameterSpec.builder(bodyType, toParamName(body.`type`, true))
-            val annotation = AnnotationSpec.builder(classOf[retrofit.http.Body]).build
+            val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
             parameter.addAnnotation(annotation)
             method.addParameter(parameter.build())
           })
@@ -322,9 +322,9 @@ object AndroidClasses
           operation.parameters.foreach(parameter => {
 
             val maybeAnnotationClass = parameter.location match {
-              case ParameterLocation.Path => Some(classOf[retrofit.http.Path])
-              case ParameterLocation.Query => Some(classOf[retrofit.http.Query])
-              case ParameterLocation.Form => Some(classOf[retrofit.http.Query])
+              case ParameterLocation.Path => Some(classOf[retrofit2.http.Path])
+              case ParameterLocation.Query => Some(classOf[retrofit2.http.Query])
+              case ParameterLocation.Form => Some(classOf[retrofit2.http.Query])
               case _ => None
             }
 
@@ -365,7 +365,7 @@ object AndroidClasses
             val returnType = dataTypeFromField(successfulResponse.`type`)
 
             //below, Void in "classOf[retrofit.Call[Void]" is ignored, what matters is returnType
-            val callTypeName = ParameterizedTypeName.get(ClassName.get(classOf[retrofit.Call[Void]]), returnType)
+            val callTypeName = ParameterizedTypeName.get(ClassName.get(classOf[retrofit2.Call[Void]]), returnType)
             method.returns(callTypeName)
           })
           builder.addMethod(method.build)
