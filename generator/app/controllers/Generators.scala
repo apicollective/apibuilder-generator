@@ -172,7 +172,7 @@ object Generators {
       metaData = Generator(
         key = "android_client",
         name = "Android Client",
-        description = Some("Generate Android models and client from the API description."),
+        description = Some("Generate Java models and Retrofit 2 client for Android from the API description."),
         language = Some("Java")
       ),
       status = lib.generator.Status.InDevelopment,
