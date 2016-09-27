@@ -32,7 +32,7 @@ case class Play2RouteGenerator(form: InvocationForm) {
     } match {
       case Nil => {
         Left(
-          Seq("Service does not have any resource operations")
+          Seq(s"Service[${service.organization.key}/${service.application.key}] does not have any resource operations - cannot generate play routes")
         )
       }
       case all => {

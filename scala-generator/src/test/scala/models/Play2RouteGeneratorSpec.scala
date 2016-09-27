@@ -37,7 +37,9 @@ class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
     """))
 
     Play2RouteGenerator(InvocationForm(service)).invoke() match {
-      case Left(errors) => errors.mkString(", ") should be("Service does not have any resource operations")
+      case Left(errors) => errors.mkString(", ") should be(
+        s"Service[${service.organization.key}/${service.application.key}] does not have any resource operations - cannot generate play routes"
+      )
       case Right(code) => fail("expected error when generating routes for a service with no operations")
     }
   }
