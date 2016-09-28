@@ -219,7 +219,7 @@ module HttpClient
     end
 
     def body_json
-      JSON.parse(@body)
+      @body ? JSON.parse(@body) : nil
     end
 
   end
