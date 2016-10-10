@@ -105,6 +105,10 @@ module Com
                     @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
                   end
 
+                  def subtype_to_hash
+                    raise 'Cannot serialize an instance of foobar directly - must use one of the specific types: foo, bar'
+                  end
+
                   def to_hash
                     { @name => subtype_to_hash }
                   end
@@ -158,6 +162,10 @@ module Com
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:name], 'User')
                     @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                  end
+
+                  def subtype_to_hash
+                    raise 'Cannot serialize an instance of user directly - must use one of the specific types: registered_user, guest_user, uuid'
                   end
 
                   def to_hash
