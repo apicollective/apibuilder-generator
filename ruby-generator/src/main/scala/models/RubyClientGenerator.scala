@@ -691,14 +691,15 @@ ${headers.rubyModuleConstants.indent(2)}
         Seq(
           s"def $className.from_json(hash)",
           s"  HttpClient::Preconditions.assert_class('hash', hash, Hash)",
-          s"  case HttpClient::Helper.symbolize_keys(hash)[:$disc]",
+          s"  discriminator = HttpClient::Helper.symbolize_keys(hash)[:$disc]",
+          s"  case discriminator",
           union.types.map { ut =>
             Datatype.Primitive(ut.`type`) match {
               case Failure(_) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(hash)"
               case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(hash)"
             }
           }.mkString("\n").indent(4),
-          s"    else ${undefinedTypeClassName(union)}.new(:name => union_type_name)",
+          s"    else ${undefinedTypeClassName(union)}.new(:name => discriminator)",
           s"  end",
           s"end"
         ).mkString("\n")
