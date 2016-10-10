@@ -691,7 +691,10 @@ ${headers.rubyModuleConstants.indent(2)}
         Seq(
           s"def $className.from_json(hash)",
           s"  HttpClient::Preconditions.assert_class('hash', hash, Hash)",
-          s"  discriminator = HttpClient::Helper.symbolize_keys(hash)[:$disc]",
+          s"  discriminator = HttpClient::Helper.symbolize_keys(hash)[:$disc].to_s.strip",
+          s"  if discriminator.empty?",
+          s"""    raise "Union type[${union.name}] requires a field named '$disc'"""",
+          s"  end",
           s"  case discriminator",
           union.types.map { ut =>
             Datatype.Primitive(ut.`type`) match {
