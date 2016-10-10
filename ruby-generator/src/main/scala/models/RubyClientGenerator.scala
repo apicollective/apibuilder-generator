@@ -622,6 +622,7 @@ ${headers.rubyModuleConstants.indent(2)}
   }
 
   def generateUnionClass(union: Union): String = {
+    val typeNames = union.types.map(_.`type`)
     val className = RubyUtil.toClassName(union.name)
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
@@ -639,6 +640,12 @@ ${headers.rubyModuleConstants.indent(2)}
         "  opts = HttpClient::Helper.symbolize_keys(incoming)",
         s"  HttpClient::Preconditions.require_keys(opts, [:name], '$className')",
         "  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)",
+        "end"
+      ).mkString("\n"),
+
+      Seq(
+        "def subtype_to_hash",
+        s"  raise 'Cannot serialize an instance of ${union.name} directly - must use one of the specific types: ${typeNames.mkString(", ")}'",
         "end"
       ).mkString("\n"),
 
