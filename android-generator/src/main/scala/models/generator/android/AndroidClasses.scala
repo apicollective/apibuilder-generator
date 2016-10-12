@@ -1,11 +1,11 @@
 package models.generator.android
 
 
-import lib.Text
+import lib.{Constants, Text}
 import lib.generator.CodeGenerator
-
 import com.squareup.javapoet._
 import javax.lang.model.element.Modifier
+
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -15,7 +15,9 @@ import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import java.util.Locale
 import java.io.IOException
+
 import com.bryzek.apidoc.spec.v0.models.Enum
+
 import scala.Some
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import com.bryzek.apidoc.spec.v0.models.Union
@@ -39,9 +41,7 @@ object AndroidClasses
 
   private def generateCode(form: InvocationForm, addHeader: Boolean = true): Seq[File] = {
     val header =
-      if (addHeader) Some(
-        s"${form.service.version}\n${form.userAgent}"
-      )
+      if (addHeader) Some(new ApidocComments(form.service.version, form.userAgent).forClassFile)
       else None
 
     new Generator(form.service, header).generateSourceFiles()
@@ -57,6 +57,11 @@ object AndroidClasses
     private val sharedJacksonDirectoryPath = createDirectoryPath(sharedJacksonSpace)
     private val sharedObjectMapperClassName = "ApidocObjectMapper"
 
+    private val apiDocComments = {
+      val s = JAVADOC_CLASS_MESSAGE + "\n"
+      header.fold(s)(_ + "\n" + s)
+    }
+    
     val T = "$T" //this is a hack for substituting types, as "$" is used by scala to do string substitution, and $T is sued by javapoet to handle types
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
@@ -126,7 +131,7 @@ object AndroidClasses
         TypeSpec.classBuilder(sharedObjectMapperClassName)
           .superclass(classOf[ObjectMapper])
           .addModifiers(Modifier.PUBLIC)
-          .addJavadoc(JAVADOC_CLASS_MESSAGE)
+          .addJavadoc(apiDocComments)
 
       builder.addField(pattern.build)
       builder.addField(formatter.build)
@@ -160,7 +165,7 @@ object AndroidClasses
       val builder =
         TypeSpec.enumBuilder(className)
         .addModifiers(Modifier.PUBLIC)
-        .addJavadoc(JAVADOC_CLASS_MESSAGE)
+        .addJavadoc(apiDocComments)
 
       enum.description.map(builder.addJavadoc(_))
 
@@ -182,7 +187,7 @@ object AndroidClasses
       val builder =
         TypeSpec.classBuilder(className)
           .addModifiers(Modifier.PUBLIC)
-          .addJavadoc(JAVADOC_CLASS_MESSAGE)
+          .addJavadoc(apiDocComments)
 
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown","true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
@@ -262,7 +267,7 @@ object AndroidClasses
       val builder =
         TypeSpec.interfaceBuilder(className)
           .addModifiers(Modifier.PUBLIC)
-          .addJavadoc(JAVADOC_CLASS_MESSAGE)
+          .addJavadoc(apiDocComments)
 
 
       resource.operations.foreach{operation =>
