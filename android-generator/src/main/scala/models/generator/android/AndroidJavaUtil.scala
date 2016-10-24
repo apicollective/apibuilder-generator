@@ -1,7 +1,7 @@
 package models.generator.android
 
 import lib.Text
-import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet._
 
 /**
  *
@@ -37,6 +37,55 @@ trait AndroidJavaUtil {
 
   def isParameterArray(modelName: String): Boolean = {
     modelName.startsWith("[") && modelName.endsWith("]")
+  }
+
+  def getArrayType(modelName: String): String = {
+    if (isParameterArray(modelName)) {
+      modelName.replaceAll("^\\[", "").replaceAll("\\]$", "")
+    } else {
+      modelName
+    }
+  }
+
+  def isParameterMap(modelName: String): Boolean = {
+    modelName.startsWith("map[") && modelName.endsWith("]")
+  }
+
+  def getMapType(modelName: String): String = {
+    if(isParameterMap(modelName)){
+      modelName.replaceAll("^.*\\[","").replaceAll("\\]$","")
+    } else {
+      modelName
+    }
+
+  }
+
+  //TODO: we can use primitives as well, but then equal method needs to become smarter, this way is ok
+
+  val dataTypes = Map[String, TypeName](
+    "boolean" -> ClassName.get("java.lang", "Boolean"),
+    "date-iso8601" -> ClassName.get("org.joda.time", "DateTime"),
+    "date-time-iso8601" -> ClassName.get("org.joda.time", "DateTime"),
+    "decimal" -> ClassName.get("java.math","BigDecimal"),
+    "double" -> ClassName.get("java.lang","Double"),
+    "integer" -> ClassName.get("java.lang", "Integer"),
+    "long" -> ClassName.get("java.lang", "Long"),
+    "object" -> ClassName.get("java.util","Map"),
+    "string" -> ClassName.get("java.lang","String"),
+    "unit" -> ClassName.get("java.lang", "Void"),
+    "uuid" -> ClassName.get("java.util","UUID")
+  )
+
+  def dataTypeFromField(`type`: String, modelsNameSpace: String): TypeName = {
+    dataTypes.get(`type`).getOrElse{
+      val name = toParamName(`type`, false)
+      if(isParameterArray(`type`))
+        ArrayTypeName.of(dataTypeFromField(getArrayType(`type`), modelsNameSpace))
+      else if (isParameterMap(`type`))
+        ParameterizedTypeName.get(ClassName.get("java.util", "Map"), ClassName.get("java.lang", "String"), dataTypeFromField(getMapType(`type`), modelsNameSpace))
+      else
+        ClassName.get(modelsNameSpace, name)
+    }
   }
 
   def toParamName(modelName: String, startingWithLowercase: Boolean): String = {
