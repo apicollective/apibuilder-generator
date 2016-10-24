@@ -211,7 +211,7 @@ object AndroidClasses
         val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
-        val javaDataType = dataTypeFromField(field.`type`)
+        val javaDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
         val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL)
         builder.addField(fieldBuilder.build)
@@ -316,7 +316,7 @@ object AndroidClasses
           method.addAnnotation(methodAnnotation)
 
           operation.body.map(body => {
-            val bodyType = dataTypeFromField(body.`type`)
+            val bodyType = dataTypeFromField(body.`type`, modelsNameSpace)
 
             val parameter = ParameterSpec.builder(bodyType, toParamName(body.`type`, true))
             val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
@@ -334,7 +334,7 @@ object AndroidClasses
             }
 
             maybeAnnotationClass.map(annotationClass => {
-              val parameterType: TypeName = dataTypeFromField(parameter.`type`)
+              val parameterType: TypeName = dataTypeFromField(parameter.`type`, modelsNameSpace)
               val param = ParameterSpec.builder(parameterType, toParamName(parameter.name, true))
               val annotation = AnnotationSpec.builder(annotationClass).addMember("value", "\"" + parameter.name + "\"").build
               param.addAnnotation(annotation)
@@ -367,7 +367,7 @@ object AndroidClasses
           })
 
           maybeSuccessfulResponse.map(successfulResponse => {
-            val returnType = dataTypeFromField(successfulResponse.`type`)
+            val returnType = dataTypeFromField(successfulResponse.`type`, modelsNameSpace)
 
             //below, Void in "classOf[retrofit.Call[Void]" is ignored, what matters is returnType
             val callTypeName = ParameterizedTypeName.get(ClassName.get(classOf[retrofit2.Call[Void]]), returnType)
@@ -403,33 +403,6 @@ object AndroidClasses
 
     def makeFile(name: String, builder: TypeSpec.Builder): File = {
       File(s"${name}.java", Some(modelsDirectoryPath), JavaFile.builder(modelsNameSpace, builder.build).build.toString)
-    }
-
-    //TODO: we can use primitives as well, but then equal method needs to become smarter, this way is ok
-
-    val dataTypes = Map[String, TypeName](
-      "boolean" -> ClassName.get("java.lang", "Boolean"),
-      "date-iso8601" -> ClassName.get("org.joda.time", "DateTime"),
-      "date-time-iso8601" -> ClassName.get("org.joda.time", "DateTime"),
-      "decimal" -> ClassName.get("java.math","BigDecimal"),
-      "double" -> ClassName.get("java.lang","Double"),
-      "integer" -> ClassName.get("java.lang", "Integer"),
-      "long" -> ClassName.get("java.lang", "Long"),
-      "object" -> ClassName.get("java.util","Map"),
-      "string" -> ClassName.get("java.lang","String"),
-      "unit" -> ClassName.get("java.lang", "Void"),
-      "uuid" -> ClassName.get("java.util","UUID"),
-      "map[string]" -> ClassName.get("java.util","Map")
-    )
-
-    def dataTypeFromField(`type`: String): TypeName = {
-      dataTypes.get(`type`).getOrElse{
-        val name = toParamName(`type`, false)
-        if(isParameterArray(`type`))
-          ArrayTypeName.of(ClassName.get(modelsNameSpace, name))
-        else
-          ClassName.get(modelsNameSpace, name)
-      }
     }
 
   }
