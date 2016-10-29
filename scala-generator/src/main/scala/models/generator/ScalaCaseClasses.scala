@@ -85,7 +85,7 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTrait(union: ScalaUnion): String = {
     // TODO: handle primitive types
-    s"sealed trait ${union.name}"
+    s"${ScalaUtil.deprecationString(union.deprecation)}sealed trait ${union.name}"
   }
 
   def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
@@ -93,7 +93,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
+    s"${ScalaUtil.deprecationString(model.deprecation)}case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
   }
 
   def generateEnum(ssd: ScalaService, enum: ScalaEnum): String = {

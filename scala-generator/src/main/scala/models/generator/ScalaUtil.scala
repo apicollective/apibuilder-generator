@@ -8,6 +8,8 @@ import lib.generator.GeneratorUtil
 import play.api.libs.json._
 import org.joda.time.DateTime
 
+import com.bryzek.apidoc.spec.v0.models.Deprecation
+
 object ScalaUtil {
 
   private[this] val ReservedWords = Seq(
@@ -90,5 +92,14 @@ object ScalaUtil {
       throw new RuntimeException(s"parsing default `$value` for datatype $datatype", e)
     }
   }
+
+  def deprecationString(deprecation: Option[Deprecation]): String = {
+    val deprecationString: String = deprecation.map { dep =>
+      val description = dep.description.map { desc => s"""("$desc")""" }.getOrElse("")
+      s"@deprecated$description "
+    }.getOrElse("")
+    deprecationString
+  }
+
 }
 

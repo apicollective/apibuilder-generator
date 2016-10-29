@@ -9,6 +9,8 @@ import lib.Text.initLowerCase
 import play.api.libs.json._
 import play.api.Logger
 
+import com.bryzek.apidoc.spec.v0.models.Deprecation
+
 sealed trait ScalaDatatype {
   def asString(originalVarName: String): String = {
     throw new UnsupportedOperationException(s"unsupported conversion of type ${name} for var $originalVarName")
@@ -16,12 +18,16 @@ sealed trait ScalaDatatype {
 
   def name: String
 
+  def deprecationString(deprecation: Option[Deprecation]): String =
+    ScalaUtil.deprecationString(deprecation)
+
   def definition(
     originalVarName: String,
-    default: Option[String]
+    default: Option[String],
+    deprecation: Option[Deprecation]
   ): String = {
     val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-    default.fold(s"$varName: $name") { default =>
+    default.fold(s"${deprecationString(deprecation)}$varName: $name") { default =>
       s"$varName: $name = $default"
     }
   }
@@ -269,11 +275,12 @@ object ScalaDatatype {
 
     override def definition(
       originalVarName: String,
-      default: scala.Option[String]
+      default: scala.Option[String],
+      deprecation: scala.Option[Deprecation]
     ): String = {
       require(default.isEmpty, s"no defaults allowed on options: ${default}")
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName: $name = None"
+      s"${deprecationString(deprecation)}$varName: $name = None"
     }
 
     // override, since options contain at most one element

@@ -64,7 +64,7 @@ case class ScalaClientMethodGenerator(
 
   def objects(): String = {
     sortedResources.map { resource =>
-      s"object ${resource.plural} extends ${resource.plural} {\n" +
+      s"${ScalaUtil.deprecationString(resource.deprecation)}object ${resource.plural} extends ${resource.plural} {\n" +
       methods(resource).map(_.code).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
@@ -286,11 +286,11 @@ case class ScalaClientMethod(
   private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
 
   val interface: String = {
-    s"""${commentString}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
+    s"""${commentString}${ScalaUtil.deprecationString(operation.deprecation)}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
   }
 
   val code: String = {
-    s"""override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
+    s"""${ScalaUtil.deprecationString(operation.deprecation)}override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
 ${methodCall.indent}.map {
 ${response.indent(4)}
   }

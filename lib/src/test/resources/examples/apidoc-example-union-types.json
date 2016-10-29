@@ -21,10 +21,14 @@
       "values": [
         {
           "name": "b",
-          "attributes": []
+          "attributes": [],
+          "deprecation": {}
         }
       ],
-      "attributes": []
+      "attributes": [],
+      "deprecation": {
+        "description": "to be removed"
+      }
     },
     {
       "name": "foo",
@@ -68,10 +72,14 @@
         },
         {
           "type": "uuid",
-          "attributes": []
+          "attributes": [],
+          "deprecation": {}
         }
       ],
-      "attributes": []
+      "attributes": [],
+      "deprecation": {
+        "description": "to be removed"
+      }
     }
   ],
   "models": [

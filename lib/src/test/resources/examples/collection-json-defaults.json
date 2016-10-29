@@ -24,7 +24,9 @@
       "name": "user",
       "plural": "users",
       "description": null,
-      "deprecation": null,
+      "deprecation": {
+        "description": "to be merged with members"
+      },
       "attributes": [],
       "fields": [
         {
@@ -37,7 +39,7 @@
           "minimum": null,
           "maximum": null,
           "example": null,
-          "attributes": []          
+          "attributes": []
         },
         {
           "name": "role",
@@ -67,7 +69,7 @@
           "name": "permissions",
           "type": "[string]",
           "description": null,
-          "deprecation": null,
+          "deprecation": {},
           "default": null,
           "required": true,
           "minimum": null,
@@ -128,7 +130,9 @@
       "type": "user",
       "plural": "users",
       "description": null,
-      "deprecation": null,
+      "deprecation": {
+        "description": "users will be transfered to the members endpoint"
+      },
       "attributes": [],
       "operations": [
         {
@@ -157,7 +161,9 @@
           "method": "GET",
           "path": "/users/:email",
           "description": null,
-          "deprecation": null,
+          "deprecation": {
+            "description": "to be removed"
+          },
           "body": null,
           "attributes": [],
           "parameters": [
@@ -166,7 +172,8 @@
               "type": "string",
               "location": "Path",
               "description": null,
-              "deprecation": null,
+              "deprecation": {
+              },
               "required": true,
               "default": null,
               "minimum": null,
@@ -202,7 +209,9 @@
               "code": { "integer": { "value": 200 } },
               "type": "user",
               "description": null,
-              "deprecation": null
+              "deprecation": {
+                "description": "This will return a 201 in the future"
+              }
             }
           ]
         }

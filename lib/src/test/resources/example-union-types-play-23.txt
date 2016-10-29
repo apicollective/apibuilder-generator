@@ -6,7 +6,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
   sealed trait Foobar
 
-  sealed trait User
+  @deprecated("to be removed") sealed trait User
 
   case class GuestUser(
     guid: _root_.java.util.UUID,
@@ -47,9 +47,9 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
   sealed trait Bar extends Foobar
 
-  object Bar {
+  @deprecated("to be removed") object Bar {
 
-    case object B extends Bar { override def toString = "b" }
+    @deprecated case object B extends Bar { override def toString = "b" }
 
     /**
      * UNDEFINED captures values that are sent either in error or
