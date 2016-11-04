@@ -17,6 +17,8 @@ import generator.ServiceFileNames
 
 object RubyUtil {
 
+  val DefaultDiscriminatorName = "__discriminator__"
+
   private[this] val ReservedWords = Seq(
     "alias", "and", "begin", "break", "case", "class", "def", "defined?", "do",
     "else", "elsif", "end", "ensure", "false", "for", "if", "module",
@@ -614,6 +616,10 @@ ${headers.rubyModuleConstants.indent(2)}
     RubyUtil.toClassName(union.name + "UndefinedType")
   }
 
+  def discriminatorName(union: Union): String = {
+    union.discriminator.getOrElse(RubyUtil.DefaultDiscriminatorName)
+  }
+
   def generateUnion(union: Union): String = {
     Seq(
       generateUnionClass(union),
@@ -624,6 +630,7 @@ ${headers.rubyModuleConstants.indent(2)}
   def generateUnionClass(union: Union): String = {
     val typeNames = union.types.map(_.`type`)
     val className = RubyUtil.toClassName(union.name)
+    val discName = discriminatorName(union)
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
       Seq(
@@ -638,8 +645,8 @@ ${headers.rubyModuleConstants.indent(2)}
       Seq(
         "def initialize(incoming={})",
         "  opts = HttpClient::Helper.symbolize_keys(incoming)",
-        s"  HttpClient::Preconditions.require_keys(opts, [:name], '$className')",
-        "  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)",
+        s"  HttpClient::Preconditions.require_keys(opts, [:$discName], '$className')",
+        s"  @$discName = HttpClient::Preconditions.assert_class('$discName', opts.delete(:$discName), String)",
         "end"
       ).mkString("\n"),
 
@@ -658,14 +665,15 @@ ${headers.rubyModuleConstants.indent(2)}
   }
 
   private[this] def generateUnionClassToHash(union: Union): String = {
+    val discName = discriminatorName(union)
     Seq(
       "def to_hash",
       union.discriminator match {
         case None => {
-          "  { @name => subtype_to_hash }"
+          s"  { @$discName => subtype_to_hash }"
         }
         case Some(disc) => {
-          s"""  subtype_to_hash.merge(:$disc => @name)"""
+          s"""  subtype_to_hash.merge(:$disc => @$discName)"""
         }
       },
       "end"
@@ -688,7 +696,7 @@ ${headers.rubyModuleConstants.indent(2)}
               case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(data)"
             }
           }.mkString("\n").indent(6),
-          s"      else ${undefinedTypeClassName(union)}.new(:name => union_type_name)",
+          s"      else ${undefinedTypeClassName(union)}.new(:${RubyUtil.DefaultDiscriminatorName} => union_type_name)",
           s"    end",
           s"  end.first",
           s"end"
@@ -709,7 +717,7 @@ ${headers.rubyModuleConstants.indent(2)}
               case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(hash)"
             }
           }.mkString("\n").indent(4),
-          s"    else ${undefinedTypeClassName(union)}.new(:name => discriminator)",
+          s"    else ${undefinedTypeClassName(union)}.new(:$disc => discriminator)",
           s"  end",
           s"end"
         ).mkString("\n")
@@ -727,9 +735,9 @@ ${headers.rubyModuleConstants.indent(2)}
 
         Seq(
           "def initialize(incoming={})",
-	  "  super(:name => 'undefined_type')",
-          "  opts = HttpClient::Helper.symbolize_keys(incoming)",
-          "  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)",
+	  s"  super(:${discriminatorName(union)} => 'undefined_type')",
+          s"  opts = HttpClient::Helper.symbolize_keys(incoming)",
+          s"  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:${discriminatorName(union)}), String)",
           "end"
         ).mkString("\n"),
 
@@ -770,7 +778,8 @@ ${headers.rubyModuleConstants.indent(2)}
     sb.append("")
     sb.append("  def initialize(incoming={})")
     union.map { u =>
-      sb.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, model.name)})")
+      val discName = discriminatorName(u)
+      sb.append(s"    super(:$discName => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, model.name)})")
     }
 
     sb.append("    opts = HttpClient::Helper.symbolize_keys(incoming)")

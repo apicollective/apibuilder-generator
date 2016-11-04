@@ -101,8 +101,8 @@ module Com
 
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    HttpClient::Preconditions.require_keys(opts, [:name], 'Foobar')
-                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                    HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'Foobar')
+                    @__discriminator__ = HttpClient::Preconditions.assert_class('__discriminator__', opts.delete(:__discriminator__), String)
                   end
 
                   def subtype_to_hash
@@ -110,7 +110,7 @@ module Com
                   end
 
                   def to_hash
-                    { @name => subtype_to_hash }
+                    { @__discriminator__ => subtype_to_hash }
                   end
 
                   def Foobar.from_json(hash)
@@ -119,7 +119,7 @@ module Com
                       case union_type_name
                         when Types::FOO; Foo.new(data)
                         when Types::BAR; Bar.new(data)
-                        else FoobarUndefinedType.new(:name => union_type_name)
+                        else FoobarUndefinedType.new(:__discriminator__ => union_type_name)
                       end
                     end.first
                   end
@@ -131,9 +131,9 @@ module Com
                   attr_reader :name
 
                   def initialize(incoming={})
-                    super(:name => 'undefined_type')
+                    super(:__discriminator__ => 'undefined_type')
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:__discriminator__), String)
                   end
 
                   def subtype_to_hash
@@ -160,8 +160,8 @@ module Com
 
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    HttpClient::Preconditions.require_keys(opts, [:name], 'User')
-                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                    HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'User')
+                    @__discriminator__ = HttpClient::Preconditions.assert_class('__discriminator__', opts.delete(:__discriminator__), String)
                   end
 
                   def subtype_to_hash
@@ -169,7 +169,7 @@ module Com
                   end
 
                   def to_hash
-                    { @name => subtype_to_hash }
+                    { @__discriminator__ => subtype_to_hash }
                   end
 
                   def User.from_json(hash)
@@ -179,7 +179,7 @@ module Com
                         when Types::REGISTERED_USER; RegisteredUser.new(data)
                         when Types::GUEST_USER; GuestUser.new(data)
                         when Types::USER_UUID_WRAPPER; UserUuidWrapper.new(data)
-                        else UserUndefinedType.new(:name => union_type_name)
+                        else UserUndefinedType.new(:__discriminator__ => union_type_name)
                       end
                     end.first
                   end
@@ -191,9 +191,9 @@ module Com
                   attr_reader :name
 
                   def initialize(incoming={})
-                    super(:name => 'undefined_type')
+                    super(:__discriminator__ => 'undefined_type')
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:name), String)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:__discriminator__), String)
                   end
 
                   def subtype_to_hash
@@ -293,7 +293,7 @@ module Com
                   attr_reader :guid, :email
 
                   def initialize(incoming={})
-                    super(:name => User::Types::GUEST_USER)
+                    super(:__discriminator__ => User::Types::GUEST_USER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:guid, :email], 'GuestUser')
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
@@ -322,7 +322,7 @@ module Com
                   attr_reader :guid, :email, :preference
 
                   def initialize(incoming={})
-                    super(:name => User::Types::REGISTERED_USER)
+                    super(:__discriminator__ => User::Types::REGISTERED_USER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:guid, :email, :preference], 'RegisteredUser')
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
@@ -354,7 +354,7 @@ module Com
                   attr_reader :value
 
                   def initialize(incoming={})
-                    super(:name => User::Types::USER_UUID_WRAPPER)
+                    super(:__discriminator__ => User::Types::USER_UUID_WRAPPER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:value], 'UserUuidWrapper')
                     @value = HttpClient::Preconditions.assert_class('value', HttpClient::Helper.to_uuid(opts.delete(:value)), String)
