@@ -170,6 +170,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "android_client",
+        name = "Android Client",
+        description = Some("Generate Java models and Retrofit 2 client for Android from the API description."),
+        language = Some("Java")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.android.AndroidClasses)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "swagger_json",
         name = "Swagger JSON",
         description = Some("Generate a valid swagger 2.0 json description of a service."),

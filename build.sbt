@@ -26,8 +26,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -35,7 +35,8 @@ lazy val generator = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus" %% "play" % "1.4.0" % "test"
+      "org.scalatestplus" %% "play" % "1.4.0" % "test",
+      "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.10.0"
     )
   )
 
@@ -59,13 +60,22 @@ lazy val goGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
 
+lazy val androidGenerator = project
+  .in(file("android-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(
+    commonSettings: _*
+  )
+
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("apidoc-" + _),
   organization := "com.bryzek.apidoc",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.1",
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-    "org.mockito" % "mockito-all" % "1.10.19" % "test"
+    "org.mockito" % "mockito-all" % "1.10.19" % "test",
+    "com.squareup" % "javapoet" % "1.3.0",
+    "com.squareup.retrofit2" % "retrofit" % "2.1.0"
   ),
   scalacOptions += "-feature",
   sources in (Compile,doc) := Seq.empty,
