@@ -643,6 +643,7 @@ ${headers.rubyModuleConstants.indent(2)}
       ).mkString("\n"),
 
       Seq(
+        s"attr_reader :$discName",
         "def initialize(incoming={})",
         "  opts = HttpClient::Helper.symbolize_keys(incoming)",
         s"  HttpClient::Preconditions.require_keys(opts, [:$discName], '$className')",

@@ -99,6 +99,7 @@ module Com
                     BAR = 'bar' unless defined?(BAR)
                   end
 
+                  attr_reader :__discriminator__
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'Foobar')
@@ -158,6 +159,7 @@ module Com
                     USER_UUID_WRAPPER = 'uuid' unless defined?(USER_UUID_WRAPPER)
                   end
 
+                  attr_reader :__discriminator__
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'User')
