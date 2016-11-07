@@ -100,6 +100,7 @@ module Com
                   end
 
                   attr_reader :__discriminator__
+
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'Foobar')
@@ -160,6 +161,7 @@ module Com
                   end
 
                   attr_reader :__discriminator__
+
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'User')
