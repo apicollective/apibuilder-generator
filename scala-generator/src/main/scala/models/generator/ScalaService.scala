@@ -15,7 +15,7 @@ case class ScalaService(
   val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 
   val name = ScalaUtil.toClassName(service.name)
- 
+
   def unionClassName(name: String) = namespaces.unions + "." + ScalaUtil.toClassName(name)
   def modelClassName(name: String) = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String) = namespaces.enums + "." + ScalaUtil.toClassName(name)
@@ -67,7 +67,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   val qualifiedName = ssd.unionClassName(name)
 
   val discriminator: Option[String] = union.discriminator
-  
+
   val description: Option[String] = union.description
 
   // Include an undefined instance to nudge the developer to think
@@ -76,6 +76,8 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   val undefinedType = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
 
   val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, union, _) }
+
+  val deprecation: Option[Deprecation] = union.deprecation
 
 }
 
@@ -150,6 +152,8 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
 
+  val deprecation: Option[Deprecation] = model.deprecation
+
 }
 
 class ScalaBody(ssd: ScalaService, val body: Body) {
@@ -179,6 +183,8 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val values: Seq[ScalaEnumValue] = enum.values.map { new ScalaEnumValue(_) }
 
+  val deprecation: Option[Deprecation] = enum.deprecation
+
 }
 
 class ScalaEnumValue(value: EnumValue) {
@@ -188,6 +194,8 @@ class ScalaEnumValue(value: EnumValue) {
   val name: String = ScalaUtil.toClassName(value.name)
 
   val description: Option[String] = value.description
+
+  val deprecation: Option[Deprecation] = value.deprecation
 
 }
 
@@ -201,6 +209,8 @@ class ScalaResource(ssd: ScalaService, val resource: Resource) {
 
   val operations = resource.operations.map { new ScalaOperation(ssd, _, this)}
 
+  val deprecation: Option[Deprecation] = resource.deprecation
+
 }
 
 class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: ScalaResource) {
@@ -208,6 +218,8 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
   val method: Method = operation.method
 
   val path: String = operation.path
+
+  val deprecation: Option[Deprecation] = operation.deprecation
 
   val description: Option[String] = operation.description
 
@@ -312,7 +324,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
   def default = field.default.map(ScalaUtil.scalaDefault(_, datatype))
 
   def definition(varName: String = name): String = {
-    datatype.definition(varName, default)
+    datatype.definition(varName, default, field.deprecation)
   }
 }
 
@@ -335,7 +347,7 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
   def required = param.required
 
   def definition(varName: String = name): String = {
-    datatype.definition(varName, default)
+    datatype.definition(varName, default, param.deprecation)
   }
 
   def location = param.location

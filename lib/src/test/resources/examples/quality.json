@@ -459,6 +459,9 @@
           "type": "team",
           "description": "Team responsible for resolution of this incident",
           "required": false,
+          "deprecation": {
+            "description": "to be removed in a future version"
+          },
           "attributes": []
         },
         {
@@ -472,6 +475,7 @@
           "type": "[string]",
           "description": "Optional list of tags to apply to this incident",
           "required": false,
+          "deprecation": {},
           "attributes": []
         },
         {
@@ -1084,6 +1088,9 @@
               "location": "Query",
               "description": "Find agenda items for this team",
               "required": false,
+              "deprecation": {
+                "description": "to be removed in a future version"
+              },
               "attributes": []
             },
             {

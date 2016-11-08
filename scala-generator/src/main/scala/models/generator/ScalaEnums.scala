@@ -19,7 +19,7 @@ case class ScalaEnums(
     Seq(
       enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
       s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse(""),
-      s"object ${enum.name} {",
+      s"${ScalaUtil.deprecationString(enum.deprecation)}object ${enum.name} {",
       buildValues().indent(2),
       s"}"
     ).mkString("\n\n")
@@ -68,10 +68,10 @@ case class ScalaEnums(
   }
 
   private def buildValues(): String = {
-    enum.values.map { value => 
+    enum.values.map { value =>
       Seq(
         value.description.map { desc => ScalaUtil.textToComment(desc) },
-        Some(s"""case object ${value.name} extends ${enum.name} { override def toString = "${value.originalName}" }""")
+        Some(s"""${ScalaUtil.deprecationString(value.deprecation)}case object ${value.name} extends ${enum.name} { override def toString = "${value.originalName}" }""")
       ).flatten.mkString("\n")
     }.mkString("\n") + "\n" +
     s"""
