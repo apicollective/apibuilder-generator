@@ -238,6 +238,17 @@ object Generators {
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play25)
+    ),
+
+    CodeGenTarget(
+      metaData = Generator(
+        key = "swagger_2",
+        name = "Swagger 2.0",
+        description = Some("Generates a swagger 2.0 JSON file representing this application"),
+        language = Some("Swagger, Json")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(swagger.Generator)
     )
   ).sortBy(_.metaData.key)
 }
