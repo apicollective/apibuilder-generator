@@ -72,7 +72,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   organization := "com.bryzek.apidoc",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "com.squareup" % "javapoet" % "1.8.0",
     "com.squareup.retrofit2" % "retrofit" % "2.1.0"
