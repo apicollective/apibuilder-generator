@@ -170,7 +170,7 @@ module HttpClient
     private
     def to_query(params={})
       parts = (params || {}).map { |k,v|
-        if v.respond_to?(:each)
+        if v.is_a?(Enumerable)
           v.map { |el| "%s=%s" % [k, CGI.escape(el.to_s)] }
         else
           "%s=%s" % [k, CGI.escape(v.to_s)]
@@ -227,14 +227,14 @@ module HttpClient
   class PreconditionException < Exception
 
     attr_reader :message
-    
+
     def initialize(message)
       super(message)
       @message = message
     end
 
   end
-          
+
   module Preconditions
 
     def Preconditions.check_argument(expression, error_message=nil)
