@@ -1094,7 +1094,8 @@ ${headers.rubyModuleConstants.indent(2)}
         p match {
           case Primitive.Unit => "nil"
           case Primitive.Boolean | Primitive.Decimal | Primitive.Double | Primitive.Integer | Primitive.Long | Primitive.DateIso8601 | Primitive.DateTimeIso8601 | Primitive.Object | Primitive.String | Primitive.Uuid => {
-            s"${qualifiedClassName(RubyUtil.toDefaultVariable())}.new(${varName})"
+            //s"${qualifiedClassName(RubyUtil.toDefaultVariable())}.new(${varName})"
+            varName
           }
         }
       }
