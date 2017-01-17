@@ -108,7 +108,8 @@ class TestAndroidClasses
                           "value": 200
                        }
                   },
-                  "type": "model"
+                  "type": "model",
+ |                  "headers": []
               }, {
                   "code": {
                       "integer": {
