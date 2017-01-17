@@ -89,7 +89,8 @@ class TestAndroidClasses
                           "value": 404
                       }
                   },
-                  "type": "unit"
+                  "type": "unit",
+                  "headers": []
               }],
               "attributes": [],
               "description": "get all models"
@@ -109,7 +110,7 @@ class TestAndroidClasses
                        }
                   },
                   "type": "model",
- |                  "headers": []
+                  "headers": []
               }, {
                   "code": {
                       "integer": {
