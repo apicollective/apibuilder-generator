@@ -81,7 +81,8 @@ class TestAndroidClasses
                           "value": 200
                       }
                   },
-                  "type": "[model]"
+                  "type": "[model]",
+                  "headers": []
               }, {
                   "code": {
                       "integer": {
@@ -114,7 +115,8 @@ class TestAndroidClasses
                           "value": 404
                       }
                   },
-                  "type": "unit"
+                  "type": "unit",
+                  "headers": []
               }],
               "attributes": []
           }],

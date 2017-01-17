@@ -47,6 +47,7 @@
           "parameters": [],
           "responses": [
             {
+              "headers": [],
               "code": {
                 "integer": {
                   "value": 200
