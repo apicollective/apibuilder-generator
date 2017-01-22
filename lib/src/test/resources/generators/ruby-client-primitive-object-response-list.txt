@@ -1,1 +1,1 @@
-r.map { |x| ::Test::Apidoc::Apidoctest::V0::Models::Value.new(x) }
+r.map { |x| x }
