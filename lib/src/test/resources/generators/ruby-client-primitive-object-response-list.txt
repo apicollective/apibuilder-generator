@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 r.map { |x| x }
+=======
+r.map { |x| x }
+>>>>>>> master
