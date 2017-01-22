@@ -1,5 +1,1 @@
-<<<<<<< HEAD
 r.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : x[1]; hash }
-=======
-r.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : x[1]; hash }
->>>>>>> master
