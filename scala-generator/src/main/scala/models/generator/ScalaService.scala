@@ -235,20 +235,23 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
 
+  lazy val (headerParameters, nonHeaderParameters) = parameters.partition { _.location == ParameterLocation.Header }
+
   val name: String = GeneratorUtil.urlToMethodName(resource.path, resource.resource.operations.map(_.path), operation.method, path)
 
   def argList(addlArgs: Seq[String] = Nil): Option[String] = body match {
     case None => {
-      ScalaUtil.fieldsToArgList(parameters.map(_.definition()) ++ addlArgs)
+      ScalaUtil.fieldsToArgList(nonHeaderParameters.map(_.definition()) ++ headerParameters.map(_.definition()) ++ addlArgs)
     }
 
     case Some(body) => {
       val bodyVarName = body.datatype.toVariableName
 
       ScalaUtil.fieldsToArgList(
-        parameters.filter(_.param.required).map(_.definition()) ++
+        nonHeaderParameters.filter(_.param.required).map(_.definition()) ++
         Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), body.datatype.name)) ++
-        parameters.filter(!_.param.required).map(_.definition()) ++
+        nonHeaderParameters.filter(!_.param.required).map(_.definition()) ++
+        headerParameters.map(_.definition()) ++
         addlArgs
       )
     }
