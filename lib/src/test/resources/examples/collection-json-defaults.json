@@ -152,6 +152,7 @@
             {
               "code": { "integer": { "value": 201 } },
               "type": "user",
+              "headers": [],
               "description": null,
               "deprecation": null
             }
@@ -186,6 +187,7 @@
             {
               "code": { "integer": { "value": 200 } },
               "type": "user",
+              "headers": [],
               "description": null,
               "deprecation": null
             }
@@ -208,6 +210,7 @@
             {
               "code": { "integer": { "value": 200 } },
               "type": "user",
+              "headers": [],
               "description": null,
               "deprecation": {
                 "description": "This will return a 201 in the future"

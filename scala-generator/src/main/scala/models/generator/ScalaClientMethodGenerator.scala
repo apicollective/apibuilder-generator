@@ -148,6 +148,7 @@ case class ScalaClientMethodGenerator(
 
       val payload = generatorUtil.formBody(op, canSerializeUuid = config.canSerializeUuid)
       val queryParameters = generatorUtil.queryParameters("queryParameters", op.queryParameters)
+      val headerParameters = generatorUtil.queryParameters("headerParameters", op.headerParameters)
 
       val code = new scala.collection.mutable.ListBuffer[String]()
       val args = new scala.collection.mutable.ListBuffer[String]()
@@ -160,7 +161,12 @@ case class ScalaClientMethodGenerator(
         code.append(v)
         args.append("queryParameters = queryParameters")
       }
-      args.append("requestHeaders = requestHeaders")
+      headerParameters.fold(
+        args.append("requestHeaders = requestHeaders")
+      ){ h =>
+        code.append(h)
+        args.append("requestHeaders = (requestHeaders ++ headerParameters)")
+      }
 
       val methodCall = code.toList match {
         case Nil => s"""_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""

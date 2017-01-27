@@ -79,6 +79,7 @@ private[models] case class Play2Route(
           case ParameterLocation.Form => false
           case ParameterLocation.Query => true
           case ParameterLocation.Path => true
+          case ParameterLocation.Header => false
           case ParameterLocation.UNDEFINED(_) => false
         }
       }.

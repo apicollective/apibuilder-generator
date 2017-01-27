@@ -81,14 +81,16 @@ class TestAndroidClasses
                           "value": 200
                       }
                   },
-                  "type": "[model]"
+                  "type": "[model]",
+                  "headers": []
               }, {
                   "code": {
                       "integer": {
                           "value": 404
                       }
                   },
-                  "type": "unit"
+                  "type": "unit",
+                  "headers": []
               }],
               "attributes": [],
               "description": "get all models"
@@ -107,14 +109,16 @@ class TestAndroidClasses
                           "value": 200
                        }
                   },
-                  "type": "model"
+                  "type": "model",
+                  "headers": []
               }, {
                   "code": {
                       "integer": {
                           "value": 404
                       }
                   },
-                  "type": "unit"
+                  "type": "unit",
+                  "headers": []
               }],
               "attributes": []
           }],

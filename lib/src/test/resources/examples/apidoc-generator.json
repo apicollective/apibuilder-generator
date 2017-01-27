@@ -308,6 +308,7 @@
           ],
           "responses": [
             {
+              "headers": [],
               "code": {
                 "integer": {
                   "value": 200
@@ -332,6 +333,7 @@
           ],
           "responses": [
             {
+              "headers": [],
               "code": {
                 "integer": {
                   "value": 200
@@ -340,6 +342,7 @@
               "type": "generator"
             },
             {
+              "headers": [],
               "code": {
                 "integer": {
                   "value": 404
@@ -365,6 +368,7 @@
           "parameters": [],
           "responses": [
             {
+              "headers": [],
               "code": {
                 "integer": {
                   "value": 200
@@ -396,6 +400,7 @@
           ],
           "responses": [
             {
+              "headers": [],
               "code": {
                 "integer": {
                   "value": 200
@@ -404,6 +409,7 @@
               "type": "invocation"
             },
             {
+              "headers": [],
               "code": {
                 "integer": {
                   "value": 409

@@ -109,7 +109,7 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {
               "parameters": [],
               "attributes": [],
               "responses": [
-                { "code": { "integer": { "value": 200 } }, "type": "%s" }
+                { "code": { "integer": { "value": 200 } }, "type": "%s", "headers": [] }
               ]
             }
           ]
