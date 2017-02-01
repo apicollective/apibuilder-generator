@@ -250,8 +250,9 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
       ScalaUtil.fieldsToArgList(
         nonHeaderParameters.filter(_.param.required).map(_.definition()) ++
         Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), body.datatype.name)) ++
+        headerParameters.filter(_.param.required).map(_.definition()) ++
         nonHeaderParameters.filter(!_.param.required).map(_.definition()) ++
-        headerParameters.map(_.definition()) ++
+        headerParameters.filter(!_.param.required).map(_.definition()) ++
         addlArgs
       )
     }
