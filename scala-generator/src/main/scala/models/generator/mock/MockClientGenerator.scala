@@ -161,7 +161,7 @@ case class MockClientGenerator(
       case ScalaPrimitive.DateTimeIso8601 => "new org.joda.time.DateTime()"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
       case ScalaPrimitive.Object => "play.api.libs.json.Json.obj()"
-      case ScalaPrimitive.String => "randomString()"
+      case ScalaPrimitive.String => "Factories.randomString()"
       case ScalaPrimitive.Unit => "// unit type"
       case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
