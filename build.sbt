@@ -75,7 +75,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "com.squareup" % "javapoet" % "1.8.0",
-    "com.squareup.retrofit2" % "retrofit" % "2.1.0"
+    "com.squareup.retrofit2" % "retrofit" % "2.2.0"
   ),
   scalacOptions += "-feature",
   sources in (Compile,doc) := Seq.empty,
