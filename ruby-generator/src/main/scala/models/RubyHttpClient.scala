@@ -85,6 +85,7 @@ module HttpClient
     def configure_ssl(http)
       Preconditions.assert_class('http', http, Net::HTTP)
       http.use_ssl = true
+      http.ssl_version = :TLSv1_2
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       http.cert_store = OpenSSL::X509::Store.new
       http.cert_store.set_default_paths

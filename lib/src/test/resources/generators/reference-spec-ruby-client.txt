@@ -615,6 +615,7 @@ module Com
                 def configure_ssl(client)
                   Preconditions.assert_class('client', client, Net::HTTP)
                   client.use_ssl = true
+                  client.ssl_version = :TLSv1_2
                   client.verify_mode = OpenSSL::SSL::VERIFY_PEER
                   client.cert_store = OpenSSL::X509::Store.new
                   client.cert_store.set_default_paths
