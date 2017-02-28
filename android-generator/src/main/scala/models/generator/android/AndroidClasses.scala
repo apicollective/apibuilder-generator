@@ -25,7 +25,7 @@ import com.bryzek.apidoc.generator.v0.models.File
 import com.bryzek.apidoc.spec.v0.models.Model
 import com.bryzek.apidoc.spec.v0.models.Resource
 import com.bryzek.apidoc.spec.v0.models.Service
-
+import collection.JavaConverters._
 
 object AndroidClasses
   extends CodeGenerator
@@ -70,8 +70,11 @@ object AndroidClasses
 
       val generatedEnums = service.enums.map { generateEnum }
 
+      val generatedUnionTypes = service.unions.map { generateUnionType }
+
       val generatedModels = service.models.map { model =>
-        generateModel(model, Seq.empty)
+        val relatedUnions = service.unions.filter(_.types.exists(_.`type` == model.name))
+        generateModel(model, relatedUnions)
       }
 
       val generatedObjectMapper = Seq(generateObjectMapper)
@@ -79,6 +82,7 @@ object AndroidClasses
       val generatedResources = service.resources.map { generateResource }
 
       generatedEnums ++
+        generatedUnionTypes ++
         generatedModels ++
         generatedObjectMapper ++
         generatedResources
@@ -178,6 +182,17 @@ object AndroidClasses
 
     }
 
+    def generateUnionType(union: Union): File = {
+      val className = toClassName(union.name)
+
+      val builder =
+        TypeSpec.interfaceBuilder(className)
+          .addModifiers(Modifier.PUBLIC)
+          .addJavadoc(apiDocComments)
+
+      union.description.map(builder.addJavadoc(_))
+      makeFile(className, builder)
+    }
 
     def generateModel(model: Model, relatedUnions: Seq[Union]): File = {
 
@@ -204,6 +219,9 @@ object AndroidClasses
 
       val hashCode = MethodSpec.methodBuilder("hashCode").addModifiers(Modifier.PUBLIC).returns(classOf[Int]).addAnnotation(classOf[Override])
       hashCode.addStatement("int result = 0")
+
+      val unionClassTypeNames = relatedUnions.map { u => ClassName.get(modelsNameSpace, toClassName(u.name)) }
+      builder.addSuperinterfaces(unionClassTypeNames.asJava)
 
       model.fields.foreach(field => {
 
