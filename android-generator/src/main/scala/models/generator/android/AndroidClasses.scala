@@ -190,6 +190,28 @@ object AndroidClasses
           .addModifiers(Modifier.PUBLIC)
           .addJavadoc(apiDocComments)
 
+      val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties])
+          .addMember("ignoreUnknown","true")
+      builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
+
+      val jsonTypeInfoAnnotation = AnnotationSpec.builder(classOf[JsonTypeInfo])
+          .addMember("use", "com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME") //XXX better way to do this that adds an import? $L or $T investigate
+          .addMember("include","com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
+          .addMember("property", "\"" + union.discriminator.get + "\"") //XXX fix optional
+      builder.addAnnotation(jsonTypeInfoAnnotation.build)
+
+
+      val jsonSubTypesAnnotationBuilder = AnnotationSpec.builder(classOf[JsonSubTypes])
+      union.types.foreach(u => {
+        jsonSubTypesAnnotationBuilder
+          .addMember("value", "$L", AnnotationSpec.builder(classOf[JsonSubTypes.Type])
+            .addMember("value", "$L", ClassName.get(modelsNameSpace, toClassName(u.`type`)) + ".class")
+            .addMember("name", "$S", u.`type`)
+            .build())
+      })
+
+      builder.addAnnotation(jsonSubTypesAnnotationBuilder.build())
+
       union.description.map(builder.addJavadoc(_))
       makeFile(className, builder)
     }
