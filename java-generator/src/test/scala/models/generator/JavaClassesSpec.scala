@@ -1,16 +1,13 @@
 package models.generator
 
-import com.bryzek.apidoc.spec.v0.models.{Field, Model, UnionType, Union, Info, Apidoc, Organization, Application, EnumValue, Enum, Service}
-import org.scalatest.{ShouldMatchers, FunSpec}
-import org.scalatest.mock.MockitoSugar
+import java.util.regex.Pattern
 
+import com.bryzek.apidoc.spec.v0.models.{Apidoc, Application, Enum, EnumValue, Field, Info, Model, Organization, Service, Union, UnionType}
+import org.scalatest.{FunSpec, ShouldMatchers}
+import org.scalatest.mock.MockitoSugar
+import com.github.javaparser.JavaParser
 import models.generator.JavaClasses.Generator
 
-/**
- *
- * Author: jkenny
- * Date: 17/07/2015
- */
 class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
 
   val testHeader = """/** Test Header */"""
@@ -22,6 +19,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     it("should generate the correct source") {
       val source = generator.generateEnum(Enum("test_enum", "", None, None, Seq(EnumValue("value_1"), EnumValue("value_2"))))
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestEnum.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -37,6 +35,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     it("should handle enums with descriptions") {
       val source = generator.generateEnum(Enum("test_enum", "", Some("A nice description"), None, Seq(EnumValue("value_1", Some("Nice description for 1")), EnumValue("value_2", Some("Nice description for 2")))))
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestEnum.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -63,6 +62,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     it("should generate the correct source") {
       val source = generator.generateUnionType(Union("test_union", "", None, None, None, Seq.empty[UnionType]))
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestUnion.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -75,6 +75,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     it("should handle unions with descriptions") {
       val source = generator.generateUnionType(Union("test_union", "", None, Some("A nice description"), None, Seq.empty[UnionType]))
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestUnion.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -92,6 +93,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     it("should generate the correct source") {
       val source = generator.generateUndefinedUnionType(Union("test_union", "", None, None, None, Seq.empty[UnionType]))
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestUnionUndefinedType.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -116,6 +118,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     it("should generate the correct source") {
       val source = generator.generateNativeWrapper(Union("test_union", "", None, None, None, Seq.empty[UnionType]), JavaDatatypes.Boolean)
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestUnionBoolean.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -142,6 +145,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
         Field("user_defined_field", "user_defined", None, None, None, true)
       )), Seq.empty[Union])
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestModel.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -168,6 +172,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
         Field("optional_field", "boolean", Some("Nice description for optional_field"), None, None, false)
       )), Seq.empty[Union])
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestModel.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -204,6 +209,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
         Field("optional_field", "boolean", None, None, None, false)
       )), Seq(Union("union_one", "", None, None, None, Seq.empty[UnionType]), Union("union_two", "", None, None, None, Seq.empty[UnionType])))
 
+      assertValidJavaSourceFile(source)
       source.name shouldBe "TestModel.java"
       source.dir shouldBe Some("com/jkenny/test/models")
       source.contents shouldBe
@@ -220,5 +226,14 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
           |    public TestModel() {}
           |}""".stripMargin
     }
+  }
+
+  def assertValidJavaSourceFile(sourceFile: com.bryzek.apidoc.generator.v0.models.File): Unit = {
+    sourceFile.name.endsWith(".java") shouldBe true
+    sourceFile.contents.size shouldBe > (0)
+    val javaName = sourceFile.name.split(Pattern.quote(".")).head
+    javaName.length shouldBe > (0)
+    val compilationUnit = JavaParser.parse(sourceFile.contents)
+    compilationUnit.getType(0).getNameAsString shouldBe javaName
   }
 }
