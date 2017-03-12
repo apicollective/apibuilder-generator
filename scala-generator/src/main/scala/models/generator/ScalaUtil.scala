@@ -6,7 +6,6 @@ import lib.Datatype
 import lib.Text._
 import lib.generator.GeneratorUtil
 import play.api.libs.json._
-import org.joda.time.DateTime
 
 import com.bryzek.apidoc.spec.v0.models.Deprecation
 

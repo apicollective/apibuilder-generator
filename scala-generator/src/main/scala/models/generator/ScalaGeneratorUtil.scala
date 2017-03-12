@@ -139,7 +139,7 @@ case class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
         case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
         case ScalaPrimitive.Enum(_, _) => config.pathEncode(s"$name.toString")
         case ScalaPrimitive.DateIso8601 => s"$name.toString"
-        case ScalaPrimitive.DateTimeIso8601 => config.pathEncode(s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name)")
+        case ScalaPrimitive.DateTimeIso8601 => config.pathEncode(s"_root_.java.time.format.DateTimeFormatter.ISO_DATE_TIME.format($name)")
         case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Object | ScalaPrimitive.Unit => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }

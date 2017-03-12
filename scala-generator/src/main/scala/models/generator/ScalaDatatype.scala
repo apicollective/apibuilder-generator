@@ -1,8 +1,7 @@
 package scala.generator
 
 import java.util.UUID
-import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-
+import java.time.LocalDate
 import lib.Datatype
 import lib.generator.GeneratorUtil
 import lib.Text.initLowerCase
@@ -102,7 +101,7 @@ object ScalaPrimitive {
   }
 
   case object DateIso8601 extends ScalaPrimitive {
-    override def namespace = Some("_root_.org.joda.time")
+    override def namespace = Some("_root_.java.time")
     def apidocType = "date-iso8601"
     def shortName = "LocalDate"
     override def asString(originalVarName: String): String = {
@@ -114,28 +113,28 @@ object ScalaPrimitive {
 
 
     override protected def default(json: JsValue) = {
-      val dt = dateTimeParser.parseLocalDate(json.as[String])
-      s"new ${fullName}(${dt.getYear}, ${dt.getMonthOfYear}, ${dt.getDayOfMonth})"
+      val dt = LocalDate.parse(json.as[String])
+      s"${fullName}.of(${dt.getYear}, ${dt.getMonthValue}, ${dt.getDayOfMonth})"
     }
   }
 
   case object DateTimeIso8601 extends ScalaPrimitive {
-    override def namespace = Some("_root_.org.joda.time")
+    override def namespace = Some("_root_.java.time")
     def apidocType = "date-time-iso8601"
     def shortName = "DateTime"
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
+      s"_root_.java.time.format.DateTimeFormatter.ISO_DATE_TIME.format($varName)"
     }
 
     override def default(value: String) = {
-      "_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(" + ScalaUtil.wrapInQuotes(value) + ")"
+      "_root_.java.time.ZonedDateTime.parse(" + ScalaUtil.wrapInQuotes(value) + ")"
     }
 
     override protected def default(json: JsValue) = {
       // TODO would like to use the constructor for DateTime, since that would
       // be faster code, but things get quite tricky because of time zones :(
-      s"""_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${json})"""
+      s"""_root_.java.time.ZonedDateTime.parse(${json})"""
     }
   }
 

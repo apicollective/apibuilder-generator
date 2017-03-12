@@ -147,12 +147,12 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
     }
 
     it ("default: 2014-03-14, datatype: date-iso8601") {
-      ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601) should be("new _root_.org.joda.time.LocalDate(2014, 3, 14)")
+      ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601) should be("_root_.java.time.LocalDate.of(2014, 3, 14)")
     }
 
     it ("default: 2014-03-14T12:13:15Z, datatype: date-time-iso8601") {
       ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601) should be {
-        """_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime("2014-03-14T12:13:15Z")"""
+        """_root_.java.time.ZonedDateTime.parse("2014-03-14T12:13:15Z")"""
       }
     }
 
