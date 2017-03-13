@@ -131,7 +131,7 @@ object Text {
     initCap(splitIntoWords(value).flatMap(_.split("-")))
   }
 
-  private[this] val WordDelimeterRx = "_|\\-|\\.|:".r
+  private[this] val WordDelimeterRx = "_|\\-|\\.|:\\/".r
 
   def splitIntoWords(value: String): Seq[String] = {
     WordDelimeterRx.split(lib.Text.camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
