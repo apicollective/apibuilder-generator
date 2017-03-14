@@ -12,9 +12,11 @@ class Play2StandaloneModelsJsonSpec extends FunSpec with ShouldMatchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(files) => {
         files.map(_.name) should be (Seq("GiltQualityV0Models.scala"))
+        val scalaSourceCode = files.head.contents
+        models.TestHelper.assertValidScalaSourceCode(scalaSourceCode)
         models.TestHelper.assertEqualsFile(
           "/generators/play-2-standalone-json-spec-quality.txt",
-          files.head.contents
+          scalaSourceCode
         )
       }
     }
