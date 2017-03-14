@@ -194,7 +194,7 @@ object RubyUtil {
       }
       case Container.Map(inner) => {
         val map = json.as[Map[String, JsValue]].map { case (key, value) =>
-          s""""${key}" => ${rubyDefault(value, inner)}"""
+          s""""$key" => ${rubyDefault(value, inner)}"""
         }
         map.mkString("{", ",", "}")
       }
@@ -207,12 +207,12 @@ object RubyUtil {
       case Primitive.DateIso8601 => {
         // validate the input
         val dt = dateTimeParser.parseLocalDate(json.as[String])
-        s"Date.parse(${json})"
+        s"Date.parse($json)"
       }
       case Primitive.DateTimeIso8601 => {
         // validate the input
         val dt = dateTimeParser.parseDateTime(json.as[String])
-        s"""DateTime.parse(${json})"""
+        s"""DateTime.parse($json)"""
       }
       case Primitive.Uuid => s"""UUID.new("${json.as[UUID]}")"""
       case Datatype.UserDefined.Enum(name)  => {
@@ -472,7 +472,7 @@ ${headers.rubyModuleConstants.indent(2)}
       val varName = RubyUtil.toMethodName(resource.plural)
 
       s"  def $varName\n" +
-      s"    @$varName ||= ${module.fullName}::Clients::${className}.new(self)\n" +
+      s"    @$varName ||= ${module.fullName}::Clients::$className.new(self)\n" +
       s"  end"
     }.mkString("\n\n"))
 
@@ -485,7 +485,7 @@ ${headers.rubyModuleConstants.indent(2)}
     val className = RubyUtil.toClassName(resource.plural)
 
     val sb = ListBuffer[String]()
-    sb.append(s"class ${className}")
+    sb.append(s"class $className")
     sb.append("")
     sb.append("  def initialize(client)")
     sb.append(s"    @client = HttpClient::Preconditions.assert_class('client', client, ${module.fullName}::Client)")
@@ -639,7 +639,7 @@ ${headers.rubyModuleConstants.indent(2)}
       )
     }.getOrElse {
       Seq(
-        s"@$discName = 'TODO'"
+        s"@$discName = '${union.name}'"
       )
     }
 
@@ -870,7 +870,7 @@ ${headers.rubyModuleConstants.indent(2)}
     def expr = default.fold(rawExpr)(d => s"(x = ${rawExpr}; x.nil? ? ${d} : x)")
     dt match {
       case Primitive.Boolean =>
-        s"HttpClient::Preconditions.assert_boolean('$name', ${expr})"
+        s"HttpClient::Preconditions.assert_boolean('$name', $expr)"
 
       case Primitive.Unit =>
         sys.error("Cannot have a unit parameter")
@@ -881,48 +881,49 @@ ${headers.rubyModuleConstants.indent(2)}
             (expr, rubyClass(p))
 
           case Primitive.DateIso8601 =>
-            (s"HttpClient::Helper.to_date_iso8601(${expr})", "Date")
+            (s"HttpClient::Helper.to_date_iso8601($expr)", "Date")
 
           case Primitive.DateTimeIso8601 =>
-            (s"HttpClient::Helper.to_date_time_iso8601(${expr})", "DateTime")
+            (s"HttpClient::Helper.to_date_time_iso8601($expr)", "DateTime")
 
           case Primitive.Uuid =>
-            (s"HttpClient::Helper.to_uuid(${expr})", "String")
+            (s"HttpClient::Helper.to_uuid($expr)", "String")
 
           case Primitive.Decimal =>
-            (s"HttpClient::Helper.to_big_decimal(${expr})", "BigDecimal")
+            (s"HttpClient::Helper.to_big_decimal($expr)", "BigDecimal")
 
           case Primitive.Object =>
-            (s"HttpClient::Helper.to_object(${expr})", "Hash")
+            (s"HttpClient::Helper.to_object($expr)", "Hash")
         }
 
-        s"HttpClient::Preconditions.assert_class('$name', ${helperExpr}, ${className})"
+        s"HttpClient::Preconditions.assert_class('$name', $helperExpr, $className)"
       }
 
       case m: UserDefined.Model =>
         val className = qualifiedClassName(m.name)
-        s"(x = ${expr}; x.is_a?(${className}) ? x : ${className}.new(x))"
+        s"(x = $expr; x.is_a?($className) ? x : $className.new(x))"
 
       case e: UserDefined.Enum =>
         val className = qualifiedClassName(e.name)
-        val data = s"(x = ${expr}; x.is_a?(${className}) ? x : ${className}.apply(x))"
-        enumAsString match {
-          case true => s"${data}.value"
-          case false => data
+        val data = s"(x = $expr; x.is_a?($className) ? x : $className.apply(x))"
+        if (enumAsString) {
+          s"$data.value"
+        } else {
+          data
         }
 
       case u: UserDefined.Union =>
         val className = qualifiedClassName(u.name)
-        s"(x = ${expr}; x.is_a?(${className}) ? x : ${className}.from_json(x))"
+        s"(x = $expr; x.is_a?($className) ? x : $className.from_json(x))"
 
       case Container.List(inner) =>
-        s"HttpClient::Preconditions.assert_class('$name', ${expr}, Array).map { |v| ${parseArgument(name, "v", inner, None, enumAsString)} }"
+        s"HttpClient::Preconditions.assert_class('$name', $expr, Array).map { |v| ${parseArgument(name, "v", inner, None, enumAsString)} }"
 
       case Container.Map(inner) =>
-        s"HttpClient::Preconditions.assert_class('$name', ${expr}, Hash).inject({}) { |h, d| h[d[0]] = ${parseArgument(name, "d[1]", inner, None, enumAsString)}; h }"
+        s"HttpClient::Preconditions.assert_class('$name', $expr, Hash).inject({}) { |h, d| h[d[0]] = ${parseArgument(name, "d[1]", inner, None, enumAsString)}; h }"
 
       case Container.Option(inner) =>
-        s"(x = ${expr}; x.nil? ? nil : ${parseArgument(name, "x", inner, None, enumAsString)})"
+        s"(x = $expr; x.nil? ? nil : ${parseArgument(name, "x", inner, None, enumAsString)})"
     }
   }
 
