@@ -131,10 +131,10 @@ object Text {
     initCap(splitIntoWords(value).flatMap(_.split("-")))
   }
 
-  private[this] val WordDelimeterRx = "_|\\-|\\.|:\\/".r
+  private[this] val WordDelimiterRx = "_|\\-|\\.|:\\/".r
 
   def splitIntoWords(value: String): Seq[String] = {
-    WordDelimeterRx.split(lib.Text.camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
+    WordDelimiterRx.split(lib.Text.camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
   }
 
   def snakeToCamelCase(value: String) = {
