@@ -1,7 +1,5 @@
 package lib
 
-import scala.collection.immutable.StringOps
-
 object Text {
 
   /**
@@ -20,7 +18,7 @@ object Text {
 
     val startsWithLetterError = if (startsWithLetter(name)) {
                                   Seq.empty
-                                } else if (name.size == 0) {
+                                } else if (name.isEmpty) {
                                   Seq("Name cannot be blank")
                                 } else {
                                   Seq("Name must start with a letter")
@@ -119,6 +117,7 @@ object Text {
   }
 
   private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z\_])""".r
+
   def safeName(name: String): String = {
     RemoveUnsafeCharacters.replaceAllIn(name, m => "").replaceAll("\\.", "_").replaceAll("\\_+", "_").trim
   }
@@ -131,13 +130,13 @@ object Text {
     initCap(splitIntoWords(value).flatMap(_.split("-")))
   }
 
-  private[this] val WordDelimiterRx = "_|\\-|\\.|:\\/".r
+  private[this] val WordDelimiterRx = "_|\\-|\\.|:\\\\/".r
 
   def splitIntoWords(value: String): Seq[String] = {
     WordDelimiterRx.split(lib.Text.camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
   }
 
-  def snakeToCamelCase(value: String) = {
+  def snakeToCamelCase(value: String): String = {
     splitIntoWords(value).toList match {
       case Nil => ""
       case part :: rest => part + initCap(rest)
@@ -156,7 +155,7 @@ object Text {
     * Returns the word with first character in lower case
     */
   private[this] val InitLowerCaseRx = """^([A-Z])""".r
-  def initLowerCase(word: String) = {
+  def initLowerCase(word: String): String = {
     InitLowerCaseRx.replaceAllIn(word, m => s"${m.toString.toLowerCase}")
   }
 
