@@ -103,8 +103,7 @@ module Com
 
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'Foobar')
-                    @__discriminator__ = HttpClient::Preconditions.assert_class('__discriminator__', opts.delete(:__discriminator__), String)
+                    @__discriminator__ = 'foobar'
                   end
 
                   def subtype_to_hash
@@ -164,8 +163,7 @@ module Com
 
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    HttpClient::Preconditions.require_keys(opts, [:__discriminator__], 'User')
-                    @__discriminator__ = HttpClient::Preconditions.assert_class('__discriminator__', opts.delete(:__discriminator__), String)
+                    @__discriminator__ = 'user'
                   end
 
                   def subtype_to_hash
