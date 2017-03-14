@@ -4,7 +4,9 @@ name := "apidoc-generator"
 
 organization := "com.bryzek.apidoc.generator"
 
-scalaVersion in ThisBuild := "2.11.8"
+val scalaVer = "2.11.8"
+
+scalaVersion in ThisBuild := scalaVer
 
 lazy val generated = project
   .in(file("generated"))
@@ -75,6 +77,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "com.github.javaparser" % "javaparser-core" % "3.0.1" % "test",
+    "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "com.squareup" % "javapoet" % "1.8.0",
     "com.squareup.retrofit2" % "retrofit" % "2.2.0"
   ),

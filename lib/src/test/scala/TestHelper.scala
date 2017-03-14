@@ -4,13 +4,15 @@ import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 
 import play.api.libs.json._
-import com.bryzek.apidoc.spec.v0.models.{ResponseCodeInt, ResponseCode, ResponseCodeOption, ResponseCodeUndefinedType}
+import com.bryzek.apidoc.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import com.bryzek.apidoc.spec.v0.models.json._
 import com.bryzek.apidoc.spec.v0.models.Service
 import lib.Text
 import java.io.File
 
-object TestHelper {
+import org.scalatest.Matchers
+
+object TestHelper extends Matchers {
 
   lazy val collectionJsonDefaultsService = parseFile("/examples/collection-json-defaults.json")
   lazy val referenceApiService = parseFile(s"/examples/reference-service.json")
@@ -68,6 +70,24 @@ object TestHelper {
       case one :: Nil => one
       case multiple => sys.error(s"Multiple source files named[$filename]: " + multiple.mkString(", "))
     }
+  }
+
+  def assertValidScalaSourceCode(scalaSourceCode: String): Unit = {
+    import scala.tools.nsc.Global
+    import scala.tools.nsc.Settings
+    import scala.tools.nsc.reporters.StoreReporter
+
+    val settings = new Settings
+    settings.embeddedDefaults(getClass.getClassLoader)
+    settings.usejavacp.value = true
+    val reporter = new StoreReporter
+    val global = Global(settings, reporter)
+    val run = new global.Run
+    global.phase = run.parserPhase
+    run.cancel
+    val parser = global.newUnitParser(scalaSourceCode)
+    val parseResult = parser.parse()
+    reporter.errorCount shouldBe 0
   }
 
   def assertEqualsFile(filename: String, contents: String) {
