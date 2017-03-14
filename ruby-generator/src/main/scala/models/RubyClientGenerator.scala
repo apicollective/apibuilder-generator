@@ -184,7 +184,7 @@ object RubyUtil {
   private def rubyDefault(json: JsValue, datatype: Datatype): String = {
     import Datatype._
     datatype match {
-      case Container.Option(inner) => 
+      case Container.Option(inner) =>
         sys.error(s"parsing default `${json}` for datatype ${datatype}")
       case Container.List(inner) => {
         val seq = json.as[Seq[JsValue]].map { value =>
@@ -631,6 +631,18 @@ ${headers.rubyModuleConstants.indent(2)}
     val typeNames = union.types.map(_.`type`)
     val className = RubyUtil.toClassName(union.name)
     val discName = discriminatorName(union)
+
+    val discriminatorField = union.discriminator.map { disc =>
+      Seq(
+        s"HttpClient::Preconditions.require_keys(opts, [:$discName], '$className')",
+        s"@$discName = HttpClient::Preconditions.assert_class('$discName', opts.delete(:$discName), String)"
+      )
+    }.getOrElse {
+      Seq(
+        s"@$discName = 'TODO'"
+      )
+    }
+
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
       Seq(
@@ -649,8 +661,7 @@ ${headers.rubyModuleConstants.indent(2)}
       Seq(
         "def initialize(incoming={})",
         "  opts = HttpClient::Helper.symbolize_keys(incoming)",
-        s"  HttpClient::Preconditions.require_keys(opts, [:$discName], '$className')",
-        s"  @$discName = HttpClient::Preconditions.assert_class('$discName', opts.delete(:$discName), String)",
+        discriminatorField.mkString("  ", "\n  ", ""),
         "end"
       ).mkString("\n"),
 
@@ -976,7 +987,6 @@ ${headers.rubyModuleConstants.indent(2)}
 
   // TODO should be encapsulated in the RubyDatatype model
   private def asJson(varName: String, dt: Datatype): String = {
-    import Datatype._
     val hash = dt match {
       case _: Datatype.Primitive => varName
       case Datatype.Container.List(_: Datatype.Primitive) => varName
@@ -984,17 +994,17 @@ ${headers.rubyModuleConstants.indent(2)}
       case Datatype.Container.Option(_: Datatype.Primitive) => varName
 
       case Datatype.Container.List(inner) =>
-        s"${varName}.map { |o| ${asHash("o", inner)} }"
+        s"$varName.map { |o| ${asHash("o", inner)} }"
 
       case Datatype.Container.Map(inner) =>
-        s"${varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : ${asHash("o[1]", inner)}; hash }"
+        s"$varName.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : ${asHash("o[1]", inner)}; hash }"
 
       case Datatype.Container.Option(inner) =>
-        s"${varName}.nil? ? nil : ${asJson(varName, inner)}"
+        s"$varName.nil? ? nil : ${asJson(varName, inner)}"
 
-      case _: Datatype.UserDefined => s"${varName}"
+      case _: Datatype.UserDefined => s"$varName"
     }
-    s"${hash}.to_json"
+    s"$hash.to_json"
   }
 
   // TODO should be encapsulated in the RubyDatatype model
@@ -1007,17 +1017,17 @@ ${headers.rubyModuleConstants.indent(2)}
       case Datatype.Container.Option(_: Datatype.Primitive) => varName
 
       case Datatype.Container.List(inner) =>
-        s"${varName}.map { |o| ${asHash("o", inner)} }"
+        s"$varName.map { |o| ${asHash("o", inner)} }"
 
       case Datatype.Container.Map(inner) =>
-        s"${varName}.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : ${asHash("o[1]", inner)}; hash }"
+        s"$varName.inject({}) { |hash, o| hash[o[0]] = o[1].nil? ? nil : ${asHash("o[1]", inner)}; hash }"
 
       case Datatype.Container.Option(inner) =>
-        s"${varName}.nil? ? nil : ${asHash(varName, inner)}"
+        s"$varName.nil? ? nil : ${asHash(varName, inner)}"
 
-      case Datatype.UserDefined.Enum(_) => s"${varName}.value"
+      case Datatype.UserDefined.Enum(_) => s"$varName.value"
 
-      case _: Datatype.UserDefined => s"${varName}.to_hash"
+      case _: Datatype.UserDefined => s"$varName.to_hash"
     }
   }
 
@@ -1104,11 +1114,11 @@ ${headers.rubyModuleConstants.indent(2)}
       case UserDefined.Union(name) =>
         s"${qualifiedClassName(name)}.from_json(${varName})"
       case Container.List(inner) =>
-        s"${varName}.map { |x| ${generateResponse(inner, "x")} }"
+        s"$varName.map { |x| ${generateResponse(inner, "x")} }"
       case Container.Map(inner) =>
         // TODO code for this used to use pass hash to the constructor,
         // instead of x[1]. Pretty sure that was wrong, but hard to tell.
-        s"${varName}.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : ${generateResponse(inner, "x[1]")}; hash }"
+        s"$varName.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : ${generateResponse(inner, "x[1]")}; hash }"
       case Container.Option(inner) => sys.error(s"unsupported datatype ${dt} for response")
     }
   }
