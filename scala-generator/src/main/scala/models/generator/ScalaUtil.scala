@@ -94,11 +94,10 @@ object ScalaUtil {
   }
 
   def deprecationString(deprecation: Option[Deprecation]): String = {
-    val deprecationString: String = deprecation.map { dep =>
+    deprecation.map { dep =>
       val description = dep.description.map { desc => s"""("$desc")""" }.getOrElse("")
       s"@deprecated$description "
     }.getOrElse("")
-    deprecationString
   }
 
 }

@@ -25,6 +25,7 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
     ScalaUtil.toClassName("incident.create") should be("IncidentCreate")
     ScalaUtil.toClassName("incidents:create") should be("IncidentsCreate")
     ScalaUtil.toClassName("incident:create") should be("IncidentCreate")
+    ScalaUtil.toClassName("incidents/create") should be("IncidentsCreate")
   }
 
   it("toVariable") {
