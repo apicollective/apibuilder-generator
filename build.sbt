@@ -4,7 +4,7 @@ name := "apidoc-generator"
 
 organization := "com.bryzek.apidoc.generator"
 
-val scalaVer = "2.11.8"
+val scalaVer = "2.12.1"
 
 scalaVersion in ThisBuild := scalaVer
 
@@ -74,9 +74,9 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   organization := "com.bryzek.apidoc",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
-    "com.github.javaparser" % "javaparser-core" % "3.0.1" % "test",
+    "com.github.javaparser" % "javaparser-core" % "3.1.2" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "com.squareup" % "javapoet" % "1.8.0",
     "com.squareup.retrofit2" % "retrofit" % "2.2.0"
