@@ -1,9 +1,8 @@
 package models.generator.android
 
-import java.io.{File => JavaIoFile}
-
 import com.bryzek.apidoc.generator.v0.models.InvocationForm
 import org.scalatest.{FunSpec, ShouldMatchers}
+import com.github.javaparser.JavaParser
 
 
 class TestAndroidClasses
@@ -130,12 +129,13 @@ class TestAndroidClasses
     val result = AndroidClasses.invoke(InvocationForm(models.TestHelper.service(json.format())))
 
     result.isRight should be(true)
-    result.right.get.size should be(4)
-    result.right.get(0).name should be("CarType.java")
-    result.right.get(1).name should be("Model.java")
-    result.right.get(2).name should be("ApidocObjectMapper.java")
-    result.right.get(3).name should be("ModelsClient.java")
-
+    val files = result.right.get
+    files.size should be(4)
+    files(0).name should be("CarType.java")
+    files(1).name should be("Model.java")
+    files(2).name should be("ApidocObjectMapper.java")
+    files(3).name should be("ModelsClient.java")
+    files.foreach { file => JavaParser.parse(file.contents) }
   }
 
 }
