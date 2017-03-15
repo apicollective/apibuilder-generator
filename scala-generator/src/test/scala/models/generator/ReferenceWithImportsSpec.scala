@@ -28,7 +28,9 @@ class ReferenceWithImportsSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-play-23.txt", sourceFiles.head.contents)
+        val sourceCode = sourceFiles.head.contents
+        TestHelper.assertValidScalaSourceCode(sourceCode)
+        TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-play-23.txt", sourceCode)
       }
     }
   }
@@ -38,7 +40,9 @@ class ReferenceWithImportsSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-ning-client.txt", sourceFiles.head.contents)
+        val sourceCode = sourceFiles.head.contents
+        TestHelper.assertValidScalaSourceCode(sourceCode)
+        TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-ning-client.txt", sourceCode)
       }
     }
   }
