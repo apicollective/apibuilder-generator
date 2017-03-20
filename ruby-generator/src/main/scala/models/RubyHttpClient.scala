@@ -20,12 +20,17 @@ module HttpClient
 
   class HttpHandler
 
-    attr_reader :base_uri
-  
-    def initialize(base_uri)
-      Preconditions.assert_class('base_uri', base_uri, String)
-      @base_uri = URI(base_uri)
+    # Returns a client instance to use
+    #
+    # @param base_uri The base URI for this API
+    # @param path the Requested full http path (including any query strings)
+    def instance(base_uri, path)
+      raise "Override in subclass"
     end
+
+  end
+
+  class HttpHandlerInstance
 
     # Executes a request. The provided request object will be an
     # instance of Net::HTTP (e.g. Net::HTTP::Get)
@@ -34,14 +39,21 @@ module HttpClient
     end
 
   end
-  
+
   class DefaultHttpHandler < HttpHandler
+
+    def instance(base_uri, path)
+      DefaultHttpHandlerInstance.new(base_uri)
+    end
+
+  end
+
+  class DefaultHttpHandlerInstance < HttpHandlerInstance
 
     attr_reader :client
     
     def initialize(base_uri)
-      super(base_uri)
-
+      @base_uri = Preconditions.assert_class('base_uri', base_uri, URI)
       @client = Net::HTTP.new(@base_uri.host, @base_uri.port)
       if @base_uri.scheme == "https"
         configure_ssl
@@ -64,12 +76,11 @@ module HttpClient
       end
     end
 
-    private
     def full_uri(path)
-      @base_uri.to_s + request.path
+      File.join(@base_uri.to_s, path)
     end
 
-    # If HTTPS is required, this method accepts an HTTP Client and configures SSL
+    # Called to configure SSL if the base uri requires it
     def configure_ssl
       @client.use_ssl = true
       @client.verify_mode = OpenSSL::SSL::VERIFY_PEER
@@ -78,7 +89,7 @@ module HttpClient
     end
 
   end
-        
+
   class Request
 
     attr_reader :path
