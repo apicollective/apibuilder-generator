@@ -18,10 +18,75 @@ require 'bigdecimal'
   val contents = """
 module HttpClient
 
+  class HttpHandler
+
+    attr_reader :base_uri
+  
+    def initialize(base_uri)
+      Preconditions.assert_class('base_uri', base_uri, String)
+      @base_uri = URI(base_uri)
+    end
+
+    # Executes a request. The provided request object will be an
+    # instance of Net::HTTP (e.g. Net::HTTP::Get)
+    def execute(request)
+      raise "Override in subclass"
+    end
+
+  end
+  
+  class DefaultHttpHandler < HttpHandler
+
+    attr_reader :client
+    
+    def initialize(base_uri)
+      super(base_uri)
+
+      @client = Net::HTTP.new(@base_uri.host, @base_uri.port)
+      if @base_uri.scheme == "https"
+        configure_ssl
+      end
+    end
+
+    def execute(request)
+      response = begin
+                   @client.request(request)
+                 rescue SocketError => e
+                   raise Exception.new("Error accessing uri[#{full_uri(request.path)}]: #{e}")
+                 end
+
+      case response
+      when Net::HTTPSuccess
+        response.body
+      else
+        body = response.body rescue nil
+        raise HttpClient::ServerError.new(response.code.to_i, response.message, :body => body, :uri => full_uri(request.path).to_s)
+      end
+    end
+
+    private
+    def full_uri(path)
+      @base_uri.to_s + request.path
+    end
+
+    # If HTTPS is required, this method accepts an HTTP Client and configures SSL
+    def configure_ssl
+      @client.use_ssl = true
+      #@client.ssl_version = :TLSv1_2
+      @client.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      @client.cert_store = OpenSSL::X509::Store.new
+      @client.cert_store.set_default_paths
+    end
+
+  end
+        
   class Request
 
-    def initialize(uri)
-      @uri = Preconditions.assert_class('uri', uri, URI)
+    attr_reader :path
+
+    def initialize(http_handler, path)
+      @http_handler = HttpClient::Preconditions.assert_class('http_handler', http_handler, HttpClient::HttpHandler)
+      @path = Preconditions.assert_class('path', path, String)
       @params = nil
       @body = nil
       @auth = nil
@@ -71,26 +136,6 @@ module HttpClient
       self
     end
 
-    # Creates a new Net:HTTP client. The client returned should be
-    # fully configured to make a request.
-    def new_http_client
-      client = Net::HTTP.new(@uri.host, @uri.port)
-      if @uri.scheme == "https"
-        configure_ssl(client)
-      end
-      client
-    end
-
-    # If HTTPS is required, this method accepts an HTTP Client and configures SSL
-    def configure_ssl(http)
-      Preconditions.assert_class('http', http, Net::HTTP)
-      http.use_ssl = true
-      http.ssl_version = :TLSv1_2
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      http.cert_store = OpenSSL::X509::Store.new
-      http.cert_store.set_default_paths
-    end
-
     def get(&block)
       do_request(Net::HTTP::Get, &block)
     end
@@ -122,7 +167,7 @@ module HttpClient
     def do_request(klass)
       Preconditions.assert_class('klass', klass, Class)
 
-      uri = @uri.to_s
+      uri = path.dup
       if q = to_query(@params)
         uri += "?%s" % q
       end
@@ -155,10 +200,10 @@ module HttpClient
         request.add_field(key, value)
       }
 
-      curl << "'%s'" % uri
+      curl << "'%s%s'" % [@http_handler.base_uri, path]
       # DEBUG puts curl.join(" ")
 
-      raw_response = http_request(request)
+      raw_response = @http_handler.execute(request)
       response = raw_response.to_s == "" ? nil : JSON.parse(raw_response)
 
       if block_given?
@@ -180,21 +225,6 @@ module HttpClient
       parts.empty? ? nil : parts.join("&")
     end
 
-    def http_request(request)
-      response = begin
-                   new_http_client.request(request)
-                 rescue SocketError => e
-                   raise Exception.new("Error accessing uri[#{@uri}]: #{e}")
-                 end
-
-      case response
-      when Net::HTTPSuccess
-        response.body
-      else
-        body = response.body rescue nil
-        raise HttpClient::ServerError.new(response.code.to_i, response.message, :body => body, :uri => @uri.to_s)
-      end
-    end
   end
 
   class ServerError < StandardError
