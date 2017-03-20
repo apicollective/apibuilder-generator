@@ -447,13 +447,16 @@ ${headers.rubyModuleConstants.indent(2)}
     @url = HttpClient::Preconditions.assert_class('url', url, String)
     @authorization = HttpClient::Preconditions.assert_class_or_nil('authorization', opts.delete(:authorization), HttpClient::Authorization)
     @default_headers = HttpClient::Preconditions.assert_class('default_headers', opts.delete(:default_headers) || {}, Hash)
+    http_handler_class = HttpClient::Preconditions.assert_class('http_handler', opts.delete(:http_handler) || HttpClient::DefaultHttpHandler, Class)
+    @http_handler = http_handler_class.send(:new, @url)
+
     HttpClient::Preconditions.assert_empty_opts(opts)
     HttpClient::Preconditions.check_state(url.match(/http.+/i), "URL[%s] must start with http" % url)
   end${defaultClient.getOrElse("")}
 
   def request(path=nil)
     HttpClient::Preconditions.assert_class_or_nil('path', path, String)
-    request = HttpClient::Request.new(URI.parse(@url + path.to_s))$headerString
+    request = HttpClient::Request.new(@http_handler, path.to_s)$headerString
 
     @default_headers.each do |key, value|
       request = request.with_header(key, value)
