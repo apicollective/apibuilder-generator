@@ -94,8 +94,9 @@ module HttpClient
 
     attr_reader :path
 
-    def initialize(http_handler, path)
-      @http_handler = HttpClient::Preconditions.assert_class('http_handler', http_handler, HttpClient::HttpHandler)
+    def initialize(http_handler, base_uri, path)
+      @http_handler = http_handler
+      @base_uri = Preconditions.assert_class('base_uri', base_uri, URI)
       @path = Preconditions.assert_class('path', path, String)
       @params = nil
       @body = nil
@@ -210,10 +211,10 @@ module HttpClient
         request.add_field(key, value)
       }
 
-      curl << "'%s%s'" % [@http_handler.base_uri, path]
+      curl << "'%s%s'" % [@base_uri, path]
       # DEBUG puts curl.join(" ")
 
-      raw_response = @http_handler.execute(request)
+      raw_response = @http_handler.instance(@base_uri, request.path).execute(request)
       response = raw_response.to_s == "" ? nil : JSON.parse(raw_response)
 
       if block_given?
