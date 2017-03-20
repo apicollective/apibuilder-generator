@@ -72,7 +72,6 @@ module HttpClient
     # If HTTPS is required, this method accepts an HTTP Client and configures SSL
     def configure_ssl
       @client.use_ssl = true
-      #@client.ssl_version = :TLSv1_2
       @client.verify_mode = OpenSSL::SSL::VERIFY_PEER
       @client.cert_store = OpenSSL::X509::Store.new
       @client.cert_store.set_default_paths
