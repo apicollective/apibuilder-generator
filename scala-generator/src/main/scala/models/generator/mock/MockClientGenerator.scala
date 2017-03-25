@@ -105,12 +105,12 @@ case class MockClientGenerator(
         value.name
       }
     }
-    s"def make${enum.name}() = ${enum.qualifiedName}.$name"
+    s"def make${enum.name}(): ${enum.qualifiedName} = ${enum.qualifiedName}.$name"
   }
 
   private[this] def makeModel(model: ScalaModel): String = {
     Seq(
-      s"def make${model.name}() = ${model.qualifiedName}(",
+      s"def make${model.name}(): ${model.qualifiedName} = ${model.qualifiedName}(",
       model.fields.map { field =>
         s"${field.name} = ${mockValue(field.datatype)}"
       }.mkString(",\n").indent(2),
@@ -122,7 +122,7 @@ case class MockClientGenerator(
     val typ = union.types.headOption.getOrElse {
       sys.error("Union type[${union.qualifiedName}] does not have any times")
     }
-    s"def make${union.name}() = ${mockValue(typ.datatype)}"
+    s"def make${union.name}(): ${union.qualifiedName} = ${mockValue(typ.datatype)}"
   }
 
   private[this] def generateMockResource(resource: ScalaResource): String = {
@@ -131,7 +131,7 @@ case class MockClientGenerator(
       s"trait Mock${resource.plural} extends ${ssd.namespaces.base}.${resource.plural} {",
       generator.methods(resource).map { m =>
         Seq(
-          m.interface + " = scala.concurrent.Future {",
+          m.interface + " = scala.concurrent.Future.successful {",
           mockImplementation(m).indent(2),
           "}"
         ).mkString("\n")
@@ -158,7 +158,7 @@ case class MockClientGenerator(
       case ScalaPrimitive.Integer => "1"
       case ScalaPrimitive.Long => "1l"
       case ScalaPrimitive.DateIso8601 => "new org.joda.time.LocalDate()"
-      case ScalaPrimitive.DateTimeIso8601 => "new org.joda.time.DateTime()"
+      case ScalaPrimitive.DateTimeIso8601 => "org.joda.time.DateTime.now"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
       case ScalaPrimitive.Object => "play.api.libs.json.Json.obj()"
       case ScalaPrimitive.String => "Factories.randomString()"
