@@ -6,6 +6,24 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
 
   sealed trait User
 
+  sealed trait UserDiscriminator
+
+  object UserDiscriminator {
+
+    case object RegisteredUser extends UserDiscriminator { override def toString = "registered_user" }
+    case object GuestUser extends UserDiscriminator { override def toString = "guest_user" }
+    case object SystemUser extends UserDiscriminator { override def toString = "system_user" }
+    case object String extends UserDiscriminator { override def toString = "string" }
+
+    val all = Seq(RegisteredUser, GuestUser, SystemUser, String)
+
+    private[this]
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def fromString(typ: String): _root_.scala.Option[User] = byName.get(typ.toLowerCase)
+
+  }
+
   case class GuestUser(
     id: String,
     email: _root_.scala.Option[String] = None

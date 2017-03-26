@@ -68,7 +68,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
       additionalImports.mkString("\n").indent(2),
-      ssd.unions.map { generateUnionTraitWithDoc }.mkString("\n\n").indent(2),
+      ssd.unions.map { generateUnionTraitWithDocAndDiscriminator }.mkString("\n\n").indent(2),
       "",
       ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
       generatedClasses,
@@ -79,13 +79,24 @@ trait ScalaCaseClasses extends CodeGenerator {
     Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
   }
 
-  def generateUnionTraitWithDoc(union: ScalaUnion): String = {
-    generateScalaDoc(union.description) + generateUnionTrait(union)
+  def generateUnionTraitWithDocAndDiscriminator(union: ScalaUnion): String = {
+    val disc = generateUnionDiscriminatorTrait(union) match {
+      case None => ""
+      case Some(code) => s"\n\n$code"
+    }
+
+    generateScalaDoc(union.description) + generateUnionTrait(union) + disc
   }
 
   def generateUnionTrait(union: ScalaUnion): String = {
     // TODO: handle primitive types
     s"${ScalaUtil.deprecationString(union.deprecation)}sealed trait ${union.name}"
+  }
+
+  def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {
+    union.discriminator.map { disc =>
+      ScalaUnionDiscriminator(union).build()
+    }
   }
 
   def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
