@@ -18,11 +18,15 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
     case object SystemUser extends UserDiscriminator { override def toString = "system_user" }
     case object String extends UserDiscriminator { override def toString = "string" }
 
+    case class UNDEFINED(override val toString: String) extends UserDiscriminator
+
     val all = Seq(RegisteredUser, GuestUser, SystemUser, String)
 
     private[this] val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
-    def fromString(typ: String): _root_.scala.Option[UserDiscriminator] = byName.get(typ.toLowerCase)
+    def apply(value: String): UserDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[UserDiscriminator] = byName.get(value.toLowerCase)
 
   }
 
