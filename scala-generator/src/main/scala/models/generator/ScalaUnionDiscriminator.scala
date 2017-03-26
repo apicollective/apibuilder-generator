@@ -1,6 +1,5 @@
 package scala.generator
 
-import scala.models.Play2JsonCommon
 import lib.Text._
 
 case class ScalaUnionDiscriminator(
@@ -10,13 +9,15 @@ case class ScalaUnionDiscriminator(
     sys.error(s"ScalaUnionDiscriminator requires a discriminator - union[${union.name}] does not have one defined")
   }
 
-  private[this] val className = s"${union.name}Discriminator"
+  private[this] val className = s"${union.name}${underscoreToInitCap(discriminator)}"
 
   def build(): String = {
     import lib.Text._
     Seq(
-      ScalaUtil.textToComment(s"Defines the valid values for the ${union.discriminator} for the union type ${union.name}"),
-      s"sealed trait $className",
+      Seq(
+        ScalaUtil.textToComment(s"Defines the valid ${discriminator} values for the type ${union.name}"),
+        s"sealed trait $className"
+      ).mkString("\n"),
       s"${ScalaUtil.deprecationString(union.deprecation)}object $className {",
       buildTypes().indent(2),
       s"}"
@@ -31,9 +32,8 @@ case class ScalaUnionDiscriminator(
       ).flatten.mkString("\n")
     }.mkString("\n") + "\n\n" +
     s"val all = Seq(" + union.types.map(_.name).mkString(", ") + ")\n\n" +
-    s"private[this]\n" +
-    s"val byName = all.map(x => x.toString.toLowerCase -> x).toMap\n\n" +
-    s"def fromString(typ: String): _root_.scala.Option[${union.name}] = byName.get(typ.toLowerCase)\n\n"
+    s"private[this] val byName = all.map(x => x.toString.toLowerCase -> x).toMap\n\n" +
+    s"def fromString(typ: String): _root_.scala.Option[$className] = byName.get(typ.toLowerCase)\n\n"
   }
 
 }

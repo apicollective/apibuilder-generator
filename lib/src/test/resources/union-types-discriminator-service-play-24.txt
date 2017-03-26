@@ -6,6 +6,9 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
 
   sealed trait User
 
+  /**
+   * Defines the valid discriminator values for the type User
+   */
   sealed trait UserDiscriminator
 
   object UserDiscriminator {
@@ -17,10 +20,9 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
 
     val all = Seq(RegisteredUser, GuestUser, SystemUser, String)
 
-    private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    private[this] val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
-    def fromString(typ: String): _root_.scala.Option[User] = byName.get(typ.toLowerCase)
+    def fromString(typ: String): _root_.scala.Option[UserDiscriminator] = byName.get(typ.toLowerCase)
 
   }
 
