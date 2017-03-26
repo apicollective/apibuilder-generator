@@ -67,7 +67,7 @@ case class ScalaEnums(
     ).mkString("\n")
   }
 
-  private def buildValues(): String = {
+  private[this] def buildValues(): String = {
     enum.values.map { value =>
       Seq(
         value.description.map { desc => ScalaUtil.textToComment(desc) },

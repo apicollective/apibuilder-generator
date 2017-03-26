@@ -91,15 +91,21 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
  */
 case class ScalaUnionType(
   val ssd: ScalaService,
-  originalName: String,
+  val value: UnionType,
   datatype: ScalaDatatype,
   enum: Option[ScalaPrimitive.Enum] = None,
   model: Option[ScalaPrimitive.Model] = None
 ) {
 
+  val originalName: String = value.`type`
+
   val name: String = ScalaUtil.toClassName(originalName)
 
   val qualifiedName = ssd.modelClassName(name)
+
+  val description: Option[String] = value.description
+
+  val deprecation: Option[Deprecation] = value.deprecation
 
 }
 
@@ -112,14 +118,14 @@ object ScalaUnionType {
     val dt: ScalaDatatype = ssd.scalaDatatype(`type`)
     dt match {
       case enum: ScalaPrimitive.Enum => {
-        ScalaUnionType(ssd, t.`type`, dt, enum = Some(enum))
+        ScalaUnionType(ssd, t, dt, enum = Some(enum))
       }
 
       case model: ScalaPrimitive.Model => {
-        ScalaUnionType(ssd, t.`type`, dt, model = Some(model))
+        ScalaUnionType(ssd, t, dt, model = Some(model))
       }
       case p: ScalaPrimitive => {
-        ScalaUnionType(ssd, t.`type`, p)
+        ScalaUnionType(ssd, t, p)
       }
       case c: ScalaDatatype.Container => sys.error(s"illegal container type ${c} encountered in union ${t.`type`}")
     }
