@@ -139,6 +139,10 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
       ScalaUtil.scalaDefault("-124", ScalaPrimitive.Integer) should be("-124")
     }
 
+    it ("default: 00, datatype: integer") {
+      ScalaUtil.scalaDefault("00", ScalaPrimitive.Integer) should be("0")
+    }
+
     it ("default: 124, datatype: long") {
       ScalaUtil.scalaDefault("124", ScalaPrimitive.Long) should be("124")
     }

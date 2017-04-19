@@ -10,6 +10,7 @@ import play.api.libs.json._
 import play.api.Logger
 
 import com.bryzek.apidoc.spec.v0.models.Deprecation
+import scala.util.{Failure, Success, Try}
 
 sealed trait ScalaDatatype {
   def asString(originalVarName: String): String = {
@@ -32,10 +33,34 @@ sealed trait ScalaDatatype {
     }
   }
 
-  def default(value: String): String = default(Json.parse(value))
+  def default(value: String): String = {
+    Try {
+      Json.parse(value)
+    } match {
+      case Success(js) => default(js)
+      case Failure(ex) => {
+        Logger.warn(s"Could not parse default value[$value]: ${ex.getMessage} - processing as a string")
+        default(JsString(value))
+      }
+    }
+  }
 
   protected def default(json: JsValue): String = {
     throw new UnsupportedOperationException(s"default for type ${name}")
+  }
+
+  protected def toBigDecimal(json: JsValue): BigDecimal = {
+    json match {
+      case v: JsString => {
+        if (v.value.matches("0+")) {
+          BigDecimal("0")
+        } else {
+          BigDecimal(json.toString)
+        }
+      }
+      case v: JsNumber => v.value
+      case _ => BigDecimal(json.toString)
+    }
   }
 
   def toVariableName: String
@@ -76,7 +101,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = json.as[scala.Double].toString
+    override protected def default(json: JsValue) = toBigDecimal(json).toDouble.toString
   }
 
   case object Integer extends ScalaPrimitive {
@@ -87,7 +112,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = json.as[scala.Int].toString
+    override protected def default(json: JsValue) = toBigDecimal(json).toInt.toString
   }
 
   case object Long extends ScalaPrimitive {
@@ -98,7 +123,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = json.as[scala.Long].toString
+    override protected def default(json: JsValue) = toBigDecimal(json).toLong.toString
   }
 
   case object DateIso8601 extends ScalaPrimitive {
