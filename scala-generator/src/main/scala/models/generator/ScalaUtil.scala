@@ -57,10 +57,14 @@ object ScalaUtil {
   }
 
   def quoteNameIfKeyword(name: String): String = {
-    isKeyword(name) match {
+    isKeyword(name) || needsQuoting(name) match {
       case true => "`" + name + "`"
       case false => name
     }
+  }
+
+  def needsQuoting(name: String): Boolean = {
+    name.indexOf("[") >= 0
   }
 
   def toClassName(name: String) = {
