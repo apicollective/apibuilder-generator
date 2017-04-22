@@ -154,7 +154,12 @@ private[models] case class Play2Route(
         datatype.name
     }
 
-    s"${ScalaUtil.quoteNameIfKeyword(scalaParam.originalName)}: $datatypeName"
+    // Quote special chars (e.g. `foo[bar]`) but not reserved words (eg type)
+    if (ScalaUtil.needsQuoting(scalaParam.originalName)) {
+      s"${ScalaUtil.quoteNameIfKeyword(scalaParam.originalName)}: $datatypeName"
+    } else {
+      s"${scalaParam.originalName}: $datatypeName"
+    }
   }
 }
 
