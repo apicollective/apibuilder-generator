@@ -154,7 +154,7 @@ private[models] case class Play2Route(
         datatype.name
     }
 
-    s"${scalaParam.originalName}: $datatypeName"
+    s"${ScalaUtil.quoteNameIfKeyword(scalaParam.originalName)}: $datatypeName"
   }
 }
 
