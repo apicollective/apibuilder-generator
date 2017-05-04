@@ -51,7 +51,7 @@ module HttpClient
   class DefaultHttpHandlerInstance < HttpHandlerInstance
 
     attr_reader :client
-    
+
     def initialize(base_uri)
       @base_uri = Preconditions.assert_class('base_uri', base_uri, URI)
       @client = Net::HTTP.new(@base_uri.host, @base_uri.port)
@@ -64,7 +64,7 @@ module HttpClient
       response = begin
                    @client.request(request)
                  rescue SocketError => e
-                   raise Exception.new("Error accessing uri[#{full_uri(request.path)}]: #{e}")
+                   raise StandardError.new("Error accessing uri[#{full_uri(request.path)}]: #{e}")
                  end
 
       case response
@@ -266,7 +266,7 @@ module HttpClient
 
   end
 
-  class PreconditionException < Exception
+  class PreconditionException < StandardError
 
     attr_reader :message
 
