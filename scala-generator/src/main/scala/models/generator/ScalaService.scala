@@ -32,6 +32,12 @@ case class ScalaService(
     scalaTypeResolver.scalaDatatype(t)
   }
 
+  def unionsForUnion(union: ScalaUnion): Seq[ScalaUnion] = {
+    unions.filter { u =>
+      u.types.flatMap(_.union.map(_.fullName)).contains(union.qualifiedName)
+    }
+  }
+
   def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
     unions.filter { u =>
       u.types.flatMap(_.model.map(_.fullName)).contains(model.qualifiedName)
@@ -94,7 +100,8 @@ case class ScalaUnionType(
   val value: UnionType,
   datatype: ScalaDatatype,
   enum: Option[ScalaPrimitive.Enum] = None,
-  model: Option[ScalaPrimitive.Model] = None
+  model: Option[ScalaPrimitive.Model] = None,
+  union: Option[ScalaPrimitive.Union] = None
 ) {
 
   val originalName: String = value.`type`
@@ -124,9 +131,15 @@ object ScalaUnionType {
       case model: ScalaPrimitive.Model => {
         ScalaUnionType(ssd, t, dt, model = Some(model))
       }
+
+      case union: ScalaPrimitive.Union => {
+        ScalaUnionType(ssd, t, dt, union = Some(union))
+      }
+
       case p: ScalaPrimitive => {
         ScalaUnionType(ssd, t, p)
       }
+
       case c: ScalaDatatype.Container => sys.error(s"illegal container type ${c} encountered in union ${t.`type`}")
     }
   }
