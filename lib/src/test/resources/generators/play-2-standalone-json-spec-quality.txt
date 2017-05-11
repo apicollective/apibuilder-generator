@@ -270,7 +270,7 @@ package com.gilt.quality.v0.models {
   /**
    * An external service with which an organization can integrate.
    */
-  sealed trait ExternalServiceName
+  sealed trait ExternalServiceName extends _root_.scala.Product with _root_.scala.Serializable
 
   object ExternalServiceName {
 
@@ -311,7 +311,7 @@ package com.gilt.quality.v0.models {
    * A publication represents something that a user can subscribe to. An example
    * would be subscribing via email to the publication of all new incidents.
    */
-  sealed trait Publication
+  sealed trait Publication extends _root_.scala.Product with _root_.scala.Serializable
 
   object Publication {
 
@@ -367,7 +367,7 @@ package com.gilt.quality.v0.models {
 
   }
 
-  sealed trait Response
+  sealed trait Response extends _root_.scala.Product with _root_.scala.Serializable
 
   object Response {
 
@@ -402,7 +402,7 @@ package com.gilt.quality.v0.models {
 
   }
 
-  sealed trait Severity
+  sealed trait Severity extends _root_.scala.Product with _root_.scala.Serializable
 
   object Severity {
 
@@ -439,7 +439,7 @@ package com.gilt.quality.v0.models {
   /**
    * Describes what needs to be reviewed about a specific incident
    */
-  sealed trait Task
+  sealed trait Task extends _root_.scala.Product with _root_.scala.Serializable
 
   object Task {
 

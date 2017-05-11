@@ -90,7 +90,7 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTrait(union: ScalaUnion): String = {
     // TODO: handle primitive types
-    s"${ScalaUtil.deprecationString(union.deprecation)}sealed trait ${union.name}"
+    s"${ScalaUtil.deprecationString(union.deprecation)}sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable"
   }
 
   def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {

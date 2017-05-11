@@ -16,7 +16,7 @@ case class ScalaUnionDiscriminator(
     Seq(
       Seq(
         ScalaUtil.textToComment(s"Defines the valid ${discriminator} values for the type ${union.name}"),
-        s"sealed trait $className"
+        s"sealed trait $className extends _root_.scala.Product with _root_.scala.Serializable"
       ).mkString("\n"),
       s"${ScalaUtil.deprecationString(union.deprecation)}object $className {",
       buildTypes().indent(2),
