@@ -38,7 +38,7 @@ lazy val generator = project
     libraryDependencies ++= Seq(
       ws,
       "org.scalatestplus" %% "play" % "1.4.0" % "test",
-      "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.12.2"
+      "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.12.3"
     )
   )
 
