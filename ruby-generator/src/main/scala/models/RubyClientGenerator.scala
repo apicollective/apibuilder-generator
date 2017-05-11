@@ -847,7 +847,7 @@ ${headers.rubyModuleConstants.indent(2)}
     sb.mkString("\n")
   }
 
-  private def parseArgument(
+  private[this] def parseArgument(
     fieldName: String,
     `type`: String,
     required: Boolean,
@@ -862,7 +862,7 @@ ${headers.rubyModuleConstants.indent(2)}
   }
 
   // TODO should be encapsulated in the RubyDatatype model
-  private def parseArgument(
+  private[this] def parseArgument(
     name: String,
     rawExpr: String,
     dt: Datatype,
@@ -870,7 +870,7 @@ ${headers.rubyModuleConstants.indent(2)}
     enumAsString: Boolean
   ): String = {
     import Datatype._
-    def expr = default.fold(rawExpr)(d => s"(x = ${rawExpr}; x.nil? ? ${d} : x)")
+    def expr = default.fold(rawExpr)(d => s"(x = $rawExpr; x.nil? ? $d : x)")
     dt match {
       case Primitive.Boolean =>
         s"HttpClient::Preconditions.assert_boolean('$name', $expr)"
@@ -1047,12 +1047,16 @@ ${headers.rubyModuleConstants.indent(2)}
     fieldName: Option[String] = None
   ): RubyTypeInfo = {
     val dt = datatypeResolver.parse(`type`, true).get
+    var required = true
 
     val klass = {
       def iter(dt: Datatype): String = dt match {
         case p: Datatype.Primitive => rubyClass(p)
         case u: Datatype.UserDefined => qualifiedClassName(u.name)
-        case Datatype.Container.Option(inner) => iter(inner)
+        case Datatype.Container.Option(inner) => {
+          required = false
+          iter(inner)
+        }
         case m: Datatype.Container.Map => "Hash"
         case l: Datatype.Container.List => "Array"
       }
@@ -1074,6 +1078,12 @@ ${headers.rubyModuleConstants.indent(2)}
         RubyUtil.toVariable(fieldName.getOrElse(c.inner.name), multiple = true)
     }
 
+    val parser = if (`type` == "unit") {
+      "nil"
+    } else {
+      parseArgument(varName, varName, dt, None, false)
+    }
+
     val (assertStub, assertClass) = dt match {
       case Datatype.Container.List(inner) => ("assert_collection_of_class", qualifiedClassName(inner.name))
       case Datatype.Container.Map(inner) => ("assert_hash_of_class", qualifiedClassName(inner.name))
@@ -1083,7 +1093,7 @@ ${headers.rubyModuleConstants.indent(2)}
     RubyTypeInfo(
       varName = varName,
       klass = klass,
-      assertMethod = s"HttpClient::Preconditions.$assertStub('$varName', $varName, $assertClass)",
+      assertMethod = parser,
       datatype = dt
     )
   }

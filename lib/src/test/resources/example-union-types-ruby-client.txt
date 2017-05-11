@@ -78,13 +78,13 @@ module Com
                   end
 
                   def get_by_guid(guid)
-                    HttpClient::Preconditions.assert_class('guid', guid, String)
+                    HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(guid), String)
                     r = @client.request("/users/#{guid}").get
                     ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
                   end
 
                   def post(user)
-                    HttpClient::Preconditions.assert_class('user', user, ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User)
+                    (x = user; x.is_a?(::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User) ? x : ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(x))
                     r = @client.request("/users").with_json(user.to_json).post
                     ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
                   end

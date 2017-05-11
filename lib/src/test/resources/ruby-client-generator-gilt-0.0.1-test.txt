@@ -124,7 +124,7 @@ module Com
                 end
 
                 def get_by_organization(organization)
-                  HttpClient::Preconditions.assert_class('organization', organization, String)
+                  HttpClient::Preconditions.assert_class('organization', HttpClient::Helper.to_uuid(organization), String)
                   r = @client.request("/groups/#{organization}").get
                   r.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : x[1].map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x) }; hash }
                 end
@@ -156,14 +156,14 @@ module Com
                 end
 
                 def get_by_organization(organization)
-                  HttpClient::Preconditions.assert_class('organization', organization, String)
+                  HttpClient::Preconditions.assert_class('organization', HttpClient::Helper.to_uuid(organization), String)
                   r = @client.request("/members/#{organization}").get
                   r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(x) }
                 end
 
                 def post_members_bulk_by_organization(organization, members)
-                  HttpClient::Preconditions.assert_class('organization', organization, String)
-                  HttpClient::Preconditions.assert_collection_of_class('members', members, ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member)
+                  HttpClient::Preconditions.assert_class('organization', HttpClient::Helper.to_uuid(organization), String)
+                  HttpClient::Preconditions.assert_class('members', members, Array).map { |v| (x = v; x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(x)) }
                   r = @client.request("/members/#{organization}/members_bulk").with_json(members.map { |o| o.to_hash }.to_json).post
                   r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Member.new(x) }
                 end
@@ -193,7 +193,7 @@ module Com
                 end
 
                 def get_by_guid(guid)
-                  HttpClient::Preconditions.assert_class('guid', guid, String)
+                  HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(guid), String)
                   r = @client.request("/organizations/#{guid}").get
                   ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::Organization.new(r)
                 end
@@ -226,7 +226,7 @@ module Com
                 end
 
                 def get_by_age_group(age_group)
-                  HttpClient::Preconditions.assert_class('age_group', age_group, ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup)
+                  (x = age_group; x.is_a?(::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup) ? x : ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::AgeGroup.apply(x))
                   r = @client.request("/users/#{age_group.value}").get
                   r.map { |x| ::Com::Bryzek::Apidoc::Reference::Api::V0::Models::User.new(x) }
                 end
