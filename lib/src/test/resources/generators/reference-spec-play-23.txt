@@ -74,7 +74,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
     users: Seq[com.bryzek.apidoc.reference.api.v0.models.User]
   )
 
-  sealed trait AgeGroup
+  sealed trait AgeGroup extends _root_.scala.Product with _root_.scala.Serializable
 
   object AgeGroup {
 
@@ -777,7 +777,7 @@ package com.bryzek.apidoc.reference.api.v0 {
 
   }
 
-  sealed trait Authorization
+  sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
   }

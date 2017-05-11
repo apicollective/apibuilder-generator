@@ -4,12 +4,12 @@
  */
 package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
 
-  sealed trait User
+  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
 
   /**
    * Defines the valid discriminator values for the type User
    */
-  sealed trait UserDiscriminator
+  sealed trait UserDiscriminator extends _root_.scala.Product with _root_.scala.Serializable
 
   object UserDiscriminator {
 
@@ -419,7 +419,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0 {
 
   }
 
-  sealed trait Authorization
+  sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
   }

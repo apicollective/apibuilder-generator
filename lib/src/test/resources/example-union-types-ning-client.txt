@@ -4,9 +4,9 @@
  */
 package com.bryzek.apidoc.example.union.types.v0.models {
 
-  sealed trait Foobar
+  sealed trait Foobar extends _root_.scala.Product with _root_.scala.Serializable
 
-  @deprecated("to be removed") sealed trait User
+  @deprecated("to be removed") sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
 
   case class GuestUser(
     guid: _root_.java.util.UUID,
@@ -460,7 +460,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
 
   }
 
-  sealed trait Authorization
+  sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
   }
