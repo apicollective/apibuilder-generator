@@ -1,7 +1,6 @@
 package scala.generator
 
-import com.bryzek.apidoc.spec.v0.models.Service
-import models.TestHelper
+import scala.models.Play2Json
 import org.scalatest.{ ShouldMatchers, FunSpec }
 
 class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
@@ -58,7 +57,7 @@ class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
     }
 
     it("generates valid json conversions") {
-      val jsonConversions = ssd.enums.map { ScalaEnums(ssd, _).buildJson() }.mkString("\n\n")
+      val jsonConversions = Play2Json(ssd).generateEnums()
       models.TestHelper.assertEqualsFile("/play2enums-json-example.txt", jsonConversions)
     }
   }

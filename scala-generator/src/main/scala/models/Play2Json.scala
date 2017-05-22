@@ -1,7 +1,7 @@
 package scala.models
 
 import lib.Text._
-import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
 
 case class Play2JsonCommon(ssd: ScalaService) {
 
@@ -58,12 +58,62 @@ case class Play2Json(
 
   private[this] val play2JsonCommon = Play2JsonCommon(ssd)
 
-  def generate(): String = {
+  def generateModelsAndUnions(): String = {
     Seq(
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
       PrimitiveWrapper(ssd).wrappers.map(w => readers(w.model)).mkString("\n\n"),
       ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
     ).filter(!_.trim.isEmpty).mkString("\n\n")    
+  }
+
+  /**
+    * Returns the implicits for enum json serialization, handling
+    * conversion both from the string and object representations.
+    */
+  def generateEnums(): String = {
+    ssd.enums.map(enumReadersAndWriters(_)).mkString("\n\n")
+  }
+
+  private[models] def enumReadersAndWriters(enum: ScalaEnum): String = {
+    val jsObjectWriterMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
+    val jsValueWriterMethod = play2JsonCommon.implicitWriterName(enum.name)
+    val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethod)
+
+    Seq(
+      s"implicit val jsonReads${ssd.name}${enum.name} = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
+      Seq(
+        s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${enum.qualifiedName}] = {",
+        Seq(
+          "js match {",
+          Seq(
+            s"case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v.value))",
+            "case _ => {",
+            Seq(
+              """(js \ "value").validate[String] match {""",
+              Seq(
+                s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
+                "case err: play.api.libs.json.JsError => err"
+              ).mkString("\n").indent(2),
+              "}"
+            ).mkString("\n").indent(2),
+            "}"
+          ).mkString("\n").indent(2),
+          "}"
+        ).mkString("\n").indent(2),
+        "}"
+      ).mkString("\n").indent(2),
+      "}",
+      "",
+      s"def $jsValueWriterMethod(obj: ${enum.qualifiedName}) = {",
+      s"""  play.api.libs.json.JsString(obj.toString)""",
+      s"}",
+      "",
+      s"def $jsObjectWriterMethod(obj: ${enum.qualifiedName}) = {",
+      s"""  play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(obj.toString))""",
+      s"}",
+      "",
+      implicitWriter
+    ).mkString("\n")
   }
 
   private def readersAndWriters(union: ScalaUnion): String = {

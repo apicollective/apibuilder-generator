@@ -3,7 +3,7 @@ package scala.models
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
-import scala.generator.{ScalaEnums, ScalaCaseClasses, ScalaService}
+import scala.generator.{ScalaCaseClasses, ScalaService}
 import generator.ServiceFileNames
 
 object Play2Models extends Play2Models
@@ -28,8 +28,9 @@ trait Play2Models extends CodeGenerator {
 
     val caseClasses = ScalaCaseClasses.generateCode(form, addHeader = false).map(_.contents).mkString("\n\n")
     val prefix = underscoreAndDashToInitCap(ssd.name)
-    val enumJson: String = ssd.enums.map { ScalaEnums(ssd, _).buildJson() }.mkString("\n\n")
-    val play2Json = Play2Json(ssd).generate()
+    val play2json = Play2Json(ssd)
+    val enumJson: String = play2json.generateEnums()
+    val modelAndUnionJson: String = play2json.generateModelsAndUnions()
 
     val header = addHeader match {
       case false => ""
@@ -78,7 +79,7 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
       }
     }
 
-${Seq(enumJson, play2Json).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(enumJson, modelAndUnionJson).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }
 $bindables
