@@ -1,18 +1,11 @@
 package scala.generator
 
-import scala.models.Play2JsonCommon
-import lib.Text._
-
 case class ScalaEnums(
   ssd: ScalaService,
   enum: ScalaEnum
 ) {
 
   private[this] val unions = ssd.unionsForEnum(enum)
-  private[this] val play2JsonCommon = Play2JsonCommon(ssd)
-  private[this] val jsObjectWriterMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
-  private[this] val jsValueWriterMethod = play2JsonCommon.implicitWriterName(enum.name)
-  private[this] val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethod)
 
   def build(): String = {
     import lib.Text._
@@ -23,48 +16,6 @@ case class ScalaEnums(
       buildValues().indent(2),
       s"}"
     ).mkString("\n\n")
-  }
-
-  /**
-    * Returns the implicits for json serialization, handling
-    * conversion both from the string and object representations.
-    */
-  def buildJson(): String = {
-    Seq(
-      s"implicit val jsonReads${ssd.name}${enum.name} = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
-      Seq(
-        s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${enum.qualifiedName}] = {",
-        Seq(
-          "js match {",
-          Seq(
-            s"case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v.value))",
-            "case _ => {",
-            Seq(
-              """(js \ "value").validate[String] match {""",
-              Seq(
-                s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
-                "case err: play.api.libs.json.JsError => err"
-              ).mkString("\n").indent(2),
-              "}"
-            ).mkString("\n").indent(2),
-            "}"
-          ).mkString("\n").indent(2),
-          "}"
-        ).mkString("\n").indent(2),
-        "}"
-      ).mkString("\n").indent(2),
-      "}",
-      "",
-      s"def $jsValueWriterMethod(obj: ${enum.qualifiedName}) = {",
-      s"""  play.api.libs.json.JsString(obj.toString)""",
-      s"}",
-      "",
-      s"def $jsObjectWriterMethod(obj: ${enum.qualifiedName}) = {",
-      s"""  play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(obj.toString))""",
-      s"}",
-      "",
-      implicitWriter
-    ).mkString("\n")
   }
 
   private[this] def buildValues(): String = {

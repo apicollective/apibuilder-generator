@@ -82,7 +82,7 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     }
 
     it("codegen") {
-      val code = Play2Json(ssd).generate()
+      val code = Play2Json(ssd).generateModelsAndUnions()
       models.TestHelper.assertEqualsFile("/scala-union-models-json.txt", code)
     }
   }
@@ -134,7 +134,7 @@ class ScalaUnionSpec extends FunSpec with ShouldMatchers {
     lazy val ssd = ScalaService(service)
 
     it("codegen") {
-      val code = Play2Json(ssd).generate()
+      val code = Play2Json(ssd).generateModelsAndUnions()
       models.TestHelper.assertEqualsFile("/scala-union-enums-json.txt", code)
     }
   }
