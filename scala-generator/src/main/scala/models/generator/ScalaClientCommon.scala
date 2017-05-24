@@ -6,7 +6,7 @@ object ScalaClientCommon {
     config: ScalaClientMethodConfig
   ): String = {
     Seq(
-      ScalaClientObject(config),
+      config.clientObject(),
       ScalaClientAuthClassses()
     ).mkString("\n\n")
   }
@@ -28,4 +28,10 @@ class Client(
 """.trim
   }
 
+  def failedRequestUriParam(config: ScalaClientMethodConfig): String = {
+    config.requestUriMethod match {
+      case None => ""
+      case Some(methodName) => s", requestUri = Some(r.$methodName)"
+    }
+  }
 }

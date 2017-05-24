@@ -1,5 +1,7 @@
 package scala.generator
 
+import lib.Text._
+
 trait ScalaClientMethodConfig {
 
   /**
@@ -74,6 +76,30 @@ trait ScalaClientMethodConfig {
     s"""_root_.${namespace}.Client.parseJson("$className", $responseName, _.validate[$className])"""
   }
 
+  def clientObject(): String = {
+    val extraMethods = extraClientObjectMethods match {
+      case Some(methods) => methods.indent(2) + "\n"
+      case _ => ""
+    }
+
+    s"""
+    |object Client {
+    |$extraMethods
+    |  def parseJson[T](
+    |    className: String,
+    |    r: $responseClass,
+    |    f: (play.api.libs.json.JsValue => play.api.libs.json.JsResult[T])
+    |  ): T = {
+    |    f(play.api.libs.json.Json.parse(r.$responseBodyMethod)) match {
+    |      case play.api.libs.json.JsSuccess(x, _) => x
+    |      case play.api.libs.json.JsError(errors) => {
+    |        throw new ${Namespaces(namespace).errors}.FailedRequest(r.$responseStatusMethod, s"Invalid json for class[" + className + "]: " + errors.mkString(" ")${ScalaClientCommon.failedRequestUriParam(this)})
+    |      }
+    |    }
+    |  }
+    |
+    |}""".stripMargin.trim
+  }
 }
 
 object ScalaClientMethodConfigs {
