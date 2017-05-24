@@ -100,6 +100,20 @@ trait ScalaClientMethodConfig {
     |
     |}""".stripMargin.trim
   }
+
+  def encodePayload(payload: Either[String, Seq[(String, String)]]): String = payload match {
+    case Left(single) =>
+      s"val payload = play.api.libs.json.Json.toJson($single)"
+    case Right(multiple) =>
+      val params = multiple.map { case (k, v) =>
+        s""""$k" -> play.api.libs.json.Json.toJson($v)"""
+      }.mkString(",\n")
+      Seq(
+        "val payload = play.api.libs.json.Json.obj(",
+        params.indent,
+        ")"
+      ).mkString("\n")
+  }
 }
 
 object ScalaClientMethodConfigs {
