@@ -1,4 +1,4 @@
-def jsObjectUser(obj: test.apidoc.apidoctest.v0.models.User) = {
+def jsObjectUser(obj: test.apidoc.apidoctest.v0.models.User): play.api.libs.json.JsObject = {
   obj match {
     case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsObjectRegisteredUser(x))
     case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsObjectGuestUser(x))

@@ -183,7 +183,7 @@ case class Play2Json(
     val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
 
     Seq(
-      s"def $method(obj: ${union.qualifiedName}) = {",
+      s"def $method(obj: ${union.qualifiedName}): play.api.libs.json.JsObject = {",
       s"  obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
         val json = getJsonValueForUnion(t.datatype, "x")
@@ -199,7 +199,7 @@ case class Play2Json(
     val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
 
     Seq(
-      s"def $method(obj: ${union.qualifiedName}) = {",
+      s"def $method(obj: ${union.qualifiedName}): play.api.libs.json.JsObject = {",
       Seq(
         "obj match {",
         Seq(
