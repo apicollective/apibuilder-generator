@@ -8,7 +8,7 @@ implicit def jsonReadsApiDocTestUserType: play.api.libs.json.Reads[UserType] = {
   )
 }
 
-def jsObjectUserType(obj: test.apidoc.apidoctest.v0.models.UserType) = {
+def jsObjectUserType(obj: test.apidoc.apidoctest.v0.models.UserType): play.api.libs.json.JsObject = {
   obj match {
     case x: test.apidoc.apidoctest.v0.models.MemberType => play.api.libs.json.Json.obj("member_type" -> play.api.libs.json.JsString(x.toString))
     case x: test.apidoc.apidoctest.v0.models.RoleType => play.api.libs.json.Json.obj("role_type" -> play.api.libs.json.JsString(x.toString))

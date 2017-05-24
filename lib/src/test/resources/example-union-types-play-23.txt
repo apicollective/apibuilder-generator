@@ -245,7 +245,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )
     }
 
-    def jsObjectFoobar(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = {
+    def jsObjectFoobar(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar): play.api.libs.json.JsObject = {
       obj match {
         case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.JsString(x.toString))
         case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.JsString(x.toString))
@@ -273,7 +273,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )
     }
 
-    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = {
+    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.v0.models.User): play.api.libs.json.JsObject = {
       obj match {
         case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsObjectRegisteredUser(x))
         case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsObjectGuestUser(x))

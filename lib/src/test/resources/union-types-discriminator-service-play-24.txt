@@ -202,7 +202,7 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
       }
     }
 
-    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User) = {
+    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.discriminator.v0.models.User): play.api.libs.json.JsObject = {
       obj match {
         case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser => jsObjectRegisteredUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
         case x: com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser => jsObjectGuestUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
