@@ -3,7 +3,7 @@ package scala.models
 import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
-import scala.generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, ScalaClientCommon}
+import scala.generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, PlayScalaClientCommon}
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
 import generator.ServiceFileNames
 
@@ -131,7 +131,7 @@ case class Play2ClientGenerator(
 
 ${headers.objectConstants.indent(2)}
 
-${ScalaClientCommon.clientSignature(version.config).indent(2)} {
+${PlayScalaClientCommon.clientSignature(version.config).indent(2)} {
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")
@@ -214,7 +214,7 @@ ${methodGenerator.objects().indent(4)}
 
   }
 
-${ScalaClientCommon(version.config).indent(2)}
+${PlayScalaClientCommon(version.config).indent(2)}
 
 ${methodGenerator.traitsAndErrors().indent(2)}
 

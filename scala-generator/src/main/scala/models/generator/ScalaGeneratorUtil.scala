@@ -4,7 +4,7 @@ import com.bryzek.apidoc.spec.v0.models.ParameterLocation
 import lib.Datatype
 import lib.Text._
 
-case class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
+class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
 
   // TODO this would be a lot more maintainable as a method
   // defined on ScalaDatatype

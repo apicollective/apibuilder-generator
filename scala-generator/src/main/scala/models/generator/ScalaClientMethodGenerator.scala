@@ -6,7 +6,7 @@ import scala.models.{FeatureMigration, JsonImports}
 import com.bryzek.apidoc.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.collection.immutable.TreeMap
 
-case class ScalaClientMethodGenerator(
+class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,
   ssd: ScalaService
 ) {
@@ -15,7 +15,7 @@ case class ScalaClientMethodGenerator(
 
   protected val namespaces = Namespaces(config.namespace)
 
-  protected val generatorUtil = ScalaGeneratorUtil(config)
+  protected val generatorUtil = new ScalaGeneratorUtil(config)
 
   protected val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
@@ -208,7 +208,7 @@ case class ScalaClientMethodGenerator(
           }
         }
         case None => {
-          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})"""
+          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${PlayScalaClientCommon.failedRequestUriParam(config)})"""
         }
       }
 
@@ -254,7 +254,7 @@ case class ScalaClientMethodGenerator(
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
 
-      ScalaClientMethod(
+      new ScalaClientMethod(
         operation = op,
         returnType = hasOptionResult match {
           case None => s"scala.concurrent.Future[${op.resultType}]"
@@ -271,8 +271,8 @@ case class ScalaClientMethodGenerator(
 
 }
 
-case class ScalaClientMethod(
-  operation: ScalaOperation,
+class ScalaClientMethod(
+  val operation: ScalaOperation,
   returnType: String,
   methodCall: String,
   response: String,
