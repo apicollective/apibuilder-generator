@@ -208,7 +208,7 @@ case class ScalaClientMethodGenerator(
           }
         }
         case None => {
-          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientObject.failedRequestUriParam(config)})"""
+          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${ScalaClientCommon.failedRequestUriParam(config)})"""
         }
       }
 

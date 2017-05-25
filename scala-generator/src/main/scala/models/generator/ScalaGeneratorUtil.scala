@@ -110,22 +110,14 @@ case class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
         val varName = body.datatype.toVariableName
         encodeValue(varName, body.datatype)
       }
-
-      Some(s"val payload = play.api.libs.json.Json.toJson($payload)")
-
+      Some(config.encodePayload(Left(payload)))
     } else {
       val params = op.formParameters.map { param =>
         val varName = ScalaUtil.quoteNameIfKeyword(param.name)
         val value = encodeValue(varName, param.datatype)
-        s""""${param.originalName}" -> play.api.libs.json.Json.toJson(${value})"""
-      }.mkString(",\n")
-      Some(
-        Seq(
-          "val payload = play.api.libs.json.Json.obj(",
-          params.indent,
-          ")"
-        ).mkString("\n")
-      )
+        param.originalName -> value
+      }
+      Some(config.encodePayload(Right(params)))
     }
   }
 
