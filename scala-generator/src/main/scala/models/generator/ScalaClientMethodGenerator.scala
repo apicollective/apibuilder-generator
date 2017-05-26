@@ -84,7 +84,7 @@ class ScalaClientMethodGenerator(
     ).flatten.mkString("\n\n")
   }
 
-  private def failedRequestClass(): String = {
+  protected def failedRequestClass(): String = {
     """case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")"""
   }
 
@@ -257,8 +257,8 @@ class ScalaClientMethodGenerator(
       new ScalaClientMethod(
         operation = op,
         returnType = hasOptionResult match {
-          case None => s"scala.concurrent.Future[${op.resultType}]"
-          case Some(_) => s"scala.concurrent.Future[_root_.scala.Option[${op.resultType}]]"
+          case None => s"${config.asyncType}[${op.resultType}]"
+          case Some(_) => s"${config.asyncType}[_root_.scala.Option[${op.resultType}]]"
         },
         methodCall = methodCall,
         response = matchResponse,

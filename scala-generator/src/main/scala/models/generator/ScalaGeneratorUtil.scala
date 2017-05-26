@@ -129,7 +129,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
     }
   }
 
-  private object PathParamHelper {
+  object PathParamHelper {
     def urlEncode(
       name: String,
       d: ScalaDatatype

@@ -238,6 +238,16 @@ object Generators {
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play25)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "http4s_0_15",
+        name = "Http4s 0.15",
+        description = Some("Http4s 0.15 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.15/client/'>http4s client</a>"),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.http4s.Generator)
     )
   ).sortBy(_.metaData.key)
 }

@@ -18,14 +18,9 @@ class ScalaClientCommon {
   def clientSignature(
     config: ScalaClientMethodConfig
   ): String = {
-    val defaultUrl = config.baseUrl match {
-      case None => ""
-      case Some(url) => s" = ${ScalaUtil.wrapInQuotes(url)}"
-    }
-
     s"""
 class Client(
-  ${if (config.expectsInjectedWsClient) "ws: play.api.libs.ws.WSClient,\n  " else ""}val baseUrl: String$defaultUrl,
+  ${if (config.expectsInjectedWsClient) "ws: play.api.libs.ws.WSClient,\n  " else ""}${config.formatBaseUrl(config.baseUrl)},
   auth: scala.Option[${config.namespace}.Authorization] = None,
   defaultHeaders: Seq[(String, String)] = Nil${config.extraClientCtorArgs.getOrElse("")}
 ) extends interfaces.Client
