@@ -11,27 +11,13 @@ object ScalaCaseClasses extends ScalaCaseClasses
 
 trait ScalaCaseClasses extends CodeGenerator {
 
-  private[this] val MaxNumberOfFields = 21
-
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = invoke(form, addHeader = true)
-
-  def modelsWithTooManyFieldsErrors(service: Service): Seq[String] = {
-    service.models.filter(_.fields.size > MaxNumberOfFields) match {
-      case Nil => Nil
-      case invalidModels => {
-        Seq(s"One or more models has more than $MaxNumberOfFields fields. This generator relies on scala case classes and play json serialization which do not yet support a larger number of fields. Models with too many fields: " + invalidModels.map(_.name).mkString(", "))
-      }
-    }
-  }
 
   def invoke(
     form: InvocationForm,
     addHeader: Boolean = true
   ): Either[Seq[String], Seq[File]] = {
-    modelsWithTooManyFieldsErrors(form.service) match {
-      case Nil => Right(generateCode(form, addHeader))
-      case errors => Left(errors)
-    }
+    Right(generateCode(form, addHeader))
   }
 
   def generateCode(
