@@ -76,7 +76,7 @@ case class NingClientGenerator(
 
 ${headers.objectConstants.indent(2)}
 
-${ScalaClientCommon.clientSignature(config).indent(2)} {
+${PlayScalaClientCommon.clientSignature(config).indent(2)} {
     import org.slf4j.{Logger, LoggerFactory}
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
@@ -166,7 +166,7 @@ ${headerString.indent(8)}
 
   }
 
-${ScalaClientCommon(config).indent(2)}
+${PlayScalaClientCommon(config).indent(2)}
 
 ${methodGenerator.traitsAndErrors().indent(2)}
 

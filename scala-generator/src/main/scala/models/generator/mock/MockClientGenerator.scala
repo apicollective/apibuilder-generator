@@ -13,7 +13,7 @@ object MockClientGenerator {
 
     override def invoke(form: InvocationForm) = {
       val ssd = new ScalaService(form.service)
-      MockClientGenerator(form, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
+      new MockClientGenerator(form, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
     }
 
   }
@@ -22,19 +22,19 @@ object MockClientGenerator {
 
     override def invoke(form: InvocationForm) = {
       val ssd = new ScalaService(form.service)
-      MockClientGenerator(form, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
+      new MockClientGenerator(form, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
     }
 
   }
 
 }
 
-case class MockClientGenerator(
+class MockClientGenerator(
   form: InvocationForm,
   config: ScalaClientMethodConfig
 ) {
   private[this] val ssd = new ScalaService(form.service)
-  private[this] val generator = ScalaClientMethodGenerator(config, ssd)
+  private[this] val generator = new ScalaClientMethodGenerator(config, ssd)
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
