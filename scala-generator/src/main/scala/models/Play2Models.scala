@@ -13,10 +13,7 @@ trait Play2Models extends CodeGenerator {
   override def invoke(
     form: InvocationForm
   ): Either[Seq[String], Seq[File]] = {
-    ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
-      case Nil => Right(generateCode(form = form, addBindables = true, addHeader = true))
-      case errors => Left(errors)
-    }
+    Right(generateCode(form = form, addBindables = true, addHeader = true))
   }
 
   def generateCode(
