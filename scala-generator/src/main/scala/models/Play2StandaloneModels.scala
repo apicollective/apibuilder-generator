@@ -9,10 +9,7 @@ object Play2StandaloneModelsJson extends CodeGenerator {
   override def invoke(
     form: InvocationForm
   ): Either[Seq[String], Seq[File]] = {
-    ScalaCaseClasses.modelsWithTooManyFieldsErrors(form.service) match {
-      case Nil => Right(Play2Models.generateCode(form = form, addBindables = false, addHeader = true))
-      case errors => Left(errors)
-    }
+    Right(Play2Models.generateCode(form = form, addBindables = false, addHeader = true))
   }
 
 }
