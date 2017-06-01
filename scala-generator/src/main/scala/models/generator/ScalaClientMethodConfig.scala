@@ -66,6 +66,12 @@ trait ScalaClientMethodConfig {
     */
   def implicitArgs: Option[String]
 
+  def asyncType: String
+
+  def asyncSuccess: String
+
+  def formatBaseUrl(url: Option[String]): String = s"val baseUrl: String" + url.fold("")(u => s" = ${ScalaUtil.wrapInQuotes(u)}")
+
   /**
     * Given a response and a class name, returns code to create an
     * instance of the specified class.
@@ -86,6 +92,8 @@ object ScalaClientMethodConfigs {
     override val extraClientCtorArgs = None
     override val extraClientObjectMethods = None
     override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
+    override val asyncType: String = "scala.concurrent.Future"
+    override val asyncSuccess: String = "successful"
   }
 
   case class Play22(namespace: String, baseUrl: Option[String]) extends Play {
@@ -133,6 +141,8 @@ private lazy val defaultAsyncHttpClient = {
 """)
     override val canSerializeUuid = true
     override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
+    override val asyncType: String = "scala.concurrent.Future"
+    override val asyncSuccess: String = "successful"
 
     def addQueryParamMethod: String
   }
@@ -149,4 +159,25 @@ private lazy val defaultAsyncHttpClient = {
     override val expectsInjectedWsClient = false
   }
 
+
+  case class Http4s(namespace: String, baseUrl: Option[String]) extends ScalaClientMethodConfig {
+    override def pathEncode(value: String) = value
+    override val responseStatusMethod = "status.code"
+    override val responseBodyMethod = """body"""
+    override val responseClass = "org.http4s.Response"
+    override val extraClientCtorArgs = Some(",\n  asyncHttpClient: org.http4s.client.Client = Client.defaultAsyncHttpClient")
+    override val extraClientObjectMethods = Some("""
+private lazy val defaultAsyncHttpClient = PooledHttp1Client()
+""")
+    override val canSerializeUuid = true
+    override val implicitArgs = None
+    override val asyncType: String = "scalaz.concurrent.Task"
+    override val asyncSuccess: String = "now"
+    override val requestUriMethod = None //Some("getUri.toJavaNetURI")
+    override val expectsInjectedWsClient = false
+    override def formatBaseUrl(url: Option[String]): String = s"val baseUrl: org.http4s.Uri" + url.fold("")(u => s" = org.http4s.Uri.unsafeFromString(${ScalaUtil.wrapInQuotes(u)})")
+    override def toJson(responseName: String, className: String): String = {
+      s"""_root_.${namespace}.Client.parseJson[$className]("$className", $responseName)"""
+    }
+  }
 }

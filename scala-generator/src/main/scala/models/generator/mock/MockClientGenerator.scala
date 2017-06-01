@@ -38,7 +38,7 @@ class MockClientGenerator(
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
-    val code = generateCode(ssd)
+    val code = generateCode()
 
     Right(
       Seq(
@@ -55,7 +55,7 @@ class MockClientGenerator(
     )
   }
 
-  private[this] def generateCode(ssd: ScalaService): String = {
+  def generateCode(): String = {
     Seq(
       s"package ${ssd.namespaces.mock} {",
       Seq(
@@ -64,7 +64,7 @@ class MockClientGenerator(
           case _ => Some(
             Seq(
               s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
-              """  val baseUrl = "http://mock.localhost"""",
+              s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
               ssd.resources.map { resource =>
                 s"override def ${generator.methodName(resource)}: Mock${resource.plural} = Mock${resource.plural}Impl"
               }.mkString("\n").indent(2),
@@ -131,7 +131,7 @@ class MockClientGenerator(
       s"trait Mock${resource.plural} extends ${ssd.namespaces.base}.${resource.plural} {",
       generator.methods(resource).map { m =>
         Seq(
-          m.interface + " = scala.concurrent.Future.successful {",
+          m.interface + s" = ${config.asyncType}.${config.asyncSuccess} {",
           mockImplementation(m).indent(2),
           "}"
         ).mkString("\n")
