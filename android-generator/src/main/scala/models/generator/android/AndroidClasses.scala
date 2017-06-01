@@ -25,7 +25,9 @@ import com.bryzek.apidoc.generator.v0.models.File
 import com.bryzek.apidoc.spec.v0.models.Model
 import com.bryzek.apidoc.spec.v0.models.Resource
 import com.bryzek.apidoc.spec.v0.models.Service
+import com.squareup.javapoet.AnnotationSpec.Builder
 
+import collection.JavaConverters._
 
 object AndroidClasses
   extends CodeGenerator
@@ -70,8 +72,11 @@ object AndroidClasses
 
       val generatedEnums = service.enums.map { generateEnum }
 
+      val generatedUnionTypes = service.unions.map { generateUnionType }
+
       val generatedModels = service.models.map { model =>
-        generateModel(model, Seq.empty)
+        val relatedUnions = service.unions.filter(_.types.exists(_.`type` == model.name))
+        generateModel(model, relatedUnions)
       }
 
       val generatedObjectMapper = Seq(generateObjectMapper)
@@ -79,6 +84,7 @@ object AndroidClasses
       val generatedResources = service.resources.map { generateResource }
 
       generatedEnums ++
+        generatedUnionTypes ++
         generatedModels ++
         generatedObjectMapper ++
         generatedResources
@@ -178,6 +184,44 @@ object AndroidClasses
 
     }
 
+    def generateUnionType(union: Union): File = {
+      val className = toClassName(union.name)
+
+      val builder =
+        TypeSpec.interfaceBuilder(className)
+          .addModifiers(Modifier.PUBLIC)
+          .addJavadoc(apiDocComments)
+
+      val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties])
+          .addMember("ignoreUnknown","true")
+      builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
+
+      val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[JsonTypeInfo])
+      jsonAnnotationBuilder.addMember("use", "com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME")
+      if (union.discriminator.isDefined) {
+        jsonAnnotationBuilder.addMember("include","com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
+        jsonAnnotationBuilder.addMember("property", "\"" + union.discriminator.get + "\"")
+      } else {
+        jsonAnnotationBuilder.addMember("include","com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT")
+      }
+
+      builder.addAnnotation(jsonAnnotationBuilder.build)
+
+
+      val jsonSubTypesAnnotationBuilder = AnnotationSpec.builder(classOf[JsonSubTypes])
+      union.types.foreach(u => {
+        jsonSubTypesAnnotationBuilder
+          .addMember("value", "$L", AnnotationSpec.builder(classOf[JsonSubTypes.Type])
+            .addMember("value", "$L", ClassName.get(modelsNameSpace, toClassName(u.`type`)) + ".class")
+            .addMember("name", "$S", u.`type`)
+            .build())
+      })
+
+      builder.addAnnotation(jsonSubTypesAnnotationBuilder.build())
+
+      union.description.map(builder.addJavadoc(_))
+      makeFile(className, builder)
+    }
 
     def generateModel(model: Model, relatedUnions: Seq[Union]): File = {
 
@@ -204,6 +248,9 @@ object AndroidClasses
 
       val hashCode = MethodSpec.methodBuilder("hashCode").addModifiers(Modifier.PUBLIC).returns(classOf[Int]).addAnnotation(classOf[Override])
       hashCode.addStatement("int result = 0")
+
+      val unionClassTypeNames = relatedUnions.map { u => ClassName.get(modelsNameSpace, toClassName(u.name)) }
+      builder.addSuperinterfaces(unionClassTypeNames.asJava)
 
       model.fields.foreach(field => {
 
