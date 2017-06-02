@@ -291,7 +291,7 @@ case class Play2Json(
 
     val base = Seq(
       Seq(
-        s"def $method(obj: ${model.qualifiedName}) = {",
+        s"def $method(obj: ${model.qualifiedName}): play.api.libs.json.JsObject = {",
         Seq(
           nilToOption(requiredFields).map { fields =>
             Seq(
