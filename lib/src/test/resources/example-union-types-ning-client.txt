@@ -208,7 +208,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )(GuestUser.apply _)
     }
 
-    def jsObjectGuestUser(obj: com.bryzek.apidoc.example.union.types.v0.models.GuestUser) = {
+    def jsObjectGuestUser(obj: com.bryzek.apidoc.example.union.types.v0.models.GuestUser): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email)
@@ -223,7 +223,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )(RegisteredUser.apply _)
     }
 
-    def jsObjectRegisteredUser(obj: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser) = {
+    def jsObjectRegisteredUser(obj: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email),

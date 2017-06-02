@@ -7,7 +7,7 @@ implicit def jsonReadsApiDocTestGuestUser: play.api.libs.json.Reads[GuestUser] =
   )(GuestUser.apply _)
 }
 
-def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser) = {
+def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser): play.api.libs.json.JsObject = {
   play.api.libs.json.Json.obj(
     "id" -> play.api.libs.json.JsNumber(obj.id),
     "email" -> play.api.libs.json.JsString(obj.email),
@@ -27,7 +27,7 @@ implicit def jsonReadsApiDocTestRegisteredUser: play.api.libs.json.Reads[Registe
   )(RegisteredUser.apply _)
 }
 
-def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser) = {
+def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser): play.api.libs.json.JsObject = {
   play.api.libs.json.Json.obj(
     "id" -> play.api.libs.json.JsNumber(obj.id),
     "email" -> play.api.libs.json.JsString(obj.email),

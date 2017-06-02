@@ -1,4 +1,4 @@
-def jsObjectPlan(obj: com.gilt.quality.v0.models.Plan) = {
+def jsObjectPlan(obj: com.gilt.quality.v0.models.Plan): play.api.libs.json.JsObject = {
   play.api.libs.json.Json.obj(
     "id" -> play.api.libs.json.JsNumber(obj.id),
     "incident_id" -> play.api.libs.json.JsNumber(obj.incidentId),
