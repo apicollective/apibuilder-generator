@@ -38,10 +38,7 @@ sealed trait ScalaDatatype {
       Json.parse(value)
     } match {
       case Success(js) => default(js)
-      case Failure(ex) => {
-        Logger.warn(s"Could not parse default value[$value]: ${ex.getMessage} - processing as a string")
-        default(JsString(value))
-      }
+      case Failure(ex) => default(JsString(value))
     }
   }
 
