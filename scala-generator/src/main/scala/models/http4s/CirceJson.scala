@@ -156,12 +156,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"}"
     ).mkString("\n")
   }
-/*
-      Json.obj(
-        ("response", t.response.asJson),
-        ("foo", Some("bar").asJson)
-      )
- */
+
   private[models] def encoders(model: ScalaModel): String = {
     Seq(
       s"${implicitEncoderDef(model.name)} = Encoder.instance { t =>",
