@@ -67,10 +67,10 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
     implicit val columnToMapInt: Column[Map[String, Int]] = Util.parser { _.as[Map[String, Int]] }
     implicit val columnToSeqLong: Column[Seq[Long]] = Util.parser { _.as[Seq[Long]] }
     implicit val columnToMapLong: Column[Map[String, Long]] = Util.parser { _.as[Map[String, Long]] }
-    implicit val columnToSeqLocalDate: Column[Seq[_root_.org.joda.time.LocalDate]] = Util.parser { _.as[Seq[_root_.org.joda.time.LocalDate]] }
-    implicit val columnToMapLocalDate: Column[Map[String, _root_.org.joda.time.LocalDate]] = Util.parser { _.as[Map[String, _root_.org.joda.time.LocalDate]] }
-    implicit val columnToSeqDateTime: Column[Seq[_root_.org.joda.time.DateTime]] = Util.parser { _.as[Seq[_root_.org.joda.time.DateTime]] }
-    implicit val columnToMapDateTime: Column[Map[String, _root_.org.joda.time.DateTime]] = Util.parser { _.as[Map[String, _root_.org.joda.time.DateTime]] }
+    implicit val columnToSeqLocalDate: Column[Seq[_root_.java.time.LocalDate]] = Util.parser { _.as[Seq[_root_.java.time.LocalDate]] }
+    implicit val columnToMapLocalDate: Column[Map[String, _root_.java.time.LocalDate]] = Util.parser { _.as[Map[String, _root_.java.time.LocalDate]] }
+    implicit val columnToSeqDateTime: Column[Seq[_root_.java.time.DateTime]] = Util.parser { _.as[Seq[_root_.java.time.DateTime]] }
+    implicit val columnToMapDateTime: Column[Map[String, _root_.java.time.DateTime]] = Util.parser { _.as[Map[String, _root_.java.time.DateTime]] }
     implicit val columnToSeqBigDecimal: Column[Seq[BigDecimal]] = Util.parser { _.as[Seq[BigDecimal]] }
     implicit val columnToMapBigDecimal: Column[Map[String, BigDecimal]] = Util.parser { _.as[Map[String, BigDecimal]] }
     implicit val columnToSeqJsObject: Column[Seq[_root_.play.api.libs.json.JsObject]] = Util.parser { _.as[Seq[_root_.play.api.libs.json.JsObject]] }

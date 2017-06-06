@@ -5,7 +5,7 @@
 package com.gilt.quality.v0.models {
 
   case class AdjournForm(
-    adjournedAt: _root_.scala.Option[_root_.org.joda.time.DateTime] = None
+    adjournedAt: _root_.scala.Option[_root_.java.time.DateTime] = None
   )
 
   /**
@@ -66,7 +66,7 @@ package com.gilt.quality.v0.models {
   case class Followup(
     key: String,
     plan: com.gilt.quality.v0.models.Plan,
-    sentAt: _root_.org.joda.time.DateTime
+    sentAt: _root_.java.time.DateTime
   )
 
   /**
@@ -77,7 +77,7 @@ package com.gilt.quality.v0.models {
   case class FollowupResponse(
     followup: com.gilt.quality.v0.models.Followup,
     response: com.gilt.quality.v0.models.Response,
-    createdAt: _root_.org.joda.time.DateTime,
+    createdAt: _root_.java.time.DateTime,
     createdBy: com.gilt.quality.v0.models.User
   )
 
@@ -105,7 +105,7 @@ package com.gilt.quality.v0.models {
     severity: com.gilt.quality.v0.models.Severity,
     @deprecated tags: _root_.scala.Option[Seq[String]] = None,
     plan: _root_.scala.Option[com.gilt.quality.v0.models.Plan] = None,
-    createdAt: _root_.org.joda.time.DateTime
+    createdAt: _root_.java.time.DateTime
   )
 
   case class IncidentForm(
@@ -140,12 +140,12 @@ package com.gilt.quality.v0.models {
   case class Meeting(
     id: Long,
     organization: com.gilt.quality.v0.models.Organization,
-    scheduledAt: _root_.org.joda.time.DateTime,
-    adjournedAt: _root_.scala.Option[_root_.org.joda.time.DateTime] = None
+    scheduledAt: _root_.java.time.DateTime,
+    adjournedAt: _root_.scala.Option[_root_.java.time.DateTime] = None
   )
 
   case class MeetingForm(
-    scheduledAt: _root_.org.joda.time.DateTime
+    scheduledAt: _root_.java.time.DateTime
   )
 
   /**
@@ -181,7 +181,7 @@ package com.gilt.quality.v0.models {
     incidentId: Long,
     body: String,
     grade: _root_.scala.Option[Int] = None,
-    createdAt: _root_.org.joda.time.DateTime
+    createdAt: _root_.java.time.DateTime
   )
 
   case class PlanForm(
@@ -661,7 +661,7 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityAdjournForm: play.api.libs.json.Reads[AdjournForm] = {
-      (__ \ "adjourned_at").readNullable[_root_.org.joda.time.DateTime].map { x => new AdjournForm(adjournedAt = x) }
+      (__ \ "adjourned_at").readNullable[_root_.java.time.DateTime].map { x => new AdjournForm(adjournedAt = x) }
     }
 
     def jsObjectAdjournForm(obj: com.gilt.quality.v0.models.AdjournForm) = {
@@ -849,7 +849,7 @@ package com.gilt.quality.v0.models {
       (
         (__ \ "key").read[String] and
         (__ \ "plan").read[com.gilt.quality.v0.models.Plan] and
-        (__ \ "sent_at").read[_root_.org.joda.time.DateTime]
+        (__ \ "sent_at").read[_root_.java.time.DateTime]
       )(Followup.apply _)
     }
 
@@ -873,7 +873,7 @@ package com.gilt.quality.v0.models {
       (
         (__ \ "followup").read[com.gilt.quality.v0.models.Followup] and
         (__ \ "response").read[com.gilt.quality.v0.models.Response] and
-        (__ \ "created_at").read[_root_.org.joda.time.DateTime] and
+        (__ \ "created_at").read[_root_.java.time.DateTime] and
         (__ \ "created_by").read[com.gilt.quality.v0.models.User]
       )(FollowupResponse.apply _)
     }
@@ -945,7 +945,7 @@ package com.gilt.quality.v0.models {
         (__ \ "severity").read[com.gilt.quality.v0.models.Severity] and
         (__ \ "tags").readNullable[Seq[String]] and
         (__ \ "plan").readNullable[com.gilt.quality.v0.models.Plan] and
-        (__ \ "created_at").read[_root_.org.joda.time.DateTime]
+        (__ \ "created_at").read[_root_.java.time.DateTime]
       )(Incident.apply _)
     }
 
@@ -1068,8 +1068,8 @@ package com.gilt.quality.v0.models {
       (
         (__ \ "id").read[Long] and
         (__ \ "organization").read[com.gilt.quality.v0.models.Organization] and
-        (__ \ "scheduled_at").read[_root_.org.joda.time.DateTime] and
-        (__ \ "adjourned_at").readNullable[_root_.org.joda.time.DateTime]
+        (__ \ "scheduled_at").read[_root_.java.time.DateTime] and
+        (__ \ "adjourned_at").readNullable[_root_.java.time.DateTime]
       )(Meeting.apply _)
     }
 
@@ -1093,7 +1093,7 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityMeetingForm: play.api.libs.json.Reads[MeetingForm] = {
-      (__ \ "scheduled_at").read[_root_.org.joda.time.DateTime].map { x => new MeetingForm(scheduledAt = x) }
+      (__ \ "scheduled_at").read[_root_.java.time.DateTime].map { x => new MeetingForm(scheduledAt = x) }
     }
 
     def jsObjectMeetingForm(obj: com.gilt.quality.v0.models.MeetingForm) = {
@@ -1191,7 +1191,7 @@ package com.gilt.quality.v0.models {
         (__ \ "incident_id").read[Long] and
         (__ \ "body").read[String] and
         (__ \ "grade").readNullable[Int] and
-        (__ \ "created_at").read[_root_.org.joda.time.DateTime]
+        (__ \ "created_at").read[_root_.java.time.DateTime]
       )(Plan.apply _)
     }
 
