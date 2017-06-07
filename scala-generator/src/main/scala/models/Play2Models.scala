@@ -23,7 +23,7 @@ trait Play2Models extends CodeGenerator {
   ): Seq[File] = {
     val ssd = ScalaService(form.service)
 
-    val caseClasses = ScalaCaseClasses.generateCode(form, addHeader = false).map(_.contents).mkString("\n\n")
+    val caseClasses = ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
     val prefix = underscoreAndDashToInitCap(ssd.name)
     val play2json = Play2Json(ssd)
     val enumJson: String = play2json.generateEnums()

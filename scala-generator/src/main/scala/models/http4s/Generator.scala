@@ -4,7 +4,7 @@ import scala.generator.mock.MockClientGenerator
 
 import com.bryzek.apidoc.generator.v0.models.{InvocationForm, File}
 import lib.generator.CodeGenerator
-import scala.generator.{ScalaService, ScalaCaseClasses, ScalaClientMethodConfigs, Namespaces}
+import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, Namespaces}
 import scala.models.ApidocComments
 
 import generator.ServiceFileNames
@@ -19,10 +19,10 @@ trait Generator extends CodeGenerator {
     form: InvocationForm,
     addHeader: Boolean
   ): Seq[File] = {
-    val ssd = ScalaService(form.service)
+    val ssd = new ScalaService(form.service)
     val config = ScalaClientMethodConfigs.Http4s(Namespaces.quote(form.service.namespace), form.service.baseUrl)
 
-    val caseClasses = ScalaCaseClasses.generateCode(form, addHeader = false).map(_.contents).mkString("\n\n")
+    val caseClasses = ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
     val json = CirceJson(ssd).generate()
     val client = Http4sClient(form, ssd, config).generate()
 
@@ -31,7 +31,7 @@ trait Generator extends CodeGenerator {
       case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
     }
 
-    val mock = header + new MockClientGenerator(form, config).generateCode()
+    val mock = header + new MockClientGenerator(ssd, form.userAgent, config).generateCode()
 
     val modelAndJson =
       s"""$header$caseClasses

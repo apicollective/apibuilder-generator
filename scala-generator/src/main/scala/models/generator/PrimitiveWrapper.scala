@@ -8,7 +8,7 @@ object PrimitiveWrapper {
 
   def className(union: ScalaUnion, primitive: ScalaPrimitive): String = {
     primitive match {
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsJson | ScalaPrimitive.ObjectAsMap | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
         ScalaUtil.toClassName(union.name) + ScalaUtil.toClassName(primitive.shortName)
       }
       case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
@@ -55,7 +55,7 @@ case class PrimitiveWrapper(ssd: ScalaService) {
       case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
         false
       }
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Object | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsJson | ScalaPrimitive.ObjectAsMap | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
 
         true
       }

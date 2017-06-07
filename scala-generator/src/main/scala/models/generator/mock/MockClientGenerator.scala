@@ -13,7 +13,7 @@ object MockClientGenerator {
 
     override def invoke(form: InvocationForm) = {
       val ssd = new ScalaService(form.service)
-      new MockClientGenerator(form, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
     }
 
   }
@@ -22,7 +22,7 @@ object MockClientGenerator {
 
     override def invoke(form: InvocationForm) = {
       val ssd = new ScalaService(form.service)
-      new MockClientGenerator(form, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
     }
 
   }
@@ -30,23 +30,23 @@ object MockClientGenerator {
 }
 
 class MockClientGenerator(
-  form: InvocationForm,
+  ssd: ScalaService,
+  userAgent: Option[String],
   config: ScalaClientMethodConfig
 ) {
-  private[this] val ssd = new ScalaService(form.service)
   private[this] val generator = new ScalaClientMethodGenerator(config, ssd)
 
   def invoke(): Either[Seq[String], Seq[File]] = {
-    val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
+    val header = ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
     val code = generateCode()
 
     Right(
       Seq(
         ServiceFileNames.toFile(
-          form.service.namespace,
-          form.service.organization.key,
-          form.service.application.key,
-          form.service.version,
+          ssd.service.namespace,
+          ssd.service.organization.key,
+          ssd.service.application.key,
+          ssd.service.version,
           "MockClient",
           header ++ code,
           Some("Scala")
@@ -160,7 +160,8 @@ class MockClientGenerator(
       case ScalaPrimitive.DateIso8601 => "new org.joda.time.LocalDate()"
       case ScalaPrimitive.DateTimeIso8601 => "org.joda.time.DateTime.now"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
-      case ScalaPrimitive.Object => "play.api.libs.json.Json.obj()"
+      case ScalaPrimitive.ObjectAsJson => "play.api.libs.json.Json.obj()"
+      case ScalaPrimitive.ObjectAsMap => "Map()"
       case ScalaPrimitive.String => "Factories.randomString()"
       case ScalaPrimitive.Unit => "// unit type"
       case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"
