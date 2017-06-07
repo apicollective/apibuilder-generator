@@ -131,7 +131,10 @@ private[models] case class Play2Route(
     case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal => {
       value
     }
-    case ScalaPrimitive.Object => {
+    case ScalaPrimitive.ObjectAsPlay => {
+      "play.api.libs.json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
+    }
+    case ScalaPrimitive.ObjectAsCirce => {
       "play.api.libs.json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
     }
     case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Unit => {

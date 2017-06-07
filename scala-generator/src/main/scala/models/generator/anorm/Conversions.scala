@@ -13,7 +13,7 @@ object Conversions {
     ScalaPrimitive.DateIso8601,
     ScalaPrimitive.DateTimeIso8601,
     ScalaPrimitive.Decimal,
-    ScalaPrimitive.Object,
+    ScalaPrimitive.ObjectAsPlay,
     ScalaPrimitive.String,
     ScalaPrimitive.Uuid
   )

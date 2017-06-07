@@ -74,9 +74,9 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
   describe("scalaDefault") {
     it ("should fail for datatype: object") {
       val ex = intercept[Exception] {
-        ScalaUtil.scalaDefault("", ScalaPrimitive.Object)
+        ScalaUtil.scalaDefault("", ScalaPrimitive.ObjectAsPlay)
       }
-      ex.getMessage should be("parsing default `` for datatype Object")
+      ex.getMessage should be("parsing default `` for datatype ObjectAsPlay")
     }
 
     it ("should fail for datatype: unit") {
