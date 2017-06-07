@@ -172,7 +172,7 @@ object ScalaPrimitive {
     override protected def default(json: JsValue) = json.as[scala.BigDecimal].toString
   }
 
-  case object ObjectAsJson extends ScalaPrimitive {
+  case object ObjectAsPlay extends ScalaPrimitive {
     override def namespace = Some("_root_.play.api.libs.json")
     def apidocType = "object"
     def shortName = "JsObject"
@@ -182,7 +182,7 @@ object ScalaPrimitive {
     }
   }
 
-  case object ObjectAsMap extends ScalaPrimitive {
+  case object ObjectAsCirce extends ScalaPrimitive {
     override def namespace = None
     def apidocType = "object"
     def shortName = "Map[String, _root_.io.circe.Json]"
@@ -355,7 +355,7 @@ case class ScalaTypeResolver(
       case Datatype.Primitive.Integer => ScalaPrimitive.Integer
       case Datatype.Primitive.Double => ScalaPrimitive.Double
       case Datatype.Primitive.Long => ScalaPrimitive.Long
-      case Datatype.Primitive.Object => ScalaPrimitive.ObjectAsJson
+      case Datatype.Primitive.Object => ScalaPrimitive.ObjectAsPlay
       case Datatype.Primitive.String => ScalaPrimitive.String
       case Datatype.Primitive.DateIso8601 => ScalaPrimitive.DateIso8601
       case Datatype.Primitive.DateTimeIso8601 => ScalaPrimitive.DateTimeIso8601

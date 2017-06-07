@@ -140,7 +140,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
         case ScalaPrimitive.Enum(_, _) => config.pathEncode(s"$name.toString")
         case ScalaPrimitive.DateIso8601 => s"$name.toString"
         case ScalaPrimitive.DateTimeIso8601 => config.pathEncode(s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name)")
-        case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.ObjectAsJson | ScalaPrimitive.ObjectAsMap | ScalaPrimitive.Unit => {
+        case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.Unit => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }
         case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encounteered as path param($name)")

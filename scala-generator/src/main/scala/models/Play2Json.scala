@@ -385,10 +385,10 @@ case class Play2Json(
       case ScalaPrimitive.DateTimeIso8601 => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))")
       }
-      case ScalaPrimitive.ObjectAsJson => {
+      case ScalaPrimitive.ObjectAsPlay => {
         toJsObjectResult(originalName, varName)
       }
-      case ScalaPrimitive.ObjectAsMap => {
+      case ScalaPrimitive.ObjectAsCirce => {
         toJsObjectResult(originalName, varName)
       }
       case ScalaDatatype.Option(inner) => {
@@ -446,10 +446,10 @@ case class Play2Json(
       case ScalaPrimitive.DateTimeIso8601 => {
         wrapInObject(s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(${varName}.value))", discriminator)
       }
-      case ScalaPrimitive.ObjectAsJson => {
+      case ScalaPrimitive.ObjectAsPlay => {
         wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)", discriminator)
       }
-      case ScalaPrimitive.ObjectAsMap => {
+      case ScalaPrimitive.ObjectAsCirce => {
         wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)", discriminator)
       }
       case ScalaPrimitive.Enum(ns, name) => {
