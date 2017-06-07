@@ -2,7 +2,7 @@ package scala.models
 
 import lib.Text._
 
-import scala.generator.ScalaPrimitive.Model
+import scala.generator.ScalaPrimitive.{Model, Union}
 import scala.generator._
 
 case class Play2JsonCommon(ssd: ScalaService) {
@@ -264,6 +264,9 @@ case class Play2Json(
     def findModelByName(name: String): Option[ScalaModel] =
       ssd.models.find(_.qualifiedName == name)
 
+    def findUnionByName(name: String): Option[ScalaUnion] =
+      ssd.unions.find(_.qualifiedName == name)
+
     /** Does field have reference somewhere down the tree to model? */
     def hasReferenceToModel(datatype: ScalaDatatype): Boolean = {
       datatype match {
@@ -272,10 +275,22 @@ case class Play2Json(
         case ScalaDatatype.Map(inner) => hasReferenceToModel(inner)
         case mtype: Model =>
           findModelByName(mtype.fullName).fold(false) { m =>
-            if (m == model) // TODO is this good enough?
+            if (m == model) // TODO do the classes share a single instance of ScalaModel?
               true
             else
               m.fields.map(_.datatype).exists(hasReferenceToModel)
+          }
+        case utype: Union =>
+          findUnionByName(utype.fullName).fold(false) { u =>
+            val datatypes = u.types.map(_.datatype)
+
+            if (datatypes.exists {
+              case mtype: Model => findModelByName(mtype.fullName).fold(false)(_ == model)
+              case _ => false // can a union have another union as a possible type?
+            })
+              true
+            else
+              datatypes.exists(hasReferenceToModel)
           }
         case _ => false
       }
@@ -284,6 +299,7 @@ case class Play2Json(
     def getShortName(dt: ScalaDatatype): String = {
       dt match {
         case model: ScalaPrimitive.Model => model.shortName
+        case union: ScalaPrimitive.Union => union.shortName
         case ScalaDatatype.Option(inner) => getShortName(inner)
         case ScalaDatatype.List(inner)   => getShortName(inner)
         case ScalaDatatype.Map(inner)    => getShortName(inner)

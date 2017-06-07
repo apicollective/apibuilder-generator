@@ -28,7 +28,18 @@
   "enums": [],
   "resources": [],
   "attributes": [],
-  "unions": [],
+  "unions": [
+    {
+      "name": "gizmo",
+      "plural": "gizmos",
+      "attributes": [],
+      "types": [
+        { "type": "widget", "attributes": [] },
+        { "type": "gadget", "attributes": [] },
+        { "type": "integer", "attributes": [] }
+      ]
+    }
+  ],
   "models": [
     {
       "name": "foo",
@@ -70,6 +81,32 @@
         {
           "name": "otherfoo",
           "type": "apidoc.test.models.foo",
+          "required": true,
+          "attributes": []
+        }
+      ]
+    },
+    {
+      "name": "widget",
+      "plural": "widgets",
+      "attributes": [],
+      "fields": [
+        {
+          "name": "mygizmo",
+          "type": "gizmo",
+          "required": true,
+          "attributes": []
+        }
+      ]
+    },
+    {
+      "name": "gadget",
+      "plural": "gadgets",
+      "attributes": [],
+      "fields": [
+        {
+          "name": "mygizmo",
+          "type": "gizmo",
           "required": true,
           "attributes": []
         }
