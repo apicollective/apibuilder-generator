@@ -1,7 +1,7 @@
 package scala.models.http4s
 
 import lib.Text._
-import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaUnion, ScalaUnionType}
 import scala.models.JsonImports
 
 case class CirceJson(

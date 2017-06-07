@@ -5,7 +5,11 @@ import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
 import scala.models.Util
 
-case class ScalaService(
+object ScalaService {
+  def apply(service: Service) = new ScalaService(service)
+}
+
+class ScalaService(
   val service: Service
 ) {
   val namespaces = Namespaces(service.namespace)

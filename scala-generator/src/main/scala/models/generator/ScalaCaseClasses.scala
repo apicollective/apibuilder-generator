@@ -17,19 +17,19 @@ trait ScalaCaseClasses extends CodeGenerator {
     form: InvocationForm,
     addHeader: Boolean = true
   ): Either[Seq[String], Seq[File]] = {
-    Right(generateCode(form, addHeader))
+    val ssd = new ScalaService(form.service)
+    Right(generateCode(ssd, form.userAgent, addHeader))
   }
 
   def generateCode(
-    form: InvocationForm,
+    ssd: ScalaService,
+    userAgent: Option[String],
     addHeader: Boolean = true,
     additionalImports: Seq[String] = Seq.empty
   ): Seq[File] = {
-    val ssd = new ScalaService(form.service)
-
     val header = addHeader match {
       case false => ""
-      case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
+      case true => ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
     }
 
     val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
@@ -62,7 +62,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     ).mkString("\n").trim +
     s"\n\n}"
 
-    Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
+    Seq(ServiceFileNames.toFile(ssd.service.namespace, ssd.service.organization.key, ssd.service.application.key, ssd.service.version, "Models", source, Some("Scala")))
   }
 
   def generateUnionTraitWithDocAndDiscriminator(union: ScalaUnion): String = {
