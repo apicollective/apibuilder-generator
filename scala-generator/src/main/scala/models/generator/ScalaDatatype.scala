@@ -123,7 +123,7 @@ object ScalaPrimitive {
     override protected def default(json: JsValue) = toBigDecimal(json).toLong.toString
   }
 
-  case object DateIso8601 extends ScalaPrimitive {
+  case object DateIso8601Joda extends ScalaPrimitive {
     override def namespace = Some("_root_.org.joda.time")
     def apidocType = "date-iso8601"
     def shortName = "LocalDate"
@@ -141,7 +141,20 @@ object ScalaPrimitive {
     }
   }
 
-  case object DateTimeIso8601 extends ScalaPrimitive {
+  case object DateIso8601Java extends ScalaPrimitive {
+    override def namespace = Some("_root_.java.time")
+    def apidocType = "date-iso8601"
+    def shortName = "LocalDate"
+    override def asString(originalVarName: String): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.toString"
+    }
+    override def default(value: String) = {
+      "_root_.java.time.LocalDate.parse(" + ScalaUtil.wrapInQuotes(value) + ")"
+    }
+  }
+
+  case object DateTimeIso8601Joda extends ScalaPrimitive {
     override def namespace = Some("_root_.org.joda.time")
     def apidocType = "date-time-iso8601"
     def shortName = "DateTime"
@@ -158,6 +171,19 @@ object ScalaPrimitive {
       // TODO would like to use the constructor for DateTime, since that would
       // be faster code, but things get quite tricky because of time zones :(
       s"""_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${json})"""
+    }
+  }
+
+  case object DateTimeIso8601Java extends ScalaPrimitive {
+    override def namespace = Some("_root_.java.time")
+    def apidocType = "date-time-iso8601"
+    def shortName = "Instant"
+    override def asString(originalVarName: String): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.toString"
+    }
+    override def default(value: String) = {
+      "_root_.java.time.Instant.parse(" + ScalaUtil.wrapInQuotes(value) + ")"
     }
   }
 
@@ -357,8 +383,8 @@ case class ScalaTypeResolver(
       case Datatype.Primitive.Long => ScalaPrimitive.Long
       case Datatype.Primitive.Object => ScalaPrimitive.ObjectAsPlay
       case Datatype.Primitive.String => ScalaPrimitive.String
-      case Datatype.Primitive.DateIso8601 => ScalaPrimitive.DateIso8601
-      case Datatype.Primitive.DateTimeIso8601 => ScalaPrimitive.DateTimeIso8601
+      case Datatype.Primitive.DateIso8601 => ScalaPrimitive.DateIso8601Joda
+      case Datatype.Primitive.DateTimeIso8601 => ScalaPrimitive.DateTimeIso8601Joda
       case Datatype.Primitive.Uuid => ScalaPrimitive.Uuid
       case Datatype.Primitive.Unit => ScalaPrimitive.Unit
 

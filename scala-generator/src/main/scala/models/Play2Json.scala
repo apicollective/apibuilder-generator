@@ -441,13 +441,13 @@ case class Play2Json(
       case ScalaPrimitive.Decimal | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsNumber($varName)")
       }
-      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Uuid => {
+      case ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Uuid => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString(${varName}.toString)")
       }
       case ScalaPrimitive.String => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString($varName)")
       }
-      case ScalaPrimitive.DateTimeIso8601 => {
+      case ScalaPrimitive.DateTimeIso8601Joda => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName))")
       }
       case ScalaPrimitive.ObjectAsPlay => {
@@ -502,19 +502,16 @@ case class Play2Json(
       case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
         wrapInObject(s"play.api.libs.json.JsNumber(${varName}.value)", discriminator)
       }
-      case ScalaPrimitive.DateIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
+      case ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => {
         wrapInObject(s"play.api.libs.json.JsString(${varName}.value.toString)", discriminator)
       }
       case ScalaPrimitive.String => {
         wrapInObject(s"play.api.libs.json.JsString(${varName}.value)", discriminator)
       }
-      case ScalaPrimitive.DateTimeIso8601 => {
+      case ScalaPrimitive.DateTimeIso8601Joda => {
         wrapInObject(s"play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(${varName}.value))", discriminator)
       }
-      case ScalaPrimitive.ObjectAsPlay => {
-        wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)", discriminator)
-      }
-      case ScalaPrimitive.ObjectAsCirce => {
+      case ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce => {
         wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)", discriminator)
       }
       case ScalaPrimitive.Enum(ns, name) => {
