@@ -160,11 +160,15 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
   private[models] def encoders(model: ScalaModel): String = {
     Seq(
       s"${implicitEncoderDef(model.name)} = Encoder.instance { t =>",
-      s"  Json.obj(",
+      s"  Json.fromFields(Seq(",
       model.fields.map { field =>
-        s"""("${field.originalName}", t.${field.name}.asJson)"""
+        if (field.required) {
+          s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
+        } else {
+          s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""
+        }
       }.mkString(",\n").indent(4),
-      s"  )",
+      s"  ).flatten)",
       "}"
     ).mkString("\n")
   }
