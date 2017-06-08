@@ -101,20 +101,12 @@ private[models] case class Play2Route(
     params.map { param =>
       Seq(
         Some(definition(param)),
-        param.default.map( d =>
+        param.default.flatMap( d =>
           param.datatype match {
-            case ScalaDatatype.List(_) => {
-              sys.error("Cannot set defaults for lists")
-            }
-            case ScalaDatatype.Map(_) => {
-              sys.error("Cannot set defaults for maps")
-            }
-            case ScalaDatatype.Option(_) => {
-              sys.error("Cannot set defaults for options")
-            }
-            case p: ScalaPrimitive => {
-              "?= " + defaultForPrimitive(p, d)
-            }
+            case ScalaDatatype.List(v) => Some("?= Nil")
+            case ScalaDatatype.Map(_) => Some("?= Map()")
+            case ScalaDatatype.Option(inner) => None
+            case p: ScalaPrimitive => Some("?= " + defaultForPrimitive(p, d))
           }
         )
       ).flatten.mkString(" ")
