@@ -1,7 +1,9 @@
 package scala.models
 
 import lib.Text._
-import scala.generator.{Namespaces, PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUnionType}
+
+import scala.generator.ScalaPrimitive.{Model, Union}
+import scala.generator._
 
 case class Play2JsonCommon(ssd: ScalaService) {
 
@@ -259,13 +261,76 @@ case class Play2Json(
   }
 
   private[models] def fieldReaders(model: ScalaModel): String = {
+    def findModelByName(name: String): Option[ScalaModel] =
+      ssd.models.find(_.qualifiedName == name)
+
+    def findUnionByName(name: String): Option[ScalaUnion] =
+      ssd.unions.find(_.qualifiedName == name)
+
+    /** Does field have reference somewhere down the tree to model? */
+    def hasReferenceToModel(datatype: ScalaDatatype): Boolean = {
+      datatype match {
+        case ScalaDatatype.Option(inner) => hasReferenceToModel(inner)
+        case ScalaDatatype.List(inner) => hasReferenceToModel(inner)
+        case ScalaDatatype.Map(inner) => hasReferenceToModel(inner)
+        case mtype: Model =>
+          findModelByName(mtype.fullName).fold(false) { m =>
+            if (m == model) // TODO do the classes share a single instance of ScalaModel?
+              true
+            else
+              m.fields.map(_.datatype).exists(hasReferenceToModel)
+          }
+        case utype: Union =>
+          findUnionByName(utype.fullName).fold(false) { u =>
+            val datatypes = u.types.map(_.datatype)
+
+            if (datatypes.exists {
+              case mtype: Model => findModelByName(mtype.fullName).fold(false)(_ == model)
+              case _ => false // can a union have another union as a possible type?
+            })
+              true
+            else
+              datatypes.exists(hasReferenceToModel)
+          }
+        case _ => false
+      }
+    }
+
+    def getShortName(dt: ScalaDatatype): String = {
+      dt match {
+        case model: ScalaPrimitive.Model => model.shortName
+        case union: ScalaPrimitive.Union => union.shortName
+        case ScalaDatatype.Option(inner) => getShortName(inner)
+        case ScalaDatatype.List(inner)   => getShortName(inner)
+        case ScalaDatatype.Map(inner)    => getShortName(inner)
+      }
+    }
+
     val serializations = model.fields.map { field =>
+      val beLazy = hasReferenceToModel(field.datatype)
+
       field.datatype match {
         case ScalaDatatype.Option(inner) => {
-          s"""(__ \\ "${field.originalName}").readNullable[${inner.name}]"""
+          val path = s"""(__ \\ "${field.originalName}")"""
+          val reader = {
+            if (beLazy)
+              s"""lazyReadNullable(${play2JsonCommon.implicitReaderName(getShortName(inner))})"""
+            else
+              s"""readNullable[${inner.name}]"""
+          }
+
+          s"$path.$reader"
         }
         case datatype => {
-          s"""(__ \\ "${field.originalName}").read[${datatype.name}]"""
+          val path = s"""(__ \\ "${field.originalName}")"""
+          val reader = {
+            if (beLazy)
+              s"""lazyRead(${play2JsonCommon.implicitReaderName(getShortName(datatype))})"""
+            else
+              s"""read[${datatype.name}]"""
+          }
+
+          s"$path.$reader"
         }
       }
     }
@@ -291,7 +356,7 @@ case class Play2Json(
 
     val base = Seq(
       Seq(
-        s"def $method(obj: ${model.qualifiedName}) = {",
+        s"def $method(obj: ${model.qualifiedName}): play.api.libs.json.JsObject = {",
         Seq(
           nilToOption(requiredFields).map { fields =>
             Seq(

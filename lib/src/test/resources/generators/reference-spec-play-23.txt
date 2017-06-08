@@ -200,7 +200,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       )(Big.apply _)
     }
 
-    def jsObjectBig(obj: com.bryzek.apidoc.reference.api.v0.models.Big) = {
+    def jsObjectBig(obj: com.bryzek.apidoc.reference.api.v0.models.Big): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "f1" -> play.api.libs.json.JsString(obj.f1),
         "f2" -> play.api.libs.json.JsString(obj.f2),
@@ -238,7 +238,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       (__ \ "value").read[String].map { x => new Echo(value = x) }
     }
 
-    def jsObjectEcho(obj: com.bryzek.apidoc.reference.api.v0.models.Echo) = {
+    def jsObjectEcho(obj: com.bryzek.apidoc.reference.api.v0.models.Echo): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "value" -> play.api.libs.json.JsString(obj.value)
       )
@@ -259,7 +259,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       )(Error.apply _)
     }
 
-    def jsObjectError(obj: com.bryzek.apidoc.reference.api.v0.models.Error) = {
+    def jsObjectError(obj: com.bryzek.apidoc.reference.api.v0.models.Error): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "code" -> play.api.libs.json.JsString(obj.code),
         "message" -> play.api.libs.json.JsString(obj.message)
@@ -278,7 +278,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       (__ \ "members").read[Seq[com.bryzek.apidoc.reference.api.v0.models.User]].map { x => new Group(members = x) }
     }
 
-    def jsObjectGroup(obj: com.bryzek.apidoc.reference.api.v0.models.Group) = {
+    def jsObjectGroup(obj: com.bryzek.apidoc.reference.api.v0.models.Group): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "members" -> play.api.libs.json.Json.toJson(obj.members)
       )
@@ -301,7 +301,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       )(Member.apply _)
     }
 
-    def jsObjectMember(obj: com.bryzek.apidoc.reference.api.v0.models.Member) = {
+    def jsObjectMember(obj: com.bryzek.apidoc.reference.api.v0.models.Member): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "organization" -> jsObjectOrganization(obj.organization),
@@ -325,7 +325,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       )(Organization.apply _)
     }
 
-    def jsObjectOrganization(obj: com.bryzek.apidoc.reference.api.v0.models.Organization) = {
+    def jsObjectOrganization(obj: com.bryzek.apidoc.reference.api.v0.models.Organization): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "name" -> play.api.libs.json.JsString(obj.name)
@@ -350,7 +350,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       )(User.apply _)
     }
 
-    def jsObjectUser(obj: com.bryzek.apidoc.reference.api.v0.models.User) = {
+    def jsObjectUser(obj: com.bryzek.apidoc.reference.api.v0.models.User): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email),
@@ -374,7 +374,7 @@ package com.bryzek.apidoc.reference.api.v0.models {
       (__ \ "users").read[Seq[com.bryzek.apidoc.reference.api.v0.models.User]].map { x => new UserList(users = x) }
     }
 
-    def jsObjectUserList(obj: com.bryzek.apidoc.reference.api.v0.models.UserList) = {
+    def jsObjectUserList(obj: com.bryzek.apidoc.reference.api.v0.models.UserList): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "users" -> play.api.libs.json.Json.toJson(obj.users)
       )

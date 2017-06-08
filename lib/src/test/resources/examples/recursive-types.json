@@ -1,0 +1,116 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "Recursive",
+  "organization": {
+    "key": "flow"
+  },
+  "application": {
+    "key": "recursive"
+  },
+  "namespace": "io.flow.recursive.v0",
+  "version": "0.0.1",
+  "imports": [
+    {
+      "uri": "http://this.doesnt.matter",
+      "namespace": "apidoc.test",
+      "version": "0.0.1",
+      "organization": { "key": "apidoc" },
+      "application": { "key": "testapp" },
+      "unions": [],
+      "enums": [],
+      "models": ["foo"]
+    }
+  ],
+  "headers": [],
+  "info": [],
+  "enums": [],
+  "resources": [],
+  "attributes": [],
+  "unions": [
+    {
+      "name": "gizmo",
+      "plural": "gizmos",
+      "attributes": [],
+      "types": [
+        { "type": "widget", "attributes": [] },
+        { "type": "gadget", "attributes": [] },
+        { "type": "integer", "attributes": [] }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "foo",
+      "plural": "foos",
+      "attributes": [],
+      "fields": [
+        {
+          "name": "the_bar",
+          "type": "bar",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "another",
+          "type": "integer",
+          "required": true,
+          "attributes": []
+        }
+      ]
+    },
+    {
+      "name": "bar",
+      "plural": "bars",
+      "attributes": [],
+      "fields": [
+        {
+          "name": "the_foo",
+          "type": "foo",
+          "required": true,
+          "attributes": []
+        }
+      ]
+    },
+    {
+      "name": "baz",
+      "plural": "bazs",
+      "attributes": [],
+      "fields": [
+        {
+          "name": "otherfoo",
+          "type": "apidoc.test.models.foo",
+          "required": true,
+          "attributes": []
+        }
+      ]
+    },
+    {
+      "name": "widget",
+      "plural": "widgets",
+      "attributes": [],
+      "fields": [
+        {
+          "name": "mygizmo",
+          "type": "gizmo",
+          "required": true,
+          "attributes": []
+        }
+      ]
+    },
+    {
+      "name": "gadget",
+      "plural": "gadgets",
+      "attributes": [],
+      "fields": [
+        {
+          "name": "mygizmo",
+          "type": "gizmo",
+          "required": true,
+          "attributes": []
+        }
+      ]
+    }
+  ]
+}
