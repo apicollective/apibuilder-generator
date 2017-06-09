@@ -125,7 +125,7 @@ object ParserGenerator extends CodeGenerator {
     @scala.annotation.tailrec
     private[this] def parserFieldName(name: String, datatype: ScalaDatatype): String = {
       datatype match {
-        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
           ScalaUtil.toVariable(name)
         }
         case ScalaPrimitive.Model(_, _) => {
@@ -149,7 +149,7 @@ object ParserGenerator extends CodeGenerator {
     @scala.annotation.tailrec
     private[this] def parserFieldDeclaration(name: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
-        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaDatatype.List(_) | ScalaDatatype.Map(_) => {
+        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaDatatype.List(_) | ScalaDatatype.Map(_) => {
           s"""$name: String = "$originalName""""
         }
         case ScalaPrimitive.Model(namespaces, name) => {
@@ -180,7 +180,7 @@ object ParserGenerator extends CodeGenerator {
       */
     private[this] def addImports(datatype: ScalaDatatype) {
       datatype match {
-        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
           // no-op
         }
         case f @ ScalaDatatype.List(inner) => {
@@ -210,8 +210,10 @@ object ParserGenerator extends CodeGenerator {
         case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.Integer => s"SqlParser.int($fieldName)"
         case f @ ScalaPrimitive.Long => s"SqlParser.long($fieldName)"
-        case f @ ScalaPrimitive.DateIso8601 => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.DateTimeIso8601 => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.DateIso8601Joda => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.DateIso8601Java => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.DateTimeIso8601Joda => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.DateTimeIso8601Java => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.ObjectAsPlay => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.ObjectAsCirce => generatePrimitiveRowParser(fieldName, f)

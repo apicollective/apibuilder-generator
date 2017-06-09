@@ -15,17 +15,23 @@ case class CirceJson(
     import io.circe.syntax._
 ${JsonImports(ssd.service).mkString("\n").indent(4)}
 
-    private[${ssd.namespaces.last}] implicit val decodeUUID =
-      Decoder.decodeString.map(java.util.UUID.fromString)
+    private[${ssd.namespaces.last}] implicit val decodeUUID: Decoder[_root_.java.util.UUID] =
+      Decoder.decodeString.map(_root_.java.util.UUID.fromString)
 
-    private[${ssd.namespaces.last}] implicit val encodeUUID =
-      Encoder.encodeString.contramap[java.util.UUID](_.toString)
+    private[${ssd.namespaces.last}] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
+      Encoder.encodeString.contramap[_root_.java.util.UUID](_.toString)
 
-    private[${ssd.namespaces.last}] implicit val decodeJodaDateTime =
-      Decoder.decodeString.map(org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime)
+    private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
+      Decoder.decodeString.emap(str => Either.catchNonFatal(_root_.java.time.Instant.parse(str)).leftMap(t => "java.time.Instant"))
 
-    private[${ssd.namespaces.last}] implicit val encodeJodaDateTime =
-      Encoder.encodeString.contramap[org.joda.time.DateTime](org.joda.time.format.ISODateTimeFormat.dateTime.print)
+    private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.java.time.Instant] =
+      Encoder.encodeString.contramap[_root_.java.time.Instant](_.toString)
+
+    private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.java.time.LocalDate] =
+      Decoder.decodeString.emap(str => Either.catchNonFatal(_root_.java.time.LocalDate.parse(str)).leftMap(t => "java.time.LocalDate"))
+
+    private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.java.time.LocalDate] =
+      Encoder.encodeString.contramap[_root_.java.time.LocalDate](_.toString)
 
 ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }

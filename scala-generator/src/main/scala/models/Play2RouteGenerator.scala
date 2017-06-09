@@ -117,7 +117,7 @@ private[models] case class Play2Route(
     primitive: ScalaPrimitive,
     value: String
   ): String = primitive match {
-    case ScalaPrimitive.String | ScalaPrimitive.DateIso8601 | ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+    case ScalaPrimitive.String | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
       value
     }
     case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal => {
