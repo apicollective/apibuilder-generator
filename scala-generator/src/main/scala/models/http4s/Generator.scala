@@ -22,19 +22,18 @@ trait Generator extends CodeGenerator {
     val ssd = new ScalaService(form.service)
     val config = ScalaClientMethodConfigs.Http4s(Namespaces.quote(form.service.namespace), form.service.baseUrl)
 
-    val caseClasses = ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
-    val json = CirceJson(ssd).generate()
-    val client = Http4sClient(form, ssd, config).generate()
-
     val header = addHeader match {
       case false => ""
       case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
     }
 
+    val caseClasses = header + ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
+    val json = CirceJson(ssd).generate()
+    val client = Http4sClient(form, ssd, config).generate()
     val mock = header + new MockClientGenerator(ssd, form.userAgent, config).generateCode()
 
     val modelAndJson =
-      s"""$header$caseClasses
+      s"""$caseClasses
          |
          |$json""".stripMargin
 
@@ -44,11 +43,12 @@ trait Generator extends CodeGenerator {
          |$client""".stripMargin
 
     Seq(
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ModelJson", modelAndJson, Some("Scala")),
       ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Client", all, Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "JsonOnly", json, Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ClientOnly", client, Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Mock", mock, Some("Scala"))
+      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ModelsJson", modelAndJson, Some("Scala")),
+      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ModelsOnly", caseClasses, Some("Scala")),
+      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "JsonOnly", s"$header$json", Some("Scala")),
+      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ClientOnly", s"$header$client", Some("Scala")),
+      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "MockClient", mock, Some("Scala"))
     )
   }
 }
