@@ -268,31 +268,34 @@ case class Play2Json(
       ssd.unions.find(_.qualifiedName == name)
 
     /** Does field have reference somewhere down the tree to model? */
-    def hasReferenceToModel(datatype: ScalaDatatype): Boolean = {
-      datatype match {
-        case ScalaDatatype.Option(inner) => hasReferenceToModel(inner)
-        case ScalaDatatype.List(inner) => hasReferenceToModel(inner)
-        case ScalaDatatype.Map(inner) => hasReferenceToModel(inner)
-        case mtype: Model =>
-          findModelByName(mtype.fullName).fold(false) { m =>
-            if (m == model) // TODO do the classes share a single instance of ScalaModel?
-              true
-            else
-              m.fields.map(_.datatype).exists(hasReferenceToModel)
-          }
-        case utype: Union =>
-          findUnionByName(utype.fullName).fold(false) { u =>
-            val datatypes = u.types.map(_.datatype)
+    def hasReferenceToModel(datatype: ScalaDatatype, visited: List[ScalaDatatype] = Nil): Boolean = {
+      if (visited contains datatype) false
+      else {
+        datatype match {
+          case ScalaDatatype.Option(inner) => hasReferenceToModel(inner, datatype :: visited)
+          case ScalaDatatype.List(inner) => hasReferenceToModel(inner, datatype :: visited)
+          case ScalaDatatype.Map(inner) => hasReferenceToModel(inner, datatype :: visited)
+          case mtype: Model =>
+            findModelByName(mtype.fullName).fold(false) { m =>
+              if (m == model) // TODO do the classes share a single instance of ScalaModel?
+                true
+              else
+                m.fields.map(_.datatype).exists(hasReferenceToModel(_, datatype :: visited))
+            }
+          case utype: Union =>
+            findUnionByName(utype.fullName).fold(false) { u =>
+              val datatypes = u.types.map(_.datatype)
 
-            if (datatypes.exists {
-              case mtype: Model => findModelByName(mtype.fullName).fold(false)(_ == model)
-              case _ => false // can a union have another union as a possible type?
-            })
-              true
-            else
-              datatypes.exists(hasReferenceToModel)
-          }
-        case _ => false
+              if (datatypes.exists {
+                case mtype: Model => findModelByName(mtype.fullName).fold(false)(_ == model)
+                case _ => false // can a union have another union as a possible type?
+              })
+                true
+              else
+                datatypes.exists(hasReferenceToModel(_, datatype :: visited))
+            }
+          case _ => false
+        }
       }
     }
 
