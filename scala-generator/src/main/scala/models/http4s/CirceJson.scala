@@ -11,24 +11,25 @@ case class CirceJson(
     s"""package ${ssd.namespaces.models} {
 
   package object json {
+    import scala.util.Try
     import io.circe.{Json, JsonObject, Encoder, Decoder, DecodingFailure}
     import io.circe.syntax._
 ${JsonImports(ssd.service).mkString("\n").indent(4)}
 
     private[${ssd.namespaces.last}] implicit val decodeUUID: Decoder[_root_.java.util.UUID] =
-      Decoder.decodeString.map(_root_.java.util.UUID.fromString)
+      Decoder.decodeString.emapTry(str => Try(_root_.java.util.UUID.fromString(str)))
 
     private[${ssd.namespaces.last}] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
       Encoder.encodeString.contramap[_root_.java.util.UUID](_.toString)
 
     private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
-      Decoder.decodeString.emap(str => Either.catchNonFatal(_root_.java.time.Instant.parse(str)).leftMap(t => "java.time.Instant"))
+      Decoder.decodeString.emapTry(str => Try(_root_.java.time.Instant.parse(str)))
 
     private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.java.time.Instant] =
       Encoder.encodeString.contramap[_root_.java.time.Instant](_.toString)
 
     private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.java.time.LocalDate] =
-      Decoder.decodeString.emap(str => Either.catchNonFatal(_root_.java.time.LocalDate.parse(str)).leftMap(t => "java.time.LocalDate"))
+      Decoder.decodeString.emapTry(str => Try(_root_.java.time.LocalDate.parse(str)))
 
     private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.java.time.LocalDate] =
       Encoder.encodeString.contramap[_root_.java.time.LocalDate](_.toString)
@@ -59,10 +60,10 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
 
   private[models] def enumDecodersAndEncoders(enum: ScalaEnum): String = {
     Seq(
-      s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] = """,
+      s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
       s"""  Decoder.decodeString.map(${enum.qualifiedName}(_))""",
       "",
-      s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] = """,
+      s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] =""",
       s"""  Encoder.encodeString.contramap[${enum.qualifiedName}](_.toString)"""
     ).mkString("\n")
   }
