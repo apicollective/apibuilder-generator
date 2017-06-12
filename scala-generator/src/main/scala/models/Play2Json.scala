@@ -144,12 +144,13 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
-    val discriminatorMatch = union.types.find(_.isDefault).headOption.map(_.originalName) match {
+    val defaultDiscriminator = union.types.find(_.isDefault).headOption.map(_.originalName)
+    val discriminatorMatch = defaultDiscriminator match {
       case None => {
         s"""(js \\ "$discriminator").validate[String]"""
       }
-      case Some(disc) => {
-        s"""(js \\ "$discriminator").asOpt[String].getOrElse("$disc")"""
+      case Some(defaultDiscriminator) => {
+        s"""(js \\ "$discriminator").validateOpt[String]"""
       }
     }
 
@@ -163,9 +164,20 @@ case class Play2Json(
             Seq(
               """discriminator match {""",
               unionTypesWithNames(union).map { case (t, typeName) =>
-                s"""case "${t.originalName}" => js.validate[$typeName]"""
+                if (defaultDiscriminator.isDefined) {
+                  s"""case Some("${t.originalName}") => js.validate[$typeName]"""
+                } else {
+                  s"""case "${t.originalName}" => js.validate[$typeName]"""
+                }
               }.mkString("\n").indent(2),
-              s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indent(2),
+              if (defaultDiscriminator.isDefined) {
+                Seq(
+                  s"""case Some(other) => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""",
+                  s"""case None => sys.error("Expected default value of discriminator")"""
+                ).mkString("\n").indent(2)
+              } else {
+                s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indent(2)
+              },
               "}"
             ).mkString("\n").indent(2),
             "}"
