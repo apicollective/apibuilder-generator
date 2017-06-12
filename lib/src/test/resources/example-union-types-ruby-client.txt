@@ -162,11 +162,11 @@ module Com
                     USER_UUID_WRAPPER = 'uuid' unless defined?(USER_UUID_WRAPPER)
                   end
 
-                  attr_reader :__discriminator__
+                  attr_reader :discriminator
 
                   def initialize(incoming={})
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    @__discriminator__ = 'user'
+                    @discriminator = HttpClient::Preconditions.assert_class('discriminator', opts.delete(:discriminator) || 'registered_user', String)
                   end
 
                   def subtype_to_hash
@@ -174,19 +174,21 @@ module Com
                   end
 
                   def to_hash
-                    { @__discriminator__ => subtype_to_hash }
+                    subtype_to_hash.merge(:discriminator => @discriminator)
                   end
 
                   def User.from_json(hash)
                     HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                    hash.map do |union_type_name, data|
-                      case union_type_name
-                        when Types::REGISTERED_USER; RegisteredUser.new(data)
-                        when Types::GUEST_USER; GuestUser.new(data)
-                        when Types::USER_UUID_WRAPPER; UserUuidWrapper.new(data)
-                        else UserUndefinedType.new(:__discriminator__ => union_type_name)
-                      end
-                    end.first
+                    discriminator = HttpClient::Helper.symbolize_keys(hash)[:discriminator].to_s.strip
+                    if discriminator.empty?
+                      raise "Union type[user] requires a field named 'discriminator'"
+                    end
+                    case discriminator
+                      when Types::REGISTERED_USER; RegisteredUser.new(hash)
+                      when Types::GUEST_USER; GuestUser.new(hash)
+                      when Types::USER_UUID_WRAPPER; UserUuidWrapper.new(hash)
+                      else UserUndefinedType.new(:discriminator => discriminator)
+                    end
                   end
 
                 end
@@ -196,9 +198,9 @@ module Com
                   attr_reader :name
 
                   def initialize(incoming={})
-                    super(:__discriminator__ => 'undefined_type')
+                    super(:discriminator => 'undefined_type')
                     opts = HttpClient::Helper.symbolize_keys(incoming)
-                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:__discriminator__), String)
+                    @name = HttpClient::Preconditions.assert_class('name', opts.delete(:discriminator), String)
                   end
 
                   def subtype_to_hash
@@ -298,7 +300,7 @@ module Com
                   attr_reader :guid, :email
 
                   def initialize(incoming={})
-                    super(:__discriminator__ => User::Types::GUEST_USER)
+                    super(:discriminator => User::Types::GUEST_USER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:guid, :email], 'GuestUser')
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
@@ -327,7 +329,7 @@ module Com
                   attr_reader :guid, :email, :preference
 
                   def initialize(incoming={})
-                    super(:__discriminator__ => User::Types::REGISTERED_USER)
+                    super(:discriminator => User::Types::REGISTERED_USER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:guid, :email, :preference], 'RegisteredUser')
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
@@ -359,7 +361,7 @@ module Com
                   attr_reader :value
 
                   def initialize(incoming={})
-                    super(:__discriminator__ => User::Types::USER_UUID_WRAPPER)
+                    super(:discriminator => User::Types::USER_UUID_WRAPPER)
                     opts = HttpClient::Helper.symbolize_keys(incoming)
                     HttpClient::Preconditions.require_keys(opts, [:value], 'UserUuidWrapper')
                     @value = HttpClient::Preconditions.assert_class('value', HttpClient::Helper.to_uuid(opts.delete(:value)), String)

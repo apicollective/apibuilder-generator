@@ -105,6 +105,8 @@ case class ScalaUnionType(
 
   val name: String = ScalaUtil.toClassName(originalName)
 
+  val isDefault: Boolean = value.default.getOrElse(false)
+
   val qualifiedName = ssd.modelClassName(name)
 
   val description: Option[String] = value.description

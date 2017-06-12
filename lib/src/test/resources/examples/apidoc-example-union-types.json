@@ -61,10 +61,12 @@
     {
       "name": "user",
       "plural": "users",
+      "discriminator": "discriminator",
       "types": [
         {
           "type": "registered_user",
-          "attributes": []
+          "attributes": [],
+          "default": true
         },
         {
           "type": "guest_user",

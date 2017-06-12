@@ -144,19 +144,39 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    val defaultDiscriminatorTypeName: Option[String] = unionTypesWithNames(union).flatMap { case (t, typeName) =>
+      if (t.isDefault) {
+        Some(typeName)
+      } else {
+        None
+      }
+    }.headOption
+
     Seq(
       s"${play2JsonCommon.implicitReaderDef(union.name)} = new play.api.libs.json.Reads[${union.name}] {",
       Seq(s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${union.name}] = {",
-        Seq(s"""(js \\ "$discriminator").validate[String] match {""",
+        Seq(s"""(js \\ "$discriminator").validateOpt[String] match {""",
           Seq(
             """case play.api.libs.json.JsError(msg) => play.api.libs.json.JsError(msg)""",
             """case play.api.libs.json.JsSuccess(discriminator, _) => {""",
             Seq(
               """discriminator match {""",
               unionTypesWithNames(union).map { case (t, typeName) =>
-                s"""case "${t.originalName}" => js.validate[$typeName]"""
+                val default = if (defaultDiscriminatorTypeName.contains(typeName)) {
+                  " | None"
+                } else {
+                  ""
+                }
+
+                s"""case Some("${t.originalName}")$default => js.validate[$typeName]"""
               }.mkString("\n").indent(2),
-              s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indent(2),
+              s"""  case Some(other) => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""" + (
+                if (defaultDiscriminatorTypeName.isEmpty) {
+                  s"""\ncase None => sys.error("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json Value")""".indent(2)
+                } else {
+                  ""
+                }
+              ),
               "}"
             ).mkString("\n").indent(2),
             "}"
