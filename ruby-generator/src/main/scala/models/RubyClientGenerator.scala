@@ -635,15 +635,28 @@ ${headers.rubyModuleConstants.indent(2)}
     val className = RubyUtil.toClassName(union.name)
     val discName = discriminatorName(union)
 
-    val discriminatorField = union.discriminator.map { disc =>
-      Seq(
-        s"HttpClient::Preconditions.require_keys(opts, [:$discName], '$className')",
-        s"@$discName = HttpClient::Preconditions.assert_class('$discName', opts.delete(:$discName), String)"
-      )
-    }.getOrElse {
-      Seq(
-        s"@$discName = '${union.name}'"
-      )
+    val discriminatorField = union.discriminator match {
+      case None => {
+        Seq(
+          s"@$discName = '${union.name}'"
+        )
+      }
+      case Some(disc) => {
+        union.types.find(_.default.getOrElse(false)).headOption match {
+          case None => {
+            Seq(
+              s"HttpClient::Preconditions.require_keys(opts, [:$discName], '$className')",
+              s"@$discName = HttpClient::Preconditions.assert_class('$discName', opts.delete(:$discName), String)"
+            )
+          }
+
+          case Some(defaultType) => {
+            Seq(
+              s"@$discName = HttpClient::Preconditions.assert_class('$discName', opts.delete(:$discName) || '${defaultType.`type`}', String)"
+            )
+          }
+        }
+      }
     }
 
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
