@@ -144,10 +144,20 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    val discriminatorMatch = union.types.find(_.isDefault).headOption.map(_.originalName) match {
+      case None => {
+        s"""(js \\ "$discriminator").validate[String]"""
+      }
+      case Some(disc) => {
+        s"""(js \\ "$discriminator").asOpt[String].getOrElse("$disc")"""
+      }
+    }
+    println(s"union[${union.name}] defaultDiscriminator[${discriminatorMatch}]")
+
     Seq(
       s"${play2JsonCommon.implicitReaderDef(union.name)} = new play.api.libs.json.Reads[${union.name}] {",
       Seq(s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${union.name}] = {",
-        Seq(s"""(js \\ "$discriminator").validate[String] match {""",
+        Seq(s"""$discriminatorMatch match {""",
           Seq(
             """case play.api.libs.json.JsError(msg) => play.api.libs.json.JsError(msg)""",
             """case play.api.libs.json.JsSuccess(discriminator, _) => {""",
