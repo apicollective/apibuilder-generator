@@ -60,10 +60,10 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
 
   private[models] def enumDecodersAndEncoders(enum: ScalaEnum): String = {
     Seq(
-      s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] = """,
+      s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
       s"""  Decoder.decodeString.map(${enum.qualifiedName}(_))""",
       "",
-      s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] = """,
+      s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] =""",
       s"""  Encoder.encodeString.contramap[${enum.qualifiedName}](_.toString)"""
     ).mkString("\n")
   }
