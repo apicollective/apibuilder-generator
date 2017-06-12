@@ -152,7 +152,6 @@ case class Play2Json(
         s"""(js \\ "$discriminator").asOpt[String].getOrElse("$disc")"""
       }
     }
-    println(s"union[${union.name}] defaultDiscriminator[${discriminatorMatch}]")
 
     Seq(
       s"${play2JsonCommon.implicitReaderDef(union.name)} = new play.api.libs.json.Reads[${union.name}] {",
