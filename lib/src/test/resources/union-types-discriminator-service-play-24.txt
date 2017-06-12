@@ -191,12 +191,11 @@ package com.bryzek.apidoc.example.union.types.discriminator.v0.models {
           case play.api.libs.json.JsError(msg) => play.api.libs.json.JsError(msg)
           case play.api.libs.json.JsSuccess(discriminator, _) => {
             discriminator match {
-              case Some("registered_user") => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser]
+              case Some("registered_user") | None => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.RegisteredUser]
               case Some("guest_user") => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.GuestUser]
               case Some("system_user") => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.SystemUser]
               case Some("string") => js.validate[com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserString]
               case Some(other) => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.discriminator.v0.models.UserUndefinedType(other))
-              case None => sys.error("Union[User] requires a discriminator named 'discriminator' - this field was not found in the Json Value")
             }
           }
         }
