@@ -29,5 +29,35 @@ class RecursiveJsonSpec extends FunSpec {
       assert(Play2Json(service).readers(gadget) contains "lazyRead(")
       assert(Play2Json(service).readers(widget) contains "lazyRead(")
     }
+
+    it("should not call implicit methods") {
+      val json = models.TestHelper.buildJson("""
+        "imports": [],
+        "headers": [],
+        "info": [],
+        "unions": [],
+        "enums": [],
+        "resources": [],
+        "attributes": [],
+        "models": [
+          {
+            "name": "foo",
+            "plural": "foos",
+            "attributes": [],
+            "fields": [
+              { "name": "bar", "type": "foo", "required": true, "attributes": [] },
+              { "name": "baz", "type": "[foo]", "required": true, "attributes": [] }
+            ]
+          }
+        ]
+      """)
+
+      val ssd = ScalaService(models.TestHelper.service(json))
+      val model = ssd.models.head
+      val reader = Play2Json(ssd).fieldReaders(model)
+
+      assert(reader contains """(__ \ "bar").lazyRead(play.api.libs.json.Reads.of[test.apidoc.apidoctest.v0.models.Foo])""")
+      assert(reader contains """(__ \ "baz").lazyRead(play.api.libs.json.Reads.of[Seq[test.apidoc.apidoctest.v0.models.Foo]])""")
+    }
   }
 }

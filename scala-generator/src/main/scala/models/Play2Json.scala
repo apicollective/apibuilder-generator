@@ -337,7 +337,7 @@ case class Play2Json(
           val path = s"""(__ \\ "${field.originalName}")"""
           val reader = {
             if (beLazy)
-              s"""lazyReadNullable(${play2JsonCommon.implicitReaderName(getShortName(inner))})"""
+              s"""lazyReadNullable(play.api.libs.json.Reads.of[${inner.name}])"""
             else
               s"""readNullable[${inner.name}]"""
           }
@@ -348,7 +348,7 @@ case class Play2Json(
           val path = s"""(__ \\ "${field.originalName}")"""
           val reader = {
             if (beLazy)
-              s"""lazyRead(${play2JsonCommon.implicitReaderName(getShortName(datatype))})"""
+              s"""lazyRead(play.api.libs.json.Reads.of[${datatype.name}])"""
             else
               s"""read[${datatype.name}]"""
           }
