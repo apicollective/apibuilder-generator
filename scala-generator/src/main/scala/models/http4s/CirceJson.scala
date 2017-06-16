@@ -16,6 +16,9 @@ case class CirceJson(
     import io.circe.syntax._
 ${JsonImports(ssd.service).mkString("\n").indent(4)}
 
+    // Make Scala 2.11 Either monadic
+    private[${ssd.namespaces.last}] implicit def eitherOps[A,B](e: Either[A,B]) = cats.implicits.catsSyntaxEither(e)
+
     private[${ssd.namespaces.last}] implicit val decodeUUID: Decoder[_root_.java.util.UUID] =
       Decoder.decodeString.emapTry(str => Try(_root_.java.util.UUID.fromString(str)))
 
