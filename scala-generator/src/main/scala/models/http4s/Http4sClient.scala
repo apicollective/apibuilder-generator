@@ -42,6 +42,12 @@ ${methodGenerator.accessors().indent(4)}
 
 ${methodGenerator.objects().indent(4)}
 
+    private lazy val defaultApiHeaders = Seq(
+${headerString.indent(6)}
+    )
+
+    def apiHeaders: Seq[(String, String)] = defaultApiHeaders
+
     def _executeRequest[T, U](
       method: String,
       path: Seq[String],
@@ -58,9 +64,7 @@ ${methodGenerator.objects().indent(4)}
       }
 
       val headers = org.http4s.Headers((
-        Seq(
-${headerString.indent(10)}
-        ) ++
+        apiHeaders ++
         defaultHeaders ++
         requestHeaders
       ).toList.map { case (k, v) => org.http4s.Header(k, v) })
