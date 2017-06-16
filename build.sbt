@@ -4,7 +4,7 @@ name := "apidoc-generator"
 
 organization := "com.bryzek.apidoc.generator"
 
-val scalaVer = "2.11.8"
+val scalaVer = "2.11.11"
 
 scalaVersion in ThisBuild := scalaVer
 
