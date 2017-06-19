@@ -18,9 +18,6 @@ class AndroidJavaUtilTest
 
     toParamName("String", false) should be("String")
     toParamName("String", true) should be("string")
-
-    toParamName("this.and.that", false) should be("ThisAndThat")
-    toParamName("this.and.that", true) should be("thisAndThat")
   }
 
   "makeNameSpace" should "respect reserved words" in {
@@ -67,6 +64,15 @@ class AndroidJavaUtilTest
     dataTypeFromField("uuid", "com.apidoc.example").toString should be ("java.util.UUID")
     dataTypeFromField("date-iso8601", "com.apidoc.example").toString should be ("org.joda.time.DateTime")
     dataTypeFromField("date-time-iso8601", "com.apidoc.example").toString should be ("org.joda.time.DateTime")
+  }
+
+  "isModelNameWithPackage" should "return correctly" in {
+    isModelNameWithPackage("abc") should be(false)
+    isModelNameWithPackage("com.bryzek.apidoc.common.v0.models.reference") should be(true)
+  }
+
+  "capitalizeModelNameWithPackage" should "capitalize last word" in {
+    capitalizeModelNameWithPackage("com.bryzek.apidoc.common.v0.models.reference") should be("com.bryzek.apidoc.common.v0.models.Reference")
   }
 
   it should "handle arrays" in {

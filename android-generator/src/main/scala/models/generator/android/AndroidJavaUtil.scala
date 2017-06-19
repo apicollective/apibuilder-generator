@@ -32,7 +32,19 @@ trait AndroidJavaUtil {
       if (word == word.toUpperCase) word.toLowerCase
       else word
 
-    Text.safeName(Text.splitIntoWords(modelName).map { checkForUpperCase(_).capitalize }.mkString)
+    if(isModelNameWithPackage(modelName)){
+      capitalizeModelNameWithPackage(modelName)
+    } else {
+      Text.safeName(Text.splitIntoWords(modelName).map { checkForUpperCase(_).capitalize }.mkString)
+    }
+  }
+
+  def isModelNameWithPackage(modelName: String): Boolean = {
+    modelName.toLowerCase.equals(modelName) && modelName.contains(".")
+  }
+
+  def capitalizeModelNameWithPackage(modelName: String): String ={
+    (Seq(modelName.split("\\.").reverse.head.capitalize) ++ modelName.split("\\.").reverse.tail).reverse.mkString(".")
   }
 
   def isParameterArray(modelName: String): Boolean = {
@@ -104,7 +116,7 @@ trait AndroidJavaUtil {
 
 
   def toEnumName(input: String): String = {
-    toClassName(input).replaceAll(".","")
+    Text.safeName(input.replaceAll("\\.","_")).toUpperCase()
   }
 
   def makeNameSpace(namespace: String): String = {
