@@ -177,7 +177,7 @@ object AndroidClasses
 
       enum.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value","\""+value.name+"\"")
-        builder.addEnumConstant(value.name.toUpperCase(), TypeSpec.anonymousClassBuilder("").addAnnotation(annotation.build()).build())
+        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("").addAnnotation(annotation.build()).build())
       })
 
       makeFile(className, builder)
@@ -212,7 +212,7 @@ object AndroidClasses
       union.types.foreach(u => {
         jsonSubTypesAnnotationBuilder
           .addMember("value", "$L", AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-            .addMember("value", "$L", ClassName.get(modelsNameSpace, toClassName(u.`type`)) + ".class")
+            .addMember("value", "$L", dataTypeFromField(u.`type`, modelsNameSpace) + ".class")
             .addMember("name", "$S", u.`type`)
             .build())
       })

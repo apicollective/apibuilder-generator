@@ -116,7 +116,7 @@ trait AndroidJavaUtil {
 
 
   def toEnumName(input: String): String = {
-    toClassName(input).replaceAll("\\.","")
+    Text.safeName(input.replaceAll("\\.","_")).toUpperCase()
   }
 
   def makeNameSpace(namespace: String): String = {
