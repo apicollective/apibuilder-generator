@@ -1,7 +1,7 @@
 package controllers
 
-import com.bryzek.apidoc.generator.v0.models.Generator
-import com.bryzek.apidoc.generator.v0.models.json._
+import io.apibuilder.generator.v0.models.Generator
+import io.apibuilder.generator.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
 import lib.generator.{CodeGenerator, CodeGenTarget}

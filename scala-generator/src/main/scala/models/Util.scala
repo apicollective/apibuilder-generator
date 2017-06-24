@@ -1,6 +1,6 @@
 package scala.models
 
-import com.bryzek.apidoc.spec.v0.models._
+import io.apibuilder.spec.v0.models._
 
 object Util {
 

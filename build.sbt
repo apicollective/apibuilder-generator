@@ -2,7 +2,7 @@ import play.PlayImport.PlayKeys._
 
 name := "apidoc-generator"
 
-organization := "com.bryzek.apidoc.generator"
+organization := "io.apibuilder.generator"
 
 val scalaVer = "2.11.11"
 
@@ -33,7 +33,7 @@ lazy val generator = project
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
-    routesImport += "com.bryzek.apidoc.generator.v0.Bindables._",
+    routesImport += "io.apibuilder.generator.v0.Bindables._",
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
@@ -70,7 +70,7 @@ lazy val androidGenerator = project
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("apidoc-" + _),
-  organization := "com.bryzek.apidoc",
+  organization := "io.apibuilder",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",

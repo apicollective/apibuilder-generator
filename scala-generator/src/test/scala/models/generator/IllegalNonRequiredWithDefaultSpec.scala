@@ -1,6 +1,6 @@
 package scala.generator
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.InvocationForm
 
 import models.TestHelper
 import org.scalatest.{FunSpec, Matchers}

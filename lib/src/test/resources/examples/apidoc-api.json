@@ -9,7 +9,7 @@
   "application": {
     "key": "apidoc-api"
   },
-  "namespace": "com.bryzek.apidoc.api.v0",
+  "namespace": "io.apibuilder.api.v0",
   "version": "0.11.17",
   "info": {
     "license": {
@@ -26,7 +26,7 @@
   "imports": [
     {
       "uri": "http://www.apidoc.me/bryzek/apidoc-common/0.11.17/service.json",
-      "namespace": "com.bryzek.apidoc.common.v0",
+      "namespace": "io.apibuilder.common.v0",
       "organization": {
         "key": "bryzek"
       },
@@ -45,7 +45,7 @@
     },
     {
       "uri": "http://www.apidoc.me/bryzek/apidoc-generator/0.11.17/service.json",
-      "namespace": "com.bryzek.apidoc.generator.v0",
+      "namespace": "io.apibuilder.generator.v0",
       "organization": {
         "key": "bryzek"
       },
@@ -67,7 +67,7 @@
     },
     {
       "uri": "http://www.apidoc.me/bryzek/apidoc-spec/0.11.17/service.json",
-      "namespace": "com.bryzek.apidoc.spec.v0",
+      "namespace": "io.apibuilder.spec.v0",
       "organization": {
         "key": "bryzek"
       },
@@ -231,7 +231,7 @@
         },
         {
           "name": "organization",
-          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "type": "io.apibuilder.common.v0.models.reference",
           "required": true,
           "attributes": []
         },
@@ -264,7 +264,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -316,7 +316,7 @@
         },
         {
           "name": "organization",
-          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "type": "io.apibuilder.common.v0.models.reference",
           "required": true,
           "attributes": []
         },
@@ -357,7 +357,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -430,7 +430,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -463,13 +463,13 @@
         },
         {
           "name": "organization",
-          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "type": "io.apibuilder.common.v0.models.reference",
           "required": true,
           "attributes": []
         },
         {
           "name": "application",
-          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "type": "io.apibuilder.common.v0.models.reference",
           "required": true,
           "attributes": []
         },
@@ -507,7 +507,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -572,7 +572,7 @@
         },
         {
           "name": "files",
-          "type": "[com.bryzek.apidoc.generator.v0.models.file]",
+          "type": "[io.apibuilder.generator.v0.models.file]",
           "required": true,
           "attributes": [],
           "description": "A collection of source files",
@@ -675,7 +675,7 @@
         },
         {
           "name": "generator",
-          "type": "com.bryzek.apidoc.generator.v0.models.generator",
+          "type": "io.apibuilder.generator.v0.models.generator",
           "required": true,
           "attributes": []
         }
@@ -700,7 +700,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -733,7 +733,7 @@
         },
         {
           "name": "generator",
-          "type": "com.bryzek.apidoc.generator.v0.models.generator",
+          "type": "io.apibuilder.generator.v0.models.generator",
           "required": true,
           "attributes": []
         }
@@ -807,7 +807,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -848,7 +848,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -918,7 +918,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -1090,7 +1090,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -1157,7 +1157,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -1217,7 +1217,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -1338,13 +1338,13 @@
         },
         {
           "name": "organization",
-          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "type": "io.apibuilder.common.v0.models.reference",
           "required": true,
           "attributes": []
         },
         {
           "name": "application",
-          "type": "com.bryzek.apidoc.common.v0.models.reference",
+          "type": "io.apibuilder.common.v0.models.reference",
           "required": true,
           "attributes": []
         },
@@ -1365,14 +1365,14 @@
         },
         {
           "name": "service",
-          "type": "com.bryzek.apidoc.spec.v0.models.service",
+          "type": "io.apibuilder.spec.v0.models.service",
           "required": true,
           "attributes": [],
           "description": "spec/spec.json description of this API"
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -1431,7 +1431,7 @@
         },
         {
           "name": "audit",
-          "type": "com.bryzek.apidoc.common.v0.models.audit",
+          "type": "io.apibuilder.common.v0.models.audit",
           "required": true,
           "attributes": []
         }
@@ -2014,7 +2014,7 @@
       "path": "/:orgKey/:applicationKey/:version/:generatorKey"
     },
     {
-      "type": "com.bryzek.apidoc.generator.v0.models.healthcheck",
+      "type": "io.apibuilder.generator.v0.models.healthcheck",
       "plural": "healthchecks",
       "operations": [
         {
@@ -2029,7 +2029,7 @@
                   "value": 200
                 }
               },
-              "type": "com.bryzek.apidoc.generator.v0.models.healthcheck"
+              "type": "io.apibuilder.generator.v0.models.healthcheck"
             }
           ],
           "attributes": []

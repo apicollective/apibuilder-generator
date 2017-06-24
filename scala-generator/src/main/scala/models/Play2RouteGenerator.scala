@@ -1,8 +1,8 @@
 package scala.models
 
 import lib.generator.{CodeGenerator, GeneratorUtil}
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
-import com.bryzek.apidoc.spec.v0.models._
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models._
 import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaOperation, ScalaParameter, ScalaResource, ScalaService, ScalaUtil}
 
 object Play2RouteGenerator extends CodeGenerator {

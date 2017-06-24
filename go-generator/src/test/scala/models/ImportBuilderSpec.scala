@@ -1,6 +1,6 @@
 package go.models
 
-import com.bryzek.apidoc.spec.v0.models.{Application, Import, Organization}
+import io.apibuilder.spec.v0.models.{Application, Import, Organization}
 import org.scalatest.{FunSpec, Matchers}
 
 class ImportBuilderSpec extends FunSpec with Matchers {

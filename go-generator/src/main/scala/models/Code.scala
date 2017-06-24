@@ -1,8 +1,8 @@
 package go.models
 
-import com.bryzek.apidoc.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, Service, Union}
-import com.bryzek.apidoc.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, Service, Union}
+import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import Formatter._
 import lib.Datatype
 import lib.generator.GeneratorUtil

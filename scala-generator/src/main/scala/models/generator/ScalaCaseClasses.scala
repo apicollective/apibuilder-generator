@@ -1,8 +1,8 @@
 package scala.generator
 
 import scala.models.ApidocComments
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
-import com.bryzek.apidoc.spec.v0.models.Service
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models.Service
 import lib.Text._
 import lib.generator.CodeGenerator
 import generator.ServiceFileNames

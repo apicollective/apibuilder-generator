@@ -2,7 +2,7 @@ package scala.generator
 
 import lib.Datatype
 
-import com.bryzek.apidoc.spec.v0.models.{Field, Model}
+import io.apibuilder.spec.v0.models.{Field, Model}
 
 case class UnionTypeUndefinedModel(ssd: ScalaService) {
 

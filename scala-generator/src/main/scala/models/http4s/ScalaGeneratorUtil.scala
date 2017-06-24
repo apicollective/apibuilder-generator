@@ -2,7 +2,7 @@ package scala.models.http4s
 
 import scala.generator.{ScalaPrimitive, ScalaClientMethodConfig, ScalaUtil, ScalaOperation, ScalaDatatype}
 
-import com.bryzek.apidoc.spec.v0.models.ParameterLocation
+import io.apibuilder.spec.v0.models.ParameterLocation
 import lib.Text._
 
 class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generator.ScalaGeneratorUtil(config) {

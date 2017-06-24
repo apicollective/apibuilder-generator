@@ -1,7 +1,7 @@
 package models.generator
 
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
-import com.bryzek.apidoc.spec.v0.models.{EnumValue, Union, Field, Service, Model, Enum}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models.{EnumValue, Union, Field, Service, Model, Enum}
 
 import lib.Text
 import lib.generator.{GeneratorUtil, CodeGenerator}

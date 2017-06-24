@@ -21,7 +21,7 @@ module Com
 
           module Constants
 
-            NAMESPACE = 'com.bryzek.apidoc.test' unless defined?(Constants::NAMESPACE)
+            NAMESPACE = 'io.apibuilder.test' unless defined?(Constants::NAMESPACE)
             USER_AGENT = 'apidoc:play_2x_client:unknown' unless defined?(Constants::USER_AGENT)
             VERSION = '0.0.1-dev' unless defined?(Constants::VERSION)
             VERSION_MAJOR = 0 unless defined?(VERSION_MAJOR)
@@ -57,7 +57,7 @@ module Com
           end
 
           def users
-            @users ||= ::Com::Bryzek::Apidoc::Test::Clients::Users.new(self)
+            @users ||= ::Io::Apidoc::Test::Clients::Users.new(self)
           end
         end
 
@@ -66,7 +66,7 @@ module Com
           class Users
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Test::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Apidoc::Test::Client)
             end
 
             def post(hash)

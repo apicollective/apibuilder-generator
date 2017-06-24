@@ -1,8 +1,8 @@
 package controllers
 
-import com.bryzek.apidoc.example.union.types.v0.errors.UnitResponse
-import com.bryzek.apidoc.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
-import com.bryzek.apidoc.example.union.types.v0.models.json._
+import io.apibuilder.example.union.types.v0.errors.UnitResponse
+import io.apibuilder.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
+import io.apibuilder.example.union.types.v0.models.json._
 import java.util.UUID
 
 import play.api.test._
@@ -15,7 +15,7 @@ class UsersSpec extends PlaySpec with OneServerPerSuite {
 
   implicit override lazy val port = 9010
   implicit override lazy val app: FakeApplication = FakeApplication()
-  lazy val client = new com.bryzek.apidoc.example.union.types.v0.Client(s"http://localhost:$port")
+  lazy val client = new io.apibuilder.example.union.types.v0.Client(s"http://localhost:$port")
 
   "POST /users with a guest user" in new WithServer {
     val guid = UUID.randomUUID

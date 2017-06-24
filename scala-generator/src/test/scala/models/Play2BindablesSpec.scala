@@ -1,6 +1,6 @@
 package scala.models
 
-import com.bryzek.apidoc.spec.v0.models.Service
+import io.apibuilder.spec.v0.models.Service
 import scala.generator.ScalaService
 import org.scalatest.{ ShouldMatchers, FunSpec }
 

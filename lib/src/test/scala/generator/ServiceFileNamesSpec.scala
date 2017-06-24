@@ -1,6 +1,6 @@
 package generator
 
-import com.bryzek.apidoc.generator.v0.models.File
+import io.apibuilder.generator.v0.models.File
 import org.scalatest.{FunSpec, ShouldMatchers}
 
 class ServiceFileNamesSpec extends FunSpec with ShouldMatchers {
@@ -12,7 +12,7 @@ class ServiceFileNamesSpec extends FunSpec with ShouldMatchers {
       version: String = "0.0.1"
     ): File = {
       ServiceFileNames.toFile(
-        namespace = "com.bryzek.apidoc",
+        namespace = "io.apibuilder",
         organizationKey = "bryzek",
         applicationKey = "apidoc",
         version = version,

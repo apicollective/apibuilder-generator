@@ -1,6 +1,6 @@
 package scala.models
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.FunSpec
 
 import scala.generator.ScalaService

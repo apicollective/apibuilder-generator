@@ -9,7 +9,7 @@ import lib.Text.initLowerCase
 import play.api.libs.json._
 import play.api.Logger
 
-import com.bryzek.apidoc.spec.v0.models.Deprecation
+import io.apibuilder.spec.v0.models.Deprecation
 import scala.util.{Failure, Success, Try}
 
 sealed trait ScalaDatatype {

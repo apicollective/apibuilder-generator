@@ -1,7 +1,7 @@
 package scala.models
 
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class ScalaNestedUnionSpec extends FunSpec with ShouldMatchers {

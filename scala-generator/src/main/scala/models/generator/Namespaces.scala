@@ -1,7 +1,7 @@
 package scala.generator
 
 import lib.generator.GeneratorUtil
-import com.bryzek.apidoc.spec.v0.models.Service
+import io.apibuilder.spec.v0.models.Service
 
 object Namespaces {
 

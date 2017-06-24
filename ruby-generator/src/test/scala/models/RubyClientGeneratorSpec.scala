@@ -1,7 +1,7 @@
 package ruby.models
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import com.bryzek.apidoc.spec.v0.models.{Enum, EnumValue}
+import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.spec.v0.models.{Enum, EnumValue}
 
 import org.scalatest.{ FunSpec, Matchers }
 

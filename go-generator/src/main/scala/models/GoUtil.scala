@@ -1,6 +1,6 @@
 package go.models
 
-import com.bryzek.apidoc.spec.v0.models.Resource
+import io.apibuilder.spec.v0.models.Resource
 import lib.generator.GeneratorUtil
 import lib.Text._
 

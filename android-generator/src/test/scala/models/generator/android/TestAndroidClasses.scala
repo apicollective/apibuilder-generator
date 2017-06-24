@@ -1,6 +1,6 @@
 package models.generator.android
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{FunSpec, ShouldMatchers}
 import com.github.javaparser.JavaParser
 

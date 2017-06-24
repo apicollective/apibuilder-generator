@@ -52,7 +52,7 @@ module Com
           end
 
           def users
-            @users ||= ::Com::Bryzek::Test::V0::Clients::Users.new(self)
+            @users ||= ::Io::Test::V0::Clients::Users.new(self)
           end
         end
 
@@ -61,25 +61,25 @@ module Com
           class Users
 
             def initialize(client)
-              @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Test::V0::Client)
+              @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Test::V0::Client)
             end
 
             def post(user)
-              HttpClient::Preconditions.assert_class('user', user, ::Com::Bryzek::Test::V0::Models::User)
+              HttpClient::Preconditions.assert_class('user', user, ::Io::Test::V0::Models::User)
               r = @client.request("/users").with_json(user.to_json).post
-              ::Com::Bryzek::Test::V0::Models::User.new(r)
+              ::Io::Test::V0::Models::User.new(r)
             end
 
             def get_by_email(email)
               HttpClient::Preconditions.assert_class('email', email, String)
               r = @client.request("/users/#{CGI.escape(email)}").get
-              ::Com::Bryzek::Test::V0::Models::User.new(r)
+              ::Io::Test::V0::Models::User.new(r)
             end
 
             def patch(user_patch)
-              HttpClient::Preconditions.assert_class('user_patch', user_patch, ::Com::Bryzek::Test::V0::Models::UserPatch)
+              HttpClient::Preconditions.assert_class('user_patch', user_patch, ::Io::Test::V0::Models::UserPatch)
               r = @client.request("/users").with_json(user_patch.to_json).patch
-              ::Com::Bryzek::Test::V0::Models::User.new(r)
+              ::Io::Test::V0::Models::User.new(r)
             end
 
           end

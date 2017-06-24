@@ -1,6 +1,6 @@
 package lib
 
-import com.bryzek.apidoc.generator.v0.models.Error
+import io.apibuilder.generator.v0.models.Error
 import play.api.libs.json.JsError
 
 object Validation {

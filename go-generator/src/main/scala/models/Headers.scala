@@ -1,6 +1,6 @@
 package go.models
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.InvocationForm
 import lib.VersionTag
 import lib.Text._
 

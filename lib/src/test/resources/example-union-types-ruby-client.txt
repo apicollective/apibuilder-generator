@@ -24,7 +24,7 @@ module Com
 
                 module Constants
 
-                  NAMESPACE = 'com.bryzek.apidoc.example.union.types.v0' unless defined?(Constants::NAMESPACE)
+                  NAMESPACE = 'io.apibuilder.example.union.types.v0' unless defined?(Constants::NAMESPACE)
                   USER_AGENT = 'apidoc:play_2x_client:unknown' unless defined?(Constants::USER_AGENT)
                   VERSION = '0.3.46' unless defined?(Constants::VERSION)
                   VERSION_MAJOR = 0 unless defined?(VERSION_MAJOR)
@@ -60,7 +60,7 @@ module Com
                 end
 
                 def users
-                  @users ||= ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Clients::Users.new(self)
+                  @users ||= ::Io::Apidoc::Example::Union::Types::V0::Clients::Users.new(self)
                 end
               end
 
@@ -69,24 +69,24 @@ module Com
                 class Users
 
                   def initialize(client)
-                    @client = HttpClient::Preconditions.assert_class('client', client, ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Client)
+                    @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Apidoc::Example::Union::Types::V0::Client)
                   end
 
                   def get
                     r = @client.request("/users").get
-                    r.map { |x| ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(x) }
+                    r.map { |x| ::Io::Apidoc::Example::Union::Types::V0::Models::User.from_json(x) }
                   end
 
                   def get_by_guid(guid)
                     HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(guid), String)
                     r = @client.request("/users/#{guid}").get
-                    ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
+                    ::Io::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
                   end
 
                   def post(user)
-                    (x = user; x.is_a?(::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User) ? x : ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(x))
+                    (x = user; x.is_a?(::Io::Apidoc::Example::Union::Types::V0::Models::User) ? x : ::Io::Apidoc::Example::Union::Types::V0::Models::User.from_json(x))
                     r = @client.request("/users").with_json(user.to_json).post
-                    ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
+                    ::Io::Apidoc::Example::Union::Types::V0::Models::User.from_json(r)
                   end
 
                 end
@@ -334,7 +334,7 @@ module Com
                     HttpClient::Preconditions.require_keys(opts, [:guid, :email, :preference], 'RegisteredUser')
                     @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid(opts.delete(:guid)), String)
                     @email = HttpClient::Preconditions.assert_class('email', opts.delete(:email), String)
-                    @preference = (x = opts.delete(:preference); x.is_a?(::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::Foobar) ? x : ::Com::Bryzek::Apidoc::Example::Union::Types::V0::Models::Foobar.from_json(x))
+                    @preference = (x = opts.delete(:preference); x.is_a?(::Io::Apidoc::Example::Union::Types::V0::Models::Foobar) ? x : ::Io::Apidoc::Example::Union::Types::V0::Models::Foobar.from_json(x))
                   end
 
                   def to_json

@@ -1,6 +1,6 @@
 package scala.models.ning
 
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import scala.generator._
 import scala.models._
 import lib.Text._
