@@ -1,6 +1,6 @@
 package lib.generator
 
-import com.bryzek.apidoc.spec.v0.models.Method
+import io.apibuilder.spec.v0.models.Method
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class GeneratorUtilSpec extends FunSpec with ShouldMatchers {

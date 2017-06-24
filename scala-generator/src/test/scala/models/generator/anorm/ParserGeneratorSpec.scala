@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class ParserGeneratorSpec extends FunSpec with ShouldMatchers {

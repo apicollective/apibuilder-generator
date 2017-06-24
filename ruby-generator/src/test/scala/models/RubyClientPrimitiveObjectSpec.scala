@@ -1,7 +1,7 @@
 package ruby.models
 
-import com.bryzek.apidoc.spec.v0.models._
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.spec.v0.models._
+import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class RubyClientPrimitiveObjectSpec extends FunSpec with ShouldMatchers {

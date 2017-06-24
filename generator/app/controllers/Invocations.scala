@@ -1,7 +1,7 @@
 package controllers
 
-import com.bryzek.apidoc.generator.v0.models.json._
-import com.bryzek.apidoc.generator.v0.models.{Invocation, InvocationForm}
+import io.apibuilder.generator.v0.models.json._
+import io.apibuilder.generator.v0.models.{Invocation, InvocationForm}
 import lib.Validation
 import play.api.libs.json._
 import play.api.mvc._

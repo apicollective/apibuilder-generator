@@ -1,6 +1,6 @@
 package scala.generator.mock
 
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text._

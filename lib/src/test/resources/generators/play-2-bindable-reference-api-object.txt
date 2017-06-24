@@ -3,7 +3,7 @@ object Bindables {
   import play.api.mvc.{PathBindable, QueryStringBindable}
   import org.joda.time.{DateTime, LocalDate}
   import org.joda.time.format.ISODateTimeFormat
-  import com.bryzek.apidoc.reference.api.v0.models._
+  import io.apibuilder.reference.api.v0.models._
 
   // Type: date-time-iso8601
   implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](
@@ -24,13 +24,13 @@ object Bindables {
   )
 
   // Enum: AgeGroup
-  private[this] val enumAgeGroupNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.reference.api.v0.models.AgeGroup.all.mkString(", ")}"
+  private[this] val enumAgeGroupNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.reference.api.v0.models.AgeGroup.all.mkString(", ")}"
 
-  implicit val pathBindableEnumAgeGroup = new PathBindable.Parsing[com.bryzek.apidoc.reference.api.v0.models.AgeGroup] (
+  implicit val pathBindableEnumAgeGroup = new PathBindable.Parsing[io.apibuilder.reference.api.v0.models.AgeGroup] (
     AgeGroup.fromString(_).get, _.toString, enumAgeGroupNotFound
   )
 
-  implicit val queryStringBindableEnumAgeGroup = new QueryStringBindable.Parsing[com.bryzek.apidoc.reference.api.v0.models.AgeGroup](
+  implicit val queryStringBindableEnumAgeGroup = new QueryStringBindable.Parsing[io.apibuilder.reference.api.v0.models.AgeGroup](
     AgeGroup.fromString(_).get, _.toString, enumAgeGroupNotFound
   )
 

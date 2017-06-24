@@ -2,7 +2,7 @@ package scala.models.http4s
 
 import scala.generator.mock.MockClientGenerator
 
-import com.bryzek.apidoc.generator.v0.models.{InvocationForm, File}
+import io.apibuilder.generator.v0.models.{InvocationForm, File}
 import lib.generator.CodeGenerator
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, Namespaces}
 import scala.models.ApidocComments

@@ -1,7 +1,7 @@
 package scala.generator
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import com.bryzek.apidoc.spec.v0.models._
+import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.spec.v0.models._
 import models.TestHelper
 import org.scalatest.{ ShouldMatchers, FunSpec }
 

@@ -1,6 +1,6 @@
 package lib.generator
 
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 
 trait CodeGenerator {
 

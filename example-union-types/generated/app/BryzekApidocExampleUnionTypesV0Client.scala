@@ -3,7 +3,7 @@
  * Service version: 0.3.46
  * apidoc:0.11.19 http://localhost:9000/bryzek/apidoc-example-union-types/0.3.46/play_2_4_client
  */
-package com.bryzek.apidoc.example.union.types.v0.models {
+package io.apibuilder.example.union.types.v0.models {
 
   sealed trait Foobar
 
@@ -17,7 +17,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
   case class RegisteredUser(
     guid: _root_.java.util.UUID,
     email: String,
-    preference: com.bryzek.apidoc.example.union.types.v0.models.Foobar
+    preference: io.apibuilder.example.union.types.v0.models.Foobar
   ) extends User
 
   /**
@@ -114,14 +114,14 @@ package com.bryzek.apidoc.example.union.types.v0.models {
 
 }
 
-package com.bryzek.apidoc.example.union.types.v0.models {
+package io.apibuilder.example.union.types.v0.models {
 
   package object json {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
-    import com.bryzek.apidoc.example.union.types.v0.models.json._
+    import io.apibuilder.example.union.types.v0.models.json._
 
     private[v0] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
@@ -142,13 +142,13 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesBar = new play.api.libs.json.Reads[com.bryzek.apidoc.example.union.types.v0.models.Bar] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.bryzek.apidoc.example.union.types.v0.models.Bar] = {
+    implicit val jsonReadsApidocExampleUnionTypesBar = new play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Bar] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.example.union.types.v0.models.Bar] = {
         js match {
-          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.Bar(v.value))
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Bar(v.value))
           case _ => {
             (js \ "value").validate[String] match {
-              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.Bar(v))
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Bar(v))
               case err: play.api.libs.json.JsError => err
             }
           }
@@ -156,29 +156,29 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       }
     }
 
-    def jsonWritesApidocExampleUnionTypesBar(obj: com.bryzek.apidoc.example.union.types.v0.models.Bar) = {
+    def jsonWritesApidocExampleUnionTypesBar(obj: io.apibuilder.example.union.types.v0.models.Bar) = {
       play.api.libs.json.JsString(obj.toString)
     }
 
-    def jsObjectBar(obj: com.bryzek.apidoc.example.union.types.v0.models.Bar) = {
+    def jsObjectBar(obj: io.apibuilder.example.union.types.v0.models.Bar) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
 
     implicit def jsonWritesApidocExampleUnionTypesBar: play.api.libs.json.Writes[Bar] = {
-      new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.Bar] {
-        def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Bar) = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.Bar] {
+        def writes(obj: io.apibuilder.example.union.types.v0.models.Bar) = {
           jsonWritesApidocExampleUnionTypesBar(obj)
         }
       }
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesFoo = new play.api.libs.json.Reads[com.bryzek.apidoc.example.union.types.v0.models.Foo] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.bryzek.apidoc.example.union.types.v0.models.Foo] = {
+    implicit val jsonReadsApidocExampleUnionTypesFoo = new play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Foo] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.example.union.types.v0.models.Foo] = {
         js match {
-          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.Foo(v.value))
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Foo(v.value))
           case _ => {
             (js \ "value").validate[String] match {
-              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.Foo(v))
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Foo(v))
               case err: play.api.libs.json.JsError => err
             }
           }
@@ -186,17 +186,17 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       }
     }
 
-    def jsonWritesApidocExampleUnionTypesFoo(obj: com.bryzek.apidoc.example.union.types.v0.models.Foo) = {
+    def jsonWritesApidocExampleUnionTypesFoo(obj: io.apibuilder.example.union.types.v0.models.Foo) = {
       play.api.libs.json.JsString(obj.toString)
     }
 
-    def jsObjectFoo(obj: com.bryzek.apidoc.example.union.types.v0.models.Foo) = {
+    def jsObjectFoo(obj: io.apibuilder.example.union.types.v0.models.Foo) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
 
     implicit def jsonWritesApidocExampleUnionTypesFoo: play.api.libs.json.Writes[Foo] = {
-      new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.Foo] {
-        def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Foo) = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.Foo] {
+        def writes(obj: io.apibuilder.example.union.types.v0.models.Foo) = {
           jsonWritesApidocExampleUnionTypesFoo(obj)
         }
       }
@@ -209,7 +209,7 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       )(GuestUser.apply _)
     }
 
-    def jsObjectGuestUser(obj: com.bryzek.apidoc.example.union.types.v0.models.GuestUser) = {
+    def jsObjectGuestUser(obj: io.apibuilder.example.union.types.v0.models.GuestUser) = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email)
@@ -220,11 +220,11 @@ package com.bryzek.apidoc.example.union.types.v0.models {
       (
         (__ \ "guid").read[_root_.java.util.UUID] and
         (__ \ "email").read[String] and
-        (__ \ "preference").read[com.bryzek.apidoc.example.union.types.v0.models.Foobar]
+        (__ \ "preference").read[io.apibuilder.example.union.types.v0.models.Foobar]
       )(RegisteredUser.apply _)
     }
 
-    def jsObjectRegisteredUser(obj: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser) = {
+    def jsObjectRegisteredUser(obj: io.apibuilder.example.union.types.v0.models.RegisteredUser) = {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email),
@@ -242,21 +242,21 @@ package com.bryzek.apidoc.example.union.types.v0.models {
         orElse
         (__ \ "bar").read(jsonReadsApidocExampleUnionTypesBar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
         orElse
-        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.FoobarUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Foobar]]
       )
     }
 
-    def jsObjectFoobar(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = {
+    def jsObjectFoobar(obj: io.apibuilder.example.union.types.v0.models.Foobar) = {
       obj match {
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.JsString(x.toString))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.JsString(x.toString))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
+        case x: io.apibuilder.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.JsString(x.toString))
+        case x: io.apibuilder.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.JsString(x.toString))
+        case x: io.apibuilder.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[io.apibuilder.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
       }
     }
 
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = {
-      new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.Foobar] {
-        def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.Foobar) = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.Foobar] {
+        def writes(obj: io.apibuilder.example.union.types.v0.models.Foobar) = {
           jsObjectFoobar(obj)
         }
       }
@@ -270,22 +270,22 @@ package com.bryzek.apidoc.example.union.types.v0.models {
         orElse
         (__ \ "uuid").read(jsonReadsApidocExampleUnionTypesUserUuid).asInstanceOf[play.api.libs.json.Reads[User]]
         orElse
-        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
+        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
       )
     }
 
-    def jsObjectUser(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = {
+    def jsObjectUser(obj: io.apibuilder.example.union.types.v0.models.User) = {
       obj match {
-        case x: com.bryzek.apidoc.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsObjectRegisteredUser(x))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsObjectGuestUser(x))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.UserUuid => play.api.libs.json.Json.obj("uuid" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.value.toString)))
-        case x: com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apidoc.example.union.types.v0.models.UserUndefinedType] should never be serialized")
+        case x: io.apibuilder.example.union.types.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsObjectRegisteredUser(x))
+        case x: io.apibuilder.example.union.types.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsObjectGuestUser(x))
+        case x: io.apibuilder.example.union.types.v0.models.UserUuid => play.api.libs.json.Json.obj("uuid" -> play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(x.value.toString)))
+        case x: io.apibuilder.example.union.types.v0.models.UserUndefinedType => sys.error(s"The type[io.apibuilder.example.union.types.v0.models.UserUndefinedType] should never be serialized")
       }
     }
 
     implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = {
-      new play.api.libs.json.Writes[com.bryzek.apidoc.example.union.types.v0.models.User] {
-        def writes(obj: com.bryzek.apidoc.example.union.types.v0.models.User) = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.User] {
+        def writes(obj: io.apibuilder.example.union.types.v0.models.User) = {
           jsObjectUser(obj)
         }
       }
@@ -293,14 +293,14 @@ package com.bryzek.apidoc.example.union.types.v0.models {
   }
 }
 
-package com.bryzek.apidoc.example.union.types.v0 {
+package io.apibuilder.example.union.types.v0 {
 
   object Bindables {
 
     import play.api.mvc.{PathBindable, QueryStringBindable}
     import org.joda.time.{DateTime, LocalDate}
     import org.joda.time.format.ISODateTimeFormat
-    import com.bryzek.apidoc.example.union.types.v0.models._
+    import io.apibuilder.example.union.types.v0.models._
 
     // Type: date-time-iso8601
     implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](
@@ -321,24 +321,24 @@ package com.bryzek.apidoc.example.union.types.v0 {
     )
 
     // Enum: Bar
-    private[this] val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Bar.all.mkString(", ")}"
+    private[this] val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.v0.models.Bar.all.mkString(", ")}"
 
-    implicit val pathBindableEnumBar = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Bar] (
+    implicit val pathBindableEnumBar = new PathBindable.Parsing[io.apibuilder.example.union.types.v0.models.Bar] (
       Bar.fromString(_).get, _.toString, enumBarNotFound
     )
 
-    implicit val queryStringBindableEnumBar = new QueryStringBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Bar](
+    implicit val queryStringBindableEnumBar = new QueryStringBindable.Parsing[io.apibuilder.example.union.types.v0.models.Bar](
       Bar.fromString(_).get, _.toString, enumBarNotFound
     )
 
     // Enum: Foo
-    private[this] val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${com.bryzek.apidoc.example.union.types.v0.models.Foo.all.mkString(", ")}"
+    private[this] val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.v0.models.Foo.all.mkString(", ")}"
 
-    implicit val pathBindableEnumFoo = new PathBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Foo] (
+    implicit val pathBindableEnumFoo = new PathBindable.Parsing[io.apibuilder.example.union.types.v0.models.Foo] (
       Foo.fromString(_).get, _.toString, enumFooNotFound
     )
 
-    implicit val queryStringBindableEnumFoo = new QueryStringBindable.Parsing[com.bryzek.apidoc.example.union.types.v0.models.Foo](
+    implicit val queryStringBindableEnumFoo = new QueryStringBindable.Parsing[io.apibuilder.example.union.types.v0.models.Foo](
       Foo.fromString(_).get, _.toString, enumFooNotFound
     )
 
@@ -347,11 +347,11 @@ package com.bryzek.apidoc.example.union.types.v0 {
 }
 
 
-package com.bryzek.apidoc.example.union.types.v0 {
+package io.apibuilder.example.union.types.v0 {
 
   object Constants {
 
-    val Namespace = "com.bryzek.apidoc.example.union.types.v0"
+    val Namespace = "io.apibuilder.example.union.types.v0"
     val UserAgent = "apidoc:0.11.19 http://localhost:9000/bryzek/apidoc-example-union-types/0.3.46/play_2_4_client"
     val Version = "0.3.46"
     val VersionMajor = 0
@@ -360,47 +360,47 @@ package com.bryzek.apidoc.example.union.types.v0 {
 
   class Client(
     val baseUrl: String,
-    auth: scala.Option[com.bryzek.apidoc.example.union.types.v0.Authorization] = None,
+    auth: scala.Option[io.apibuilder.example.union.types.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {
-    import com.bryzek.apidoc.example.union.types.v0.models.json._
+    import io.apibuilder.example.union.types.v0.models.json._
 
-    private[this] val logger = play.api.Logger("com.bryzek.apidoc.example.union.types.v0.Client")
+    private[this] val logger = play.api.Logger("io.apibuilder.example.union.types.v0.Client")
 
-    logger.info(s"Initializing com.bryzek.apidoc.example.union.types.v0.Client for url $baseUrl")
+    logger.info(s"Initializing io.apibuilder.example.union.types.v0.Client for url $baseUrl")
 
     def users: Users = Users
 
     object Users extends Users {
       override def get(
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.example.union.types.v0.models.User]] = {
         _executeRequest("GET", s"/users", requestHeaders = requestHeaders).map {
-          case r if r.status == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("Seq[com.bryzek.apidoc.example.union.types.v0.models.User]", r, _.validate[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]])
-          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+          case r if r.status == 200 => _root_.io.apibuilder.example.union.types.v0.Client.parseJson("Seq[io.apibuilder.example.union.types.v0.models.User]", r, _.validate[Seq[io.apibuilder.example.union.types.v0.models.User]])
+          case r => throw new io.apibuilder.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
       }
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.example.union.types.v0.models.User] = {
         _executeRequest("GET", s"/users/${guid}", requestHeaders = requestHeaders).map {
-          case r if r.status == 200 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.models.User])
-          case r if r.status == 404 => throw new com.bryzek.apidoc.example.union.types.v0.errors.UnitResponse(r.status)
-          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
+          case r if r.status == 200 => _root_.io.apibuilder.example.union.types.v0.Client.parseJson("io.apibuilder.example.union.types.v0.models.User", r, _.validate[io.apibuilder.example.union.types.v0.models.User])
+          case r if r.status == 404 => throw new io.apibuilder.example.union.types.v0.errors.UnitResponse(r.status)
+          case r => throw new io.apibuilder.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
         }
       }
 
       override def post(
-        user: com.bryzek.apidoc.example.union.types.v0.models.User,
+        user: io.apibuilder.example.union.types.v0.models.User,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.example.union.types.v0.models.User] = {
         val payload = play.api.libs.json.Json.toJson(user)
 
         _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
-          case r if r.status == 201 => _root_.com.bryzek.apidoc.example.union.types.v0.Client.parseJson("com.bryzek.apidoc.example.union.types.v0.models.User", r, _.validate[com.bryzek.apidoc.example.union.types.v0.models.User])
-          case r => throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201")
+          case r if r.status == 201 => _root_.io.apibuilder.example.union.types.v0.Client.parseJson("io.apibuilder.example.union.types.v0.models.User", r, _.validate[io.apibuilder.example.union.types.v0.models.User])
+          case r => throw new io.apibuilder.example.union.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201")
         }
       }
     }
@@ -481,7 +481,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
       f(play.api.libs.json.Json.parse(r.body)) match {
         case play.api.libs.json.JsSuccess(x, _) => x
         case play.api.libs.json.JsError(errors) => {
-          throw new com.bryzek.apidoc.example.union.types.v0.errors.FailedRequest(r.status, s"Invalid json for class[" + className + "]: " + errors.mkString(" "))
+          throw new io.apibuilder.example.union.types.v0.errors.FailedRequest(r.status, s"Invalid json for class[" + className + "]: " + errors.mkString(" "))
         }
       }
     }
@@ -497,7 +497,7 @@ package com.bryzek.apidoc.example.union.types.v0 {
 
     trait Client {
       def baseUrl: String
-      def users: com.bryzek.apidoc.example.union.types.v0.Users
+      def users: io.apibuilder.example.union.types.v0.Users
     }
 
   }
@@ -505,22 +505,22 @@ package com.bryzek.apidoc.example.union.types.v0 {
   trait Users {
     def get(
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.bryzek.apidoc.example.union.types.v0.models.User]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.example.union.types.v0.models.User]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.example.union.types.v0.models.User]
 
     def post(
-      user: com.bryzek.apidoc.example.union.types.v0.models.User,
+      user: io.apibuilder.example.union.types.v0.models.User,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.bryzek.apidoc.example.union.types.v0.models.User]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.example.union.types.v0.models.User]
   }
 
   package errors {
 
-    import com.bryzek.apidoc.example.union.types.v0.models.json._
+    import io.apibuilder.example.union.types.v0.models.json._
 
     case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 

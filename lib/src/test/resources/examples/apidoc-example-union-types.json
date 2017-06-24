@@ -9,7 +9,7 @@
   "application": {
     "key": "apidoc-example-union-types"
   },
-  "namespace": "com.bryzek.apidoc.example.union.types.v0",
+  "namespace": "io.apibuilder.example.union.types.v0",
   "version": "0.3.46",
   "info": {},
   "headers": [],

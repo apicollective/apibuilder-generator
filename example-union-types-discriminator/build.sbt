@@ -2,7 +2,7 @@ import play.PlayImport.PlayKeys._
 
 name := "apidoc-example-union-types-discriminator"
 
-organization := "com.bryzek.apidoc.generator"
+organization := "io.apibuilder.generator"
 
 scalaVersion in ThisBuild := "2.11.7"
 
@@ -21,7 +21,7 @@ lazy val api = project
   .aggregate(generated)
   .enablePlugins(PlayScala)
   .settings(
-    routesImport += "com.bryzek.apidoc.example.union.types.discriminator.v0._",
+    routesImport += "io.apibuilder.example.union.types.discriminator.v0._",
     libraryDependencies ++= Seq(
       ws,
       specs2 % Test,

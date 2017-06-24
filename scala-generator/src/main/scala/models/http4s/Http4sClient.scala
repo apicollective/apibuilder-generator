@@ -1,6 +1,6 @@
 package scala.models.http4s
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.InvocationForm
 import scala.generator.{ScalaClientMethodConfig, ScalaUtil}
 import scala.models.{Headers, JsonImports}
 

@@ -1,6 +1,6 @@
 package scala.generator
 
-import com.bryzek.apidoc.spec.v0.models.{Field, Model}
+import io.apibuilder.spec.v0.models.{Field, Model}
 
 object PrimitiveWrapper {
 

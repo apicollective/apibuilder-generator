@@ -1,6 +1,6 @@
 package scala.generator
 
-import com.bryzek.apidoc.spec.v0.models._
+import io.apibuilder.spec.v0.models._
 import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
 import scala.models.Util

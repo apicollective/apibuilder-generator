@@ -1,14 +1,14 @@
 code:
-  bryzek:
-    apidoc-common:
+  apicollective:
+    apibuilder-common:
       version: latest
       generators:
         play_2_x_json: generated/app
-    apidoc-spec:
+    apibuilder-spec:
       version: latest
       generators:
         play_2_4_client: generated/app
-    apidoc-generator:
+    apibuilder-generator:
       version: latest
       generators:
         play_2_4_client: generated/app

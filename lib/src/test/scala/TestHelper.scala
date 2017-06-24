@@ -4,9 +4,9 @@ import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 
 import play.api.libs.json._
-import com.bryzek.apidoc.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import com.bryzek.apidoc.spec.v0.models.json._
-import com.bryzek.apidoc.spec.v0.models.Service
+import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
+import io.apibuilder.spec.v0.models.json._
+import io.apibuilder.spec.v0.models.Service
 import lib.Text
 import java.io.File
 
@@ -21,7 +21,7 @@ object TestHelper extends Matchers {
   lazy val apidocApiService = parseFile(s"/examples/apidoc-api.json")
 
   def buildJson(json: String): String = {
-    val specVersion = com.bryzek.apidoc.spec.v0.Constants.Version
+    val specVersion = io.apibuilder.spec.v0.Constants.Version
     val body = s"""
       "apidoc": { "version": "$specVersion" },
       "base_url": "http://localhost:9000",

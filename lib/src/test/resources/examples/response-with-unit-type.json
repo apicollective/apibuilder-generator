@@ -9,7 +9,7 @@
   "application": {
     "key": "apidoc-response-with-unit-type"
   },
-  "namespace": "com.bryzek.apidoc.test",
+  "namespace": "io.apibuilder.test",
   "version": "0.0.1-dev",
   "headers": [],
   "info": [],

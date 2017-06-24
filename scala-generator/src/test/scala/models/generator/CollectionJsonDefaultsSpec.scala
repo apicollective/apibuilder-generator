@@ -1,6 +1,6 @@
 package scala.generator
 
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.InvocationForm
 import scala.models.Play23ClientGenerator
 import scala.models.ning.Ning18ClientGenerator
 

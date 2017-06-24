@@ -3,7 +3,7 @@ package scala.models.http4s
 import scala.generator.ScalaDatatype
 import scala.generator.ScalaPrimitive.{ObjectAsPlay, ObjectAsCirce, DateIso8601Joda, DateIso8601Java, DateTimeIso8601Joda, DateTimeIso8601Java}
 
-import com.bryzek.apidoc.spec.v0.models.Service
+import io.apibuilder.spec.v0.models.Service
 import lib.Datatype
 
 class ScalaService(service: Service) extends scala.generator.ScalaService(service) {

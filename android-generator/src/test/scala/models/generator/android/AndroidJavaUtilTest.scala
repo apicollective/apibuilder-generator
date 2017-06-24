@@ -68,11 +68,11 @@ class AndroidJavaUtilTest
 
   "isModelNameWithPackage" should "return correctly" in {
     isModelNameWithPackage("abc") should be(false)
-    isModelNameWithPackage("com.bryzek.apidoc.common.v0.models.reference") should be(true)
+    isModelNameWithPackage("io.apibuilder.common.v0.models.reference") should be(true)
   }
 
   "capitalizeModelNameWithPackage" should "capitalize last word" in {
-    capitalizeModelNameWithPackage("com.bryzek.apidoc.common.v0.models.reference") should be("com.bryzek.apidoc.common.v0.models.Reference")
+    capitalizeModelNameWithPackage("io.apibuilder.common.v0.models.reference") should be("io.apibuilder.common.v0.models.Reference")
   }
 
   it should "handle arrays" in {

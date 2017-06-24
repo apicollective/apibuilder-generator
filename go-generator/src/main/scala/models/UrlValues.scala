@@ -1,7 +1,7 @@
 package go.models
 
 import Formatter._
-import com.bryzek.apidoc.spec.v0.models.Parameter
+import io.apibuilder.spec.v0.models.Parameter
 import lib.{Datatype, DatatypeResolver}
 
 case class UrlValues(

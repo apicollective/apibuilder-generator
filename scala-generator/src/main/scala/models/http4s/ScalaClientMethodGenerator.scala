@@ -1,6 +1,6 @@
 package scala.models.http4s
 
-import com.bryzek.apidoc.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
+import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import scala.generator.{ScalaClientMethodConfig, ScalaUtil, ScalaResource, ScalaOperation}
 
 class ScalaClientMethodGenerator (

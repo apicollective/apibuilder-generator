@@ -1,6 +1,6 @@
 package scala.models
 
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
 import scala.generator.{ScalaCaseClasses, ScalaService}

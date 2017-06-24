@@ -2,8 +2,8 @@ package scala.generator.anorm
 
 import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUtil}
 import scala.models.ApidocComments
-import com.bryzek.apidoc.spec.v0.models.Service
-import com.bryzek.apidoc.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models.Service
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text

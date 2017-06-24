@@ -1,6 +1,6 @@
 package generator
 
-import com.bryzek.apidoc.generator.v0.models.File
+import io.apibuilder.generator.v0.models.File
 import org.scalatest.{FunSpec, ShouldMatchers}
 
 class ServiceFileNamesSpec extends FunSpec with ShouldMatchers {
@@ -12,9 +12,9 @@ class ServiceFileNamesSpec extends FunSpec with ShouldMatchers {
       version: String = "0.0.1"
     ): File = {
       ServiceFileNames.toFile(
-        namespace = "com.bryzek.apidoc",
-        organizationKey = "bryzek",
-        applicationKey = "apidoc",
+        namespace = "io.apibuilder",
+        organizationKey = "apicollective",
+        applicationKey = "apibuilder",
         version = version,
         suffix = "Client",
         contents = "test",
@@ -24,14 +24,14 @@ class ServiceFileNamesSpec extends FunSpec with ShouldMatchers {
 
     it("ruby is underscored") {
       val file = toFile("ruby")
-      file.name should be("bryzek_apidoc_v0_client.rb")
-      file.dir should be(Some("com/bryzek/apidoc"))
+      file.name should be("apicollective_apibuilder_v0_client.rb")
+      file.dir should be(Some("io/apibuilder"))
     }
 
     it("scala is camelcased") {
       val file = toFile("scala")
-      file.name should be("BryzekApidocV0Client.scala")
-      file.dir should be(Some("com/bryzek/apidoc"))
+      file.name should be("ApicollectiveApibuilderV0Client.scala")
+      file.dir should be(Some("io/apibuilder"))
     }
 
   }

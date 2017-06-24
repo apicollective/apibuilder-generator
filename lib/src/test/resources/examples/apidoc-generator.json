@@ -9,7 +9,7 @@
   "application": {
     "key": "apidoc-generator"
   },
-  "namespace": "com.bryzek.apidoc.generator.v0",
+  "namespace": "io.apibuilder.generator.v0",
   "version": "0.11.17",
   "info": {
     "license": {
@@ -26,7 +26,7 @@
   "imports": [
     {
       "uri": "http://www.apidoc.me/bryzek/apidoc-common/0.11.17/service.json",
-      "namespace": "com.bryzek.apidoc.common.v0",
+      "namespace": "io.apibuilder.common.v0",
       "organization": {
         "key": "bryzek"
       },
@@ -45,7 +45,7 @@
     },
     {
       "uri": "http://www.apidoc.me/bryzek/apidoc-spec/0.11.17/service.json",
-      "namespace": "com.bryzek.apidoc.spec.v0",
+      "namespace": "io.apibuilder.spec.v0",
       "organization": {
         "key": "bryzek"
       },
@@ -249,7 +249,7 @@
       "fields": [
         {
           "name": "service",
-          "type": "com.bryzek.apidoc.spec.v0.models.service",
+          "type": "io.apibuilder.spec.v0.models.service",
           "required": true,
           "attributes": []
         },

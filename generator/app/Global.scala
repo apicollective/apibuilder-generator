@@ -1,4 +1,4 @@
-import com.bryzek.apidoc.generator.v0.models.json._
+import io.apibuilder.generator.v0.models.json._
 import lib.Validation
 import play.api._
 import play.api.mvc._

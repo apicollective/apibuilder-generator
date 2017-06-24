@@ -2,7 +2,7 @@ package models.generator
 
 import java.util.regex.Pattern
 
-import com.bryzek.apidoc.spec.v0.models.{Apidoc, Application, Enum, EnumValue, Field, Info, Model, Organization, Service, Union, UnionType}
+import io.apibuilder.spec.v0.models.{Apidoc, Application, Enum, EnumValue, Field, Info, Model, Organization, Service, Union, UnionType}
 import org.scalatest.{FunSpec, ShouldMatchers}
 import org.scalatest.mock.MockitoSugar
 import com.github.javaparser.JavaParser
@@ -228,7 +228,7 @@ class JavaClassesSpec extends FunSpec with ShouldMatchers with MockitoSugar {
     }
   }
 
-  def assertValidJavaSourceFile(sourceFile: com.bryzek.apidoc.generator.v0.models.File): Unit = {
+  def assertValidJavaSourceFile(sourceFile: io.apibuilder.generator.v0.models.File): Unit = {
     sourceFile.name.endsWith(".java") shouldBe true
     sourceFile.contents.size shouldBe > (0)
     val javaName = sourceFile.name.split(Pattern.quote(".")).head

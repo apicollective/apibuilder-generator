@@ -10,21 +10,21 @@ import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, JsonProcessingException, Version}
-import com.bryzek.apidoc.spec.v0.models._
+import io.apibuilder.spec.v0.models._
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import java.util.Locale
 import java.io.IOException
 
-import com.bryzek.apidoc.spec.v0.models.Enum
+import io.apibuilder.spec.v0.models.Enum
 
 import scala.Some
-import com.bryzek.apidoc.generator.v0.models.InvocationForm
-import com.bryzek.apidoc.spec.v0.models.Union
-import com.bryzek.apidoc.generator.v0.models.File
-import com.bryzek.apidoc.spec.v0.models.Model
-import com.bryzek.apidoc.spec.v0.models.Resource
-import com.bryzek.apidoc.spec.v0.models.Service
+import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.spec.v0.models.Union
+import io.apibuilder.generator.v0.models.File
+import io.apibuilder.spec.v0.models.Model
+import io.apibuilder.spec.v0.models.Resource
+import io.apibuilder.spec.v0.models.Service
 import com.squareup.javapoet.AnnotationSpec.Builder
 
 import collection.JavaConverters._

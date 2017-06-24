@@ -1,7 +1,7 @@
 package scala.models
 
 import scala.generator.Namespaces
-import com.bryzek.apidoc.spec.v0.models.Service
+import io.apibuilder.spec.v0.models.Service
 
 /**
   * Given a service, returns a list of all of the imports needed for

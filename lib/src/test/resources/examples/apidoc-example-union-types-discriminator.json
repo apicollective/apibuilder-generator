@@ -9,7 +9,7 @@
   "application": {
     "key": "apidoc-example-union-types-discriminator"
   },
-  "namespace": "com.bryzek.apidoc.example.union.types.discriminator.v0",
+  "namespace": "io.apibuilder.example.union.types.discriminator.v0",
   "version": "0.3.46",
   "info": {},
   "headers": [],

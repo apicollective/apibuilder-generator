@@ -1,6 +1,6 @@
 package lib.generator
 
-import com.bryzek.apidoc.spec.v0.models.{Method, ParameterLocation, Service}
+import io.apibuilder.spec.v0.models.{Method, ParameterLocation, Service}
 import lib.{Datatype, DatatypeResolver}
 import lib.Text
 import lib.Text._

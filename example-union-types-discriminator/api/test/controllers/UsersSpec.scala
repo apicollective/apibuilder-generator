@@ -1,9 +1,9 @@
 package controllers
 
-import com.bryzek.apidoc.example.union.types.discriminator.v0.Client
-import com.bryzek.apidoc.example.union.types.discriminator.v0.errors.UnitResponse
-import com.bryzek.apidoc.example.union.types.discriminator.v0.models._
-import com.bryzek.apidoc.example.union.types.discriminator.v0.models.json._
+import io.apibuilder.example.union.types.discriminator.v0.Client
+import io.apibuilder.example.union.types.discriminator.v0.errors.UnitResponse
+import io.apibuilder.example.union.types.discriminator.v0.models._
+import io.apibuilder.example.union.types.discriminator.v0.models.json._
 
 import java.util.UUID
 import scala.util.{Failure, Success, Try}
