@@ -13,8 +13,8 @@ class ServiceFileNamesSpec extends FunSpec with ShouldMatchers {
     ): File = {
       ServiceFileNames.toFile(
         namespace = "io.apibuilder",
-        organizationKey = "bryzek",
-        applicationKey = "apidoc",
+        organizationKey = "apicollective",
+        applicationKey = "apibuilder",
         version = version,
         suffix = "Client",
         contents = "test",
@@ -24,14 +24,14 @@ class ServiceFileNamesSpec extends FunSpec with ShouldMatchers {
 
     it("ruby is underscored") {
       val file = toFile("ruby")
-      file.name should be("bryzek_apidoc_v0_client.rb")
-      file.dir should be(Some("com/bryzek/apidoc"))
+      file.name should be("apicollective_apibuilder_v0_client.rb")
+      file.dir should be(Some("io/apibuilder"))
     }
 
     it("scala is camelcased") {
       val file = toFile("scala")
-      file.name should be("BryzekApidocV0Client.scala")
-      file.dir should be(Some("com/bryzek/apidoc"))
+      file.name should be("ApicollectiveApibuilderV0Client.scala")
+      file.dir should be(Some("io/apibuilder"))
     }
 
   }

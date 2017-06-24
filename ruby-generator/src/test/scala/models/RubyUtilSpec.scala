@@ -12,11 +12,11 @@ class RubyUtilSpec extends FunSpec with Matchers {
   it("RubyUtil.Module") {
     RubyUtil.Module("foobar").fullName should be("::Foobar")
     RubyUtil.Module("foo_bar").fullName should be("::FooBar")
-    RubyUtil.Module("io.apibuilder.v0").parts should be(Seq("Com", "Bryzek", "Apidoc", "V0"))
-    RubyUtil.Module("io.apibuilder.v0").fullName should be("::Io::Apidoc::V0")
-    RubyUtil.Module("io.apibuilder.v0.models.change_type").fullName should be("::Io::Apidoc::V0::Models::ChangeType")
-    RubyUtil.Module("io.apibuilder.v0.enums.change_type").fullName should be("::Io::Apidoc::V0::Models::ChangeType")
-    RubyUtil.Module("io.apibuilder.v0.unions.change_type").fullName should be("::Io::Apidoc::V0::Models::ChangeType")
+    RubyUtil.Module("io.apibuilder.v0").parts should be(Seq("Io", "Apibuilder", "V0"))
+    RubyUtil.Module("io.apibuilder.v0").fullName should be("::Io::Apibuilder::V0")
+    RubyUtil.Module("io.apibuilder.v0.models.change_type").fullName should be("::Io::Apibuilder::V0::Models::ChangeType")
+    RubyUtil.Module("io.apibuilder.v0.enums.change_type").fullName should be("::Io::Apibuilder::V0::Models::ChangeType")
+    RubyUtil.Module("io.apibuilder.v0.unions.change_type").fullName should be("::Io::Apibuilder::V0::Models::ChangeType")
   }
 
   it("RubyUtil.toVariable") {
