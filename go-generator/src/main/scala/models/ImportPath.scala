@@ -17,11 +17,11 @@ case class ImportPath(url: String, alias: String) extends Ordered[ImportPath] {
 object ImportPath {
 
   // Ex: io.flow.carrier.account.v0.unions.expandable_carrier_account
-  private[this] val ApidocUrlPattern = """^(.+)\.v\d+\.\w+\.?([^\.]*)$""".r
+  private[this] val ApibuilderUrlPattern = """^(.+)\.v\d+\.\w+\.?([^\.]*)$""".r
 
   def apply(value: String, mappings: Map[String, String]): ImportPath = {
     value match {
-      case ApidocUrlPattern(pkg, app) => {
+      case ApibuilderUrlPattern(pkg, app) => {
 
         mappings.keys.toSeq.sortBy(_.length).reverse.find { key =>
           pkg.startsWith(s"${key}.")
