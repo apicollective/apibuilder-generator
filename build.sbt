@@ -1,6 +1,6 @@
 import play.PlayImport.PlayKeys._
 
-name := "apidoc-generator"
+name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
@@ -69,7 +69,7 @@ lazy val androidGenerator = project
   )
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
-  name <<= name("apidoc-" + _),
+  name <<= name("apibuilder-generator-" + _),
   organization := "io.apibuilder",
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
