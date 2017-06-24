@@ -1,4 +1,5 @@
 builds:
   - root:
+      instance.type: t2.small
       port.container: 9000
       port.host: 7072
