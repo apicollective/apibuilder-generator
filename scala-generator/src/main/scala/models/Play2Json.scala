@@ -326,6 +326,9 @@ case class Play2Json(
         case ScalaDatatype.Option(inner) => getShortName(inner)
         case ScalaDatatype.List(inner)   => getShortName(inner)
         case ScalaDatatype.Map(inner)    => getShortName(inner)
+        case _ => {
+          sys.error(s"Unexpected datatype: $dt")
+        }
       }
     }
 
