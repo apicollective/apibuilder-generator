@@ -120,6 +120,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_6_client",
+        name = "Play 2.6 client",
+        description = Some("Play Framework 2.6 client based on <a href='http://www.playframework.com/documentation/2.6.x/ScalaWS'>WS API</a>."),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Beta,
+      codeGenerator = Some(scala.models.Play25ClientGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "play_2_x_json",
         name = "Play 2.x json",
         description = Some("Generate play 2.x case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
@@ -238,6 +248,16 @@ object Generators {
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play25)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "play_2_6_mock_client",
+        name = "Play 2.6 Mock Client",
+        description = Some("Provides a mock client with non functional, but compiling stubs, that can serve as a baseline for testing"),
+        language = Some("Java, Scala")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play26)
     ),
     CodeGenTarget(
       metaData = Generator(

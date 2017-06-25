@@ -27,6 +27,15 @@ object MockClientGenerator {
 
   }
 
+  object Play26 extends CodeGenerator {
+
+    override def invoke(form: InvocationForm) = {
+      val ssd = new ScalaService(form.service)
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play26(ssd.namespaces.base, None)).invoke()
+    }
+
+  }
+
 }
 
 class MockClientGenerator(
