@@ -1,8 +1,11 @@
 package scala.models
 
+import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.Method
-import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaService, ScalaClientMethodGenerator, ScalaClientMethodConfigs}
-import org.scalatest.{ShouldMatchers, FunSpec}
+import models.TestHelper
+
+import scala.generator.{ScalaClientMethodConfigs, ScalaClientMethodGenerator, ScalaDatatype, ScalaPrimitive, ScalaService}
+import org.scalatest.{FunSpec, ShouldMatchers}
 
 class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
 
@@ -70,6 +73,15 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     val ssd = ScalaService(models.TestHelper.service(json))
     val contents = new ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
     models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
+  }
+
+  it("Play 2.6.x generator produces valid Scala code") {
+    val service = models.TestHelper.generatorApiService
+    val ssd = new ScalaService(service)
+    val invocationForm = InvocationForm(service, Seq.empty, None)
+    val play26Config = ScalaClientMethodConfigs.Play26("whatever", None)
+    val output = Play26ClientGenerator.invoke(invocationForm).right.get
+    TestHelper.assertValidScalaSourceFiles(output)
   }
 
 /*
