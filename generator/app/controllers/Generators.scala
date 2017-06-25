@@ -126,7 +126,7 @@ object Generators {
         language = Some("Scala")
       ),
       status = lib.generator.Status.Beta,
-      codeGenerator = Some(scala.models.Play25ClientGenerator)
+      codeGenerator = Some(scala.models.Play26ClientGenerator)
     ),
     CodeGenTarget(
       metaData = Generator(
