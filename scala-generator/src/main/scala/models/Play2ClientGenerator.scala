@@ -167,7 +167,7 @@ ${methodGenerator.accessors().indent(4)}
 ${methodGenerator.objects().indent(4)}
 
     def _requestHolder(path: String): ${version.requestHolderClass} = {
-      ${if (version.config.expectsInjectedWsClient) "" else "import play.api.Play.current\n"}
+${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Play.current\n"}
       val holder = ${if (version.config.expectsInjectedWsClient) "ws" else "play.api.libs.ws.WS"}.url(baseUrl + path)$headerString
       auth.fold(holder) {
         case Authorization.Basic(username, password) => {
