@@ -297,7 +297,7 @@ class ScalaClientMethod(
     }
 
     ScalaUtil.textToComment(methoddesc + "\n" + paramsdesc.mkString("\n")) match {
-      case "" => ""
+      case "" => "" // don't add extra \n for empty comments
       case x => x + "\n"
     }
   }
