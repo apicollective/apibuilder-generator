@@ -71,7 +71,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       case Some(code) => s"\n\n$code"
     }
 
-    generateScalaDoc(union.description, union.types.map(f => f.name -> f.description).toMap) + generateUnionTrait(union) + disc
+    generateScalaDoc(union.description, Map()) + generateUnionTrait(union) + disc
   }
 
   def generateUnionTrait(union: ScalaUnion): String = {
