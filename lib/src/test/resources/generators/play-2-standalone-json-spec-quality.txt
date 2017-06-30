@@ -4,6 +4,9 @@
  */
 package com.gilt.quality.v0.models {
 
+  /**
+   * @param adjournedAt Defaults to the time of the request
+   */
   case class AdjournForm(
     adjournedAt: _root_.scala.Option[_root_.org.joda.time.DateTime] = None
   )
@@ -11,6 +14,10 @@ package com.gilt.quality.v0.models {
   /**
    * Describe an agenda item for a meeting. Currently the only agenda items we have
    * are that a particular incident needs to be reviewed.
+   * @param id Internal unique identifier for this record.
+   * @param meeting The meeting to which this agenda item belongs
+   * @param incident Summary of the incident to review.
+   * @param task What needs to be reviewed at this meeting for this incident.
    */
   case class AgendaItem(
     id: Long,
@@ -34,6 +41,10 @@ package com.gilt.quality.v0.models {
     body: String
   )
 
+  /**
+   * @param code Machine readable code for this specific error message
+   * @param message Description of the error
+   */
   case class Error(
     code: String,
     message: String
@@ -62,6 +73,9 @@ package com.gilt.quality.v0.models {
    * Every n days (e.g. 30) we follow up to see if a given plan has been implemented.
    * This gives teams the ability to say: Yes, completed. Not yet. or No, won't do.
    * After 3 consecutive no replies, we assume not doing.
+   * @param key Unique token identifying this response
+   * @param plan
+   * @param sentAt
    */
   case class Followup(
     key: String,
@@ -87,6 +101,8 @@ package com.gilt.quality.v0.models {
 
   /**
    * URLs to key icons used through the application
+   * @param smileyUrl URL for the smiley icon
+   * @param frownyUrl URL for the frowny icon
    */
   case class Icons(
     smileyUrl: String,
@@ -95,6 +111,15 @@ package com.gilt.quality.v0.models {
 
   /**
    * A bug or error that affected public or internal users in a negative way
+   * @param organization Organization to which this incident belongs
+   * @param description Full description of the incident
+   * @param tags Optional list of tags to apply to this incident
+   * @param id Internal unique identifier for this incident.
+   * @param team Team responsible for resolution of this incident
+   * @param createdAt
+   * @param severity
+   * @param summary Summary of the incident.
+   * @param plan
    */
   case class Incident(
     id: Long,
@@ -108,6 +133,13 @@ package com.gilt.quality.v0.models {
     createdAt: _root_.org.joda.time.DateTime
   )
 
+  /**
+   * @param teamKey Team responsible for resolution of this incident
+   * @param description Full description of the incident
+   * @param tags Optional list of tags to apply to this incident
+   * @param severity
+   * @param summary Summary of the incident.
+   */
   case class IncidentForm(
     teamKey: _root_.scala.Option[String] = None,
     severity: com.gilt.quality.v0.models.Severity,
@@ -136,6 +168,12 @@ package com.gilt.quality.v0.models {
    * Incidents can then be reviewed from the context of a meeting, facilitating
    * online navigation. Incidents within a meeting can require one of two actions -
    * team assignment or plan review.
+   * @param id Internal unique identifier for this meeting.
+   * @param organization Organization to which this meeting belongs
+   * @param scheduledAt The date and time for which this meeting is scheduled.
+   * @param adjournedAt The date and time at which this meeting was adjourned. This
+   * can be done explicitly by a person, or will automatically occur a few hours
+   * after the meeting's scheduled time.
    */
   case class Meeting(
     id: Long,
@@ -162,12 +200,18 @@ package com.gilt.quality.v0.models {
   /**
    * Top level organization for which we are managing quality. Key entities like
    * teams and meetings are scoped to the organization.
+   * @param key Used as a unique key for this organization that is URL safe.
+   * @param name The name of this organization.
    */
   case class Organization(
     key: String,
     name: String
   )
 
+  /**
+   * @param name
+   * @param key Defaults to a url friendy version of the name
+   */
   case class OrganizationForm(
     name: String,
     key: _root_.scala.Option[String] = None
@@ -175,6 +219,11 @@ package com.gilt.quality.v0.models {
 
   /**
    * Details for how an incident will be resolved
+   * @param body Full description of the incident
+   * @param incidentId
+   * @param id Internal unique identifier for this incident.
+   * @param grade Grade given to this plan on a scale of 0 (bad) to 100 (good)
+   * @param createdAt
    */
   case class Plan(
     id: Long,
@@ -191,6 +240,14 @@ package com.gilt.quality.v0.models {
 
   /**
    * Statistics on each team's quality metrics, number of issues
+   * @param totalOpenIncidents Number of incidents without a plan for this team.
+   * @param team Team for statistics.
+   * @param totalGrades Number of graded plans given time span requested.
+   * @param totalPlans Number of plans attached to reported incidents in the time
+   * span requested.
+   * @param plans Last plans to display grades for.
+   * @param averageGrade Average grade for graded plans given time span requested.
+   * @param totalIncidents Number of incidents reported in the time span requested.
    */
   case class Statistic(
     team: com.gilt.quality.v0.models.Team,
@@ -204,6 +261,10 @@ package com.gilt.quality.v0.models {
 
   /**
    * Represents a user that is currently subscribed to a publication
+   * @param id Internal unique identifier for this subscription record
+   * @param organization
+   * @param user
+   * @param publication
    */
   case class Subscription(
     id: Long,
@@ -221,6 +282,12 @@ package com.gilt.quality.v0.models {
   /**
    * A team is the main actor in the system. Teams have a unique key and own
    * incidents
+   * @param organization Organization to which this team belongs
+   * @param key Unique identifier for this team
+   * @param email Email address for members of this team. If provided, used to send
+   * updates on new incidents, meetings, etc.
+   * @param icons Set of icons used on the site for this team (e.g. smiley and
+   * frowney faces). Teams inherit a default set of icons if not otherwise provided.
    */
   case class Team(
     organization: com.gilt.quality.v0.models.Organization,
@@ -229,6 +296,12 @@ package com.gilt.quality.v0.models {
     icons: com.gilt.quality.v0.models.Icons
   )
 
+  /**
+   * @param key Unique identifier for this team
+   * @param email
+   * @param smileyUrl
+   * @param frownyUrl
+   */
   case class TeamForm(
     key: String,
     email: _root_.scala.Option[String] = None,
@@ -257,6 +330,8 @@ package com.gilt.quality.v0.models {
 
   /**
    * A user is a top level person.
+   * @param guid Internal unique identifier for this user.
+   * @param email
    */
   case class User(
     guid: _root_.java.util.UUID,
