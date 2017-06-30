@@ -75,13 +75,24 @@ class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
     models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
   }
 
-  it("Play 2.6.x generator produces valid Scala code") {
+  describe("Play 2.6.x generator basic output") {
     val service = models.TestHelper.generatorApiService
     val ssd = new ScalaService(service)
     val invocationForm = InvocationForm(service, Seq.empty, None)
     val play26Config = ScalaClientMethodConfigs.Play26("whatever", None)
     val output = Play26ClientGenerator.invoke(invocationForm).right.get
-    TestHelper.assertValidScalaSourceFiles(output)
+
+    it("is valid scala code") {
+      TestHelper.assertValidScalaSourceFiles(output)
+    }
+
+    it("has non deprecated request with-methods") {
+      val rawContent = output.map(_.contents).mkString("\n")
+      rawContent.contains("withHttpHeaders(").shouldBe(true)
+      rawContent.contains("withQueryStringParameters(").shouldBe(true)
+      rawContent.contains("withHeaders(").shouldBe(false)
+      rawContent.contains("withQueryString(").shouldBe(false)
+    }
   }
 
 /*
