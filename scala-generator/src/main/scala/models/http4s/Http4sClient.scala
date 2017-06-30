@@ -78,7 +78,9 @@ ${headerString.indent(6)}
 
       val authReq = auth.fold(request) {
         case Authorization.Basic(username, passwordOpt) => {
-          request.putHeaders(org.http4s.Header("Authorization", org.http4s.BasicCredentials(username, passwordOpt.getOrElse("")).value))
+          val userpass = s"$$username:$${passwordOpt.getOrElse("")}"
+          val token = java.util.Base64.getEncoder.encodeToString(userpass.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1))
+          request.putHeaders(org.http4s.Header("Authorization", s"Basic $$token"))
         }
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
