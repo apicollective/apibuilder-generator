@@ -847,6 +847,13 @@ package io.apibuilder.reference.api.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.User]
 
+    /**
+     * @param guid
+     * @param organizationGuids Limits users to the specified organizations.
+     * @param ageGroup Limit to users in this age group
+     * @param email
+     * @param active
+     */
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       organizationGuids: _root_.scala.Option[Seq[Long]] = None,

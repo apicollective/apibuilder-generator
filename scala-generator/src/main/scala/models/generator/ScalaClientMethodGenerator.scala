@@ -287,9 +287,20 @@ class ScalaClientMethod(
     case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
   }
 
-  val comments: Option[String] = operation.description
+  private[this] val commentString = {
+    val methoddesc = operation.description.getOrElse("")
+    val paramsdesc = {
+      if (operation.parameters.forall(_.param.description.isEmpty))
+        Seq() // if no parameter has a description, don't write any @param lines
+      else
+        operation.parameters.map(p => s"@param ${p.name} ${p.param.description.getOrElse("")}")
+    }
 
-  private[this] val commentString = comments.map(string => ScalaUtil.textToComment(string) + "\n").getOrElse("")
+    ScalaUtil.textToComment(methoddesc + "\n" + paramsdesc.mkString("\n")) match {
+      case "" => "" // don't add extra \n for empty comments
+      case x => x + "\n"
+    }
+  }
 
   val interface: String = {
     s"""${commentString}${ScalaUtil.deprecationString(operation.deprecation)}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""

@@ -69,6 +69,21 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
       ScalaUtil.textToComment(source) should be(target)
     }
 
+    it("keeps newlines in the input") {
+      val source =
+        """|Method desc goes here
+           |@param x the first argument
+           |@param y the second argument""".stripMargin
+
+
+      ScalaUtil.textToComment(source) should be(
+        """|/**
+           | * Method desc goes here
+           | * @param x the first argument
+           | * @param y the second argument
+           | */""".stripMargin)
+    }
+
   }
 
   describe("scalaDefault") {
