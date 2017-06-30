@@ -798,11 +798,6 @@ package io.apibuilder.reference.api.v0 {
   }
 
   trait Echoes {
-    /**
-     * @param foo foo
-     * @param optionalMessages optionalMessages
-     * @param requiredMessages requiredMessages
-     */
     def get(
       foo: _root_.scala.Option[String] = None,
       optionalMessages: _root_.scala.Option[Seq[String]] = None,
@@ -810,10 +805,6 @@ package io.apibuilder.reference.api.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
 
-    /**
-     * @param optionalMessages optionalMessages
-     * @param requiredMessages requiredMessages
-     */
     def getArraysOnly(
       optionalMessages: _root_.scala.Option[Seq[String]] = None,
       requiredMessages: Seq[String],
@@ -822,9 +813,6 @@ package io.apibuilder.reference.api.v0 {
   }
 
   trait Groups {
-    /**
-     * @param organization organization
-     */
     def getByOrganization(
       organization: _root_.java.util.UUID,
       requestHeaders: Seq[(String, String)] = Nil
@@ -832,12 +820,6 @@ package io.apibuilder.reference.api.v0 {
   }
 
   trait Members {
-    /**
-     * @param guid guid
-     * @param organization organization
-     * @param user user
-     * @param role role
-     */
     def post(
       guid: _root_.java.util.UUID,
       organization: _root_.java.util.UUID,
@@ -846,12 +828,6 @@ package io.apibuilder.reference.api.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Member]
 
-    /**
-     * @param guid guid
-     * @param organizationGuid organizationGuid
-     * @param userGuid userGuid
-     * @param role role
-     */
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       organizationGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
@@ -860,17 +836,11 @@ package io.apibuilder.reference.api.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
 
-    /**
-     * @param organization organization
-     */
     def getByOrganization(
       organization: _root_.java.util.UUID,
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
 
-    /**
-     * @param organization organization
-     */
     def postMembersBulkByOrganization(
       organization: _root_.java.util.UUID,
       members: Seq[io.apibuilder.reference.api.v0.models.Member],
@@ -879,27 +849,17 @@ package io.apibuilder.reference.api.v0 {
   }
 
   trait Organizations {
-    /**
-     * @param organization organization
-     */
     def postOrganizations(
       organization: io.apibuilder.reference.api.v0.models.Organization,
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Organization]
 
-    /**
-     * @param guid guid
-     * @param name name
-     */
     def getOrganizations(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       name: _root_.scala.Option[String] = None,
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Organization]]
 
-    /**
-     * @param guid guid
-     */
     def getByGuid(
       guid: _root_.java.util.UUID,
       requestHeaders: Seq[(String, String)] = Nil
@@ -907,11 +867,6 @@ package io.apibuilder.reference.api.v0 {
   }
 
   trait Users {
-    /**
-     * @param guid guid
-     * @param email email
-     * @param active active
-     */
     def post(
       guid: _root_.java.util.UUID,
       email: String,
@@ -920,11 +875,11 @@ package io.apibuilder.reference.api.v0 {
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.User]
 
     /**
-     * @param guid guid
+     * @param guid
      * @param organizationGuids Limits users to the specified organizations.
      * @param ageGroup Limit to users in this age group
-     * @param email email
-     * @param active active
+     * @param email
+     * @param active
      */
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
@@ -935,9 +890,6 @@ package io.apibuilder.reference.api.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]]
 
-    /**
-     * @param ageGroup ageGroup
-     */
     def getByAgeGroup(
       ageGroup: io.apibuilder.reference.api.v0.models.AgeGroup,
       requestHeaders: Seq[(String, String)] = Nil

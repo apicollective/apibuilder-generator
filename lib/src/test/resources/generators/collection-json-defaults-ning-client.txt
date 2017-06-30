@@ -291,9 +291,6 @@ package com.gilt.test.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User]
 
-    /**
-     * @param email email
-     */
     @deprecated("to be removed") def getByEmail(
       @deprecated email: String,
       requestHeaders: Seq[(String, String)] = Nil

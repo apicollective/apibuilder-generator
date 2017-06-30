@@ -444,9 +444,6 @@ package io.apibuilder.example.union.types.discriminator.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.example.union.types.discriminator.v0.models.User]]
 
-    /**
-     * @param id id
-     */
     def getById(
       id: String,
       requestHeaders: Seq[(String, String)] = Nil

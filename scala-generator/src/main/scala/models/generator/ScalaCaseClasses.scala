@@ -103,7 +103,7 @@ trait ScalaCaseClasses extends CodeGenerator {
 
     val paramDesc = {
       if (params.values.forall(_.isEmpty))
-        Seq()
+        Seq() // if no parameter has a description, don't write any @param lines
       else
         params.map { case (name, descOpt) => s"@param $name ${descOpt.getOrElse("")}" }
     }

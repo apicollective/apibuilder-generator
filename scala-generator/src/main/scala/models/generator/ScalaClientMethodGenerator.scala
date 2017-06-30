@@ -289,7 +289,12 @@ class ScalaClientMethod(
 
   private[this] val commentString = {
     val methoddesc = operation.description.getOrElse("")
-    val paramsdesc = operation.parameters.map(p => s"@param ${p.name} ${p.description}")
+    val paramsdesc = {
+      if (operation.parameters.forall(_.param.description.isEmpty))
+        Seq() // if no parameter has a description, don't write any @param lines
+      else
+        operation.parameters.map(p => s"@param ${p.name} ${p.param.description.getOrElse("")}")
+    }
 
     ScalaUtil.textToComment(methoddesc + "\n" + paramsdesc.mkString("\n")) match {
       case "" => ""

@@ -559,9 +559,6 @@ package io.apibuilder.example.union.types.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.example.union.types.v0.models.User]]
 
-    /**
-     * @param guid guid
-     */
     def getByGuid(
       guid: _root_.java.util.UUID,
       requestHeaders: Seq[(String, String)] = Nil
