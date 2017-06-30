@@ -71,7 +71,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       case Some(code) => s"\n\n$code"
     }
 
-    generateScalaDoc(union.description) + generateUnionTrait(union) + disc
+    generateScalaDoc(union.description, union.types.map(f => f.name -> f.description).toMap) + generateUnionTrait(union) + disc
   }
 
   def generateUnionTrait(union: ScalaUnion): String = {
@@ -86,7 +86,8 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    generateScalaDoc(model.description) + generateCaseClass(model, unions)
+    generateScalaDoc(model.description, model.fields.map(f => f.name -> f.description).toMap) +
+      generateCaseClass(model, unions)
   }
 
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
@@ -97,5 +98,19 @@ trait ScalaCaseClasses extends CodeGenerator {
     ScalaEnums(ssd, enum).build
   }
 
-  def generateScalaDoc(description: Option[String]) = description.fold("")(d => ScalaUtil.textToComment(d) + "\n")
+  def generateScalaDoc(description: Option[String], params: Map[String, Option[String]]) = {
+    val modelDesc = description.getOrElse("")
+
+    val paramDesc = {
+      if (params.values.forall(_.isEmpty))
+        Seq()
+      else
+        params.map { case (name, descOpt) => s"@param $name ${descOpt.getOrElse("")}" }
+    }
+
+    ScalaUtil.textToComment(modelDesc + "\n\n" + paramDesc.mkString("\n")) match {
+      case "" => "" // don't add extra \n for empty comments
+      case x => x + "\n"
+    }
+  }
 }
