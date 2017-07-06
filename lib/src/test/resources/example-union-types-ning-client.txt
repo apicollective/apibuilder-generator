@@ -299,16 +299,11 @@ package io.apibuilder.example.union.types.v0.models {
 
     implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = new play.api.libs.json.Reads[User] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[User] = {
-        (js \ "discriminator").validateOpt[String] match {
-          case play.api.libs.json.JsError(msg) => play.api.libs.json.JsError(msg)
-          case play.api.libs.json.JsSuccess(discriminator, _) => {
-            discriminator match {
-              case Some("registered_user") | None => js.validate[io.apibuilder.example.union.types.v0.models.RegisteredUser]
-              case Some("guest_user") => js.validate[io.apibuilder.example.union.types.v0.models.GuestUser]
-              case Some("uuid") => js.validate[io.apibuilder.example.union.types.v0.models.UserUuid]
-              case Some(other) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.UserUndefinedType(other))
-            }
-          }
+        (js \ "discriminator").asOpt[String].getOrElse("registered_user") match {
+          case "registered_user" => js.validate[io.apibuilder.example.union.types.v0.models.RegisteredUser]
+          case "guest_user" => js.validate[io.apibuilder.example.union.types.v0.models.GuestUser]
+          case "uuid" => js.validate[io.apibuilder.example.union.types.v0.models.UserUuid]
+          case other => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.UserUndefinedType(other))
         }
       }
     }
