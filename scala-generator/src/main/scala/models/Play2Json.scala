@@ -147,7 +147,7 @@ case class Play2Json(
     val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.originalName).headOption
 
     val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
-      case None => s"""{ sys.error("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json Value") }"""
+      case None => s""" { sys.error("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json Value") }"""
       case Some(defaultValue) => s"""("$defaultValue")"""
     }
 
