@@ -95,14 +95,20 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
   }
 
   private[this] def decodersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    val typesWithNames = unionTypesWithNames(union)
+    val defaultClause = typesWithNames.filter(_._1.isDefault).headOption match {
+      case Some((_, typeName)) => s"""c.as[$typeName]"""
+      case None => s"""Left(DecodingFailure("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json", c.history))"""
+    }
+
     Seq(
       s"""${implicitDecoderDef(union.name)} = Decoder.instance { c =>""",
-      s"""  c.get[String]("$discriminator") match {""",
-      unionTypesWithNames(union).map { case (t, typeName) =>
-        s"""  case Right(s) if s == "${t.originalName}" => c.as[$typeName]"""
+      s"""  c.get[Option[String]]("$discriminator") match {""",
+      typesWithNames.map { case (t, typeName) =>
+        s"""  case Right(Some(s)) if s == "${t.originalName}" => c.as[$typeName]"""
       }.mkString("\n").indent(2),
-      s"""    case Right(s) => Right(${union.undefinedType.fullName}(s))""",
-      s"""    case _ => Left(DecodingFailure("Attempt to decode value on failed cursor", c.history))""",
+      s"""    case Right(Some(s)) => Right(${union.undefinedType.fullName}(s))""",
+      s"""    case _ => $defaultClause""",
       s"""  }""",
       s"""}"""
     ).mkString("\n")
