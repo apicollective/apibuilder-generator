@@ -31,7 +31,7 @@ import collection.JavaConverters._
 
 object AndroidClasses
   extends CodeGenerator
-  with AndroidJavaUtil{
+    with AndroidJavaUtil {
 
   val JAVADOC_CLASS_MESSAGE = "WARNING: not all features (notably unions) and data types work with android generator yet.  \n" +
     "Android generator is designed to be used in an android application, but should work in any java codebase as long as you import jackson and retrofit2 libraries.  \n" +
@@ -63,16 +63,20 @@ object AndroidClasses
       val s = JAVADOC_CLASS_MESSAGE + "\n"
       header.fold(s)(_ + "\n" + s)
     }
-    
+
     val T = "$T" //this is a hack for substituting types, as "$" is used by scala to do string substitution, and $T is sued by javapoet to handle types
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
     def generateSourceFiles() = {
 
-      val generatedEnums = service.enums.map { generateEnum }
+      val generatedEnums = service.enums.map {
+        generateEnum
+      }
 
-      val generatedUnionTypes = service.unions.map { generateUnionType }
+      val generatedUnionTypes = service.unions.map {
+        generateUnionType
+      }
 
       val generatedModels = service.models.map { model =>
         val relatedUnions = service.unions.filter(_.types.exists(_.`type` == model.name))
@@ -81,7 +85,9 @@ object AndroidClasses
 
       val generatedObjectMapper = Seq(generateObjectMapper)
 
-      val generatedResources = service.resources.map { generateResource }
+      val generatedResources = service.resources.map {
+        generateResource
+      }
 
       generatedEnums ++
         generatedUnionTypes ++
@@ -170,13 +176,13 @@ object AndroidClasses
 
       val builder =
         TypeSpec.enumBuilder(className)
-        .addModifiers(Modifier.PUBLIC)
-        .addJavadoc(apiDocComments)
+          .addModifiers(Modifier.PUBLIC)
+          .addJavadoc(apiDocComments)
 
       enum.description.map(builder.addJavadoc(_))
 
       enum.values.foreach(value => {
-        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value","\""+value.name+"\"")
+        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + value.name + "\"")
         builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("").addAnnotation(annotation.build()).build())
       })
 
@@ -193,16 +199,16 @@ object AndroidClasses
           .addJavadoc(apiDocComments)
 
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties])
-          .addMember("ignoreUnknown","true")
+        .addMember("ignoreUnknown", "true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
       val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[JsonTypeInfo])
       jsonAnnotationBuilder.addMember("use", "com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME")
       if (union.discriminator.isDefined) {
-        jsonAnnotationBuilder.addMember("include","com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
+        jsonAnnotationBuilder.addMember("include", "com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
         jsonAnnotationBuilder.addMember("property", "\"" + union.discriminator.get + "\"")
       } else {
-        jsonAnnotationBuilder.addMember("include","com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT")
+        jsonAnnotationBuilder.addMember("include", "com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT")
       }
 
       builder.addAnnotation(jsonAnnotationBuilder.build)
@@ -233,7 +239,7 @@ object AndroidClasses
           .addModifiers(Modifier.PUBLIC)
           .addJavadoc(apiDocComments)
 
-      val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown","true")
+      val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown", "true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
       model.description.map(builder.addJavadoc(_))
@@ -251,6 +257,12 @@ object AndroidClasses
 
       val unionClassTypeNames = relatedUnions.map { u => ClassName.get(modelsNameSpace, toClassName(u.name)) }
       builder.addSuperinterfaces(unionClassTypeNames.asJava)
+
+      relatedUnions.headOption.map { _ =>
+        val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
+        jsonAnnotationBuilder.addMember("use", "com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
+        builder.addAnnotation(jsonAnnotationBuilder.build())
+      }
 
       model.fields.foreach(field => {
 
@@ -272,7 +284,7 @@ object AndroidClasses
         builder.addMethod(getterBuilder.build)
 
         val constructorParameter = ParameterSpec.builder(javaDataType, fieldCamelCaseName)
-        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value","\""+fieldSnakeCaseName+"\"")
+        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + fieldSnakeCaseName + "\"")
         constructorParameter.addAnnotation(annotation.build)
         constructorWithParams.addParameter(constructorParameter.build)
         constructorWithParams.addStatement("this.$N = $N", fieldCamelCaseName, fieldCamelCaseName)
@@ -317,7 +329,7 @@ object AndroidClasses
           .addJavadoc(apiDocComments)
 
 
-      resource.operations.foreach{operation =>
+      resource.operations.foreach { operation =>
 
         val maybeAnnotationClass = operation.method match {
           case Method.Get => Some(classOf[retrofit2.http.GET])
@@ -356,7 +368,7 @@ object AndroidClasses
             val deprecationAnnotation = AnnotationSpec.builder(classOf[Deprecated]).build
             method.addAnnotation(deprecationAnnotation)
             deprecation.description.map(description => {
-                method.addJavadoc("\n@deprecated: "+description)
+              method.addJavadoc("\n@deprecated: " + description)
             })
           })
 
@@ -427,8 +439,8 @@ object AndroidClasses
       makeFile(className, builder)
     }
 
-    private def toMap(cc: AnyRef): Map[String,Any] =
-      (Map[String, Any]() /: cc.getClass.getDeclaredFields) {(a, f) =>
+    private def toMap(cc: AnyRef): Map[String, Any] =
+      (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
         f.setAccessible(true)
         a + (f.getName -> f.get(cc))
       }
@@ -438,12 +450,12 @@ object AndroidClasses
       opt.fold("") { s => textToComment(s) + "\n" }
     }
 
-    def camelToUnderscores(name: String): String = "[A-Z\\d]".r.replaceAllIn(name, {m =>
+    def camelToUnderscores(name: String): String = "[A-Z\\d]".r.replaceAllIn(name, { m =>
       "_" + m.group(0).toLowerCase()
     })
 
 
-    def underscoreToCamel(name: String): String = "_([a-z\\d])".r.replaceAllIn(name, {m =>
+    def underscoreToCamel(name: String): String = "_([a-z\\d])".r.replaceAllIn(name, { m =>
       m.group(1).toUpperCase()
     })
 
