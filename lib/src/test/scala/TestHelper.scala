@@ -3,13 +3,13 @@ package models
 import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 import java.io.{File => JFile}
+
 import play.api.libs.json._
 import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import io.apibuilder.spec.v0.models.json._
 import io.apibuilder.spec.v0.models.Service
 import io.apibuilder.generator.v0.models.File
 import lib.Text
-
 import org.scalatest.Matchers
 
 object TestHelper extends Matchers {
@@ -83,21 +83,16 @@ object TestHelper extends Matchers {
   }
 
   def assertValidScalaSourceCode(scalaSourceCode: String): Unit = {
-    import scala.tools.nsc.Global
-    import scala.tools.nsc.Settings
-    import scala.tools.nsc.reporters.StoreReporter
+    import scala.reflect.runtime.currentMirror
+    import scala.tools.reflect.{ToolBox, ToolBoxError}
 
-    val settings = new Settings
-    settings.embeddedDefaults(getClass.getClassLoader)
-    settings.usejavacp.value = true
-    val reporter = new StoreReporter
-    val global = Global(settings, reporter)
-    val run = new global.Run
-    global.phase = run.parserPhase
-    run.cancel
-    val parser = global.newUnitParser(scalaSourceCode)
-    val parseResult = parser.parse()
-    reporter.errorCount shouldBe 0
+    val toolbox = currentMirror.mkToolBox()
+    val tree = toolbox.parse(scalaSourceCode)
+    try {
+      val compiled = toolbox.compile(tree)
+    } catch {
+      case ex: ToolBoxError => fail("Unable to compile Scala source code. " + ex)
+    }
   }
 
   def assertEqualsFile(filename: String, contents: String) {
