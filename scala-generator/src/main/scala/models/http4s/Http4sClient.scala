@@ -48,6 +48,8 @@ ${headerString.indent(6)}
 
     def apiHeaders: Seq[(String, String)] = defaultApiHeaders
 
+    def modifyRequest(request: Task[org.http4s.Request]): Task[org.http4s.Request] = request
+
     def _executeRequest[T, U](
       method: String,
       path: Seq[String],
@@ -87,7 +89,7 @@ ${headerString.indent(6)}
 
       val authBody = body.fold(Task.now(authReq))(authReq.withBody)
 
-      asyncHttpClient.fetch(authBody)(handler)
+      asyncHttpClient.fetch(modifyRequest(authBody))(handler)
     }
   }
 
