@@ -1,6 +1,6 @@
 @deprecated("to be merged with members") case class User(
   email: String,
   role: String = "admin",
-  groups: Seq[String],
-  @deprecated permissions: Seq[String]
+  groups: List[String],
+  @deprecated permissions: List[String]
 )

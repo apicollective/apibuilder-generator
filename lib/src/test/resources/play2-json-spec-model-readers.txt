@@ -1,5 +1,5 @@
 (
-  (__ \ "required_tags").read[Seq[String]] and
-  (__ \ "optional_tags").readNullable[Seq[String]] and
+  (__ \ "required_tags").read[List[String]] and
+  (__ \ "optional_tags").readNullable[List[String]] and
   (__ \ "data").readNullable[Map[String, Long]]
 )(Content.apply _)

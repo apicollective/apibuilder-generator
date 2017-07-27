@@ -1,7 +1,7 @@
 package test.apidoc.apidoctest.v0.models {
 
   case class Content(
-    data: Seq[_root_.play.api.libs.json.JsObject]
+    data: List[_root_.play.api.libs.json.JsObject]
   )
 
 }

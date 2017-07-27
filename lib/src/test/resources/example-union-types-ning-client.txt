@@ -21,9 +21,9 @@ package io.apibuilder.example.union.types.v0.models {
 
     case class UNDEFINED(override val toString: String) extends UserDiscriminator
 
-    val all = Seq(RegisteredUser, GuestUser, Uuid)
+    val all: List[UserDiscriminator] = List(RegisteredUser, GuestUser, Uuid)
 
-    private[this] val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    private[this] val byName: Map[String, UserDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): UserDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -103,10 +103,10 @@ package io.apibuilder.example.union.types.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(B)
+    val all: List[Bar] = List(B)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, Bar] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Bar = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -136,10 +136,10 @@ package io.apibuilder.example.union.types.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(A)
+    val all: List[Foo] = List(A)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, Foo] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Foo = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -363,9 +363,9 @@ package io.apibuilder.example.union.types.v0 {
     object Users extends Users {
       override def get(
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.example.union.types.v0.models.User]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.example.union.types.v0.models.User]] = {
         _executeRequest("GET", s"/users", requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.example.union.types.v0.Client.parseJson("Seq[io.apibuilder.example.union.types.v0.models.User]", r, _.validate[Seq[io.apibuilder.example.union.types.v0.models.User]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.example.union.types.v0.Client.parseJson("List[io.apibuilder.example.union.types.v0.models.User]", r, _.validate[List[io.apibuilder.example.union.types.v0.models.User]])
           case r => throw new io.apibuilder.example.union.types.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
@@ -514,7 +514,7 @@ package io.apibuilder.example.union.types.v0 {
   trait Users {
     def get(
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.example.union.types.v0.models.User]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.example.union.types.v0.models.User]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,

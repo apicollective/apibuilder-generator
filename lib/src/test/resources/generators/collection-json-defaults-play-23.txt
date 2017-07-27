@@ -7,14 +7,14 @@ package com.gilt.test.v0.models {
   @deprecated("to be merged with members") case class User(
     email: String,
     role: String = "admin",
-    groups: Seq[String],
-    @deprecated permissions: Seq[String]
+    groups: List[String],
+    @deprecated permissions: List[String]
   )
 
   case class UserPatch(
-    groups: _root_.scala.Option[Seq[String]] = None,
-    permissions: Seq[String] = Nil,
-    preferences: Seq[String] = Seq("foo")
+    groups: _root_.scala.Option[List[String]] = None,
+    permissions: List[String] = Nil,
+    preferences: List[String] = List("foo")
   )
 
 }
@@ -51,8 +51,8 @@ package com.gilt.test.v0.models {
       (
         (__ \ "email").read[String] and
         (__ \ "role").read[String] and
-        (__ \ "groups").read[Seq[String]] and
-        (__ \ "permissions").read[Seq[String]]
+        (__ \ "groups").read[List[String]] and
+        (__ \ "permissions").read[List[String]]
       )(User.apply _)
     }
 
@@ -75,9 +75,9 @@ package com.gilt.test.v0.models {
 
     implicit def jsonReadsTestUserPatch: play.api.libs.json.Reads[UserPatch] = {
       (
-        (__ \ "groups").readNullable[Seq[String]] and
-        (__ \ "permissions").read[Seq[String]] and
-        (__ \ "preferences").read[Seq[String]]
+        (__ \ "groups").readNullable[List[String]] and
+        (__ \ "permissions").read[List[String]] and
+        (__ \ "preferences").read[List[String]]
       )(UserPatch.apply _)
     }
 
