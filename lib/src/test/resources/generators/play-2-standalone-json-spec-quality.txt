@@ -371,10 +371,10 @@ package com.gilt.quality.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(Jira)
+    val all: List[ExternalServiceName] = List(Jira)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, ExternalServiceName] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): ExternalServiceName = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -431,10 +431,10 @@ package com.gilt.quality.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(IncidentsCreate, IncidentsUpdate, PlansCreate, PlansUpdate, MeetingsAdjourned, IncidentsTeamUpdate)
+    val all: List[Publication] = List(IncidentsCreate, IncidentsUpdate, PlansCreate, PlansUpdate, MeetingsAdjourned, IncidentsTeamUpdate)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, Publication] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Publication = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -466,10 +466,10 @@ package com.gilt.quality.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(Complete, NotYet, Willnotcomplete)
+    val all: List[Response] = List(Complete, NotYet, Willnotcomplete)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, Response] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Response = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -500,10 +500,10 @@ package com.gilt.quality.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(Low, High)
+    val all: List[Severity] = List(Low, High)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, Severity] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Severity = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -544,10 +544,10 @@ package com.gilt.quality.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(ReviewTeam, ReviewPlan)
+    val all: List[Task] = List(ReviewTeam, ReviewPlan)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, Task] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Task = fromString(value).getOrElse(UNDEFINED(value))
 

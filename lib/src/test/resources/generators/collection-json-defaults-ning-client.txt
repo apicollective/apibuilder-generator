@@ -14,7 +14,7 @@ package com.gilt.test.v0.models {
   case class UserPatch(
     groups: _root_.scala.Option[Seq[String]] = None,
     permissions: Seq[String] = Nil,
-    preferences: Seq[String] = Seq("foo")
+    preferences: Seq[String] = List("foo")
   )
 
 }

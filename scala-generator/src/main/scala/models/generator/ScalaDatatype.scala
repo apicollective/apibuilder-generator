@@ -313,7 +313,7 @@ object ScalaDatatype {
       val seq = arr.value.map { value =>
         inner.default(value)
       }
-      if (seq.isEmpty) "Nil" else seq.mkString(s"Seq(", ",", ")")
+      if (seq.isEmpty) "Nil" else seq.mkString(s"List(", ",", ")")
     }
   }
 

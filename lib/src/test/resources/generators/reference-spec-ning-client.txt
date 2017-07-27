@@ -103,10 +103,10 @@ package io.apibuilder.reference.api.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all = Seq(Youth, Adult)
+    val all: List[AgeGroup] = List(Youth, Adult)
 
     private[this]
-    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+    val byName: Map[String, AgeGroup] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
 
