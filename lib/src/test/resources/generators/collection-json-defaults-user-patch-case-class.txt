@@ -1,5 +1,5 @@
 case class UserPatch(
-  groups: _root_.scala.Option[List[String]] = None,
-  permissions: List[String] = Nil,
-  preferences: List[String] = List("foo")
+  groups: _root_.scala.Option[Seq[String]] = None,
+  permissions: Seq[String] = Nil,
+  preferences: Seq[String] = List("foo")
 )

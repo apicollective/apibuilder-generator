@@ -47,7 +47,7 @@ package io.apibuilder.reference.api.v0.models {
    * A group of users in an organization.
    */
   case class Group(
-    members: List[io.apibuilder.reference.api.v0.models.User]
+    members: Seq[io.apibuilder.reference.api.v0.models.User]
   )
 
   case class Member(
@@ -71,7 +71,7 @@ package io.apibuilder.reference.api.v0.models {
   )
 
   case class UserList(
-    users: List[io.apibuilder.reference.api.v0.models.User]
+    users: Seq[io.apibuilder.reference.api.v0.models.User]
   )
 
   sealed trait AgeGroup extends _root_.scala.Product with _root_.scala.Serializable
@@ -276,7 +276,7 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiGroup: play.api.libs.json.Reads[Group] = {
-      (__ \ "members").read[List[io.apibuilder.reference.api.v0.models.User]].map { x => new Group(members = x) }
+      (__ \ "members").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => new Group(members = x) }
     }
 
     def jsObjectGroup(obj: io.apibuilder.reference.api.v0.models.Group): play.api.libs.json.JsObject = {
@@ -372,7 +372,7 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiUserList: play.api.libs.json.Reads[UserList] = {
-      (__ \ "users").read[List[io.apibuilder.reference.api.v0.models.User]].map { x => new UserList(users = x) }
+      (__ \ "users").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => new UserList(users = x) }
     }
 
     def jsObjectUserList(obj: io.apibuilder.reference.api.v0.models.UserList): play.api.libs.json.JsObject = {
@@ -435,8 +435,8 @@ package io.apibuilder.reference.api.v0 {
     object Echoes extends Echoes {
       override def get(
         foo: _root_.scala.Option[String] = None,
-        optionalMessages: _root_.scala.Option[List[String]] = None,
-        requiredMessages: List[String],
+        optionalMessages: _root_.scala.Option[Seq[String]] = None,
+        requiredMessages: Seq[String],
         requestHeaders: Seq[(String, String)] = Nil
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val queryParameters = Seq(
@@ -452,8 +452,8 @@ package io.apibuilder.reference.api.v0 {
       }
 
       override def getArraysOnly(
-        optionalMessages: _root_.scala.Option[List[String]] = None,
-        requiredMessages: List[String],
+        optionalMessages: _root_.scala.Option[Seq[String]] = None,
+        requiredMessages: Seq[String],
         requestHeaders: Seq[(String, String)] = Nil
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val queryParameters = optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
@@ -470,9 +470,9 @@ package io.apibuilder.reference.api.v0 {
       override def getByOrganization(
         organization: _root_.java.util.UUID,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, List[io.apibuilder.reference.api.v0.models.User]]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]] = {
         _executeRequest("GET", s"/groups/${organization}", requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Map[String, List[io.apibuilder.reference.api.v0.models.User]]", r, _.validate[Map[String, List[io.apibuilder.reference.api.v0.models.User]]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]", r, _.validate[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]])
           case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
@@ -506,7 +506,7 @@ package io.apibuilder.reference.api.v0 {
         userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
         role: _root_.scala.Option[String] = None,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Member]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
           organizationGuid.map("organization_guid" -> _.toString),
@@ -515,7 +515,7 @@ package io.apibuilder.reference.api.v0 {
         ).flatten
 
         _executeRequest("GET", s"/members", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("List[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[List[io.apibuilder.reference.api.v0.models.Member]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
           case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
@@ -523,22 +523,22 @@ package io.apibuilder.reference.api.v0 {
       override def getByOrganization(
         organization: _root_.java.util.UUID,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Member]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]] = {
         _executeRequest("GET", s"/members/${organization}", requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("List[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[List[io.apibuilder.reference.api.v0.models.Member]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
           case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
       override def postMembersBulkByOrganization(
         organization: _root_.java.util.UUID,
-        members: List[io.apibuilder.reference.api.v0.models.Member],
+        members: Seq[io.apibuilder.reference.api.v0.models.Member],
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Member]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]] = {
         val payload = play.api.libs.json.Json.toJson(members)
 
         _executeRequest("POST", s"/members/${organization}/members_bulk", body = Some(payload), requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("List[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[List[io.apibuilder.reference.api.v0.models.Member]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
           case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
@@ -564,14 +564,14 @@ package io.apibuilder.reference.api.v0 {
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
         name: _root_.scala.Option[String] = None,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Organization]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Organization]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
           name.map("name" -> _)
         ).flatten
 
         _executeRequest("GET", s"/organizations", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("List[io.apibuilder.reference.api.v0.models.Organization]", r, _.validate[List[io.apibuilder.reference.api.v0.models.Organization]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Organization]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Organization]])
           case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
@@ -609,12 +609,12 @@ package io.apibuilder.reference.api.v0 {
 
       override def get(
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
-        organizationGuids: _root_.scala.Option[List[Long]] = None,
+        organizationGuids: _root_.scala.Option[Seq[Long]] = None,
         ageGroup: _root_.scala.Option[io.apibuilder.reference.api.v0.models.AgeGroup] = None,
         email: _root_.scala.Option[String] = None,
         active: Boolean = true,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.User]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
           ageGroup.map("age_group" -> _.toString),
@@ -624,7 +624,7 @@ package io.apibuilder.reference.api.v0 {
           organizationGuids.getOrElse(Nil).map("organization_guids" -> _.toString)
 
         _executeRequest("GET", s"/users", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("List[io.apibuilder.reference.api.v0.models.User]", r, _.validate[List[io.apibuilder.reference.api.v0.models.User]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.User]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.User]])
           case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
@@ -632,9 +632,9 @@ package io.apibuilder.reference.api.v0 {
       override def getByAgeGroup(
         ageGroup: io.apibuilder.reference.api.v0.models.AgeGroup,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.User]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]] = {
         _executeRequest("GET", s"/users/${_root_.io.apibuilder.reference.api.v0.PathSegment.encode(ageGroup.toString, "UTF-8")}", requestHeaders = requestHeaders).map {
-          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("List[io.apibuilder.reference.api.v0.models.User]", r, _.validate[List[io.apibuilder.reference.api.v0.models.User]])
+          case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.User]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.User]])
           case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
@@ -773,14 +773,14 @@ package io.apibuilder.reference.api.v0 {
   trait Echoes {
     def get(
       foo: _root_.scala.Option[String] = None,
-      optionalMessages: _root_.scala.Option[List[String]] = None,
-      requiredMessages: List[String],
+      optionalMessages: _root_.scala.Option[Seq[String]] = None,
+      requiredMessages: Seq[String],
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
 
     def getArraysOnly(
-      optionalMessages: _root_.scala.Option[List[String]] = None,
-      requiredMessages: List[String],
+      optionalMessages: _root_.scala.Option[Seq[String]] = None,
+      requiredMessages: Seq[String],
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
@@ -789,7 +789,7 @@ package io.apibuilder.reference.api.v0 {
     def getByOrganization(
       organization: _root_.java.util.UUID,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, List[io.apibuilder.reference.api.v0.models.User]]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]]
   }
 
   trait Members {
@@ -807,18 +807,18 @@ package io.apibuilder.reference.api.v0 {
       userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
       role: _root_.scala.Option[String] = None,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Member]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
 
     def getByOrganization(
       organization: _root_.java.util.UUID,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Member]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
 
     def postMembersBulkByOrganization(
       organization: _root_.java.util.UUID,
-      members: List[io.apibuilder.reference.api.v0.models.Member],
+      members: Seq[io.apibuilder.reference.api.v0.models.Member],
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Member]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
   }
 
   trait Organizations {
@@ -831,7 +831,7 @@ package io.apibuilder.reference.api.v0 {
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       name: _root_.scala.Option[String] = None,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.Organization]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Organization]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
@@ -856,17 +856,17 @@ package io.apibuilder.reference.api.v0 {
      */
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
-      organizationGuids: _root_.scala.Option[List[Long]] = None,
+      organizationGuids: _root_.scala.Option[Seq[Long]] = None,
       ageGroup: _root_.scala.Option[io.apibuilder.reference.api.v0.models.AgeGroup] = None,
       email: _root_.scala.Option[String] = None,
       active: Boolean = true,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.User]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]]
 
     def getByAgeGroup(
       ageGroup: io.apibuilder.reference.api.v0.models.AgeGroup,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[List[io.apibuilder.reference.api.v0.models.User]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]]
 
     def postNoop(
       requestHeaders: Seq[(String, String)] = Nil
@@ -882,7 +882,7 @@ package io.apibuilder.reference.api.v0 {
       response: _root_.com.ning.http.client.Response,
       message: Option[String] = None
     ) extends Exception(message.getOrElse(response.getStatusCode + ": " + response.getResponseBody("UTF-8"))){
-      lazy val errors = _root_.io.apibuilder.reference.api.v0.Client.parseJson("List[io.apibuilder.reference.api.v0.models.Error]", response, _.validate[List[io.apibuilder.reference.api.v0.models.Error]])
+      lazy val errors = _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Error]", response, _.validate[Seq[io.apibuilder.reference.api.v0.models.Error]])
     }
 
     case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")

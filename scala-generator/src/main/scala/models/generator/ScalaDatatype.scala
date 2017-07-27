@@ -306,7 +306,7 @@ object ScalaDatatype {
   }
 
   case class List(inner: ScalaDatatype) extends Container(inner) {
-    override def name = s"List[${inner.name}]"
+    override def name = s"Seq[${inner.name}]"
 
     override protected def default(json: JsValue) = {
       val arr = json.as[JsArray]
