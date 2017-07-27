@@ -306,14 +306,14 @@ object ScalaDatatype {
   }
 
   case class List(inner: ScalaDatatype) extends Container(inner) {
-    override def name = s"Seq[${inner.name}]"
+    override def name = s"List[${inner.name}]"
 
     override protected def default(json: JsValue) = {
       val arr = json.as[JsArray]
       val seq = arr.value.map { value =>
         inner.default(value)
       }
-      if (seq.isEmpty) "Nil" else seq.mkString(s"Seq(", ",", ")")
+      if (seq.isEmpty) "Nil" else seq.mkString(s"List(", ",", ")")
     }
   }
 
