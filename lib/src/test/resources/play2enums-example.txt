@@ -21,7 +21,7 @@ object AgeGroup {
    * lower case to avoid collisions with the camel cased values
    * above.
    */
-  val all: List[AgeGroup] = List(Twenties, Thirties)
+  val all: scala.List[AgeGroup] = scala.List(Twenties, Thirties)
 
   private[this]
   val byName: Map[String, AgeGroup] = all.map(x => x.toString.toLowerCase -> x).toMap
@@ -55,7 +55,7 @@ object Genre {
    * lower case to avoid collisions with the camel cased values
    * above.
    */
-  val all: List[Genre] = List(Classical, Jazz)
+  val all: scala.List[Genre] = scala.List(Classical, Jazz)
 
   private[this]
   val byName: Map[String, Genre] = all.map(x => x.toString.toLowerCase -> x).toMap

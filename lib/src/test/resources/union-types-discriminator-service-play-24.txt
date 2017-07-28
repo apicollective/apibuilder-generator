@@ -20,7 +20,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
     case class UNDEFINED(override val toString: String) extends UserDiscriminator
 
-    val all: List[UserDiscriminator] = List(RegisteredUser, GuestUser, SystemUser, String)
+    val all: scala.List[UserDiscriminator] = scala.List(RegisteredUser, GuestUser, SystemUser, String)
 
     private[this] val byName: Map[String, UserDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
 
@@ -86,7 +86,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all: List[SystemUser] = List(System, Anonymous)
+    val all: scala.List[SystemUser] = scala.List(System, Anonymous)
 
     private[this]
     val byName: Map[String, SystemUser] = all.map(x => x.toString.toLowerCase -> x).toMap
