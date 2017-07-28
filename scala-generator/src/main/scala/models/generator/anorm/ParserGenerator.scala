@@ -148,16 +148,15 @@ object ParserGenerator extends CodeGenerator {
 
     @scala.annotation.tailrec
     private[this] def parserFieldDeclaration(name: String, datatype: ScalaDatatype, originalName: String): String = {
+      val varName = parserFieldName(originalName, datatype)
       datatype match {
         case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaDatatype.List(_) | ScalaDatatype.Map(_) => {
-          s"""$name: String = "$originalName""""
+          s"""$varName: String = "$originalName""""
         }
         case ScalaPrimitive.Model(namespaces, name) => {
-          val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
           s"""$varName: String = "$originalName""""
         }
         case ScalaPrimitive.Union(namespaces, name) => {
-          val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
           s"""$varName: String = "$originalName""""
         }
         case ScalaDatatype.Option(inner) => {
@@ -277,7 +276,7 @@ object ParserGenerator extends CodeGenerator {
     private[this] def parserName(field: ScalaField): String = {
       ScalaUtil.isKeyword(field.originalName) match {
         case true => Text.snakeToCamelCase(field.originalName) + "Instance"
-        case false => field.name
+        case false => Text.initLowerCase(field.name)
       }
     }
 
