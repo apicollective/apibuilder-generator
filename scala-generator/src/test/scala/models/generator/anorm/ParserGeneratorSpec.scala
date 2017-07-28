@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{ShouldMatchers, FunSpec}
 
 class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
@@ -267,6 +267,32 @@ class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
         files.map(_.name) should be(fileNames)
         models.TestHelper.assertEqualsFile("/generator/anorm/location-conversions.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/location-parsers.txt", files.last.contents)
+      }
+    }
+  }
+
+  it("can handle field names that start with an uppercase letter") {
+    val model = """
+    {
+      "name": "notification",
+      "plural": "notifications",
+      "attributes": [],
+      "fields": [
+        { "name": "Notification", "type": "string", "required": true, "attributes": [] }
+      ]
+    }
+    """
+
+    val form = ServiceBuilder().addModel(model).form
+
+    ParserGenerator.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(fileNames)
+        models.TestHelper.assertEqualsFile("/generator/anorm/notification-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/notification-parsers.txt", files.last.contents)
       }
     }
   }
