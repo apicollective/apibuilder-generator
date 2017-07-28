@@ -33,7 +33,7 @@ case class ScalaUnionDiscriminator(
         ).flatten.mkString("\n")
       }.mkString("\n"),
       s"case class UNDEFINED(override val toString: String) extends $className",
-      s"val all: List[$className] = List(" + union.types.map(_.name).mkString(", ") + ")",
+      s"val all: scala.List[$className] = scala.List(" + union.types.map(_.name).mkString(", ") + ")",
       s"private[this] val byName: Map[String, $className] = all.map(x => x.toString.toLowerCase -> x).toMap",
       s"def apply(value: String): $className = fromString(value).getOrElse(UNDEFINED(value))",
       s"def fromString(value: String): _root_.scala.Option[$className] = byName.get(value.toLowerCase)"

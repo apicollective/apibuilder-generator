@@ -191,7 +191,7 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
     }
 
     it ("""default: ["foo"], datatype: [string]""") {
-      ScalaUtil.scalaDefault("""["foo"]""", ScalaDatatype.List(ScalaPrimitive.String)) should be("""List("foo")""")
+      ScalaUtil.scalaDefault("""["foo"]""", ScalaDatatype.List(ScalaPrimitive.String)) should be("""scala.List("foo")""")
     }
 
     it ("default: [], datatype: [string]") {
