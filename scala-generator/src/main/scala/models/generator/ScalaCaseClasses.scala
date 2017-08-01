@@ -27,9 +27,10 @@ trait ScalaCaseClasses extends CodeGenerator {
     addHeader: Boolean = true,
     additionalImports: Seq[String] = Seq.empty
   ): Seq[File] = {
-    val header = addHeader match {
-      case false => ""
-      case true => ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
+    val header = if (addHeader) {
+      ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
+    } else {
+      ""
     }
 
     val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
@@ -71,7 +72,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       case Some(code) => s"\n\n$code"
     }
 
-    generateScalaDoc(union.description, Map()) + generateUnionTrait(union) + disc
+    ScalaGeneratorUtil.scaladoc(union.description, Nil) + generateUnionTrait(union) + disc
   }
 
   def generateUnionTrait(union: ScalaUnion): String = {
@@ -86,7 +87,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    generateScalaDoc(model.description, model.fields.map(f => f.name -> f.description).toMap) +
+    ScalaGeneratorUtil.scaladoc(model.description, model.fields.map(f => (f.name, f.description))) +
       generateCaseClass(model, unions)
   }
 
@@ -98,24 +99,4 @@ trait ScalaCaseClasses extends CodeGenerator {
     ScalaEnums(ssd, enum).build
   }
 
-  def generateScalaDoc(description: Option[String], params: Map[String, Option[String]]) = {
-    val modelDesc = description.map(_.trim).filter(_.nonEmpty)
-
-    val prefix = s"@param "
-    val paramDesc: Seq[String] = params.keys.flatMap { name =>
-      params(name).map(_.trim).filter(_.nonEmpty).map { desc =>
-        val lines = GeneratorUtil.splitIntoLines(desc).map { _.indent(prefix.length) }
-        s"$prefix$name " + lines.mkString("\n").trim
-      }
-    }.toSeq
-
-    (modelDesc, paramDesc) match {
-      case (None, Nil) => ""
-      case (Some(m), Nil) => ScalaUtil.textToComment(m) + "\n"
-      case (None, p) => ScalaUtil.textToComment(p) + "\n"
-      case (Some(m), p) => ScalaUtil.textToComment(
-        (GeneratorUtil.splitIntoLines(m).mkString("\n") + "\n\n" + p.mkString("\n")).split("\n")
-      ) + "\n"
-    }
-  }
 }
