@@ -202,13 +202,13 @@ class ScalaClientMethodGenerator(
       } match {
         case Some(response) => {
           if (response.isUnit) {
-            s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})"
+            s"case r => throw ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})"
           } else {
-            s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r)"
+            s"case r => throw ${namespaces.errors}.${response.errorClassName}(r)"
           }
         }
         case None => {
-          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${PlayScalaClientCommon.failedRequestUriParam(config)})"""
+          s"""case r => throw ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${PlayScalaClientCommon.failedRequestUriParam(config)})"""
         }
       }
 
@@ -239,10 +239,10 @@ class ScalaClientMethodGenerator(
 
               } else {
                 if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})")
 
                 } else {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw new ${namespaces.errors}.${response.errorClassName}(r)")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw ${namespaces.errors}.${response.errorClassName}(r)")
                 }
               }
             }

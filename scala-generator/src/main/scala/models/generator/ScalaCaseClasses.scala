@@ -4,7 +4,7 @@ import scala.models.ApidocComments
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
 import lib.Text._
-import lib.generator.CodeGenerator
+import lib.generator.{CodeGenerator, GeneratorUtil}
 import generator.ServiceFileNames
 
 object ScalaCaseClasses extends ScalaCaseClasses
@@ -99,18 +99,23 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateScalaDoc(description: Option[String], params: Map[String, Option[String]]) = {
-    val modelDesc = description.getOrElse("")
+    val modelDesc = description.map(_.trim).filter(_.nonEmpty)
 
-    val paramDesc = {
-      if (params.values.forall(_.isEmpty))
-        Seq() // if no parameter has a description, don't write any @param lines
-      else
-        params.map { case (name, descOpt) => s"@param $name ${descOpt.getOrElse("")}" }
-    }
+    val prefix = s"@param "
+    val paramDesc: Seq[String] = params.keys.flatMap { name =>
+      params(name).map(_.trim).filter(_.nonEmpty).map { desc =>
+        val lines = GeneratorUtil.splitIntoLines(desc).map { _.indent(prefix.length) }
+        s"$prefix$name " + lines.mkString("\n").trim
+      }
+    }.toSeq
 
-    ScalaUtil.textToComment(modelDesc + "\n\n" + paramDesc.mkString("\n")) match {
-      case "" => "" // don't add extra \n for empty comments
-      case x => x + "\n"
+    (modelDesc, paramDesc) match {
+      case (None, Nil) => ""
+      case (Some(m), Nil) => ScalaUtil.textToComment(m) + "\n"
+      case (None, p) => ScalaUtil.textToComment(p) + "\n"
+      case (Some(m), p) => ScalaUtil.textToComment(
+        (GeneratorUtil.splitIntoLines(m).mkString("\n") + "\n\n" + p.mkString("\n")).split("\n")
+      ) + "\n"
     }
   }
 }
