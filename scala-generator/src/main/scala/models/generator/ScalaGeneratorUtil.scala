@@ -3,6 +3,45 @@ package scala.generator
 import io.apibuilder.spec.v0.models.ParameterLocation
 import lib.Datatype
 import lib.Text._
+import lib.generator.GeneratorUtil
+
+object ScalaGeneratorUtil {
+
+  /**
+    * Generates the scala doc given an optional description and a list of parameters
+    * @param params a list of parameters as (key, optional description)
+    */
+  def scaladoc(description: Option[String], params: Seq[(String, Option[String])]): String = {
+    internalScaladoc(description, params) match {
+      case None => ""
+      case Some(d) => d + "\n"
+    }
+  }
+
+  private[this] def internalScaladoc(description: Option[String], params: Seq[(String, Option[String])]): Option[String] = {
+    val modelDesc = description.map(_.trim).filter(_.nonEmpty)
+
+    val prefix = s"@param "
+    val paramDesc: Seq[String] = params.flatMap { case (name, optionalDescription) =>
+      optionalDescription.map(_.trim).filter(_.nonEmpty).map { desc =>
+        val lines = GeneratorUtil.splitIntoLines(desc).map { _.indent(prefix.length) }
+        s"$prefix$name " + lines.mkString("\n").trim
+      }
+    }
+
+    (modelDesc, paramDesc) match {
+      case (None, Nil) => None
+      case (Some(m), Nil) => Some(ScalaUtil.textToComment(m))
+      case (None, p) => Some(ScalaUtil.textToComment(p.mkString("\n").split("\n")))
+      case (Some(m), p) => Some(
+        ScalaUtil.textToComment(
+          (GeneratorUtil.splitIntoLines(m).mkString("\n") + "\n\n" + p.mkString("\n")).split("\n")
+        )
+      )
+    }
+  }
+
+}
 
 class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
 

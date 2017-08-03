@@ -445,7 +445,7 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("GET", s"/echoes", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 204 => ()
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
       }
 
@@ -459,7 +459,7 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("GET", s"/echoes/arrays-only", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 204 => ()
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
       }
     }
@@ -471,7 +471,7 @@ package io.apibuilder.reference.api.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]] = {
         _executeRequest("GET", s"/groups/${organization}", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]", r, _.validate[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
     }
@@ -493,8 +493,8 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("POST", s"/members", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 201 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.Member", r, _.validate[io.apibuilder.reference.api.v0.models.Member])
-          case r if r.getStatusCode == 409 => throw new io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 409 => throw io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
         }
       }
 
@@ -514,7 +514,7 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("GET", s"/members", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -524,7 +524,7 @@ package io.apibuilder.reference.api.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]] = {
         _executeRequest("GET", s"/members/${organization}", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -537,7 +537,7 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("POST", s"/members/${organization}/members_bulk", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
     }
@@ -553,8 +553,8 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("POST", s"/organizations", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 201 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.Organization", r, _.validate[io.apibuilder.reference.api.v0.models.Organization])
-          case r if r.getStatusCode == 409 => throw new io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 409 => throw io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
         }
       }
 
@@ -570,7 +570,7 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("GET", s"/organizations", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Organization]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Organization]])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -580,7 +580,7 @@ package io.apibuilder.reference.api.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Organization] = {
         _executeRequest("GET", s"/organizations/${guid}", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.Organization", r, _.validate[io.apibuilder.reference.api.v0.models.Organization])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
     }
@@ -600,8 +600,8 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 201 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.User", r, _.validate[io.apibuilder.reference.api.v0.models.User])
-          case r if r.getStatusCode == 409 => throw new io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
+          case r if r.getStatusCode == 409 => throw io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
         }
       }
 
@@ -623,7 +623,7 @@ package io.apibuilder.reference.api.v0 {
 
         _executeRequest("GET", s"/users", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.User]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.User]])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -633,7 +633,7 @@ package io.apibuilder.reference.api.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]] = {
         _executeRequest("GET", s"/users/${_root_.io.apibuilder.reference.api.v0.PathSegment.encode(ageGroup.toString, "UTF-8")}", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.User]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.User]])
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -642,7 +642,7 @@ package io.apibuilder.reference.api.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         _executeRequest("POST", s"/users/noop", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => ()
-          case r => throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
     }
@@ -743,7 +743,7 @@ package io.apibuilder.reference.api.v0 {
       f(play.api.libs.json.Json.parse(r.getResponseBody("UTF-8"))) match {
         case play.api.libs.json.JsSuccess(x, _) => x
         case play.api.libs.json.JsError(errors) => {
-          throw new io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), requestUri = Some(r.getUri))
+          throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), requestUri = Some(r.getUri))
         }
       }
     }
@@ -846,11 +846,8 @@ package io.apibuilder.reference.api.v0 {
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.User]
 
     /**
-     * @param guid
      * @param organizationGuids Limits users to the specified organizations.
      * @param ageGroup Limit to users in this age group
-     * @param email
-     * @param active
      */
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,

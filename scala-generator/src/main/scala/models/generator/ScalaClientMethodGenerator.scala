@@ -1,17 +1,13 @@
 package scala.generator
 
-import lib.VersionTag
-import lib.generator.GeneratorUtil
 import scala.models.{FeatureMigration, JsonImports}
 import io.apibuilder.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import scala.collection.immutable.TreeMap
+import lib.Text._
 
 class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,
   ssd: ScalaService
 ) {
-  import lib.Text
-  import lib.Text._
 
   protected val namespaces = Namespaces(config.namespace)
 
@@ -202,13 +198,13 @@ class ScalaClientMethodGenerator(
       } match {
         case Some(response) => {
           if (response.isUnit) {
-            s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})"
+            s"case r => throw ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})"
           } else {
-            s"case r => throw new ${namespaces.errors}.${response.errorClassName}(r)"
+            s"case r => throw ${namespaces.errors}.${response.errorClassName}(r)"
           }
         }
         case None => {
-          s"""case r => throw new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${PlayScalaClientCommon.failedRequestUriParam(config)})"""
+          s"""case r => throw ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${PlayScalaClientCommon.failedRequestUriParam(config)})"""
         }
       }
 
@@ -239,10 +235,10 @@ class ScalaClientMethodGenerator(
 
               } else {
                 if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod})")
 
                 } else {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw new ${namespaces.errors}.${response.errorClassName}(r)")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => throw ${namespaces.errors}.${response.errorClassName}(r)")
                 }
               }
             }
@@ -278,7 +274,6 @@ class ScalaClientMethod(
   response: String,
   implicitArgs: Option[String]
 ) {
-  import lib.Text._
 
   val name: String = operation.name
 
@@ -287,23 +282,13 @@ class ScalaClientMethod(
     case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
   }
 
-  private[this] val commentString = {
-    val methoddesc = operation.description.getOrElse("")
-    val paramsdesc = {
-      if (operation.parameters.forall(_.param.description.isEmpty))
-        Seq() // if no parameter has a description, don't write any @param lines
-      else
-        operation.parameters.map(p => s"@param ${p.name} ${p.param.description.getOrElse("")}")
-    }
-
-    ScalaUtil.textToComment(methoddesc + "\n" + paramsdesc.mkString("\n")) match {
-      case "" => "" // don't add extra \n for empty comments
-      case x => x + "\n"
-    }
-  }
+  private[this] val commentString = ScalaGeneratorUtil.scaladoc(
+    operation.description,
+    operation.parameters.map { p => (p.name, p.param.description) }
+  )
 
   val interface: String = {
-    s"""${commentString}${ScalaUtil.deprecationString(operation.deprecation)}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
+    s"""$commentString${ScalaUtil.deprecationString(operation.deprecation)}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
   }
 
   val code: String = {

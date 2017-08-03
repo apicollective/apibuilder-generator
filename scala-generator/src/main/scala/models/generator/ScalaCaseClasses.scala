@@ -4,7 +4,7 @@ import scala.models.ApidocComments
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
 import lib.Text._
-import lib.generator.CodeGenerator
+import lib.generator.{CodeGenerator, GeneratorUtil}
 import generator.ServiceFileNames
 
 object ScalaCaseClasses extends ScalaCaseClasses
@@ -27,9 +27,10 @@ trait ScalaCaseClasses extends CodeGenerator {
     addHeader: Boolean = true,
     additionalImports: Seq[String] = Seq.empty
   ): Seq[File] = {
-    val header = addHeader match {
-      case false => ""
-      case true => ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
+    val header = if (addHeader) {
+      ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
+    } else {
+      ""
     }
 
     val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
@@ -71,7 +72,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       case Some(code) => s"\n\n$code"
     }
 
-    generateScalaDoc(union.description, Map()) + generateUnionTrait(union) + disc
+    ScalaGeneratorUtil.scaladoc(union.description, Nil) + generateUnionTrait(union) + disc
   }
 
   def generateUnionTrait(union: ScalaUnion): String = {
@@ -86,7 +87,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    generateScalaDoc(model.description, model.fields.map(f => f.name -> f.description).toMap) +
+    ScalaGeneratorUtil.scaladoc(model.description, model.fields.map(f => (f.name, f.description))) +
       generateCaseClass(model, unions)
   }
 
@@ -98,19 +99,4 @@ trait ScalaCaseClasses extends CodeGenerator {
     ScalaEnums(ssd, enum).build
   }
 
-  def generateScalaDoc(description: Option[String], params: Map[String, Option[String]]) = {
-    val modelDesc = description.getOrElse("")
-
-    val paramDesc = {
-      if (params.values.forall(_.isEmpty))
-        Seq() // if no parameter has a description, don't write any @param lines
-      else
-        params.map { case (name, descOpt) => s"@param $name ${descOpt.getOrElse("")}" }
-    }
-
-    ScalaUtil.textToComment(modelDesc + "\n\n" + paramDesc.mkString("\n")) match {
-      case "" => "" // don't add extra \n for empty comments
-      case x => x + "\n"
-    }
-  }
 }

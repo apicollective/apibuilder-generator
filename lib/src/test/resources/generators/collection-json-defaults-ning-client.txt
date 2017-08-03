@@ -141,7 +141,7 @@ package com.gilt.test.v0 {
 
         _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 201 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
-          case r => throw new com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201", requestUri = Some(r.getUri))
+          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201", requestUri = Some(r.getUri))
         }
       }
 
@@ -151,7 +151,7 @@ package com.gilt.test.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User] = {
         _executeRequest("GET", s"/users/${_root_.com.gilt.test.v0.PathSegment.encode(email, "UTF-8")}", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
-          case r => throw new com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
@@ -163,7 +163,7 @@ package com.gilt.test.v0 {
 
         _executeRequest("PATCH", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
-          case r => throw new com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
     }
@@ -264,7 +264,7 @@ package com.gilt.test.v0 {
       f(play.api.libs.json.Json.parse(r.getResponseBody("UTF-8"))) match {
         case play.api.libs.json.JsSuccess(x, _) => x
         case play.api.libs.json.JsError(errors) => {
-          throw new com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), requestUri = Some(r.getUri))
+          throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), requestUri = Some(r.getUri))
         }
       }
     }
