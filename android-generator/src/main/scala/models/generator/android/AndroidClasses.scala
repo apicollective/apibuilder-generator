@@ -389,6 +389,7 @@ object AndroidClasses
               case ParameterLocation.Path => Some(classOf[retrofit2.http.Path])
               case ParameterLocation.Query => Some(classOf[retrofit2.http.Query])
               case ParameterLocation.Form => Some(classOf[retrofit2.http.Query])
+              case ParameterLocation.Header => Some(classOf[retrofit2.http.Header])
               case _ => None
             }
 
