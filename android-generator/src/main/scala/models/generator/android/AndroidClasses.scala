@@ -349,12 +349,11 @@ object AndroidClasses
         maybeAnnotationClass.map(annotationClass => {
 
           val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value", "\"" + retrofitPath + "\"").build()
-
           val methodName =
             if (operation.path == "/")
-              toParamName(operation.method.toString.toLowerCase, true)
+              toMethodName(operation.method.toString.toLowerCase)
             else
-              toParamName(operation.method.toString.toLowerCase + "_" + operation.path.replaceAll("/", "_"), true)
+              toMethodName(operation.method.toString.toLowerCase + "_" + operation.path.replaceAll("/", "_"))
 
           val method = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT)
 
