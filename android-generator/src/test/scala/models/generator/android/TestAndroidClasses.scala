@@ -133,7 +133,7 @@ class TestAndroidClasses
     files.size should be(4)
     files(0).name should be("CarType.java")
     files(1).name should be("Model.java")
-    files(2).name should be("ApidocObjectMapper.java")
+    files(2).name should be("ApiBuilderObjectMapper.java")
     files(3).name should be("ModelsClient.java")
     files.foreach { file => JavaParser.parse(file.contents) }
   }
