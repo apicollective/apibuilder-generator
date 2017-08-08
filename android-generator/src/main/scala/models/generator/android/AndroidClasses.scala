@@ -57,7 +57,7 @@ object AndroidClasses
 
     private val sharedJacksonSpace = "com.gilt.android.jackson"
     private val sharedJacksonDirectoryPath = createDirectoryPath(sharedJacksonSpace)
-    private val sharedObjectMapperClassName = "ApidocObjectMapper"
+    private val sharedObjectMapperClassName = "ApiBuilderObjectMapper"
 
     private val apiDocComments = {
       val s = JAVADOC_CLASS_MESSAGE + "\n"
@@ -113,7 +113,6 @@ object AndroidClasses
 
         val deserialize = MethodSpec.methodBuilder("deserialize").addAnnotation(classOf[Override]).addModifiers(Modifier.PUBLIC)
           .addException(classOf[IOException])
-          .addException(classOf[JsonProcessingException])
           .returns(classOf[DateTime])
           .addParameter(classOf[JsonParser], "jsonParser")
           .addParameter(classOf[DeserializationContext], "ctxt")
@@ -129,13 +128,12 @@ object AndroidClasses
 
         val serialize = MethodSpec.methodBuilder("serialize").addAnnotation(classOf[Override]).addModifiers(Modifier.PUBLIC)
           .addException(classOf[IOException])
-          .addException(classOf[JsonProcessingException])
           .addParameter(classOf[DateTime], "value")
           .addParameter(classOf[JsonGenerator], "jgen")
           .addParameter(classOf[SerializerProvider], "provider")
           .addStatement("jgen.writeString(value.toString(formatter))")
 
-        TypeSpec.anonymousClassBuilder("").superclass(classOf[JsonSerializer[DateTime]])
+        TypeSpec.anonymousClassBuilder("").superclass(ParameterizedTypeName.get(classOf[JsonSerializer[DateTime]], classOf[DateTime]))
           .addMethod(serialize.build)
       }
 
@@ -154,7 +152,7 @@ object AndroidClasses
       builder.addStaticBlock(CodeBlock.builder
         .addStatement("SimpleModule module = new $T(new $T(1, 0, 0, null, null, null))", classOf[SimpleModule], classOf[Version])
         .addStatement("module.addDeserializer($T.class, $L)", classOf[DateTime], deserializer.build)
-        .addStatement("module.addSerializer($T.class, $L)", classOf[DateTime], serializer.build)
+        .addStatement("module.addSerializer($L)", serializer.build)
         .addStatement("MAPPER = new ObjectMapper()")
         .addStatement("MAPPER.setPropertyNamingStrategy($T.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)", classOf[PropertyNamingStrategy])
         .addStatement("MAPPER.configure($T.FAIL_ON_UNKNOWN_PROPERTIES, false)", classOf[DeserializationFeature])
@@ -351,12 +349,11 @@ object AndroidClasses
         maybeAnnotationClass.map(annotationClass => {
 
           val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value", "\"" + retrofitPath + "\"").build()
-
           val methodName =
             if (operation.path == "/")
-              toParamName(operation.method.toString.toLowerCase, true)
+              toMethodName(operation.method.toString.toLowerCase)
             else
-              toParamName(operation.method.toString.toLowerCase + "_" + operation.path.replaceAll("/", "_"), true)
+              toMethodName(operation.method.toString.toLowerCase + "_" + operation.path.replaceAll("/", "_"))
 
           val method = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addModifiers(Modifier.ABSTRACT)
 

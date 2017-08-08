@@ -111,9 +111,14 @@ trait AndroidJavaUtil {
     } else {
       checkForReservedWord(paramStartingWithUppercase)
     }
-
   }
 
+  def toMethodName(modelName: String): String = {
+    val paramStartingWithUppercase = {
+      Text.safeName(Text.splitIntoWords(modelName).map { _.toLowerCase.capitalize }.mkString)
+    }
+    checkForReservedWord(paramStartingWithUppercase)
+  }
 
   def toEnumName(input: String): String = {
     Text.safeName(input.replaceAll("\\.","_")).toUpperCase()
