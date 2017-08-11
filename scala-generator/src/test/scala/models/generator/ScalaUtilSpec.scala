@@ -166,13 +166,25 @@ class ScalaUtilSpec extends FunSpec with ShouldMatchers {
       ScalaUtil.scalaDefault("-124", ScalaPrimitive.Long) should be("-124")
     }
 
-    it ("default: 2014-03-14, datatype: date-iso8601") {
-      ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601Joda) should be("new _root_.org.joda.time.LocalDate(2014, 3, 14)")
+    describe ("default: 2014-03-14, datatype: date-iso8601") {
+      it("behaves for Joda-Time") {
+        ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601Joda) should be("new _root_.org.joda.time.LocalDate(2014, 3, 14)")
+      }
+      it("behaves for java.time") {
+        ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601Java) should be("""_root_.java.time.LocalDate.parse("2014-03-14")""")
+      }
     }
 
-    it ("default: 2014-03-14T12:13:15Z, datatype: date-time-iso8601") {
-      ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601Joda) should be {
-        """_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime("2014-03-14T12:13:15Z")"""
+    describe ("default: 2014-03-14T12:13:15Z, datatype: date-time-iso8601") {
+      it("behaves for Joda-Time") {
+        ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601Joda) should be {
+          """_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime("2014-03-14T12:13:15Z")"""
+        }
+      }
+      it("behaves for java.time") {
+          ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601Java) should be {
+            """_root_.java.time.Instant.parse("2014-03-14T12:13:15Z")"""
+          }
       }
     }
 
