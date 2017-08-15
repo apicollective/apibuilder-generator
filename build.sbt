@@ -28,8 +28,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -66,6 +66,19 @@ lazy val androidGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(
     commonSettings: _*
+  )
+
+lazy val kotlinGenerator = project
+  .in(file("kotlin-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.0",
+      "com.squareup" % "kotlinpoet" % "0.4.0",
+      "com.squareup.retrofit2" % "retrofit" % "2.2.0",
+      "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+      "org.mockito" % "mockito-all" % "1.10.19" % "test"
+    )
   )
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
