@@ -1,7 +1,9 @@
 package models.generator.kotlin
 
+import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicInteger
 
+import io.apibuilder.generator.v0.models.{File => ApiBuilderFile}
 import org.jetbrains.kotlin.cli.common.messages.{CompilerMessageLocation, CompilerMessageSeverity, MessageCollector}
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
@@ -9,6 +11,17 @@ import org.jetbrains.kotlin.config.Services
 import org.scalatest.Matchers
 
 object KotlinTestHelper extends Matchers {
+
+  def writeFiles(dir: java.io.File, files: Seq[ApiBuilderFile]): Unit = {
+    for (f <- files) {
+      val javaFile = new java.io.File(dir.getAbsolutePath, f.name)
+      javaFile.createNewFile()
+      val writer = new FileWriter(javaFile)
+      writer.write(f.contents)
+      writer.flush()
+      writer.close()
+    }
+  }
 
   def assertValidKotlinSourceCode(sourceCode: String): Unit = {
     val msgCollector = new MessageCollectorImpl()
