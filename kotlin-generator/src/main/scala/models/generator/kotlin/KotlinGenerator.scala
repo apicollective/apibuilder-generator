@@ -78,7 +78,7 @@ class KotlinGenerator
     val className = toClassName(model.name)
 
     val builder = TypeSpec.classBuilder(className)
-        .addModifiers(KModifier.PUBLIC)
+        .addModifiers(KModifier.PUBLIC, KModifier.DATA)
         .addKdoc(kdocClassMessage)
 
     val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown", "true")
@@ -106,16 +106,12 @@ class KotlinGenerator
 
       val kotlinDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
-      val propBuilder = PropertySpec.builder(fieldCamelCaseName, kotlinDataType).addModifiers(KModifier.PUBLIC)
-      builder.addProperty(propBuilder.build)
-
       val methodName = Text.snakeToCamelCase(s"get_${fieldSnakeCaseName}")
 
       val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, kotlinDataType)
       val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + fieldSnakeCaseName + "\"")
       constructorParameter.addAnnotation(annotation.build)
       constructorWithParams.addParameter(constructorParameter.build)
-      constructorWithParams.addStatement("this.$N = $N", fieldCamelCaseName, fieldCamelCaseName)
     })
 
     builder.addFun(constructorWithParams.build)
