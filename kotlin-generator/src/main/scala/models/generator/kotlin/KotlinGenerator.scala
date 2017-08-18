@@ -86,8 +86,7 @@ class KotlinGenerator
 
     model.description.map(builder.addKdoc(_))
 
-    val constructorWithParams = FunSpec.constructorBuilder().addModifiers(KModifier.PUBLIC)
-    constructorWithParams.addAnnotation(classOf[JsonCreator])
+    val constructorWithParams = FunSpec.constructorBuilder()
 
     val unionClassTypeNames = relatedUnions.map { u => new ClassName(modelsNameSpace, toClassName(u.name)) }
     builder.addSuperinterfaces(unionClassTypeNames.asJava)
@@ -106,15 +105,11 @@ class KotlinGenerator
 
       val kotlinDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
-      val methodName = Text.snakeToCamelCase(s"get_${fieldSnakeCaseName}")
-
       val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, kotlinDataType)
-      val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + fieldSnakeCaseName + "\"")
-      constructorParameter.addAnnotation(annotation.build)
       constructorWithParams.addParameter(constructorParameter.build)
     })
 
-    builder.addFun(constructorWithParams.build)
+    builder.primaryConstructor(constructorWithParams.build)
 
     makeFile(className, builder)
   }
