@@ -77,7 +77,7 @@ lazy val kotlinGenerator = project
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.0",
       "com.squareup" % "kotlinpoet" % "0.4.0",
       "com.squareup.retrofit2" % "retrofit" % "2.2.0",
-      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.1.3-2" % "test",
+      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.1.4" % "test",
       "org.scalatest" %% "scalatest" % "2.2.6" % "test",
       "org.mockito" % "mockito-all" % "1.10.19" % "test"
     )
@@ -90,10 +90,10 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
-    "com.github.javaparser" % "javaparser-core" % "3.3.0" % "test",
+    "com.github.javaparser" % "javaparser-core" % "3.3.1" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "com.squareup" % "javapoet" % "1.9.0",
-    "com.squareup.retrofit2" % "retrofit" % "2.2.0"
+    "com.squareup.retrofit2" % "retrofit" % "2.3.0"
   ),
   scalacOptions += "-feature",
   sources in (Compile,doc) := Seq.empty,
