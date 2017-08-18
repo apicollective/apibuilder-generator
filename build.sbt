@@ -76,7 +76,7 @@ lazy val kotlinGenerator = project
       "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.0",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.0",
       "com.squareup" % "kotlinpoet" % "0.4.0",
-      "com.squareup.retrofit2" % "retrofit" % "2.2.0",
+      "com.squareup.retrofit2" % "retrofit" % "2.3.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.1.4" % "test",
       "org.scalatest" %% "scalatest" % "2.2.6" % "test",
       "org.mockito" % "mockito-all" % "1.10.19" % "test"
