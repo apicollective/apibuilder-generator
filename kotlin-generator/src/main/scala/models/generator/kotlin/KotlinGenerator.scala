@@ -255,6 +255,7 @@ class KotlinGenerator
     val createFunSpec = FunSpec.builder("create")
       .addCode(createCodeBlock)
       .addModifiers(KModifier.PUBLIC)
+      .returns(classOf[com.fasterxml.jackson.databind.ObjectMapper])
       .build()
     val builder = TypeSpec.classBuilder(className)
       .addModifiers(KModifier.PUBLIC)
