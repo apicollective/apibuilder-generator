@@ -114,10 +114,13 @@ trait AndroidJavaUtil {
   }
 
   def toMethodName(modelName: String): String = {
-    val paramStartingWithUppercase = {
-      Text.safeName(Text.splitIntoWords(modelName).map { _.toLowerCase.capitalize }.mkString)
+    val methodName = {
+      val methoNameStartingWithUpperCase = Text.splitIntoWords(modelName).map {
+        _.toLowerCase.capitalize
+      }.mkString
+      Text.safeName(methoNameStartingWithUpperCase.head.toLower + methoNameStartingWithUpperCase.tail)
     }
-    checkForReservedWord(paramStartingWithUppercase)
+    checkForReservedWord(methodName)
   }
 
   def toEnumName(input: String): String = {

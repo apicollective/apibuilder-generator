@@ -55,7 +55,7 @@ object AndroidClasses
     private val modelsNameSpace = nameSpace + ".models"
     private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
 
-    private val sharedJacksonSpace = "com.gilt.android.jackson"
+    private val sharedJacksonSpace = nameSpace + ".android"
     private val sharedJacksonDirectoryPath = createDirectoryPath(sharedJacksonSpace)
     private val sharedObjectMapperClassName = "ApiBuilderObjectMapper"
 
@@ -152,7 +152,7 @@ object AndroidClasses
       builder.addStaticBlock(CodeBlock.builder
         .addStatement("SimpleModule module = new $T(new $T(1, 0, 0, null, null, null))", classOf[SimpleModule], classOf[Version])
         .addStatement("module.addDeserializer($T.class, $L)", classOf[DateTime], deserializer.build)
-        .addStatement("module.addSerializer($L)", serializer.build)
+        .addStatement("module.addSerializer($T.class, $L)", classOf[DateTime], serializer.build)
         .addStatement("MAPPER = new ObjectMapper()")
         .addStatement("MAPPER.setPropertyNamingStrategy($T.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)", classOf[PropertyNamingStrategy])
         .addStatement("MAPPER.configure($T.FAIL_ON_UNKNOWN_PROPERTIES, false)", classOf[DeserializationFeature])
@@ -312,6 +312,13 @@ object AndroidClasses
       //      val constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC)
       //      constructor.addParameter(classOf[String], "json")
       //      builder.addMethod(constructor.build)
+
+
+      val fromBuilder = MethodSpec.methodBuilder("parseJson").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC).addParameter(classOf[String], "json").addException(classOf[IOException])
+      val modelType = ClassName.get(modelsNameSpace, className)
+      fromBuilder.returns(modelType)
+      fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.getInstance().readValue( json, ${modelType.simpleName() + ".class"})")
+      builder.addMethod(fromBuilder.build)
 
       makeFile(className, builder)
 
