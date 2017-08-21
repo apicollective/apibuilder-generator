@@ -1,7 +1,7 @@
 package scala.models.http4s
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import scala.generator.{ScalaClientMethodConfig, ScalaUtil}
+import scala.generator.{ScalaClientMethodConfigs, ScalaUtil}
 import scala.models.{Headers, JsonImports}
 
 import lib.Text._
@@ -10,7 +10,7 @@ import lib.Text._
 case class Http4sClient(
   form: InvocationForm,
   ssd: ScalaService,
-  config: ScalaClientMethodConfig
+  config: ScalaClientMethodConfigs.Http4s
 ) {
 
   def generate(): String = {
@@ -30,8 +30,7 @@ ${Http4sScalaClientCommon.clientSignature(config).indent(2)} {
     import org.http4s.Response
     implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
     implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
-    import scalaz._
-    import scalaz.concurrent.Task
+    import ${config.asyncType}
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     def closeAsyncHttpClient() {
@@ -61,8 +60,8 @@ ${headerString.indent(6)}
       import org.http4s.QueryParamEncoder._
 
       val m = org.http4s.Method.fromString(method) match {
-        case \\/-(m) => m
-        case -\\/(e) => sys.error(e.toString)
+        case ${config.rightType}(m) => m
+        case ${config.leftType}(e) => sys.error(e.toString)
       }
 
       val headers = org.http4s.Headers((

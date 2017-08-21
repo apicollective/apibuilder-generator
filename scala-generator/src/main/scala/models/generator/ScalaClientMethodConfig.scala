@@ -167,7 +167,7 @@ private lazy val defaultAsyncHttpClient = {
   }
 
 
-  case class Http4s(namespace: String, baseUrl: Option[String]) extends ScalaClientMethodConfig {
+  trait Http4s extends ScalaClientMethodConfig {
     override def pathEncode(value: String) = value
     override val responseStatusMethod = "status.code"
     override val responseBodyMethod = """body"""
@@ -186,5 +186,22 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override def toJson(responseName: String, className: String): String = {
       s"""_root_.${namespace}.Client.parseJson[$className]("$className", $responseName)"""
     }
+    def leftType: String
+    def rightType: String
+    def monadTransformerInvoke: String
+  }
+
+  case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
+    override val asyncType = "scalaz.concurrent.Task"
+    override val leftType = "scalaz.-\\/"
+    override val rightType = "scalaz.\\/-"
+    override val monadTransformerInvoke = "run"
+  }
+
+  case class Http4s017(namespace: String, baseUrl: Option[String]) extends Http4s {
+    override val asyncType = "fs2.Task"
+    override val leftType = "Left"
+    override val rightType = "Right"
+    override val monadTransformerInvoke = "value"
   }
 }

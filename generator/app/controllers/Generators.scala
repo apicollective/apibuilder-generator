@@ -262,12 +262,22 @@ object Generators {
     CodeGenTarget(
       metaData = Generator(
         key = "http4s_0_15",
-        name = "Http4s 0.15",
-        description = Some("Http4s 0.15 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.15/client/'>http4s client</a>"),
+        name = "Http4s 0.15 / 0.16",
+        description = Some("Http4s 0.15 and 0.16 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.15/client/'>http4s client</a>"),
         language = Some("Scala")
       ),
       status = lib.generator.Status.Alpha,
-      codeGenerator = Some(scala.models.http4s.Generator)
+      codeGenerator = Some(scala.models.http4s.Http4s015Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "http4s_0_17",
+        name = "Http4s 0.17",
+        description = Some("Http4s 0.17 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.17/client/'>http4s client</a>"),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.http4s.Http4s017Generator)
     )
   ).sortBy(_.metaData.key)
 }
