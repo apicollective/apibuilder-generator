@@ -9,15 +9,38 @@ import scala.generator.ScalaClientMethodConfigs
 class Http4sClientGeneratorSpec extends FunSpec with Matchers {
 
   describe("generate") {
-    it("produces valid Scala source code") {
+    it("Http4s 0.15 generator produces valid Scala source code") {
       val service = models.TestHelper.generatorApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s015(namespace = "whatever", baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
       scalaSourceCode should not include ("org.joda")
+      scalaSourceCode should include ("scalaz.concurrent.Task")
+      scalaSourceCode should include (" scalaz.-\\/")
+      scalaSourceCode should include (" scalaz.\\/-")
+      scalaSourceCode should not include ("fs2.Task")
+      scalaSourceCode should not include (" Left")
+      scalaSourceCode should not include (" Right")
+    }
+
+    it("Http4s 0.17 generator produces valid Scala source code") {
+      val service = models.TestHelper.generatorApiService
+      val ssd = new ScalaService(service)
+      val invocationForm = new InvocationForm(service, Seq.empty, None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None)
+      val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
+      val scalaSourceCode = client.generate()
+      assertValidScalaSourceCode(scalaSourceCode)
+      scalaSourceCode should not include ("org.joda")
+      scalaSourceCode should not include ("scalaz.concurrent.Task")
+      scalaSourceCode should not include ("-\\/")
+      scalaSourceCode should not include ("\\/-")
+      scalaSourceCode should include ("fs2.Task")
+      scalaSourceCode should include (" Left")
+      scalaSourceCode should include (" Right")
     }
   }
 }

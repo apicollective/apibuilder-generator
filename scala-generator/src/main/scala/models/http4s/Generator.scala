@@ -9,9 +9,16 @@ import scala.models.ApidocComments
 
 import generator.ServiceFileNames
 
-object Generator extends Generator
+object Http4s015Generator extends Generator {
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s015(namespace, baseUrl)
+}
+
+object Http4s017Generator extends Generator {
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s017(namespace, baseUrl)
+}
 
 trait Generator extends CodeGenerator {
+  def mkConfig(namespace: String, baseUrl: Option[String]): ScalaClientMethodConfigs.Http4s
 
   override def invoke(form: InvocationForm) = Right(generateCode(form = form, addHeader = true))
 
@@ -20,7 +27,7 @@ trait Generator extends CodeGenerator {
     addHeader: Boolean
   ): Seq[File] = {
     val ssd = new ScalaService(form.service)
-    val config = ScalaClientMethodConfigs.Http4s(Namespaces.quote(form.service.namespace), form.service.baseUrl)
+    val config = mkConfig(Namespaces.quote(form.service.namespace), form.service.baseUrl)
 
     val header = addHeader match {
       case false => ""
