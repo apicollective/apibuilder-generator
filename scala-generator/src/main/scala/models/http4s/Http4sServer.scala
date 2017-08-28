@@ -6,6 +6,8 @@ import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaOperation,
 import lib.Text._
 import lib.VersionTag
 
+import scala.models.JsonImports
+
 object Http4sServer {
   def pathExtractorName(sp: ScalaPrimitive, min: Option[Long], max: Option[Long]): String = {
     val minPart = min.fold("")(v => s"$v")
@@ -71,7 +73,11 @@ case class Http4sServer(form: InvocationForm,
       val name = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(ScalaUtil.toClassName(resource.resource.`type`)).toLowerCase + "_routes").capitalize
 
       s"""trait $name {
-         |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
+         |  implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
+         |  implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
+         |
+ |       |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
+         |
          |  def service() = org.http4s.HttpService {
          |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indent(4)}
          |  }
@@ -82,6 +88,7 @@ case class Http4sServer(form: InvocationForm,
     s"""package ${ssd.namespaces.base}.server
        |
        |import org.http4s.dsl._
+       |${JsonImports(form.service).mkString("\n")}
        |$versionCapture
        |${path.mkString("\n")}
        |${query.mkString("\n")}
@@ -196,27 +203,29 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
 
   def operation(): Seq[String] = {
     def params =
-      Seq("_req: org.http4s.Request") ++
+      Seq(Some("_req: org.http4s.Request")) ++
       op.nonHeaderParameters.map { field =>
         val typ = field.datatype match {
           case ScalaDatatype.Option(nested) => nested.name
           case _ => field.datatype.name
         }
-        s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ"
-      }
+        Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
+      } ++
+      Seq(op.body.map(body => s"body: => org.http4s.DecodeResult[${body.datatype.name}]"))
 
     Seq(
       s"def ${op.name}(",
-      params.mkString(",\n").indent(2),
+      params.flatten.mkString(",\n").indent(2),
       s"): ${config.asyncType}[org.http4s.Response]"
     )
   }
 
   def route(version: Option[Int]): Seq[String] = {
     val args = (
-      Seq("req") ++
-      op.nonHeaderParameters.map(field => s"${ScalaUtil.quoteNameIfKeyword(field.name)}")
-    ).mkString(", ")
+      Seq(Some("_req")) ++
+      op.nonHeaderParameters.map(field => Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}")) ++
+      Seq(op.body.map(body => s"_req.attemptAs[${body.datatype.name}]"))
+    ).flatten.mkString(", ")
 
     val path = (
       Seq("Root") ++
@@ -236,10 +245,10 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
 
     val queryStart = if (query.size > 0) """ :? """ else ""
 
-    val verFilter = version.fold("")(_ => " if ApiVersion(req)")
+    val verFilter = version.fold("")(_ => " if ApiVersion(_req)")
 
     Seq(
-      s"case req @ ${op.method} -> $path$queryStart$query$verFilter =>",
+      s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>",
       s"  ${op.name}($args)"
     )
   }
