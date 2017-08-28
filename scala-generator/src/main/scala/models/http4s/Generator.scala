@@ -6,7 +6,7 @@ import io.apibuilder.generator.v0.models.{InvocationForm, File}
 import lib.generator.CodeGenerator
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, Namespaces}
 import scala.models.ApidocComments
-
+import scala.models.http4s.server.Http4sServer
 import generator.ServiceFileNames
 
 object Http4s015Generator extends Generator {

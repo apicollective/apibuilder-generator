@@ -1,12 +1,12 @@
-package scala.models.http4s
+package scala.models.http4s.server
 
 import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaOperation, ScalaPrimitive, ScalaResource, ScalaUtil}
+import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaPrimitive, ScalaUtil}
+import scala.models.JsonImports
+import scala.models.http4s.{ScalaGeneratorUtil, ScalaService}
 import lib.Text._
 import lib.VersionTag
-
-import scala.models.JsonImports
 
 object Http4sServer {
   def pathExtractorName(sp: ScalaPrimitive, min: Option[Long], max: Option[Long]): String = {
@@ -30,6 +30,7 @@ object Http4sServer {
         queryExtractorName(name, nested, min, max, default, Some("Opt"))
     }
   }
+
 }
 
 case class Http4sServer(form: InvocationForm,
@@ -181,75 +182,3 @@ case class Http4sServer(form: InvocationForm,
   }
 }
 
-sealed trait PathSegment
-case class Literal(name: String) extends PathSegment
-case class PlainString(name: String) extends PathSegment
-case class Extracted(name: String, dt: ScalaPrimitive, min: Option[Long], max: Option[Long]) extends PathSegment
-
-case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClientMethodConfigs.Http4s) {
-  val pathSegments = op.path.split("/").filterNot(_.isEmpty).map { segment =>
-    if(!segment.startsWith(":")) {
-      Literal(segment)
-    } else {
-      val truncated = segment.drop(1)
-      op.pathParameters.find(_.name == truncated).fold(Literal(segment): PathSegment) { scalaParameter =>
-        scalaParameter.datatype match {
-          case ScalaPrimitive.String if scalaParameter.param.minimum.isEmpty && scalaParameter.param.maximum.isEmpty => PlainString(truncated)
-          case dt: ScalaPrimitive => Extracted(truncated, dt, scalaParameter.param.minimum, scalaParameter.param.maximum)
-        }
-      }
-    }
-  }
-
-  def operation(): Seq[String] = {
-    def params =
-      Seq(Some("_req: org.http4s.Request")) ++
-      op.nonHeaderParameters.map { field =>
-        val typ = field.datatype match {
-          case ScalaDatatype.Option(nested) => nested.name
-          case _ => field.datatype.name
-        }
-        Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
-      } ++
-      Seq(op.body.map(body => s"body: => org.http4s.DecodeResult[${body.datatype.name}]"))
-
-    Seq(
-      s"def ${op.name}(",
-      params.flatten.mkString(",\n").indent(2),
-      s"): ${config.asyncType}[org.http4s.Response]"
-    )
-  }
-
-  def route(version: Option[Int]): Seq[String] = {
-    val args = (
-      Seq(Some("_req")) ++
-      op.nonHeaderParameters.map(field => Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}")) ++
-      Seq(op.body.map(body => s"_req.attemptAs[${body.datatype.name}]"))
-    ).flatten.mkString(", ")
-
-    val path = (
-      Seq("Root") ++
-      pathSegments.collect {
-        case Literal(n) => s""""$n""""
-        case PlainString(n) => s"$n"
-        case Extracted(name, dt, min, max) => s"${Http4sServer.pathExtractorName(dt, min, max)}($name)"
-      }
-    ).mkString(" / ")
-
-    val query = (
-      op.queryParameters.map { st =>
-        val (extractor, handler) = Http4sServer.queryExtractorName(st.name, st.datatype, st.param.minimum, st.param.maximum, st.default)
-        s"$extractor($handler)"
-      }
-    ).mkString(" +& ")
-
-    val queryStart = if (query.size > 0) """ :? """ else ""
-
-    val verFilter = version.fold("")(_ => " if ApiVersion(_req)")
-
-    Seq(
-      s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>",
-      s"  ${op.name}($args)"
-    )
-  }
-}
