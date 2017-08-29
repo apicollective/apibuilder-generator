@@ -136,7 +136,7 @@ case class Http4sServer(form: InvocationForm,
 
   def genQueryExtractors(routes: List[Route]): Seq[String] = {
     val d = routes.flatMap(_.op.queryParameters).map { st =>
-      (st.name, st.datatype, st.param.minimum, st.param.maximum, st.default)
+      (st.originalName, st.datatype, st.param.minimum, st.param.maximum, st.default)
     }
     d.distinct.map { case (name: String, dt: ScalaDatatype, min: Option[Long], max: Option[Long], default: Option[String]) =>
       val extractorName = Http4sServer.queryExtractorName(name, dt, min, max, default)._1
