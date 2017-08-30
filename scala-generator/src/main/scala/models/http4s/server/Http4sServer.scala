@@ -135,13 +135,18 @@ case class Http4sServer(form: InvocationForm,
   }
 
   def genQueryExtractors(routes: List[Route]): Seq[String] = {
-    val d = routes.flatMap(_.op.queryParameters).map { st =>
-      (st.originalName, st.datatype, st.param.minimum, st.param.maximum, st.default)
-    }
-    d.distinct.map { case (name: String, dt: ScalaDatatype, min: Option[Long], max: Option[Long], default: Option[String]) =>
-      val extractorName = Http4sServer.queryExtractorName(name, dt, min, max, default)._1
+    val distinctParams = routes.flatMap(_.op.queryParameters).groupBy { param =>
+      val typ = param.datatype match {
+        case ScalaDatatype.Option(container: ScalaDatatype.Container) => container
+        case other => other
+      }
+      (param.originalName, typ, param.param.minimum, param.param.maximum, param.default)
+    }.values.toList.map(_.head)
+    distinctParams.map { param =>
+      val name = param.originalName
+      val extractorName = Http4sServer.queryExtractorName(name, param.datatype, param.param.minimum, param.param.maximum, param.default)._1
 
-      dt match {
+      param.datatype match {
         case ScalaDatatype.Option(ScalaDatatype.List(sp: ScalaPrimitive)) =>
           s"""object $extractorName extends OptionalMultiQueryParamDecoderMatcher[${sp.shortName}]("$name")"""
         case ScalaDatatype.List(sp: ScalaPrimitive) =>
@@ -149,7 +154,7 @@ case class Http4sServer(form: InvocationForm,
         case ScalaDatatype.Option(sp: ScalaPrimitive) =>
           s"""object $extractorName extends OptionalQueryParamDecoderMatcher[${sp.shortName}]("$name")"""
         case sp: ScalaPrimitive =>
-          val defPart = default.map { d =>
+          val defPart = param.default.map { d =>
             val default = sp match {
               case ScalaPrimitive.Long if d.toLowerCase.lastOption != Some('l') => s"${d}L"
               case _ => d
@@ -157,7 +162,7 @@ case class Http4sServer(form: InvocationForm,
             s".orElse(Some($default))"
           }
 
-          val filterPart = (sp, min, max) match {
+          val filterPart = (sp, param.param.minimum, param.param.maximum) match {
             case (ScalaPrimitive.Integer | ScalaPrimitive.Long, Some(min), None) => Some(s".filter(_ >= $min)")
             case (ScalaPrimitive.Integer | ScalaPrimitive.Long, None, Some(max)) => Some(s".filter(_ <= $max)")
             case (ScalaPrimitive.Integer | ScalaPrimitive.Long, Some(min), Some(max)) => Some(s".filter(v => v >= $min && v <= $max)")

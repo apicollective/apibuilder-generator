@@ -56,8 +56,8 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
       Seq(Some("_req: org.http4s.Request")) ++
       op.nonHeaderParameters.map { field =>
         val typ = field.datatype match {
-          case ScalaDatatype.Option(nested) => nested.name
-          case _ => field.datatype.name
+          case ScalaDatatype.Option(container: ScalaDatatype.Container) => container.name
+          case other => other.name
         }
         Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
       } ++
@@ -105,14 +105,14 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
 
     Seq(
       s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>",
-      s"  ${op.name}($args).flatMap { _ match {"
+      s"  ${op.name}($args).flatMap {"
     ) ++ statusCodes.collect {
       case StatusCode(code, Some(_)) =>
         s"    case $responseTrait.HTTP$code(value, headers) => ${HttpStatusCodes.apply(code)}(value).putHeaders(headers: _*)"
       case StatusCode(code, None) =>
         s"    case $responseTrait.HTTP$code(headers) => ${HttpStatusCodes.apply(code)}().putHeaders(headers: _*)"
     } ++ Seq(
-      s"  }}"
+      s"  }"
     )
   }
 }
