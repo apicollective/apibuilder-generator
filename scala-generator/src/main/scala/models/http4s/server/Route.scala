@@ -1,13 +1,14 @@
 package scala.models.http4s.server
 
 import io.apibuilder.spec.v0.models.ResponseCodeInt
-import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaOperation, ScalaPrimitive, ScalaResource, ScalaUtil}
+
+import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaOperation, ScalaParameter, ScalaPrimitive, ScalaResource, ScalaUtil}
 import lib.Text._
 
 sealed trait PathSegment
 case class Literal(name: String) extends PathSegment
 case class PlainString(name: String) extends PathSegment
-case class Extracted(name: String, dt: ScalaPrimitive, min: Option[Long], max: Option[Long]) extends PathSegment
+case class Extracted(name: String, parameter: ScalaParameter) extends PathSegment
 
 case class StatusCode(code: Int, datatype: Option[String])
 
@@ -20,7 +21,7 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
       op.pathParameters.find(_.name == truncated).fold(Literal(segment): PathSegment) { scalaParameter =>
         scalaParameter.datatype match {
           case ScalaPrimitive.String if scalaParameter.param.minimum.isEmpty && scalaParameter.param.maximum.isEmpty => PlainString(truncated)
-          case dt: ScalaPrimitive => Extracted(truncated, dt, scalaParameter.param.minimum, scalaParameter.param.maximum)
+          case _: ScalaPrimitive => Extracted(truncated, scalaParameter)
         }
       }
     }
@@ -88,14 +89,14 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
         pathSegments.collect {
           case Literal(n) => s""""$n""""
           case PlainString(n) => s"$n"
-          case Extracted(name, dt, min, max) => s"${Http4sServer.pathExtractorName(dt, min, max)}($name)"
+          case Extracted(name, param) => s"${Http4sServer.pathExtractor(param).name}($name)"
         }
       ).mkString(" / ")
 
     val query = (
       op.queryParameters.map { param =>
-        val (extractor, handler) = Http4sServer.queryExtractorName(param)
-        s"$extractor($handler)"
+        val extractor = Http4sServer.queryExtractor(param)
+        s"${extractor.name}(${extractor.handler})"
       }
       ).mkString(" +& ")
 
