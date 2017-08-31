@@ -93,8 +93,8 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
       ).mkString(" / ")
 
     val query = (
-      op.queryParameters.map { st =>
-        val (extractor, handler) = Http4sServer.queryExtractorName(st.name, st.datatype, st.param.minimum, st.param.maximum, st.default)
+      op.queryParameters.map { param =>
+        val (extractor, handler) = Http4sServer.queryExtractorName(param)
         s"$extractor($handler)"
       }
       ).mkString(" +& ")
