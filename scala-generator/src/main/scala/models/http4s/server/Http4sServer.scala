@@ -79,7 +79,7 @@ case class Http4sServer(form: InvocationForm,
          |
  |       |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
          |
-         |  def apiVersionMatch(req: org.http4s.Message) = ApiVersion(req)
+         |  def apiVersionMatch(req: org.http4s.Message): Boolean = ApiVersion(req)
          |
          |  def service() = org.http4s.HttpService {
          |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indent(4)}
