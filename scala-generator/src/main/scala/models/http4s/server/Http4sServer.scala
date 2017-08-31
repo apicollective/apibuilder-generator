@@ -77,7 +77,7 @@ case class Http4sServer(form: InvocationForm,
          |  implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
          |  implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
          |
- |       |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
+         |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
          |
          |  def apiVersionMatch(req: org.http4s.Message): Boolean = ApiVersion(req)
          |
