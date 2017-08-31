@@ -2,7 +2,7 @@ package scala.models.http4s.server
 
 import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaPrimitive, ScalaUtil}
+import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaParameter, ScalaPrimitive, ScalaUtil}
 import scala.models.JsonImports
 import scala.models.http4s.{ScalaGeneratorUtil, ScalaService}
 import lib.Text._
@@ -15,20 +15,22 @@ object Http4sServer {
     s"${sp.shortName}${minPart}${maxPart}Val"
   }
 
-  def queryExtractorName(name: String, sdt: ScalaDatatype, min: Option[Long], max: Option[Long], default: Option[String], collType: Option[String] = None): (String, String) = {
-    sdt match {
-      case sp: ScalaPrimitive =>
-        val collPart = collType.getOrElse("")
-        val minPart = min.fold("")(v => s"$v")
-        val maxPart = max.fold("")(v => s"To$v")
-        val defPart = default.fold("")(v => s"Def$v")
-        (s"${name.capitalize}$collPart${sp.shortName}$minPart$maxPart${defPart}Matcher", name)
-      case ScalaDatatype.List(nested) =>
-        val (extractor, handler) = queryExtractorName(name, nested, min, max, default, Some("List"))
-        (extractor, s"cats.data.Validated.Valid($handler)")
-      case ScalaDatatype.Option(nested) =>
-        queryExtractorName(name, nested, min, max, default, Some("Opt"))
+  def queryExtractorName(param: ScalaParameter): (String, String) = {
+    def recurse(typ: ScalaDatatype, collPart: String): (String, String) = {
+      typ match {
+        case sp: ScalaPrimitive =>
+          val minPart = param.param.minimum.fold("")(v => s"$v")
+          val maxPart = param.param.maximum.fold("")(v => s"To$v")
+          val defPart = param.default.fold("")(v => s"Def$v")
+          (s"${param.name.capitalize}$collPart${sp.shortName}$minPart$maxPart${defPart}Matcher", param.name)
+        case ScalaDatatype.List(nested) =>
+          val (extractor, handler) = recurse(nested, "List")
+          (extractor, s"cats.data.Validated.Valid($handler)")
+        case ScalaDatatype.Option(nested) =>
+          recurse(nested, "Opt")
+      }
     }
+    recurse(param.datatype, "")
   }
 
 }
@@ -143,16 +145,14 @@ case class Http4sServer(form: InvocationForm,
       (param.originalName, typ, param.param.minimum, param.param.maximum, param.default)
     }.values.toList.map(_.head)
     distinctParams.map { param =>
-      val name = param.originalName
-      val extractorName = Http4sServer.queryExtractorName(name, param.datatype, param.param.minimum, param.param.maximum, param.default)._1
-
+      val (extractor, _) = Http4sServer.queryExtractorName(param)
       param.datatype match {
         case ScalaDatatype.Option(ScalaDatatype.List(sp: ScalaPrimitive)) =>
-          s"""object $extractorName extends OptionalMultiQueryParamDecoderMatcher[${sp.shortName}]("$name")"""
+          s"""object $extractor extends OptionalMultiQueryParamDecoderMatcher[${sp.shortName}]("${param.originalName}")"""
         case ScalaDatatype.List(sp: ScalaPrimitive) =>
-          s"""object $extractorName extends OptionalMultiQueryParamDecoderMatcher[${sp.shortName}]("$name")"""
+          s"""object $extractor extends OptionalMultiQueryParamDecoderMatcher[${sp.shortName}]("${param.originalName}")"""
         case ScalaDatatype.Option(sp: ScalaPrimitive) =>
-          s"""object $extractorName extends OptionalQueryParamDecoderMatcher[${sp.shortName}]("$name")"""
+          s"""object $extractor extends OptionalQueryParamDecoderMatcher[${sp.shortName}]("${param.originalName}")"""
         case sp: ScalaPrimitive =>
           val defPart = param.default.map { d =>
             val default = sp match {
@@ -175,12 +175,12 @@ case class Http4sServer(form: InvocationForm,
 
           if (defPart.isDefined || filterPart.isDefined) {
             Seq(
-              s"""object $extractorName extends QueryParamDecoderMatcher[${sp.shortName}]("$name") {""",
+              s"""object $extractor extends QueryParamDecoderMatcher[${sp.shortName}]("${param.originalName}") {""",
               s"""  override def unapply(params: Map[String, Seq[String]]) = super.unapply(params)${defPart.getOrElse("")}${filterPart.getOrElse("")}""",
               s"""}"""
             ).mkString("\n")
           } else {
-            s"""object $extractorName extends QueryParamDecoderMatcher[${sp.shortName}]("$name")"""
+            s"""object $extractor extends QueryParamDecoderMatcher[${sp.shortName}]("${param.originalName}")"""
           }
       }
     }.map(_ + "\n")
