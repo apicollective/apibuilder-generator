@@ -101,7 +101,7 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
 
     val queryStart = if (query.size > 0) """ :? """ else ""
 
-    val verFilter = version.fold("")(_ => " if ApiVersion(_req)")
+    val verFilter = version.fold("")(_ => " if apiVersionMatch(_req)")
 
     Seq(
       s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>",
