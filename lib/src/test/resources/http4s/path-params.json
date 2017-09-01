@@ -1,0 +1,611 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "http4s",
+  "organization": {
+    "key": "http4s"
+  },
+  "application": {
+    "key": "http4s"
+  },
+  "namespace": "io.apibuilder.http4s.test",
+  "version": "0.0.1",
+  "headers": [],
+  "info": [],
+  "imports": [],
+  "enums": [
+    {
+      "name": "enum",
+      "plural": "enums",
+      "values": [
+        {
+          "name": "value",
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "unions": [],
+  "attributes": [],
+
+  "models": [
+    {
+      "name": "model",
+      "plural": "models",
+      "fields": [],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "model",
+      "plural": "models",
+      "attributes": [],
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/string/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/string_with_min/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Path",
+              "minimum": 10,
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/string_with_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Path",
+              "maximum": 10,
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/string_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/int/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/int_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/long/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "long",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/long_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "long",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/boolean/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "boolean",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/boolean_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "boolean",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/double/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "double",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/double_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "double",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/decimal/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "decimal",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/decimal_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "decimal",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/date/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "date-iso8601",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/date_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "date-iso8601",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/datetime/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "date-time-iso8601",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/datetime_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "date-time-iso8601",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/uuid/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "uuid",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/uuid_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "uuid",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/enum/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "enum",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/enum_with_min_and_max/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "enum",
+              "location": "Path",
+              "minimum": 10,
+              "maximum": 30,
+              "default": "20",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/invalid/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "model",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
