@@ -1,0 +1,185 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "http4s",
+  "organization": {
+    "key": "http4s"
+  },
+  "application": {
+    "key": "http4s"
+  },
+  "namespace": "io.apibuilder.http4s.test",
+  "version": "0.0.1",
+  "headers": [],
+  "info": [],
+  "imports": [],
+  "enums": [
+    {
+      "name": "enum",
+      "plural": "enums",
+      "values": [
+        {
+          "name": "value",
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "unions": [],
+  "attributes": [],
+
+  "models": [
+    {
+      "name": "model",
+      "plural": "models",
+      "fields": [
+        {
+          "name": "id",
+          "type": "long",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "model",
+      "plural": "models",
+      "attributes": [],
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/string",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/enum",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "enum"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/model",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "model"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/list",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[integer]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/map",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "map[uuid]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/multiple",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "model"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 201
+                }
+              },
+              "type": "enum"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 202
+                }
+              },
+              "type": "string"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 206
+                }
+              },
+              "type": "[model]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
