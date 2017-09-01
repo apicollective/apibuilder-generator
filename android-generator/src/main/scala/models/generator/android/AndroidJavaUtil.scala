@@ -78,7 +78,7 @@ trait AndroidJavaUtil {
 
   def getMapType(modelName: String): String = {
     if(isParameterMap(modelName)){
-      modelName.replaceAll("^.*\\[","").replaceAll("\\]$","")
+      modelName.substring(modelName.indexOf("[")+1).replaceAll("\\]$","")
     } else {
       modelName
     }

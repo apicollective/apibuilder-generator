@@ -36,6 +36,7 @@ class AndroidJavaUtilTest
 
   "getArrayType" should "return array type" in {
     getArrayType("[abc]") should be("abc")
+    getArrayType("[[abc]]") should be("[abc]")
     getArrayType("[long]") should be("long")
     getArrayType("not[long]") should be("not[long]")
     getArrayType("not[long]") should be("not[long]")
@@ -53,9 +54,12 @@ class AndroidJavaUtilTest
 
   "getMapType" should "return map type" in {
     getMapType("map[abc]") should be("abc")
+    getMapType("map[map[abc]]") should be("map[abc]")
     getMapType("map[long]") should be("long")
     getMapType("notmap[long]") should be("notmap[long]")
     getMapType("map[long]not") should be("map[long]not")
+    getMapType("map[map[[long]]]") should be("map[[long]]")
+    getMapType("map[map[map[[long]]]]") should be("map[map[[long]]]")
   }
 
   "dataTypeFromField" should "produce simple types" in {
@@ -86,6 +90,11 @@ class AndroidJavaUtilTest
     dataTypeFromField("map[date-time-iso8601]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, org.joda.time.DateTime>")
     dataTypeFromField("map[string]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.lang.String>")
     dataTypeFromField("map[CustomType]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, com.apidoc.example.CustomType>")
+  }
+
+  it should "handle map and array combinations" in {
+    dataTypeFromField("map[map[CustomType]]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.util.Map<java.lang.String, com.apidoc.example.CustomType>>")
+    dataTypeFromField("map[map[[CustomType]]]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.util.Map<java.lang.String, com.apidoc.example.CustomType[]>>")
   }
 
   "replaceEnumsPrefixWithModels" should "replace enums prefix correctly" in {
