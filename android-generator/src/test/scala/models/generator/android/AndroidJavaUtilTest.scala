@@ -88,4 +88,16 @@ class AndroidJavaUtilTest
     dataTypeFromField("map[CustomType]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, com.apidoc.example.CustomType>")
   }
 
+  "replaceEnumsPrefixWithModels" should "replace enums prefix correctly" in {
+    replaceEnumsPrefixWithModels("com.gilt.commons.enums.v0.enums.Store") should be("com.gilt.commons.enums.v0.models.Store")
+    replaceEnumsPrefixWithModels("com.gilt.commons.enums.v0.models.Store") should be("com.gilt.commons.enums.v0.models.Store")
+    replaceEnumsPrefixWithModels("com.gilt.commons.enums.v0.other.Store") should be("com.gilt.commons.enums.v0.other.Store")
+    replaceEnumsPrefixWithModels("com.gilt.commons.enums.enums.enums.enums") should be("com.gilt.commons.enums.enums.models.enums")
+    replaceEnumsPrefixWithModels("com.gilt.ClassName") should be("com.gilt.ClassName")
+    replaceEnumsPrefixWithModels("com.enums.ClassName") should be("com.models.ClassName")
+    replaceEnumsPrefixWithModels("com.ClassName") should be("com.ClassName")
+    replaceEnumsPrefixWithModels("enums.ClassName") should be("models.ClassName")
+
+  }
+
 }

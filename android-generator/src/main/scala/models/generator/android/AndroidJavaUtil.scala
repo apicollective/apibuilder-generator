@@ -33,10 +33,23 @@ trait AndroidJavaUtil {
       else word
 
     if(isModelNameWithPackage(modelName)){
-      capitalizeModelNameWithPackage(modelName)
+      replaceEnumsPrefixWithModels(capitalizeModelNameWithPackage(modelName))
     } else {
       Text.safeName(Text.splitIntoWords(modelName).map { checkForUpperCase(_).capitalize }.mkString)
     }
+  }
+
+  /**
+    * Because we put enums models directory and package (scala client does the same), we need to replace
+    * a.b.c.d.enums.EnumName with a.b.c.d.models.EnumName
+    * @param str
+    * @return
+    */
+
+  def replaceEnumsPrefixWithModels(str: String): String ={
+    val arr = str.split("\\.")
+    val updatedArr = (arr.reverse.head +: (if(arr.reverse.tail.head == "enums") "models" else arr.reverse.tail.head) +: arr.reverse.tail.tail).reverse
+    updatedArr.mkString(".")
   }
 
   def isModelNameWithPackage(modelName: String): Boolean = {
@@ -114,10 +127,13 @@ trait AndroidJavaUtil {
   }
 
   def toMethodName(modelName: String): String = {
-    val paramStartingWithUppercase = {
-      Text.safeName(Text.splitIntoWords(modelName).map { _.toLowerCase.capitalize }.mkString)
+    val methodName = {
+      val methoNameStartingWithUpperCase = Text.splitIntoWords(modelName).map {
+        _.toLowerCase.capitalize
+      }.mkString
+      Text.safeName(methoNameStartingWithUpperCase.head.toLower + methoNameStartingWithUpperCase.tail)
     }
-    checkForReservedWord(paramStartingWithUppercase)
+    checkForReservedWord(methodName)
   }
 
   def toEnumName(input: String): String = {
