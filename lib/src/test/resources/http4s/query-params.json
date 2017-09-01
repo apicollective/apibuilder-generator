@@ -53,13 +53,13 @@
       "operations": [
         {
           "method": "GET",
-          "path": "/string/:id",
+          "path": "/string",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "string",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -76,13 +76,13 @@
         },
         {
           "method": "GET",
-          "path": "/string_with_min/:id",
+          "path": "/string_with_min",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "string",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "required": true
             }
@@ -100,13 +100,13 @@
         },
         {
           "method": "GET",
-          "path": "/string_with_max/:id",
+          "path": "/string_with_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "string",
-              "location": "Path",
+              "location": "Query",
               "maximum": 10,
               "required": true
             }
@@ -124,13 +124,13 @@
         },
         {
           "method": "GET",
-          "path": "/string_with_min_and_max/:id",
+          "path": "/string_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "string",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "default",
@@ -150,13 +150,61 @@
         },
         {
           "method": "GET",
-          "path": "/int/:id",
+          "path": "/optional_string",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
-              "type": "integer",
-              "location": "Path",
+              "type": "string",
+              "location": "Query",
+              "required": false
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/optional_string_with_min_and_max",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Query",
+              "minimum": 10,
+              "maximum": 30,
+              "required": false
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/list_string",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "[string]",
+              "location": "Query",
               "required": true
             }
           ],
@@ -173,13 +221,109 @@
         },
         {
           "method": "GET",
-          "path": "/int_with_min_and_max/:id",
+          "path": "/list_string_with_min_and_max",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "[string]",
+              "location": "Query",
+              "minimum": 10,
+              "maximum": 30,
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/optional_list_string",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "[string]",
+              "location": "Query",
+              "required": false
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/optional_list_string_with_min_and_max",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "[string]",
+              "location": "Query",
+              "minimum": 10,
+              "maximum": 30,
+              "required": false
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/int",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "integer",
-              "location": "Path",
+              "location": "Query",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/int_with_min_and_max",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "20",
@@ -199,13 +343,13 @@
         },
         {
           "method": "GET",
-          "path": "/long/:id",
+          "path": "/long",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "long",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -222,13 +366,13 @@
         },
         {
           "method": "GET",
-          "path": "/long_with_min_and_max/:id",
+          "path": "/long_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "long",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "20",
@@ -248,13 +392,13 @@
         },
         {
           "method": "GET",
-          "path": "/boolean/:id",
+          "path": "/boolean",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "boolean",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -271,13 +415,13 @@
         },
         {
           "method": "GET",
-          "path": "/boolean_with_min_and_max/:id",
+          "path": "/boolean_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "boolean",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "true",
@@ -297,13 +441,13 @@
         },
         {
           "method": "GET",
-          "path": "/double/:id",
+          "path": "/double",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "double",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -320,13 +464,13 @@
         },
         {
           "method": "GET",
-          "path": "/double_with_min_and_max/:id",
+          "path": "/double_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "double",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "3.14",
@@ -346,13 +490,13 @@
         },
         {
           "method": "GET",
-          "path": "/decimal/:id",
+          "path": "/decimal",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "decimal",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -369,13 +513,13 @@
         },
         {
           "method": "GET",
-          "path": "/decimal_with_min_and_max/:id",
+          "path": "/decimal_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "decimal",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "3.14",
@@ -395,13 +539,13 @@
         },
         {
           "method": "GET",
-          "path": "/date/:id",
+          "path": "/date",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "date-iso8601",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -418,13 +562,13 @@
         },
         {
           "method": "GET",
-          "path": "/date_with_min_and_max/:id",
+          "path": "/date_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "date-iso8601",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "1999-12-31",
@@ -444,13 +588,13 @@
         },
         {
           "method": "GET",
-          "path": "/datetime/:id",
+          "path": "/datetime",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "date-time-iso8601",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -467,13 +611,13 @@
         },
         {
           "method": "GET",
-          "path": "/datetime_with_min_and_max/:id",
+          "path": "/datetime_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "date-time-iso8601",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "1999-12-31T23:59:59Z",
@@ -493,13 +637,13 @@
         },
         {
           "method": "GET",
-          "path": "/uuid/:id",
+          "path": "/uuid",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "uuid",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -516,13 +660,13 @@
         },
         {
           "method": "GET",
-          "path": "/uuid_with_min_and_max/:id",
+          "path": "/uuid_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "uuid",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "e86bdef2-b6a6-4c0a-ab74-594cdce3d86f",
@@ -542,13 +686,13 @@
         },
         {
           "method": "GET",
-          "path": "/enum/:id",
+          "path": "/enum",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "enum",
-              "location": "Path",
+              "location": "Query",
               "required": true
             }
           ],
@@ -565,39 +709,16 @@
         },
         {
           "method": "GET",
-          "path": "/enum_with_min_and_max/:id",
+          "path": "/enum_with_min_and_max",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "enum",
-              "location": "Path",
+              "location": "Query",
               "minimum": 10,
               "maximum": 30,
               "default": "value",
-              "required": true
-            }
-          ],
-          "responses": [
-            {
-              "code": {
-                "integer": {
-                  "value": 200
-                }
-              },
-              "type": "unit"
-            }
-          ]
-        },
-        {
-          "method": "GET",
-          "path": "/invalid/:id",
-          "attributes": [],
-          "parameters": [
-            {
-              "name": "id",
-              "type": "model",
-              "location": "Path",
               "required": true
             }
           ],
