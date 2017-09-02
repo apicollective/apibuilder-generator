@@ -13,13 +13,16 @@ case class PathExtractor(name: String, filter: Option[String])
 case class QueryExtractor(name: String, handler: String)
 
 object Http4sServer {
+  def typeName(ssd: ScalaService, dataType: ScalaDatatype): String = dataType match {
+    case model: ScalaPrimitive.Model if model.namespaces.base == ssd.service.namespace => model.shortName
+    case model: ScalaPrimitive.Model => ScalaUtil.toClassName(model.name)
+    case enum: ScalaPrimitive.Enum if enum.namespaces.base == ssd.service.namespace => enum.shortName
+    case enum: ScalaPrimitive.Enum => ScalaUtil.toClassName(enum.name)
+    case sp: ScalaPrimitive => sp.shortName
+    case other => other.name
+  }
 
-  def pathExtractor(parameter: ScalaParameter): PathExtractor = {
-    val name = parameter.datatype match {
-      case sp: ScalaPrimitive => sp.shortName
-      case other => other.name
-    }
-
+  def pathExtractor(ssd: ScalaService, parameter: ScalaParameter): PathExtractor = {
     val filter = (parameter.datatype, parameter.param.minimum, parameter.param.maximum) match {
       case (ScalaPrimitive.Integer | ScalaPrimitive.Long, Some(min), None) => Some(s".filter(_ >= $min)")
       case (ScalaPrimitive.Integer | ScalaPrimitive.Long, None, Some(max)) => Some(s".filter(_ <= $max)")
@@ -32,19 +35,20 @@ object Http4sServer {
 
     val minMaxPart = filter.fold("")(_ => parameter.param.minimum.fold("")(v => s"$v") + parameter.param.maximum.fold("")(v => s"To$v"))
 
-    PathExtractor(s"$name${minMaxPart}Val", filter)
+    PathExtractor(s"${typeName(ssd, parameter.datatype)}${minMaxPart}Val", filter)
   }
 
-  def queryExtractor(param: ScalaParameter): QueryExtractor = {
+  def queryExtractor(ssd: ScalaService, param: ScalaParameter): QueryExtractor = {
+
     def recurse(typ: ScalaDatatype, collPart: String, withMinMaxDef: Boolean): QueryExtractor = {
       typ match {
         case sp: ScalaPrimitive if withMinMaxDef =>
           val minPart = param.param.minimum.fold("")(v => s"$v")
           val maxPart = param.param.maximum.fold("")(v => s"To$v")
           val defPart = param.param.default.fold("")(v => s"Def${ScalaUtil.toClassName(v)}")
-          QueryExtractor(s"${param.name.capitalize}$collPart${sp.shortName}$minPart$maxPart${defPart}Matcher", param.name)
+          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}$minPart$maxPart${defPart}Matcher", param.name)
         case sp: ScalaPrimitive =>
-          QueryExtractor(s"${param.name.capitalize}$collPart${sp.shortName}Matcher", param.name)
+          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}Matcher", param.name)
         case ScalaDatatype.List(nested) =>
           val extractor = recurse(nested, "List", false)
           QueryExtractor(extractor.name, s"cats.data.Validated.Valid(${extractor.handler})")
@@ -85,7 +89,7 @@ case class Http4sServer(form: InvocationForm,
     }
 
     val resourcesAndRoutes = sortedResources.toList.map { res =>
-      res -> res.operations.map(op => Route(res, op, config))
+      res -> res.operations.map(op => Route(ssd, res, op, config))
     }
 
     val allRoutes = resourcesAndRoutes.map(_._2).flatten
@@ -121,7 +125,7 @@ case class Http4sServer(form: InvocationForm,
       case ScalaDatatype.Option(ScalaDatatype.List(enum: ScalaPrimitive.Enum)) => enum
     }.distinct.map { enum =>
       s"""
-         |implicit lazy val ${Text.initLowerCase(ssd.name)}${ScalaUtil.toClassName(enum.shortName)}QueryParamDecoder: org.http4s.QueryParamDecoder[${enum.fullName}] =
+         |implicit lazy val ${Text.initLowerCase(Http4sServer.typeName(ssd, enum))}QueryParamDecoder: org.http4s.QueryParamDecoder[${enum.fullName}] =
          |  org.http4s.QueryParamDecoder.fromUnsafeCast[${enum.fullName}](p => ${enum.fullName}.fromString(p.value).get)("${enum.fullName}")""".stripMargin
     }.mkString("\n")
 
@@ -155,7 +159,7 @@ case class Http4sServer(form: InvocationForm,
 
   def genPathExtractors(routes: List[Route]): Seq[String] = {
     val distinctParams: Seq[(PathExtractor, ScalaParameter)] = routes.flatMap(_.pathSegments).collect {
-      case Extracted(_, param) => Http4sServer.pathExtractor(param) -> param
+      case Extracted(_, param) => Http4sServer.pathExtractor(ssd, param) -> param
     }.toMap.toList.sortBy(_._1.name)
 
     distinctParams.map { case (extractor, param) =>
@@ -175,17 +179,16 @@ case class Http4sServer(form: InvocationForm,
         case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
       }
 
-      Seq(
-        s"object ${extractor.name} {",
-        s"  def unapply(s: String): Option[${param.datatype.name}] = $toOption",
-        "}\n"
-      ).mkString("\n")
+      s"""
+         |object ${extractor.name} {
+         |  def unapply(s: String): Option[${param.datatype.name}] = $toOption
+         |}""".stripMargin
     }
   }
 
   def genQueryExtractors(routes: List[Route]): Seq[String] = {
     val distinctParams = routes.flatMap(_.op.queryParameters).map { param =>
-      Http4sServer.queryExtractor(param) -> param
+      Http4sServer.queryExtractor(ssd, param) -> param
     }.toMap.toList.sortBy(_._1.name)
     distinctParams.map { case (QueryExtractor(extractorName, _), param) =>
       param.datatype match {
@@ -239,7 +242,7 @@ case class Http4sServer(form: InvocationForm,
             s"""object $extractorName extends QueryParamDecoderMatcher[${sp.name}]("${param.originalName}")"""
           }
       }
-    }.map(_ + "\n")
+    }.map("\n" + _)
   }
 }
 

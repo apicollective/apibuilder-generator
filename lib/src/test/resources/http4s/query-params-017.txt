@@ -17,7 +17,7 @@ private[server] object Matchers {
   implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[java.util.UUID](p => java.util.UUID.fromString(p.value))("java.util.UUID")
 
-  implicit lazy val http4sEnumQueryParamDecoder: org.http4s.QueryParamDecoder[io.apibuilder.http4s.test.models.Enum] =
+  implicit lazy val enumQueryParamDecoder: org.http4s.QueryParamDecoder[io.apibuilder.http4s.test.models.Enum] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[io.apibuilder.http4s.test.models.Enum](p => io.apibuilder.http4s.test.models.Enum.fromString(p.value).get)("io.apibuilder.http4s.test.models.Enum")
 
   object ApiVersion {
@@ -31,6 +31,7 @@ private[server] object Matchers {
       case _ => false
     }
   }
+
 
   object IdBigDecimal10To30Def314Matcher extends QueryParamDecoderMatcher[BigDecimal]("id") {
     override def unapply(params: Map[String, Seq[String]]) = super.unapply(params).orElse(Some(3.14))

@@ -1,0 +1,214 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "http4s",
+  "organization": {
+    "key": "http4s"
+  },
+  "application": {
+    "key": "http4s"
+  },
+  "namespace": "io.apibuilder.http4s.test",
+  "version": "0.0.1",
+  "headers": [],
+  "info": [],
+  "imports": [
+    {
+      "uri": "http://localhost/apibuilder/imported/0.0.1/service.json",
+      "namespace": "io.apibuilder.http4s.imported",
+      "organization": {
+        "key": "http4s"
+      },
+      "application": {
+        "key": "imported"
+      },
+      "version": "0.0.1",
+      "enums": [
+        "enum"
+      ],
+      "unions": [],
+      "models": [
+        "model"
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "enum",
+      "plural": "enums",
+      "values": [
+        {
+          "name": "value",
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "unions": [],
+  "attributes": [],
+
+  "models": [
+    {
+      "name": "model",
+      "plural": "models",
+      "fields": [
+        {
+          "name": "id",
+          "type": "long",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "model",
+      "plural": "models",
+      "attributes": [],
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/path-enum-local/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "enum",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/path-enum-imported/:id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "io.apibuilder.http4s.imported.enums.enum",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/query-enum-local",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "enum",
+              "location": "Query",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/query-enum-imported",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "io.apibuilder.http4s.imported.enums.enum",
+              "location": "Query",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/query-model-local",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "model",
+              "location": "Query",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/query-model-imported",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "io.apibuilder.http4s.imported.models.model",
+              "location": "Query",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

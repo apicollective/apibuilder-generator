@@ -5,6 +5,8 @@ import io.apibuilder.spec.v0.models.ResponseCodeInt
 import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaOperation, ScalaParameter, ScalaPrimitive, ScalaResource, ScalaUtil}
 import lib.Text._
 
+import scala.models.http4s.ScalaService
+
 sealed trait PathSegment
 case class Literal(name: String) extends PathSegment
 case class PlainString(name: String) extends PathSegment
@@ -12,7 +14,7 @@ case class Extracted(name: String, parameter: ScalaParameter) extends PathSegmen
 
 case class StatusCode(code: Int, datatype: Option[String])
 
-case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClientMethodConfigs.Http4s) {
+case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation, config: ScalaClientMethodConfigs.Http4s) {
   val pathSegments: Array[PathSegment] = op.path.split("/").filterNot(_.isEmpty).map { segment =>
     if(!segment.startsWith(":")) {
       Literal(segment)
@@ -89,13 +91,13 @@ case class Route(resource: ScalaResource, op: ScalaOperation, config: ScalaClien
         pathSegments.collect {
           case Literal(n) => s""""$n""""
           case PlainString(n) => s"$n"
-          case Extracted(name, param) => s"${Http4sServer.pathExtractor(param).name}($name)"
+          case Extracted(name, param) => s"${Http4sServer.pathExtractor(ssd, param).name}($name)"
         }
       ).mkString(" / ")
 
     val query = (
       op.queryParameters.map { param =>
-        val extractor = Http4sServer.queryExtractor(param)
+        val extractor = Http4sServer.queryExtractor(ssd, param)
         s"${extractor.name}(${extractor.handler})"
       }
       ).mkString(" +& ")

@@ -29,6 +29,7 @@ private[server] object Matchers {
       case _ => false
     }
   }
+
   object BigDecimalVal {
     def unapply(s: String): Option[BigDecimal] = scala.util.Try(BigDecimal(s)).toOption
   }
