@@ -19,7 +19,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     if(!segment.startsWith(":")) {
       Literal(segment)
     } else {
-      val truncated = segment.drop(1)
+      val truncated = ScalaUtil.toVariable(segment.drop(1))
       op.pathParameters.find(_.name == truncated).fold(Literal(segment): PathSegment) { scalaParameter =>
         scalaParameter.datatype match {
           case ScalaPrimitive.String if scalaParameter.param.minimum.isEmpty && scalaParameter.param.maximum.isEmpty => PlainString(truncated)

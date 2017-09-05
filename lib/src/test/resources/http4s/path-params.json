@@ -76,6 +76,29 @@
         },
         {
           "method": "GET",
+          "path": "/named_string/:named_id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "named_id",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
           "path": "/string_with_min/:id",
           "attributes": [],
           "parameters": [
@@ -547,6 +570,29 @@
           "parameters": [
             {
               "name": "id",
+              "type": "enum",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/named_enum/:named_id",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "named_id",
               "type": "enum",
               "location": "Path",
               "required": true
