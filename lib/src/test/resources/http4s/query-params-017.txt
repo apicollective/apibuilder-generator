@@ -108,6 +108,10 @@ private[server] object Matchers {
   }
 
   object IdUUIDMatcher extends QueryParamDecoderMatcher[_root_.java.util.UUID]("id")
+
+  object NamedIdEnumMatcher extends QueryParamDecoderMatcher[io.apibuilder.http4s.test.models.Enum]("named_id")
+
+  object NamedIdStringMatcher extends QueryParamDecoderMatcher[String]("named_id")
 }
 
 trait ModelRoutes {
@@ -126,6 +130,17 @@ trait ModelRoutes {
     _req: org.http4s.Request,
     id: String
   ): fs2.Task[GetStringResponse]
+
+  sealed trait GetNamedStringResponse
+
+  object GetNamedStringResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetNamedStringResponse
+  }
+
+  def getNamedString(
+    _req: org.http4s.Request,
+    namedId: String
+  ): fs2.Task[GetNamedStringResponse]
 
   sealed trait GetStringWithMinResponse
 
@@ -413,6 +428,17 @@ trait ModelRoutes {
     id: io.apibuilder.http4s.test.models.Enum
   ): fs2.Task[GetEnumResponse]
 
+  sealed trait GetNamedEnumResponse
+
+  object GetNamedEnumResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetNamedEnumResponse
+  }
+
+  def getNamedEnum(
+    _req: org.http4s.Request,
+    namedId: io.apibuilder.http4s.test.models.Enum
+  ): fs2.Task[GetNamedEnumResponse]
+
   sealed trait GetEnumWithMinAndMaxResponse
 
   object GetEnumWithMinAndMaxResponse {
@@ -430,6 +456,11 @@ trait ModelRoutes {
     case _req @ GET -> Root / "string" :? IdStringMatcher(id) if apiVersionMatch(_req) =>
       getString(_req, id).flatMap {
         case GetStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+      }
+
+    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(named_id) if apiVersionMatch(_req) =>
+      getNamedString(_req, named_id).flatMap {
+        case GetNamedStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
       }
 
     case _req @ GET -> Root / "string_with_min" :? IdString10Matcher(id) if apiVersionMatch(_req) =>
@@ -560,6 +591,11 @@ trait ModelRoutes {
     case _req @ GET -> Root / "enum" :? IdEnumMatcher(id) if apiVersionMatch(_req) =>
       getEnum(_req, id).flatMap {
         case GetEnumResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+      }
+
+    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(named_id) if apiVersionMatch(_req) =>
+      getNamedEnum(_req, named_id).flatMap {
+        case GetNamedEnumResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
       }
 
     case _req @ GET -> Root / "enum_with_min_and_max" :? IdEnum10To30DefValueMatcher(id) if apiVersionMatch(_req) =>

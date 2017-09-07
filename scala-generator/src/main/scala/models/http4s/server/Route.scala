@@ -19,8 +19,8 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     if(!segment.startsWith(":")) {
       Literal(segment)
     } else {
-      val truncated = segment.drop(1)
-      op.pathParameters.find(_.name == truncated).fold(Literal(segment): PathSegment) { scalaParameter =>
+      val truncated = segment.drop(1) //ScalaUtil.toVariable(segment.drop(1))
+      op.pathParameters.find(_.originalName == truncated).fold(Literal(segment): PathSegment) { scalaParameter =>
         scalaParameter.datatype match {
           case ScalaPrimitive.String if scalaParameter.param.minimum.isEmpty && scalaParameter.param.maximum.isEmpty => PlainString(truncated)
           case _: ScalaPrimitive => Extracted(truncated, scalaParameter)
@@ -82,7 +82,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
   def route(version: Option[Int]): Seq[String] = {
     val args = (
       Seq(Some("_req")) ++
-        op.nonHeaderParameters.map(field => Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}")) ++
+        op.nonHeaderParameters.map(field => Some(s"${ScalaUtil.quoteNameIfKeyword(field.originalName)}")) ++
         Seq(op.body.map(body => s"_req.attemptAs[${body.datatype.name}]"))
       ).flatten.mkString(", ")
 
