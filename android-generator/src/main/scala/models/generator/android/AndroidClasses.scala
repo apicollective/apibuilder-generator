@@ -1,33 +1,23 @@
 package models.generator.android
 
 
-import lib.{Constants, Text}
-import lib.generator.CodeGenerator
-import com.squareup.javapoet._
+import java.io.IOException
 import javax.lang.model.element.Modifier
 
 import com.fasterxml.jackson.annotation._
+import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, JsonProcessingException, Version}
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, JsonProcessingException, Version}
-import io.apibuilder.spec.v0.models._
-import org.joda.time.DateTime
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import java.util.Locale
-import java.io.IOException
-
-import io.apibuilder.spec.v0.models.Enum
-
-import scala.Some
-import io.apibuilder.generator.v0.models.InvocationForm
-import io.apibuilder.spec.v0.models.Union
-import io.apibuilder.generator.v0.models.File
-import io.apibuilder.spec.v0.models.Model
-import io.apibuilder.spec.v0.models.Resource
-import io.apibuilder.spec.v0.models.Service
 import com.squareup.javapoet.AnnotationSpec.Builder
+import com.squareup.javapoet._
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models.{Enum, Model, Resource, Service, Union, _}
+import lib.Text
+import lib.generator.CodeGenerator
+import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 
 object AndroidClasses
   extends CodeGenerator
@@ -99,14 +89,9 @@ object AndroidClasses
 
     def generateObjectMapper: File = {
 
-      def pattern: FieldSpec.Builder = {
-        FieldSpec.builder(classOf[String], "pattern", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-          .initializer("\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\"")
-      }
-
       def formatter: FieldSpec.Builder = {
         FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-          .initializer("$T.forPattern(pattern).withLocale($T.US).withZoneUTC()", classOf[DateTimeFormat], classOf[Locale])
+          .initializer("$T.dateTimeParser()", classOf[ISODateTimeFormat])
       }
 
       def deserializer: TypeSpec.Builder = {
@@ -143,7 +128,6 @@ object AndroidClasses
           .addModifiers(Modifier.PUBLIC)
           .addJavadoc(apiDocComments)
 
-      builder.addField(pattern.build)
       builder.addField(formatter.build)
 
       val modifierField = FieldSpec.builder(classOf[ObjectMapper], "MAPPER").addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL).addModifiers(Modifier.STATIC)
