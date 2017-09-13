@@ -3,3 +3,4 @@ builds:
       instance.type: t2.small
       port.container: 9000
       port.host: 7072
+      version: 1.3
