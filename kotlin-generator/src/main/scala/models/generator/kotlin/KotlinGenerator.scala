@@ -225,7 +225,7 @@ class KotlinGenerator
           val callTypeName = ParameterizedTypeName.get(classOf[retrofit2.Call[Void]], returnType)
           method.returns(callTypeName)
         })
-        builder.addFun(method.build)
+        builder.addFunction(method.build)
       })
     }
 
@@ -251,7 +251,7 @@ class KotlinGenerator
     val builder = TypeSpec.classBuilder(className)
       .addModifiers(KModifier.PUBLIC)
       .addKdoc(kdocClassMessage)
-      .addFun(createFunSpec)
+      .addFunction(createFunSpec)
     makeFile(className, builder)
   }
 
@@ -281,7 +281,7 @@ class KotlinGenerator
 
   def makeFile(name: String, typeSpecBuilder: TypeSpec.Builder): File = {
     val typeSpec = typeSpecBuilder.build
-    val kFile = KotlinFile.get(modelsNameSpace, typeSpec)
+    val kFile = FileSpec.get(modelsNameSpace, typeSpec)
     val sw = new StringWriter(1024)
     try {
       kFile.writeTo(sw)
