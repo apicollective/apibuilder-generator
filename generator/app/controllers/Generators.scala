@@ -70,6 +70,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "ning_1_9_mock_client",
+        name = "Ning Async Mock Http Client 1.9",
+        description = Some("Ning Async Mock Http v. 1.9.x Client - see https://sonatype.github.io/async-http-client"),
+        language = Some("Java, Scala")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.generator.mock.MockClientGenerator.Ning19)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "ning_1_8_client",
         name = "Ning Async Http Client 1.8",
         description = Some("Ning Async Http v. 1.8.x Client - see https://sonatype.github.io/async-http-client"),

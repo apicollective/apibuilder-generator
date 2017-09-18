@@ -36,6 +36,15 @@ object MockClientGenerator {
 
   }
 
+  object Ning19 extends CodeGenerator {
+
+    override def invoke(form: InvocationForm) = {
+      val ssd = new ScalaService(form.service)
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Ning19(ssd.namespaces.base, None)).invoke()
+    }
+
+  }
+
 }
 
 class MockClientGenerator(
