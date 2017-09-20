@@ -93,7 +93,8 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "com.github.javaparser" % "javaparser-core" % "3.3.1" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "com.squareup" % "javapoet" % "1.9.0",
-    "com.squareup.retrofit2" % "retrofit" % "2.3.0"
+    "com.squareup.retrofit2" % "retrofit" % "2.3.0",
+    "io.reactivex.rxjava2" % "rxjava" % "2.1.3"
   ),
   scalacOptions += "-feature",
   sources in (Compile,doc) := Seq.empty,
