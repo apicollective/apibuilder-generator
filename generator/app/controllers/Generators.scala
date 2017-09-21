@@ -190,6 +190,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "android_rx2_client",
+        name = "Android RxJava2 Client",
+        description = Some("Generate Java models and Retrofit 2 + RxJava2 client for Android from the API description."),
+        language = Some("Java")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.android.AndroidRxClasses)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "android_client",
         name = "Android Client",
         description = Some("Generate Java models and Retrofit 2 client for Android from the API description."),
