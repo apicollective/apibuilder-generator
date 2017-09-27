@@ -68,9 +68,8 @@ module Io
             @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Apibuilder::Test::Client)
           end
 
-          def post(hash)
-            HttpClient::Preconditions.assert_class('hash', hash, Hash)
-            r = @client.request("/users").with_json(hash.to_json).post
+          def post
+            r = @client.request("/users").post
             nil
           end
 

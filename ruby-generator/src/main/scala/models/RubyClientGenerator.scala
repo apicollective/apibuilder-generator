@@ -540,10 +540,8 @@ ${headers.rubyModuleConstants.indent(2)}
 
       if (Methods.isJsonDocumentMethod(op.method.toString)) {
         op.body.flatMap(body => datatypeResolver.parse(body.`type`, true).toOption) match {
-          case None => paramStrings.append("hash")
-          case Some(dt) => {
-            paramStrings.append(RubyUtil.toVariable(dt))
-          }
+          case None => // no-op
+          case Some(dt) => paramStrings.append(RubyUtil.toVariable(dt))
         }
       }
 
@@ -587,8 +585,7 @@ ${headers.rubyModuleConstants.indent(2)}
       if (Methods.isJsonDocumentMethod(op.method.toString)) {
         op.body.map(_.`type`) match {
           case None => {
-            sb.append("    HttpClient::Preconditions.assert_class('hash', hash, Hash)")
-            requestBuilder.append(".with_json(hash.to_json)")
+            // no-op
           }
           case Some(body) => {
             val ti = parseType(body)
