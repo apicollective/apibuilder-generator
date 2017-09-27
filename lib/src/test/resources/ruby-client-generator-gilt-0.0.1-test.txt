@@ -136,9 +136,8 @@ module Io
                 @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Apibuilder::Reference::Api::V0::Client)
               end
 
-              def post(hash)
-                HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                r = @client.request("/members").with_json(hash.to_json).post
+              def post
+                r = @client.request("/members").post
                 ::Io::Apibuilder::Reference::Api::V0::Models::Member.new(r)
               end
 
@@ -175,9 +174,8 @@ module Io
                 @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Apibuilder::Reference::Api::V0::Client)
               end
 
-              def post(hash)
-                HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                r = @client.request("/organizations").with_json(hash.to_json).post
+              def post
+                r = @client.request("/organizations").post
                 ::Io::Apibuilder::Reference::Api::V0::Models::Organization.new(r)
               end
 
@@ -205,9 +203,8 @@ module Io
                 @client = HttpClient::Preconditions.assert_class('client', client, ::Io::Apibuilder::Reference::Api::V0::Client)
               end
 
-              def post(hash)
-                HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                r = @client.request("/users").with_json(hash.to_json).post
+              def post
+                r = @client.request("/users").post
                 ::Io::Apibuilder::Reference::Api::V0::Models::User.new(r)
               end
 
@@ -230,9 +227,8 @@ module Io
                 r.map { |x| ::Io::Apibuilder::Reference::Api::V0::Models::User.new(x) }
               end
 
-              def post_noop(hash)
-                HttpClient::Preconditions.assert_class('hash', hash, Hash)
-                r = @client.request("/users/noop").with_json(hash.to_json).post
+              def post_noop
+                r = @client.request("/users/noop").post
                 nil
               end
 
