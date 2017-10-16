@@ -190,7 +190,7 @@ module Io
             @http_handler = http_handler
             @base_uri = Preconditions.assert_class('base_uri', base_uri, URI)
             @path = Preconditions.assert_class('path', path, String)
-            @full_uri = URI.parse(@base_uri.to_s + @path)
+            @full_uri = @base_uri.to_s + @path
             @params = nil
             @body = nil
             @auth = nil
