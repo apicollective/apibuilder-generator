@@ -97,7 +97,7 @@ module HttpClient
     def initialize(http_handler, base_uri, path)
       @http_handler = http_handler
       @base_uri = Preconditions.assert_class('base_uri', base_uri, URI)
-      @path = Preconditions.assert_class('path', path, String)
+      @path = URI::join(@base_uri.to_s, Preconditions.assert_class('path', path, String)).path
       @params = nil
       @body = nil
       @auth = nil
