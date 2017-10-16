@@ -92,12 +92,13 @@ module HttpClient
 
   class Request
 
-    attr_reader :path
+    attr_reader :base_uri, :path, :full_uri
 
     def initialize(http_handler, base_uri, path)
       @http_handler = http_handler
       @base_uri = Preconditions.assert_class('base_uri', base_uri, URI)
       @path = Preconditions.assert_class('path', path, String)
+      @full_uri = URI.parse(@base_uri.to_s + @path)
       @params = nil
       @body = nil
       @auth = nil
@@ -178,7 +179,7 @@ module HttpClient
     def do_request(klass)
       Preconditions.assert_class('klass', klass, Class)
 
-      uri = path.dup
+      uri = @full_uri.dup
       if q = to_query(@params)
         uri += "?%s" % q
       end
