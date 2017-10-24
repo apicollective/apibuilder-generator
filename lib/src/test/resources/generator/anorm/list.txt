@@ -12,17 +12,15 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
-    def parserWithPrefix(prefix: String, sep: String = "_") = parser(
-      guid = s"$prefix${sep}guid",
-      emails = s"$prefix${sep}emails"
-    )
+    def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[test.apidoc.apidoctest.v0.models.User] = parser(prefixOpt = Some(s"$prefix$sep"))
 
     def parser(
       guid: String = "guid",
-      emails: String = "emails"
+      emails: String = "emails",
+      prefixOpt: Option[String] = None
     ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
-      SqlParser.get[_root_.java.util.UUID](guid) ~
-      SqlParser.get[Seq[String]](emails) map {
+      SqlParser.get[_root_.java.util.UUID](prefixOpt.getOrElse("") + guid) ~
+      SqlParser.get[Seq[String]](prefixOpt.getOrElse("") + emails) map {
         case guid ~ emails => {
           test.apidoc.apidoctest.v0.models.User(
             guid = guid,

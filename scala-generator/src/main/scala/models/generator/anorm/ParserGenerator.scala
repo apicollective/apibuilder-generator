@@ -249,7 +249,7 @@ object ParserGenerator extends CodeGenerator {
       Seq(
         s"object ${enum.name} {",
         Seq(
-          s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${enum.qualifiedName}] = parser(prefixOpt = Some("""" + "$prefix$sep" + """"))""",
+          s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${enum.qualifiedName}] = parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))""",
           Seq(
             s"""def parser(name: String = "${enum.originalName}", prefixOpt: Option[String] = None): RowParser[${enum.qualifiedName}] = {""",
             s"""  SqlParser.str(prefixOpt.getOrElse("") + name) map {""",
