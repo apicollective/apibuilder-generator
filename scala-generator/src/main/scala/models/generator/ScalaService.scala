@@ -66,6 +66,8 @@ class ScalaService(
 
 class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
+  val originalName: String = union.name
+
   val name: String = ScalaUtil.toClassName(union.name)
 
   val qualifiedName = ssd.unionClassName(name)
