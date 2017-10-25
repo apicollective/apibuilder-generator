@@ -416,7 +416,7 @@ package io.apibuilder.reference.api.v0 {
     import io.apibuilder.reference.api.v0.models.json._
     import io.apibuilder.spec.v0.models.json._
 
-    def closeAsyncHttpClient() {
+    def closeAsyncHttpClient(): Unit = {
       asyncHttpClient.close()
     }
 
@@ -649,7 +649,7 @@ package io.apibuilder.reference.api.v0 {
       }
     }
 
-    def _logRequest(request: Request) {
+    def _logRequest(request: Request): Unit = {
       logger.info("_logRequest: " + request)
     }
 

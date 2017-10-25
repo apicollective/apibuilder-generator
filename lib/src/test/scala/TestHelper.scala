@@ -38,7 +38,7 @@ object TestHelper extends Matchers {
     }
   }
 
-  def writeToFile(path: String, contents: String) {
+  def writeToFile(path: String, contents: String): Unit = {
     val outputPath = Paths.get(path)
     val bytes = contents.getBytes(StandardCharsets.UTF_8)
     Files.write(outputPath, bytes)
@@ -100,7 +100,7 @@ object TestHelper extends Matchers {
     reporter.errorCount shouldBe 0
   }
 
-  def assertEqualsFile(filename: String, contents: String) {
+  def assertEqualsFile(filename: String, contents: String): Unit = {
     val actualPath = resolvePath(filename)
     val current = readFile(actualPath).trim
     if (current != contents.trim) {
