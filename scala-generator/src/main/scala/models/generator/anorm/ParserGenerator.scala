@@ -170,7 +170,7 @@ object ParserGenerator extends CodeGenerator {
       generateRowParser(field.name, field.datatype, field.originalName)
     }
 
-    private[this] def addImports(ns: Namespaces) {
+    private[this] def addImports(ns: Namespaces): Unit = {
       requiredImports += s"import ${ns.anormConversions}.Types._"
     }
 
@@ -178,7 +178,7 @@ object ParserGenerator extends CodeGenerator {
       * Recursively adds anorm parser imports for any
       * datatype that is from an imported application.
       */
-    private[this] def addImports(datatype: ScalaDatatype) {
+    private[this] def addImports(datatype: ScalaDatatype): Unit = {
       datatype match {
         case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
           // no-op
