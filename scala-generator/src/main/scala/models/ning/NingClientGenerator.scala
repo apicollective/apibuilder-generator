@@ -77,7 +77,7 @@ ${PlayScalaClientCommon.clientSignature(config).indent(2)} {
     import org.slf4j.{Logger, LoggerFactory}
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
-    def closeAsyncHttpClient() {
+    def closeAsyncHttpClient(): Unit = {
       asyncHttpClient.close()
     }
 
@@ -87,7 +87,7 @@ ${methodGenerator.accessors().indent(4)}
 
 ${methodGenerator.objects().indent(4)}
 
-    def _logRequest(request: Request) {
+    def _logRequest(request: Request): Unit = {
       logger.info("_logRequest: " + request)
     }
 

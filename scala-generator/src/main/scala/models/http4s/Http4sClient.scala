@@ -33,7 +33,7 @@ ${Http4sScalaClientCommon.clientSignature(config).indent(2)} {
     import ${config.asyncType}
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
-    def closeAsyncHttpClient() {
+    def closeAsyncHttpClient(): Unit = {
       asyncHttpClient.shutdownNow()
     }
 
