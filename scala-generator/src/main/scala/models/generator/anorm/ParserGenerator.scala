@@ -231,12 +231,12 @@ object ParserGenerator extends CodeGenerator {
         case ScalaPrimitive.Model(ns, name) => {
           addImports(ns)
           val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
-          s"${ns.anormParsers}.$name.parserWithPrefix($varName)"
+          s"""${ns.anormParsers}.$name.parserWithPrefix(prefixOpt.getOrElse("") + $varName)"""
         }
         case ScalaPrimitive.Union(ns, name) => {
           addImports(ns)
           val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
-          s"${ns.anormParsers}.$name.parserWithPrefix($varName)"
+          s"""${ns.anormParsers}.$name.parserWithPrefix(prefixOpt.getOrElse("") + $varName)"""
         }
       }
     }

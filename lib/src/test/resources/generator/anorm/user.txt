@@ -44,7 +44,7 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
     ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
       SqlParser.get[_root_.java.util.UUID](prefixOpt.getOrElse("") + guid) ~
       SqlParser.str(prefixOpt.getOrElse("") + email) ~
-      test.apidoc.apidoctest.v0.anorm.parsers.Name.parserWithPrefix(namePrefix).? map {
+      test.apidoc.apidoctest.v0.anorm.parsers.Name.parserWithPrefix(prefixOpt.getOrElse("") + namePrefix).? map {
         case guid ~ email ~ name => {
           test.apidoc.apidoctest.v0.models.User(
             guid = guid,
