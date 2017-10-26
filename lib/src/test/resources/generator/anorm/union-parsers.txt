@@ -12,14 +12,13 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object GuestUser {
 
-    def parserWithPrefix(prefix: String, sep: String = "_") = parser(
-      guid = s"$prefix${sep}guid"
-    )
+    def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[test.apidoc.apidoctest.v0.models.GuestUser] = parser(prefixOpt = Some(s"$prefix$sep"))
 
     def parser(
-      guid: String = "guid"
+      guid: String = "guid",
+      prefixOpt: Option[String] = None
     ): RowParser[test.apidoc.apidoctest.v0.models.GuestUser] = {
-      SqlParser.get[_root_.java.util.UUID](guid) map {
+      SqlParser.get[_root_.java.util.UUID](prefixOpt.getOrElse("") + guid) map {
         case guid => {
           test.apidoc.apidoctest.v0.models.GuestUser(
             guid = guid
@@ -32,14 +31,13 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object RegisteredUser {
 
-    def parserWithPrefix(prefix: String, sep: String = "_") = parser(
-      guid = s"$prefix${sep}guid"
-    )
+    def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[test.apidoc.apidoctest.v0.models.RegisteredUser] = parser(prefixOpt = Some(s"$prefix$sep"))
 
     def parser(
-      guid: String = "guid"
+      guid: String = "guid",
+      prefixOpt: Option[String] = None
     ): RowParser[test.apidoc.apidoctest.v0.models.RegisteredUser] = {
-      SqlParser.get[_root_.java.util.UUID](guid) map {
+      SqlParser.get[_root_.java.util.UUID](prefixOpt.getOrElse("") + guid) map {
         case guid => {
           test.apidoc.apidoctest.v0.models.RegisteredUser(
             guid = guid
@@ -53,8 +51,8 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
   object User {
 
     def parserWithPrefix(prefix: String, sep: String = "_") = {
-      test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.parserWithPrefix(prefix, sep) |
-      test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.parserWithPrefix(prefix, sep)
+      test.apidoc.apidoctest.v0.anorm.parsers.GuestUser.parser(prefixOpt = Some(s"$prefix$sep")) |
+      test.apidoc.apidoctest.v0.anorm.parsers.RegisteredUser.parser(prefixOpt = Some(s"$prefix$sep"))
     }
 
     def parser() = {

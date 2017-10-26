@@ -1,8 +1,7 @@
 package scala.generator.anorm
 
-import scala.generator.{Namespaces, ScalaDatatype, ScalaEnum, ScalaField, ScalaModel, ScalaPrimitive, ScalaService, ScalaUnion, ScalaUtil}
+import scala.generator._
 import scala.models.ApidocComments
-import io.apibuilder.spec.v0.models.Service
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -89,24 +88,17 @@ object ParserGenerator extends CodeGenerator {
 
     private[this] def generateModelParser(model: ScalaModel): String = {
       Seq(
-        Seq(
-          s"""def parserWithPrefix(prefix: String, sep: String = "_") = parser(""",
-          model.fields.map { f =>
-            val argName = parserFieldName(f.originalName, f.datatype)
-            s"""${ScalaUtil.quoteNameIfKeyword(argName)} = s"""" + "$prefix${sep}" + s"""${f.originalName}""""
-          }.mkString(",\n").indent(2),
-          ")"
-        ).mkString("\n"),
+        s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${model.qualifiedName}] = parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))""",
         "",
         s"def parser(",
-        model.fields.map { f =>
+        (model.fields.map { f =>
           parserFieldDeclaration(f.name, f.datatype, f.originalName)
-        }.mkString(",\n").indent(2),
+        } ++ List("prefixOpt: Option[String] = None")).mkString(",\n").indent(2),
         s"): RowParser[${model.qualifiedName}] = {",
         Seq(
-          model.fields.map { generateRowParser(_) }.mkString(" ~\n") + " map {",
+          model.fields.map { f => generateRowParser("""prefixOpt.getOrElse("") + """ + f.name, f.datatype, f.originalName) }.mkString(" ~\n") + " map {",
           Seq(
-            "case " + model.fields.map(parserName(_)).mkString(" ~ ") + " => {",
+            "case " + model.fields.map(parserName).mkString(" ~ ") + " => {",
             Seq(
               s"${model.qualifiedName}(",
               model.fields.map { f =>
@@ -239,12 +231,12 @@ object ParserGenerator extends CodeGenerator {
         case ScalaPrimitive.Model(ns, name) => {
           addImports(ns)
           val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
-          s"${ns.anormParsers}.$name.parserWithPrefix($varName)"
+          s"""${ns.anormParsers}.$name.parserWithPrefix(prefixOpt.getOrElse("") + $varName)"""
         }
         case ScalaPrimitive.Union(ns, name) => {
           addImports(ns)
           val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
-          s"${ns.anormParsers}.$name.parserWithPrefix($varName)"
+          s"""${ns.anormParsers}.$name.parserWithPrefix(prefixOpt.getOrElse("") + $varName)"""
         }
       }
     }
@@ -257,10 +249,10 @@ object ParserGenerator extends CodeGenerator {
       Seq(
         s"object ${enum.name} {",
         Seq(
-          """def parserWithPrefix(prefix: String, sep: String = "_") = parser(s"""" + "$prefix${sep}name" + """")""",
+          s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${enum.qualifiedName}] = parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))""",
           Seq(
-            s"""def parser(name: String = "${enum.originalName}"): RowParser[${enum.qualifiedName}] = {""",
-            s"  SqlParser.str(name) map {",
+            s"""def parser(name: String = "${enum.originalName}", prefixOpt: Option[String] = None): RowParser[${enum.qualifiedName}] = {""",
+            s"""  SqlParser.str(prefixOpt.getOrElse("") + name) map {""",
             s"    case value => ${enum.qualifiedName}(value)",
             s"  }",
             s"}"
@@ -282,13 +274,18 @@ object ParserGenerator extends CodeGenerator {
     }
 
     private[this] def generateUnion(union: ScalaUnion): String = {
+      import PrimitiveWrapper._
       Seq(
         s"object ${union.name} {",
 
         Seq(
           """def parserWithPrefix(prefix: String, sep: String = "_") = {""",
           union.types.map { t =>
-            s"${t.ssd.namespaces.anormParsers}.${t.name}.parserWithPrefix(prefix, sep)"
+            t.datatype match {
+              case _: ScalaPrimitive.Enum => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser("${union.originalName}", Some(s"""" + "$prefix$sep" + """"))"""
+              case p: ScalaPrimitive if isBasicType(p) => generateRowParser("""s"$prefix${sep}""" + s"""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.models}.${className(union, p)}.apply)"""
+              case _ => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))"""
+            }
           }.mkString(" |\n").indent(2),
           "}"
         ).mkString("\n").indent(2),
@@ -296,7 +293,11 @@ object ParserGenerator extends CodeGenerator {
         Seq(
           "def parser() = {",
           union.types.map { t =>
-            s"${t.ssd.namespaces.anormParsers}.${t.name}.parser()"
+            t.datatype match {
+              case _: ScalaPrimitive.Enum => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser("${union.originalName}")"""
+              case p: ScalaPrimitive if isBasicType(p) => generateRowParser(s""""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.models}.${className(union, p)}.apply)"""
+              case _ => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser()"""
+            }
           }.mkString(" |\n").indent(2),
           "}"
         ).mkString("\n").indent(2),

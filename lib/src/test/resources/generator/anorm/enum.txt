@@ -12,10 +12,10 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Status {
 
-    def parserWithPrefix(prefix: String, sep: String = "_") = parser(s"$prefix${sep}name")
+    def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[test.apidoc.apidoctest.v0.models.Status] = parser(prefixOpt = Some(s"$prefix$sep"))
 
-    def parser(name: String = "status"): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
-      SqlParser.str(name) map {
+    def parser(name: String = "status", prefixOpt: Option[String] = None): RowParser[test.apidoc.apidoctest.v0.models.Status] = {
+      SqlParser.str(prefixOpt.getOrElse("") + name) map {
         case value => test.apidoc.apidoctest.v0.models.Status(value)
       }
     }
@@ -24,17 +24,15 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object User {
 
-    def parserWithPrefix(prefix: String, sep: String = "_") = parser(
-      guid = s"$prefix${sep}guid",
-      status = s"$prefix${sep}status"
-    )
+    def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[test.apidoc.apidoctest.v0.models.User] = parser(prefixOpt = Some(s"$prefix$sep"))
 
     def parser(
       guid: String = "guid",
-      status: String = "status"
+      status: String = "status",
+      prefixOpt: Option[String] = None
     ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
-      SqlParser.get[_root_.java.util.UUID](guid) ~
-      test.apidoc.apidoctest.v0.anorm.parsers.Status.parser(status) map {
+      SqlParser.get[_root_.java.util.UUID](prefixOpt.getOrElse("") + guid) ~
+      test.apidoc.apidoctest.v0.anorm.parsers.Status.parser(prefixOpt.getOrElse("") + status) map {
         case guid ~ status => {
           test.apidoc.apidoctest.v0.models.User(
             guid = guid,

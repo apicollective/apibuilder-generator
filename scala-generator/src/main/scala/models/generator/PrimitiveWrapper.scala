@@ -16,20 +16,34 @@ object PrimitiveWrapper {
       }
     }
   }
+
+  def isBasicType(primitive: ScalaPrimitive): Boolean = {
+    primitive match {
+      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+        false
+      }
+      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+
+        true
+      }
+    }
+  }
+
 }
 
 case class PrimitiveWrapper(ssd: ScalaService) {
+  import PrimitiveWrapper.isBasicType
 
   case class Wrapper(model: ScalaModel, union: ScalaUnion)
 
   private[this] val primitives = ssd.unions.flatMap(_.types).map(_.datatype).collect {
     case p: ScalaPrimitive => p
-  }.filter(isBasicType(_)).sortWith(_.shortName < _.shortName)
+  }.filter(isBasicType).sortWith(_.shortName < _.shortName)
 
   val wrappers: Seq[Wrapper] = ssd.unions.flatMap { union =>
     union.types.map(_.datatype).collect {
       case p: ScalaPrimitive => p
-    }.filter(isBasicType(_)).sortWith(_.shortName < _.shortName).map { p =>
+    }.filter(isBasicType).sortWith(_.shortName < _.shortName).map { p =>
       val name = PrimitiveWrapper.className(union, p)
       val model = Model(
         name = name,
@@ -47,18 +61,6 @@ case class PrimitiveWrapper(ssd: ScalaService) {
         new ScalaModel(ssd, model),
         union
       )
-    }
-  }
-
-  private def isBasicType(primitive: ScalaPrimitive): Boolean = {
-    primitive match {
-      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
-        false
-      }
-      case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
-
-        true
-      }
     }
   }
 

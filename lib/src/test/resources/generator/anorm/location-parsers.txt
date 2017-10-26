@@ -12,14 +12,13 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
 
   object Location {
 
-    def parserWithPrefix(prefix: String, sep: String = "_") = parser(
-      ipAddress = s"$prefix${sep}ip_address"
-    )
+    def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[test.apidoc.apidoctest.v0.models.Location] = parser(prefixOpt = Some(s"$prefix$sep"))
 
     def parser(
-      ipAddress: String = "ip_address"
+      ipAddress: String = "ip_address",
+      prefixOpt: Option[String] = None
     ): RowParser[test.apidoc.apidoctest.v0.models.Location] = {
-      SqlParser.str(ipAddress) map {
+      SqlParser.str(prefixOpt.getOrElse("") + ipAddress) map {
         case ipAddress => {
           test.apidoc.apidoctest.v0.models.Location(
             ipAddress = ipAddress
