@@ -124,7 +124,7 @@ package com.gilt.test.v0 {
     import org.slf4j.{Logger, LoggerFactory}
     import com.gilt.test.v0.models.json._
 
-    def closeAsyncHttpClient() {
+    def closeAsyncHttpClient(): Unit = {
       asyncHttpClient.close()
     }
 
@@ -168,7 +168,7 @@ package com.gilt.test.v0 {
       }
     }
 
-    def _logRequest(request: Request) {
+    def _logRequest(request: Request): Unit = {
       logger.info("_logRequest: " + request)
     }
 
