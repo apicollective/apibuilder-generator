@@ -23,7 +23,7 @@ object Http4sScalaClientCommon extends ScalaClientCommon {
         |  def parseJson[T](
         |    className: String,
         |    r: ${config.responseClass}
-        |  )(implicit decoder: org.http4s.EntityDecoder[T]): Task[T] = r.attemptAs[T].${http4sConfig.monadTransformerInvoke}.flatMap {
+        |  )(implicit decoder: io.circe.Decoder[T]): Task[T] = r.attemptAs[T].${http4sConfig.monadTransformerInvoke}.flatMap {
         |    case ${http4sConfig.rightType}(value) => Task.now(value)
         |    case ${http4sConfig.leftType}(error) => Task.fail(new ${Namespaces(config.namespace).errors}.FailedRequest(r.${config.responseStatusMethod}, s"Invalid json for class[" + className + "]", None, error))
         |  }

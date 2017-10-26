@@ -28,8 +28,6 @@ ${headers.objectConstants.indent(2)}
 
 ${Http4sScalaClientCommon.clientSignature(config).indent(2)} {
     import org.http4s.Response
-    implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
-    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
     import ${config.asyncType}
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
@@ -49,6 +47,8 @@ ${headerString.indent(6)}
 
     def modifyRequest(request: Task[org.http4s.Request]): Task[org.http4s.Request] = request
 
+    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
+
     def _executeRequest[T, U](
       method: String,
       path: Seq[String],
@@ -56,7 +56,7 @@ ${headerString.indent(6)}
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[T] = None
     )(handler: Response => Task[U]
-    )(implicit encoder: org.http4s.EntityEncoder[T]): Task[U] = {
+    )(implicit encoder: io.circe.Encoder[T]): Task[U] = {
       import org.http4s.QueryParamEncoder._
 
       val m = org.http4s.Method.fromString(method) match {

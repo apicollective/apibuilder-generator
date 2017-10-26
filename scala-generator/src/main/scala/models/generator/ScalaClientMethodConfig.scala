@@ -174,6 +174,8 @@ private lazy val defaultAsyncHttpClient = {
     override val responseClass = "org.http4s.Response"
     override val extraClientCtorArgs = Some(",\n  asyncHttpClient: org.http4s.client.Client = Client.defaultAsyncHttpClient")
     override val extraClientObjectMethods = Some("""
+implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
+
 private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 """)
     override val canSerializeUuid = true
