@@ -1,10 +1,10 @@
 package scala.models.http4s
 
 import scala.generator.mock.MockClientGenerator
-
-import io.apibuilder.generator.v0.models.{InvocationForm, File}
+import io.apibuilder.generator.v0.models.{File, FileFlag, InvocationForm}
 import lib.generator.CodeGenerator
-import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, Namespaces}
+
+import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfigs}
 import scala.models.ApidocComments
 import scala.models.http4s.server.Http4sServer
 import generator.ServiceFileNames
@@ -57,7 +57,7 @@ trait Generator extends CodeGenerator {
       ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ModelsOnly", caseClasses, Some("Scala")),
       ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "JsonOnly", s"$header$json", Some("Scala")),
       ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ClientOnly", s"$header$client", Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "MockClient", mock, Some("Scala")),
+      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "MockClient", mock, Some("Scala"), flags = Seq(FileFlag.Scaffolding)),
       ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Server", server, Some("Scala"))
     )
   }

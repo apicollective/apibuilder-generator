@@ -1,6 +1,6 @@
 package generator
 
-import io.apibuilder.generator.v0.models.File
+import io.apibuilder.generator.v0.models.{File, FileFlag}
 import lib.{Text, VersionTag}
 
 object ServiceFileNames {
@@ -12,7 +12,8 @@ object ServiceFileNames {
     version: String,
     suffix: String,
     contents: String,
-    languages: Option[String] = None
+    languages: Option[String] = None,
+    flags: Seq[FileFlag] = Seq.empty
   ): File = {
     val language = languages.map { toLanguages(_) }.getOrElse(Nil).headOption.getOrElse(Language.Default)
 
@@ -31,7 +32,8 @@ object ServiceFileNames {
     File(
       name = s"$name.${language.extension}",
       dir = Some(namespace.split("\\.").mkString("/")),
-      contents = contents
+      contents = contents,
+      flags = if (flags.isEmpty) None else Some(flags)
     )
   }
 
