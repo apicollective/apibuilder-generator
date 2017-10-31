@@ -166,8 +166,22 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
 
       enum.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + value.name + "\"")
-        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("").addAnnotation(annotation.build()).build())
+        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("$S", value.name).addAnnotation(annotation.build()).build())
       })
+
+      val nameField = "jsonProperty"
+      val nameFieldType = classOf[String]
+      builder.addField(FieldSpec.builder(nameFieldType, nameField, Modifier.PRIVATE, Modifier.FINAL).build())
+
+      val constructorWithParams = MethodSpec.constructorBuilder()
+      val constructorParameter = ParameterSpec.builder(nameFieldType, nameField)
+      constructorWithParams.addParameter(constructorParameter.build)
+      constructorWithParams.addStatement("this.$N = $N", nameField, nameField)
+      builder.addMethod(constructorWithParams.build())
+
+      val toStringMethod = MethodSpec.methodBuilder("toString").addAnnotation(classOf[Override]).addModifiers(Modifier.PUBLIC).returns(nameFieldType)
+      toStringMethod.addStatement(s"return $nameField")
+      builder.addMethod(toStringMethod.build)
 
       makeFile(className, builder)
 
