@@ -4,7 +4,7 @@ import io.apibuilder.generator.v0.models.Generator
 import io.apibuilder.generator.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
-import lib.generator.{CodeGenerator, CodeGenTarget}
+import lib.generator.{CodeGenTarget, CodeGenerator}
 
 class Generators extends Controller {
 
@@ -298,6 +298,16 @@ object Generators {
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s017Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "http4s_0_18",
+        name = "Http4s 0.18",
+        description = Some("Http4s 0.18 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.18/client/'>http4s client</a>"),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(models.http4s018.Http4s018Generator)
     )
   ).sortBy(_.metaData.key)
 }
