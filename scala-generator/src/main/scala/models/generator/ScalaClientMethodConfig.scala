@@ -206,4 +206,19 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
   }
+
+  case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
+    override val asyncType = "cats.effect.IO"
+    override val leftType = "Left"
+    override val rightType = "Right"
+    override val monadTransformerInvoke = "value"
+    override val responseClass = "org.http4s.Response[IO]"
+    override val extraClientCtorArgs = Some(",\n  asyncHttpClient: org.http4s.client.Client[IO] = Client.defaultAsyncHttpClient")
+    override val extraClientObjectMethods = Some("""
+implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[IO, A]
+
+private lazy val defaultAsyncHttpClient = PooledHttp1Client[IO]()
+""")
+    override val asyncSuccess: String = "pure"
+  }
 }
