@@ -80,7 +80,7 @@ case class Http4sServer(form: InvocationForm,
          |    "X-Apidoc-Version-Major".ci
          |  }
          |
-         |  def apply(req: org.http4s.Message): Boolean = req.headers.get(ApiVersionMajor) match {
+         |  def apply(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
          |    case Some(v) if v.value == "$ver" => true
          |    case _ => false
          |  }
@@ -104,14 +104,14 @@ case class Http4sServer(form: InvocationForm,
       s"""trait $name {
          |  import Matchers._
          |
-         |  implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
-         |  implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
+         |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = ${config.generateCirceJsonOf("A")}
+         |  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
          |
          |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
          |
-         |  def apiVersionMatch(req: org.http4s.Message): Boolean = ApiVersion(req)
+         |  def apiVersionMatch(req: ${config.messageClass}): Boolean = ApiVersion(req)
          |
-         |  def service() = org.http4s.HttpService {
+         |  def service() = ${config.httpServiceClass} {
          |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indent(4)}
          |  }
          |}
@@ -132,6 +132,7 @@ case class Http4sServer(form: InvocationForm,
     s"""package ${ssd.namespaces.base}.server
        |
        |import org.http4s.dsl._
+       |${config.serverImports}
        |${JsonImports(form.service).mkString("\n")}
        |
        |private[server] object Matchers {

@@ -307,7 +307,7 @@ object Generators {
         language = Some("Scala")
       ),
       status = lib.generator.Status.Alpha,
-      codeGenerator = Some(models.http4s018.Http4s018Generator)
+      codeGenerator = Some(scala.models.http4s.Http4s018Generator)
     )
   ).sortBy(_.metaData.key)
 }

@@ -1,10 +1,10 @@
 package scala.models.http4s
 
 import scala.generator.mock.MockClientGenerator
-
-import io.apibuilder.generator.v0.models.{InvocationForm, File}
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
-import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, Namespaces}
+
+import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfigs}
 import scala.models.ApidocComments
 import scala.models.http4s.server.Http4sServer
 import generator.ServiceFileNames
@@ -15,6 +15,10 @@ object Http4s015Generator extends Generator {
 
 object Http4s017Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s017(namespace, baseUrl)
+}
+
+object Http4s018Generator extends Generator {
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s018(namespace, baseUrl)
 }
 
 trait Generator extends CodeGenerator {

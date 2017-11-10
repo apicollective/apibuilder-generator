@@ -1,13 +1,18 @@
 package scala.models.http4s
 
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import scala.generator.{ScalaClientMethodConfig, ScalaUtil, ScalaResource, ScalaOperation}
+
+import scala.generator._
 
 class ScalaClientMethodGenerator (
   config: ScalaClientMethodConfig,
   ssd: ScalaService
 )  extends scala.generator.ScalaClientMethodGenerator(config, ssd) {
   import lib.Text._
+
+  val http4sConfig = config match {
+    case cfg: ScalaClientMethodConfigs.Http4s => cfg
+  }
 
   override protected val generatorUtil = new ScalaGeneratorUtil(config)
 
@@ -99,13 +104,13 @@ class ScalaClientMethodGenerator (
       } match {
         case Some(response) => {
           if (response.isUnit) {
-            s"case r => Task.fail(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
+            s"case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
           } else {
-            s"case r => Task.fail(new ${namespaces.errors}.${response.errorClassName}(r))"
+            s"case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))"
           }
         }
         case None => {
-          s"""case r => Task.fail(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
+          s"""case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
         }
       }
 
@@ -116,14 +121,14 @@ class ScalaClientMethodGenerator (
               if (response.isSuccess) {
                 if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Task.now(Some(()))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(Some(()))")
                   } else {
                     val json = config.toJson("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Task.now(Some($json))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(Some($json))")
                   }
 
                 } else if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Task.now(())")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(())")
 
                 } else {
                   val json = config.toJson("r", response.datatype.name)
@@ -136,10 +141,10 @@ class ScalaClientMethodGenerator (
 
               } else {
                 if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Task.fail(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
 
                 } else {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Task.fail(new ${namespaces.errors}.${response.errorClassName}(r))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
                 }
               }
             }
