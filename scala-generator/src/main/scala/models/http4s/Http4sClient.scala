@@ -55,7 +55,7 @@ ${headerString.indent(6)}
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[T] = None
-    )(handler: Response => ${config.asyncType}[U]
+    )(handler: ${config.responseClass} => ${config.asyncType}[U]
     )(implicit encoder: io.circe.Encoder[T]): ${config.asyncType}[U] = {
       import org.http4s.QueryParamEncoder._
 
