@@ -239,9 +239,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client[$asyncType]()
     override def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$asyncType, $datatypeName]"
 
     override def serverImports: String =
-      s"""
-         |import cats.effect._
-         |import org.http4s.dsl.io._
-       """.stripMargin
+      s"""import cats.effect._
+         |import org.http4s.dsl.io._""".stripMargin
   }
 }
