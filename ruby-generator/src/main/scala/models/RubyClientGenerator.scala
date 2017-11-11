@@ -698,13 +698,13 @@ ${headers.rubyModuleConstants.indent(2)}
       "def to_hash",
       union.discriminator match {
         case None => {
-          (
+          Seq(
             Seq(
               s"case $discName"
             ) ++ union.types.flatMap { ut =>
               Datatype.Primitive(ut.`type`) match {
-                case Failure(_) => Some(s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; subtype_to_hash")
-                case Success(_) => None
+                case Failure(_) => None
+                case Success(_) => Some(s"  when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; subtype_to_hash")
               }
             } ++ Seq(
               s"  else { @$discName => subtype_to_hash }",
