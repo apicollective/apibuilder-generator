@@ -700,7 +700,7 @@ ${headers.rubyModuleConstants.indent(2)}
         case None => {
           Seq(
             Seq(
-              s"case $discName"
+              s"  case @$discName"
             ) ++ union.types.flatMap { ut =>
               Datatype.Primitive(ut.`type`) match {
                 case Failure(_) => None
@@ -708,7 +708,7 @@ ${headers.rubyModuleConstants.indent(2)}
               }
             } ++ Seq(
               s"  else { @$discName => subtype_to_hash }",
-              "end"
+              "  end"
             )
           ).flatten.mkString("\n")
         }
