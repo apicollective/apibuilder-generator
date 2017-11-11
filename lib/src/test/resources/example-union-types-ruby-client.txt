@@ -113,9 +113,7 @@ module Io
                 end
 
                 def to_hash
-                  case @__discriminator__
-                  else { @__discriminator__ => subtype_to_hash }
-                  end
+                  { @__discriminator__ => subtype_to_hash }
                 end
 
                 def Foobar.from_json(hash)
@@ -378,7 +376,7 @@ module Io
 
                 def subtype_to_hash
                   {
-                    :uuid => value
+                    :value => value
                   }
                 end
 
