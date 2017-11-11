@@ -45,7 +45,7 @@ class KotlinGenerator
         .addKdoc(kdocClassMessage)
 
     val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties])
-      .addMember("ignoreUnknown", "true")
+      .addMember("ignoreUnknown=true")
     builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
     val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
@@ -81,7 +81,7 @@ class KotlinGenerator
         .addModifiers(KModifier.PUBLIC, KModifier.DATA)
         .addKdoc(kdocClassMessage)
 
-    val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown", "true")
+    val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown=true")
     builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
     model.description.map(builder.addKdoc(_))
@@ -97,6 +97,7 @@ class KotlinGenerator
       builder.addAnnotation(jsonAnnotationBuilder.build())
     }
 
+    val propSpecs = new java.util.ArrayList[PropertySpec]
     model.fields.foreach(field => {
 
       val fieldSnakeCaseName = field.name
@@ -107,9 +108,10 @@ class KotlinGenerator
 
       val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, kotlinDataType)
       constructorWithParams.addParameter(constructorParameter.build)
+      propSpecs.add(PropertySpec.builder(fieldCamelCaseName, kotlinDataType).initializer(fieldCamelCaseName).build())
     })
 
-    builder.primaryConstructor(constructorWithParams.build)
+    builder.primaryConstructor(constructorWithParams.build).addProperties(propSpecs)
 
     makeFile(className, builder)
   }

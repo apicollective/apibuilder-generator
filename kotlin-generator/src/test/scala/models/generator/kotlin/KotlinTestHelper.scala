@@ -13,6 +13,7 @@ import org.scalatest.Matchers
 object KotlinTestHelper extends Matchers {
 
   def writeFiles(dir: java.io.File, files: Seq[ApiBuilderFile]): Unit = {
+    dir.createNewFile()
     for (f <- files) {
       val javaFile = new java.io.File(dir.getAbsolutePath, f.name)
       javaFile.createNewFile()
