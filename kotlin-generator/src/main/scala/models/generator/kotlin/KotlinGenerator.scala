@@ -250,7 +250,7 @@ class KotlinGenerator
       .addModifiers(KModifier.PUBLIC)
       .returns(classOf[com.fasterxml.jackson.databind.ObjectMapper])
       .build()
-    val builder = TypeSpec.classBuilder(className)
+    val builder = TypeSpec.objectBuilder(className)
       .addModifiers(KModifier.PUBLIC)
       .addKdoc(kdocClassMessage)
       .addFunction(createFunSpec)
