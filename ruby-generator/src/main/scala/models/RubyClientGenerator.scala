@@ -31,9 +31,9 @@ object RubyUtil {
     name: String
   ) {
 
-    val parts = name.split("\\.").map(toClassName(_))
+    val parts: Array[String] = name.split("\\.").map(toClassName(_))
 
-    val fullName = "::" + (parts.toList match {
+    val fullName: String = "::" + (parts.toList match {
       case Nil => sys.error(s"Invalid module name[$name]")
       case one :: Nil => parts.mkString("::")
       case one :: two :: Nil => parts.mkString("::")
@@ -1094,12 +1094,6 @@ ${headers.rubyModuleConstants.indent(2)}
       parseArgument(varName, varName, dt, None, false)
     }
 
-    val (assertStub, assertClass) = dt match {
-      case Datatype.Container.List(inner) => ("assert_collection_of_class", qualifiedClassName(inner.name))
-      case Datatype.Container.Map(inner) => ("assert_hash_of_class", qualifiedClassName(inner.name))
-      case _ => ("assert_class", klass)
-    }
-
     RubyTypeInfo(
       varName = varName,
       klass = klass,
@@ -1134,9 +1128,9 @@ ${headers.rubyModuleConstants.indent(2)}
         }
       }
       case t @ (UserDefined.Model(_) | UserDefined.Enum(_)) =>
-        s"${qualifiedClassName(t.name)}.new(${varName})"
+        s"${qualifiedClassName(t.name)}.new($varName)"
       case UserDefined.Union(name) =>
-        s"${qualifiedClassName(name)}.from_json(${varName})"
+        s"${qualifiedClassName(name)}.from_json($varName)"
       case Container.List(inner) =>
         s"$varName.map { |x| ${generateResponse(inner, "x")} }"
       case Container.Map(inner) =>
