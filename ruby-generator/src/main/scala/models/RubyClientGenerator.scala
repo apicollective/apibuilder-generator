@@ -245,7 +245,7 @@ object RubyUtil {
 object RubyClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    new RubyClientGenerator(form).invoke
+    new RubyClientGenerator(form).invoke()
   }
 
   def classDeclaration(name: String, parent: Option[String]): String = {
@@ -253,6 +253,10 @@ object RubyClientGenerator extends CodeGenerator {
       Some(s"class $name"),
       parent.map { p => s"< $p" }
     ).flatten.mkString(" ")
+  }
+
+  def discriminatorName(union: Union): String = {
+    union.discriminator.getOrElse(RubyUtil.DefaultDiscriminatorName)
   }
 
   def generateEnum(enum: Enum, union: Option[Union]): String = {
@@ -266,8 +270,9 @@ object RubyClientGenerator extends CodeGenerator {
 
     lines.append("")
     lines.append("  def initialize(value)")
-    union.map { u =>
-      lines.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, enum.name)})")
+    union.foreach { u =>
+      val discName = discriminatorName(u)
+      lines.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, enum.name)}, :$discName => '${u.name}')")
     }
 
     lines.append("    @value = HttpClient::Preconditions.assert_class('value', value, String)")
@@ -617,7 +622,7 @@ ${headers.rubyModuleConstants.indent(2)}
   }
 
   def discriminatorName(union: Union): String = {
-    union.discriminator.getOrElse(RubyUtil.DefaultDiscriminatorName)
+    RubyClientGenerator.discriminatorName(union)
   }
 
   def generateUnion(union: Union): String = {
@@ -635,11 +640,11 @@ ${headers.rubyModuleConstants.indent(2)}
     val discriminatorField = union.discriminator match {
       case None => {
         Seq(
-          s"@$discName = '${union.name}'"
+          s"@$discName = opts[:$discName] ||'${union.name}'"
         )
       }
-      case Some(disc) => {
-        union.types.find(_.default.getOrElse(false)).headOption match {
+      case Some(_) => {
+        union.types.find(_.default.getOrElse(false)) match {
           case None => {
             Seq(
               s"HttpClient::Preconditions.require_keys(opts, [:$discName], '$className')",
@@ -810,14 +815,14 @@ ${headers.rubyModuleConstants.indent(2)}
 
     val sb = ListBuffer[String]()
 
-    model.description.map { desc => sb.append(GeneratorUtil.formatComment(desc)) }
+    model.description.foreach { desc => sb.append(GeneratorUtil.formatComment(desc)) }
     sb.append(RubyClientGenerator.classDeclaration(className, union.map(u => RubyUtil.toClassName(u.name))) + "\n")
 
     sb.append("  attr_reader " + model.fields.map( f => s":${RubyUtil.quoteNameIfKeyword(f.name)}" ).mkString(", "))
 
     sb.append("")
     sb.append("  def initialize(incoming={})")
-    union.map { u =>
+    union.foreach { u =>
       val discName = discriminatorName(u)
       sb.append(s"    super(:$discName => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, model.name)})")
     }
@@ -831,7 +836,7 @@ ${headers.rubyModuleConstants.indent(2)}
       }
     }
 
-    model.fields.map { field =>
+    model.fields.foreach { field =>
       val varName = RubyUtil.quoteNameIfKeyword(field.name)
       sb.append(s"    @$varName = ${parseArgument(field.name, field.`type`, field.required, field.default, enumAsString = false)}")
     }
@@ -858,6 +863,7 @@ ${headers.rubyModuleConstants.indent(2)}
         val datatype = datatypeResolver.parse(field.`type`, field.required).get
         val varName = RubyUtil.quoteNameIfKeyword(field.name)
         val value = asHash(varName, datatype)
+        println(s"varName[$varName]: ${field.name} => $value datatype[$datatype]")
         s":${field.name} => ${value}"
       }.mkString(",\n").indent(6)
     )
