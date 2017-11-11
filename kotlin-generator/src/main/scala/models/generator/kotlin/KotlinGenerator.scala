@@ -145,7 +145,7 @@ class KotlinGenerator
 
       maybeAnnotationClass.map(annotationClass => {
 
-        val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value", "\"" + retrofitPath + "\"").build()
+        val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + retrofitPath + "\"").build()
         val methodName =
           if (operation.path == "/")
             toMethodName(operation.method.toString.toLowerCase)
@@ -190,7 +190,7 @@ class KotlinGenerator
           maybeAnnotationClass.map(annotationClass => {
             val parameterType: TypeName = dataTypeFromField(parameter.`type`, modelsNameSpace)
             val param = ParameterSpec.builder(toParamName(parameter.name, true), parameterType)
-            val annotation = AnnotationSpec.builder(annotationClass).addMember("value", "\"" + parameter.name + "\"").build
+            val annotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + parameter.name + "\"").build
             param.addAnnotation(annotation)
             method.addParameter(param.build)
           })
