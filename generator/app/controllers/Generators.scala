@@ -210,6 +210,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "android_kotlin_rx2_client",
+        name = "Android Kotlin RxJava2 Client",
+        description = Some("Generate Kotlin models and Retrofit 2 + RxJava2 client for Android from the API description."),
+        language = Some("Kotlin")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.kotlin.KotlinRxClasses)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "swagger_json",
         name = "Swagger JSON",
         description = Some("Generate a valid swagger 2.0 json description of a service."),

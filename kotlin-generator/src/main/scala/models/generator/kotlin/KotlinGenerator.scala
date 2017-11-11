@@ -294,3 +294,5 @@ class KotlinGenerator
   }
 
 }
+
+object KotlinRxClasses extends KotlinGenerator
