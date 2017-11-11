@@ -272,7 +272,7 @@ object RubyClientGenerator extends CodeGenerator {
     lines.append("  def initialize(value)")
     union.foreach { u =>
       val discName = discriminatorName(u)
-      lines.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, enum.name)}, :$discName => '${u.name}')")
+      lines.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, enum.name)}, :$discName => '${enum.name}')")
     }
 
     lines.append("    @value = HttpClient::Preconditions.assert_class('value', value, String)")
@@ -407,8 +407,8 @@ case class RubyClientGenerator(form: InvocationForm) {
             service.unions.map { generateUnion(_) },
             service.enums.map { e => RubyClientGenerator.generateEnum(e, singleUnion(unionsFor(e))) },
             service.models.map { m => generateModel(m, singleUnion(unionsFor(m))) },
-            primitiveWrapper.wrappers.map { w => generateModel(w.model, Some(w.union)) }
-          ).filter(!_.isEmpty).flatten.mkString("\n\n").indent(2),
+            primitiveWrapper.wrappers.map { w => generateModel(w.model, Some(w.union), primitiveWrapper = true) }
+          ).filter(_.nonEmpty).flatten.mkString("\n\n").indent(2),
           "end"
         ).mkString("\n\n").indent(moduleIndent),
         "",
@@ -810,7 +810,7 @@ ${headers.rubyModuleConstants.indent(2)}
     ).mkString("\n\n")
   }
 
-  def generateModel(model: Model, union: Option[Union]): String = {
+  def generateModel(model: Model, union: Option[Union], primitiveWrapper: Boolean = false): String = {
     val className = RubyUtil.toClassName(model.name)
 
     val sb = ListBuffer[String]()
@@ -862,9 +862,13 @@ ${headers.rubyModuleConstants.indent(2)}
       model.fields.map { field =>
         val datatype = datatypeResolver.parse(field.`type`, field.required).get
         val varName = RubyUtil.quoteNameIfKeyword(field.name)
+        val jsonFieldName = if (primitiveWrapper) {
+          datatype.asInstanceOf[Datatype.Primitive].name
+        } else {
+          field.name
+        }
         val value = asHash(varName, datatype)
-        println(s"varName[$varName]: ${field.name} => $value datatype[$datatype]")
-        s":${field.name} => ${value}"
+        s":$jsonFieldName => $value"
       }.mkString(",\n").indent(6)
     )
     sb.append("    }")
