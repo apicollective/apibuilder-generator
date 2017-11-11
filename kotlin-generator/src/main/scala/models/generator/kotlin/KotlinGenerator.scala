@@ -238,9 +238,9 @@ class KotlinGenerator
     val className = "JacksonObjectMapperFactory"
     val deserializationFeatureClassName = classOf[DeserializationFeature].getName
     val createCodeBlock = CodeBlock.builder()
-      .addStatement("com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper()")
-      .addStatement("mapper.registerModule(new com.fasterxml.jackson.module.kotlin.KotlinModule())")
-      .addStatement("mapper.registerModule(new com.fasterxml.jackson.datatype.joda.JodaModule())")
+      .addStatement("val mapper = com.fasterxml.jackson.databind.ObjectMapper()")
+      .addStatement("mapper.registerModule(com.fasterxml.jackson.module.kotlin.KotlinModule())")
+      .addStatement("mapper.registerModule(com.fasterxml.jackson.datatype.joda.JodaModule())")
       .addStatement(s"mapper.configure(${deserializationFeatureClassName}.FAIL_ON_UNKNOWN_PROPERTIES, false)")
       .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)")
       .addStatement("return mapper")
