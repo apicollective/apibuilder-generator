@@ -404,10 +404,10 @@ case class RubyClientGenerator(form: InvocationForm) {
         Seq(
           "module Models",
           Seq(
-            service.unions.map { generateUnion(_) },
+            service.unions.map { generateUnion },
             service.enums.map { e => RubyClientGenerator.generateEnum(e, singleUnion(unionsFor(e))) },
             service.models.map { m => generateModel(m, singleUnion(unionsFor(m))) },
-            primitiveWrapper.wrappers.map { w => generateModel(w.model, Some(w.union), primitiveWrapper = true) }
+            primitiveWrapper.wrappers.map { w => generateModel(w.model, Some(w.union)) }
           ).filter(_.nonEmpty).flatten.mkString("\n\n").indent(2),
           "end"
         ).mkString("\n\n").indent(moduleIndent),
@@ -703,19 +703,7 @@ ${headers.rubyModuleConstants.indent(2)}
       "def to_hash",
       union.discriminator match {
         case None => {
-          Seq(
-            Seq(
-              s"  case @$discName"
-            ) ++ union.types.flatMap { ut =>
-              Datatype.Primitive(ut.`type`) match {
-                case Failure(_) => None
-                case Success(_) => Some(s"  when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; subtype_to_hash")
-              }
-            } ++ Seq(
-              s"  else { @$discName => subtype_to_hash }",
-              "  end"
-            )
-          ).flatten.mkString("\n")
+          s"  { @$discName => subtype_to_hash }"
         }
         case Some(disc) => {
           s"""  subtype_to_hash.merge(:$disc => @$discName)"""
@@ -810,7 +798,7 @@ ${headers.rubyModuleConstants.indent(2)}
     ).mkString("\n\n")
   }
 
-  def generateModel(model: Model, union: Option[Union], primitiveWrapper: Boolean = false): String = {
+  def generateModel(model: Model, union: Option[Union]): String = {
     val className = RubyUtil.toClassName(model.name)
 
     val sb = ListBuffer[String]()
@@ -862,13 +850,8 @@ ${headers.rubyModuleConstants.indent(2)}
       model.fields.map { field =>
         val datatype = datatypeResolver.parse(field.`type`, field.required).get
         val varName = RubyUtil.quoteNameIfKeyword(field.name)
-        val jsonFieldName = if (primitiveWrapper) {
-          datatype.asInstanceOf[Datatype.Primitive].name
-        } else {
-          field.name
-        }
         val value = asHash(varName, datatype)
-        s":$jsonFieldName => $value"
+        s":${field.name} => $value"
       }.mkString(",\n").indent(6)
     )
     sb.append("    }")
