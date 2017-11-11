@@ -105,7 +105,7 @@ module Io
 
                 def initialize(incoming={})
                   opts = HttpClient::Helper.symbolize_keys(incoming)
-                  @__discriminator__ = 'foobar'
+                  @__discriminator__ = opts[:__discriminator__] ||'foobar'
                 end
 
                 def subtype_to_hash
@@ -221,7 +221,7 @@ module Io
                 attr_reader :value
 
                 def initialize(value)
-                  super(:name => Foobar::Types::BAR)
+                  super(:name => Foobar::Types::BAR, :__discriminator__ => 'bar')
                   @value = HttpClient::Preconditions.assert_class('value', value, String)
                 end
 
@@ -260,7 +260,7 @@ module Io
                 attr_reader :value
 
                 def initialize(value)
-                  super(:name => Foobar::Types::FOO)
+                  super(:name => Foobar::Types::FOO, :__discriminator__ => 'foo')
                   @value = HttpClient::Preconditions.assert_class('value', value, String)
                 end
 
