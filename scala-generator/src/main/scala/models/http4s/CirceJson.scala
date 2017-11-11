@@ -11,6 +11,8 @@ case class CirceJson(
     s"""package ${ssd.namespaces.models} {
 
   package object json {
+    import io.circe.Decoder._
+    import io.circe.Encoder._
     import scala.util.Try
     import io.circe.{Json, JsonObject, Encoder, Decoder, DecodingFailure}
     import io.circe.syntax._

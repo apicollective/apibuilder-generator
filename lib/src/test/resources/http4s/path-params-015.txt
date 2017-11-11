@@ -1,6 +1,7 @@
 package io.apibuilder.http4s.test.server
 
 import org.http4s.dsl._
+
 import io.apibuilder.http4s.test.models.json._
 
 private[server] object Matchers {
@@ -95,8 +96,8 @@ private[server] object Matchers {
 trait ModelRoutes {
   import Matchers._
 
-  implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
-  implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
 
   sealed trait GetStringByIdResponse
 

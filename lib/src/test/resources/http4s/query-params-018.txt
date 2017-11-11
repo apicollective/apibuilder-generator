@@ -1,7 +1,8 @@
 package io.apibuilder.http4s.test.server
 
 import org.http4s.dsl._
-
+import cats.effect._
+import org.http4s.dsl.io._
 import io.apibuilder.http4s.test.models.json._
 
 private[server] object Matchers {
@@ -27,7 +28,7 @@ private[server] object Matchers {
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply(req: org.http4s.Message): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply(req: org.http4s.Message[cats.effect.IO]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -118,8 +119,8 @@ private[server] object Matchers {
 trait ModelRoutes {
   import Matchers._
 
-  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
-  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[cats.effect.IO, A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[cats.effect.IO, A]
 
   sealed trait GetStringResponse
 
@@ -128,9 +129,9 @@ trait ModelRoutes {
   }
 
   def getString(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: String
-  ): fs2.Task[GetStringResponse]
+  ): cats.effect.IO[GetStringResponse]
 
   sealed trait GetNamedStringResponse
 
@@ -139,9 +140,9 @@ trait ModelRoutes {
   }
 
   def getNamedString(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     namedId: String
-  ): fs2.Task[GetNamedStringResponse]
+  ): cats.effect.IO[GetNamedStringResponse]
 
   sealed trait GetStringWithMinResponse
 
@@ -150,9 +151,9 @@ trait ModelRoutes {
   }
 
   def getStringWithMin(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: String
-  ): fs2.Task[GetStringWithMinResponse]
+  ): cats.effect.IO[GetStringWithMinResponse]
 
   sealed trait GetStringWithMaxResponse
 
@@ -161,9 +162,9 @@ trait ModelRoutes {
   }
 
   def getStringWithMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: String
-  ): fs2.Task[GetStringWithMaxResponse]
+  ): cats.effect.IO[GetStringWithMaxResponse]
 
   sealed trait GetStringWithMinAndMaxResponse
 
@@ -172,9 +173,9 @@ trait ModelRoutes {
   }
 
   def getStringWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: String
-  ): fs2.Task[GetStringWithMinAndMaxResponse]
+  ): cats.effect.IO[GetStringWithMinAndMaxResponse]
 
   sealed trait GetOptionalStringResponse
 
@@ -183,9 +184,9 @@ trait ModelRoutes {
   }
 
   def getOptionalString(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.scala.Option[String]
-  ): fs2.Task[GetOptionalStringResponse]
+  ): cats.effect.IO[GetOptionalStringResponse]
 
   sealed trait GetOptionalStringWithMinAndMaxResponse
 
@@ -194,9 +195,9 @@ trait ModelRoutes {
   }
 
   def getOptionalStringWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.scala.Option[String]
-  ): fs2.Task[GetOptionalStringWithMinAndMaxResponse]
+  ): cats.effect.IO[GetOptionalStringWithMinAndMaxResponse]
 
   sealed trait GetListStringResponse
 
@@ -205,9 +206,9 @@ trait ModelRoutes {
   }
 
   def getListString(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Seq[String]
-  ): fs2.Task[GetListStringResponse]
+  ): cats.effect.IO[GetListStringResponse]
 
   sealed trait GetListStringWithMinAndMaxResponse
 
@@ -216,9 +217,9 @@ trait ModelRoutes {
   }
 
   def getListStringWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Seq[String]
-  ): fs2.Task[GetListStringWithMinAndMaxResponse]
+  ): cats.effect.IO[GetListStringWithMinAndMaxResponse]
 
   sealed trait GetOptionalListStringResponse
 
@@ -227,9 +228,9 @@ trait ModelRoutes {
   }
 
   def getOptionalListString(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Seq[String]
-  ): fs2.Task[GetOptionalListStringResponse]
+  ): cats.effect.IO[GetOptionalListStringResponse]
 
   sealed trait GetOptionalListStringWithMinAndMaxResponse
 
@@ -238,9 +239,9 @@ trait ModelRoutes {
   }
 
   def getOptionalListStringWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Seq[String]
-  ): fs2.Task[GetOptionalListStringWithMinAndMaxResponse]
+  ): cats.effect.IO[GetOptionalListStringWithMinAndMaxResponse]
 
   sealed trait GetIntResponse
 
@@ -249,9 +250,9 @@ trait ModelRoutes {
   }
 
   def getInt(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Int
-  ): fs2.Task[GetIntResponse]
+  ): cats.effect.IO[GetIntResponse]
 
   sealed trait GetIntWithMinAndMaxResponse
 
@@ -260,9 +261,9 @@ trait ModelRoutes {
   }
 
   def getIntWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Int
-  ): fs2.Task[GetIntWithMinAndMaxResponse]
+  ): cats.effect.IO[GetIntWithMinAndMaxResponse]
 
   sealed trait GetLongResponse
 
@@ -271,9 +272,9 @@ trait ModelRoutes {
   }
 
   def getLong(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Long
-  ): fs2.Task[GetLongResponse]
+  ): cats.effect.IO[GetLongResponse]
 
   sealed trait GetLongWithMinAndMaxResponse
 
@@ -282,9 +283,9 @@ trait ModelRoutes {
   }
 
   def getLongWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Long
-  ): fs2.Task[GetLongWithMinAndMaxResponse]
+  ): cats.effect.IO[GetLongWithMinAndMaxResponse]
 
   sealed trait GetBooleanResponse
 
@@ -293,9 +294,9 @@ trait ModelRoutes {
   }
 
   def getBoolean(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Boolean
-  ): fs2.Task[GetBooleanResponse]
+  ): cats.effect.IO[GetBooleanResponse]
 
   sealed trait GetBooleanWithMinAndMaxResponse
 
@@ -304,9 +305,9 @@ trait ModelRoutes {
   }
 
   def getBooleanWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Boolean
-  ): fs2.Task[GetBooleanWithMinAndMaxResponse]
+  ): cats.effect.IO[GetBooleanWithMinAndMaxResponse]
 
   sealed trait GetDoubleResponse
 
@@ -315,9 +316,9 @@ trait ModelRoutes {
   }
 
   def getDouble(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Double
-  ): fs2.Task[GetDoubleResponse]
+  ): cats.effect.IO[GetDoubleResponse]
 
   sealed trait GetDoubleWithMinAndMaxResponse
 
@@ -326,9 +327,9 @@ trait ModelRoutes {
   }
 
   def getDoubleWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: Double
-  ): fs2.Task[GetDoubleWithMinAndMaxResponse]
+  ): cats.effect.IO[GetDoubleWithMinAndMaxResponse]
 
   sealed trait GetDecimalResponse
 
@@ -337,9 +338,9 @@ trait ModelRoutes {
   }
 
   def getDecimal(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: BigDecimal
-  ): fs2.Task[GetDecimalResponse]
+  ): cats.effect.IO[GetDecimalResponse]
 
   sealed trait GetDecimalWithMinAndMaxResponse
 
@@ -348,9 +349,9 @@ trait ModelRoutes {
   }
 
   def getDecimalWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: BigDecimal
-  ): fs2.Task[GetDecimalWithMinAndMaxResponse]
+  ): cats.effect.IO[GetDecimalWithMinAndMaxResponse]
 
   sealed trait GetDateResponse
 
@@ -359,9 +360,9 @@ trait ModelRoutes {
   }
 
   def getDate(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.java.time.LocalDate
-  ): fs2.Task[GetDateResponse]
+  ): cats.effect.IO[GetDateResponse]
 
   sealed trait GetDateWithMinAndMaxResponse
 
@@ -370,9 +371,9 @@ trait ModelRoutes {
   }
 
   def getDateWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.java.time.LocalDate
-  ): fs2.Task[GetDateWithMinAndMaxResponse]
+  ): cats.effect.IO[GetDateWithMinAndMaxResponse]
 
   sealed trait GetDatetimeResponse
 
@@ -381,9 +382,9 @@ trait ModelRoutes {
   }
 
   def getDatetime(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.java.time.Instant
-  ): fs2.Task[GetDatetimeResponse]
+  ): cats.effect.IO[GetDatetimeResponse]
 
   sealed trait GetDatetimeWithMinAndMaxResponse
 
@@ -392,9 +393,9 @@ trait ModelRoutes {
   }
 
   def getDatetimeWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.java.time.Instant
-  ): fs2.Task[GetDatetimeWithMinAndMaxResponse]
+  ): cats.effect.IO[GetDatetimeWithMinAndMaxResponse]
 
   sealed trait GetUuidResponse
 
@@ -403,9 +404,9 @@ trait ModelRoutes {
   }
 
   def getUuid(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.java.util.UUID
-  ): fs2.Task[GetUuidResponse]
+  ): cats.effect.IO[GetUuidResponse]
 
   sealed trait GetUuidWithMinAndMaxResponse
 
@@ -414,9 +415,9 @@ trait ModelRoutes {
   }
 
   def getUuidWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: _root_.java.util.UUID
-  ): fs2.Task[GetUuidWithMinAndMaxResponse]
+  ): cats.effect.IO[GetUuidWithMinAndMaxResponse]
 
   sealed trait GetEnumResponse
 
@@ -425,9 +426,9 @@ trait ModelRoutes {
   }
 
   def getEnum(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: io.apibuilder.http4s.test.models.Enum
-  ): fs2.Task[GetEnumResponse]
+  ): cats.effect.IO[GetEnumResponse]
 
   sealed trait GetNamedEnumResponse
 
@@ -436,9 +437,9 @@ trait ModelRoutes {
   }
 
   def getNamedEnum(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     namedId: io.apibuilder.http4s.test.models.Enum
-  ): fs2.Task[GetNamedEnumResponse]
+  ): cats.effect.IO[GetNamedEnumResponse]
 
   sealed trait GetEnumWithMinAndMaxResponse
 
@@ -447,13 +448,13 @@ trait ModelRoutes {
   }
 
   def getEnumWithMinAndMax(
-    _req: org.http4s.Request,
+    _req: org.http4s.Request[cats.effect.IO],
     id: io.apibuilder.http4s.test.models.Enum
-  ): fs2.Task[GetEnumWithMinAndMaxResponse]
+  ): cats.effect.IO[GetEnumWithMinAndMaxResponse]
 
-  def apiVersionMatch(req: org.http4s.Message): Boolean = ApiVersion(req)
+  def apiVersionMatch(req: org.http4s.Message[cats.effect.IO]): Boolean = ApiVersion(req)
 
-  def service() = org.http4s.HttpService {
+  def service() = org.http4s.HttpService[cats.effect.IO] {
     case _req @ GET -> Root / "string" :? IdStringMatcher(id) if apiVersionMatch(_req) =>
       getString(_req, id).flatMap {
         case GetStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)

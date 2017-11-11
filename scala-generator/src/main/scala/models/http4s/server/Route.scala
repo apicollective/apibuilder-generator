@@ -56,7 +56,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     }
 
     val params =
-      Seq(Some("_req: org.http4s.Request")) ++
+      Seq(Some(s"_req: ${config.requestClass}")) ++
       op.nonHeaderParameters.map { field =>
         val typ = field.datatype match {
           case ScalaDatatype.Option(container: ScalaDatatype.Container) => container.name
@@ -64,7 +64,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
         }
         Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
       } ++
-      Seq(op.body.map(body => s"body: => org.http4s.DecodeResult[${body.datatype.name}]"))
+      Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
 
     Seq(
       s"sealed trait $responseTrait",

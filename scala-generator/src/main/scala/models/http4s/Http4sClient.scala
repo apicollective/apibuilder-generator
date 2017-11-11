@@ -45,9 +45,9 @@ ${headerString.indent(6)}
 
     def apiHeaders: Seq[(String, String)] = defaultApiHeaders
 
-    def modifyRequest(request: Task[org.http4s.Request]): Task[org.http4s.Request] = request
+    def modifyRequest(request: ${config.asyncType}[${config.requestClass}]): ${config.asyncType}[${config.requestClass}] = request
 
-    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
+    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
 
     def _executeRequest[T, U](
       method: String,
@@ -55,8 +55,8 @@ ${headerString.indent(6)}
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[T] = None
-    )(handler: Response => Task[U]
-    )(implicit encoder: io.circe.Encoder[T]): Task[U] = {
+    )(handler: ${config.responseClass} => ${config.asyncType}[U]
+    )(implicit encoder: io.circe.Encoder[T]): ${config.asyncType}[U] = {
       import org.http4s.QueryParamEncoder._
 
       val m = org.http4s.Method.fromString(method) match {
@@ -73,7 +73,7 @@ ${headerString.indent(6)}
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
       val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
 
-      val request = org.http4s.Request(method = m,
+      val request = ${config.requestClass}(method = m,
                                        uri = uri,
                                        headers = headers)
 
@@ -86,7 +86,7 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val authBody = body.fold(Task.now(authReq))(authReq.withBody)
+      val authBody = body.fold(${config.asyncType}.${config.asyncSuccess}(authReq))(authReq.withBody)
 
       asyncHttpClient.fetch(modifyRequest(authBody))(handler)
     }
