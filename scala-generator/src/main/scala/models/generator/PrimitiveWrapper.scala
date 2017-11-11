@@ -51,7 +51,7 @@ case class PrimitiveWrapper(ssd: ScalaService) {
         description = Some(s"Wrapper class to support the union types containing the datatype[${p.apidocType}]"),
         fields = Seq(
           Field(
-            name = p.apidocType.toString,
+            name = PrimitiveWrapper.FieldName,
             `type` = p.apidocType,
             required = true
           )

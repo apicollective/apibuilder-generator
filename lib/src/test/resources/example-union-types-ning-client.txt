@@ -77,7 +77,7 @@ package io.apibuilder.example.union.types.v0.models {
    * Wrapper class to support the union types containing the datatype[uuid]
    */
   case class UserUuid(
-    uuid: _root_.java.util.UUID
+    value: _root_.java.util.UUID
   ) extends User
 
   sealed trait Bar extends Foobar
@@ -267,7 +267,7 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonReadsApidocExampleUnionTypesUserUuid: play.api.libs.json.Reads[UserUuid] = {
-      (__ \ "uuid").read[_root_.java.util.UUID].map { x => new UserUuid(uuid = x) }
+      (__ \ "value").read[_root_.java.util.UUID].map { x => new UserUuid(value = x) }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[Foobar] = {

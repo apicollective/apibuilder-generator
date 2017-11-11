@@ -60,7 +60,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    * Wrapper class to support the union types containing the datatype[string]
    */
   case class UserString(
-    string: String
+    value: String
   ) extends User
 
   sealed trait SystemUser extends User
@@ -188,7 +188,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Reads[UserString] = {
-      (__ \ "string").read[String].map { x => new UserString(string = x) }
+      (__ \ "value").read[String].map { x => new UserString(value = x) }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Reads[User] = new play.api.libs.json.Reads[User] {
