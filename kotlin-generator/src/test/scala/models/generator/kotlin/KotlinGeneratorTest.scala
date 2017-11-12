@@ -10,14 +10,7 @@ class KotlinGeneratorTest
   extends FlatSpec
     with Matchers {
 
-  "generateJacksonObjectMapper" should "output source file" in {
-    val generator = new KotlinGenerator()
-    val file = generator.generateJacksonObjectMapper()
-    file.name shouldBe "JacksonObjectMapperFactory.kt"
-    file.contents should include (classOf[ObjectMapper].getSimpleName)
-  }
-
-  "invoke" should "output source files" in {
+  "invoke" should "output Kotlin source files" in {
     val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
     tmpDir.deleteOnExit()
     val service = models.TestHelper.generatorApiService
@@ -31,5 +24,9 @@ class KotlinGeneratorTest
       f.name should endWith (".kt")
       // assertValidKotlinSourceCode(tmpDir)
      })
+    files.exists(
+      file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
+    ) shouldBe true
+
   }
 }
