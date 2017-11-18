@@ -1,0 +1,68 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "http4s",
+  "organization": {
+    "key": "http4s"
+  },
+  "application": {
+    "key": "http4s"
+  },
+  "namespace": "io.apibuilder.http4s.test",
+  "version": "0.0.1",
+  "headers": [],
+  "info": [],
+  "imports": [],
+  "enums": [],
+  "unions": [],
+  "attributes": [],
+
+  "models": [
+    {
+      "name": "model",
+      "plural": "models",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "model",
+      "plural": "models",
+      "attributes": [],
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/string",
+          "attributes": [],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Form",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
