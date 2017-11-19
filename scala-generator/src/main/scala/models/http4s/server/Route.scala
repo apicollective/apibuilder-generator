@@ -54,10 +54,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
   }
 
-  val requestCaseClassName = op.method match {
-    case Method.Get | Method.Delete => s""
-    case _  => s"${op.name.capitalize}Request"
-  }
+  val requestCaseClassName = s"${op.name.capitalize}Request"
 
   def operation(): Seq[String] = {
 
@@ -74,9 +71,27 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
         nonHeaderParameters ++
         Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
 
+    val requestCaseClass = s"$requestCaseClassName(${nonHeaderParameters.flatten.mkString(", ")})"
 
+    val requestDecoder = Seq(s"implicit val ${requestCaseClassName}Decoder: _root_.io.circe.Decoder[$requestCaseClassName] = _root_.io.circe.Decoder.instance { a =>",
+                             s"  for {",
+                             op.nonHeaderParameters.map(p => s"""    ${p.name} <- a.downField("${p.originalName}").as[${p.datatype.name}]""").mkString("\n"),
+                             s"  } yield {",
+                             s"    $requestCaseClassName(",
+                             op.nonHeaderParameters.map(p => s"""      ${p.name} = ${p.name}""").mkString(",\n"),
+                             s"    )",
+                             s"  }",
+                             s"}")
 
-    Seq(
+    val requestCaseClassAndDecoder = op.method match {
+      case Method.Get | Method.Delete => Seq()
+      case _ => Seq(
+        s"case class $requestCaseClass",
+        s"") ++ requestDecoder ++ Seq("")
+    }
+
+      requestCaseClassAndDecoder ++
+      Seq(
       s"sealed trait $responseTrait",
       s"",
       s"object ${op.name.capitalize}Response {",
@@ -91,11 +106,11 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
   def route(version: Option[Int]): Seq[String] = {
 
-    val nonHeaderParameters = op.nonHeaderParameters.map(field => Some(s"${ScalaUtil.quoteNameIfKeyword(field.originalName)}"))
+    def nonHeaderParameters(prefix:String) = op.nonHeaderParameters.map(field => Some(s"$prefix${ScalaUtil.quoteNameIfKeyword(field.originalName)}"))
 
-    val args = (
+    def args(prefix:String) = (
       Seq(Some("_req")) ++
-        nonHeaderParameters ++
+        nonHeaderParameters(prefix) ++
         Seq(op.body.map(body => s"_req.attemptAs[${body.datatype.name}]"))
       ).flatten.mkString(", ")
 
@@ -119,7 +134,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
     val verFilter = version.fold("")(_ => " if apiVersionMatch(_req)")
 
-    val route = Seq(s"  ${op.name}($args).flatMap {"
+    def route(prefix:String) = Seq(s"  ${op.name}(${args(prefix)}).flatMap {"
                   ) ++ statusCodes.collect {
                     case StatusCode(code, Some(_)) =>
                     s"    case $responseTrait.HTTP$code(value, headers) => ${HttpStatusCodes.apply(code)}(value).putHeaders(headers: _*)"
@@ -152,19 +167,27 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
               case _ => s"""$name <- Some(req.get("$originalName").flatMap(f => _root_.io.circe.parser.decode[${inner.name}](f).toOption))"""
             }
         }
-      }.map(_.indent(8))
+      }.map(_.indent(10))
     }
 
     op.method match {
-      case Method.Get | Method.Delete => prefix ++ route
+      case Method.Get | Method.Delete => prefix ++ route("")
       case _ =>
-        val decoding:Seq[String] = Seq(s"  _req.decode[_root_.org.http4s.UrlForm] {",
-                                       s"    req =>",
-                                       s"      val responseOpt = for {") ++ decodingParameters ++
-                                   Seq(s"      } yield {") ++ route.map(_.indent(8)) ++
-                                   Seq(s"        }",
-                                       s"      responseOpt.getOrElse(BadRequest())",
-                                       s"  }")
+        val decoding:Seq[String] = Seq(s"if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {",
+                                       s"  _req.as[_root_.io.circe.Json].flatMap{",
+                                       s"    _.as[$requestCaseClassName].map {",
+                                       s"      req =>") ++ route("req.").map(_.indent(8)) ++
+                                   Seq(s"    }.getOrElse(BadRequest())",
+                                       s"  }",
+                                       s"} else {",
+                                       s"    _req.decode[_root_.org.http4s.UrlForm] {",
+                                       s"      req =>",
+                                       s"        val responseOpt = for {") ++ decodingParameters ++
+                                   Seq(s"        } yield {") ++ route("").map(_.indent(10)) ++
+                                   Seq(s"          }",
+                                       s"        responseOpt.getOrElse(BadRequest())",
+                                       s"  }",
+                                       s"}")
 
         prefix ++ decoding
 
