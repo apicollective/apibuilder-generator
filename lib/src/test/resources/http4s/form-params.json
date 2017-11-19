@@ -14,7 +14,19 @@
   "headers": [],
   "info": [],
   "imports": [],
-  "enums": [],
+  "enums": [
+    {
+      "name": "enum",
+      "plural": "enums",
+      "values": [
+        {
+          "name": "value",
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
   "unions": [],
   "attributes": [],
 
@@ -41,12 +53,36 @@
       "operations": [
         {
           "method": "POST",
-          "path": "/string",
+          "path": "/test",
           "attributes": [],
           "parameters": [
             {
               "name": "id",
               "type": "string",
+              "location": "Form",
+              "required": true
+            },
+            {
+              "name": "model",
+              "type": "model",
+              "location": "Form",
+              "required": true
+            },
+            {
+              "name": "enum",
+              "type": "enum",
+              "location": "Form",
+              "required": true
+            },
+            {
+              "name": "opt",
+              "type": "integer",
+              "location": "Form",
+              "required": false
+            },
+            {
+              "name": "list",
+              "type": "[string]",
               "location": "Form",
               "required": true
             }

@@ -129,16 +129,25 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
     val prefix = Seq(s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>")
 
-
     val decodingParameters:Seq[String] = {
       op.nonHeaderParameters.map { field =>
+        val name = ScalaUtil.quoteNameIfKeyword(field.name)
+        val originalName = ScalaUtil.quoteNameIfKeyword(field.originalName)
+
         field.datatype match {
-          case _: ScalaPrimitive =>
-            s"""${ScalaUtil.quoteNameIfKeyword(field.name)} <- req.getFirst("${ScalaUtil.quoteNameIfKeyword(field.originalName)}")"""
-          case ScalaDatatype.Option(_) =>
-            s"""${ScalaUtil.quoteNameIfKeyword(field.name)} <- Some(req.getFirst("${ScalaUtil.quoteNameIfKeyword(field.originalName)}"))"""
-          case ScalaDatatype.List(_) | ScalaDatatype.Map(_) =>
-            s"""${ScalaUtil.quoteNameIfKeyword(field.name)} <- Some(req.get("${ScalaUtil.quoteNameIfKeyword(field.originalName)}"))"""
+          case ScalaPrimitive.String => s"""$name <- req.getFirst("$originalName")"""
+          case _: ScalaPrimitive => s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[${field.datatype.name}](f).toOption)"""
+            s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[${field.datatype.name}](f).toOption)"""
+          case ScalaDatatype.Option(inner) =>
+            inner match {
+              case ScalaPrimitive.String => s"""$name <- Some(req.getFirst("$originalName"))"""
+              case _ => s"""$name <- Some(req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[${inner.name}](f).toOption))"""
+            }
+          case ScalaDatatype.List(inner) =>
+            inner match {
+              case ScalaPrimitive.String => s"""$name <- Some(req.get("$originalName"))"""
+              case _ => s"""$name <- Some(req.get("$originalName").flatMap(f => _root_.io.circe.parser.decode[${inner.name}](f).toOption))"""
+            }
         }
       }.map(_.indent(8))
     }

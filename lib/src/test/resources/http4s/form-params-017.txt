@@ -48,19 +48,27 @@ trait ModelRoutes {
 
   def post(
     _req: org.http4s.Request,
-    id: String
+    id: String,
+    model: io.apibuilder.http4s.test.models.Model,
+    enum: io.apibuilder.http4s.test.models.Enum,
+    opt: _root_.scala.Option[Int],
+    list: Seq[String]
   ): fs2.Task[PostResponse]
 
   def apiVersionMatch(req: org.http4s.Message): Boolean = ApiVersion(req)
 
   def service() = org.http4s.HttpService {
-    case _req @ POST -> Root / "string" if apiVersionMatch(_req) =>
+    case _req @ POST -> Root / "test" if apiVersionMatch(_req) =>
       _req.decode[_root_.org.http4s.UrlForm] {
         req =>
           val responseOpt = for {
             id <- req.getFirst("id")
+            model <- req.getFirst("model").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Model](f).toOption)
+            enum <- req.getFirst("enum").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Enum](f).toOption)
+            opt <- Some(req.getFirst("opt").flatMap(f => _root_.io.circe.parser.decode[Int](f).toOption))
+            list <- Some(req.get("list"))
           } yield {
-              post(_req, id).flatMap {
+              post(_req, id, model, enum, opt, list).flatMap {
                 case PostResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
               }
             }
