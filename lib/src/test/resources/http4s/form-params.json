@@ -85,6 +85,12 @@
               "type": "[string]",
               "location": "Form",
               "required": true
+            },
+            {
+              "name": "map",
+              "type": "map[string]",
+              "location": "Form",
+              "required": true
             }
           ],
           "responses": [

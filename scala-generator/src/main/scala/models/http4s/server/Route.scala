@@ -56,7 +56,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
   val requestCaseClassName = op.method match {
     case Method.Get | Method.Delete => s""
-    case _ => s"${op.name.capitalize}Request"
+    case _  => s"${op.name.capitalize}Request"
   }
 
   def operation(): Seq[String] = {
@@ -73,6 +73,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       Seq(Some(s"_req: ${config.requestClass}")) ++
         nonHeaderParameters ++
         Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
+
 
 
     Seq(
@@ -133,16 +134,18 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       op.nonHeaderParameters.map { field =>
         val name = ScalaUtil.quoteNameIfKeyword(field.name)
         val originalName = ScalaUtil.quoteNameIfKeyword(field.originalName)
+        val datatype = field.datatype.name
 
         field.datatype match {
           case ScalaPrimitive.String => s"""$name <- req.getFirst("$originalName")"""
-          case _: ScalaPrimitive => s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[${field.datatype.name}](f).toOption)"""
-            s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[${field.datatype.name}](f).toOption)"""
+          case _: ScalaPrimitive => s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[$datatype](f).toOption)"""
           case ScalaDatatype.Option(inner) =>
             inner match {
               case ScalaPrimitive.String => s"""$name <- Some(req.getFirst("$originalName"))"""
               case _ => s"""$name <- Some(req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[${inner.name}](f).toOption))"""
             }
+          case ScalaDatatype.Map(_) =>
+            s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[$datatype](f).toOption)"""
           case ScalaDatatype.List(inner) =>
             inner match {
               case ScalaPrimitive.String => s"""$name <- Some(req.get("$originalName"))"""
