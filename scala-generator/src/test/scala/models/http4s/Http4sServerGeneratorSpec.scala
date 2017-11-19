@@ -93,7 +93,7 @@ class Http4sServerGeneratorSpec extends FunSpec with ShouldMatchers {
     val service = models.TestHelper.parseFile(s"/http4s/form-params.json")
     val server = Http4sServer(new InvocationForm(service, Seq.empty, None),
       new ScalaService(service),
-      new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None))
+      new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
     val scalaSourceCode = server.generate()
     assertValidScalaSourceCode(scalaSourceCode)
     models.TestHelper.assertEqualsFile("/http4s/form-params-018.txt", scalaSourceCode)
