@@ -1,9 +1,10 @@
 package models.generator.kotlin
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import org.scalatest.{FlatSpec, Matchers}
 import java.nio.file.Files.createTempDirectory
+
 import KotlinTestHelper._
 
 class KotlinGeneratorTest
@@ -13,13 +14,16 @@ class KotlinGeneratorTest
   "invoke" should "output Kotlin source files" in {
     val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
     tmpDir.deleteOnExit()
-    val service = models.TestHelper.generatorApiService
+    val service = models.TestHelper.apidocApiService
+    service.enums.size shouldBe (3)
+    System.out.println(service.enums)
     val invocationForm = new InvocationForm(service, Seq.empty, None)
     val generator = new KotlinGenerator()
     val files = generator.invoke(invocationForm).right.get
     writeFiles(tmpDir, files)
     files.size shouldBe > (0)
     files.foreach(f => {
+      System.out.println(f)
       f.contents.length shouldBe > (0)
       f.name should endWith (".kt")
       // assertValidKotlinSourceCode(tmpDir)
@@ -28,5 +32,14 @@ class KotlinGeneratorTest
       file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
     ) shouldBe true
 
+    Seq("Visibility", "Publication", "OriginalType").foreach { enumName =>
+      enumFileExists(files, enumName) shouldBe true
+    }
+  }
+
+  private def enumFileExists(files: Seq[File], enumName: String): Boolean = {
+    files.exists(file => {
+      file.contents.contains(s"enum class ${enumName}") && file.contents.contains("UNKNOWN")
+    })
   }
 }
