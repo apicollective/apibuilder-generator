@@ -16,14 +16,12 @@ class KotlinGeneratorTest
     tmpDir.deleteOnExit()
     val service = models.TestHelper.apidocApiService
     service.enums.size shouldBe (3)
-    System.out.println(service.enums)
     val invocationForm = new InvocationForm(service, Seq.empty, None)
     val generator = new KotlinGenerator()
     val files = generator.invoke(invocationForm).right.get
     writeFiles(tmpDir, files)
     files.size shouldBe > (0)
     files.foreach(f => {
-      System.out.println(f)
       f.contents.length shouldBe > (0)
       f.name should endWith (".kt")
       // assertValidKotlinSourceCode(tmpDir)
