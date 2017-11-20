@@ -38,7 +38,9 @@ class KotlinGenerator
 
       enum.description.map(builder.addKdoc(_))
 
-      enum.values.foreach(value => {
+      val allEnumValues = enum.values ++ Seq(io.apibuilder.spec.v0.models.EnumValue("UNKNOWN", Some("UNKNOWN")))
+
+      allEnumValues.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + value.name + "\"")
         builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("").addAnnotation(annotation.build()).build())
       })
@@ -266,8 +268,12 @@ class KotlinGenerator
       makeFile(className, builder)
     }
 
+    def generateEnums(enums: Seq[Enum]): Seq[File] = {
+      enums.map(generateEnum(_))
+    }
+
     def generateSourceFiles(service: Service): Seq[File] = {
-      val generatedEnums = service.enums.map(generateEnum(_))
+      val generatedEnums = generateEnums(service.enums)
 
       val generatedUnionTypes = service.unions.map(generateUnionType(_))
 
