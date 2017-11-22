@@ -38,7 +38,7 @@ class KotlinGenerator
 
       enum.description.map(builder.addKdoc(_))
 
-      val allEnumValues = enum.values ++ Seq(io.apibuilder.spec.v0.models.EnumValue("UNDEFINED", Some("UNDEFINED")))
+      val allEnumValues = enum.values ++ Seq(io.apibuilder.spec.v0.models.EnumValue(undefinedEnumName, Some(undefinedEnumName)))
 
       allEnumValues.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + value.name + "\"")

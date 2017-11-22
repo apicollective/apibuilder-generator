@@ -4,6 +4,8 @@ import lib.Text
 import com.squareup.kotlinpoet._
 
 trait KotlinUtil {
+  val undefinedEnumName = "UNDEFINED"
+
   // http://kotlinlang.org/docs/reference/keyword-reference.html
   private val ReservedWords = Set(
     "abstract",
@@ -190,7 +192,7 @@ trait KotlinUtil {
   }
 
   def toEnumName(input: String): String = {
-    if (input == "UNDEFINED") {
+    if (input == undefinedEnumName) {
       input
     } else {
       Text.snakeToCamelCase(Text.safeName(input.replaceAll("\\.", "_"))).capitalize
