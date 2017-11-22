@@ -190,7 +190,11 @@ trait KotlinUtil {
   }
 
   def toEnumName(input: String): String = {
-    Text.safeName(input.replaceAll("\\.","_")).toUpperCase()
+    if (input == "UNDEFINED") {
+      input
+    } else {
+      Text.snakeToCamelCase(Text.safeName(input.replaceAll("\\.", "_"))).capitalize
+    }
   }
 
   def makeNameSpace(namespace: String): String = {
