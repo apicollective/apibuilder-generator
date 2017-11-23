@@ -122,7 +122,6 @@ trait ScalaCaseClasses extends CodeGenerator {
     unions.flatMap { union =>
       union.discriminator.map { disc =>
         val base = s"${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}"
-        println(s"union.undefinedType.name == model.name: ${union.undefinedType.shortName} == ${model.name}")
         if (union.undefinedType.shortName == model.name) {
           s"""  override def ${discriminatorMethodName(disc)}: $base = sys.error("Undefined type[${model.name}]")"""
         } else {
