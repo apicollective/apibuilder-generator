@@ -113,7 +113,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
     Seq(
       ScalaUtil.deprecationString(model.deprecation),
-      s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
+      s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions).map(s => s" $s").getOrElse("")
     ).filter(_.nonEmpty).mkString("\n")
   }
 
