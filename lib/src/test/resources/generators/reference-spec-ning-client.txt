@@ -430,7 +430,6 @@ package io.apibuilder.reference.api.v0 {
 
     def users: Users = Users
 
-
     object Echoes extends Echoes {
       override def get(
         foo: _root_.scala.Option[String] = None,
@@ -465,7 +464,6 @@ package io.apibuilder.reference.api.v0 {
       }
     }
 
-
     object Groups extends Groups {
       override def getByOrganization(
         organization: _root_.java.util.UUID,
@@ -477,7 +475,6 @@ package io.apibuilder.reference.api.v0 {
         }
       }
     }
-
 
     object Members extends Members {
       override def post(
@@ -545,7 +542,6 @@ package io.apibuilder.reference.api.v0 {
       }
     }
 
-
     object Organizations extends Organizations {
       override def post(
         organization: io.apibuilder.reference.api.v0.models.Organization,
@@ -588,7 +584,6 @@ package io.apibuilder.reference.api.v0 {
         }
       }
     }
-
 
     object Users extends Users {
       override def post(

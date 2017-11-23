@@ -160,7 +160,7 @@ package com.gilt.test.v0 {
 
     def users: Users = Users
 
-    @deprecated("users will be transfered to the members endpoint") 
+    @deprecated("users will be transfered to the members endpoint")
     object Users extends Users {
       override def post(
         user: com.gilt.test.v0.models.User,
@@ -174,7 +174,8 @@ package com.gilt.test.v0 {
         }
       }
 
-      @deprecated("to be removed") override def getByEmail(
+      @deprecated("to be removed")
+      override def getByEmail(
         @deprecated email: String,
         requestHeaders: Seq[(String, String)] = Nil
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User] = {
@@ -311,7 +312,8 @@ package com.gilt.test.v0 {
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User]
 
-    @deprecated("to be removed") def getByEmail(
+    @deprecated("to be removed")
+    def getByEmail(
       @deprecated email: String,
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User]

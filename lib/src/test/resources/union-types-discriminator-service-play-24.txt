@@ -15,8 +15,8 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    */
   sealed trait UserDiscriminator extends _root_.scala.Product with _root_.scala.Serializable
 
-
   object UserDiscriminator {
+
     case object RegisteredUser extends UserDiscriminator { override def toString = "registered_user" }
     case object GuestUser extends UserDiscriminator { override def toString = "guest_user" }
     case object SystemUser extends UserDiscriminator { override def toString = "system_user" }
@@ -31,6 +31,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     def apply(value: String): UserDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
 
     def fromString(value: String): _root_.scala.Option[UserDiscriminator] = byName.get(value.toLowerCase)
+
   }
 
   /**
@@ -41,7 +42,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     email: _root_.scala.Option[String] = None
   ) extends User {
 
-    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.GuestUser
+    override val discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.GuestUser
 
   }
 
@@ -50,7 +51,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     email: String
   ) extends User {
 
-    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.RegisteredUser
+    override val discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.RegisteredUser
 
   }
 
@@ -66,7 +67,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     description: String
   ) extends User {
 
-    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.UserUndefinedType
+    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = sys.error("Undefined type[UserUndefinedType]")
 
   }
 
@@ -78,7 +79,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     value: String
   ) extends User {
 
-    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.UserString
+    override val discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.UserString
 
   }
 
@@ -310,7 +311,6 @@ package io.apibuilder.example.union.types.discriminator.v0 {
     logger.info(s"Initializing io.apibuilder.example.union.types.discriminator.v0.Client for url $baseUrl")
 
     def users: Users = Users
-
 
     object Users extends Users {
       override def get(
