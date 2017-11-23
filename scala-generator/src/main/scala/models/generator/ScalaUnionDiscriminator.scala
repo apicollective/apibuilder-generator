@@ -9,7 +9,7 @@ case class ScalaUnionDiscriminator(
     sys.error(s"ScalaUnionDiscriminator requires a discriminator - union[${union.name}] does not have one defined")
   }
 
-  private[this] val className = s"${union.name}${underscoreToInitCap(discriminator)}"
+  val className = s"${union.name}${underscoreToInitCap(discriminator)}"
 
   def build(): String = {
     Seq(
@@ -17,9 +17,19 @@ case class ScalaUnionDiscriminator(
         ScalaUtil.textToComment(s"Defines the valid $discriminator values for the type ${union.name}"),
         s"sealed trait $className extends _root_.scala.Product with _root_.scala.Serializable"
       ).mkString("\n"),
-      s"${ScalaUtil.deprecationString(union.deprecation)}object $className {",
-      buildTypes().indent(2),
-      s"}"
+      Seq(
+        ScalaUtil.deprecationString(union.deprecation).trim match {
+          case "" => None
+          case v => Some(v)
+        },
+        Some(
+          Seq(
+            s"object $className {",
+            buildTypes().indent(2),
+            s"}"
+          ).mkString("\n\n")
+        )
+      ).flatten.mkString("\n")
     ).mkString("\n\n")
   }
 
@@ -28,7 +38,11 @@ case class ScalaUnionDiscriminator(
       union.types.map { typ =>
         Seq(
           typ.description.map { desc => ScalaUtil.textToComment(desc) },
-          Some(s"""${ScalaUtil.deprecationString(typ.deprecation)}case object ${typ.name} extends $className { override def toString = "${typ.originalName}" }""")
+          ScalaUtil.deprecationString(typ.deprecation) match {
+            case "" => None
+            case v => Some(v)
+          },
+          Some(s"""case object ${typ.name} extends $className { override def toString = "${typ.originalName}" }""")
         ).flatten.mkString("\n")
       }.mkString("\n"),
       s"case class UNDEFINED(override val toString: String) extends $className",

@@ -1,12 +1,7 @@
 package scala.generator
 
-import java.util.UUID
-
-import lib.Datatype
 import lib.Text._
 import lib.generator.GeneratorUtil
-import play.api.libs.json._
-import org.joda.time.DateTime
 
 import io.apibuilder.spec.v0.models.Deprecation
 
@@ -25,10 +20,10 @@ object ScalaUtil {
     "with", "yield"
   ).toSet
 
-  def extendsClause(names: Seq[String]): Option[String] = {
-    names match {
+  def extendsClause(unions: Seq[String]): Option[String] = {
+    unions match {
       case Nil => None
-      case unions => Some("extends " + names.sorted.mkString(" with "))
+      case _ => Some("extends " + unions.sorted.mkString(" with "))
     }
   }
 
@@ -57,9 +52,10 @@ object ScalaUtil {
   }
 
   def quoteNameIfKeyword(name: String): String = {
-    isKeyword(name) || needsQuoting(name) match {
-      case true => "`" + name + "`"
-      case false => name
+    if (isKeyword(name) || needsQuoting(name)) {
+      "`" + name + "`"
+    } else {
+      name
     }
   }
 
@@ -67,7 +63,7 @@ object ScalaUtil {
     name.indexOf("[") >= 0
   }
 
-  def toClassName(name: String) = {
+  def toClassName(name: String): String = {
     val baseName =lib.Text.safeName(
       if (name == name.toUpperCase) {
         lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")

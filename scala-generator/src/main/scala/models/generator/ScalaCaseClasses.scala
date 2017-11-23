@@ -77,14 +77,25 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTrait(union: ScalaUnion): String = {
     // TODO: handle primitive types
+
+    val declaration = s"sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable"
+    val code = union.discriminator match {
+      case None => declaration
+      case Some(disc) => {
+        Seq(
+          s"$declaration {",
+          s"  def ${discriminatorMethodName(disc)}: ${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}",
+          "}"
+        ).mkString("\n\n")
+      }
+    }
+
     Seq(
       ScalaUtil.deprecationString(union.deprecation).trim match {
         case "" => None
         case v => Some(v)
       },
-      Some(
-        s"sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable"
-      )
+      Some(code)
     ).flatten.mkString("\n")
   }
 
@@ -100,11 +111,36 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    s"${ScalaUtil.deprecationString(model.deprecation)}case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
+    val body = defineDiscriminators(model, unions).map { code => s" {\n\n$code\n\n}" }
+    Seq(
+      Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
+      Some(s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("") + body.getOrElse(""))
+    ).flatten.mkString("\n")
+  }
+
+  private[this] def defineDiscriminators(model: ScalaModel, unions: Seq[ScalaUnion]): Option[String] = {
+    unions.flatMap { union =>
+      union.discriminator.map { disc =>
+        val base = s"${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}"
+        if (union.undefinedType.shortName == model.name) {
+          s"""  override def ${discriminatorMethodName(disc)}: $base = sys.error("Undefined type[${model.name}]")"""
+        } else {
+          s"  override val ${discriminatorMethodName(disc)}: $base = $base.${model.name}"
+        }
+      }
+    }.toList match {
+      case Nil => None
+      case functions => {
+        Some(functions.mkString("\n\n"))
+      }
+    }
   }
 
   def generateEnum(ssd: ScalaService, enum: ScalaEnum): String = {
     ScalaEnums(ssd, enum).build()
   }
 
+  private[this] def discriminatorMethodName(disc: String): String = {
+    ScalaUtil.quoteNameIfKeyword(ScalaUtil.toVariable(disc))
+  }
 }
