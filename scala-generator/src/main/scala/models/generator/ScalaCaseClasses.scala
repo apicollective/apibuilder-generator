@@ -84,7 +84,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       case Some(disc) => {
         Seq(
           s"$declaration {",
-          s"  def ${ScalaUtil.toVariable(disc)}: ${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}",
+          s"  def ${discriminatorMethodName(disc)}: ${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}",
           "}"
         ).mkString("\n\n")
       }
@@ -122,7 +122,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     unions.flatMap { union =>
       union.discriminator.map { disc =>
         val base = s"${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}"
-        s"  override def ${ScalaUtil.toVariable(disc)}: $base = $base.${model.name}"
+        s"  override val ${discriminatorMethodName(disc)}: $base = $base.${model.name}"
       }
     }.toList match {
       case Nil => None
@@ -136,4 +136,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     ScalaEnums(ssd, enum).build()
   }
 
+  private[this] def discriminatorMethodName(disc: String): String = {
+    ScalaUtil.quoteNameIfKeyword(ScalaUtil.toVariable(disc))
+  }
 }
