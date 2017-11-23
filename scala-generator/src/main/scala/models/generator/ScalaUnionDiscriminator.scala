@@ -18,12 +18,18 @@ case class ScalaUnionDiscriminator(
         s"sealed trait $className extends _root_.scala.Product with _root_.scala.Serializable"
       ).mkString("\n"),
       Seq(
-        "",
-        ScalaUtil.deprecationString(union.deprecation),
-        s"object $className {",
-        buildTypes().indent(2),
-        s"}"
-      ).mkString("\n")
+        ScalaUtil.deprecationString(union.deprecation).trim match {
+          case "" => None
+          case v => Some(v)
+        },
+        Some(
+          Seq(
+            s"object $className {",
+            buildTypes().indent(2),
+            s"}"
+          ).mkString("\n\n")
+        )
+      ).flatten.mkString("\n")
     ).mkString("\n\n")
   }
 
