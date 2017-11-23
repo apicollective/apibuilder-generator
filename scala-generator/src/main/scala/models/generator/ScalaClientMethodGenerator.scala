@@ -287,20 +287,36 @@ class ScalaClientMethod(
     case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
   }
 
-  private[this] val commentString = ScalaGeneratorUtil.scaladoc(
-    operation.description,
-    operation.parameters.map { p => (p.name, p.param.description) }
+  private[this] val commentString: Option[String] = toOption(
+    ScalaGeneratorUtil.scaladoc(
+      operation.description,
+      operation.parameters.map { p => (p.name, p.param.description) }
+    )
   )
 
   val interface: String = {
-    s"""$commentString${ScalaUtil.deprecationString(operation.deprecation)}def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType"""
+    Seq(
+      commentString,
+      toOption(ScalaUtil.deprecationString(operation.deprecation)),
+      Some(s"""def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType""")
+    ).flatten.mkString("\n")
   }
 
   val code: String = {
-    s"""${ScalaUtil.deprecationString(operation.deprecation)}override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
+    Seq(
+      toOption(ScalaUtil.deprecationString(operation.deprecation)),
+      Some(s"""override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
 ${methodCall.indent}.map {
 ${response.indent(4)}
   }
-}"""
+}""")
+    ).flatten.mkString("\n")
+  }
+
+  private[this] def toOption(value: String): Option[String] = {
+    value.trim match {
+      case "" => None
+      case c => Some(c)
+    }
   }
 }
