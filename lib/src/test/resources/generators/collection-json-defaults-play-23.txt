@@ -4,7 +4,8 @@
  */
 package com.gilt.test.v0.models {
 
-  @deprecated("to be merged with members") case class User(
+  @deprecated("to be merged with members") 
+  case class User(
     email: String,
     role: String = "admin",
     groups: Seq[String],
@@ -159,7 +160,8 @@ package com.gilt.test.v0 {
 
     def users: Users = Users
 
-    @deprecated("users will be transfered to the members endpoint") object Users extends Users {
+    @deprecated("users will be transfered to the members endpoint") 
+    object Users extends Users {
       override def post(
         user: com.gilt.test.v0.models.User,
         requestHeaders: Seq[(String, String)] = Nil

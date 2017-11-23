@@ -60,9 +60,12 @@ class ScalaClientMethodGenerator(
 
   def objects(): String = {
     sortedResources.map { resource =>
-      s"${ScalaUtil.deprecationString(resource.deprecation)}object ${resource.plural} extends ${resource.plural} {\n" +
-      methods(resource).map(_.code).mkString("\n\n").indent(2) +
-      "\n}"
+      Seq(
+        ScalaUtil.deprecationString(resource.deprecation),
+        s"object ${resource.plural} extends ${resource.plural} {\n" +
+          methods(resource).map(_.code).mkString("\n\n").indent(2) +
+          "\n}"
+      ).mkString("\n")
     }.mkString("\n\n")
   }
 

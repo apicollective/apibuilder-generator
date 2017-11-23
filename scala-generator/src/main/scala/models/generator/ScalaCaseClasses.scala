@@ -77,14 +77,25 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTrait(union: ScalaUnion): String = {
     // TODO: handle primitive types
+
+    val declaration = s"sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable"
+    val code = union.discriminator match {
+      case None => declaration
+      case Some(disc) => {
+        Seq(
+          s"$declaration {",
+          s"  def ${ScalaUtil.toVariable(disc)}: ${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}",
+          "}"
+        ).mkString("\n\n")
+      }
+    }
+
     Seq(
       ScalaUtil.deprecationString(union.deprecation).trim match {
         case "" => None
         case v => Some(v)
       },
-      Some(
-        s"sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable"
-      )
+      Some(code)
     ).flatten.mkString("\n")
   }
 
@@ -100,7 +111,10 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    s"${ScalaUtil.deprecationString(model.deprecation)}case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
+    Seq(
+      ScalaUtil.deprecationString(model.deprecation),
+      s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
+    ).filter(_.nonEmpty).mkString("\n")
   }
 
   def generateEnum(ssd: ScalaService, enum: ScalaEnum): String = {

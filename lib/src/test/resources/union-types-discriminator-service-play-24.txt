@@ -4,15 +4,19 @@
  */
 package io.apibuilder.example.union.types.discriminator.v0.models {
 
-  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable {
+
+    def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator
+
+  }
 
   /**
    * Defines the valid discriminator values for the type User
    */
   sealed trait UserDiscriminator extends _root_.scala.Product with _root_.scala.Serializable
 
-  object UserDiscriminator {
 
+  object UserDiscriminator {
     case object RegisteredUser extends UserDiscriminator { override def toString = "registered_user" }
     case object GuestUser extends UserDiscriminator { override def toString = "guest_user" }
     case object SystemUser extends UserDiscriminator { override def toString = "system_user" }
@@ -27,7 +31,6 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     def apply(value: String): UserDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
 
     def fromString(value: String): _root_.scala.Option[UserDiscriminator] = byName.get(value.toLowerCase)
-
   }
 
   /**
@@ -291,6 +294,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
     logger.info(s"Initializing io.apibuilder.example.union.types.discriminator.v0.Client for url $baseUrl")
 
     def users: Users = Users
+
 
     object Users extends Users {
       override def get(
