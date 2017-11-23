@@ -6,7 +6,8 @@ package io.apibuilder.example.union.types.v0.models {
 
   sealed trait Foobar extends _root_.scala.Product with _root_.scala.Serializable
 
-  @deprecated("to be removed") sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
+  @deprecated("to be removed")
+  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
 
   /**
    * Defines the valid discriminator values for the type User
