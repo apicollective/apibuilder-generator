@@ -77,11 +77,19 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTrait(union: ScalaUnion): String = {
     // TODO: handle primitive types
-    s"${ScalaUtil.deprecationString(union.deprecation)}sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable"
+    Seq(
+      ScalaUtil.deprecationString(union.deprecation).trim match {
+        case "" => None
+        case v => Some(v)
+      },
+      Some(
+        s"sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable"
+      )
+    ).flatten.mkString("\n")
   }
 
   def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {
-    union.discriminator.map { disc =>
+    union.discriminator.map { _ =>
       ScalaUnionDiscriminator(union).build()
     }
   }
@@ -96,7 +104,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateEnum(ssd: ScalaService, enum: ScalaEnum): String = {
-    ScalaEnums(ssd, enum).build
+    ScalaEnums(ssd, enum).build()
   }
 
 }
