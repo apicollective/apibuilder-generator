@@ -39,12 +39,20 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
   case class GuestUser(
     id: String,
     email: _root_.scala.Option[String] = None
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.GuestUser
+
+  }
 
   case class RegisteredUser(
     id: String,
     email: String
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.RegisteredUser
+
+  }
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -56,7 +64,11 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    */
   case class UserUndefinedType(
     description: String
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.UserUndefinedType
+
+  }
 
 
   /**
@@ -64,7 +76,11 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    */
   case class UserString(
     value: String
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.UserString
+
+  }
 
   sealed trait SystemUser extends User
 

@@ -1,4 +1,4 @@
-@deprecated("to be merged with members") 
+@deprecated("to be merged with members")
 case class User(
   email: String,
   role: String = "admin",

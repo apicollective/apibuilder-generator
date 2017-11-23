@@ -42,7 +42,11 @@ package io.apibuilder.example.union.types.v0.models {
   case class GuestUser(
     guid: _root_.java.util.UUID,
     email: String
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = io.apibuilder.example.union.types.v0.models.UserDiscriminator.GuestUser
+
+  }
 
   /**
    * @param guid Internal unique identifier for this user.
@@ -51,7 +55,11 @@ package io.apibuilder.example.union.types.v0.models {
     guid: _root_.java.util.UUID,
     email: String,
     preference: io.apibuilder.example.union.types.v0.models.Foobar
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = io.apibuilder.example.union.types.v0.models.UserDiscriminator.RegisteredUser
+
+  }
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -75,7 +83,11 @@ package io.apibuilder.example.union.types.v0.models {
    */
   case class UserUndefinedType(
     description: String
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = io.apibuilder.example.union.types.v0.models.UserDiscriminator.UserUndefinedType
+
+  }
 
 
   /**
@@ -83,7 +95,11 @@ package io.apibuilder.example.union.types.v0.models {
    */
   case class UserUuid(
     value: _root_.java.util.UUID
-  ) extends User
+  ) extends User {
+
+    override def discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = io.apibuilder.example.union.types.v0.models.UserDiscriminator.UserUuid
+
+  }
 
   sealed trait Bar extends Foobar
 

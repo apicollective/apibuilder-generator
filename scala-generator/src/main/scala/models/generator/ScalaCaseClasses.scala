@@ -111,10 +111,25 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
+    val body = defineDiscriminators(model, unions).map { code => s" {\n\n$code\n\n}" }
     Seq(
-      ScalaUtil.deprecationString(model.deprecation),
-      s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("")
-    ).filter(_.nonEmpty).mkString("\n")
+      Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
+      Some(s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse("") + body.getOrElse(""))
+    ).flatten.mkString("\n")
+  }
+
+  private[this] def defineDiscriminators(model: ScalaModel, unions: Seq[ScalaUnion]): Option[String] = {
+    unions.flatMap { union =>
+      union.discriminator.map { disc =>
+        val base = s"${union.ssd.namespaces.models}.${ScalaUnionDiscriminator(union).className}"
+        s"  override def ${ScalaUtil.toVariable(disc)}: $base = $base.${model.name}"
+      }
+    }.toList match {
+      case Nil => None
+      case functions => {
+        Some(functions.mkString("\n\n"))
+      }
+    }
   }
 
   def generateEnum(ssd: ScalaService, enum: ScalaEnum): String = {
