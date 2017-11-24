@@ -4,7 +4,7 @@ import io.apibuilder.spec.v0.models.{Field, Model}
 
 object PrimitiveWrapper {
 
-  val FieldName = "value"
+  val FieldName: String = "value"
 
   def className(union: ScalaUnion, primitive: ScalaPrimitive): String = {
     primitive match {
@@ -35,10 +35,6 @@ case class PrimitiveWrapper(ssd: ScalaService) {
   import PrimitiveWrapper.isBasicType
 
   case class Wrapper(model: ScalaModel, union: ScalaUnion)
-
-  private[this] val primitives = ssd.unions.flatMap(_.types).map(_.datatype).collect {
-    case p: ScalaPrimitive => p
-  }.filter(isBasicType).sortWith(_.shortName < _.shortName)
 
   val wrappers: Seq[Wrapper] = ssd.unions.flatMap { union =>
     union.types.map(_.datatype).collect {

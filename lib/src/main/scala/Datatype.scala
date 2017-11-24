@@ -2,7 +2,6 @@ package lib
 
 import scala.util.Try
 import scala.util.Success
-import scala.util.Failure
 
 sealed abstract class Datatype(val name: String)
 

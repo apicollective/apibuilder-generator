@@ -89,9 +89,9 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
 
       val singleParams = params.filter(p => isSingleValue(p.`type`)) match {
         case Nil => Seq.empty
-        case params => Seq(
+        case singleValueParams => Seq(
           s"val $fieldName = Seq(",
-          params.map(p => p -> p.datatype).collect {
+          singleValueParams.map(p => p -> p.datatype).collect {
             case (p, ScalaDatatype.Option(inner)) => {
               s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${inner.asString("_")})"""
             }
@@ -143,9 +143,9 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
 
     if (op.formParameters.isEmpty && op.body.isEmpty) {
       None
-    } else if (!op.body.isEmpty) {
+    } else if (op.body.isDefined) {
       val body = op.body.get
-      val payload = {
+      val payload: String = {
         val varName = body.datatype.toVariableName
         encodeValue(varName, body.datatype)
       }

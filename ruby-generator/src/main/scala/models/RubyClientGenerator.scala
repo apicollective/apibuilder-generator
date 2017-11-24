@@ -387,7 +387,7 @@ case class RubyClientGenerator(form: InvocationForm) {
     val moduleIndent = spacerSize * module.parts.length
 
     val source = Seq(
-      ApidocComments(form.service.version, form.userAgent).toRubyString(),
+      ApidocComments(form.service.version, form.userAgent).toRubyString,
       RubyHttpClient.require,
       Seq(
         service.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +

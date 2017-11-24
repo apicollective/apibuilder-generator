@@ -89,8 +89,8 @@ object ScalaClientMethodConfigs {
     override val responseStatusMethod = "status"
     override val responseBodyMethod = "body"
     override val expectsInjectedWsClient = false
-    override val extraClientCtorArgs = None
-    override val extraClientObjectMethods = None
+    override val extraClientCtorArgs: Option[String] = None
+    override val extraClientObjectMethods: Option[String] = None
     override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
     override val asyncType: String = "scala.concurrent.Future"
     override val asyncSuccess: String = "successful"
@@ -105,28 +105,28 @@ object ScalaClientMethodConfigs {
 
   case class Play23(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
-    override val requestUriMethod = None
+    override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = true
   }
 
   case class Play24(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
-    override val requestUriMethod = None
+    override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = true
   }
 
   case class Play25(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
-    override val requestUriMethod = None
+    override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
   }
 
   case class Play26(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
-    override val requestUriMethod = None
+    override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
   }
@@ -151,24 +151,24 @@ private lazy val defaultAsyncHttpClient = {
     override val asyncType: String = "scala.concurrent.Future"
     override val asyncSuccess: String = "successful"
 
-    def addQueryParamMethod: String
+    def addQueryParamMethod(): String
   }
 
   case class Ning18(namespace: String, baseUrl: Option[String]) extends Ning {
-    override def addQueryParamMethod: String = "addQueryParameter"
+    override def addQueryParamMethod(): String = "addQueryParameter"
     override val requestUriMethod = Some("getUri")
     override val expectsInjectedWsClient = false
   }
 
   case class Ning19(namespace: String, baseUrl: Option[String]) extends Ning {
-    override def addQueryParamMethod: String = "addQueryParam"
+    override def addQueryParamMethod(): String = "addQueryParam"
     override val requestUriMethod = Some("getUri.toJavaNetURI")
     override val expectsInjectedWsClient = false
   }
 
 
   trait Http4s extends ScalaClientMethodConfig {
-    override def pathEncode(value: String) = value
+    override def pathEncode(value: String): String = value
     override val responseStatusMethod = "status.code"
     override val responseBodyMethod = """body"""
     override val responseClass = "org.http4s.Response"
@@ -179,10 +179,10 @@ implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.ht
 private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 """)
     override val canSerializeUuid = true
-    override val implicitArgs = None
+    override val implicitArgs: Option[String] = None
     override val asyncType: String = "scalaz.concurrent.Task"
     override val asyncSuccess: String = "now"
-    override val requestUriMethod = None //Some("getUri.toJavaNetURI")
+    override val requestUriMethod: Option[String] = None //Some("getUri.toJavaNetURI")
     override val expectsInjectedWsClient = false
     override def formatBaseUrl(url: Option[String]): String = s"val baseUrl: org.http4s.Uri" + url.fold("")(u => s" = org.http4s.Uri.unsafeFromString(${ScalaUtil.wrapInQuotes(u)})")
     override def toJson(responseName: String, className: String): String = {

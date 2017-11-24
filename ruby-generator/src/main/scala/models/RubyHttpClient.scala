@@ -2,7 +2,7 @@ package ruby.models
 
 object RubyHttpClient {
 
-  val require = """
+  val require: String = """
 require 'cgi'
 require 'net/http'
 require 'net/https'
@@ -15,7 +15,7 @@ require 'json'
 require 'bigdecimal'
 """.trim
 
-  val contents = """
+  val contents: String = """
 module HttpClient
 
   class HttpHandler

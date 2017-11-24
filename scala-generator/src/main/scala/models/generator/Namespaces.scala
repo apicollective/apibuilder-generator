@@ -9,14 +9,14 @@ object Namespaces {
   val Conversions = "conversions"
 
   def quote(ns: String): String = {
-    ns.split("\\.").map(ScalaUtil.quoteNameIfKeyword(_)).mkString(".")
+    ns.split("\\.").map(ScalaUtil.quoteNameIfKeyword).mkString(".")
   }
 
 }
 
 case class Namespaces(original: String) {
 
-  val base = Namespaces.quote(original)
+  val base: String = Namespaces.quote(original)
 
   val models: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Model)
   val enums: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Enum)

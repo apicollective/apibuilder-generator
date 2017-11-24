@@ -11,7 +11,7 @@ object MockClientGenerator {
 
   object Play24 extends CodeGenerator {
 
-    override def invoke(form: InvocationForm) = {
+    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
       val ssd = new ScalaService(form.service)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
     }
@@ -20,7 +20,7 @@ object MockClientGenerator {
 
   object Play25 extends CodeGenerator {
 
-    override def invoke(form: InvocationForm) = {
+    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
       val ssd = new ScalaService(form.service)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
     }
@@ -29,7 +29,7 @@ object MockClientGenerator {
 
   object Play26 extends CodeGenerator {
 
-    override def invoke(form: InvocationForm) = {
+    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
       val ssd = new ScalaService(form.service)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play26(ssd.namespaces.base, None)).invoke()
     }
@@ -38,7 +38,7 @@ object MockClientGenerator {
 
   object Ning19 extends CodeGenerator {
 
-    override def invoke(form: InvocationForm) = {
+    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
       val ssd = new ScalaService(form.service)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Ning19(ssd.namespaces.base, None)).invoke()
     }
@@ -102,9 +102,9 @@ class MockClientGenerator(
               "}"
             ).mkString("\n").indent(2),
             Seq(
-              ssd.enums.map { makeEnum(_) },
-              ssd.models.map { makeModel(_) },
-              ssd.unions.map { makeUnion(_) }
+              ssd.enums.map { makeEnum },
+              ssd.models.map { makeModel },
+              ssd.unions.map { makeUnion }
             ).flatten.mkString("\n\n").indent(2),
             "}"
           ).mkString("\n\n")

@@ -16,21 +16,21 @@ class ScalaService(
 
   private[this] val scalaTypeResolver = ScalaTypeResolver(namespaces)
 
-  val datatypeResolver = GeneratorUtil.datatypeResolver(service)
+  val datatypeResolver: DatatypeResolver = GeneratorUtil.datatypeResolver(service)
 
-  val name = ScalaUtil.toClassName(service.name)
+  val name: String = ScalaUtil.toClassName(service.name)
 
-  def unionClassName(name: String) = namespaces.unions + "." + ScalaUtil.toClassName(name)
-  def modelClassName(name: String) = namespaces.models + "." + ScalaUtil.toClassName(name)
-  def enumClassName(name: String) = namespaces.enums + "." + ScalaUtil.toClassName(name)
+  def unionClassName(name: String): String = namespaces.unions + "." + ScalaUtil.toClassName(name)
+  def modelClassName(name: String): String = namespaces.models + "." + ScalaUtil.toClassName(name)
+  def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
-  val models = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
+  val models: Seq[ScalaModel] = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 
-  val enums = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(this, _) }
+  val enums: Seq[ScalaEnum] = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(this, _) }
 
-  val unions = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
+  val unions: Seq[ScalaUnion] = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
 
-  val resources = service.resources.map { r => new ScalaResource(this, r) }
+  val resources: Seq[ScalaResource] = service.resources.map { r => new ScalaResource(this, r) }
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
     scalaTypeResolver.scalaDatatype(t)
@@ -162,7 +162,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val description: Option[String] = model.description
 
-  val fields = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
+  val fields: List[ScalaField] = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
   val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
 
@@ -172,7 +172,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
 class ScalaBody(ssd: ScalaService, val body: Body) {
 
-  val datatype = {
+  val datatype: ScalaDatatype = {
     val t = ssd.datatypeResolver.parse(body.`type`, true).getOrElse {
       sys.error(ssd.errorParsingType(body.`type`, s"body[$body]"))
     }
@@ -191,7 +191,7 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   def datatype = ScalaPrimitive.Enum(ssd.namespaces, name)
 
-  val qualifiedName = ssd.enumClassName(name)
+  val qualifiedName: String = ssd.enumClassName(name)
 
   val description: Option[String] = enum.description
 
@@ -215,13 +215,13 @@ class ScalaEnumValue(value: EnumValue) {
 
 class ScalaResource(ssd: ScalaService, val resource: Resource) {
 
-  val path = resource.path
+  val path: Option[String] = resource.path
 
   val plural: String = ScalaUtil.toClassName(resource.plural)
 
-  val namespaces = ssd.namespaces
+  val namespaces: Namespaces = ssd.namespaces
 
-  val operations = resource.operations.map { new ScalaOperation(ssd, _, this)}
+  val operations: Seq[ScalaOperation] = resource.operations.map { new ScalaOperation(ssd, _, this)}
 
   val deprecation: Option[Deprecation] = resource.deprecation
 
@@ -243,31 +243,31 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
     operation.parameters.toList.map { new ScalaParameter(ssd, _) }
   }
 
-  lazy val pathParameters = parameters.filter { _.location == ParameterLocation.Path }
+  lazy val pathParameters: List[ScalaParameter] = parameters.filter { _.location == ParameterLocation.Path }
 
-  lazy val queryParameters = parameters.filter { _.location == ParameterLocation.Query }
+  lazy val queryParameters: List[ScalaParameter] = parameters.filter { _.location == ParameterLocation.Query }
 
-  lazy val formParameters = parameters.filter { _.location == ParameterLocation.Form }
+  lazy val formParameters: List[ScalaParameter] = parameters.filter { _.location == ParameterLocation.Form }
 
   lazy val (headerParameters, nonHeaderParameters) = parameters.partition { _.location == ParameterLocation.Header }
 
   val name: String = GeneratorUtil.urlToMethodName(resource.path, resource.resource.operations.map(_.path), operation.method, path)
 
-  def argList(addlArgs: Seq[String] = Nil): Option[String] = body match {
+  def argList(additionalArgs: Seq[String] = Nil): Option[String] = body match {
     case None => {
-      ScalaUtil.fieldsToArgList(nonHeaderParameters.map(_.definition()) ++ headerParameters.map(_.definition()) ++ addlArgs)
+      ScalaUtil.fieldsToArgList(nonHeaderParameters.map(_.definition()) ++ headerParameters.map(_.definition()) ++ additionalArgs)
     }
 
-    case Some(body) => {
-      val bodyVarName = body.datatype.toVariableName
+    case Some(b) => {
+      val bodyVarName = b.datatype.toVariableName
 
       ScalaUtil.fieldsToArgList(
         nonHeaderParameters.filter(_.param.required).map(_.definition()) ++
-        Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), body.datatype.name)) ++
+        Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), b.datatype.name)) ++
         headerParameters.filter(_.param.required).map(_.definition()) ++
         nonHeaderParameters.filter(!_.param.required).map(_.definition()) ++
         headerParameters.filter(!_.param.required).map(_.definition()) ++
-        addlArgs
+        additionalArgs
       )
     }
   }
@@ -276,7 +276,7 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
     .sortBy { r => Util.responseCodeAsString(r.code) }
     .map { new ScalaResponse(ssd, method, _) }
 
-  lazy val resultType = responses.find(_.isSuccess).map(_.resultType).getOrElse("Unit")
+  lazy val resultType: String = responses.find(_.isSuccess).map(_.resultType).getOrElse("Unit")
 
 }
 
@@ -288,38 +288,35 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
     sys.error(ssd.errorParsingType(response.`type`, s"response[$response]"))
   }
 
-  val isOption = `type` match {
+  val isOption: Boolean = `type` match {
     case Datatype.Container.List(_) | Datatype.Container.Map(_) => false
     case _ => !Methods.isJsonDocumentMethod(method.toString)
   }
 
-  val isSuccess = response.code match {
+  val isSuccess: Boolean = response.code match {
     case ResponseCodeInt(value) => value >= 200 && value < 300
     case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
   }
 
-  val isNotFound = response.code match {
+  val isNotFound: Boolean = response.code match {
     case ResponseCodeInt(value) => value == 404
     case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
   }
 
-  val datatype = ssd.scalaDatatype(`type`)
+  val datatype: ScalaDatatype = ssd.scalaDatatype(`type`)
 
-  val isUnit = `type` == Datatype.Primitive.Unit
+  val isUnit: Boolean = `type` == Datatype.Primitive.Unit
 
   val resultType: String = datatype.name
 
-  val (errorVariableName, errorClassName) = isUnit match {
-    case true => {
-      (None, "UnitResponse")
-    }
-    case false => {
-      val variableName = datatype.toVariableName
-      (
-        Some(variableName),
-        lib.Text.initCap(variableName) + "Response"
-      )
-    }
+  val (errorVariableName, errorClassName) = if (isUnit) {
+    (None, "UnitResponse")
+  } else {
+    val variableName = datatype.toVariableName
+    (
+      Some(variableName),
+      lib.Text.initCap(variableName) + "Response"
+    )
   }
 }
 
@@ -333,13 +330,13 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     sys.error(ssd.errorParsingType(field.`type`, s"model[$modelName] field[$name]"))
   }
 
-  def datatype = ssd.scalaDatatype(`type`)
+  def datatype: ScalaDatatype = ssd.scalaDatatype(`type`)
 
   def description: Option[String] = field.description
 
-  def required = field.required
+  def required: Boolean = field.required
 
-  def default = field.default.map(ScalaUtil.scalaDefault(_, datatype))
+  def default: Option[String] = field.default.map(ScalaUtil.scalaDefault(_, datatype))
 
   def definition(varName: String = name): String = {
     datatype.definition(varName, default, field.deprecation)
@@ -356,17 +353,17 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
 
   def originalName: String = param.name
 
-  def datatype = ssd.scalaDatatype(`type`)
+  def datatype: ScalaDatatype = ssd.scalaDatatype(`type`)
 
   def description: String = param.description.getOrElse(name)
 
-  def default = param.default.map(ScalaUtil.scalaDefault(_, datatype))
+  def default: Option[String] = param.default.map(ScalaUtil.scalaDefault(_, datatype))
 
-  def required = param.required
+  def required: Boolean = param.required
 
   def definition(varName: String = name): String = {
     datatype.definition(varName, default, param.deprecation)
   }
 
-  def location = param.location
+  def location: ParameterLocation = param.location
 }

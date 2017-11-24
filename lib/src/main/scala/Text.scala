@@ -119,7 +119,7 @@ object Text {
   private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z\_])""".r
 
   def safeName(name: String): String = {
-    RemoveUnsafeCharacters.replaceAllIn(name, m => "").replaceAll("\\.", "_").replaceAll("\\_+", "_").trim
+    RemoveUnsafeCharacters.replaceAllIn(name, _ => "").replaceAll("\\.", "_").replaceAll("\\_+", "_").trim
   }
 
   def underscoreToInitCap(value: String): String = {

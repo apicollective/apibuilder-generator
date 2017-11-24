@@ -10,7 +10,6 @@ case class Headers(
 
   private[this] val versionMajor: Option[Int] = VersionTag(form.service.version).major
 
-  private[this] val NamespaceName = "Namespace"
   private[this] val VersionMajorName = "VersionMajor"
   private[this] val VersionMajorHeaderName = "X-Apidoc-Version-Major"
 
@@ -37,12 +36,12 @@ case class Headers(
     ).mkString("\n\n")
   }
 
-  val ruby = Seq(
+  val ruby: Seq[(String, String)] = Seq(
     Some("User-Agent" -> s"Constants::USER_AGENT"),
     Some("X-Apidoc-Version" -> s"Constants::VERSION"),
     versionMajor.map { major => VersionMajorHeaderName -> s"Constants::VERSION_MAJOR" }
-  ).flatten ++ form.service.headers.filter(!_.default.isEmpty).map { h =>
-    (h.name -> RubyUtil.wrapInQuotes(h.default.get))
+  ).flatten ++ form.service.headers.filter(_.default.isDefined).map { h =>
+    h.name -> RubyUtil.wrapInQuotes(h.default.get)
   }
 
 }

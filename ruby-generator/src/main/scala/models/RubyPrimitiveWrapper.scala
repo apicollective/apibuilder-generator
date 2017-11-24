@@ -1,7 +1,5 @@
 package ruby.models
 
-import scala.util.Try
-
 import lib.Datatype.Primitive
 
 import io.apibuilder.spec.v0.models.{Field, Model, Service, Union}
@@ -38,7 +36,7 @@ private[models] case class RubyPrimitiveWrapper(service: Service) {
             )
           )
         )
-        new Wrapper(model, union)
+        Wrapper(model, union)
       }
     }
   }

@@ -2,9 +2,8 @@ package scala.generator
 
 import scala.models.ApidocComments
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models.Service
 import lib.Text._
-import lib.generator.{CodeGenerator, GeneratorUtil}
+import lib.generator.CodeGenerator
 import generator.ServiceFileNames
 
 object ScalaCaseClasses extends ScalaCaseClasses
@@ -35,15 +34,15 @@ trait ScalaCaseClasses extends CodeGenerator {
 
     val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
       case Nil => ""
-      case wrappers => {
-        wrappers.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
+      case models => {
+        models.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
       }
     }
 
     val wrappers = PrimitiveWrapper(ssd).wrappers match {
       case Nil => ""
-      case wrappers => {
-        wrappers.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
+      case primitives => {
+        primitives.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
       }
     }
 

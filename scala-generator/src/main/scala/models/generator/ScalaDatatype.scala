@@ -4,10 +4,8 @@ import java.util.UUID
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 
 import lib.Datatype
-import lib.generator.GeneratorUtil
 import lib.Text.initLowerCase
 import play.api.libs.json._
-import play.api.Logger
 
 import io.apibuilder.spec.v0.models.Deprecation
 import scala.util.{Failure, Success, Try}
@@ -38,7 +36,7 @@ sealed trait ScalaDatatype {
       Json.parse(value)
     } match {
       case Success(js) => default(js)
-      case Failure(ex) => default(JsString(value))
+      case Failure(_) => default(JsString(value))
     }
   }
 
@@ -72,7 +70,7 @@ sealed trait ScalaPrimitive extends ScalaDatatype {
     case None => shortName
     case Some(ns) => s"$ns.$shortName"
   }
-  def name = fullName
+  def name: String = fullName
 
   override def toVariableName = "value"
 }
@@ -87,7 +85,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = json.as[scala.Boolean].toString
+    override protected def default(json: JsValue): String = json.as[scala.Boolean].toString
   }
 
   case object Double extends ScalaPrimitive {
@@ -98,7 +96,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = toBigDecimal(json).toDouble.toString
+    override protected def default(json: JsValue): String = toBigDecimal(json).toDouble.toString
   }
 
   case object Integer extends ScalaPrimitive {
@@ -109,7 +107,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = toBigDecimal(json).toInt.toString
+    override protected def default(json: JsValue): String = toBigDecimal(json).toInt.toString
   }
 
   case object Long extends ScalaPrimitive {
@@ -120,7 +118,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = toBigDecimal(json).toLong.toString
+    override protected def default(json: JsValue): String = toBigDecimal(json).toLong.toString
   }
 
   case object DateIso8601Joda extends ScalaPrimitive {
@@ -132,10 +130,10 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override def default(value: String) = default(JsString(value))
+    override def default(value: String): String = default(JsString(value))
 
 
-    override protected def default(json: JsValue) = {
+    override protected def default(json: JsValue): String = {
       val dt = dateTimeParser.parseLocalDate(json.as[String])
       s"new ${fullName}(${dt.getYear}, ${dt.getMonthOfYear}, ${dt.getDayOfMonth})"
     }
@@ -149,7 +147,7 @@ object ScalaPrimitive {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
-    override def default(value: String) = {
+    override def default(value: String): String = {
       "_root_.java.time.LocalDate.parse(" + ScalaUtil.wrapInQuotes(value) + ")"
     }
   }
@@ -163,11 +161,11 @@ object ScalaPrimitive {
       s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
     }
 
-    override def default(value: String) = {
+    override def default(value: String): String = {
       "_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(" + ScalaUtil.wrapInQuotes(value) + ")"
     }
 
-    override protected def default(json: JsValue) = {
+    override protected def default(json: JsValue): String = {
       // TODO would like to use the constructor for DateTime, since that would
       // be faster code, but things get quite tricky because of time zones :(
       s"""_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${json})"""
@@ -182,7 +180,7 @@ object ScalaPrimitive {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
-    override def default(value: String) = {
+    override def default(value: String): String = {
       "_root_.java.time.Instant.parse(" + ScalaUtil.wrapInQuotes(value) + ")"
     }
   }
@@ -195,7 +193,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue) = json.as[scala.BigDecimal].toString
+    override protected def default(json: JsValue): String = json.as[scala.BigDecimal].toString
   }
 
   case object ObjectAsPlay extends ScalaPrimitive {
@@ -209,7 +207,7 @@ object ScalaPrimitive {
   }
 
   case object ObjectAsCirce extends ScalaPrimitive {
-    override def namespace = None
+    override def namespace: None.type = None
     def apidocType = "object"
     def shortName = "Map[String, _root_.io.circe.Json]"
     override def asString(originalVarName: String): String = {
@@ -226,9 +224,9 @@ object ScalaPrimitive {
       s"$varName"
     }
 
-    override def default(value: String) = ScalaUtil.wrapInQuotes(value)
+    override def default(value: String): String = ScalaUtil.wrapInQuotes(value)
 
-    override protected def default(json: JsValue) = default(json.as[String])
+    override protected def default(json: JsValue): String = default(json.as[String])
   }
 
   case object Unit extends ScalaPrimitive {
@@ -248,26 +246,26 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override def default(value: String) = "_root_.java.util.UUID.fromString(" + ScalaUtil.wrapInQuotes(value) + ")"
+    override def default(value: String): String = "_root_.java.util.UUID.fromString(" + ScalaUtil.wrapInQuotes(value) + ")"
 
-    override protected def default(json: JsValue) = default(json.as[UUID].toString)
+    override protected def default(json: JsValue): String = default(json.as[UUID].toString)
 
   }
 
   case class Model(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(namespaces.models)
-    def apidocType = shortName
+    def apidocType: String = shortName
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
 
-    override def toVariableName = initLowerCase(shortName)
+    override def toVariableName: String = initLowerCase(shortName)
   }
 
   case class Enum(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(namespaces.enums)
-    def apidocType = shortName
+    def apidocType: String = shortName
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
@@ -277,29 +275,29 @@ object ScalaPrimitive {
       fullName + "." + ScalaUtil.toClassName(value)
     }
 
-    override protected def default(json: JsValue) = {
+    override protected def default(json: JsValue): String = {
       default(json.as[String])
     }
 
-    override def toVariableName = initLowerCase(shortName)
+    override def toVariableName: String = initLowerCase(shortName)
   }
 
   case class Union(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(namespaces.unions)
-    def apidocType = shortName
+    def apidocType: String = shortName
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
 
-    override def toVariableName = initLowerCase(shortName)
+    override def toVariableName: String = initLowerCase(shortName)
   }
 
 }
 
 object ScalaDatatype {
   sealed abstract class Container(inner: ScalaDatatype) extends ScalaDatatype {
-    override def toVariableName = inner match {
+    override def toVariableName: String = inner match {
       case _: Container => inner.toVariableName
       case _ => lib.Text.pluralize(inner.toVariableName)
     }
@@ -308,7 +306,7 @@ object ScalaDatatype {
   case class List(inner: ScalaDatatype) extends Container(inner) {
     override def name = s"Seq[${inner.name}]"
 
-    override protected def default(json: JsValue) = {
+    override protected def default(json: JsValue): String = {
       val arr = json.as[JsArray]
       val seq = arr.value.map { value =>
         inner.default(value)
@@ -320,7 +318,7 @@ object ScalaDatatype {
   case class Map(inner: ScalaDatatype) extends Container(inner) {
     override def name = s"Map[String, ${inner.name}]"
 
-    override protected def default(json: JsValue) = {
+    override protected def default(json: JsValue): String = {
       val map = json.as[scala.collection.immutable.Map[String, JsValue]].map {
         case (key, value) => s""""${key}" -> ${inner.default(value)}"""
       }
@@ -342,7 +340,7 @@ object ScalaDatatype {
     }
 
     // override, since options contain at most one element
-    override def toVariableName = datatype.toVariableName
+    override def toVariableName: String = datatype.toVariableName
   }
 
 }
@@ -356,13 +354,9 @@ object ScalaTypeResolver {
    */
   private def parseQualifiedName(defaultNamespaces: Namespaces, name: String): (Namespaces, String) = {
     name.split("\\.").toList match {
-      case n :: Nil => (defaultNamespaces, ScalaUtil.toClassName(name))
+      case _ :: Nil => (defaultNamespaces, ScalaUtil.toClassName(name))
       case multiple =>
         val n = multiple.last
-        val objectType = GeneratorUtil.ObjectType.fromString(multiple.reverse.drop(1).reverse.last).getOrElse {
-          Logger.warn(s"Could not resolve object type[${multiple.reverse.drop(1).reverse.last}]. Defaults to models")
-          GeneratorUtil.ObjectType.Model
-        }
         val baseNamespace = multiple.reverse.drop(2).reverse.mkString(".")
         (Namespaces(baseNamespace), ScalaUtil.toClassName(n))
     }
@@ -395,7 +389,7 @@ case class ScalaTypeResolver(
       case Datatype.UserDefined.Model(name) => {
         name.split("\\.").toList match {
           case n :: Nil => ScalaPrimitive.Model(namespaces, ScalaUtil.toClassName(n))
-          case multiple => {
+          case _ => {
             val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces, name)
             ScalaPrimitive.Model(ns, n)
           }

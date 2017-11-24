@@ -1,7 +1,7 @@
 package scala.generator
 
 import scala.models.{FeatureMigration, JsonImports}
-import io.apibuilder.spec.v0.models.{Resource, ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
+import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import lib.Text._
 
 class ScalaClientMethodGenerator(
@@ -9,13 +9,13 @@ class ScalaClientMethodGenerator(
   ssd: ScalaService
 ) {
 
-  protected val namespaces = Namespaces(config.namespace)
+  protected val namespaces: Namespaces = Namespaces(config.namespace)
 
-  protected val generatorUtil = new ScalaGeneratorUtil(config)
+  protected val generatorUtil: ScalaGeneratorUtil = new ScalaGeneratorUtil(config)
 
-  protected val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
+  protected val sortedResources: Seq[ScalaResource] = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
-  protected val featureMigration = FeatureMigration(ssd.service.apidoc.version)
+  protected val featureMigration: FeatureMigration = FeatureMigration(ssd.service.apidoc.version)
 
   def traitsAndErrors(): String = {
     Seq(
@@ -103,19 +103,16 @@ class ScalaClientMethodGenerator(
   protected def errorTypeClass(response: ScalaResponse): String = {
     require(!response.isSuccess)
 
-    response.isUnit match {
-      case true => {
-        unitExceptionClass(response.errorClassName)
-      }
-      case false => {
-        exceptionClass(
-          response.errorClassName,
-          response.errorVariableName.map { name =>
-            val json = config.toJson("response", response.datatype.name)
-            s"lazy val $name = ${json.indent(2).trim}"
-          }
-        )
-      }
+    if (response.isUnit) {
+      unitExceptionClass(response.errorClassName)
+    } else {
+      exceptionClass(
+        response.errorClassName,
+        response.errorVariableName.map { name =>
+          val json = config.toJson("response", response.datatype.name)
+          s"lazy val $name = ${json.indent(2).trim}"
+        }
+      )
     }
   }
 
@@ -174,13 +171,12 @@ class ScalaClientMethodGenerator(
         case v => s"""${v.mkString("\n\n")}\n\n_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
       }
 
-      val hasOptionResult = featureMigration.hasImplicit404s match {
-        case true => {
-          op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
-            s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
-          }
+      val hasOptionResult = if (featureMigration.hasImplicit404s()) {
+        op.responses.filter(_.isSuccess).find(_.isOption).map { _ =>
+          s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
         }
-        case false => None
+      } else {
+        None
       }
 
       val allResponseCodes = (
