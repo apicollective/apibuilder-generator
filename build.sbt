@@ -1,5 +1,7 @@
 import play.PlayImport.PlayKeys._
 
+import scoverage.ScoverageKeys
+
 name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
@@ -45,6 +47,7 @@ lazy val scalaGenerator = project
   .in(file("scala-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
+  .settings(Seq(ScoverageKeys.coverageMinimum := 77.5))
 
 lazy val rubyGenerator = project
   .in(file("ruby-generator"))
@@ -55,6 +58,7 @@ lazy val javaGenerator = project
   .in(file("java-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
+  .settings(Seq(ScoverageKeys.coverageMinimum := 44.5))
 
 lazy val goGenerator = project
   .in(file("go-generator"))
@@ -67,6 +71,7 @@ lazy val androidGenerator = project
   .settings(
     commonSettings: _*
   )
+  .settings(Seq(ScoverageKeys.coverageMinimum := 77.8))
 
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
@@ -82,10 +87,12 @@ lazy val kotlinGenerator = project
       "org.mockito" % "mockito-all" % "1.10.19" % "test"
     )
   )
+  .settings(Seq(ScoverageKeys.coverageMinimum := 93.5))
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("apibuilder-generator-" + _),
   organization := "io.apibuilder",
+  ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % "2.2.6" % "test",
