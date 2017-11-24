@@ -70,7 +70,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val name: String = ScalaUtil.toClassName(union.name)
 
-  val qualifiedName = ssd.unionClassName(name)
+  val qualifiedName: String = ssd.unionClassName(name)
 
   val discriminator: Option[String] = union.discriminator
 
@@ -96,24 +96,24 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
  *        for each type.
  */
 case class ScalaUnionType(
-  val ssd: ScalaService,
-  val value: UnionType,
+  ssd: ScalaService,
+  value: UnionType,
   datatype: ScalaDatatype,
   enum: Option[ScalaPrimitive.Enum] = None,
   model: Option[ScalaPrimitive.Model] = None
 ) {
 
-  val originalName: String = value.`type`
-
-  val name: String = ScalaUtil.toClassName(originalName)
+  val name: String = ScalaUtil.toClassName(value.`type`)
 
   val isDefault: Boolean = value.default.getOrElse(false)
 
-  val qualifiedName = ssd.modelClassName(name)
+  val qualifiedName: String = ssd.modelClassName(name)
 
   val description: Option[String] = value.description
 
   val deprecation: Option[Deprecation] = value.deprecation
+
+  val discriminatorName: String = value.discriminatorValue.getOrElse(value.`type`)
 
 }
 
