@@ -203,7 +203,7 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
 class ScalaEnumValue(value: EnumValue) {
 
-  val originalName: String = value.name
+  val serializedValue: String = value.value.getOrElse(value.name)
 
   val name: String = ScalaUtil.toClassName(value.name)
 

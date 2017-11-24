@@ -303,7 +303,7 @@ object RubyClientGenerator extends CodeGenerator {
         lines.append(GeneratorUtil.formatComment(desc).indent(2))
       }
       lines.append(s"  def $className.$varName")
-      lines.append(s"    @@_$varName ||= $className.new('${value.name}')")
+      lines.append(s"    @@_$varName ||= $className.new('${enumValueString(value)}')")
       lines.append(s"  end")
       lines.append("")
     }
@@ -320,6 +320,10 @@ object RubyClientGenerator extends CodeGenerator {
 
     lines.append("end")
     lines.mkString("\n")
+  }
+
+  private[this] def enumValueString(value: EnumValue): String = {
+    value.value.getOrElse(value.name)
   }
 
   def enumName(value: String): String = {

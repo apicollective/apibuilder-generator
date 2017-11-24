@@ -22,7 +22,7 @@ case class ScalaEnums(
     enum.values.map { value =>
       Seq(
         value.description.map { desc => ScalaUtil.textToComment(desc) },
-        Some(s"""${ScalaUtil.deprecationString(value.deprecation)}case object ${value.name} extends ${enum.name} { override def toString = "${value.originalName}" }""")
+        Some(s"""${ScalaUtil.deprecationString(value.deprecation)}case object ${value.name} extends ${enum.name} { override def toString = "${value.serializedValue}" }""")
       ).flatten.mkString("\n")
     }.mkString("\n") + "\n" +
     s"""
