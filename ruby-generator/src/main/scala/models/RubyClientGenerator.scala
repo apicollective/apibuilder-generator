@@ -5,8 +5,7 @@ import scala.util.Failure
 import scala.util.Success
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
-import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-import lib.{Datatype, Methods, Text, VersionTag}
+import lib.{Datatype, Methods, Text}
 import lib.Text._
 import lib.generator.{CodeGenerator, GeneratorUtil}
 
@@ -35,8 +34,8 @@ object RubyUtil {
 
     val fullName: String = "::" + (parts.toList match {
       case Nil => sys.error(s"Invalid module name[$name]")
-      case one :: Nil => parts.mkString("::")
-      case one :: two :: Nil => parts.mkString("::")
+      case _ :: Nil => parts.mkString("::")
+      case _ :: _ :: Nil => parts.mkString("::")
       case multiple => {
         val klassName = multiple.last
         val typ = multiple.dropRight(1).last
@@ -143,9 +142,10 @@ object RubyUtil {
       lib.Text.initLowerCase(lib.Text.splitIntoWords(name).map(_.toLowerCase).mkString("_"))
     )
     quoteNameIfKeyword(
-      multiple match {
-        case true => lib.Text.pluralize(value)
-        case false => value
+      if (multiple) {
+        lib.Text.pluralize(value)
+      } else {
+        value
       }
     )
   }
@@ -169,7 +169,7 @@ object RubyUtil {
         Primitive.DateTimeIso8601 |
         Primitive.Uuid => rubyDefault(JsString(value), datatype)
       case _: Primitive => rubyDefault(Json.parse(value), datatype)
-      case Datatype.UserDefined.Enum(name) => {
+      case Datatype.UserDefined.Enum(_) => {
         rubyDefault(JsString(value), datatype)
       }
       case _ => rubyDefault(Json.parse(value), datatype)
@@ -184,7 +184,7 @@ object RubyUtil {
   private def rubyDefault(json: JsValue, datatype: Datatype): String = {
     import Datatype._
     datatype match {
-      case Container.Option(inner) =>
+      case Container.Option(_) =>
         sys.error(s"parsing default `${json}` for datatype ${datatype}")
       case Container.List(inner) => {
         val seq = json.as[Seq[JsValue]].map { value =>
@@ -205,17 +205,13 @@ object RubyUtil {
       case Primitive.Long => json.as[Long].toString
       case Primitive.String => s""""${json.as[String]}""""
       case Primitive.DateIso8601 => {
-        // validate the input
-        val dt = dateTimeParser.parseLocalDate(json.as[String])
         s"Date.parse($json)"
       }
       case Primitive.DateTimeIso8601 => {
-        // validate the input
-        val dt = dateTimeParser.parseDateTime(json.as[String])
         s"""DateTime.parse($json)"""
       }
       case Primitive.Uuid => s"""UUID.new("${json.as[UUID]}")"""
-      case Datatype.UserDefined.Enum(name)  => {
+      case Datatype.UserDefined.Enum(_)  => {
         s""""${json.as[String]}""""
       }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) |
@@ -333,7 +329,7 @@ object RubyClientGenerator extends CodeGenerator {
       lib.Text.camelCaseToUnderscore(value)
     }
 
-    Text.splitIntoWords(formatted).map(lib.Text.initLowerCase(_)).mkString("_")
+    Text.splitIntoWords(formatted).map(lib.Text.initLowerCase).mkString("_")
   }
 
 }
@@ -360,7 +356,6 @@ case class RubyClientGenerator(form: InvocationForm) {
       case Nil => None
       case single :: Nil => Some(single)
       case multiple => {
-        val types = multiple.map(_.name).mkString(", ")
         Logger.warn("Ruby client does not support multiple inheritance. Multiple union types: ${types}. Using first type")
         Some(multiple.head)
       }
@@ -385,7 +380,7 @@ case class RubyClientGenerator(form: InvocationForm) {
 
   private def generateCode(): Seq[File] = {
     val spacerSize = 2
-    val moduleIndent = spacerSize * module.parts.size
+    val moduleIndent = spacerSize * module.parts.length
 
     val source = Seq(
       ApidocComments(form.service.version, form.userAgent).toRubyString(),
@@ -397,7 +392,7 @@ case class RubyClientGenerator(form: InvocationForm) {
         "",
         Seq(
           "module Clients",
-          service.resources.map { generateClientForResource(_) }.mkString("\n\n").indent(2),
+          service.resources.map { generateClientForResource }.mkString("\n\n").indent(2),
           "end"
         ).mkString("\n\n").indent(moduleIndent),
         "",
@@ -407,14 +402,14 @@ case class RubyClientGenerator(form: InvocationForm) {
             service.unions.map { generateUnion },
             service.enums.map { e => RubyClientGenerator.generateEnum(e, singleUnion(unionsFor(e))) },
             service.models.map { m => generateModel(m, singleUnion(unionsFor(m))) },
-            primitiveWrapper.wrappers.map { w => generateModel(w.model, Some(w.union)) }
+            primitiveWrapper.wrappers().map { w => generateModel(w.model, Some(w.union)) }
           ).filter(_.nonEmpty).flatten.mkString("\n\n").indent(2),
           "end"
         ).mkString("\n\n").indent(moduleIndent),
         "",
         "# ===== END OF SERVICE DEFINITION =====".indent(moduleIndent),
         RubyHttpClient.contents.indent(moduleIndent),
-        module.parts.zipWithIndex.reverse.map { case (name, i) => "end".indent(spacerSize * i) }.mkString("\n")
+        module.parts.zipWithIndex.reverse.map { case (_, i) => "end".indent(spacerSize * i) }.mkString("\n")
       ).mkString("\n")
     ).mkString("\n\n")
 
@@ -502,7 +497,6 @@ ${headers.rubyModuleConstants.indent(2)}
     resource.operations.foreach { op =>
       val pathParams = op.parameters.filter { p => p.location == ParameterLocation.Path }
       val queryParams = op.parameters.filter { p => p.location == ParameterLocation.Query }
-      val formParams = op.parameters.filter { p => p.location == ParameterLocation.Form }
 
       val rubyPath = op.path.split("/").map { name =>
         if (name.startsWith(":")) {
@@ -518,7 +512,7 @@ ${headers.rubyModuleConstants.indent(2)}
               val code = asString(RubyUtil.toVariable(varName), p, escape = true)
               s"#{$code}"
             }
-            case e: Datatype.UserDefined.Enum => {
+            case _: Datatype.UserDefined.Enum => {
               val code = RubyUtil.toVariable(varName)
               s"#{$code.value}"
             }
@@ -550,12 +544,12 @@ ${headers.rubyModuleConstants.indent(2)}
         }
       }
 
-      if (!queryParams.isEmpty) {
+      if (queryParams.nonEmpty) {
         paramStrings.append("incoming={}")
       }
 
       sb.append("")
-      op.description.map { desc =>
+      op.description.foreach { desc =>
         sb.append(GeneratorUtil.formatComment(desc, 2))
       }
 
@@ -567,7 +561,7 @@ ${headers.rubyModuleConstants.indent(2)}
         sb.append("    " + ti.assertMethod)
       }
 
-      if (!queryParams.isEmpty) {
+      if (queryParams.nonEmpty) {
         val paramBuilder = ListBuffer[String]()
 
         queryParams.foreach { param =>
@@ -583,7 +577,7 @@ ${headers.rubyModuleConstants.indent(2)}
       val requestBuilder = new StringBuilder()
       requestBuilder.append("@client.request(\"" + rubyPath + "\")")
 
-      if (!queryParams.isEmpty) {
+      if (queryParams.nonEmpty) {
         requestBuilder.append(".with_query(query)")
       }
 
@@ -597,7 +591,7 @@ ${headers.rubyModuleConstants.indent(2)}
             sb.append("    " + ti.assertMethod)
 
             ti.datatype match {
-              case p: Datatype.Primitive => requestBuilder.append(s".with_body(${ti.varName})")
+              case _: Datatype.Primitive => requestBuilder.append(s".with_body(${ti.varName})")
               case dt => requestBuilder.append(s".with_json(${asJson(ti.varName, dt)})")
             }
           }
@@ -633,7 +627,6 @@ ${headers.rubyModuleConstants.indent(2)}
   }
 
   def generateUnionClass(union: Union): String = {
-    val typeNames = union.types.map(_.`type`)
     val className = RubyUtil.toClassName(union.name)
     val discName = discriminatorName(union)
 
@@ -661,13 +654,15 @@ ${headers.rubyModuleConstants.indent(2)}
       }
     }
 
+    val typeNames = union.types.map(_.`type`)
+
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
       Seq(
         "module Types",
         union.types.map { ut =>
           ut.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
-          s"${RubyUtil.toUnionConstant(union, ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} unless defined?(${RubyUtil.toUnionConstant(union, ut.`type`)})"
+          s"${RubyUtil.toUnionConstant(union, ut.`type`)} = ${RubyUtil.wrapInQuotes(unionTypeDiscriminatorValue(ut))} unless defined?(${RubyUtil.toUnionConstant(union, ut.`type`)})"
         }.mkString("\n").indent(2),
         "end"
       ).mkString("\n"),
@@ -695,6 +690,10 @@ ${headers.rubyModuleConstants.indent(2)}
 
     ).mkString("\n\n").indent(2) +
     "\n\nend"
+  }
+
+  private[this] def unionTypeDiscriminatorValue(ut: UnionType): String = {
+    ut.discriminatorValue.getOrElse(ut.`type`)
   }
 
   private[this] def generateUnionClassToHash(union: Union): String = {
@@ -952,7 +951,7 @@ ${headers.rubyModuleConstants.indent(2)}
     // use the name directly. Otherwise add this service's module
     // name.
     val thisModule = RubyUtil.Module(name)
-    if (thisModule.parts.size <= 1) {
+    if (thisModule.parts.length <= 1) {
       "%s::Models::%s".format(
         module.fullName,
         RubyUtil.toClassName(name)
@@ -1028,7 +1027,6 @@ ${headers.rubyModuleConstants.indent(2)}
 
   // TODO should be encapsulated in the RubyDatatype model
   private def asHash(varName: String, dt: Datatype): String = {
-    import Datatype._
     dt match {
       case _: Datatype.Primitive => varName
       case Datatype.Container.List(_: Datatype.Primitive) => varName
@@ -1072,14 +1070,14 @@ ${headers.rubyModuleConstants.indent(2)}
           required = false
           iter(inner)
         }
-        case m: Datatype.Container.Map => "Hash"
-        case l: Datatype.Container.List => "Array"
+        case _: Datatype.Container.Map => "Hash"
+        case _: Datatype.Container.List => "Array"
       }
       iter(dt)
     }
 
     val varName = dt match {
-      case p: Datatype.Primitive => {
+      case _: Datatype.Primitive => {
         fieldName match {
           case Some(n) => RubyUtil.toVariable(n)
           case None => RubyUtil.toDefaultVariable()
@@ -1142,7 +1140,7 @@ ${headers.rubyModuleConstants.indent(2)}
         // TODO code for this used to use pass hash to the constructor,
         // instead of x[1]. Pretty sure that was wrong, but hard to tell.
         s"$varName.inject({}) { |hash, x| hash[x[0]] = x[1].nil? ? nil : ${generateResponse(inner, "x[1]")}; hash }"
-      case Container.Option(inner) => sys.error(s"unsupported datatype ${dt} for response")
+      case Container.Option(_) => sys.error(s"unsupported datatype ${dt} for response")
     }
   }
 
