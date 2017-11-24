@@ -89,7 +89,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"${implicitDecoderDef(union.name)} = Decoder.instance { c =>",
       s"  import cats.implicits._",
       unionTypesWithNames(union).map { case (t, typeName) =>
-        s"""c.get[$typeName]("${t.originalName}") orElse"""
+        s"""c.get[$typeName]("${t.discriminatorName}") orElse"""
       }.mkString("\n").indent(2),
       s"  Right(${union.undefinedType.fullName}(c.value.toString))",
       s"}"
@@ -107,7 +107,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"""${implicitDecoderDef(union.name)} = Decoder.instance { c =>""",
       s"""  c.get[Option[String]]("$discriminator") match {""",
       typesWithNames.map { case (t, typeName) =>
-        s"""  case Right(Some(s)) if s == "${t.originalName}" => c.as[$typeName]"""
+        s"""  case Right(Some(s)) if s == "${t.discriminatorName}" => c.as[$typeName]"""
       }.mkString("\n").indent(2),
       s"""    case Right(Some(s)) => Right(${union.undefinedType.fullName}(s))""",
       s"""    case _ => $defaultClause""",
@@ -129,7 +129,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
     Seq(
       s"${implicitEncoderDef(union.name)} = Encoder.instance {",
       unionTypesWithNames(union).map { case (t, typeName) =>
-        s"""case t: ${typeName} => Json.fromJsonObject(JsonObject.singleton("${t.originalName}", t.asJson))"""
+        s"""case t: ${typeName} => Json.fromJsonObject(JsonObject.singleton("${t.discriminatorName}", t.asJson))"""
       }.mkString("\n").indent(2),
       s"""  case other => sys.error(s"The type[$${other.getClass.getName}] has no JSON encoder")""",
       "}"
@@ -140,7 +140,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
     Seq(
       s"${implicitEncoderDef(union.name)} = Encoder.instance {",
       unionTypesWithNames(union).map { case (t, typeName) =>
-        s"""case t: ${typeName} => t.asJson.mapObject(obj => ("$discriminator", Json.fromString("${t.originalName}")) +: obj)"""
+        s"""case t: ${typeName} => t.asJson.mapObject(obj => ("$discriminator", Json.fromString("${t.discriminatorName}")) +: obj)"""
       }.mkString("\n").indent(2),
       s"""  case other => sys.error(s"The type[$${other.getClass.getName}] has no JSON encoder")""",
       "}"

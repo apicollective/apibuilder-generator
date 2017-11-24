@@ -42,7 +42,7 @@ case class ScalaUnionDiscriminator(
             case "" => None
             case v => Some(v)
           },
-          Some(s"""case object ${typ.name} extends $className { override def toString = "${typ.originalName}" }""")
+          Some(s"""case object ${typ.name} extends $className { override def toString = "${typ.discriminatorName}" }""")
         ).flatten.mkString("\n")
       }.mkString("\n"),
       s"case class UNDEFINED(override val toString: String) extends $className",

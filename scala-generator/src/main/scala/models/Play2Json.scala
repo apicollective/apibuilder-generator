@@ -134,7 +134,7 @@ case class Play2Json(
       s"${play2JsonCommon.implicitReaderDef(union.name)} = {",
       s"  (",
       union.types.map { scalaUnionType =>
-        s"""(__ \\ "${scalaUnionType.originalName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+        s"""(__ \\ "${scalaUnionType.discriminatorName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indent(4),
       s"    orElse",
       s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
@@ -144,7 +144,7 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
-    val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.originalName).headOption
+    val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.discriminatorName).headOption
 
     val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
       case None => s""" { sys.error("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json Value") }"""
@@ -156,7 +156,7 @@ case class Play2Json(
       Seq(s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${union.name}] = {",
         Seq(s"""(js \\ "$discriminator").asOpt[String].getOrElse$defaultDiscriminatorClause match {""",
           unionTypesWithNames(union).map { case (t, typeName) =>
-            s"""case "${t.originalName}" => js.validate[$typeName]"""
+            s"""case "${t.discriminatorName}" => js.validate[$typeName]"""
           }.mkString("\n").indent(2),
           s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indent(2),
           "}"
@@ -187,7 +187,7 @@ case class Play2Json(
       s"  obj match {",
       unionTypesWithNames(union).map { case (t, typeName) =>
         val json = getJsonValueForUnion(t.datatype, "x")
-        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.originalName}" -> $json)"""
+        s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.discriminatorName}" -> $json)"""
       }.mkString("\n").indent(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -204,7 +204,7 @@ case class Play2Json(
         "obj match {",
         Seq(
           unionTypesWithNames(union).map { case (t, typeName) =>
-            val json = getJsonValueForUnion(t.datatype, "x", Some(Discriminator(discriminator, t.originalName)))
+            val json = getJsonValueForUnion(t.datatype, "x", Some(Discriminator(discriminator, t.discriminatorName)))
             s"case x: ${typeName} => $json"
           }.mkString("\n"),
           s"case other => {",
