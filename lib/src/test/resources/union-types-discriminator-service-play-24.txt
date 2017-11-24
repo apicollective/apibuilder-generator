@@ -4,11 +4,7 @@
  */
 package io.apibuilder.example.union.types.discriminator.v0.models {
 
-  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable {
-
-    def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator
-
-  }
+  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
 
   /**
    * Defines the valid discriminator values for the type User
@@ -40,20 +36,12 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
   case class GuestUser(
     id: String,
     email: _root_.scala.Option[String] = None
-  ) extends User {
-
-    override val discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.GuestUser
-
-  }
+  ) extends User
 
   case class RegisteredUser(
     id: String,
     email: String
-  ) extends User {
-
-    override val discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.RegisteredUser
-
-  }
+  ) extends User
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -65,11 +53,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    */
   case class UserUndefinedType(
     description: String
-  ) extends User {
-
-    override def discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = sys.error("Undefined type[UserUndefinedType]")
-
-  }
+  ) extends User
 
 
   /**
@@ -77,11 +61,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    */
   case class UserString(
     value: String
-  ) extends User {
-
-    override val discriminator: io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator = io.apibuilder.example.union.types.discriminator.v0.models.UserDiscriminator.UserString
-
-  }
+  ) extends User
 
   sealed trait SystemUser extends User
 

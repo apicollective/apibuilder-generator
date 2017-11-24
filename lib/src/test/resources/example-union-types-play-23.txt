@@ -7,11 +7,7 @@ package io.apibuilder.example.union.types.v0.models {
   sealed trait Foobar extends _root_.scala.Product with _root_.scala.Serializable
 
   @deprecated("to be removed")
-  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable {
-
-    def discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator
-
-  }
+  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
 
   /**
    * Defines the valid discriminator values for the type User
@@ -44,11 +40,7 @@ package io.apibuilder.example.union.types.v0.models {
   case class GuestUser(
     guid: _root_.java.util.UUID,
     email: String
-  ) extends User {
-
-    override val discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = io.apibuilder.example.union.types.v0.models.UserDiscriminator.GuestUser
-
-  }
+  ) extends User
 
   /**
    * @param guid Internal unique identifier for this user.
@@ -57,11 +49,7 @@ package io.apibuilder.example.union.types.v0.models {
     guid: _root_.java.util.UUID,
     email: String,
     preference: io.apibuilder.example.union.types.v0.models.Foobar
-  ) extends User {
-
-    override val discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = io.apibuilder.example.union.types.v0.models.UserDiscriminator.RegisteredUser
-
-  }
+  ) extends User
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -85,11 +73,7 @@ package io.apibuilder.example.union.types.v0.models {
    */
   case class UserUndefinedType(
     description: String
-  ) extends User {
-
-    override def discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = sys.error("Undefined type[UserUndefinedType]")
-
-  }
+  ) extends User
 
 
   /**
@@ -97,11 +81,7 @@ package io.apibuilder.example.union.types.v0.models {
    */
   case class UserUuid(
     value: _root_.java.util.UUID
-  ) extends User {
-
-    override val discriminator: io.apibuilder.example.union.types.v0.models.UserDiscriminator = io.apibuilder.example.union.types.v0.models.UserDiscriminator.UserUuid
-
-  }
+  ) extends User
 
   sealed trait Bar extends Foobar
 
