@@ -5,7 +5,6 @@ import scala.util.Failure
 import scala.util.Success
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
-import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import lib.{Datatype, Methods, Text}
 import lib.Text._
 import lib.generator.{CodeGenerator, GeneratorUtil}
@@ -628,7 +627,6 @@ ${headers.rubyModuleConstants.indent(2)}
   }
 
   def generateUnionClass(union: Union): String = {
-    val typeNames = union.types.map(_.`type`)
     val className = RubyUtil.toClassName(union.name)
     val discName = discriminatorName(union)
 
@@ -656,13 +654,15 @@ ${headers.rubyModuleConstants.indent(2)}
       }
     }
 
+    val typeNames = union.types.map(_.`type`)
+
     union.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") + s"class $className\n\n" +
     Seq(
       Seq(
         "module Types",
         union.types.map { ut =>
           ut.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
-          s"${RubyUtil.toUnionConstant(union, ut.`type`)} = ${RubyUtil.wrapInQuotes(ut.`type`)} unless defined?(${RubyUtil.toUnionConstant(union, ut.`type`)})"
+          s"${RubyUtil.toUnionConstant(union, ut.`type`)} = ${RubyUtil.wrapInQuotes(unionTypeDiscriminatorValue(ut))} unless defined?(${RubyUtil.toUnionConstant(union, ut.`type`)})"
         }.mkString("\n").indent(2),
         "end"
       ).mkString("\n"),
@@ -690,6 +690,10 @@ ${headers.rubyModuleConstants.indent(2)}
 
     ).mkString("\n\n").indent(2) +
     "\n\nend"
+  }
+
+  private[this] def unionTypeDiscriminatorValue(ut: UnionType): String = {
+    ut.discriminatorValue.getOrElse(ut.`type`)
   }
 
   private[this] def generateUnionClassToHash(union: Union): String = {
