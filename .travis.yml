@@ -8,7 +8,7 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 script: 
-  - sbt ++$TRAVIS_SCALA_VERSION clean compile test
+  - sbt  ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
