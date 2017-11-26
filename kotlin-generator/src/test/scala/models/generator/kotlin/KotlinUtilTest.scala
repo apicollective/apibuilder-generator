@@ -88,4 +88,10 @@ class KotlinUtilTest
     dataTypeFromField("map[CustomType]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, com.foobar.example.CustomType>")
   }
 
+  "textToComment" should "accept String" in {
+    textToComment("Hello world") shouldBe "/**\n * Hello world\n */"
+  }
+  "textToComment" should "accept Seq(String)" in {
+    textToComment(Seq("1+2", "2+3")) shouldBe "/**\n * 1+2\n * 2+3\n */"
+  }
 }
