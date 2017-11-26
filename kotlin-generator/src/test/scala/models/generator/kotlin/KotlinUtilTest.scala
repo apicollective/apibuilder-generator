@@ -91,7 +91,19 @@ class KotlinUtilTest
   "textToComment" should "accept String" in {
     textToComment("Hello world") shouldBe "/**\n * Hello world\n */"
   }
+
   "textToComment" should "accept Seq(String)" in {
     textToComment(Seq("1+2", "2+3")) shouldBe "/**\n * 1+2\n * 2+3\n */"
+  }
+
+  "toMethodName" should "behave correctly" in {
+    toMethodName("a") shouldBe "a"
+    toMethodName("getThing") shouldBe "getThing"
+    toMethodName("GetThing") shouldBe "getThing"
+    toMethodName("Get_Thing") shouldBe "getThing"
+    toMethodName("Get-Thing") shouldBe "getThing"
+    toMethodName("Get Thing") shouldBe "getThing"
+    toMethodName("Get$Thing") shouldBe "getThing"
+    toMethodName("GetThing_") shouldBe "getThing"
   }
 }

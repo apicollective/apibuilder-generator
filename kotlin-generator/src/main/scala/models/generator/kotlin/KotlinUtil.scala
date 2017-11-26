@@ -185,10 +185,10 @@ trait KotlinUtil {
   }
 
   def toMethodName(modelName: String): String = {
-    val paramStartingWithUppercase = {
-      Text.safeName(Text.splitIntoWords(modelName).map { _.toLowerCase.capitalize }.mkString)
+    val paramStartingWithLowercase = {
+      Text.initLowerCase(Text.safeName(Text.splitIntoWords(modelName).map { _.toLowerCase.capitalize }.mkString))
     }
-    checkForReservedWord(paramStartingWithUppercase)
+    checkForReservedWord(paramStartingWithLowercase)
   }
 
   def toEnumName(input: String): String = {
