@@ -1,4 +1,3 @@
-import play.PlayImport.PlayKeys._
 
 import scoverage.ScoverageKeys
 
@@ -39,7 +38,7 @@ lazy val generator = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus" %% "play" % "1.4.0" % "test"
+      "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test"
     )
   )
 
@@ -84,7 +83,7 @@ lazy val kotlinGenerator = project
       "com.squareup" % "kotlinpoet" % "0.6.0",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.1.60" % "test",
-      "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.4" % "test",
       "org.mockito" % "mockito-all" % "1.10.19" % "test"
     )
   )
@@ -96,7 +95,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.4" % "test",
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "com.github.javaparser" % "javaparser-core" % "3.4.2" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",

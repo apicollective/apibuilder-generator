@@ -6,7 +6,7 @@ import play.api.libs.json._
 import play.api.mvc.Results._
 import scala.concurrent.Future
 
-object Global extends WithFilters(LoggingFilter) {
+object Global {
 
   override def onHandlerNotFound(request: RequestHeader) = {
     Future.successful(NotFound)
