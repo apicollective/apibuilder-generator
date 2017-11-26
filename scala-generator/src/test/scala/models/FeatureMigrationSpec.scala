@@ -1,8 +1,8 @@
 package scala.models
 
-import org.scalatest.{ShouldMatchers, FunSpec}
+import org.scalatest.{Matchers, FunSpec}
 
-class FeatureMigrationSpec extends FunSpec with ShouldMatchers {
+class FeatureMigrationSpec extends FunSpec with Matchers {
 
   it("hasImplicit404s") {
     FeatureMigration("0.0.1").hasImplicit404s should be(true)

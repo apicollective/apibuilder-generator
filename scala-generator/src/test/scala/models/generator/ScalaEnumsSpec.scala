@@ -1,9 +1,9 @@
 package scala.generator
 
 import scala.models.Play2Json
-import org.scalatest.{ ShouldMatchers, FunSpec }
+import org.scalatest.{ Matchers, FunSpec }
 
-class ScalaEnumsSpec extends FunSpec with ShouldMatchers {
+class ScalaEnumsSpec extends FunSpec with Matchers {
 
   describe("for a model with 2 enum fields") {
 

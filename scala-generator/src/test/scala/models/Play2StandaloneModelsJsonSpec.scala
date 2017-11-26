@@ -1,9 +1,9 @@
 package scala.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{FunSpec, ShouldMatchers}
+import org.scalatest.{FunSpec, Matchers}
 
-class Play2StandaloneModelsJsonSpec extends FunSpec with ShouldMatchers {
+class Play2StandaloneModelsJsonSpec extends FunSpec with Matchers {
 
   it("quality") {
     val quality = models.TestHelper.parseFile("/examples/quality.json")

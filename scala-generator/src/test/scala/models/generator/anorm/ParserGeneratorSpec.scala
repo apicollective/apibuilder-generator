@@ -1,9 +1,9 @@
 package scala.generator.anorm
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import org.scalatest.{ShouldMatchers, FunSpec}
+import org.scalatest.{Matchers, FunSpec}
 
-class ParserGeneratorSpec extends FunSpec with ShouldMatchers {
+class ParserGeneratorSpec extends FunSpec with Matchers {
 
   val fileNames = Seq("TestApidocTestV1Conversions.scala", "TestApidocTestV1Parsers.scala")
 

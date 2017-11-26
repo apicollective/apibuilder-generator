@@ -5,9 +5,9 @@ import io.apibuilder.spec.v0.models.Method
 import models.TestHelper
 
 import scala.generator.{ScalaClientMethodConfigs, ScalaClientMethodGenerator, ScalaDatatype, ScalaPrimitive, ScalaService}
-import org.scalatest.{FunSpec, ShouldMatchers}
+import org.scalatest.{FunSpec, Matchers}
 
-class Play2ClientGeneratorSpec extends FunSpec with ShouldMatchers {
+class Play2ClientGeneratorSpec extends FunSpec with Matchers {
 
   val clientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", None)
 

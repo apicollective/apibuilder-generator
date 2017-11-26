@@ -1,9 +1,9 @@
 package lib.generator
 
 import io.apibuilder.spec.v0.models.Method
-import org.scalatest.{ShouldMatchers, FunSpec}
+import org.scalatest.{Matchers, FunSpec}
 
-class GeneratorUtilSpec extends FunSpec with ShouldMatchers {
+class GeneratorUtilSpec extends FunSpec with Matchers {
 
   it("formatComment") {
     GeneratorUtil.formatComment("test") should be("# test")

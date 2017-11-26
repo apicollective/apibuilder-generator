@@ -2,12 +2,12 @@ package scala.models.http4s
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import models.TestHelper.assertValidScalaSourceCode
-import org.scalatest.{FunSpec, ShouldMatchers}
+import org.scalatest.{FunSpec, Matchers}
 
 import scala.generator.ScalaClientMethodConfigs
 import scala.models.http4s.server.Http4sServer
 
-class Http4sServerGeneratorSpec extends FunSpec with ShouldMatchers {
+class Http4sServerGeneratorSpec extends FunSpec with Matchers {
 
   it("path parameters test generates expected code for http4s 0.15 server") {
     val service = models.TestHelper.parseFile(s"/http4s/path-params.json")

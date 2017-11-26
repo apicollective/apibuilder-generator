@@ -2,9 +2,9 @@ package scala.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import ning.Ning18ClientGenerator
-import org.scalatest.{ShouldMatchers, FunSpec}
+import org.scalatest.{Matchers, FunSpec}
 
-class ExampleUnionTypesWithDiscriminatorSpec extends FunSpec with ShouldMatchers {
+class ExampleUnionTypesWithDiscriminatorSpec extends FunSpec with Matchers {
 
   private lazy val service = models.TestHelper.parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
 

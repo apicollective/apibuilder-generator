@@ -3,9 +3,9 @@ package scala.models
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.Method
 import scala.generator.{ScalaOperation, ScalaResource, ScalaService}
-import org.scalatest.{ShouldMatchers, FunSpec}
+import org.scalatest.{Matchers, FunSpec}
 
-class Play2RouteGeneratorSpec extends FunSpec with ShouldMatchers {
+class Play2RouteGeneratorSpec extends FunSpec with Matchers {
 
   def getScalaResource(ssd: ScalaService, plural: String): ScalaResource = {
     ssd.resources.find(_.plural == plural).getOrElse {
