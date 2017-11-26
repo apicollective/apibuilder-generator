@@ -1,13 +1,13 @@
 package models.generator.android
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{FunSpec, ShouldMatchers}
+import org.scalatest.{FunSpec, Matchers}
 import com.github.javaparser.JavaParser
 
 
 class TestAndroidClasses
   extends FunSpec
-    with ShouldMatchers {
+    with Matchers {
 
   describe("for a model with 2 enum fields") {
 

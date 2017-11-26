@@ -4,7 +4,7 @@ import models.TestHelper
 import io.apibuilder.spec.v0.models._
 import org.scalatest._
 
-class ScalaOperationSpec extends FunSpec with ShouldMatchers {
+class ScalaOperationSpec extends FunSpec with Matchers {
 
   private lazy val service = models.TestHelper.referenceApiService
   private lazy val ssd = new ScalaService(service)

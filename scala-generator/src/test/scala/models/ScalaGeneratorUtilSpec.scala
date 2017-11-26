@@ -3,9 +3,9 @@ package scala.models
 import lib.Datatype
 import io.apibuilder.spec.v0.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
 import scala.generator._
-import org.scalatest.{ ShouldMatchers, FunSpec }
+import org.scalatest.{ Matchers, FunSpec }
 
-class ScalaGeneratorUtilSpec extends FunSpec with ShouldMatchers {
+class ScalaGeneratorUtilSpec extends FunSpec with Matchers {
 
   private lazy val service = models.TestHelper.referenceApiService
   private lazy val ssd = new ScalaService(service)

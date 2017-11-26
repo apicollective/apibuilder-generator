@@ -1,8 +1,8 @@
 package scala.models
 
-import org.scalatest.{ShouldMatchers, FunSpec}
+import org.scalatest.{Matchers, FunSpec}
 
-class ApidocCommentsSpec extends FunSpec with ShouldMatchers {
+class ApidocCommentsSpec extends FunSpec with Matchers {
 
   it("with only version") {
     ApidocComments("1.0", None).toJavaString should be("""
