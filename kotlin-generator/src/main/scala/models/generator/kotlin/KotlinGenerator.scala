@@ -1,11 +1,13 @@
 package models.generator.kotlin
 
 import java.io.StringWriter
+
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.squareup.kotlinpoet._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
+import io.reactivex.Single
 import lib.generator.CodeGenerator
 import scala.collection.JavaConverters._
 
@@ -47,6 +49,8 @@ class KotlinGenerator
 
       makeFile(className, builder)
     }
+
+    def getRetrofitReturnTypeWrapperClass(): ClassName = classToClassName(classOf[Single[Void]])
 
     def generateUnionType(union: Union): File = {
       val className = toClassName(union.name)
@@ -233,10 +237,8 @@ class KotlinGenerator
 
           maybeSuccessfulResponse.map(successfulResponse => {
             val returnType = dataTypeFromField(successfulResponse.`type`, modelsNameSpace)
-
-            //below, Void in "classOf[retrofit.Call[Void]" is ignored, what matters is returnType
-            val callTypeName = ParameterizedTypeName.get(classOf[retrofit2.Call[Void]], returnType)
-            method.returns(callTypeName)
+            val retrofitWrappedClassname = getRetrofitReturnTypeWrapperClass()
+            method.returns(ParameterizedTypeName.get(retrofitWrappedClassname, returnType))
           })
           builder.addFunction(method.build)
         })
