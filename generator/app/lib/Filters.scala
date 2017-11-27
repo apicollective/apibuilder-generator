@@ -1,3 +1,5 @@
+package lib
+
 import javax.inject.Inject
 
 import play.api.http.EnabledFilters

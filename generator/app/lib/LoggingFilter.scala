@@ -1,7 +1,8 @@
+package lib
+
 import akka.stream.Materializer
 import play.api.Logger
 import play.api.mvc._
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class LoggingFilter(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
