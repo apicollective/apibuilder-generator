@@ -1,11 +1,12 @@
 package lib
 
+import javax.inject.Inject
 import akka.stream.Materializer
 import play.api.Logger
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 
-class LoggingFilter(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
+class LoggingFilter @Inject ()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
   def apply(nextFilter: (RequestHeader) => Future[Result])
            (requestHeader: RequestHeader): Future[Result] = {
     val startTime = System.currentTimeMillis
