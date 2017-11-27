@@ -90,7 +90,7 @@ lazy val kotlinGenerator = project
   .settings(Seq(ScoverageKeys.coverageMinimum := 93.5))
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
-  name <<= name("apibuilder-generator-" + _),
+  name ~= ("apibuilder-generator-" + _),
   organization := "io.apibuilder",
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
@@ -103,6 +103,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "com.squareup.retrofit2" % "retrofit" % "2.3.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.1.3"
   ),
+  libraryDependencies += guice,
   scalacOptions += "-feature",
   sources in (Compile,doc) := Seq.empty,
   publishArtifact in (Compile, packageDoc) := false
