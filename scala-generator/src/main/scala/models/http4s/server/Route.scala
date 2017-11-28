@@ -83,8 +83,8 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
                              s"  }",
                              s"}")
 
-    val requestCaseClassAndDecoder = op.method match {
-      case Method.Get | Method.Delete => Seq()
+    val requestCaseClassAndDecoder = op.formParameters match {
+      case Nil => Seq()
       case _ => Seq(
         s"case class $requestCaseClass",
         s"") ++ requestDecoder ++ Seq("")
@@ -170,29 +170,27 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       }.map(_.indent(10))
     }
 
-    op.method match {
-      case Method.Get | Method.Delete => prefix ++ route("")
-      case _ =>
-        val decoding:Seq[String] = Seq(s"if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {",
-                                       s"  _req.as[_root_.io.circe.Json].flatMap{",
-                                       s"    _.as[$requestCaseClassName].map {",
-                                       s"      req =>") ++ route("req.").map(_.indent(8)) ++
-                                   Seq(s"    }.getOrElse(BadRequest())",
-                                       s"  }",
-                                       s"} else {",
-                                       s"    _req.decode[_root_.org.http4s.UrlForm] {",
-                                       s"      req =>",
-                                       s"        val responseOpt = for {") ++ decodingParameters ++
-                                   Seq(s"        } yield {") ++ route("").map(_.indent(10)) ++
-                                   Seq(s"          }",
-                                       s"        responseOpt.getOrElse(BadRequest())",
-                                       s"  }",
-                                       s"}")
-
-        prefix ++ decoding
-
+    val decoding = if(op.formParameters.nonEmpty) {
+      Seq(s"if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {",
+        s"  _req.as[_root_.io.circe.Json].flatMap{",
+        s"    _.as[$requestCaseClassName].map {",
+        s"      req =>") ++ route("req.").map(_.indent(8)) ++
+        Seq(s"    }.getOrElse(BadRequest())",
+          s"  }",
+          s"} else {",
+          s"    _req.decode[_root_.org.http4s.UrlForm] {",
+          s"      req =>",
+          s"        val responseOpt = for {") ++ decodingParameters ++
+        Seq(s"        } yield {") ++ route("").map(_.indent(10)) ++
+        Seq(s"          }",
+          s"        responseOpt.getOrElse(BadRequest())",
+          s"  }",
+          s"}")
+    } else {
+      route("")
     }
 
+    prefix ++ decoding
 
   }
 
