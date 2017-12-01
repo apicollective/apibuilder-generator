@@ -47,7 +47,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
   def generateModels(): String = {
     Seq(
       ssd.models.map(decodersAndEncoders(_)).mkString("\n\n"),
-      PrimitiveWrapper(ssd).wrappers.map(w => decoders(w.model)).mkString("\n\n")
+      PrimitiveWrapper(ssd).wrappers.map(w => decodersAndEncoders(w.model)).mkString("\n\n")
     ).filter(!_.trim.isEmpty).mkString("\n\n")
   }
 

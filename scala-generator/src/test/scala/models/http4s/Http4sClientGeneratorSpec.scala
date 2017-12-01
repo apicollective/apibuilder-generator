@@ -67,5 +67,15 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should include (".raiseError")
       scalaSourceCode should include (".pure")
     }
+
+    it("Circe generator handles primitive union types") {
+      val service = models.TestHelper.generatorApiServiceWithUnionAndDescriminator
+      val ssd = new ScalaService(service)
+      val json = CirceJson(ssd)
+      val scalaSourceCode = json.generate()
+      assertValidScalaSourceCode(scalaSourceCode)
+      scalaSourceCode should include ("decodeApidocExampleUnionTypesDiscriminatorUserString")
+      scalaSourceCode should include ("encodeApidocExampleUnionTypesDiscriminatorUserString")
+    }
   }
 }

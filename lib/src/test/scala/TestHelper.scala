@@ -19,6 +19,7 @@ object TestHelper extends Matchers {
   lazy val referenceWithImportsApiService = parseFile(s"/examples/reference-with-imports.json")
   lazy val generatorApiService = parseFile(s"/examples/apidoc-generator.json")
   lazy val apidocApiService = parseFile(s"/examples/apidoc-api.json")
+  lazy val generatorApiServiceWithUnionAndDescriminator = parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
 
   def buildJson(json: String): String = {
     val specVersion = io.apibuilder.spec.v0.Constants.Version
