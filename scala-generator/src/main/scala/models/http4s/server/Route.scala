@@ -173,8 +173,9 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     val decoding = if(op.formParameters.nonEmpty) {
       Seq(s"if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {",
           s"  _req.attemptAs[$requestCaseClassName].value.map{",
-          s"    req =>") ++ route("req.").map(_.indent(4)) ++
-      Seq(s"  }.toOption.getOrElse(BadRequest())",
+          s"    case Right(req) =>") ++ route("req.").map(_.indent(4)) ++
+      Seq(s"    case Left(_) => BadRequest()",
+          s"  }",
           s"} else {",
           s"    _req.decode[_root_.org.http4s.UrlForm] {",
           s"      req =>",

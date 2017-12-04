@@ -84,11 +84,12 @@ trait ModelRoutes {
     case _req @ POST -> Root / "test" if apiVersionMatch(_req) =>
     if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {
       _req.attemptAs[PostRequest].value.map{
-        req =>
+        case Right(req) =>
           post(_req, req.id, req.model, req.enum, req.opt, req.list, req.map).flatMap {
             case PostResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
           }
-      }.toOption.getOrElse(BadRequest())
+        case Left(_) => BadRequest()
+      }
     } else {
         _req.decode[_root_.org.http4s.UrlForm] {
           req =>
