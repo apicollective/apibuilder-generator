@@ -74,8 +74,19 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val json = CirceJson(ssd)
       val scalaSourceCode = json.generate()
       assertValidScalaSourceCode(scalaSourceCode)
+
       scalaSourceCode should include ("decodeApidocExampleUnionTypesDiscriminatorUserString")
       scalaSourceCode should include ("encodeApidocExampleUnionTypesDiscriminatorUserString")
+    }
+
+    it("Circe generator produces valid json decoder for unions without descriminator") {
+      val service = models.TestHelper.generatorApiServiceWithUnionWithoutDescriminator
+      val ssd = new ScalaService(service)
+      val json = CirceJson(ssd)
+      val scalaSourceCode = json.generate()
+      assertValidScalaSourceCode(scalaSourceCode)
+
+      scalaSourceCode should not include ("import cats.implicits._")
     }
   }
 }

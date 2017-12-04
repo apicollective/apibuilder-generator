@@ -87,7 +87,6 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
   private[this] def decodersWithoutDiscriminator(union: ScalaUnion): String = {
     Seq(
       s"${implicitDecoderDef(union.name)} = Decoder.instance { c =>",
-      s"  import cats.implicits._",
       unionTypesWithNames(union).map { case (t, typeName) =>
         s"""c.get[$typeName]("${t.discriminatorName}") orElse"""
       }.mkString("\n").indent(2),
