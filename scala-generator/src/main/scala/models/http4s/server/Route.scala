@@ -1,6 +1,6 @@
 package scala.models.http4s.server
 
-import io.apibuilder.spec.v0.models.ResponseCodeInt
+import io.apibuilder.spec.v0.models.{Method, ResponseCodeInt}
 
 import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaOperation, ScalaParameter, ScalaPrimitive, ScalaResource, ScalaUtil}
 import lib.Text._
@@ -46,7 +46,18 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     }
   }
 
+  val nonHeaderParameters = op.nonHeaderParameters.map { field =>
+    val typ = field.datatype match {
+      case ScalaDatatype.Option(container: ScalaDatatype.Container) => container.name
+      case other => other.name
+    }
+    Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
+  }
+
+  val requestCaseClassName = s"${op.name.capitalize}Request"
+
   def operation(): Seq[String] = {
+
     val responses = statusCodes.map { case StatusCode(code, datatype) =>
       datatype.fold(
         s"""case class HTTP$code(headers: Seq[org.http4s.Header] = Nil) extends $responseTrait""".stripMargin
@@ -57,16 +68,30 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
     val params =
       Seq(Some(s"_req: ${config.requestClass}")) ++
-      op.nonHeaderParameters.map { field =>
-        val typ = field.datatype match {
-          case ScalaDatatype.Option(container: ScalaDatatype.Container) => container.name
-          case other => other.name
-        }
-        Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
-      } ++
-      Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
+        nonHeaderParameters ++
+        Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
 
-    Seq(
+    val requestCaseClass = s"$requestCaseClassName(${nonHeaderParameters.flatten.mkString(", ")})"
+
+    val requestDecoder = Seq(s"implicit val ${requestCaseClassName}Decoder: _root_.io.circe.Decoder[$requestCaseClassName] = _root_.io.circe.Decoder.instance { a =>",
+                             s"  for {",
+                             op.nonHeaderParameters.map(p => s"""    ${p.name} <- a.downField("${p.originalName}").as[${p.datatype.name}]""").mkString("\n"),
+                             s"  } yield {",
+                             s"    $requestCaseClassName(",
+                             op.nonHeaderParameters.map(p => s"""      ${p.name} = ${p.name}""").mkString(",\n"),
+                             s"    )",
+                             s"  }",
+                             s"}")
+
+    val requestCaseClassAndDecoder = op.formParameters match {
+      case Nil => Seq()
+      case _ => Seq(
+        s"case class $requestCaseClass",
+        s"") ++ requestDecoder ++ Seq("")
+    }
+
+      requestCaseClassAndDecoder ++
+      Seq(
       s"sealed trait $responseTrait",
       s"",
       s"object ${op.name.capitalize}Response {",
@@ -80,9 +105,12 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
   }
 
   def route(version: Option[Int]): Seq[String] = {
-    val args = (
+
+    def nonHeaderParameters(prefix:String) = op.nonHeaderParameters.map(field => Some(s"$prefix${ScalaUtil.quoteNameIfKeyword(field.originalName)}"))
+
+    def args(prefix:String) = (
       Seq(Some("_req")) ++
-        op.nonHeaderParameters.map(field => Some(s"${ScalaUtil.quoteNameIfKeyword(field.originalName)}")) ++
+        nonHeaderParameters(prefix) ++
         Seq(op.body.map(body => s"_req.attemptAs[${body.datatype.name}]"))
       ).flatten.mkString(", ")
 
@@ -106,16 +134,63 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
     val verFilter = version.fold("")(_ => " if apiVersionMatch(_req)")
 
-    Seq(
-      s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>",
-      s"  ${op.name}($args).flatMap {"
-    ) ++ statusCodes.collect {
-      case StatusCode(code, Some(_)) =>
-        s"    case $responseTrait.HTTP$code(value, headers) => ${HttpStatusCodes.apply(code)}(value).putHeaders(headers: _*)"
-      case StatusCode(code, None) =>
-        s"    case $responseTrait.HTTP$code(headers) => ${HttpStatusCodes.apply(code)}().putHeaders(headers: _*)"
-    } ++ Seq(
-      s"  }"
-    )
+    def route(prefix:String) = Seq(s"  ${op.name}(${args(prefix)}).flatMap {"
+                  ) ++ statusCodes.collect {
+                    case StatusCode(code, Some(_)) =>
+                    s"    case $responseTrait.HTTP$code(value, headers) => ${HttpStatusCodes.apply(code)}(value).putHeaders(headers: _*)"
+                    case StatusCode(code, None) =>
+                    s"    case $responseTrait.HTTP$code(headers) => ${HttpStatusCodes.apply(code)}().putHeaders(headers: _*)"
+                  } ++ Seq(
+                    s"  }")
+
+    val prefix = Seq(s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>")
+
+    val decodingParameters:Seq[String] = {
+      op.nonHeaderParameters.map { field =>
+        val name = ScalaUtil.quoteNameIfKeyword(field.name)
+        val originalName = ScalaUtil.quoteNameIfKeyword(field.originalName)
+        val datatype = field.datatype.name
+
+        field.datatype match {
+          case ScalaPrimitive.String => s"""$name <- req.getFirst("$originalName")"""
+          case _: ScalaPrimitive => s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[$datatype](f).toOption)"""
+          case ScalaDatatype.Option(inner) =>
+            inner match {
+              case ScalaPrimitive.String => s"""$name <- Some(req.getFirst("$originalName"))"""
+              case _ => s"""$name <- Some(req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[${inner.name}](f).toOption))"""
+            }
+          case ScalaDatatype.Map(_) =>
+            s"""$name <- req.getFirst("$originalName").flatMap(f => _root_.io.circe.parser.decode[$datatype](f).toOption)"""
+          case ScalaDatatype.List(inner) =>
+            inner match {
+              case ScalaPrimitive.String => s"""$name <- Some(req.get("$originalName"))"""
+              case _ => s"""$name <- Some(req.get("$originalName").flatMap(f => _root_.io.circe.parser.decode[${inner.name}](f).toOption))"""
+            }
+        }
+      }.map(_.indent(10))
+    }
+
+    val decoding = if(op.formParameters.nonEmpty) {
+      Seq(s"if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {",
+          s"  _req.attemptAs[$requestCaseClassName].value.map{",
+          s"    case Right(req) =>") ++ route("req.").map(_.indent(4)) ++
+      Seq(s"    case Left(_) => BadRequest()",
+          s"  }",
+          s"} else {",
+          s"    _req.decode[_root_.org.http4s.UrlForm] {",
+          s"      req =>",
+          s"        val responseOpt = for {") ++ decodingParameters ++
+        Seq(s"        } yield {") ++ route("").map(_.indent(10)) ++
+        Seq(s"          }",
+          s"        responseOpt.getOrElse(BadRequest())",
+          s"  }",
+          s"}")
+    } else {
+      route("")
+    }
+
+    prefix ++ decoding
+
   }
+
 }
