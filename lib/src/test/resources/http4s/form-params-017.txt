@@ -83,7 +83,7 @@ trait ModelRoutes {
   def service() = org.http4s.HttpService {
     case _req @ POST -> Root / "test" if apiVersionMatch(_req) =>
     if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {
-      _req.attemptAs[PostRequest].value.map{
+      _req.attemptAs[PostRequest].value.flatMap{
         case Right(req) =>
           post(_req, req.id, req.model, req.enum, req.opt, req.list, req.map).flatMap {
             case PostResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
