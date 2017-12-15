@@ -179,7 +179,7 @@ class MockClientGenerator(
       case ScalaPrimitive.DateIso8601Java => "java.time.LocalDate.now"
       case ScalaPrimitive.DateTimeIso8601Joda => "org.joda.time.DateTime.now"
       case ScalaPrimitive.DateTimeIso8601Java => "java.time.Instant.now"
-      case ScalaPrimitive.Decimal => """BigDecimal("1")"""
+      case ScalaPrimitive.Decimal => """BigDecimal("1.99")"""
       case ScalaPrimitive.ObjectAsPlay => "play.api.libs.json.Json.obj()"
       case ScalaPrimitive.ObjectAsCirce => "Map()"
       case ScalaPrimitive.String => "Factories.randomString()"
