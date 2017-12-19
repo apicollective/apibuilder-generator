@@ -1,6 +1,6 @@
 package models.generator.kotlin
 
-import java.io.StringWriter
+import java.io.{IOException, StringWriter}
 
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -9,6 +9,7 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import io.reactivex.Single
 import lib.generator.CodeGenerator
+
 import scala.collection.JavaConverters._
 
 class KotlinGenerator
@@ -29,6 +30,9 @@ class KotlinGenerator
     private val modelsNameSpace = nameSpace + ".models"
     private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
 
+    private val sharedJacksonSpace = modelsNameSpace
+    private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
+
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
     def generateEnum(enum: io.apibuilder.spec.v0.models.Enum): File = {
@@ -43,9 +47,23 @@ class KotlinGenerator
       val allEnumValues = enum.values ++ Seq(io.apibuilder.spec.v0.models.EnumValue(undefinedEnumName, Some(undefinedEnumName)))
 
       allEnumValues.foreach(value => {
-        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + value.name + "\"")
-        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("").addAnnotation(annotation.build()).build())
+        val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
+        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder(""""""" +  s"${value.name}" + """"""").addAnnotation(annotation.build()).build())
       })
+
+      val nameField = "jsonProperty"
+      val nameFieldType = ClassName.bestGuess("kotlin.String")
+      builder.addProperty(PropertySpec.builder(nameField, nameFieldType, KModifier.PRIVATE, KModifier.FINAL).build())
+
+      val constructorWithParams = FunSpec.constructorBuilder()
+      val constructorParameter = ParameterSpec.builder(nameField, nameFieldType)
+      constructorWithParams.addParameter(constructorParameter.build)
+      constructorWithParams.addStatement(s"this.$nameField = $nameField")
+      builder.primaryConstructor(constructorWithParams.build())
+
+      val toStringMethod = FunSpec.builder("toString").addModifiers(KModifier.OVERRIDE, KModifier.PUBLIC).returns(nameFieldType)
+      toStringMethod.addStatement(s"return $nameField")
+      builder.addFunction(toStringMethod.build)
 
       makeFile(className, builder)
     }
@@ -99,6 +117,9 @@ class KotlinGenerator
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown=true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
+      builder.addSuperinterface(classOf[java.io.Serializable])
+
+
       model.description.map(builder.addKdoc(_))
 
       val constructorWithParams = FunSpec.constructorBuilder()
@@ -121,12 +142,25 @@ class KotlinGenerator
 
         val kotlinDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
-        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, kotlinDataType)
+        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if(field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
         constructorWithParams.addParameter(constructorParameter.build)
-        propSpecs.add(PropertySpec.builder(fieldCamelCaseName, kotlinDataType).initializer(fieldCamelCaseName).build())
+        propSpecs.add(PropertySpec.builder(fieldCamelCaseName, if(field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable()).initializer(fieldCamelCaseName).build())
       })
 
       builder.primaryConstructor(constructorWithParams.build).addProperties(propSpecs)
+
+      val toJsonString = FunSpec.builder("toJsonString").addModifiers(KModifier.PUBLIC).returns(ClassName.bestGuess("kotlin.String")) //.addException(classOf[JsonProcessingException])
+      toJsonString.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().writeValueAsString(this)")
+      builder.addFunction(toJsonString.build)
+
+      val companionBuilder = TypeSpec.companionObjectBuilder()
+      val fromBuilder = FunSpec.builder("parseJson").addModifiers(KModifier.PUBLIC).addParameter("json", ClassName.bestGuess("kotlin.String"))
+      val modelType = ClassName.bestGuess(modelsNameSpace + "." + className)
+      fromBuilder.returns(modelType)
+      fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue( json, ${modelType.simpleName() + "::class.java"})")
+      companionBuilder.addFunction(fromBuilder.build)
+      builder.companionObject(companionBuilder.build())
+
 
       makeFile(className, builder)
     }
@@ -204,7 +238,7 @@ class KotlinGenerator
 
             maybeAnnotationClass.map(annotationClass => {
               val parameterType: TypeName = dataTypeFromField(parameter.`type`, modelsNameSpace)
-              val param = ParameterSpec.builder(toParamName(parameter.name, true), parameterType)
+              val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNullable() else parameterType.asNullable())
               val annotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + parameter.name + "\"").build
               param.addAnnotation(annotation)
               method.addParameter(param.build)
@@ -248,7 +282,7 @@ class KotlinGenerator
     }
 
     def generateJacksonObjectMapper(): File = {
-      val className = "JacksonObjectMapperFactory"
+      val className = sharedObjectMapperClassName
       val deserializationFeatureClassName = classOf[DeserializationFeature].getName
       val createCodeBlock = CodeBlock.builder()
         .addStatement("val mapper = com.fasterxml.jackson.databind.ObjectMapper()")
