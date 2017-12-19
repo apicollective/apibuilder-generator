@@ -1,0 +1,416 @@
+{
+  "apidoc": {
+    "version": "0.13.11"
+  },
+  "name": "built-in-types",
+  "organization": {
+    "key": "apibuilder"
+  },
+  "application": {
+    "key": "built-in-types"
+  },
+  "namespace": "apibuilder",
+  "version": "0.0.1-dev",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [],
+  "models": [
+    {
+      "name": "array",
+      "plural": "arrays",
+      "fields": [
+        {
+          "name": "boolean",
+          "type": "[boolean]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "dateiso8601",
+          "type": "[date-iso8601]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "datetimeiso8601",
+          "type": "[date-time-iso8601]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "decimal",
+          "type": "[decimal]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "double",
+          "type": "[double]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "integer",
+          "type": "[integer]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "json",
+          "type": "[json]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "long",
+          "type": "[long]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "object",
+          "type": "[object]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "string",
+          "type": "[string]",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "uuid",
+          "type": "[uuid]",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "optarray",
+      "plural": "optarrays",
+      "fields": [
+        {
+          "name": "boolean",
+          "type": "[boolean]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "dateiso8601",
+          "type": "[date-iso8601]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "datetimeiso8601",
+          "type": "[date-time-iso8601]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "decimal",
+          "type": "[decimal]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "double",
+          "type": "[double]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "integer",
+          "type": "[integer]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "json",
+          "type": "[json]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "long",
+          "type": "[long]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "object",
+          "type": "[object]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "string",
+          "type": "[string]",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "uuid",
+          "type": "[uuid]",
+          "required": false,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "optional",
+      "plural": "optionals",
+      "fields": [
+        {
+          "name": "boolean",
+          "type": "boolean",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "dateiso8601",
+          "type": "date-iso8601",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "datetimeiso8601",
+          "type": "date-time-iso8601",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "decimal",
+          "type": "decimal",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "double",
+          "type": "double",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "integer",
+          "type": "integer",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "json",
+          "type": "json",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "long",
+          "type": "long",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "object",
+          "type": "object",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "string",
+          "type": "string",
+          "required": false,
+          "attributes": []
+        },
+        {
+          "name": "uuid",
+          "type": "uuid",
+          "required": false,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "required",
+      "plural": "requireds",
+      "fields": [
+        {
+          "name": "boolean",
+          "type": "boolean",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "dateiso8601",
+          "type": "date-iso8601",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "datetimeiso8601",
+          "type": "date-time-iso8601",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "decimal",
+          "type": "decimal",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "double",
+          "type": "double",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "integer",
+          "type": "integer",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "json",
+          "type": "json",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "long",
+          "type": "long",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "object",
+          "type": "object",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "string",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "uuid",
+          "type": "uuid",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "array",
+      "plural": "arrays",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/arrays",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "array",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/arrays"
+    },
+    {
+      "type": "optarray",
+      "plural": "optarrays",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/optarrays",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "optarray",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/optarrays"
+    },
+    {
+      "type": "optional",
+      "plural": "optionals",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/optionals",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "optional",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/optionals"
+    },
+    {
+      "type": "required",
+      "plural": "requireds",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/requireds",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "required",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/requireds"
+    }
+  ],
+  "attributes": []
+}
