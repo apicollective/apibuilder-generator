@@ -31,7 +31,7 @@ case class UrlValues(
     val varName = s"${prefix}." + GoUtil.publicName(param.name)
 
     goType.datatype match {
-      case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) => {
+      case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.Primitive.Boolean | Datatype.Primitive.Object | Datatype.Primitive.JsonValue | Datatype.Primitive.Unit | Datatype.UserDefined.Enum(_) => {
         param.default match {
           case None => {
             Seq(

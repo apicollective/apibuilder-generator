@@ -34,6 +34,17 @@ case class ResponseBuilder(
         )
       }
 
+      case Datatype.Primitive.JsonValue => {
+        val json = importBuilder.ensureImport("encoding/json")
+        Some(
+          Seq(
+            s"var tmp ${goType.klass.localName}",
+            s"${json}.NewDecoder($readerName).Decode(&tmp)",
+            "tmp"
+          ).mkString("\n")
+        )
+      }
+
       case Datatype.Primitive.String => {
         Some(s"$readerName.(string)")
       }

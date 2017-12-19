@@ -35,6 +35,9 @@ case class GoType(
       case Datatype.Primitive.Object => {
         "nil"
       }
+      case Datatype.Primitive.JsonValue => {
+        "nil"
+      }
       case Datatype.Primitive.Unit => {
         "nil"
       }
@@ -130,6 +133,7 @@ case class GoType(
       case Datatype.Primitive.DateTimeIso8601 => varName // TODO
       case Datatype.Primitive.Decimal => varName
       case Datatype.Primitive.Object => sys.error("Object cannot be converted to escaped string")
+      case Datatype.Primitive.JsonValue => sys.error("Json cannot be converted to escaped string")
       case Datatype.Primitive.String => varName
       case Datatype.Primitive.Unit => "nil"
       case Datatype.Primitive.Uuid => varName
@@ -162,7 +166,7 @@ case class GoType(
       case Datatype.Primitive.Boolean | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.UserDefined.Enum(_) => {
         s""""" $operator $varName"""
       }
-      case Datatype.Primitive.Object | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
+      case Datatype.Primitive.Object | Datatype.Primitive.JsonValue | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         s"""nil $operator $varName"""
       }
       case Datatype.Container.Option(inner) => {
@@ -196,6 +200,7 @@ object GoType {
       case Datatype.Primitive.DateTimeIso8601 => Klass("string")
       case Datatype.Primitive.Decimal => Klass("float64") // TODO. Should we use big/math/Float
       case Datatype.Primitive.Object => Klass("map[string]interface{}")
+      case Datatype.Primitive.JsonValue => Klass("interface{}")
       case Datatype.Primitive.String => Klass("string")
       case Datatype.Primitive.Unit => Klass("nil")
       case Datatype.Primitive.Uuid => Klass("string")

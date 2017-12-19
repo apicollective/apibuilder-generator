@@ -460,6 +460,12 @@ case class Play2Json(
       case ScalaPrimitive.ObjectAsCirce => {
         toJsObjectResult(originalName, varName)
       }
+      case ScalaPrimitive.JsonValueAsPlay => {
+        toJsObjectResult(originalName, varName)
+      }
+      case ScalaPrimitive.JsonValueAsCirce => {
+        toJsObjectResult(originalName, varName)
+      }
       case ScalaDatatype.Option(inner) => {
         val value = getJsonObject(originalName, inner, "x").value
         JsObjectResult(
@@ -517,6 +523,9 @@ case class Play2Json(
       }
       case ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce => {
         wrapInObject(s"play.api.libs.json.Json.obj(${varName}.value)", discriminator)
+      }
+      case ScalaPrimitive.JsonValueAsPlay | ScalaPrimitive.JsonValueAsCirce => {
+        wrapInObject(s"${varName}.value)", discriminator)
       }
       case ScalaPrimitive.Enum(ns, name) => {
         discriminator match {

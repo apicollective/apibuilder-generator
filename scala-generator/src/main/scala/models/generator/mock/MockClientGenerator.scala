@@ -182,6 +182,8 @@ class MockClientGenerator(
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
       case ScalaPrimitive.ObjectAsPlay => "play.api.libs.json.Json.obj()"
       case ScalaPrimitive.ObjectAsCirce => "Map()"
+      case ScalaPrimitive.JsonValueAsPlay => "play.api.libs.json.Json.obj().asInstanceOf[play.api.libs.json.JsValue]"
+      case ScalaPrimitive.JsonValueAsCirce => "io.circe.Json.obj()"
       case ScalaPrimitive.String => "Factories.randomString()"
       case ScalaPrimitive.Unit => "// unit type"
       case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"

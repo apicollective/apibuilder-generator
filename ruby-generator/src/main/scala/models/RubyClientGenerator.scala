@@ -215,7 +215,7 @@ object RubyUtil {
         s""""${json.as[String]}""""
       }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) |
-        Primitive.Object | Primitive.Unit => {
+        Primitive.Object | Primitive.JsonValue | Primitive.Unit => {
         throw new UnsupportedOperationException(
           s"unsupported default for type ${datatype.name}")
       }
@@ -915,6 +915,9 @@ ${headers.rubyModuleConstants.indent(2)}
 
           case Primitive.Object =>
             (s"HttpClient::Helper.to_object($expr)", "Hash")
+
+          case Primitive.JsonValue =>
+            (expr, "BasicObject")
         }
 
         s"HttpClient::Preconditions.assert_class('$name', $helperExpr, $className)"
@@ -977,6 +980,7 @@ ${headers.rubyModuleConstants.indent(2)}
       case Primitive.DateIso8601 => "Date"
       case Primitive.DateTimeIso8601 => "DateTime"
       case Primitive.Object => "Hash"
+      case Primitive.JsonValue => "BasicObject"
       case Primitive.String => "String"
       case Primitive.Unit => "nil"
       case Primitive.Uuid => "String"
@@ -1001,7 +1005,7 @@ ${headers.rubyModuleConstants.indent(2)}
       }
       case Primitive.DateIso8601 => s"HttpClient::Helper.date_iso8601_to_string($varName)"
       case Primitive.DateTimeIso8601 => s"HttpClient::Helper.date_time_iso8601_to_string($varName)"
-      case Primitive.Object | Primitive.Unit => {
+      case Primitive.Object | Primitive.JsonValue | Primitive.Unit => {
         sys.error(s"Unsupported type[${pt.name}] for string formatting - varName[$varName]")
       }
     }
@@ -1128,7 +1132,7 @@ ${headers.rubyModuleConstants.indent(2)}
       case p: Primitive => {
         p match {
           case Primitive.Unit => "nil"
-          case Primitive.Boolean | Primitive.Decimal | Primitive.Double | Primitive.Integer | Primitive.Long | Primitive.DateIso8601 | Primitive.DateTimeIso8601 | Primitive.Object | Primitive.String | Primitive.Uuid => {
+          case Primitive.Boolean | Primitive.Decimal | Primitive.Double | Primitive.Integer | Primitive.Long | Primitive.DateIso8601 | Primitive.DateTimeIso8601 | Primitive.Object | Primitive.JsonValue | Primitive.String | Primitive.Uuid => {
             //s"${qualifiedClassName(RubyUtil.toDefaultVariable())}.new(${varName})"
             varName
           }

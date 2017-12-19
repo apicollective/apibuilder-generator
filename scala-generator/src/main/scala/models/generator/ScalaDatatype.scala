@@ -216,6 +216,26 @@ object ScalaPrimitive {
     }
   }
 
+  case object JsonValueAsPlay extends ScalaPrimitive {
+    override def namespace = Some("_root_.play.api.libs.json")
+    def apidocType = "json"
+    def shortName = "JsValue"
+    override def asString(originalVarName: String): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.toString"
+    }
+  }
+
+  case object JsonValueAsCirce extends ScalaPrimitive {
+    override def namespace: None.type = None
+    def apidocType = "json"
+    def shortName = "_root_.io.circe.Json"
+    override def asString(originalVarName: String): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.asJson"
+    }
+  }
+
   case object String extends ScalaPrimitive {
     def apidocType = "string"
     def shortName = "String"
@@ -376,6 +396,7 @@ case class ScalaTypeResolver(
       case Datatype.Primitive.Double => ScalaPrimitive.Double
       case Datatype.Primitive.Long => ScalaPrimitive.Long
       case Datatype.Primitive.Object => ScalaPrimitive.ObjectAsPlay
+      case Datatype.Primitive.JsonValue => ScalaPrimitive.JsonValueAsPlay
       case Datatype.Primitive.String => ScalaPrimitive.String
       case Datatype.Primitive.DateIso8601 => ScalaPrimitive.DateIso8601Joda
       case Datatype.Primitive.DateTimeIso8601 => ScalaPrimitive.DateTimeIso8601Joda
