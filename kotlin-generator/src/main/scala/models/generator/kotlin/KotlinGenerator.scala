@@ -48,7 +48,7 @@ class KotlinGenerator
 
       allEnumValues.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
-        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder(""""""" +  s"${value.name}" + """"""").addAnnotation(annotation.build()).build())
+        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("\"" + value.name + "\"").addAnnotation(annotation.build()).build())
       })
 
       val nameField = "jsonProperty"
