@@ -150,7 +150,7 @@ trait KotlinUtil {
     "double" -> new ClassName("kotlin","Double"),
     "integer" -> new ClassName("kotlin", "Int"),
     "long" -> new ClassName("kotlin", "Long"),
-    "object" -> new ClassName("kotlin.collections","Map"),
+    "object" -> new ClassName("kotlin","Any"),
     "string" -> new ClassName("kotlin","String"),
     "unit" -> new ClassName("kotlin", "Unit"),
     "uuid" -> new ClassName("java.util","UUID")
@@ -195,7 +195,7 @@ trait KotlinUtil {
     if (input == undefinedEnumName) {
       input
     } else {
-      Text.snakeToCamelCase(Text.safeName(input.replaceAll("\\.", "_"))).capitalize
+      Text.safeName(input.replaceAll("\\.", "_")).toUpperCase
     }
   }
 
