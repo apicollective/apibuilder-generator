@@ -1,6 +1,6 @@
 package models.generator.kotlin
 
-import java.io.{IOException, StringWriter}
+import java.io.StringWriter
 
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.DeserializationFeature
