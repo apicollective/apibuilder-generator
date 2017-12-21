@@ -2,36 +2,44 @@ package models.generator.kotlin
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import java.nio.file.Files.createTempDirectory
 
 import KotlinTestHelper._
 
 class KotlinGeneratorTest
-  extends FlatSpec
+  extends FunSpec
     with Matchers {
 
-  "invoke" should "output Kotlin source files" in {
-    val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
-    tmpDir.deleteOnExit()
-    val service = models.TestHelper.apidocApiService
-    service.enums.size shouldBe (3)
-    val invocationForm = new InvocationForm(service, Seq.empty, None)
-    val generator = new KotlinGenerator()
-    val files = generator.invoke(invocationForm).right.get
-    writeFiles(tmpDir, files)
-    files.size shouldBe > (0)
-    files.foreach(f => {
-      f.contents.length shouldBe > (0)
-      f.name should endWith (".kt")
-      // assertValidKotlinSourceCode(tmpDir)
-     })
-    files.exists(
-      file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
-    ) shouldBe true
+  import models.TestHelper._
 
-    Seq("Visibility", "Publication", "OriginalType").foreach { enumName =>
-      enumFileExists(files, enumName) shouldBe true
+  val serviceDefs = Seq(apidocApiService, generatorApiServiceWithUnionAndDescriminator)
+
+  describe("invoke should output Kotlin source files") {
+    for (service <- serviceDefs) {
+      it(s"for service [${service.name}]") {
+        val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
+        tmpDir.deleteOnExit()
+        val service = models.TestHelper.apidocApiService
+        service.enums.size shouldBe (3)
+        val invocationForm = new InvocationForm(service, Seq.empty, None)
+        val generator = new KotlinGenerator()
+        val files = generator.invoke(invocationForm).right.get
+        writeFiles(tmpDir, files)
+        files.size shouldBe >(0)
+        files.foreach(f => {
+          f.contents.length shouldBe >(0)
+          f.name should endWith(".kt")
+          // assertValidKotlinSourceCode(tmpDir)
+        })
+        files.exists(
+          file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
+        ) shouldBe true
+
+        Seq("Visibility", "Publication", "OriginalType").foreach { enumName =>
+          enumFileExists(files, enumName) shouldBe true
+        }
+      }
     }
   }
 
