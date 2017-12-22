@@ -151,6 +151,7 @@ trait KotlinUtil {
     "integer" -> new ClassName("kotlin", "Int"),
     "long" -> new ClassName("kotlin", "Long"),
     "object" -> new ClassName("kotlin","Any"),
+    "json" -> new ClassName("kotlin","Any"),
     "string" -> new ClassName("kotlin","String"),
     "unit" -> new ClassName("kotlin", "Unit"),
     "uuid" -> new ClassName("java.util","UUID")

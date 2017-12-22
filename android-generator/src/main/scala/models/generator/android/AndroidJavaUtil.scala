@@ -96,6 +96,7 @@ trait AndroidJavaUtil {
     "integer" -> ClassName.get("java.lang", "Integer"),
     "long" -> ClassName.get("java.lang", "Long"),
     "object" -> ClassName.get("java.util","Map"),
+    "json" -> ClassName.get("java.lang","Object"),
     "string" -> ClassName.get("java.lang","String"),
     "unit" -> ClassName.get("java.lang", "Void"),
     "uuid" -> ClassName.get("java.util","UUID")
