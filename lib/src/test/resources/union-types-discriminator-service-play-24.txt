@@ -91,7 +91,10 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     private[this]
     val byName: Map[String, SystemUser] = all.map(x => x.toString.toLowerCase -> x).toMap
 
-    def apply(value: String): SystemUser = fromString(value).getOrElse(UNDEFINED(value))
+    def apply(value: String)(implicit onUndefined: String => Unit = _ => {}): SystemUser = fromString(value).getOrElse {
+    	onUndefined(value)
+    	UNDEFINED(value)
+    }
 
     def fromString(value: String): _root_.scala.Option[SystemUser] = byName.get(value.toLowerCase)
 

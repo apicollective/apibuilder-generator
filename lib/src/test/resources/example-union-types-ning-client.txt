@@ -110,7 +110,10 @@ package io.apibuilder.example.union.types.v0.models {
     private[this]
     val byName: Map[String, Bar] = all.map(x => x.toString.toLowerCase -> x).toMap
 
-    def apply(value: String): Bar = fromString(value).getOrElse(UNDEFINED(value))
+    def apply(value: String)(implicit onUndefined: String => Unit = _ => {}): Bar = fromString(value).getOrElse {
+    	onUndefined(value)
+    	UNDEFINED(value)
+    }
 
     def fromString(value: String): _root_.scala.Option[Bar] = byName.get(value.toLowerCase)
 
@@ -143,7 +146,10 @@ package io.apibuilder.example.union.types.v0.models {
     private[this]
     val byName: Map[String, Foo] = all.map(x => x.toString.toLowerCase -> x).toMap
 
-    def apply(value: String): Foo = fromString(value).getOrElse(UNDEFINED(value))
+    def apply(value: String)(implicit onUndefined: String => Unit = _ => {}): Foo = fromString(value).getOrElse {
+    	onUndefined(value)
+    	UNDEFINED(value)
+    }
 
     def fromString(value: String): _root_.scala.Option[Foo] = byName.get(value.toLowerCase)
 
