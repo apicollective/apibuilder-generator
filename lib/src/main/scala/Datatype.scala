@@ -19,6 +19,7 @@ object Datatype {
       case "date-time-iso8601" => DateTimeIso8601
       case "decimal" => Decimal
       case "object" => Object
+      case "json" => JsonValue
       case "string" => String
       case "unit" => Unit
       case "uuid" => Uuid
@@ -32,6 +33,7 @@ object Datatype {
     case object DateTimeIso8601 extends Primitive("date-time-iso8601")
     case object Decimal extends Primitive("decimal")
     case object Object extends Primitive("object")
+    case object JsonValue extends Primitive("json")
     case object String extends Primitive("string")
     case object Unit extends Primitive("unit")
     case object Uuid extends Primitive("uuid")
@@ -105,6 +107,7 @@ case class DatatypeResolver(
       case "date-time-iso8601" => Success(Datatype.Primitive.DateTimeIso8601)
       case "decimal" => Success(Datatype.Primitive.Decimal)
       case "object" => Success(Datatype.Primitive.Object)
+      case "json" => Success(Datatype.Primitive.JsonValue)
       case "string" => Success(Datatype.Primitive.String)
       case "unit" => Success(Datatype.Primitive.Unit)
       case "uuid" => Success(Datatype.Primitive.Uuid)

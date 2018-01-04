@@ -14,6 +14,7 @@ object Conversions {
     ScalaPrimitive.DateTimeIso8601Joda,
     ScalaPrimitive.Decimal,
     ScalaPrimitive.ObjectAsPlay,
+    ScalaPrimitive.JsonValueAsPlay,
     ScalaPrimitive.String,
     ScalaPrimitive.Uuid
   )

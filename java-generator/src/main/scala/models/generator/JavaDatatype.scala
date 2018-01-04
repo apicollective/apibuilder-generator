@@ -97,7 +97,13 @@ object JavaDatatypes {
   case object Object extends NativeDatatype {
     override val apidocType = "object"
     override val namespace = Some("java.util")
-    override val shortName = "Map<String, String>"
+    override val shortName = "Map<String, Object>"
+  }
+
+  case object JsonValue extends NativeDatatype {
+    override val apidocType = "json"
+    override val namespace = Some("java.lang")
+    override val shortName = "Object"
   }
 
   case object String extends NativeDatatype {
@@ -209,6 +215,7 @@ object JavaDatatype {
     case Datatype.Primitive.Double => JavaDatatypes.Double
     case Datatype.Primitive.Long => JavaDatatypes.Long
     case Datatype.Primitive.Object => JavaDatatypes.Object
+    case Datatype.Primitive.JsonValue => JavaDatatypes.JsonValue
     case Datatype.Primitive.String => JavaDatatypes.String
     case Datatype.Primitive.DateIso8601 => JavaDatatypes.DateIso8601
     case Datatype.Primitive.DateTimeIso8601 => JavaDatatypes.DateTimeIso8601

@@ -75,6 +75,58 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
     models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
   }
 
+  describe("Play 2.2.x generator basic output") {
+    it("generates built-in types") {
+      val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
+      Play22ClientGenerator.invoke(InvocationForm(service = service)) match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
+          models.TestHelper.assertEqualsFile("/generators/play-22-built-in-types.txt", sourceFiles.head.contents)
+        }
+      }
+    }
+  }
+
+  describe("Play 2.3.x generator basic output") {
+    it("generates built-in types") {
+      val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
+      Play23ClientGenerator.invoke(InvocationForm(service = service)) match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
+          models.TestHelper.assertEqualsFile("/generators/play-23-built-in-types.txt", sourceFiles.head.contents)
+        }
+      }
+    }
+  }
+
+  describe("Play 2.4.x generator basic output") {
+    it("generates built-in types") {
+      val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
+      Play24ClientGenerator.invoke(InvocationForm(service = service)) match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
+          models.TestHelper.assertEqualsFile("/generators/play-24-built-in-types.txt", sourceFiles.head.contents)
+        }
+      }
+    }
+  }
+
+  describe("Play 2.5.x generator basic output") {
+    it("generates built-in types") {
+      val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
+      Play25ClientGenerator.invoke(InvocationForm(service = service)) match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
+          models.TestHelper.assertEqualsFile("/generators/play-25-built-in-types.txt", sourceFiles.head.contents)
+        }
+      }
+    }
+  }
+
   describe("Play 2.6.x generator basic output") {
     val service = models.TestHelper.generatorApiService
     val ssd = new ScalaService(service)
@@ -92,6 +144,17 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
       rawContent.contains("withQueryStringParameters(").shouldBe(true)
       rawContent.contains("withHeaders(").shouldBe(false)
       rawContent.contains("withQueryString(").shouldBe(false)
+    }
+
+    it("generates built-in types") {
+      val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
+      Play26ClientGenerator.invoke(InvocationForm(service = service)) match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
+          models.TestHelper.assertEqualsFile("/generators/play-26-built-in-types.txt", sourceFiles.head.contents)
+        }
+      }
     }
   }
 

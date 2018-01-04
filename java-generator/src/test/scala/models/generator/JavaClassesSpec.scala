@@ -6,6 +6,7 @@ import io.apibuilder.spec.v0.models.{Apidoc, Application, Enum, EnumValue, Field
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.mock.MockitoSugar
 import com.github.javaparser.JavaParser
+import io.apibuilder.generator.v0.models.InvocationForm
 import models.generator.JavaClasses.Generator
 
 class JavaClassesSpec extends FunSpec with Matchers with MockitoSugar {
@@ -225,6 +226,17 @@ class JavaClassesSpec extends FunSpec with Matchers with MockitoSugar {
           |
           |    public TestModel() {}
           |}""".stripMargin
+    }
+  }
+
+  it("generates built-in types") {
+    val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
+    JavaClasses.invoke(InvocationForm(service = service)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 4
+        models.TestHelper.assertEqualsFile("/generators/java-built-in-types.txt", sourceFiles.map(_.contents).mkString("\n"))
+      }
     }
   }
 

@@ -46,19 +46,19 @@ lazy val scalaGenerator = project
   .in(file("scala-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 77.5))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 80.7))
 
 lazy val rubyGenerator = project
   .in(file("ruby-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 89.4))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 89.6))
 
 lazy val javaGenerator = project
   .in(file("java-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 44.5))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 68.0))
 
 lazy val goGenerator = project
   .in(file("go-generator"))

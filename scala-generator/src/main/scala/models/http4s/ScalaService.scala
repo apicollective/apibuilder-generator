@@ -1,7 +1,7 @@
 package scala.models.http4s
 
 import scala.generator.ScalaDatatype
-import scala.generator.ScalaPrimitive.{ObjectAsPlay, ObjectAsCirce, DateIso8601Joda, DateIso8601Java, DateTimeIso8601Joda, DateTimeIso8601Java}
+import scala.generator.ScalaPrimitive.{ObjectAsPlay, ObjectAsCirce, JsonValueAsPlay, JsonValueAsCirce, DateIso8601Joda, DateIso8601Java, DateTimeIso8601Joda, DateTimeIso8601Java}
 
 import io.apibuilder.spec.v0.models.Service
 import lib.Datatype
@@ -11,6 +11,7 @@ class ScalaService(service: Service) extends scala.generator.ScalaService(servic
 
   private def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
     case ObjectAsPlay => ObjectAsCirce
+    case JsonValueAsPlay => JsonValueAsCirce
     case DateIso8601Joda => DateIso8601Java
     case DateTimeIso8601Joda => DateTimeIso8601Java
     case ScalaDatatype.List(t) => ScalaDatatype.List(convertObjectType(t))

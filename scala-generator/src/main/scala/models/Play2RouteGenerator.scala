@@ -124,10 +124,16 @@ private[models] case class Play2Route(
       value
     }
     case ScalaPrimitive.ObjectAsPlay => {
-      "play.api.libs.json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
+      "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
     }
     case ScalaPrimitive.ObjectAsCirce => {
-      "play.api.libs.json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
+      "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
+    }
+    case ScalaPrimitive.JsonValueAsPlay => {
+      "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
+    }
+    case ScalaPrimitive.JsonValueAsCirce => {
+      "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
     }
     case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Unit => {
       sys.error(s"Unsupported type[$primitive] for default values")
