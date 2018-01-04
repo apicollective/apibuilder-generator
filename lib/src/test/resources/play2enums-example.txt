@@ -26,7 +26,10 @@ object AgeGroup {
   private[this]
   val byName: Map[String, AgeGroup] = all.map(x => x.toString.toLowerCase -> x).toMap
 
-  def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
+  def apply(value: String)(implicit onUndefined: String => Unit = _ => {}): AgeGroup = fromString(value).getOrElse {
+  	onUndefined(value)
+  	UNDEFINED(value)
+  }
 
   def fromString(value: String): _root_.scala.Option[AgeGroup] = byName.get(value.toLowerCase)
 
@@ -60,7 +63,10 @@ object Genre {
   private[this]
   val byName: Map[String, Genre] = all.map(x => x.toString.toLowerCase -> x).toMap
 
-  def apply(value: String): Genre = fromString(value).getOrElse(UNDEFINED(value))
+  def apply(value: String)(implicit onUndefined: String => Unit = _ => {}): Genre = fromString(value).getOrElse {
+  	onUndefined(value)
+  	UNDEFINED(value)
+  }
 
   def fromString(value: String): _root_.scala.Option[Genre] = byName.get(value.toLowerCase)
 

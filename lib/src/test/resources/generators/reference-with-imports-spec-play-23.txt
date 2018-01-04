@@ -108,7 +108,10 @@ package io.apibuilder.reference.api.v0.models {
     private[this]
     val byName: Map[String, AgeGroup] = all.map(x => x.toString.toLowerCase -> x).toMap
 
-    def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
+    def apply(value: String)(implicit onUndefined: String => Unit = _ => {}): AgeGroup = fromString(value).getOrElse {
+    	onUndefined(value)
+    	UNDEFINED(value)
+    }
 
     def fromString(value: String): _root_.scala.Option[AgeGroup] = byName.get(value.toLowerCase)
 
