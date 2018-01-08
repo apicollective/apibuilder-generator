@@ -147,12 +147,14 @@ class KotlinGenerator
         val kotlinDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
+        val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
         val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
         constructorWithParams.addParameter(constructorParameter.build)
         propSpecs.add(
           PropertySpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
             .initializer(fieldCamelCaseName)
             .addAnnotation(annotation.build())
+            .addAnnotation(getterAnnotation.build())
             .build()
         )
       })
