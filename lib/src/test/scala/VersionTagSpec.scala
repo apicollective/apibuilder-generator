@@ -4,9 +4,17 @@ import org.scalatest.{FunSpec, Matchers}
 
 class VersionTagSpec extends FunSpec with Matchers {
 
-  def assertSorted(versions: Seq[String], target: String): Unit = {
+  def assertSorted(versions: Seq[String], target: String) {
     val versionObjects = versions.map( VersionTag(_) )
     versionObjects.sorted.map(_.version).mkString(" ") should be(target)
+  }
+
+  it("sorts developer tags before release tags (latest release tag should be last)") {
+    assertSorted(Seq("1.0.0", "1.0.0-g-1"), "1.0.0-g-1 1.0.0")
+    assertSorted(Seq("0.6.0-3-g3b52fba", "0.7.6"), "0.6.0-3-g3b52fba 0.7.6")
+
+    assertSorted(Seq("0.28.1", "0.28.1-dev"), "0.28.1-dev 0.28.1")
+    assertSorted(Seq("0.28.1-dev", "0.28.1"), "0.28.1-dev 0.28.1")
   }
 
   it("sorts 1 element version") {
@@ -32,11 +40,6 @@ class VersionTagSpec extends FunSpec with Matchers {
 
   it("sorts string tags as strings") {
     assertSorted(Seq("r20140201.1", "r20140201.2"), "r20140201.1 r20140201.2")
-  }
-
-  it("sorts developer tags after release tags") {
-    assertSorted(Seq("1.0.0", "1.0.0-g-1"), "1.0.0 1.0.0-g-1")
-    assertSorted(Seq("0.6.0-3-g3b52fba", "0.7.6"), "0.6.0-3-g3b52fba 0.7.6")
   }
 
   it("sorts strings mixed with semver tags") {
@@ -66,6 +69,27 @@ class VersionTagSpec extends FunSpec with Matchers {
   it("major ignores whitespace") {
     VersionTag(" 1.0").major should be(Some(1))
     VersionTag(" v2.0").major should be(Some(2))
+  }
+
+  it("nextMicro") {
+    VersionTag("foo").nextMicro should be(None)
+    VersionTag("0.0.1").nextMicro should be(Some("0.0.2"))
+    VersionTag("1.2.3").nextMicro should be(Some("1.2.4"))
+    VersionTag("0.0.5-dev").nextMicro should be(None)
+  }
+
+  it("qualifier") {
+    VersionTag("foo").qualifier should be(None)
+    VersionTag("0.0.1").qualifier should be(None)
+    VersionTag("0.0.5-dev").qualifier should be(Some("dev"))
+  }
+
+  it("sorts versions w/ varying lengths") {
+    assertSorted(Seq("1", "0.1"), "0.1 1")
+    assertSorted(Seq("1", "0.1", "0.0.1"), "0.0.1 0.1 1")
+    assertSorted(Seq("1.2", "1.2.1"), "1.2 1.2.1")
+    assertSorted(Seq("1.2", "1.2.1", "2"), "1.2 1.2.1 2")
+
   }
 
 }
