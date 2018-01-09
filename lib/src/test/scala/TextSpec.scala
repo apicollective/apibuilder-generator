@@ -5,12 +5,28 @@ import org.scalatest.Matchers
 
 class TextSpec extends FunSpec with Matchers {
 
-  it("splitIntoWords") {
-    Text.splitIntoWords("foo") should be(Seq("foo"))
-    Text.splitIntoWords("foo_bar") should be(Seq("foo", "bar"))
-    Text.splitIntoWords("foo-bar") should be(Seq("foo", "bar"))
-    Text.splitIntoWords("foo.bar") should be(Seq("foo", "bar"))
-    Text.splitIntoWords("foo:bar") should be(Seq("foo", "bar"))
+  describe("splitIntoWords") {
+
+    it("handles basic separators") {
+      Text.splitIntoWords("foo") should be(Seq("foo"))
+      Text.splitIntoWords("foo_bar") should be(Seq("foo", "bar"))
+      Text.splitIntoWords("foo-bar") should be(Seq("foo", "bar"))
+      Text.splitIntoWords("foo.bar") should be(Seq("foo", "bar"))
+      Text.splitIntoWords("Foo.Bar") should be(Seq("Foo", "Bar"))
+      Text.splitIntoWords("foo:bar") should be(Seq("foo", "bar"))
+    }
+
+    it("flattens multiple delimiters") {
+      Text.splitIntoWords("foo__bar") should be(Seq("foo", "bar"))
+      Text.splitIntoWords("foo--bar") should be(Seq("foo", "bar"))
+      Text.splitIntoWords("foo...bar") should be(Seq("foo", "bar"))
+      Text.splitIntoWords("foo:::bar") should be(Seq("foo", "bar"))
+    }
+
+    it("flattens trims whitespace") {
+      Text.splitIntoWords("  foo_  _bar  ") should be(Seq("foo", "bar"))
+    }
+
   }
 
   it("isValidName") {
@@ -33,6 +49,8 @@ class TextSpec extends FunSpec with Matchers {
     Text.validateName("_") should be(Seq("Name must start with a letter"))
     Text.validateName("vendor") should be(Seq.empty)
     Text.validateName("Vendor") should be(Seq.empty)
+    Text.validateName("some service") should be(Seq("Name can only contain a-z, A-Z, 0-9, - and _ characters"))
+    Text.validateName("me.apidoc.models.service") should be(Seq.empty)
   }
 
   describe("isAlphaNumeric") {
@@ -42,12 +60,13 @@ class TextSpec extends FunSpec with Matchers {
       Text.isAlphaNumeric("this_dog") should be(true)
       Text.isAlphaNumeric("this_DOG") should be(true)
       Text.isAlphaNumeric("this_dog_1") should be(true)
+      Text.isAlphaNumeric("foo.bar") should be(true)
     }
 
     it("for non alpha numeric strings") {
-      Text.isAlphaNumeric("-") should be(false)
       Text.isAlphaNumeric("this!") should be(false)
       Text.isAlphaNumeric(" this") should be(false)
+      Text.isAlphaNumeric("foo bar") should be(false)
     }
 
   }
@@ -56,12 +75,14 @@ class TextSpec extends FunSpec with Matchers {
 
     it("for valid strings") {
       Text.startsWithLetter("this_dog") should be(true)
+      Text.startsWithLetter("this-dog") should be(true)
       Text.startsWithLetter("This dog") should be(true)
       Text.startsWithLetter("this!") should be(true)
     }
 
     it("for invalid strings") {
-      Text.startsWithLetter("-") should be(false)
+      Text.startsWithLetter("-test") should be(false)
+      Text.startsWithLetter("_test") should be(false)
       Text.startsWithLetter("!this") should be(false)
       Text.startsWithLetter("_ this") should be(false)
       Text.startsWithLetter("1this") should be(false)
@@ -161,6 +182,7 @@ class TextSpec extends FunSpec with Matchers {
         "price" -> "prices",
         "metadata" -> "metadata",
         "family" -> "families",
+        "history" -> "histories",
         "datum" -> "data",
         "person" -> "people",
         "species" -> "species",
@@ -178,6 +200,9 @@ class TextSpec extends FunSpec with Matchers {
       val errors = actuals.flatMap { case (singular, plural) =>
         if (Text.pluralize(singular) != plural) {
           Some("a: %s should have been %s but was %s".format(singular, plural, Text.pluralize(singular)))
+        } else if (Text.pluralize(plural) != plural) {
+          Some("a: %s should have been %s but was %s".format(plural, plural, Text.pluralize(plural)))
+          None // TODO
         } else {
           None
         }
@@ -211,7 +236,6 @@ class TextSpec extends FunSpec with Matchers {
     Text.safeName("foo") should be("foo")
     Text.safeName("val") should be("val")
     Text.safeName("foo Bar") should be("fooBar")
-    Text.safeName("foo.Bar") should be("fooBar")
   }
 
   it("underscoreToInitCap") {

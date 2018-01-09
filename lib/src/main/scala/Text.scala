@@ -1,5 +1,7 @@
 package lib
 
+import scala.collection.immutable.StringOps
+
 object Text {
 
   /**
@@ -13,7 +15,7 @@ object Text {
     val alphaNumericError = if (isAlphaNumeric(name)) {
                               Seq.empty
                             } else {
-                              Seq("Name can only contain a-z, A-Z, 0-9 and _ characters")
+                              Seq("Name can only contain a-z, A-Z, 0-9, - and _ characters")
                             }
 
     val startsWithLetterError = if (startsWithLetter(name)) {
@@ -27,7 +29,7 @@ object Text {
     alphaNumericError ++ startsWithLetterError
   }
 
-  private[this] val AlphaNumericRx = "^[a-zA-Z0-9_.\\.]*$".r
+  private[this] val AlphaNumericRx = "^[a-zA-Z0-9-_.\\.]*$".r
 
   def isAlphaNumeric(value: String): Boolean = {
     value match {
@@ -49,12 +51,22 @@ object Text {
   private[this] val Ellipsis = "..."
 
   /**
-   * if value is longer than maxLength characters, it wil be truncated to <= 97
-   * characters and an ellipsis added. We try to truncate on a space to avoid
-   * breaking a word in pieces.
+    * if value is longer than maxLength characters, it wil be truncated
+    * to <= (maxLength-Ellipsis.length) characters and an ellipsis
+    * added. We try to truncate on a space to avoid breaking a word in
+    * pieces.
+    *
+    * @param value The string value to truncate
+    * @param maxLength The max length of the returned string, including the final ellipsis if added. Must be >= 10
+    * @param ellipsis If the string is truncated, this value will be appended to the string.
    */
-  def truncate(value: String, maxLength: Int = 100): String = {
-    require(maxLength >= 10, "maxLength must be >= 10")
+  def truncate(
+    value: String,
+    maxLength: Int = 80,
+    ellipsis: Option[String] = Some(Ellipsis)
+  ): String = {
+    val suffix = ellipsis.getOrElse("")
+    require(maxLength >= suffix.length, "maxLength must be greater than the length of the suffix[${suffix.length}]")
 
     if (value.length <= maxLength) {
       value
@@ -62,15 +74,15 @@ object Text {
       val pieces = value.split(" ")
       var i = pieces.length
       while (i > 0) {
-        val sentence = pieces.slice(0, i).mkString(" ")
-        if (sentence.length <= (maxLength-Ellipsis.length)) {
-          return sentence + Ellipsis
+        val sentence = pieces.slice(0, i).mkString(" ").trim
+        val target = sentence + suffix
+        if (target.length <= maxLength) {
+          return target
         }
         i -= 1
       }
 
-      val letters = value.split("")
-      letters.slice(0, letters.length-4).mkString("") + Ellipsis
+      value.split("").slice(0, maxLength - suffix.length).mkString("") + suffix
     }
   }
 
@@ -116,8 +128,7 @@ object Text {
     }
   }
 
-  private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z\_])""".r
-
+  private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z\-\_])""".r
   def safeName(name: String): String = {
     RemoveUnsafeCharacters.replaceAllIn(name, _ => "").replaceAll("\\.", "_").replaceAll("\\_+", "_").trim
   }
