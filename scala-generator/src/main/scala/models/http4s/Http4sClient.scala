@@ -71,7 +71,7 @@ ${headerString.indent(6)}
       ).toList.map { case (k, v) => org.http4s.Header(k, v) })
 
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
-      val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
+      val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment.takeWhile(_ != '#') }.setQueryParams(queryMap)
 
       val request = ${config.requestClass}(method = m,
                                        uri = uri,
