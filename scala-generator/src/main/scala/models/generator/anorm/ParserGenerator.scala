@@ -202,13 +202,13 @@ trait ParserGenerator extends CodeGenerator {
         case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.JsonValueAsPlay | ScalaPrimitive.JsonValueAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
           // no-op
         }
-        case f@ScalaDatatype.List(inner) => {
+        case f @ ScalaDatatype.List(inner) => {
           addImports(inner)
         }
-        case f@ScalaDatatype.Map(inner) => {
+        case f @ ScalaDatatype.Map(inner) => {
           addImports(inner)
         }
-        case f@ScalaDatatype.Option(inner) => {
+        case f @ ScalaDatatype.Option(inner) => {
           addImports(inner)
         }
         case ScalaPrimitive.Enum(ns, name) => {
@@ -225,31 +225,31 @@ trait ParserGenerator extends CodeGenerator {
 
     private[this] def generateRowParser(fieldName: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
-        case f@ScalaPrimitive.Boolean => s"SqlParser.bool($fieldName)"
-        case f@ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.Integer => s"SqlParser.int($fieldName)"
-        case f@ScalaPrimitive.Long => s"SqlParser.long($fieldName)"
-        case f@ScalaPrimitive.DateIso8601Joda => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.DateIso8601Java => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.DateTimeIso8601Joda => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.DateTimeIso8601Java => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.Decimal => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.ObjectAsPlay => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.ObjectAsCirce => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.JsonValueAsPlay => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.JsonValueAsCirce => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.String => s"SqlParser.str($fieldName)"
-        case f@ScalaPrimitive.Unit => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaPrimitive.Uuid => generatePrimitiveRowParser(fieldName, f)
-        case f@ScalaDatatype.List(inner) => {
+        case f @ ScalaPrimitive.Boolean => s"SqlParser.bool($fieldName)"
+        case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.Integer => s"SqlParser.int($fieldName)"
+        case f @ ScalaPrimitive.Long => s"SqlParser.long($fieldName)"
+        case f @ ScalaPrimitive.DateIso8601Joda => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.DateIso8601Java => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.DateTimeIso8601Joda => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.DateTimeIso8601Java => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.ObjectAsPlay => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.ObjectAsCirce => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.JsonValueAsPlay => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.JsonValueAsCirce => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.String => s"SqlParser.str($fieldName)"
+        case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaDatatype.List(inner) => {
           addImports(inner)
           s"SqlParser.get[Seq[${inner.name}]]($fieldName)"
         }
-        case f@ScalaDatatype.Map(inner) => {
+        case f @ ScalaDatatype.Map(inner) => {
           addImports(inner)
           s"SqlParser.get[Map[String, ${inner.name}]]($fieldName)"
         }
-        case f@ScalaDatatype.Option(inner) => {
+        case f @ ScalaDatatype.Option(inner) => {
           addImports(inner)
           generateRowParser(fieldName, inner, originalName) + ".?"
         }
