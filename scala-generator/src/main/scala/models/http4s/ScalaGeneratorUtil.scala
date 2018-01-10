@@ -11,7 +11,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
       require(p.location == ParameterLocation.Path, "Only singletons can be path parameters.")
       s":${p.originalName}" -> urlEncode(p.name, p.datatype)
     }.toMap
-    val path = op.path.split("/").map(_.trim).filter(!_.isEmpty).map { e => pairs.get(e).getOrElse(s""""$e"""") }
+    val path = op.path.split("/").map(_.trim).filter(!_.isEmpty).map { e => pairs.get(e).getOrElse(s""""${e.takeWhile(_ != '#')}"""") }
     path.mkString("Seq(", ", ", ")").trim
   }
 
