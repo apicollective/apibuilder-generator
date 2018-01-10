@@ -3,7 +3,7 @@ package scala.generator.anorm
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import org.scalatest.{Matchers, FunSpec}
 
-class ParserGeneratorSpec extends FunSpec with Matchers {
+class ParserGenerator24Spec extends FunSpec with Matchers {
 
   val fileNames = Seq("TestApidocTestV1Conversions.scala", "TestApidocTestV1Parsers.scala")
 
@@ -80,7 +80,7 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
 
   it("service with no models") {
     val form = ServiceBuilder().form
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         // Success
       }
@@ -92,13 +92,13 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
 
   it("model with one field") {
     val form = ServiceBuilder(models = Seq(referenceModel)).form
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/reference-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/reference-conversions-24.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/reference.txt", files.last.contents)
       }
     }
@@ -106,13 +106,13 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
 
   it("model with multiple fields") {
     val form = ServiceBuilder(models = Seq(nameModel)).form
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/name-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/name-conversions-24.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/name.txt", files.last.contents)
       }
     }
@@ -132,13 +132,13 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
       }
     """).form
 
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/user-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/user-conversions-24.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/user.txt", files.last.contents)
       }
     }
@@ -167,13 +167,13 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/enum-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/enum-conversions-24.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/enum.txt", files.last.contents)
       }
     }
@@ -192,13 +192,13 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/list-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/list-conversions-24.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/list.txt", files.last.contents)
       }
     }
@@ -235,13 +235,13 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/union-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/union-conversions-24.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/union-parsers.txt", files.last.contents)
       }
     }
@@ -259,13 +259,13 @@ class ParserGeneratorSpec extends FunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator.invoke(form) match {
+    ParserGenerator24.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/location-conversions.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/location-conversions-24.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/location-parsers.txt", files.last.contents)
       }
     }

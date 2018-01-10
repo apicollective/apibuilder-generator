@@ -8,7 +8,34 @@ import lib.generator.CodeGenerator
 import lib.Text
 import lib.Text._
 
-object ParserGenerator extends CodeGenerator {
+object ParserGenerator24 extends ParserGenerator {
+  override val attributes = ParserGeneratorPlayVersionSpecificAttributes(
+    imports = Seq(
+      "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
+      "play.api.libs.json.{JsArray, JsObject, JsValue}",
+      "scala.util.{Failure, Success, Try}"
+    )
+  )
+}
+
+object ParserGenerator26 extends ParserGenerator {
+  override val attributes = ParserGeneratorPlayVersionSpecificAttributes(
+    imports = Seq(
+      "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
+      "play.api.libs.json.{JsArray, JsObject, JsValue}",
+      "scala.util.{Failure, Success, Try}",
+      "play.api.libs.json.JodaReads._"
+    )
+  )
+}
+
+case class ParserGeneratorPlayVersionSpecificAttributes(
+                                                         imports: Seq[String]
+                                                       )
+
+trait ParserGenerator extends CodeGenerator {
+
+  val attributes: ParserGeneratorPlayVersionSpecificAttributes
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val ssd = new ScalaService(form.service)
@@ -28,7 +55,7 @@ object ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Conversions",
-              header ++ Conversions.code(ssd),
+              header ++ Conversions.code(ssd, attributes),
               Some("Scala")
             ),
             ServiceFileNames.toFile(
