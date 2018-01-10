@@ -21,10 +21,7 @@ object Conversions {
 
   private val Header = """
 package %s {
-
-  import anorm.{Column, MetaDataItem, TypeDoesNotMatch}
-  import play.api.libs.json.{JsArray, JsObject, JsValue}
-  import scala.util.{Failure, Success, Try}
+%s
 
   /**
     * Conversions to collections of objects using JSON.
@@ -69,10 +66,11 @@ package %s {
 """.trim
 
   def code(
-    ssd: ScalaService
+    ssd: ScalaService,
+    attributes: ParserGeneratorPlayVersionSpecificAttributes
   ): String = {
     Seq(
-      Header.format(ssd.namespaces.anormConversions),
+      Header.format(ssd.namespaces.anormConversions, attributes.imports.map(i => s"\n  import $i").mkString),
       Seq(
         Some("object Types {"),
         buildCollectionConversions(ssd).map(_.indent(2)),
