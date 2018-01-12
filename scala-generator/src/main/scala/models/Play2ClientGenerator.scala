@@ -209,10 +209,7 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
         case "DELETE" => loggedRequest.delete()
         case "HEAD" => loggedRequest.head()
         case "OPTIONS" => loggedRequest.options()
-        case _ => {
-          loggedRequest
-          sys.error("Unsupported method[%s]".format(method))
-        }
+        case _ => sys.error("Unsupported method[%s]".format(method))
       }
     }
 
