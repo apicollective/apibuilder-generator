@@ -87,7 +87,7 @@ lazy val kotlinGenerator = project
       "org.mockito" % "mockito-all" % "1.10.19" % "test"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 93.5))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 95.3))
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name ~= ("apibuilder-generator-" + _),
