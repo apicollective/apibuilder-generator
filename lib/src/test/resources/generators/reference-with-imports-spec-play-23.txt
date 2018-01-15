@@ -145,6 +145,19 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
+    private[v0] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
+      import org.joda.time.format.ISODateTimeFormat.dateParser
+      dateParser.parseLocalDate(str)
+    }
+
+    private[v0] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
+      def writes(x: org.joda.time.LocalDate) = {
+        import org.joda.time.format.ISODateTimeFormat.date
+        val str = date.print(x)
+        JsString(str)
+      }
+    }
+
     implicit val jsonReadsApidocReferenceApiAgeGroup = new play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.AgeGroup] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.reference.api.v0.models.AgeGroup] = {
         js match {

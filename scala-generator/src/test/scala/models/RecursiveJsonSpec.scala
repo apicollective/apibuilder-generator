@@ -19,7 +19,7 @@ class RecursiveJsonSpec extends FunSpec {
     it("should work with imports") {
       Play2StandaloneModelsJson.invoke(InvocationForm(service.service)) match {
         case Left(errors) => fail(errors.mkString(", "))
-        case Right(files) => println(files.head.contents)
+        case Right(files) => //println(files.head.contents)
       }
     }
 

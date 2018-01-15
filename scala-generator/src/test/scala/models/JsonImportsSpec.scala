@@ -14,7 +14,6 @@ class JsonImportsSpec extends FunSpec with Matchers {
   }
 
   it("includes imports") {
-    println(JsonImports(models.TestHelper.generatorApiService))
     JsonImports(models.TestHelper.generatorApiService) should be(
       Seq(
         "import io.apibuilder.common.v0.models.json._",
