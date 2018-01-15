@@ -425,11 +425,11 @@ package apibuilder {
 
     def _requestHolder(path: String): play.api.libs.ws.WSRequest = {
 
-      val holder = ws.url(baseUrl + path).withHttpHeaders(
+      val holder = ws.url(baseUrl + path).addHttpHeaders(
         "User-Agent" -> Constants.UserAgent,
         "X-Apidoc-Version" -> Constants.Version,
         "X-Apidoc-Version-Major" -> Constants.VersionMajor.toString
-      ).withHttpHeaders(defaultHeaders : _*)
+      ).addHttpHeaders(defaultHeaders : _*)
       auth.fold(holder) {
         case Authorization.Basic(username, password) => {
           holder.withAuth(username, password.getOrElse(""), play.api.libs.ws.WSAuthScheme.BASIC)
@@ -457,20 +457,32 @@ package apibuilder {
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
-      val requestHolder = _requestHolder(path)
-      val requestHolderHeaders = requestHolder.headers.keys.flatMap(key => requestHolder.headers(key).map(value => (key, value))).toSeq
-      val distinctHeaders = (requestHolderHeaders ++ requestHeaders).distinct
-      val loggedRequest = _logRequest(method.toUpperCase, requestHolder.withHttpHeaders(_withJsonContentType(distinctHeaders): _*).withQueryStringParameters(queryParameters: _*)
-      )
       method.toUpperCase match {
-        case "GET" => loggedRequest.get()
-        case "POST" => loggedRequest.post(body.getOrElse(play.api.libs.json.Json.obj()))
-        case "PUT" => loggedRequest.put(body.getOrElse(play.api.libs.json.Json.obj()))
-        case "PATCH" => loggedRequest.patch(body.getOrElse(play.api.libs.json.Json.obj()))
-        case "DELETE" => loggedRequest.delete()
-        case "HEAD" => loggedRequest.head()
-        case "OPTIONS" => loggedRequest.options()
-        case _ => sys.error("Unsupported method[%s]".format(method))
+        case "GET" => {
+          _logRequest("GET", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).get()
+        }
+        case "POST" => {
+          _logRequest("POST", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
+        }
+        case "PUT" => {
+          _logRequest("PUT", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
+        }
+        case "PATCH" => {
+          _logRequest("PATCH", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))
+        }
+        case "DELETE" => {
+          _logRequest("DELETE", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).delete()
+        }
+         case "HEAD" => {
+          _logRequest("HEAD", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).head()
+        }
+         case "OPTIONS" => {
+          _logRequest("OPTIONS", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).options()
+        }
+        case _ => {
+          _logRequest(method, _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          sys.error("Unsupported method[%s]".format(method))
+        }
       }
     }
 

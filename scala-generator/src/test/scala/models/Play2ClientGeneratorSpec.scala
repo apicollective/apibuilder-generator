@@ -140,8 +140,8 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
 
     it("has non deprecated request with-methods") {
       val rawContent = output.map(_.contents).mkString("\n")
-      rawContent.contains("withHttpHeaders(").shouldBe(true)
-      rawContent.contains("withQueryStringParameters(").shouldBe(true)
+      rawContent.contains("addHttpHeaders(").shouldBe(true)
+      rawContent.contains("addQueryStringParameters(").shouldBe(true)
       rawContent.contains("withHeaders(").shouldBe(false)
       rawContent.contains("withQueryString(").shouldBe(false)
     }
