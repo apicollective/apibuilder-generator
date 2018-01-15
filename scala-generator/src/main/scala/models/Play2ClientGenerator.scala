@@ -142,7 +142,7 @@ case class Play2ClientGenerator(
     }
 
     val patchMethod = version.supportsHttpPatch match {
-      case true => s"""loggedRequest.patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
+      case true => s"""_logRequest("PATCH", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
       case false => s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
     }
 
@@ -196,20 +196,32 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[${version.config.responseClass}] = {
-      val requestHolder = _requestHolder(path)
-      val requestHolderHeaders = requestHolder.headers.keys.flatMap(key => requestHolder.headers(key).map(value => (key, value))).toSeq
-      val distinctHeaders = (requestHolderHeaders ++ requestHeaders).distinct
-      val loggedRequest = _logRequest(method.toUpperCase, requestHolder.$withHeadersMethod(_withJsonContentType(distinctHeaders): _*).$withQueryStringMethod(queryParameters: _*)
-      )
       method.toUpperCase match {
-        case "GET" => loggedRequest.get()
-        case "POST" => loggedRequest.post(body.getOrElse(play.api.libs.json.Json.obj()))
-        case "PUT" => loggedRequest.put(body.getOrElse(play.api.libs.json.Json.obj()))
-        case "PATCH" => $patchMethod
-        case "DELETE" => loggedRequest.delete()
-        case "HEAD" => loggedRequest.head()
-        case "OPTIONS" => loggedRequest.options()
-        case _ => sys.error("Unsupported method[%s]".format(method))
+        case "GET" => {
+          _logRequest("GET", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).get()
+        }
+        case "POST" => {
+          _logRequest("POST", _requestHolder(path).$withHeadersMethod(_withJsonContentType(requestHeaders):_*).$withQueryStringMethod(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
+        }
+        case "PUT" => {
+          _logRequest("PUT", _requestHolder(path).$withHeadersMethod(_withJsonContentType(requestHeaders):_*).$withQueryStringMethod(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
+        }
+        case "PATCH" => {
+          $patchMethod
+        }
+        case "DELETE" => {
+          _logRequest("DELETE", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).delete()
+        }
+         case "HEAD" => {
+          _logRequest("HEAD", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).head()
+        }
+         case "OPTIONS" => {
+          _logRequest("OPTIONS", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).options()
+        }
+        case _ => {
+          _logRequest(method, _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*))
+          sys.error("Unsupported method[%s]".format(method))
+        }
       }
     }
 
