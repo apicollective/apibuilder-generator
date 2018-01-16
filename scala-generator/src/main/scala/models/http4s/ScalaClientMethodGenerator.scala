@@ -104,13 +104,13 @@ class ScalaClientMethodGenerator (
       } match {
         case Some(response) => {
           if (response.isUnit) {
-            s"case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
+            s"case r => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
           } else {
-            s"case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))"
+            s"case r => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))"
           }
         }
         case None => {
-          s"""case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
+          s"""case r => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
         }
       }
 
@@ -141,10 +141,10 @@ class ScalaClientMethodGenerator (
 
               } else {
                 if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
 
                 } else {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
                 }
               }
             }

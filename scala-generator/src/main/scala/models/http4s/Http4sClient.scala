@@ -23,12 +23,12 @@ case class Http4sClient(
 
     s"""package ${ssd.namespaces.base} {
   import org.http4s.client.blaze._
+  import cats.effect._
 
 ${headers.objectConstants.indent(2)}
 
 ${Http4sScalaClientCommon.clientSignature(config).indent(2)} {
     import org.http4s.Response
-    import cats.effect._
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     def closeAsyncHttpClient(): Unit = {

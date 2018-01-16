@@ -235,7 +235,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val extraClientObjectMethods = Some(s"""
 implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
 
-private lazy val defaultAsyncHttpClient = PooledHttp1Client[$asyncType]()
+private def defaultAsyncHttpClient[F[_]] = Http1Client[$asyncType]()
 """)
     override val asyncSuccess: String = "pure"
     override def asyncFailure: String = "raiseError"
