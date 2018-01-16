@@ -86,7 +86,7 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val authBody = body.fold(${config.asyncType}.${config.asyncSuccess}(authReq))(authReq.withBody)
+      val authBody = body.fold(${config.wrappedAsyncType.getOrElse(config.asyncType)}.${config.asyncSuccess}(authReq))(authReq.withBody)
 
       asyncHttpClient.fetch(modifyRequest(authBody))(handler)
     }

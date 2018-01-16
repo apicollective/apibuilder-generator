@@ -121,14 +121,14 @@ class ScalaClientMethodGenerator (
               if (response.isSuccess) {
                 if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(Some(()))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(Some(()))")
                   } else {
                     val json = config.toJson("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(Some($json))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(Some($json))")
                   }
 
                 } else if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(())")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType.getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(())")
 
                 } else {
                   val json = config.toJson("r", response.datatype.name)
@@ -175,7 +175,7 @@ class ScalaClientMethod(
   methodCall: String,
   response: String,
   implicitArgs: Option[String],
-  typeParam: String
+  typeParam: Option[String]
 ) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs) {
   import lib.Text._
 
@@ -183,7 +183,7 @@ class ScalaClientMethod(
     Seq(
       commentString,
       toOption(ScalaUtil.deprecationString(operation.deprecation)),
-      Some(s"""def $name$typeParam(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType""")
+      Some(s"""def $name${typeParam.getOrElse("")}(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType""")
     ).flatten.mkString("\n")
   }
 

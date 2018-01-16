@@ -80,7 +80,9 @@ trait ScalaClientMethodConfig {
     s"""_root_.${namespace}.Client.parseJson("$className", $responseName, _.validate[$className])"""
   }
 
-  def asyncTypeParam: String = ""
+  def asyncTypeParam: Option[String] = None
+
+  def wrappedAsyncType: Option[String] = None
 
 }
 
@@ -203,7 +205,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def serverImports: String = ""
     def routeKind: String = "trait"
     val asyncTypeImport: String = "import cats.effect._"
-    def asyncTypeMultipleParam: String = ""
+    def asyncTypeMultipleParam: Option[String] = None
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -247,8 +249,9 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client[$asyncType]()
       s"""import cats.effect._
          |import org.http4s.dsl.io._""".stripMargin
 
-    override val asyncTypeParam = "[F[_]: Effect]"
-    override val asyncTypeMultipleParam = "F[_]: Effect, "
+    override val asyncTypeParam = Some("[F[_]: Effect]")
+    override val asyncTypeMultipleParam = Some("F[_]: Effect")
     override val routeKind = "abstract class"
+    override val wrappedAsyncType = Some(s"Effect[$asyncType]")
   }
 }
