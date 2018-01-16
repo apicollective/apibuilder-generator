@@ -13,7 +13,7 @@ case class PlayFrameworkVersion(
   requestHolderClass: String,
   authSchemeClass: String,
   supportsHttpPatch: Boolean,
-  useSpecificWithMethods: Boolean
+  useSpecificAddMethods: Boolean
 )
 
 object Play22ClientGenerator extends CodeGenerator {
@@ -25,7 +25,7 @@ object Play22ClientGenerator extends CodeGenerator {
       requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
       authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
       supportsHttpPatch = false,
-      useSpecificWithMethods = false
+      useSpecificAddMethods = false
     )
 
     Play2ClientGenerator.invoke(config, form)
@@ -42,7 +42,7 @@ object Play23ClientGenerator extends CodeGenerator {
       requestHolderClass = "play.api.libs.ws.WSRequestHolder",
       authSchemeClass = "play.api.libs.ws.WSAuthScheme",
       supportsHttpPatch = true,
-      useSpecificWithMethods = false
+      useSpecificAddMethods = false
     )
 
     Play2ClientGenerator.invoke(config, form)
@@ -59,7 +59,7 @@ object Play24ClientGenerator extends CodeGenerator {
       requestHolderClass = "play.api.libs.ws.WSRequest",
       authSchemeClass = "play.api.libs.ws.WSAuthScheme",
       supportsHttpPatch = true,
-      useSpecificWithMethods = false
+      useSpecificAddMethods = false
     )
 
     Play2ClientGenerator.invoke(config, form)
@@ -76,7 +76,7 @@ object Play25ClientGenerator extends CodeGenerator {
       requestHolderClass = "play.api.libs.ws.WSRequest",
       authSchemeClass = "play.api.libs.ws.WSAuthScheme",
       supportsHttpPatch = true,
-      useSpecificWithMethods = false
+      useSpecificAddMethods = false
     )
 
     Play2ClientGenerator.invoke(config, form)
@@ -93,7 +93,7 @@ object Play26ClientGenerator extends CodeGenerator {
       requestHolderClass = "play.api.libs.ws.WSRequest",
       authSchemeClass = "play.api.libs.ws.WSAuthScheme",
       supportsHttpPatch = true,
-      useSpecificWithMethods = true
+      useSpecificAddMethods = true
     )
 
     Play2ClientGenerator.invoke(config, form)
@@ -136,20 +136,20 @@ case class Play2ClientGenerator(
 
     val methodGenerator = new ScalaClientMethodGenerator(version.config, ssd)
 
-    val (withHeadersMethod, withQueryStringMethod) = version.useSpecificWithMethods match {
-      case true => ("withHttpHeaders", "withQueryStringParameters")
+    val (addHeadersMethod, addQueryStringMethod) = version.useSpecificAddMethods match {
+      case true => ("addHttpHeaders", "addQueryStringParameters")
       case false => ("withHeaders", "withQueryString")
     }
 
     val patchMethod = version.supportsHttpPatch match {
-      case true => s"""_logRequest("PATCH", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
+      case true => s"""_logRequest("PATCH", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
       case false => s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
     }
 
     val headers = Headers(form)
     val headerString = headers.scala.
       map { case (name, value) => s""""$name" -> ${value}""" }.
-      mkString(s".$withHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$withHeadersMethod(defaultHeaders : _*)"
+      mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders : _*)"
 
     s"""package ${ssd.namespaces.base} {
 
@@ -198,28 +198,28 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[${version.config.responseClass}] = {
       method.toUpperCase match {
         case "GET" => {
-          _logRequest("GET", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).get()
+          _logRequest("GET", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).get()
         }
         case "POST" => {
-          _logRequest("POST", _requestHolder(path).$withHeadersMethod(_withJsonContentType(requestHeaders):_*).$withQueryStringMethod(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("POST", _requestHolder(path).$addHeadersMethod(_withJsonContentType(requestHeaders):_*).$addQueryStringMethod(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PUT" => {
-          _logRequest("PUT", _requestHolder(path).$withHeadersMethod(_withJsonContentType(requestHeaders):_*).$withQueryStringMethod(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("PUT", _requestHolder(path).$addHeadersMethod(_withJsonContentType(requestHeaders):_*).$addQueryStringMethod(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PATCH" => {
           $patchMethod
         }
         case "DELETE" => {
-          _logRequest("DELETE", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).delete()
+          _logRequest("DELETE", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).delete()
         }
          case "HEAD" => {
-          _logRequest("HEAD", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).head()
+          _logRequest("HEAD", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).head()
         }
          case "OPTIONS" => {
-          _logRequest("OPTIONS", _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*)).options()
+          _logRequest("OPTIONS", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).options()
         }
         case _ => {
-          _logRequest(method, _requestHolder(path).$withHeadersMethod(requestHeaders:_*).$withQueryStringMethod(queryParameters:_*))
+          _logRequest(method, _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*))
           sys.error("Unsupported method[%s]".format(method))
         }
       }
