@@ -2,7 +2,7 @@ package io.apibuilder.http4s.test.server
 
 import org.http4s.dsl._
 import cats.effect._
-import org.http4s.dsl.io._
+import cats.implicits._
 import io.apibuilder.http4s.test.models.json._
 
 private[server] object Matchers {
@@ -94,7 +94,7 @@ private[server] object Matchers {
 
 }
 
-abstract class ModelRoutes[F[_]: Effect] {
+abstract class ModelRoutes[F[_]: Effect] extends Http4sDsl[F] {
   import Matchers._
 
   implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[F, A]

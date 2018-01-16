@@ -206,6 +206,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def routeKind: String = "trait"
     val asyncTypeImport: String = "import cats.effect._"
     def asyncTypeMultipleParam: Option[String] = None
+    def routeExtends: Option[String] = None
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -247,11 +248,12 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client[$asyncType]()
 
     override def serverImports: String =
       s"""import cats.effect._
-         |import org.http4s.dsl.io._""".stripMargin
+         |import cats.implicits._""".stripMargin
 
-    override val asyncTypeParam = Some("[F[_]: Effect]")
-    override val asyncTypeMultipleParam = Some("F[_]: Effect")
+    override val asyncTypeParam = Some(s"[$asyncType[_]: Effect]")
+    override val asyncTypeMultipleParam = Some(s"$asyncType[_]: Effect")
     override val routeKind = "abstract class"
     override val wrappedAsyncType = Some(s"Effect[$asyncType]")
+    override val routeExtends = Some(s"extends Http4sDsl[$asyncType]")
   }
 }

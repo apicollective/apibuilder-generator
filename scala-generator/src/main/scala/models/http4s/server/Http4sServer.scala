@@ -103,7 +103,7 @@ case class Http4sServer(form: InvocationForm,
       val name = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(ScalaUtil.toClassName(resource.resource.`type`)).toLowerCase + "_routes").capitalize
       val apiVersionTypeParam = if (config.asyncType == "F") "[F]" else ""
 
-      s"""${config.routeKind} $name${config.asyncTypeParam.getOrElse("")} {
+      s"""${config.routeKind} $name${config.asyncTypeParam.getOrElse("")}${config.routeExtends.map(" "+_).getOrElse("")} {
          |  import Matchers._
          |
          |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = ${config.generateCirceJsonOf("A")}
