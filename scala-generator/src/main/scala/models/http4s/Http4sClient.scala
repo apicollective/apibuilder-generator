@@ -28,7 +28,7 @@ ${headers.objectConstants.indent(2)}
 
 ${Http4sScalaClientCommon.clientSignature(config).indent(2)} {
     import org.http4s.Response
-    import ${config.asyncType}
+    import cats.effect._
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     def closeAsyncHttpClient(): Unit = {

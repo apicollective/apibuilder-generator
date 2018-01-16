@@ -25,6 +25,9 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should not include ("cats.effect.IO")
       scalaSourceCode should not include (" Left")
       scalaSourceCode should not include (" Right")
+      scalaSourceCode should not include ("Response[F]")
+      scalaSourceCode should not include ("org.http4s.circe.jsonOf[F,")
+      scalaSourceCode should not include ("org.http4s.circe.jsonEncoderOf[F,")
     }
 
     it("Http4s 0.17 generator produces valid Scala source code") {
@@ -34,6 +37,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val clientMethodConfig = new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
+      println(scalaSourceCode)
       assertValidScalaSourceCode(scalaSourceCode)
       scalaSourceCode should not include ("org.joda")
       scalaSourceCode should not include ("scalaz.concurrent.Task")
@@ -43,6 +47,9 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should include ("fs2.Task")
       scalaSourceCode should include (" Left")
       scalaSourceCode should include (" Right")
+      scalaSourceCode should not include ("Response[F]")
+      scalaSourceCode should not include ("org.http4s.circe.jsonOf[F,")
+      scalaSourceCode should not include ("org.http4s.circe.jsonEncoderOf[F,")
     }
 
     it("Http4s 0.18 generator produces valid Scala source code") {
@@ -58,10 +65,10 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should not include ("-\\/")
       scalaSourceCode should not include ("\\/-")
       scalaSourceCode should not include ("fs2.Task")
-      scalaSourceCode should include ("cats.effect.IO")
-      scalaSourceCode should include ("Response[cats.effect.IO]")
-      scalaSourceCode should include ("org.http4s.circe.jsonOf[cats.effect.IO,")
-      scalaSourceCode should include ("org.http4s.circe.jsonEncoderOf[cats.effect.IO,")
+      scalaSourceCode should not include ("cats.effect.IO")
+      scalaSourceCode should include ("Response[F]")
+      scalaSourceCode should include ("org.http4s.circe.jsonOf[F,")
+      scalaSourceCode should include ("org.http4s.circe.jsonEncoderOf[F,")
       scalaSourceCode should include (" Left")
       scalaSourceCode should include (" Right")
       scalaSourceCode should include (".raiseError")

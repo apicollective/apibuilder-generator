@@ -161,7 +161,8 @@ class ScalaClientMethodGenerator (
         returnType = s"${config.asyncType}[$resType]",
         methodCall = methodCall,
         response = matchResponse,
-        implicitArgs = config.implicitArgs
+        implicitArgs = config.implicitArgs,
+        typeParam = config.asyncTypeParam
       )
 
     }
@@ -173,9 +174,18 @@ class ScalaClientMethod(
   returnType: String,
   methodCall: String,
   response: String,
-  implicitArgs: Option[String]
+  implicitArgs: Option[String],
+  typeParam: String
 ) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs) {
   import lib.Text._
+
+  override val interface: String = {
+    Seq(
+      commentString,
+      toOption(ScalaUtil.deprecationString(operation.deprecation)),
+      Some(s"""def $name$typeParam(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType""")
+    ).flatten.mkString("\n")
+  }
 
   override val code: String = {
     s"""${ScalaUtil.deprecationString(operation.deprecation)}override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {

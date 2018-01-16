@@ -283,7 +283,7 @@ class ScalaClientMethod(
     case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
   }
 
-  private[this] val commentString: Option[String] = toOption(
+  protected[this] val commentString: Option[String] = toOption(
     ScalaGeneratorUtil.scaladoc(
       operation.description,
       operation.parameters.map { p => (p.name, p.param.description) }
@@ -309,7 +309,7 @@ ${response.indent(4)}
     ).flatten.mkString("\n")
   }
 
-  private[this] def toOption(value: String): Option[String] = {
+  protected[this] def toOption(value: String): Option[String] = {
     value.trim match {
       case "" => None
       case c => Some(c)

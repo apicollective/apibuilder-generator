@@ -80,6 +80,8 @@ trait ScalaClientMethodConfig {
     s"""_root_.${namespace}.Client.parseJson("$className", $responseName, _.validate[$className])"""
   }
 
+  def asyncTypeParam: String = ""
+
 }
 
 object ScalaClientMethodConfigs {
@@ -199,6 +201,9 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def generateCirceJsonOf(datatypeName: String): String = s"org.http4s.circe.jsonOf[$datatypeName]"
     def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$datatypeName]"
     def serverImports: String = ""
+    def routeKind: String = "trait"
+    val asyncTypeImport: String = "import cats.effect._"
+    def asyncTypeMultipleParam: String = ""
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -218,7 +223,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
   }
 
   case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
-    override val asyncType = "cats.effect.IO"
+    override val asyncType = "F"
     override val leftType = "Left"
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
@@ -241,5 +246,9 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client[$asyncType]()
     override def serverImports: String =
       s"""import cats.effect._
          |import org.http4s.dsl.io._""".stripMargin
+
+    override val asyncTypeParam = "[F[_]: Effect]"
+    override val asyncTypeMultipleParam = "F[_]: Effect, "
+    override val routeKind = "abstract class"
   }
 }

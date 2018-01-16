@@ -32,7 +32,7 @@ private[server] object Matchers {
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply(req: org.http4s.Message[cats.effect.IO]): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply[F[_]: Effect](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -55,11 +55,11 @@ private[server] object Matchers {
   object IdModelMatcher extends QueryParamDecoderMatcher[io.apibuilder.http4s.test.models.Model]("id")
 }
 
-trait ModelRoutes {
+abstract class ModelRoutes[F[_]: Effect] {
   import Matchers._
 
-  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[cats.effect.IO, A]
-  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[cats.effect.IO, A]
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[F, A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[F, A]
 
   sealed trait GetPathEnumLocalByIdResponse
 
@@ -68,9 +68,9 @@ trait ModelRoutes {
   }
 
   def getPathEnumLocalById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.test.models.Enum
-  ): cats.effect.IO[GetPathEnumLocalByIdResponse]
+  ): F[GetPathEnumLocalByIdResponse]
 
   sealed trait GetPathEnumImportedByIdResponse
 
@@ -79,9 +79,9 @@ trait ModelRoutes {
   }
 
   def getPathEnumImportedById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.imported.models.Enum
-  ): cats.effect.IO[GetPathEnumImportedByIdResponse]
+  ): F[GetPathEnumImportedByIdResponse]
 
   sealed trait GetQueryEnumLocalResponse
 
@@ -90,9 +90,9 @@ trait ModelRoutes {
   }
 
   def getQueryEnumLocal(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.test.models.Enum
-  ): cats.effect.IO[GetQueryEnumLocalResponse]
+  ): F[GetQueryEnumLocalResponse]
 
   sealed trait GetQueryEnumImportedResponse
 
@@ -101,9 +101,9 @@ trait ModelRoutes {
   }
 
   def getQueryEnumImported(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.imported.models.Enum
-  ): cats.effect.IO[GetQueryEnumImportedResponse]
+  ): F[GetQueryEnumImportedResponse]
 
   sealed trait GetQueryModelLocalResponse
 
@@ -112,9 +112,9 @@ trait ModelRoutes {
   }
 
   def getQueryModelLocal(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.test.models.Model
-  ): cats.effect.IO[GetQueryModelLocalResponse]
+  ): F[GetQueryModelLocalResponse]
 
   sealed trait GetQueryModelImportedResponse
 
@@ -123,13 +123,13 @@ trait ModelRoutes {
   }
 
   def getQueryModelImported(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.imported.models.Model
-  ): cats.effect.IO[GetQueryModelImportedResponse]
+  ): F[GetQueryModelImportedResponse]
 
-  def apiVersionMatch(req: org.http4s.Message[cats.effect.IO]): Boolean = ApiVersion(req)
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion[F](req)
 
-  def service() = org.http4s.HttpService[cats.effect.IO] {
+  def service() = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "path-enum-local" / EnumVal(id) if apiVersionMatch(_req) =>
       getPathEnumLocalById(_req, id).flatMap {
         case GetPathEnumLocalByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
