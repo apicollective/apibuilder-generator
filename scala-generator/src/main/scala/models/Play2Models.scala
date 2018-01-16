@@ -76,6 +76,19 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
       }
     }
 
+    private[${ssd.namespaces.last}] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
+      import org.joda.time.format.ISODateTimeFormat.dateParser
+      dateParser.parseLocalDate(str)
+    }
+
+    private[${ssd.namespaces.last}] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
+      def writes(x: org.joda.time.LocalDate) = {
+        import org.joda.time.format.ISODateTimeFormat.date
+        val str = date.print(x)
+        JsString(str)
+      }
+    }
+
 ${Seq(enumJson, modelAndUnionJson).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }

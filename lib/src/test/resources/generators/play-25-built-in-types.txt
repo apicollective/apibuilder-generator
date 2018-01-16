@@ -90,6 +90,19 @@ package apibuilder.models {
       }
     }
 
+    private[apibuilder] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
+      import org.joda.time.format.ISODateTimeFormat.dateParser
+      dateParser.parseLocalDate(str)
+    }
+
+    private[apibuilder] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
+      def writes(x: org.joda.time.LocalDate) = {
+        import org.joda.time.format.ISODateTimeFormat.date
+        val str = date.print(x)
+        JsString(str)
+      }
+    }
+
     implicit def jsonReadsBuiltInTypesArray: play.api.libs.json.Reads[Array] = {
       (
         (__ \ "boolean").read[Seq[Boolean]] and

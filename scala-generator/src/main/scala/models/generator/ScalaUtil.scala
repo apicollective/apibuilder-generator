@@ -88,7 +88,6 @@ object ScalaUtil {
     datatype.default(value)
   } catch {
     case e: Exception => {
-      e.printStackTrace(System.err)
       throw new RuntimeException(s"parsing default `$value` for datatype $datatype", e)
     }
   }
