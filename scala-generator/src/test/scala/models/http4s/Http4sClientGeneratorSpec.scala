@@ -58,6 +58,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val clientMethodConfig = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
+      println(scalaSourceCode)
       assertValidScalaSourceCode(scalaSourceCode)
       scalaSourceCode should not include ("org.joda")
       scalaSourceCode should not include ("scalaz.concurrent.Task")

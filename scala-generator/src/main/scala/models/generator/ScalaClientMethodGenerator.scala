@@ -126,7 +126,7 @@ class ScalaClientMethodGenerator(
     }
 
     Seq(
-      s"case class $className(",
+      s"case class $className${config.asyncTypeParam.getOrElse("")}(",
       s"  response: ${config.responseClass},",
       s"  message: Option[String] = None",
       s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$bodyString"""

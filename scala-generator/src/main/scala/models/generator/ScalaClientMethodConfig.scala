@@ -207,6 +207,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     val asyncTypeImport: String = "import cats.effect._"
     def asyncTypeMultipleParam: Option[String] = None
     def routeExtends: Option[String] = None
+    def clientImports: String = """import org.http4s.client.blaze._
+                                  |import cats.effect._""".stripMargin
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -227,15 +229,17 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
   case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "F"
+    override val asyncTypeParam = Some(s"[$asyncType[_]: Effect]")
+    override val asyncTypeMultipleParam = Some(s"$asyncType[_]: Effect")
     override val leftType = "Left"
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
     override val responseClass = s"org.http4s.Response[$asyncType]"
-    override val extraClientCtorArgs = Some(s",\n  asyncHttpClient: org.http4s.client.Client[$asyncType] = Client.defaultAsyncHttpClient")
+    override val extraClientCtorArgs = Some(s",\n  asyncHttpClient: org.http4s.client.Client[$asyncType] = Client.defaultAsyncHttpClient[$asyncType]")
     override val extraClientObjectMethods = Some(s"""
-implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
+implicit def circeJsonDecoder[${asyncTypeMultipleParam.map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
 
-private def defaultAsyncHttpClient[F[_]] = Http1Client[$asyncType]()
+private def defaultAsyncHttpClient${asyncTypeParam.getOrElse("")} = PooledHttp1Client[$asyncType]()
 """)
     override val asyncSuccess: String = "pure"
     override def asyncFailure: String = "raiseError"
@@ -250,10 +254,12 @@ private def defaultAsyncHttpClient[F[_]] = Http1Client[$asyncType]()
       s"""import cats.effect._
          |import cats.implicits._""".stripMargin
 
-    override val asyncTypeParam = Some(s"[$asyncType[_]: Effect]")
-    override val asyncTypeMultipleParam = Some(s"$asyncType[_]: Effect")
+
     override val routeKind = "abstract class"
     override val wrappedAsyncType = Some(s"Effect[$asyncType]")
     override val routeExtends = Some(s"extends Http4sDsl[$asyncType]")
+    override val clientImports: String = """import org.http4s.client.blaze._
+                                  |import cats.effect._
+                                  |import cats.implicits._""".stripMargin
   }
 }

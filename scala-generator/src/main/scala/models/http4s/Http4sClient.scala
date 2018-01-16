@@ -22,8 +22,7 @@ case class Http4sClient(
     val methodGenerator = new ScalaClientMethodGenerator(config, ssd)
 
     s"""package ${ssd.namespaces.base} {
-  import org.http4s.client.blaze._
-  import cats.effect._
+${config.clientImports}
 
 ${headers.objectConstants.indent(2)}
 
@@ -47,7 +46,7 @@ ${headerString.indent(6)}
 
     def modifyRequest(request: ${config.asyncType}[${config.requestClass}]): ${config.asyncType}[${config.requestClass}] = request
 
-    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
+    implicit def circeJsonEncoder[${config.asyncTypeMultipleParam.map(p => p + ", ").getOrElse("")}A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
 
     def _executeRequest[T, U](
       method: String,
