@@ -190,7 +190,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val expectsInjectedWsClient = false
     override def formatBaseUrl(url: Option[String]): String = s"val baseUrl: org.http4s.Uri" + url.fold("")(u => s" = org.http4s.Uri.unsafeFromString(${ScalaUtil.wrapInQuotes(u)})")
     override def toJson(responseName: String, className: String): String = {
-      s"""_root_.${namespace}.Client.parseJson[$className]("$className", $responseName)"""
+      s"""_root_.${namespace}.Client.parseJson[${if(asyncType == "F")"F, " else ""}$className]("$className", $responseName)"""
     }
     def leftType: String
     def rightType: String
@@ -261,5 +261,6 @@ private def defaultAsyncHttpClient${asyncTypeParam.getOrElse("")} = PooledHttp1C
     override val clientImports: String = """import org.http4s.client.blaze._
                                   |import cats.effect._
                                   |import cats.implicits._""".stripMargin
+
   }
 }
