@@ -301,6 +301,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_6_flow_mock_client",
+        name = "Play 2.6 Flow Mock Client",
+        description = Some("Provides a Flow mock client that instantiates service specific client with values from FlowMockClient base class for testing Flow services"),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.generator.flow.FlowMockClientGenerator.Play26)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "http4s_0_15",
         name = "Http4s 0.15 / 0.16",
         description = Some("Http4s 0.15 and 0.16 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.15/client/'>http4s client</a>"),
