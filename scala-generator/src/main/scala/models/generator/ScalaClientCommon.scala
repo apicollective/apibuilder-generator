@@ -19,11 +19,11 @@ class ScalaClientCommon {
     config: ScalaClientMethodConfig
   ): String = {
     s"""
-class Client${config.asyncTypeParam.getOrElse("")}(
+class Client${config.asyncTypeParam(Some("Effect")).map(p => s"[$p]").getOrElse("")}(
   ${if (config.expectsInjectedWsClient) "ws: play.api.libs.ws.WSClient,\n  " else ""}${config.formatBaseUrl(config.baseUrl)},
   auth: scala.Option[${config.namespace}.Authorization] = None,
   defaultHeaders: Seq[(String, String)] = Nil${config.extraClientCtorArgs.getOrElse("")}
-) extends interfaces.Client
+) extends interfaces.Client${config.wrappedAsyncType().getOrElse("")}
 """.trim
   }
 

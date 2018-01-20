@@ -81,7 +81,7 @@ case class Http4sServer(form: InvocationForm,
          |    "X-Apidoc-Version-Major".ci
          |  }
          |
-         |  def apply${config.asyncTypeParam.getOrElse("")}(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
+         |  def apply${config.asyncTypeParam(Some("Effect")).getOrElse("")}(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
          |    case Some(v) if v.value == "$ver" => true
          |    case _ => false
          |  }
@@ -103,7 +103,7 @@ case class Http4sServer(form: InvocationForm,
       val name = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(ScalaUtil.toClassName(resource.resource.`type`)).toLowerCase + "_routes").capitalize
       val apiVersionTypeParam = if (config.asyncType == "F") "[F]" else ""
 
-      s"""${config.routeKind} $name${config.asyncTypeParam.getOrElse("")}${config.routeExtends.map(" "+_).getOrElse("")} {
+      s"""${config.routeKind} $name${config.asyncTypeParam().getOrElse("")}${config.routeExtends.map(" "+_).getOrElse("")} {
          |  import Matchers._
          |
          |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = ${config.generateCirceJsonOf("A")}
