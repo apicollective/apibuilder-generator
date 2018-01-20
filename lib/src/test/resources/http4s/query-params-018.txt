@@ -28,7 +28,7 @@ private[server] object Matchers {
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply[F[_]: Effect](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply[F[_]](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -116,11 +116,11 @@ private[server] object Matchers {
   object NamedIdStringMatcher extends QueryParamDecoderMatcher[String]("named_id")
 }
 
-abstract class ModelRoutes[F[_]: Effect] extends Http4sDsl[F] {
+trait ModelRoutes[F[_]] extends Http4sDsl[F] {
   import Matchers._
 
-  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[F, A]
-  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[F, A]
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
 
   sealed trait GetStringResponse
 
@@ -454,7 +454,7 @@ abstract class ModelRoutes[F[_]: Effect] extends Http4sDsl[F] {
 
   def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion[F](req)
 
-  def service() = org.http4s.HttpService[F] {
+  def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "string" :? IdStringMatcher(id) if apiVersionMatch(_req) =>
       getString(_req, id).flatMap {
         case GetStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)

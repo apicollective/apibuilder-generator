@@ -43,7 +43,7 @@ ${headerString.indent(6)}
 
     def modifyRequest(request: ${config.asyncType}[${config.requestClass}]): ${config.asyncType}[${config.requestClass}] = request
 
-    implicit def circeJsonEncoder[${config.asyncTypeParam(Some("Effect")).map(p => p + ", ").getOrElse("")}A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
+    implicit def circeJsonEncoder[${config.asyncTypeParam(Some("Sync")).map(p => p + ", ").getOrElse("")}A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
 
     def _executeRequest[T, U](
       method: String,

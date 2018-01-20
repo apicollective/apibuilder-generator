@@ -20,7 +20,7 @@ object Http4sScalaClientCommon extends ScalaClientCommon {
         |  ${http4sConfig.asyncTypeImport}
         |
         |$extraMethods
-        |  def parseJson[${http4sConfig.asyncTypeParam(Some("Effect")).map(p => p+", ").getOrElse("")}T](
+        |  def parseJson[${http4sConfig.asyncTypeParam(Some("Sync")).map(p => p+", ").getOrElse("")}T](
         |    className: String,
         |    r: ${config.responseClass}
         |  )(implicit decoder: io.circe.Decoder[T]): ${http4sConfig.asyncType}[T] = r.attemptAs[T].${http4sConfig.monadTransformerInvoke}.flatMap {
