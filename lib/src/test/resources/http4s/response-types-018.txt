@@ -110,36 +110,36 @@ trait ModelRoutes[F[_]] extends Http4sDsl[F] {
   def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "string" if apiVersionMatch(_req) =>
       getString(_req).flatMap {
-        case GetStringResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetStringResponse.HTTP200(value, headers) => Ok(value, headers: _*)
       }
 
     case _req @ GET -> Root / "enum" if apiVersionMatch(_req) =>
       getEnum(_req).flatMap {
-        case GetEnumResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetEnumResponse.HTTP200(value, headers) => Ok(value, headers: _*)
       }
 
     case _req @ GET -> Root / "model" if apiVersionMatch(_req) =>
       getModel(_req).flatMap {
-        case GetModelResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetModelResponse.HTTP200(value, headers) => Ok(value, headers: _*)
       }
 
     case _req @ GET -> Root / "list" if apiVersionMatch(_req) =>
       getList(_req).flatMap {
-        case GetListResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetListResponse.HTTP200(value, headers) => Ok(value, headers: _*)
       }
 
     case _req @ GET -> Root / "map" if apiVersionMatch(_req) =>
       getMap(_req).flatMap {
-        case GetMapResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetMapResponse.HTTP200(value, headers) => Ok(value, headers: _*)
       }
 
     case _req @ GET -> Root / "multiple" if apiVersionMatch(_req) =>
       getMultiple(_req).flatMap {
-        case GetMultipleResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
-        case GetMultipleResponse.HTTP201(value, headers) => Created(value).putHeaders(headers: _*)
-        case GetMultipleResponse.HTTP202(value, headers) => Accepted(value).putHeaders(headers: _*)
-        case GetMultipleResponse.HTTP204(headers) => NoContent().putHeaders(headers: _*)
-        case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value).putHeaders(headers: _*)
+        case GetMultipleResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetMultipleResponse.HTTP201(value, headers) => Created(value, headers: _*)
+        case GetMultipleResponse.HTTP202(value, headers) => Accepted(value, headers: _*)
+        case GetMultipleResponse.HTTP204(headers) => NoContent(headers: _*)
+        case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value, headers: _*)
       }
   }
 }

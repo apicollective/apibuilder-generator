@@ -212,6 +212,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
                                 |def closeAsyncHttpClient(): Unit = {
                                 |  asyncHttpClient.shutdownNow()
                                 |}""".stripMargin)
+    def headerString(prefix: String): String
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -220,6 +221,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "scalaz.\\/-"
     override val monadTransformerInvoke = "run"
     override def asyncFailure: String = "fail"
+    override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
   }
 
   case class Http4s017(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -228,6 +230,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
     override def asyncFailure: String = "fail"
+    override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
   }
 
   case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -262,6 +265,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
                                   |import cats.implicits._""".stripMargin
 
     override val closeClient = None
+    override def headerString(prefix: String) = s"${prefix}headers: _*)"
 
   }
 }
