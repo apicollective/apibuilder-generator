@@ -22,18 +22,14 @@ case class Http4sClient(
     val methodGenerator = new ScalaClientMethodGenerator(config, ssd)
 
     s"""package ${ssd.namespaces.base} {
-  import org.http4s.client.blaze._
+${config.clientImports}
 
 ${headers.objectConstants.indent(2)}
 
 ${Http4sScalaClientCommon.clientSignature(config).indent(2)} {
     import org.http4s.Response
-    import ${config.asyncType}
 ${JsonImports(form.service).mkString("\n").indent(4)}
-
-    def closeAsyncHttpClient(): Unit = {
-      asyncHttpClient.shutdownNow()
-    }
+${config.closeClient.getOrElse("")}
 
 ${methodGenerator.accessors().indent(4)}
 
@@ -47,7 +43,7 @@ ${headerString.indent(6)}
 
     def modifyRequest(request: ${config.asyncType}[${config.requestClass}]): ${config.asyncType}[${config.requestClass}] = request
 
-    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
+    implicit def circeJsonEncoder[${config.asyncTypeParam(Some("Sync")).map(p => p + ", ").getOrElse("")}A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
 
     def _executeRequest[T, U](
       method: String,
@@ -86,7 +82,7 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val authBody = body.fold(${config.asyncType}.${config.asyncSuccess}(authReq))(authReq.withBody)
+      val authBody = body.fold(${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess}(authReq))(authReq.withBody)
 
       asyncHttpClient.fetch(modifyRequest(authBody))(handler)
     }

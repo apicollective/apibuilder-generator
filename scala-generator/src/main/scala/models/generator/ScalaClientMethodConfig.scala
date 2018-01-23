@@ -80,6 +80,10 @@ trait ScalaClientMethodConfig {
     s"""_root_.${namespace}.Client.parseJson("$className", $responseName, _.validate[$className])"""
   }
 
+  def asyncTypeParam(constraint: Option[String] = None): Option[String] = None
+
+  def wrappedAsyncType(instance: String = ""): Option[String] = None
+
 }
 
 object ScalaClientMethodConfigs {
@@ -172,7 +176,7 @@ private lazy val defaultAsyncHttpClient = {
     override val responseStatusMethod = "status.code"
     override val responseBodyMethod = """body"""
     override val responseClass = "org.http4s.Response"
-    override val extraClientCtorArgs = Some(",\n  asyncHttpClient: org.http4s.client.Client = Client.defaultAsyncHttpClient")
+    override def extraClientCtorArgs: Option[String] = Some(",\n  asyncHttpClient: org.http4s.client.Client = Client.defaultAsyncHttpClient")
     override val extraClientObjectMethods = Some("""
 implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
 
@@ -186,7 +190,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val expectsInjectedWsClient = false
     override def formatBaseUrl(url: Option[String]): String = s"val baseUrl: org.http4s.Uri" + url.fold("")(u => s" = org.http4s.Uri.unsafeFromString(${ScalaUtil.wrapInQuotes(u)})")
     override def toJson(responseName: String, className: String): String = {
-      s"""_root_.${namespace}.Client.parseJson[$className]("$className", $responseName)"""
+      s"""_root_.${namespace}.Client.parseJson[${if(asyncType == "F")"F, " else ""}$className]("$className", $responseName)"""
     }
     def leftType: String
     def rightType: String
@@ -199,6 +203,16 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def generateCirceJsonOf(datatypeName: String): String = s"org.http4s.circe.jsonOf[$datatypeName]"
     def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$datatypeName]"
     def serverImports: String = ""
+    def routeKind: String = "trait"
+    val asyncTypeImport: String = "import cats.effect._"
+    def routeExtends: Option[String] = None
+    def clientImports: String = """import org.http4s.client.blaze._
+                                  |import cats.effect._""".stripMargin
+    def closeClient: Option[String] = Some("""
+                                |def closeAsyncHttpClient(): Unit = {
+                                |  asyncHttpClient.shutdownNow()
+                                |}""".stripMargin)
+    def headerString(prefix: String): String
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -207,6 +221,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "scalaz.\\/-"
     override val monadTransformerInvoke = "run"
     override def asyncFailure: String = "fail"
+    override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
   }
 
   case class Http4s017(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -215,20 +230,20 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
     override def asyncFailure: String = "fail"
+    override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
   }
 
   case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
-    override val asyncType = "cats.effect.IO"
+    override val asyncType = "F"
+    override def asyncTypeParam(constraint: Option[String] = None) = Some(s"F[_]${constraint.map(c => s": $c").getOrElse("")}")
     override val leftType = "Left"
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
     override val responseClass = s"org.http4s.Response[$asyncType]"
-    override val extraClientCtorArgs = Some(s",\n  asyncHttpClient: org.http4s.client.Client[$asyncType] = Client.defaultAsyncHttpClient")
+    override val extraClientCtorArgs: Option[String] = Some(s",\n  asyncHttpClient: org.http4s.client.Client[$asyncType]")
     override val extraClientObjectMethods = Some(s"""
-implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
-
-private lazy val defaultAsyncHttpClient = PooledHttp1Client[$asyncType]()
-""")
+implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
+      """)
     override val asyncSuccess: String = "pure"
     override def asyncFailure: String = "raiseError"
     override def requestClass: String = s"org.http4s.Request[$asyncType]"
@@ -240,6 +255,17 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client[$asyncType]()
 
     override def serverImports: String =
       s"""import cats.effect._
-         |import org.http4s.dsl.io._""".stripMargin
+         |import cats.implicits._""".stripMargin
+
+
+    override val routeKind = "trait"
+    override def wrappedAsyncType(instance: String = "") = Some(s"$instance[$asyncType]")
+    override val routeExtends = Some(s"extends Http4sDsl[$asyncType]")
+    override val clientImports: String = """import cats.effect._
+                                  |import cats.implicits._""".stripMargin
+
+    override val closeClient = None
+    override def headerString(prefix: String) = s"${prefix}headers: _*)"
+
   }
 }

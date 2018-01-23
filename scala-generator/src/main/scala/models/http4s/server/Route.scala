@@ -137,9 +137,9 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     def route(prefix:String) = Seq(s"  ${op.name}(${args(prefix)}).flatMap {"
                   ) ++ statusCodes.collect {
                     case StatusCode(code, Some(_)) =>
-                    s"    case $responseTrait.HTTP$code(value, headers) => ${HttpStatusCodes.apply(code)}(value).putHeaders(headers: _*)"
+                    s"    case $responseTrait.HTTP$code(value, headers) => ${HttpStatusCodes.apply(code)}(value${config.headerString(", ")}"
                     case StatusCode(code, None) =>
-                    s"    case $responseTrait.HTTP$code(headers) => ${HttpStatusCodes.apply(code)}().putHeaders(headers: _*)"
+                    s"    case $responseTrait.HTTP$code(headers) => ${HttpStatusCodes.apply(code)}(${config.headerString("")}"
                   } ++ Seq(
                     s"  }")
 

@@ -2,7 +2,7 @@ package io.apibuilder.http4s.test.server
 
 import org.http4s.dsl._
 import cats.effect._
-import org.http4s.dsl.io._
+import cats.implicits._
 import io.apibuilder.http4s.test.models.json._
 
 private[server] object Matchers {
@@ -26,7 +26,7 @@ private[server] object Matchers {
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply(req: org.http4s.Message[cats.effect.IO]): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply[F[_]](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -94,11 +94,11 @@ private[server] object Matchers {
 
 }
 
-trait ModelRoutes {
+trait ModelRoutes[F[_]] extends Http4sDsl[F] {
   import Matchers._
 
-  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[cats.effect.IO, A]
-  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[cats.effect.IO, A]
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
 
   sealed trait GetStringByIdResponse
 
@@ -107,9 +107,9 @@ trait ModelRoutes {
   }
 
   def getStringById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: String
-  ): cats.effect.IO[GetStringByIdResponse]
+  ): F[GetStringByIdResponse]
 
   sealed trait GetNamedStringByNamedIdResponse
 
@@ -118,9 +118,9 @@ trait ModelRoutes {
   }
 
   def getNamedStringByNamedId(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     namedId: String
-  ): cats.effect.IO[GetNamedStringByNamedIdResponse]
+  ): F[GetNamedStringByNamedIdResponse]
 
   sealed trait GetStringWithMinByIdResponse
 
@@ -129,9 +129,9 @@ trait ModelRoutes {
   }
 
   def getStringWithMinById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: String
-  ): cats.effect.IO[GetStringWithMinByIdResponse]
+  ): F[GetStringWithMinByIdResponse]
 
   sealed trait GetStringWithMaxByIdResponse
 
@@ -140,9 +140,9 @@ trait ModelRoutes {
   }
 
   def getStringWithMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: String
-  ): cats.effect.IO[GetStringWithMaxByIdResponse]
+  ): F[GetStringWithMaxByIdResponse]
 
   sealed trait GetStringWithMinAndMaxByIdResponse
 
@@ -151,9 +151,9 @@ trait ModelRoutes {
   }
 
   def getStringWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: String
-  ): cats.effect.IO[GetStringWithMinAndMaxByIdResponse]
+  ): F[GetStringWithMinAndMaxByIdResponse]
 
   sealed trait GetIntByIdResponse
 
@@ -162,9 +162,9 @@ trait ModelRoutes {
   }
 
   def getIntById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Int
-  ): cats.effect.IO[GetIntByIdResponse]
+  ): F[GetIntByIdResponse]
 
   sealed trait GetIntWithMinAndMaxByIdResponse
 
@@ -173,9 +173,9 @@ trait ModelRoutes {
   }
 
   def getIntWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Int
-  ): cats.effect.IO[GetIntWithMinAndMaxByIdResponse]
+  ): F[GetIntWithMinAndMaxByIdResponse]
 
   sealed trait GetLongByIdResponse
 
@@ -184,9 +184,9 @@ trait ModelRoutes {
   }
 
   def getLongById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Long
-  ): cats.effect.IO[GetLongByIdResponse]
+  ): F[GetLongByIdResponse]
 
   sealed trait GetLongWithMinAndMaxByIdResponse
 
@@ -195,9 +195,9 @@ trait ModelRoutes {
   }
 
   def getLongWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Long
-  ): cats.effect.IO[GetLongWithMinAndMaxByIdResponse]
+  ): F[GetLongWithMinAndMaxByIdResponse]
 
   sealed trait GetBooleanByIdResponse
 
@@ -206,9 +206,9 @@ trait ModelRoutes {
   }
 
   def getBooleanById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Boolean
-  ): cats.effect.IO[GetBooleanByIdResponse]
+  ): F[GetBooleanByIdResponse]
 
   sealed trait GetBooleanWithMinAndMaxByIdResponse
 
@@ -217,9 +217,9 @@ trait ModelRoutes {
   }
 
   def getBooleanWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Boolean
-  ): cats.effect.IO[GetBooleanWithMinAndMaxByIdResponse]
+  ): F[GetBooleanWithMinAndMaxByIdResponse]
 
   sealed trait GetDoubleByIdResponse
 
@@ -228,9 +228,9 @@ trait ModelRoutes {
   }
 
   def getDoubleById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Double
-  ): cats.effect.IO[GetDoubleByIdResponse]
+  ): F[GetDoubleByIdResponse]
 
   sealed trait GetDoubleWithMinAndMaxByIdResponse
 
@@ -239,9 +239,9 @@ trait ModelRoutes {
   }
 
   def getDoubleWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: Double
-  ): cats.effect.IO[GetDoubleWithMinAndMaxByIdResponse]
+  ): F[GetDoubleWithMinAndMaxByIdResponse]
 
   sealed trait GetDecimalByIdResponse
 
@@ -250,9 +250,9 @@ trait ModelRoutes {
   }
 
   def getDecimalById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: BigDecimal
-  ): cats.effect.IO[GetDecimalByIdResponse]
+  ): F[GetDecimalByIdResponse]
 
   sealed trait GetDecimalWithMinAndMaxByIdResponse
 
@@ -261,9 +261,9 @@ trait ModelRoutes {
   }
 
   def getDecimalWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: BigDecimal
-  ): cats.effect.IO[GetDecimalWithMinAndMaxByIdResponse]
+  ): F[GetDecimalWithMinAndMaxByIdResponse]
 
   sealed trait GetDateByIdResponse
 
@@ -272,9 +272,9 @@ trait ModelRoutes {
   }
 
   def getDateById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: _root_.java.time.LocalDate
-  ): cats.effect.IO[GetDateByIdResponse]
+  ): F[GetDateByIdResponse]
 
   sealed trait GetDateWithMinAndMaxByIdResponse
 
@@ -283,9 +283,9 @@ trait ModelRoutes {
   }
 
   def getDateWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: _root_.java.time.LocalDate
-  ): cats.effect.IO[GetDateWithMinAndMaxByIdResponse]
+  ): F[GetDateWithMinAndMaxByIdResponse]
 
   sealed trait GetDatetimeByIdResponse
 
@@ -294,9 +294,9 @@ trait ModelRoutes {
   }
 
   def getDatetimeById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: _root_.java.time.Instant
-  ): cats.effect.IO[GetDatetimeByIdResponse]
+  ): F[GetDatetimeByIdResponse]
 
   sealed trait GetDatetimeWithMinAndMaxByIdResponse
 
@@ -305,9 +305,9 @@ trait ModelRoutes {
   }
 
   def getDatetimeWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: _root_.java.time.Instant
-  ): cats.effect.IO[GetDatetimeWithMinAndMaxByIdResponse]
+  ): F[GetDatetimeWithMinAndMaxByIdResponse]
 
   sealed trait GetUuidByIdResponse
 
@@ -316,9 +316,9 @@ trait ModelRoutes {
   }
 
   def getUuidById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: _root_.java.util.UUID
-  ): cats.effect.IO[GetUuidByIdResponse]
+  ): F[GetUuidByIdResponse]
 
   sealed trait GetUuidWithMinAndMaxByIdResponse
 
@@ -327,9 +327,9 @@ trait ModelRoutes {
   }
 
   def getUuidWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: _root_.java.util.UUID
-  ): cats.effect.IO[GetUuidWithMinAndMaxByIdResponse]
+  ): F[GetUuidWithMinAndMaxByIdResponse]
 
   sealed trait GetEnumByIdResponse
 
@@ -338,9 +338,9 @@ trait ModelRoutes {
   }
 
   def getEnumById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.test.models.Enum
-  ): cats.effect.IO[GetEnumByIdResponse]
+  ): F[GetEnumByIdResponse]
 
   sealed trait GetNamedEnumByNamedIdResponse
 
@@ -349,9 +349,9 @@ trait ModelRoutes {
   }
 
   def getNamedEnumByNamedId(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     namedId: io.apibuilder.http4s.test.models.Enum
-  ): cats.effect.IO[GetNamedEnumByNamedIdResponse]
+  ): F[GetNamedEnumByNamedIdResponse]
 
   sealed trait GetEnumWithMinAndMaxByIdResponse
 
@@ -360,9 +360,9 @@ trait ModelRoutes {
   }
 
   def getEnumWithMinAndMaxById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.test.models.Enum
-  ): cats.effect.IO[GetEnumWithMinAndMaxByIdResponse]
+  ): F[GetEnumWithMinAndMaxByIdResponse]
 
   sealed trait GetInvalidByIdResponse
 
@@ -371,136 +371,136 @@ trait ModelRoutes {
   }
 
   def getInvalidById(
-    _req: org.http4s.Request[cats.effect.IO],
+    _req: org.http4s.Request[F],
     id: io.apibuilder.http4s.test.models.Model
-  ): cats.effect.IO[GetInvalidByIdResponse]
+  ): F[GetInvalidByIdResponse]
 
-  def apiVersionMatch(req: org.http4s.Message[cats.effect.IO]): Boolean = ApiVersion(req)
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion[F](req)
 
-  def service() = org.http4s.HttpService[cats.effect.IO] {
+  def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "string" / id if apiVersionMatch(_req) =>
       getStringById(_req, id).flatMap {
-        case GetStringByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "named_string" / named_id if apiVersionMatch(_req) =>
       getNamedStringByNamedId(_req, named_id).flatMap {
-        case GetNamedStringByNamedIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetNamedStringByNamedIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "string_with_min" / String10Val(id) if apiVersionMatch(_req) =>
       getStringWithMinById(_req, id).flatMap {
-        case GetStringWithMinByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMinByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "string_with_max" / StringTo10Val(id) if apiVersionMatch(_req) =>
       getStringWithMaxById(_req, id).flatMap {
-        case GetStringWithMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "string_with_min_and_max" / String10To30Val(id) if apiVersionMatch(_req) =>
       getStringWithMinAndMaxById(_req, id).flatMap {
-        case GetStringWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "int" / IntVal(id) if apiVersionMatch(_req) =>
       getIntById(_req, id).flatMap {
-        case GetIntByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetIntByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "int_with_min_and_max" / Int10To30Val(id) if apiVersionMatch(_req) =>
       getIntWithMinAndMaxById(_req, id).flatMap {
-        case GetIntWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetIntWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "long" / LongVal(id) if apiVersionMatch(_req) =>
       getLongById(_req, id).flatMap {
-        case GetLongByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetLongByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "long_with_min_and_max" / Long10To30Val(id) if apiVersionMatch(_req) =>
       getLongWithMinAndMaxById(_req, id).flatMap {
-        case GetLongWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetLongWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "boolean" / BooleanVal(id) if apiVersionMatch(_req) =>
       getBooleanById(_req, id).flatMap {
-        case GetBooleanByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetBooleanByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "boolean_with_min_and_max" / BooleanVal(id) if apiVersionMatch(_req) =>
       getBooleanWithMinAndMaxById(_req, id).flatMap {
-        case GetBooleanWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetBooleanWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "double" / DoubleVal(id) if apiVersionMatch(_req) =>
       getDoubleById(_req, id).flatMap {
-        case GetDoubleByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDoubleByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "double_with_min_and_max" / DoubleVal(id) if apiVersionMatch(_req) =>
       getDoubleWithMinAndMaxById(_req, id).flatMap {
-        case GetDoubleWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDoubleWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "decimal" / BigDecimalVal(id) if apiVersionMatch(_req) =>
       getDecimalById(_req, id).flatMap {
-        case GetDecimalByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDecimalByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "decimal_with_min_and_max" / BigDecimalVal(id) if apiVersionMatch(_req) =>
       getDecimalWithMinAndMaxById(_req, id).flatMap {
-        case GetDecimalWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDecimalWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "date" / LocalDateVal(id) if apiVersionMatch(_req) =>
       getDateById(_req, id).flatMap {
-        case GetDateByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDateByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "date_with_min_and_max" / LocalDateVal(id) if apiVersionMatch(_req) =>
       getDateWithMinAndMaxById(_req, id).flatMap {
-        case GetDateWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDateWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "datetime" / InstantVal(id) if apiVersionMatch(_req) =>
       getDatetimeById(_req, id).flatMap {
-        case GetDatetimeByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDatetimeByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "datetime_with_min_and_max" / InstantVal(id) if apiVersionMatch(_req) =>
       getDatetimeWithMinAndMaxById(_req, id).flatMap {
-        case GetDatetimeWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDatetimeWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "uuid" / UUIDVal(id) if apiVersionMatch(_req) =>
       getUuidById(_req, id).flatMap {
-        case GetUuidByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetUuidByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "uuid_with_min_and_max" / UUIDVal(id) if apiVersionMatch(_req) =>
       getUuidWithMinAndMaxById(_req, id).flatMap {
-        case GetUuidWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetUuidWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "enum" / EnumVal(id) if apiVersionMatch(_req) =>
       getEnumById(_req, id).flatMap {
-        case GetEnumByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetEnumByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "named_enum" / EnumVal(named_id) if apiVersionMatch(_req) =>
       getNamedEnumByNamedId(_req, named_id).flatMap {
-        case GetNamedEnumByNamedIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetNamedEnumByNamedIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "enum_with_min_and_max" / EnumVal(id) if apiVersionMatch(_req) =>
       getEnumWithMinAndMaxById(_req, id).flatMap {
-        case GetEnumWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetEnumWithMinAndMaxByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
 
     case _req @ GET -> Root / "invalid" / ModelVal(id) if apiVersionMatch(_req) =>
       getInvalidById(_req, id).flatMap {
-        case GetInvalidByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetInvalidByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
   }
 }

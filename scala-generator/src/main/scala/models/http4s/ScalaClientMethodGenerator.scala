@@ -20,10 +20,10 @@ class ScalaClientMethodGenerator (
     Seq(
       "package interfaces {",
       Seq(
-        "trait Client {",
+        s"trait Client${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")} {",
         "  def baseUrl: org.http4s.Uri",
         sortedResources.map { resource =>
-          s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}"
+          s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
         }.mkString("\n").indent(2),
         "}"
       ).mkString("\n").indent(2),
@@ -104,13 +104,13 @@ class ScalaClientMethodGenerator (
       } match {
         case Some(response) => {
           if (response.isUnit) {
-            s"case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
+            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
           } else {
-            s"case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))"
+            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))"
           }
         }
         case None => {
-          s"""case r => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
+          s"""case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
         }
       }
 
@@ -121,14 +121,14 @@ class ScalaClientMethodGenerator (
               if (response.isSuccess) {
                 if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(Some(()))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(Some(()))")
                   } else {
                     val json = config.toJson("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(Some($json))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(Some($json))")
                   }
 
                 } else if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncSuccess}(())")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(())")
 
                 } else {
                   val json = config.toJson("r", response.datatype.name)
@@ -141,10 +141,10 @@ class ScalaClientMethodGenerator (
 
               } else {
                 if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
 
                 } else {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncType}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
                 }
               }
             }
@@ -161,7 +161,8 @@ class ScalaClientMethodGenerator (
         returnType = s"${config.asyncType}[$resType]",
         methodCall = methodCall,
         response = matchResponse,
-        implicitArgs = config.implicitArgs
+        implicitArgs = config.implicitArgs,
+        typeParam = config.asyncTypeParam()
       )
 
     }
@@ -173,9 +174,18 @@ class ScalaClientMethod(
   returnType: String,
   methodCall: String,
   response: String,
-  implicitArgs: Option[String]
+  implicitArgs: Option[String],
+  typeParam: Option[String]
 ) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs) {
   import lib.Text._
+
+  override val interface: String = {
+    Seq(
+      commentString,
+      toOption(ScalaUtil.deprecationString(operation.deprecation)),
+      Some(s"""def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType""")
+    ).flatten.mkString("\n")
+  }
 
   override val code: String = {
     s"""${ScalaUtil.deprecationString(operation.deprecation)}override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {

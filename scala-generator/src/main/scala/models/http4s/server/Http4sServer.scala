@@ -72,6 +72,7 @@ case class Http4sServer(form: InvocationForm,
   val version: Option[Int] = VersionTag(form.service.version).major
 
   def generate(): String = {
+
     val versionCapture = version.fold("") { ver =>
       s"""
          |object ApiVersion {
@@ -80,7 +81,7 @@ case class Http4sServer(form: InvocationForm,
          |    "X-Apidoc-Version-Major".ci
          |  }
          |
-         |  def apply(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
+         |  def apply${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
          |    case Some(v) if v.value == "$ver" => true
          |    case _ => false
          |  }
@@ -100,18 +101,19 @@ case class Http4sServer(form: InvocationForm,
     val resources = resourcesAndRoutes.map { case (resource, routes) =>
 
       val name = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(ScalaUtil.toClassName(resource.resource.`type`)).toLowerCase + "_routes").capitalize
+      val apiVersionTypeParam = if (config.asyncType == "F") "[F]" else ""
 
-      s"""trait $name {
+      s"""${config.routeKind} $name${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.routeExtends.map(" "+_).getOrElse("")} {
          |  import Matchers._
          |
-         |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = ${config.generateCirceJsonOf("A")}
-         |  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
+         |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonOf("A")}
+         |  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonEncoderOf("A")}
          |
          |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
          |
-         |  def apiVersionMatch(req: ${config.messageClass}): Boolean = ApiVersion(req)
+         |  def apiVersionMatch(req: ${config.messageClass}): Boolean = ApiVersion$apiVersionTypeParam(req)
          |
-         |  def service() = ${config.httpServiceClass} {
+         |  def service()${config.asyncTypeParam().map(p => s"(implicit sync: Sync[F])").getOrElse("")} = ${config.httpServiceClass} {
          |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indent(4)}
          |  }
          |}

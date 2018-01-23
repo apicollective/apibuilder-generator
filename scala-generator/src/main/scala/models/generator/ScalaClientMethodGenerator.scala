@@ -31,7 +31,7 @@ class ScalaClientMethodGenerator(
 
   def accessors(): String = {
     sortedResources.map { resource =>
-      s"def ${methodName(resource)}: ${resource.plural} = ${resource.plural}"
+      s"def ${methodName(resource)}: ${resource.plural}${config.wrappedAsyncType().getOrElse("")} = ${resource.plural}"
     }.mkString("\n\n")
   }
 
@@ -39,10 +39,10 @@ class ScalaClientMethodGenerator(
     Seq(
       "package interfaces {",
       Seq(
-        "trait Client {",
+        s"trait Client${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")} {",
         "  def baseUrl: String",
         sortedResources.map { resource =>
-          s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}"
+          s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
        }.mkString("\n").indent(2),
         "}"
       ).mkString("\n").indent(2),
@@ -52,7 +52,7 @@ class ScalaClientMethodGenerator(
 
   def traits(): String = {
     sortedResources.map { resource =>
-      s"trait ${resource.plural} {\n" +
+      s"trait ${resource.plural}${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")} {\n" +
       methods(resource).map(_.interface).mkString("\n\n").indent(2) +
       "\n}"
     }.mkString("\n\n")
@@ -63,7 +63,7 @@ class ScalaClientMethodGenerator(
       Seq(
         Some(ScalaUtil.deprecationString(resource.deprecation).trim).filter(_.nonEmpty),
         Some(
-          s"object ${resource.plural} extends ${resource.plural} {\n" +
+          s"object ${resource.plural} extends ${resource.plural}${config.wrappedAsyncType().getOrElse("")} {\n" +
             methods(resource).map(_.code).mkString("\n\n").indent(2) +
             "\n}"
         )
@@ -126,7 +126,7 @@ class ScalaClientMethodGenerator(
     }
 
     Seq(
-      s"case class $className(",
+      s"case class $className${config.asyncTypeParam(Some("Sync")).map(p =>s"[$p]").getOrElse("")}(",
       s"  response: ${config.responseClass},",
       s"  message: Option[String] = None",
       s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$bodyString"""
@@ -283,7 +283,7 @@ class ScalaClientMethod(
     case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
   }
 
-  private[this] val commentString: Option[String] = toOption(
+  protected[this] val commentString: Option[String] = toOption(
     ScalaGeneratorUtil.scaladoc(
       operation.description,
       operation.parameters.map { p => (p.name, p.param.description) }
@@ -309,7 +309,7 @@ ${response.indent(4)}
     ).flatten.mkString("\n")
   }
 
-  private[this] def toOption(value: String): Option[String] = {
+  protected[this] def toOption(value: String): Option[String] = {
     value.trim match {
       case "" => None
       case c => Some(c)
