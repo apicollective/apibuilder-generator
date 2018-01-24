@@ -246,7 +246,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
     override val responseClass = s"org.http4s.Response[$asyncType]"
-    override val extraClientCtorArgs: Option[String] = Some(s",\n  asyncHttpClient: org.http4s.client.Client[$asyncType]")
+    override val extraClientCtorArgs: Option[String] = Some(s",\n  httpClient: org.http4s.client.Client[$asyncType]")
     override val extraClientObjectMethods = Some(s"""
 implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
       """)

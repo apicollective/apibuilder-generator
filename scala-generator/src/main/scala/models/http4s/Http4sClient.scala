@@ -84,7 +84,7 @@ ${headerString.indent(6)}
 
       val authBody = body.fold(${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess}(authReq))(authReq.withBody)
 
-      asyncHttpClient.fetch(modifyRequest(authBody))(handler)
+      httpClient.fetch(modifyRequest(authBody))(handler)
     }
   }
 
