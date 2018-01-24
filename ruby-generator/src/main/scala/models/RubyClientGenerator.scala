@@ -504,7 +504,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
       val rubyPath = op.path.split("/").map { name =>
         if (name.startsWith(":")) {
-          val varName = name.slice(1, name.length)
+          val varName = toParameterName(name.slice(1, name.length))
           val param = pathParams.find(_.name == varName).getOrElse {
             sys.error(s"Could not find path parameter named[$varName]")
           }
@@ -694,6 +694,18 @@ ${headers.rubyModuleConstants.indent(2)}
 
     ).mkString("\n\n").indent(2) +
     "\n\nend"
+  }
+
+  /**
+    * Turns id.html => id
+    */
+  private[this] def toParameterName(name: String): String = {
+    val i = name.indexOf(".")
+    if (i > 0) {
+      name.substring(0, i)
+    } else {
+      name
+    }
   }
 
   private[this] def unionTypeDiscriminatorValue(ut: UnionType): String = {
