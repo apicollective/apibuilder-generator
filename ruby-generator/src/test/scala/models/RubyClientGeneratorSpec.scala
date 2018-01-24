@@ -41,6 +41,10 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
       models.TestHelper.assertEqualsFile("/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum, None))
     }
 
+    it("for enum with spaces") {
+      RubyClientGenerator.enumName("sq m") should be("sq_m")
+    }
+
   }
 
   it("generate ruby") {
