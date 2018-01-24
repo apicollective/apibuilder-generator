@@ -5,7 +5,7 @@ import cats.effect._
 import cats.implicits._
 import io.apibuilder.http4s.test.models.json._
 
-private[server] object Matchers {
+private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
 
   implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
@@ -24,11 +24,10 @@ private[server] object Matchers {
 
   object ApiVersion {
     val ApiVersionMajor = {
-      import org.http4s.syntax.string._
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply[F[_]](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply(req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -116,8 +115,7 @@ private[server] object Matchers {
   object NamedIdStringMatcher extends QueryParamDecoderMatcher[String]("named_id")
 }
 
-trait ModelRoutes[F[_]] extends Http4sDsl[F] {
-  import Matchers._
+trait ModelRoutes[F[_]] extends Matchers[F] {
 
   implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
   implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
@@ -452,157 +450,157 @@ trait ModelRoutes[F[_]] extends Http4sDsl[F] {
     id: io.apibuilder.http4s.test.models.Enum
   ): F[GetEnumWithMinAndMaxResponse]
 
-  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion[F](req)
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
 
   def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "string" :? IdStringMatcher(id) if apiVersionMatch(_req) =>
       getString(_req, id).flatMap {
-        case GetStringResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetStringResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(named_id) if apiVersionMatch(_req) =>
       getNamedString(_req, named_id).flatMap {
-        case GetNamedStringResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetNamedStringResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "string_with_min" :? IdString10Matcher(id) if apiVersionMatch(_req) =>
       getStringWithMin(_req, id).flatMap {
-        case GetStringWithMinResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetStringWithMinResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "string_with_max" :? IdStringTo10Matcher(id) if apiVersionMatch(_req) =>
       getStringWithMax(_req, id).flatMap {
-        case GetStringWithMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetStringWithMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "string_with_min_and_max" :? IdString10To30DefDefaultMatcher(id) if apiVersionMatch(_req) =>
       getStringWithMinAndMax(_req, id).flatMap {
-        case GetStringWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetStringWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "optional_string" :? IdOptStringMatcher(id) if apiVersionMatch(_req) =>
       getOptionalString(_req, id).flatMap {
-        case GetOptionalStringResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetOptionalStringResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "optional_string_with_min_and_max" :? IdOptString10To30Matcher(id) if apiVersionMatch(_req) =>
       getOptionalStringWithMinAndMax(_req, id).flatMap {
-        case GetOptionalStringWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetOptionalStringWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "list_string" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getListString(_req, id).flatMap {
-        case GetListStringResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetListStringResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "list_string_with_min_and_max" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getListStringWithMinAndMax(_req, id).flatMap {
-        case GetListStringWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetListStringWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "optional_list_string" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getOptionalListString(_req, id).flatMap {
-        case GetOptionalListStringResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetOptionalListStringResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "optional_list_string_with_min_and_max" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getOptionalListStringWithMinAndMax(_req, id).flatMap {
-        case GetOptionalListStringWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetOptionalListStringWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "int" :? IdIntMatcher(id) if apiVersionMatch(_req) =>
       getInt(_req, id).flatMap {
-        case GetIntResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetIntResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "int_with_min_and_max" :? IdInt10To30Def20Matcher(id) if apiVersionMatch(_req) =>
       getIntWithMinAndMax(_req, id).flatMap {
-        case GetIntWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetIntWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "long" :? IdLongMatcher(id) if apiVersionMatch(_req) =>
       getLong(_req, id).flatMap {
-        case GetLongResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetLongResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "long_with_min_and_max" :? IdLong10To30Def20Matcher(id) if apiVersionMatch(_req) =>
       getLongWithMinAndMax(_req, id).flatMap {
-        case GetLongWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetLongWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "boolean" :? IdBooleanMatcher(id) if apiVersionMatch(_req) =>
       getBoolean(_req, id).flatMap {
-        case GetBooleanResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetBooleanResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "boolean_with_min_and_max" :? IdBoolean10To30DefTrueMatcher(id) if apiVersionMatch(_req) =>
       getBooleanWithMinAndMax(_req, id).flatMap {
-        case GetBooleanWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetBooleanWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "double" :? IdDoubleMatcher(id) if apiVersionMatch(_req) =>
       getDouble(_req, id).flatMap {
-        case GetDoubleResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDoubleResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "double_with_min_and_max" :? IdDouble10To30Def314Matcher(id) if apiVersionMatch(_req) =>
       getDoubleWithMinAndMax(_req, id).flatMap {
-        case GetDoubleWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDoubleWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "decimal" :? IdBigDecimalMatcher(id) if apiVersionMatch(_req) =>
       getDecimal(_req, id).flatMap {
-        case GetDecimalResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDecimalResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "decimal_with_min_and_max" :? IdBigDecimal10To30Def314Matcher(id) if apiVersionMatch(_req) =>
       getDecimalWithMinAndMax(_req, id).flatMap {
-        case GetDecimalWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDecimalWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "date" :? IdLocalDateMatcher(id) if apiVersionMatch(_req) =>
       getDate(_req, id).flatMap {
-        case GetDateResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDateResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "date_with_min_and_max" :? IdLocalDate10To30Def19991231Matcher(id) if apiVersionMatch(_req) =>
       getDateWithMinAndMax(_req, id).flatMap {
-        case GetDateWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDateWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "datetime" :? IdInstantMatcher(id) if apiVersionMatch(_req) =>
       getDatetime(_req, id).flatMap {
-        case GetDatetimeResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDatetimeResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "datetime_with_min_and_max" :? IdInstant10To30Def19991231t235959zMatcher(id) if apiVersionMatch(_req) =>
       getDatetimeWithMinAndMax(_req, id).flatMap {
-        case GetDatetimeWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetDatetimeWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "uuid" :? IdUUIDMatcher(id) if apiVersionMatch(_req) =>
       getUuid(_req, id).flatMap {
-        case GetUuidResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetUuidResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "uuid_with_min_and_max" :? IdUUID10To30DefE86bdef2B6a64c0aAb74594cdce3d86fMatcher(id) if apiVersionMatch(_req) =>
       getUuidWithMinAndMax(_req, id).flatMap {
-        case GetUuidWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetUuidWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "enum" :? IdEnumMatcher(id) if apiVersionMatch(_req) =>
       getEnum(_req, id).flatMap {
-        case GetEnumResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetEnumResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(named_id) if apiVersionMatch(_req) =>
       getNamedEnum(_req, named_id).flatMap {
-        case GetNamedEnumResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetNamedEnumResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "enum_with_min_and_max" :? IdEnum10To30DefValueMatcher(id) if apiVersionMatch(_req) =>
       getEnumWithMinAndMax(_req, id).flatMap {
-        case GetEnumWithMinAndMaxResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetEnumWithMinAndMaxResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
   }
 }

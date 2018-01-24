@@ -6,7 +6,7 @@ import cats.implicits._
 import io.apibuilder.http4s.imported.models.json._
 import io.apibuilder.http4s.test.models.json._
 
-private[server] object Matchers {
+private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
 
   implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
@@ -28,11 +28,10 @@ private[server] object Matchers {
 
   object ApiVersion {
     val ApiVersionMajor = {
-      import org.http4s.syntax.string._
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply[F[_]](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply(req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -55,8 +54,7 @@ private[server] object Matchers {
   object IdModelMatcher extends QueryParamDecoderMatcher[io.apibuilder.http4s.test.models.Model]("id")
 }
 
-trait ModelRoutes[F[_]] extends Http4sDsl[F] {
-  import Matchers._
+trait ModelRoutes[F[_]] extends Matchers[F] {
 
   implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
   implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
@@ -127,37 +125,37 @@ trait ModelRoutes[F[_]] extends Http4sDsl[F] {
     id: io.apibuilder.http4s.imported.models.Model
   ): F[GetQueryModelImportedResponse]
 
-  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion[F](req)
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
 
   def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "path-enum-local" / EnumVal(id) if apiVersionMatch(_req) =>
       getPathEnumLocalById(_req, id).flatMap {
-        case GetPathEnumLocalByIdResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetPathEnumLocalByIdResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "path-enum-imported" / IoApibuilderHttp4sImportedModelsEnumVal(id) if apiVersionMatch(_req) =>
       getPathEnumImportedById(_req, id).flatMap {
-        case GetPathEnumImportedByIdResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetPathEnumImportedByIdResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "query-enum-local" :? IdEnumMatcher(id) if apiVersionMatch(_req) =>
       getQueryEnumLocal(_req, id).flatMap {
-        case GetQueryEnumLocalResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryEnumLocalResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "query-enum-imported" :? IdIoApibuilderHttp4sImportedModelsEnumMatcher(id) if apiVersionMatch(_req) =>
       getQueryEnumImported(_req, id).flatMap {
-        case GetQueryEnumImportedResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryEnumImportedResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "query-model-local" :? IdModelMatcher(id) if apiVersionMatch(_req) =>
       getQueryModelLocal(_req, id).flatMap {
-        case GetQueryModelLocalResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryModelLocalResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "query-model-imported" :? IdIoApibuilderHttp4sImportedModelsModelMatcher(id) if apiVersionMatch(_req) =>
       getQueryModelImported(_req, id).flatMap {
-        case GetQueryModelImportedResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryModelImportedResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
       }
   }
 }

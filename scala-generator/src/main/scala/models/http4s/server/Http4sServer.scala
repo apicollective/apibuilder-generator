@@ -77,11 +77,10 @@ case class Http4sServer(form: InvocationForm,
       s"""
          |object ApiVersion {
          |  val ApiVersionMajor = {
-         |    import org.http4s.syntax.string._
          |    "X-Apidoc-Version-Major".ci
          |  }
          |
-         |  def apply${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
+         |  def apply(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
          |    case Some(v) if v.value == "$ver" => true
          |    case _ => false
          |  }
@@ -101,17 +100,15 @@ case class Http4sServer(form: InvocationForm,
     val resources = resourcesAndRoutes.map { case (resource, routes) =>
 
       val name = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(ScalaUtil.toClassName(resource.resource.`type`)).toLowerCase + "_routes").capitalize
-      val apiVersionTypeParam = if (config.asyncType == "F") "[F]" else ""
 
-      s"""${config.routeKind} $name${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.routeExtends.map(" "+_).getOrElse("")} {
-         |  import Matchers._
-         |
+      s"""${config.routeKind} $name${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.routeExtends.getOrElse("")} {
+         |${config.matchersImport}
          |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonOf("A")}
          |  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonEncoderOf("A")}
          |
          |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
          |
-         |  def apiVersionMatch(req: ${config.messageClass}): Boolean = ApiVersion$apiVersionTypeParam(req)
+         |  def apiVersionMatch(req: ${config.messageClass}): Boolean = ApiVersion(req)
          |
          |  def service()${config.asyncTypeParam().map(p => s"(implicit sync: Sync[F])").getOrElse("")} = ${config.httpServiceClass} {
          |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indent(4)}
@@ -137,7 +134,7 @@ case class Http4sServer(form: InvocationForm,
        |${config.serverImports}
        |${JsonImports(form.service).mkString("\n")}
        |
-       |private[server] object Matchers {
+       |private[server] ${config.matcherKind} Matchers${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.matchersExtends.getOrElse("")} {
        |
        |  implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")

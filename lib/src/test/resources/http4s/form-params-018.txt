@@ -5,7 +5,7 @@ import cats.effect._
 import cats.implicits._
 import io.apibuilder.http4s.test.models.json._
 
-private[server] object Matchers {
+private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
 
   implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
@@ -22,11 +22,10 @@ private[server] object Matchers {
 
   object ApiVersion {
     val ApiVersionMajor = {
-      import org.http4s.syntax.string._
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply[F[_]](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply(req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -35,8 +34,7 @@ private[server] object Matchers {
 
 }
 
-trait ModelRoutes[F[_]] extends Http4sDsl[F] {
-  import Matchers._
+trait ModelRoutes[F[_]] extends Matchers[F] {
 
   implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
   implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
@@ -79,7 +77,7 @@ trait ModelRoutes[F[_]] extends Http4sDsl[F] {
     map: Map[String, String]
   ): F[PostResponse]
 
-  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion[F](req)
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
 
   def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ POST -> Root / "test" if apiVersionMatch(_req) =>
@@ -87,7 +85,7 @@ trait ModelRoutes[F[_]] extends Http4sDsl[F] {
       _req.attemptAs[PostRequest].value.flatMap{
         case Right(req) =>
           post(_req, req.id, req.model, req.enum, req.opt, req.list, req.map).flatMap {
-            case PostResponse.HTTP200(headers) => Ok(headers: _*)
+            case PostResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
           }
         case Left(_) => BadRequest()
       }
@@ -103,7 +101,7 @@ trait ModelRoutes[F[_]] extends Http4sDsl[F] {
               map <- req.getFirst("map").flatMap(f => _root_.io.circe.parser.decode[Map[String, String]](f).toOption)
             } yield {
                 post(_req, id, model, enum, opt, list, map).flatMap {
-                  case PostResponse.HTTP200(headers) => Ok(headers: _*)
+                  case PostResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
                 }
               }
             responseOpt.getOrElse(BadRequest())
