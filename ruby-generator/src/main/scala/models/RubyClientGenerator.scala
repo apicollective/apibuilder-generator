@@ -165,6 +165,7 @@ object RubyUtil {
     import Datatype._
     datatype match {
       case Primitive.String |
+        Primitive.Decimal |
         Primitive.DateIso8601 |
         Primitive.DateTimeIso8601 |
         Primitive.Uuid => rubyDefault(JsString(value), datatype)
@@ -181,7 +182,7 @@ object RubyUtil {
   }
 
   // TODO should be encapsulated in the RubyDatatype model
-  private def rubyDefault(json: JsValue, datatype: Datatype): String = {
+  def rubyDefault(json: JsValue, datatype: Datatype): String = {
     import Datatype._
     datatype match {
       case Container.Option(_) =>

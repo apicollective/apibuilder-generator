@@ -1,10 +1,5 @@
 package ruby.models
 
-import java.io.File
-
-import io.apibuilder.generator.v0.models.InvocationForm
-import io.apibuilder.spec.v0.models.{Enum, EnumValue}
-
 import org.scalatest.{ FunSpec, Matchers }
 
 class RubyUtilSpec extends FunSpec with Matchers {
@@ -110,6 +105,10 @@ class RubyUtilSpec extends FunSpec with Matchers {
 
     it ("default: 123, datatype: double") {
       RubyUtil.rubyDefault("123", Primitive.Double) should be("123.0")
+    }
+
+    it ("default: .5, datatype: decimal") {
+      RubyUtil.rubyDefault(".5", Primitive.Decimal) should be("0.5")
     }
 
     it ("default: 124, datatype: integer") {

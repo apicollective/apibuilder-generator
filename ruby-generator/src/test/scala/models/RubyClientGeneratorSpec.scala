@@ -2,8 +2,8 @@ package ruby.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.{Enum, EnumValue}
-
-import org.scalatest.{ FunSpec, Matchers }
+import org.scalatest.{FunSpec, Matchers}
+import play.api.libs.json.JsString
 
 class RubyClientGeneratorSpec extends FunSpec with Matchers {
 
