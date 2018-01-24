@@ -130,7 +130,7 @@ case class Http4sServer(form: InvocationForm,
 
     s"""package ${ssd.namespaces.base}.server
        |
-       |import org.http4s.dsl._
+       |import org.http4s.dsl.{io => _, _}
        |${config.serverImports}
        |${JsonImports(form.service).mkString("\n")}
        |
