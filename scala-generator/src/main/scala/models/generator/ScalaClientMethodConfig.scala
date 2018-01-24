@@ -202,7 +202,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$datatypeName]"
     def generateCirceJsonOf(datatypeName: String): String = s"org.http4s.circe.jsonOf[$datatypeName]"
     def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$datatypeName]"
-    def serverImports: String = ""
+    def serverImports: String = "\nimport org.http4s.dsl._\n"
     def routeKind: String = "trait"
     def matcherKind: String = "object"
     val asyncTypeImport: String = "import cats.effect._"
@@ -260,7 +260,9 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$asyncType, $datatypeName]"
 
     override def serverImports: String =
-      s"""import cats.effect._
+      s"""
+         |import org.http4s.dsl.{io => _, _}
+         |import cats.effect._
          |import cats.implicits._""".stripMargin
 
 
