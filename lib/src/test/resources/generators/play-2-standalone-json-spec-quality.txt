@@ -442,7 +442,7 @@ package com.gilt.quality.v0.models {
 
     case object Complete extends Response { override def toString = "Complete" }
     case object NotYet extends Response { override def toString = "Not Yet" }
-    case object Willnotcomplete extends Response { override def toString = "Will not complete" }
+    case object WillNotComplete extends Response { override def toString = "Will not complete" }
 
     /**
      * UNDEFINED captures values that are sent either in error or
@@ -460,7 +460,7 @@ package com.gilt.quality.v0.models {
      * lower case to avoid collisions with the camel cased values
      * above.
      */
-    val all: scala.List[Response] = scala.List(Complete, NotYet, Willnotcomplete)
+    val all: scala.List[Response] = scala.List(Complete, NotYet, WillNotComplete)
 
     private[this]
     val byName: Map[String, Response] = all.map(x => x.toString.toLowerCase -> x).toMap
