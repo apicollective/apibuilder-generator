@@ -17,7 +17,7 @@ case class Headers(
 
   private[this] val constants = Seq(
     form.service.baseUrl.map { url => ("BaseUrl" -> url) },
-    Some("UserAgent", form.userAgent.getOrElse("apidoc:go_1_5_client:unknown")),
+    Some("UserAgent", form.userAgent.getOrElse("apibuilder-go_1_5_client-unknown")),
     Some("Version", form.service.version),
     versionMajor.map { major => (VersionMajorName, major.toString) }
   ).flatten
