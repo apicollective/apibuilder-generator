@@ -366,7 +366,7 @@ package apibuilder {
   object Constants {
 
     val Namespace = "apibuilder"
-    val UserAgent = "apidoc:play_2x_client:unknown"
+    val UserAgent = "apibuilder-play_2x_client-unknown"
     val Version = "0.0.1-dev"
     val VersionMajor = 0
 
