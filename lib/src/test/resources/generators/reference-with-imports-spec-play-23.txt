@@ -453,7 +453,7 @@ package io.apibuilder.reference.api.v0 {
 
     val BaseUrl = "http://localhost:9000"
     val Namespace = "io.apibuilder.reference.api.v0"
-    val UserAgent = "apidoc:play_2x_client:unknown"
+    val UserAgent = "apibuilder-play_2x_client-unknown"
     val Version = "0.3.47"
     val VersionMajor = 0
 
