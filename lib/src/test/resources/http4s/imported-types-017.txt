@@ -27,7 +27,6 @@ private[server] object Matchers {
 
   object ApiVersion {
     val ApiVersionMajor = {
-      import org.http4s.syntax.string._
       "X-Apidoc-Version-Major".ci
     }
 
@@ -55,6 +54,7 @@ private[server] object Matchers {
 }
 
 trait ModelRoutes {
+
   import Matchers._
 
   implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]

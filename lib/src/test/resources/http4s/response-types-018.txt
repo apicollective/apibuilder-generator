@@ -1,11 +1,11 @@
 package io.apibuilder.http4s.test.server
 
-import org.http4s.dsl._
+import org.http4s.dsl.{io => _, _}
 import cats.effect._
 import cats.implicits._
 import io.apibuilder.http4s.test.models.json._
 
-private[server] object Matchers {
+private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
 
   implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
@@ -22,11 +22,10 @@ private[server] object Matchers {
 
   object ApiVersion {
     val ApiVersionMajor = {
-      import org.http4s.syntax.string._
       "X-Apidoc-Version-Major".ci
     }
 
-    def apply[F[_]](req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
+    def apply(req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
       case Some(v) if v.value == "0" => true
       case _ => false
     }
@@ -35,8 +34,7 @@ private[server] object Matchers {
 
 }
 
-trait ModelRoutes[F[_]] extends Http4sDsl[F] {
-  import Matchers._
+trait ModelRoutes[F[_]] extends Matchers[F] {
 
   implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
   implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
@@ -105,41 +103,41 @@ trait ModelRoutes[F[_]] extends Http4sDsl[F] {
     _req: org.http4s.Request[F]
   ): F[GetMultipleResponse]
 
-  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion[F](req)
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
 
   def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "string" if apiVersionMatch(_req) =>
       getString(_req).flatMap {
-        case GetStringResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetStringResponse.HTTP200(value, headers) => Ok(value).map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "enum" if apiVersionMatch(_req) =>
       getEnum(_req).flatMap {
-        case GetEnumResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetEnumResponse.HTTP200(value, headers) => Ok(value).map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "model" if apiVersionMatch(_req) =>
       getModel(_req).flatMap {
-        case GetModelResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetModelResponse.HTTP200(value, headers) => Ok(value).map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "list" if apiVersionMatch(_req) =>
       getList(_req).flatMap {
-        case GetListResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetListResponse.HTTP200(value, headers) => Ok(value).map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "map" if apiVersionMatch(_req) =>
       getMap(_req).flatMap {
-        case GetMapResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetMapResponse.HTTP200(value, headers) => Ok(value).map(_.putHeaders(headers: _*))
       }
 
     case _req @ GET -> Root / "multiple" if apiVersionMatch(_req) =>
       getMultiple(_req).flatMap {
-        case GetMultipleResponse.HTTP200(value, headers) => Ok(value, headers: _*)
-        case GetMultipleResponse.HTTP201(value, headers) => Created(value, headers: _*)
-        case GetMultipleResponse.HTTP202(value, headers) => Accepted(value, headers: _*)
-        case GetMultipleResponse.HTTP204(headers) => NoContent(headers: _*)
-        case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value, headers: _*)
+        case GetMultipleResponse.HTTP200(value, headers) => Ok(value).map(_.putHeaders(headers: _*))
+        case GetMultipleResponse.HTTP201(value, headers) => Created(value).map(_.putHeaders(headers: _*))
+        case GetMultipleResponse.HTTP202(value, headers) => Accepted(value).map(_.putHeaders(headers: _*))
+        case GetMultipleResponse.HTTP204(headers) => NoContent().map(_.putHeaders(headers: _*))
+        case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value).map(_.putHeaders(headers: _*))
       }
   }
 }

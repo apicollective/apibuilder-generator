@@ -202,10 +202,12 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$datatypeName]"
     def generateCirceJsonOf(datatypeName: String): String = s"org.http4s.circe.jsonOf[$datatypeName]"
     def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$datatypeName]"
-    def serverImports: String = ""
+    def serverImports: String = "\nimport org.http4s.dsl._\n"
     def routeKind: String = "trait"
+    def matcherKind: String = "object"
     val asyncTypeImport: String = "import cats.effect._"
     def routeExtends: Option[String] = None
+    def matchersExtends: Option[String] = None
     def clientImports: String = """import org.http4s.client.blaze._
                                   |import cats.effect._""".stripMargin
     def closeClient: Option[String] = Some("""
@@ -213,6 +215,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
                                 |  asyncHttpClient.shutdownNow()
                                 |}""".stripMargin)
     def headerString(prefix: String): String
+    def matchersImport: String
+    def httpClient: String
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -222,6 +226,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val monadTransformerInvoke = "run"
     override def asyncFailure: String = "fail"
     override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
+    override val matchersImport: String = "\n  import Matchers._\n"
+    override val httpClient: String = "asyncHttpClient"
   }
 
   case class Http4s017(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -231,6 +237,9 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val monadTransformerInvoke = "value"
     override def asyncFailure: String = "fail"
     override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
+
+    override val matchersImport: String = "\n  import Matchers._\n"
+    override val httpClient: String = "asyncHttpClient"
   }
 
   case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -240,7 +249,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
     override val responseClass = s"org.http4s.Response[$asyncType]"
-    override val extraClientCtorArgs: Option[String] = Some(s",\n  asyncHttpClient: org.http4s.client.Client[$asyncType]")
+    override val extraClientCtorArgs: Option[String] = Some(s",\n  httpClient: org.http4s.client.Client[$asyncType]")
     override val extraClientObjectMethods = Some(s"""
 implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
       """)
@@ -254,18 +263,25 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$asyncType, $datatypeName]"
 
     override def serverImports: String =
-      s"""import cats.effect._
+      s"""
+         |import org.http4s.dsl.{io => _, _}
+         |import cats.effect._
          |import cats.implicits._""".stripMargin
 
 
     override val routeKind = "trait"
     override def wrappedAsyncType(instance: String = "") = Some(s"$instance[$asyncType]")
-    override val routeExtends = Some(s"extends Http4sDsl[$asyncType]")
+    override val routeExtends: Option[String] = Some(s" extends Matchers[$asyncType]")
+    override val matchersExtends = Some(s" extends Http4sDsl[$asyncType]")
     override val clientImports: String = """import cats.effect._
                                   |import cats.implicits._""".stripMargin
 
     override val closeClient = None
-    override def headerString(prefix: String) = s"${prefix}headers: _*)"
+    override def headerString(prefix: String) = s"${prefix}headers: _*))"
+
+    override val matcherKind: String = "trait"
+    override val matchersImport: String = ""
+    override val httpClient: String = "httpClient"
 
   }
 }
