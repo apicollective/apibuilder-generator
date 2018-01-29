@@ -86,10 +86,10 @@ class KotlinGenerator
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
       val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
-      jsonAnnotationBuilder.addMember("use", "com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME")
+      jsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME")
       if (union.discriminator.isDefined) {
-        jsonAnnotationBuilder.addMember("include", "com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
-        jsonAnnotationBuilder.addMember("property", "\"" + union.discriminator.get + "\"")
+        jsonAnnotationBuilder.addMember("include = com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
+        jsonAnnotationBuilder.addMember("property = \"" + union.discriminator.get + "\"")
       } else {
         jsonAnnotationBuilder.addMember("include", "com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT")
       }
@@ -99,10 +99,12 @@ class KotlinGenerator
       val jsonSubTypesAnnotationBuilder = AnnotationSpec.builder(classOf[JsonSubTypes])
       union.types.foreach(u => {
         jsonSubTypesAnnotationBuilder
-          .addMember("value", "$L", AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-            .addMember("value", "$L", dataTypeFromField(u.`type`, modelsNameSpace) + ".class")
-            .addMember("name", "$S", u.`type`)
-            .build())
+          .addMember("%L",
+            AnnotationSpec.builder(classOf[JsonSubTypes.Type])
+            .addMember("value = %L", dataTypeFromField(u.`type`, modelsNameSpace) + "::class")
+            .addMember("name = %S", u.`type`)
+            .build()
+          )
       })
 
       builder.addAnnotation(jsonSubTypesAnnotationBuilder.build())
@@ -133,7 +135,7 @@ class KotlinGenerator
 
       relatedUnions.headOption.map { _ =>
         val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
-        jsonAnnotationBuilder.addMember("use", "com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
+        jsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
         builder.addAnnotation(jsonAnnotationBuilder.build())
       }
 
