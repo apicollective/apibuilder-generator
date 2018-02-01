@@ -39,7 +39,7 @@ trait ScalaClientMethodConfig {
 
   /** Whether or not play.api.libs.ws.WS exists as a static object, or if
     * play.api.libs.ws.WSClient is expected to be passed in.
-   */
+    */
   def expectsInjectedWsClient: Boolean
 
   /**
@@ -205,15 +205,14 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def serverImports: String = "\nimport org.http4s.dsl._\n"
     def routeKind: String = "trait"
     def matcherKind: String = "object"
-    val asyncTypeImport: String = "import cats.effect._"
+    def asyncTypeImport: String = ""
     def routeExtends: Option[String] = None
     def matchersExtends: Option[String] = None
-    def clientImports: String = """import org.http4s.client.blaze._
-                                  |import cats.effect._""".stripMargin
+    def clientImports: String = """import org.http4s.client.blaze._"""
     def closeClient: Option[String] = Some("""
-                                |def closeAsyncHttpClient(): Unit = {
-                                |  asyncHttpClient.shutdownNow()
-                                |}""".stripMargin)
+                                             |def closeAsyncHttpClient(): Unit = {
+                                             |  asyncHttpClient.shutdownNow()
+                                             |}""".stripMargin)
     def headerString(prefix: String): String
     def matchersImport: String
     def httpClient: String
@@ -274,7 +273,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val routeExtends: Option[String] = Some(s" extends Matchers[$asyncType]")
     override val matchersExtends = Some(s" extends Http4sDsl[$asyncType]")
     override val clientImports: String = """import cats.effect._
-                                  |import cats.implicits._""".stripMargin
+                                           |import cats.implicits._""".stripMargin
 
     override val closeClient = None
     override def headerString(prefix: String) = s"${prefix}headers: _*))"
@@ -283,5 +282,6 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val matchersImport: String = ""
     override val httpClient: String = "httpClient"
 
+    override val asyncTypeImport: String = "import cats.effect._"
   }
 }
