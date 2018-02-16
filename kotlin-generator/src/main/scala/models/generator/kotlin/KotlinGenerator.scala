@@ -123,8 +123,7 @@ class KotlinGenerator
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown=true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
-      builder.addSuperinterface(classOf[java.io.Serializable])
-
+      builder.addSuperinterface(classOf[java.io.Serializable], emptyCodeBlock)
 
       model.description.map(builder.addKdoc(_))
 
@@ -294,6 +293,8 @@ class KotlinGenerator
 
       makeFile(className, builder)
     }
+
+    def emptyCodeBlock(): CodeBlock = CodeBlock.builder().build()
 
     def generateJacksonObjectMapper(): File = {
 
