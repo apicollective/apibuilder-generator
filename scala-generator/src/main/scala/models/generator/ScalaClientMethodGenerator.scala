@@ -94,7 +94,7 @@ class ScalaClientMethodGenerator(
     * all error return types. e.g. a 409 that returns Seq[Error] is
     * handled via these classes.
     */
-  private def modelErrorClasses(): Seq[String] = {
+  protected def modelErrorClasses(): Seq[String] = {
     ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !r.isSuccess).map { response =>
       errorTypeClass(response)
     }.distinct.sorted
@@ -126,7 +126,7 @@ class ScalaClientMethodGenerator(
     }
 
     Seq(
-      s"case class $className${config.asyncTypeParam(Some("Sync")).map(p =>s"[$p]").getOrElse("")}(",
+      s"case class $className(",
       s"  response: ${config.responseClass},",
       s"  message: Option[String] = None",
       s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$bodyString"""

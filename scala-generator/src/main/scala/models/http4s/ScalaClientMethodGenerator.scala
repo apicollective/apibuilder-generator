@@ -3,6 +3,7 @@ package scala.models.http4s
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 
 import scala.generator._
+import scala.models.JsonImports
 
 class ScalaClientMethodGenerator (
   config: ScalaClientMethodConfig,
@@ -167,6 +168,19 @@ class ScalaClientMethodGenerator (
 
     }
   }
+
+  override protected def modelErrorClasses(): Seq[String] =
+    config match {
+      case _ @ (_:ScalaClientMethodConfigs.Http4s017 | _:ScalaClientMethodConfigs.Http4s015) => super.modelErrorClasses()
+      case _ => Seq()
+    }
+
+  def modelErrors(): String =
+    config match {
+      case _ @ (_:ScalaClientMethodConfigs.Http4s017 | _:ScalaClientMethodConfigs.Http4s015) => ""
+      case _ => s"\n\n${super.modelErrorClasses().mkString("\n\n")}"
+    }
+
 }
 
 class ScalaClientMethod(
