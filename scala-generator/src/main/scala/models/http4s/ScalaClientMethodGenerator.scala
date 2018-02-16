@@ -178,7 +178,7 @@ class ScalaClientMethodGenerator (
   def modelErrors(): String =
     config match {
       case _ @ (_:ScalaClientMethodConfigs.Http4s017 | _:ScalaClientMethodConfigs.Http4s015) => ""
-      case _ => s"\n\n${super.modelErrorClasses().mkString("\n\n")}"
+      case _ => s"\n\nobject errors{\n\n${super.modelErrorClasses().mkString("\n\n")}\n}"
     }
 
 }
