@@ -85,7 +85,7 @@ ${headerString.indent(6)}
       val authBody = body.fold(${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess}(authReq))(authReq.withBody)
 
       ${config.httpClient}.fetch(modifyRequest(authBody))(handler)
-    }
+    }${methodGenerator.modelErrors().indent(4)}
   }
 
 ${Http4sScalaClientCommon(config).indent(2)}
