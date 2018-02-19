@@ -105,9 +105,9 @@ class ScalaClientMethodGenerator (
       } match {
         case Some(response) => {
           if (response.isUnit) {
-            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
+            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r.${config.responseStatusMethod}))"
           } else {
-            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))"
+            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))"
           }
         }
         case None => {
@@ -142,10 +142,10 @@ class ScalaClientMethodGenerator (
 
               } else {
                 if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r.${config.responseStatusMethod}))")
 
                 } else {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))")
                 }
               }
             }
