@@ -6,9 +6,9 @@ class ScalaUtilSpec extends FunSpec with Matchers {
 
   it("extendsClause") {
     ScalaUtil.extendsClause(Nil) should be(None)
-    ScalaUtil.extendsClause(Seq("Foo")).get should be("extends Foo")
-    ScalaUtil.extendsClause(Seq("Foo", "Bar")).get should be("extends Bar with Foo")
-    ScalaUtil.extendsClause(Seq("Foo", "Bar", "Baz")).get should be("extends Bar with Baz with Foo")
+    ScalaUtil.extendsClause(Seq("Foo")).get should be(" extends Foo")
+    ScalaUtil.extendsClause(Seq("Foo", "Bar")).get should be(" extends Bar with Foo")
+    ScalaUtil.extendsClause(Seq("Foo", "Bar", "Baz")).get should be(" extends Bar with Baz with Foo")
   }
 
   it("toClassName") {

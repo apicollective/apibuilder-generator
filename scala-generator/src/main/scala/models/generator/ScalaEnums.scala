@@ -11,7 +11,7 @@ case class ScalaEnums(
     import lib.Text._
     Seq(
       enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-      s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"),
+      s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(unions.map(_.name)).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"),
       s"${ScalaUtil.deprecationString(enum.deprecation)}object ${enum.name} {",
       buildValues().indent(2),
       s"}"
