@@ -70,4 +70,14 @@ class ScalaNestedUnionSpec extends FunSpec with Matchers {
     val code = Play2Json(ssd).readers(outerType)
     models.TestHelper.assertEqualsFile("/scala-nested-union-models-json-union-type-readers-outer-type.txt", code)
   }
+
+  it("generates valid nested union traits") {
+    ScalaCaseClasses.invoke(InvocationForm(service), addHeader = false) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/scala-nested-union-models-case-classes.txt", sourceFiles.head.contents)
+      }
+    }
+  }
 }

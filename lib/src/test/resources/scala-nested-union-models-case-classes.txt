@@ -1,0 +1,35 @@
+package test.apidoc.apidoctest.v0.models {
+
+  sealed trait InnerType extends OuterType
+
+  sealed trait OuterType extends _root_.scala.Product with _root_.scala.Serializable
+
+  case class StringModel(
+    name: String
+  ) extends InnerType
+
+  /**
+   * Provides future compatibility in clients - in the future, when a type is added
+   * to the union InnerType, it will need to be handled in the client code. This
+   * implementation will deserialize these future types as an instance of this class.
+   * 
+   * @param description Information about the type that we received that is undefined in this version of
+   *        the client.
+   */
+  case class InnerTypeUndefinedType(
+    description: String
+  ) extends InnerType
+
+  /**
+   * Provides future compatibility in clients - in the future, when a type is added
+   * to the union OuterType, it will need to be handled in the client code. This
+   * implementation will deserialize these future types as an instance of this class.
+   * 
+   * @param description Information about the type that we received that is undefined in this version of
+   *        the client.
+   */
+  case class OuterTypeUndefinedType(
+    description: String
+  ) extends OuterType
+
+}
