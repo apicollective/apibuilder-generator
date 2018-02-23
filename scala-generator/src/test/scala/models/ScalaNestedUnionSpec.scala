@@ -37,6 +37,17 @@ class ScalaNestedUnionSpec extends FunSpec with Matchers {
               "attributes": []
             }
           ]
+        },
+        {
+          "name": "second_outer_type",
+          "plural": "second_outer_types",
+          "attributes": [],
+          "types": [
+            {
+              "type": "inner_type",
+              "attributes": []
+            }
+          ]
         }
       ],
       "models": [
