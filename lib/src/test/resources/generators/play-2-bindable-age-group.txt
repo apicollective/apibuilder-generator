@@ -1,10 +1,8 @@
-// Enum: AgeGroup
-private[this] val enumAgeGroupNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.reference.api.v0.models.AgeGroup.all.mkString(", ")}"
-
-implicit val pathBindableEnumAgeGroup = new PathBindable.Parsing[io.apibuilder.reference.api.v0.models.AgeGroup] (
-  AgeGroup.fromString(_).get, _.toString, enumAgeGroupNotFound
-)
-
-implicit val queryStringBindableEnumAgeGroup = new QueryStringBindable.Parsing[io.apibuilder.reference.api.v0.models.AgeGroup](
-  AgeGroup.fromString(_).get, _.toString, enumAgeGroupNotFound
-)
+val converterAgeGroup: ApibuilderTypeConverter[io.apibuilder.reference.api.v0.models.AgeGroup] = new ApibuilderTypeConverter[io.apibuilder.reference.api.v0.models.AgeGroup] {
+  override def convert(value: String): io.apibuilder.reference.api.v0.models.AgeGroup = io.apibuilder.reference.api.v0.models.AgeGroup(value)
+  override def convert(value: io.apibuilder.reference.api.v0.models.AgeGroup): String = value.toString
+  override def example: io.apibuilder.reference.api.v0.models.AgeGroup = validValues.head
+  override def validValues: Seq[io.apibuilder.reference.api.v0.models.AgeGroup] = io.apibuilder.reference.api.v0.models.AgeGroup.all
+}
+implicit val pathBindableAgeGroup = ApibuilderPathBindable(converterAgeGroup)
+implicit val queryStringBindableAgeGroup = ApibuilderQueryStringBindable(converterAgeGroup)

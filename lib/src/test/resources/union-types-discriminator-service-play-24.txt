@@ -247,34 +247,99 @@ package io.apibuilder.example.union.types.discriminator.v0 {
     import org.joda.time.format.ISODateTimeFormat
     import io.apibuilder.example.union.types.discriminator.v0.models._
 
-    // Type: date-time-iso8601
-    implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](
-      ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
-    )
+    trait ApibuilderTypeConverter[T] {
 
-    implicit val queryStringBindableTypeDateTimeIso8601 = new QueryStringBindable.Parsing[org.joda.time.DateTime](
-      ISODateTimeFormat.dateTimeParser.parseDateTime(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date time $key. Example: 2014-04-29T11:56:52Z"
-    )
+      def convert(value: String): T
 
-    // Type: date-iso8601
-    implicit val pathBindableTypeDateIso8601 = new PathBindable.Parsing[org.joda.time.LocalDate](
-      ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date $key. Example: 2014-04-29"
-    )
+      def convert(value: T): String
 
-    implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsing[org.joda.time.LocalDate](
-      ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date $key. Example: 2014-04-29"
-    )
+      def example: T
 
-    // Enum: SystemUser
-    private[this] val enumSystemUserNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.discriminator.v0.models.SystemUser.all.mkString(", ")}"
+      def validValues: Seq[T] = Nil
 
-    implicit val pathBindableEnumSystemUser = new PathBindable.Parsing[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] (
-      SystemUser.fromString(_).get, _.toString, enumSystemUserNotFound
-    )
+      def errorMessage(key: String, value: String, ex: java.lang.Exception): String = {
+        val base = s"Invalid value '$value' for parameter '$key'. "
+        validValues.toList match {
+          case Nil => base + "Ex: " + convert(example)
+          case values => base + ". Valid values are: " + values.mkString("'", "', '", "'")
+        }
+      }
+    }
 
-    implicit val queryStringBindableEnumSystemUser = new QueryStringBindable.Parsing[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser](
-      SystemUser.fromString(_).get, _.toString, enumSystemUserNotFound
-    )
+    object ApibuilderTypeConverter {
+
+      val dateTimeIso8601: ApibuilderTypeConverter[DateTime] = new ApibuilderTypeConverter[DateTime] {
+        override def convert(value: String): DateTime = ISODateTimeFormat.dateTimeParser.parseDateTime(value)
+        override def convert(value: DateTime): String = ISODateTimeFormat.dateTime.print(value)
+        override def example: DateTime = DateTime.now
+      }
+
+      val dateIso8601: ApibuilderTypeConverter[LocalDate] = new ApibuilderTypeConverter[LocalDate] {
+        override def convert(value: String): LocalDate = ISODateTimeFormat.yearMonthDay.parseLocalDate(value)
+        override def convert(value: LocalDate): String = value.toString
+        override def example: LocalDate = LocalDate.now
+      }
+
+    }
+
+    case class ApibuilderQueryStringBindable[T](
+      converters: ApibuilderTypeConverter[T]
+    ) extends QueryStringBindable[T] {
+
+      override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, T]] = {
+        params.getOrElse(key, Nil).headOption.map { v =>
+          try {
+            Right(
+              converters.convert(v)
+            )
+          } catch {
+            case ex: java.lang.Exception => Left(
+              converters.errorMessage(key, v, ex)
+            )
+          }
+        }
+      }
+
+      override def unbind(key: String, value: T): String = {
+        converters.convert(value)
+      }
+    }
+
+    case class ApibuilderPathBindable[T](
+      converters: ApibuilderTypeConverter[T]
+    ) extends PathBindable[T] {
+
+      override def bind(key: String, value: String): Either[String, T] = {
+        try {
+          Right(
+            converters.convert(value)
+          )
+        } catch {
+          case ex: java.lang.Exception => Left(
+            converters.errorMessage(key, value, ex)
+          )
+        }
+      }
+
+      override def unbind(key: String, value: T): String = {
+        converters.convert(value)
+      }
+    }
+
+    implicit val pathBindableDateTimeIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
+    implicit val queryStringBindableDateTimeIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
+
+    implicit val pathBindableDateIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
+    implicit val queryStringBindableDateIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
+
+    val converterSystemUser: ApibuilderTypeConverter[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] = new ApibuilderTypeConverter[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] {
+      override def convert(value: String): io.apibuilder.example.union.types.discriminator.v0.models.SystemUser = io.apibuilder.example.union.types.discriminator.v0.models.SystemUser(value)
+      override def convert(value: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser): String = value.toString
+      override def example: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser = validValues.head
+      override def validValues: Seq[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] = io.apibuilder.example.union.types.discriminator.v0.models.SystemUser.all
+    }
+    implicit val pathBindableSystemUser = ApibuilderPathBindable(converterSystemUser)
+    implicit val queryStringBindableSystemUser = ApibuilderQueryStringBindable(converterSystemUser)
 
   }
 
