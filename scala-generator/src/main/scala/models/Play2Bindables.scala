@@ -104,10 +104,10 @@ case class ApibuilderPathBindable[T](
   }
 }
 
-implicit val pathBindableTypeDateTimeIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val pathBindableDateTimeIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
 implicit val queryStringBindableDateTimeIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
 
-implicit val pathBindableTypeDateIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val pathBindableDateIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
 implicit val queryStringBindableDateIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
 """.trim
   }
