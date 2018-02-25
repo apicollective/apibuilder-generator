@@ -1,8 +1,8 @@
-val converterAgeGroup: ApibuilderTypeConverter[io.apibuilder.reference.api.v0.models.AgeGroup] = new ApibuilderTypeConverter[io.apibuilder.reference.api.v0.models.AgeGroup] {
+val ageGroupConverter: ApibuilderTypeConverter[io.apibuilder.reference.api.v0.models.AgeGroup] = new ApibuilderTypeConverter[io.apibuilder.reference.api.v0.models.AgeGroup] {
   override def convert(value: String): io.apibuilder.reference.api.v0.models.AgeGroup = io.apibuilder.reference.api.v0.models.AgeGroup(value)
   override def convert(value: io.apibuilder.reference.api.v0.models.AgeGroup): String = value.toString
-  override def example: io.apibuilder.reference.api.v0.models.AgeGroup = validValues.head
+  override def example: io.apibuilder.reference.api.v0.models.AgeGroup = io.apibuilder.reference.api.v0.models.AgeGroup.Youth
   override def validValues: Seq[io.apibuilder.reference.api.v0.models.AgeGroup] = io.apibuilder.reference.api.v0.models.AgeGroup.all
 }
-implicit val pathBindableAgeGroup = ApibuilderPathBindable(converterAgeGroup)
-implicit val queryStringBindableAgeGroup = ApibuilderQueryStringBindable(converterAgeGroup)
+implicit val pathBindableAgeGroup: PathBindable[io.apibuilder.reference.api.v0.models.AgeGroup] = ApibuilderPathBindable(ageGroupConverter)
+implicit val queryStringBindableAgeGroup: QueryStringBindable[io.apibuilder.reference.api.v0.models.AgeGroup] = ApibuilderQueryStringBindable(ageGroupConverter)
