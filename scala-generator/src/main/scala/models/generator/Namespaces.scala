@@ -43,7 +43,7 @@ case class Namespaces(original: String) {
   }
 
   def importStatements(service: Service): Seq[String] = {
-    Seq(s"import ${models}._")
+    Seq(s"import $models._")
   }
 
 }

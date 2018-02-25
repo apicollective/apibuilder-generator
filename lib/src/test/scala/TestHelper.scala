@@ -14,14 +14,14 @@ import org.scalatest.Matchers
 
 object TestHelper extends Matchers {
 
-  lazy val collectionJsonDefaultsService = parseFile("/examples/collection-json-defaults.json")
-  lazy val referenceApiService = parseFile(s"/examples/reference-service.json")
-  lazy val referenceWithImportsApiService = parseFile(s"/examples/reference-with-imports.json")
-  lazy val generatorApiService = parseFile(s"/examples/apidoc-generator.json")
-  lazy val apidocApiService = parseFile(s"/examples/apidoc-api.json")
+  lazy val collectionJsonDefaultsService: Service = parseFile("/examples/collection-json-defaults.json")
+  lazy val referenceApiService: Service = parseFile(s"/examples/reference-service.json")
+  lazy val referenceWithImportsApiService: Service = parseFile(s"/examples/reference-with-imports.json")
+  lazy val generatorApiService: Service = parseFile(s"/examples/apidoc-generator.json")
+  lazy val apidocApiService: Service = parseFile(s"/examples/apidoc-api.json")
 
-  lazy val generatorApiServiceWithUnionAndDescriminator = parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
-  lazy val generatorApiServiceWithUnionWithoutDescriminator = parseFile(s"/examples/apidoc-example-union-types.json")
+  lazy val generatorApiServiceWithUnionAndDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
+  lazy val generatorApiServiceWithUnionWithoutDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types.json")
 
   def buildJson(json: String): String = {
     val specVersion = io.apibuilder.spec.v0.Constants.Version
@@ -35,9 +35,10 @@ object TestHelper extends Matchers {
       "version": "1.0.0"
     """
 
-    json.isEmpty match {
-      case true => s"{ $body } "
-      case false => s"{ $body, $json } "
+    if (json.isEmpty) {
+      s"{ $body } "
+    } else {
+      s"{ $body, $json } "
     }
   }
 
@@ -77,7 +78,7 @@ object TestHelper extends Matchers {
 
   def assertValidScalaSourceFiles(files: Seq[File]): Unit = {
     files.length shouldBe > (0)
-    files.foreach(assertValidScalaSourceFile(_))
+    files.foreach(assertValidScalaSourceFile)
   }
 
   def assertValidScalaSourceFile(file: File): Unit = {
@@ -99,7 +100,7 @@ object TestHelper extends Matchers {
     global.phase = run.parserPhase
     run.cancel
     val parser = global.newUnitParser(scalaSourceCode)
-    val parseResult = parser.parse()
+    parser.parse()
     reporter.errorCount shouldBe 0
   }
 
@@ -129,10 +130,10 @@ object TestHelper extends Matchers {
 
   def responseCode(responseCode: ResponseCode): String = {
     responseCode match {
-      case ResponseCodeInt(value) => value.toString
+      case ResponseCodeInt(v) => v.toString
       case ResponseCodeOption.Default => ResponseCodeOption.Default.toString
-      case ResponseCodeOption.UNDEFINED(value) => sys.error(s"invalid value[$value]")
-      case ResponseCodeUndefinedType(value) => sys.error(s"invalid response code type[$value]")
+      case ResponseCodeOption.UNDEFINED(v) => sys.error(s"invalid value[$v]")
+      case ResponseCodeUndefinedType(v) => sys.error(s"invalid response code type[$v]")
     }
   }
 
