@@ -1,29 +1,70 @@
 package scala.models
 
-import scala.generator.{ScalaEnumValue, ScalaService}
+import lib.Text._
+
+import scala.generator.{ScalaEnumValue, ScalaService, ScalaUtil}
 
 case class Play2Bindables(ssd: ScalaService) {
 
   def build(): String = {
-    import lib.Text._
 
     Seq(
       "object Bindables {",
-      "",
-      "  import play.api.mvc.{PathBindable, QueryStringBindable}",
-      "  import org.joda.time.{DateTime, LocalDate}",
-      "  import org.joda.time.format.ISODateTimeFormat",
-      "  " + ssd.namespaces.importStatements(ssd.service).mkString("\n  "),
-      "",
-      buildDefaults().indent(2),
-      "",
-      ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n").indent(2),
-      "",
+      Seq(
+        Seq(
+          "import play.api.mvc.{PathBindable, QueryStringBindable}",
+          "import org.joda.time.{DateTime, LocalDate}",
+          "import org.joda.time.format.ISODateTimeFormat",
+          ssd.namespaces.importStatements(ssd.service).mkString("\n")
+        ).mkString("\n"),
+        buildImports(),
+        buildObjectCore(),
+        buildObjectModels(),
+        apibuilderHelpers()
+      ).filter(_.trim.nonEmpty).mkString("\n\n").indent(2),
       "}"
-    ).mkString("\n")
+    ).mkString("\n\n")
   }
 
-  private def buildDefaults(): String = {
+  private def buildObjectCore(): String = {
+    """
+object Core {
+  implicit val pathBindableApibuilderDateTimeIso8601: PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
+  implicit val queryStringBindableApibuilderDateTimeIso8601: QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
+  implicit val queryStringBindableApibuilderDateTimeIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.DateTime]] = ApibuilderQueryStringBindableOption(queryStringBindableApibuilderDateTimeIso8601)
+
+  implicit val pathBindableApibuilderDateIso8601: PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
+  implicit val queryStringBindableApibuilderDateIso8601: QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
+  implicit val queryStringBindableApibuilderDateIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.LocalDate]] = ApibuilderQueryStringBindableOption(queryStringBindableApibuilderDateIso8601)
+}
+""".trim
+  }
+
+  private def buildObjectModels(): String = {
+    if (ssd.enums.isEmpty) {
+      ""
+    } else {
+      Seq(
+        s"object Models {",
+        ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n").indent(2),
+        "}"
+      ).mkString("\n")
+    }
+  }
+
+  private[this] def buildImports(): String = {
+    Seq(
+      "// import models directly for backwards compatibility with prior versions of the generator",
+      "import Core._",
+      if (ssd.enums.isEmpty) {
+        ""
+      } else {
+        "import Models._"
+      }
+    ).filter(_.nonEmpty).mkString("\n")
+  }
+
+  private def apibuilderHelpers(): String = {
     """
 trait ApibuilderTypeConverter[T] {
 
@@ -125,14 +166,6 @@ case class ApibuilderPathBindable[T](
     converters.convert(value)
   }
 }
-
-implicit val pathBindableApibuilderDateTimeIso8601: PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
-implicit val queryStringBindableApibuilderDateTimeIso8601: QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
-implicit val queryStringBindableApibuilderDateTimeIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.DateTime]] = ApibuilderQueryStringBindableOption(queryStringBindableApibuilderDateTimeIso8601)
-
-implicit val pathBindableApibuilderDateIso8601: PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
-implicit val queryStringBindableApibuilderDateIso8601: QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
-implicit val queryStringBindableApibuilderDateIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.LocalDate]] = ApibuilderQueryStringBindableOption(queryStringBindableApibuilderDateIso8601)
 """.trim
   }
 
@@ -140,7 +173,7 @@ implicit val queryStringBindableApibuilderDateIso8601Option: QueryStringBindable
     enumName: String
   ): String = {
     val fullyQualifiedName = ssd.enumClassName(enumName)
-    val converter = s"converter$enumName"
+    val converter = ScalaUtil.toVariable(enumName) + "Converter"
     Seq(
       s"val $converter: ApibuilderTypeConverter[$fullyQualifiedName] = ${buildEnumConverter(enumName)}",
       s"implicit val pathBindable$enumName: PathBindable[$fullyQualifiedName] = ApibuilderPathBindable($converter)",
