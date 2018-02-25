@@ -85,9 +85,9 @@ case class ApibuilderQueryStringBindable[T](
 
 case class ApibuilderQueryStringBindableOption[T](
   bindable: QueryStringBindable[T]
-) extends QueryStringBindable[_root_scala.Option[T]] {
+) extends QueryStringBindable[_root_.scala.Option[T]] {
 
-  override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, _root_scala.Option[T]]] = {
+  override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, _root_.scala.Option[T]]] = {
     params.getOrElse(key, Nil).headOption match {
       case None => Some(Right(None))
       case Some(v) => bindable.bind(key, params).map {
@@ -97,7 +97,7 @@ case class ApibuilderQueryStringBindableOption[T](
     }
   }
 
-  override def unbind(key: String, value: _root_scala.Option[T]): String = {
+  override def unbind(key: String, value: _root_.scala.Option[T]): String = {
     value match {
       case None => ""
       case Some(v) => bindable.unbind(key, v)
@@ -144,8 +144,7 @@ implicit val queryStringBindableApibuilderDateIso8601Option: QueryStringBindable
     Seq(
       s"val $converter: ApibuilderTypeConverter[$fullyQualifiedName] = ${buildEnumConverter(enumName)}",
       s"implicit val pathBindable$enumName: PathBindable[$fullyQualifiedName] = ApibuilderPathBindable($converter)",
-      s"implicit val queryStringBindable$enumName: QueryStringBindable[$fullyQualifiedName] = ApibuilderQueryStringBindable($converter)",
-      s"implicit val queryStringBindable${enumName}Option: QueryStringBindable[Option[$fullyQualifiedName]] = ApibuilderQueryStringBindableOption(queryStringBindable$enumName)"
+      s"implicit val queryStringBindable$enumName: QueryStringBindable[$fullyQualifiedName] = ApibuilderQueryStringBindable($converter)"
     ).mkString("\n")
   }
 
