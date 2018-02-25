@@ -11,15 +11,10 @@ case class Play2Bindables(ssd: ScalaService) {
     Seq(
       "object Bindables {",
       Seq(
-        Seq(
-          "import play.api.mvc.{PathBindable, QueryStringBindable}",
-          "import org.joda.time.{DateTime, LocalDate}",
-          "import org.joda.time.format.ISODateTimeFormat",
-          ssd.namespaces.importStatements(ssd.service).mkString("\n")
-        ).mkString("\n"),
+        "import play.api.mvc.{PathBindable, QueryStringBindable}",
         buildImports(),
         buildObjectCore(),
-        buildObjectModels(),
+        buildObjectModels().getOrElse(""),
         apibuilderHelpers()
       ).filter(_.trim.nonEmpty).mkString("\n\n").indent(2),
       "}"
@@ -40,15 +35,20 @@ object Core {
 """.trim
   }
 
-  private def buildObjectModels(): String = {
+  private def buildObjectModels(): Option[String] = {
     if (ssd.enums.isEmpty) {
-      ""
+      None
     } else {
-      Seq(
-        s"object Models {",
-        ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n").indent(2),
-        "}"
-      ).mkString("\n")
+      Some(
+        Seq(
+          s"object Models {",
+          Seq(
+            ssd.namespaces.importStatements(ssd.service).sorted.mkString("\n"),
+            ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n")
+          ).filter(_.nonEmpty).mkString("\n\n").indent(2),
+          "}"
+        ).mkString("\n")
+      )
     }
   }
 
@@ -86,15 +86,16 @@ trait ApibuilderTypeConverter[T] {
 }
 
 object ApibuilderTypeConverter {
+  import org.joda.time.{format, DateTime, LocalDate}
 
   val dateTimeIso8601: ApibuilderTypeConverter[DateTime] = new ApibuilderTypeConverter[DateTime] {
-    override def convert(value: String): DateTime = ISODateTimeFormat.dateTimeParser.parseDateTime(value)
-    override def convert(value: DateTime): String = ISODateTimeFormat.dateTime.print(value)
+    override def convert(value: String): DateTime = format.ISODateTimeFormat.dateTimeParser.parseDateTime(value)
+    override def convert(value: DateTime): String = format.ISODateTimeFormat.dateTime.print(value)
     override def example: DateTime = DateTime.now
   }
 
   val dateIso8601: ApibuilderTypeConverter[LocalDate] = new ApibuilderTypeConverter[LocalDate] {
-    override def convert(value: String): LocalDate = ISODateTimeFormat.yearMonthDay.parseLocalDate(value)
+    override def convert(value: String): LocalDate = format.ISODateTimeFormat.yearMonthDay.parseLocalDate(value)
     override def convert(value: LocalDate): String = value.toString
     override def example: LocalDate = LocalDate.now
   }
