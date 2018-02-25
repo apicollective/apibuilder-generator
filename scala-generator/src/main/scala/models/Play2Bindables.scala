@@ -64,7 +64,7 @@ case class ApibuilderQueryStringBindable[T](
   converters: ApibuilderTypeConverter[T]
 ) extends QueryStringBindable[T] {
 
-  override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, T]] = {
+  override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, T]] = {
     params.getOrElse(key, Nil).headOption.map { v =>
       try {
         Right(
@@ -87,7 +87,7 @@ case class ApibuilderPathBindable[T](
   converters: ApibuilderTypeConverter[T]
 ) extends PathBindable[T] {
 
-  override def bind(key: String, value: String): Either[String, T] = {
+  override def bind(key: String, value: String): _root_.scala.Either[String, T] = {
     try {
       Right(
         converters.convert(value)
