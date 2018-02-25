@@ -78,12 +78,12 @@ lazy val kotlinGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.3",
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.3",
+      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.4",
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.4",
       "com.squareup" % "kotlinpoet" % "0.7.0",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.21" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test",
       "org.mockito" % "mockito-inline" % "2.15.0" % "test"
     )
   )
@@ -95,13 +95,13 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.5" % "test",
     "org.mockito" % "mockito-inline" % "2.15.0" % "test",
-    "com.github.javaparser" % "javaparser-core" % "3.5.10" % "test",
+    "com.github.javaparser" % "javaparser-core" % "3.5.15" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "com.squareup" % "javapoet" % "1.10.0",
     "com.squareup.retrofit2" % "retrofit" % "2.3.0",
-    "io.reactivex.rxjava2" % "rxjava" % "2.1.3"
+    "io.reactivex.rxjava2" % "rxjava" % "2.1.10"
   ),
   libraryDependencies += guice,
   scalacOptions += "-feature",
