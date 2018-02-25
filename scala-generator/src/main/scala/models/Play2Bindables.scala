@@ -24,13 +24,11 @@ case class Play2Bindables(ssd: ScalaService) {
   private def buildObjectCore(): String = {
     """
 object Core {
-  implicit val pathBindableDateTimeIso8601: PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
-  implicit val queryStringBindableDateTimeIso8601: QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
-  implicit val queryStringBindableDateTimeIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.DateTime]] = ApibuilderQueryStringBindableOption(queryStringBindableDateTimeIso8601)
+  implicit val pathBindableDateTimeIso8601: PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
+  implicit val queryStringBindableDateTimeIso8601: QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
 
-  implicit val pathBindableDateIso8601: PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
-  implicit val queryStringBindableDateIso8601: QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
-  implicit val queryStringBindableDateIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.LocalDate]] = ApibuilderQueryStringBindableOption(queryStringBindableDateIso8601)
+  implicit val pathBindableDateIso8601: PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
+  implicit val queryStringBindableDateIso8601: QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
 }
 """.trim
   }
@@ -85,7 +83,7 @@ trait ApibuilderTypeConverter[T] {
   }
 }
 
-object ApibuilderTypeConverter {
+object ApibuilderTypes {
   import org.joda.time.{format, DateTime, LocalDate}
 
   val dateTimeIso8601: ApibuilderTypeConverter[DateTime] = new ApibuilderTypeConverter[DateTime] {
@@ -122,28 +120,6 @@ case class ApibuilderQueryStringBindable[T](
 
   override def unbind(key: String, value: T): String = {
     converters.convert(value)
-  }
-}
-
-case class ApibuilderQueryStringBindableOption[T](
-  bindable: QueryStringBindable[T]
-) extends QueryStringBindable[_root_.scala.Option[T]] {
-
-  override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, _root_.scala.Option[T]]] = {
-    params.getOrElse(key, Nil).headOption match {
-      case None => Some(Right(None))
-      case Some(v) => bindable.bind(key, params).map {
-        case Left(errors) => Left(errors)
-        case Right(parsed) => Right(Some(parsed))
-      }
-    }
-  }
-
-  override def unbind(key: String, value: _root_.scala.Option[T]): String = {
-    value match {
-      case None => ""
-      case Some(v) => bindable.unbind(key, v)
-    }
   }
 }
 
