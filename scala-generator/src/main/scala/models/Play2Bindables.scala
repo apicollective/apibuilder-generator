@@ -1,6 +1,6 @@
 package scala.models
 
-import scala.generator.ScalaService
+import scala.generator.{ScalaEnumValue, ScalaService}
 
 case class Play2Bindables(ssd: ScalaService) {
 
@@ -104,11 +104,11 @@ case class ApibuilderPathBindable[T](
   }
 }
 
-implicit val pathBindableDateTimeIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
-implicit val queryStringBindableDateTimeIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val pathBindableApibuilderDateTimeIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val queryStringBindableApibuilderDateTimeIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
 
-implicit val pathBindableDateIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
-implicit val queryStringBindableDateIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val pathBindableApibuilderDateIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val queryStringBindableApibuilderDateIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
 """.trim
   }
 
@@ -126,14 +126,29 @@ implicit val queryStringBindableDateIso8601 = ApibuilderQueryStringBindable(Apib
 
   private[this] def buildEnumConverter(enumName: String): String = {
     val fullyQualifiedName = ssd.enumClassName(enumName)
+    val example = exampleEnumValue(enumName)
+
     Seq(
       s"new ApibuilderTypeConverter[$fullyQualifiedName] {",
       s"  override def convert(value: String): $fullyQualifiedName = $fullyQualifiedName(value)",
       s"  override def convert(value: $fullyQualifiedName): String = value.toString",
-      s"  override def example: $fullyQualifiedName = validValues.head",
+      s"  override def example: $fullyQualifiedName = $fullyQualifiedName.${example.name}",
       s"  override def validValues: Seq[$fullyQualifiedName] = $fullyQualifiedName.all",
       s"}"
     ).mkString("\n")
   }
 
+  private[this] def exampleEnumValue(enumName: String): ScalaEnumValue = {
+    val fullyQualifiedName = ssd.enumClassName(enumName)
+    val enum = ssd.enums.find(_.qualifiedName == fullyQualifiedName).getOrElse {
+      sys.error(
+        s"Failed to find enum[$fullyQualifiedName] in service[${ssd.service.name}]." +
+          s"Available enums: ${ssd.enums.map(_.qualifiedName).mkString(", ")}"
+      )
+    }
+
+    enum.values.headOption.getOrElse {
+      sys.error(s"Enum[$fullyQualifiedName] does not have any values")
+    }
+  }
 }
