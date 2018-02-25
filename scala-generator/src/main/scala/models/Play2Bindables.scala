@@ -83,6 +83,28 @@ case class ApibuilderQueryStringBindable[T](
   }
 }
 
+case class ApibuilderQueryStringBindableOption[T](
+  bindable: QueryStringBindable[T]
+) extends QueryStringBindable[Option[T]] {
+
+  override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, Option[T]]] = {
+    params.getOrElse(key, Nil).headOption match {
+      case None => Some(Right(None))
+      case Some(v) => bindable.bind(key, params).map {
+        case Left(errors) => Left(errors)
+        case Right(parsed) => Right(Some(parsed))
+      }
+    }
+  }
+
+  override def unbind(key: String, value: Option[T]): String = {
+    value match {
+      case None => ""
+      case Some(v) => bindable.unbind(key, v)
+    }
+  }
+}
+
 case class ApibuilderPathBindable[T](
   converters: ApibuilderTypeConverter[T]
 ) extends PathBindable[T] {
@@ -104,11 +126,13 @@ case class ApibuilderPathBindable[T](
   }
 }
 
-implicit val pathBindableApibuilderDateTimeIso8601: PathBindable[_root_.org.joda.date.time.DateTimeIso8601] = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
-implicit val queryStringBindableApibuilderDateTimeIso8601: QueryStringBindable[_root_.org.joda.date.time.DateTimeIso8601] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val pathBindableApibuilderDateTimeIso8601: PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val queryStringBindableApibuilderDateTimeIso8601: QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val queryStringBindableApibuilderDateTimeIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.DateTime]] = ApibuilderQueryStringBindableOption(queryStringBindableApibuilderDateTimeIso8601)
 
-implicit val pathBindableApibuilderDateIso8601: PathBindable[_root_.org.joda.date.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
-implicit val queryStringBindableApibuilderDateIso8601: QueryStringBindable[_root_.org.joda.date.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val pathBindableApibuilderDateIso8601: PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val queryStringBindableApibuilderDateIso8601: QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val queryStringBindableApibuilderDateIso8601Option: QueryStringBindable[_root_.scala.Option[_root_.org.joda.time.LocalDate]] = ApibuilderQueryStringBindableOption(queryStringBindableApibuilderDateIso8601)
 """.trim
   }
 
