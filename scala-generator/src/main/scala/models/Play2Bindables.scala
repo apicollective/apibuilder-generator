@@ -104,11 +104,11 @@ case class ApibuilderPathBindable[T](
   }
 }
 
-implicit val pathBindableApibuilderDateTimeIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
-implicit val queryStringBindableApibuilderDateTimeIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val pathBindableApibuilderDateTimeIso8601: PathBindable[_root_.org.joda.date.time.DateTimeIso8601] = ApibuilderPathBindable(ApibuilderTypeConverter.dateTimeIso8601)
+implicit val queryStringBindableApibuilderDateTimeIso8601: QueryStringBindable[_root_.org.joda.date.time.DateTimeIso8601] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateTimeIso8601)
 
-implicit val pathBindableApibuilderDateIso8601 = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
-implicit val queryStringBindableApibuilderDateIso8601 = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val pathBindableApibuilderDateIso8601: PathBindable[_root_.org.joda.date.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypeConverter.dateIso8601)
+implicit val queryStringBindableApibuilderDateIso8601: QueryStringBindable[_root_.org.joda.date.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypeConverter.dateIso8601)
 """.trim
   }
 
@@ -119,8 +119,8 @@ implicit val queryStringBindableApibuilderDateIso8601 = ApibuilderQueryStringBin
     val converter = s"converter$enumName"
     Seq(
       s"val $converter: ApibuilderTypeConverter[$fullyQualifiedName] = ${buildEnumConverter(enumName)}",
-      s"implicit val pathBindable$enumName = ApibuilderPathBindable($converter)",
-      s"implicit val queryStringBindable$enumName = ApibuilderQueryStringBindable($converter)"
+      s"implicit val pathBindable$enumName: PathBindable[$fullyQualifiedName] = ApibuilderPathBindable($converter)",
+      s"implicit val queryStringBindable$enumName: QueryStringBindable[$fullyQualifiedName] = ApibuilderQueryStringBindable($converter)"
     ).mkString("\n")
   }
 
