@@ -24,11 +24,11 @@ case class Play2Bindables(ssd: ScalaService) {
   private def buildObjectCore(): String = {
     """
 object Core {
-  implicit val pathBindableDateTimeIso8601: PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
-  implicit val queryStringBindableDateTimeIso8601: QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
+  implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
+  implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
 
-  implicit val pathBindableDateIso8601: PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
-  implicit val queryStringBindableDateIso8601: QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
+  implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
+  implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
 }
 """.trim
   }
@@ -153,8 +153,8 @@ case class ApibuilderPathBindable[T](
     val converter = ScalaUtil.toVariable(enumName) + "Converter"
     Seq(
       s"val $converter: ApibuilderTypeConverter[$fullyQualifiedName] = ${buildEnumConverter(enumName)}",
-      s"implicit val pathBindable$enumName: PathBindable[$fullyQualifiedName] = ApibuilderPathBindable($converter)",
-      s"implicit val queryStringBindable$enumName: QueryStringBindable[$fullyQualifiedName] = ApibuilderQueryStringBindable($converter)"
+      s"implicit def pathBindable$enumName(implicit stringBinder: QueryStringBindable[String]): PathBindable[$fullyQualifiedName] = ApibuilderPathBindable($converter)",
+      s"implicit def queryStringBindable$enumName(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[$fullyQualifiedName] = ApibuilderQueryStringBindable($converter)"
     ).mkString("\n")
   }
 
