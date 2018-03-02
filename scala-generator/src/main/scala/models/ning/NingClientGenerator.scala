@@ -51,15 +51,6 @@ case class NingClientGenerator(
     Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Client", source, Some("Scala")))
   }
 
-  private[ning] def toJson(klass: String): String = {
-    Seq(
-      s"""play.api.libs.json.Json.parse(response.getResponseBody("UTF-8")).validate[${klass}] match {""",
-      s"""  case play.api.libs.json.JsSuccess(x, _) => x""",
-      s"""  case play.api.libs.json.JsError(errors) => sys.error("Invalid json: " + errors.mkString(" "))""",
-      s"}"
-    ).mkString("\n")
-  }
-
   private def client(): String = {
     val headers = Headers(form)
     val headerString = headers.scala.map { case (name, value) =>
