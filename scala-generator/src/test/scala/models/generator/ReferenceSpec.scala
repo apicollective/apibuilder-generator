@@ -38,6 +38,7 @@ class ReferenceSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
+        models.TestHelper.assertValidScalaSourceFiles(sourceFiles)
         models.TestHelper.assertEqualsFile("/generators/reference-spec-ning-client.txt", sourceFiles.head.contents)
       }
     }
