@@ -84,6 +84,12 @@ ${methodGenerator.objects().indent(4)}
       }
     }
 
+    def _logResponse(response: Response): Unit = {
+      if (logger.isInfoEnabled) {
+        logger.info("_logResponse: status=" + response.getStatusCode + ", responseBody: " + response.${config.responseBodyMethod})
+      }
+    }
+
     def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): RequestBuilder = {
       val builder = new RequestBuilder(method)
         .setUrl(baseUrl + path)
@@ -136,7 +142,10 @@ ${headerString.indent(8)}
       val result = scala.concurrent.Promise[com.ning.http.client.Response]()
       asyncHttpClient.executeRequest(finalRequest,
         new AsyncCompletionHandler[Unit]() {
-          override def onCompleted(r: com.ning.http.client.Response) = result.success(r)
+          override def onCompleted(r: com.ning.http.client.Response) = {
+            _logResponse(r)
+            result.success(r)
+          }
           override def onThrowable(t: Throwable) = result.failure(t)
         }
       )
