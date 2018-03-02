@@ -1,9 +1,9 @@
 package scala.generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import scala.models.Play23ClientGenerator
-import scala.models.ning.Ning18ClientGenerator
 
+import scala.models.Play23ClientGenerator
+import scala.models.ning.{Ning18ClientGenerator, Ning19ClientGenerator}
 import models.TestHelper
 import org.scalatest.{FunSpec, Matchers}
 
@@ -33,7 +33,7 @@ class ReferenceSpec extends FunSpec with Matchers {
     }
   }
 
-  it("generates expected code for ning client") {
+  it("generates expected code for ning 1.8 client") {
     Ning18ClientGenerator.invoke(InvocationForm(service = models.TestHelper.referenceApiService)) match {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
@@ -44,6 +44,15 @@ class ReferenceSpec extends FunSpec with Matchers {
     }
   }
 
+  it("generates expected code for ning 1.9 client") {
+    Ning19ClientGenerator.invoke(InvocationForm(service = models.TestHelper.referenceApiService)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertValidScalaSourceFiles(sourceFiles)
+      }
+    }
+  }
 }
 
 
