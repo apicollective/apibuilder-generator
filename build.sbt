@@ -34,7 +34,8 @@ lazy val generator = project
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
-    routesImport += "io.apibuilder.generator.v0.Bindables._",
+    routesImport += "io.apibuilder.generator.v0.Bindables.Core._",
+    routesImport += "io.apibuilder.generator.v0.Bindables.Models._",
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
