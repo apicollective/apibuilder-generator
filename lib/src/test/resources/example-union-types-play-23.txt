@@ -355,11 +355,11 @@ package io.apibuilder.example.union.types.v0 {
     import Models._
 
     object Core {
-      implicit val pathBindableDateTimeIso8601: PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
-      implicit val queryStringBindableDateTimeIso8601: QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
+      implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
+      implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
 
-      implicit val pathBindableDateIso8601: PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
-      implicit val queryStringBindableDateIso8601: QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
+      implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
+      implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
     }
 
     object Models {
@@ -371,8 +371,8 @@ package io.apibuilder.example.union.types.v0 {
         override def example: io.apibuilder.example.union.types.v0.models.Bar = io.apibuilder.example.union.types.v0.models.Bar.B
         override def validValues: Seq[io.apibuilder.example.union.types.v0.models.Bar] = io.apibuilder.example.union.types.v0.models.Bar.all
       }
-      implicit val pathBindableBar: PathBindable[io.apibuilder.example.union.types.v0.models.Bar] = ApibuilderPathBindable(barConverter)
-      implicit val queryStringBindableBar: QueryStringBindable[io.apibuilder.example.union.types.v0.models.Bar] = ApibuilderQueryStringBindable(barConverter)
+      implicit def pathBindableBar(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.apibuilder.example.union.types.v0.models.Bar] = ApibuilderPathBindable(barConverter)
+      implicit def queryStringBindableBar(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.apibuilder.example.union.types.v0.models.Bar] = ApibuilderQueryStringBindable(barConverter)
 
       val fooConverter: ApibuilderTypeConverter[io.apibuilder.example.union.types.v0.models.Foo] = new ApibuilderTypeConverter[io.apibuilder.example.union.types.v0.models.Foo] {
         override def convert(value: String): io.apibuilder.example.union.types.v0.models.Foo = io.apibuilder.example.union.types.v0.models.Foo(value)
@@ -380,8 +380,8 @@ package io.apibuilder.example.union.types.v0 {
         override def example: io.apibuilder.example.union.types.v0.models.Foo = io.apibuilder.example.union.types.v0.models.Foo.A
         override def validValues: Seq[io.apibuilder.example.union.types.v0.models.Foo] = io.apibuilder.example.union.types.v0.models.Foo.all
       }
-      implicit val pathBindableFoo: PathBindable[io.apibuilder.example.union.types.v0.models.Foo] = ApibuilderPathBindable(fooConverter)
-      implicit val queryStringBindableFoo: QueryStringBindable[io.apibuilder.example.union.types.v0.models.Foo] = ApibuilderQueryStringBindable(fooConverter)
+      implicit def pathBindableFoo(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.apibuilder.example.union.types.v0.models.Foo] = ApibuilderPathBindable(fooConverter)
+      implicit def queryStringBindableFoo(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.apibuilder.example.union.types.v0.models.Foo] = ApibuilderQueryStringBindable(fooConverter)
     }
 
     trait ApibuilderTypeConverter[T] {
