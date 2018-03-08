@@ -144,8 +144,8 @@ trait KotlinUtil {
 
   val dataTypes = Map[String, TypeName](
     "boolean" -> new ClassName("kotlin", "Boolean"),
-    "date-iso8601" -> new ClassName("org.joda.time", "DateTime"),
-    "date-time-iso8601" -> new ClassName("org.joda.time", "DateTime"),
+    "date-iso8601" -> new ClassName("org.threeten.bp", "LocalDate"),
+    "date-time-iso8601" -> new ClassName("org.threeten.bp", "Instant"),
     "decimal" -> new ClassName("java.math","BigDecimal"),
     "double" -> new ClassName("kotlin","Double"),
     "integer" -> new ClassName("kotlin", "Int"),
