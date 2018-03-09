@@ -84,7 +84,7 @@ lazy val kotlinGenerator = project
       "com.squareup" % "kotlinpoet" % "0.7.0",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.30" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test",
       "org.mockito" % "mockito-inline" % "2.15.0" % "test"
     )
   )
@@ -96,7 +96,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.5" % "test",
     "org.mockito" % "mockito-inline" % "2.15.0" % "test",
     "com.github.javaparser" % "javaparser-core" % "3.5.10" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
