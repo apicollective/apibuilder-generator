@@ -36,7 +36,6 @@ class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
         generatedFiles.size shouldBe 1
         val sourceCode = generatedFiles(0).contents
         assertValidScalaSourceCode(sourceCode)
-        println(sourceCode)
         sourceCode should not include ("Applicative[F]")
         sourceCode should include("Task.now")
       case Left(errors) =>
