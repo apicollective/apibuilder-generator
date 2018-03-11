@@ -4,6 +4,8 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text._
+import models.http4s.mock.Cats1MockClientGenerator
+
 import scala.models.ApidocComments
 import scala.generator._
 
@@ -45,6 +47,24 @@ object MockClientGenerator {
 
   }
 
+  object Http4s017 extends CodeGenerator {
+
+    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+      val ssd = new ScalaService(form.service)
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Http4s017(ssd.namespaces.base, None)).invoke()
+    }
+
+  }
+
+  object Http4s018 extends CodeGenerator {
+
+    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+      val ssd = new ScalaService(form.service)
+      new Cats1MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Http4s018(ssd.namespaces.base, None)).invoke()
+    }
+
+  }
+
 }
 
 class MockClientGenerator(
@@ -52,7 +72,7 @@ class MockClientGenerator(
   userAgent: Option[String],
   config: ScalaClientMethodConfig
 ) {
-  private[this] val generator = new ScalaClientMethodGenerator(config, ssd)
+  val generator = new ScalaClientMethodGenerator(config, ssd)
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     val header = ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
@@ -73,48 +93,49 @@ class MockClientGenerator(
     )
   }
 
+  val clientCode =
+    Seq(
+      s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
+      s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
+      ssd.resources.map { resource =>
+        s"override def ${generator.methodName(resource)}: ${ssd.namespaces.base}.${resource.plural} = Mock${resource.plural}Impl"
+      }.mkString("\n").indent(2),
+      "}",
+      ssd.resources.map { resource =>
+        generateMockResource(resource)
+      }.mkString("\n\n")
+    ).mkString("\n\n")
+
+  val factoriesCode = Seq(
+    "object Factories {",
+    Seq(
+      "def randomString(): String = {",
+      """  "Test " + _root_.java.util.UUID.randomUUID.toString.replaceAll("-", " ")""",
+      "}"
+    ).mkString("\n").indent(2),
+    Seq(
+      ssd.enums.map { makeEnum },
+      ssd.models.map { makeModel },
+      ssd.unions.map { makeUnion }
+    ).flatten.mkString("\n\n").indent(2),
+    "}"
+  ).mkString("\n\n")
+
   def generateCode(): String = {
     Seq(
       s"package ${ssd.namespaces.mock} {",
       Seq(
         ssd.resources match {
           case Nil => None
-          case _ => Some(
-            Seq(
-              s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
-              s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
-              ssd.resources.map { resource =>
-                s"override def ${generator.methodName(resource)}: ${ssd.namespaces.base}.${resource.plural} = Mock${resource.plural}Impl"
-              }.mkString("\n").indent(2),
-              "}",
-              ssd.resources.map { resource =>
-                generateMockResource(resource)
-              }.mkString("\n\n")
-            ).mkString("\n\n")
-          )
+          case _ => Some(clientCode)
         },
-        Some(
-          Seq(
-            "object Factories {",
-            Seq(
-              "def randomString(): String = {",
-              """  "Test " + _root_.java.util.UUID.randomUUID.toString.replaceAll("-", " ")""",
-              "}"
-            ).mkString("\n").indent(2),
-            Seq(
-              ssd.enums.map { makeEnum },
-              ssd.models.map { makeModel },
-              ssd.unions.map { makeUnion }
-            ).flatten.mkString("\n\n").indent(2),
-            "}"
-          ).mkString("\n\n")
-        )
+        Some(factoriesCode)
       ).flatten.mkString("\n\n").indent(2),
       "}"
     ).mkString("\n\n")
   }
 
-  private[this] def makeEnum(enum: ScalaEnum): String = {
+  def makeEnum(enum: ScalaEnum): String = {
     val name = enum.values.headOption match {
       case None => {
         """UNDEFINED("other")"""
@@ -126,7 +147,7 @@ class MockClientGenerator(
     s"def make${enum.name}(): ${enum.qualifiedName} = ${enum.qualifiedName}.$name"
   }
 
-  private[this] def makeModel(model: ScalaModel): String = {
+  def makeModel(model: ScalaModel): String = {
     Seq(
       s"def make${model.name}(): ${model.qualifiedName} = ${model.qualifiedName}(",
       model.fields.map { field =>
@@ -136,14 +157,14 @@ class MockClientGenerator(
     ).mkString("\n")
   }
 
-  private[this] def makeUnion(union: ScalaUnion): String = {
+  def makeUnion(union: ScalaUnion): String = {
     val typ = union.types.headOption.getOrElse {
       sys.error("Union type[${union.qualifiedName}] does not have any times")
     }
     s"def make${union.name}(): ${union.qualifiedName} = ${mockValue(typ.datatype)}"
   }
 
-  private[this] def generateMockResource(resource: ScalaResource): String = {
+  def generateMockResource(resource: ScalaResource): String = {
     Seq(
       s"object Mock${resource.plural}Impl extends Mock${resource.plural}",
       s"trait Mock${resource.plural} extends ${ssd.namespaces.base}.${resource.plural} {",
@@ -158,7 +179,7 @@ class MockClientGenerator(
     ).mkString("\n\n")
   }
 
-    private[this] def mockImplementation(cm: ScalaClientMethod): String = {
+    def mockImplementation(cm: ScalaClientMethod): String = {
     cm.operation.responses.find(_.isSuccess) match {
       case None => {
         "// No-op as there is no successful response defined"
@@ -169,7 +190,7 @@ class MockClientGenerator(
     }
   }
 
-  private[this] def mockValue(datatype: ScalaDatatype): String = {
+  def mockValue(datatype: ScalaDatatype): String = {
     datatype match {
       case ScalaPrimitive.Boolean => "true"
       case ScalaPrimitive.Double => "1.0"
