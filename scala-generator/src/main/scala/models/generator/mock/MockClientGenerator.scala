@@ -93,7 +93,7 @@ class MockClientGenerator(
     )
   }
 
-  val clientCode =
+  def clientCode =
     Seq(
       s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
@@ -106,7 +106,7 @@ class MockClientGenerator(
       }.mkString("\n\n")
     ).mkString("\n\n")
 
-  val factoriesCode = Seq(
+  def factoriesCode = Seq(
     "object Factories {",
     Seq(
       "def randomString(): String = {",
