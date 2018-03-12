@@ -4,7 +4,7 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text._
-import models.http4s.mock.Cats1MockClientGenerator
+import models.http4s.mock.Http4s018MockClientGenerator
 
 import scala.models.ApidocComments
 import scala.generator._
@@ -60,7 +60,7 @@ object MockClientGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
       val ssd = new ScalaService(form.service)
-      new Cats1MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Http4s018(ssd.namespaces.base, None)).invoke()
+      new Http4s018MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Http4s018(ssd.namespaces.base, None)).invoke()
     }
 
   }

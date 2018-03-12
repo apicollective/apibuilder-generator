@@ -4,7 +4,7 @@ import scala.generator.{ScalaClientMethodConfig, ScalaResource, ScalaService}
 import scala.generator.mock.MockClientGenerator
 import lib.Text._
 
-class Cats1MockClientGenerator(
+class Http4s018MockClientGenerator(
   ssd: ScalaService,
   userAgent: Option[String],
   config: ScalaClientMethodConfig
