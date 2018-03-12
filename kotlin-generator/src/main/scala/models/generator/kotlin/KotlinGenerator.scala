@@ -11,8 +11,7 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import io.reactivex.Single
 import lib.generator.CodeGenerator
-import org.joda.time.DateTime
-import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
+import org.threeten.bp.{Instant, LocalDate}
 
 import scala.collection.JavaConverters._
 
@@ -298,40 +297,61 @@ class KotlinGenerator
 
     def generateJacksonObjectMapper(): File = {
 
-      val formatterProperty = PropertySpec.builder("formatter", classOf[DateTimeFormatter])
-        .initializer("%T.dateTimeParser()", classOf[ISODateTimeFormat])
-        .build()
-
       val moduleProperty = PropertySpec.builder("module", classOf[SimpleModule])
         .initializer("%T(%T(1, 0, 0, null, null, null))", classOf[SimpleModule], classOf[Version])
         .build()
 
-      val deserializeFunction = FunSpec.builder("deserialize")
+      val deserializeInstant = FunSpec.builder("deserialize")
         .addParameter("jsonParser", classOf[JsonParser])
         .addParameter("deserializationContext", classOf[DeserializationContext])
-        .returns(classOf[DateTime])
+        .returns(classOf[Instant])
         .addModifiers(KModifier.OVERRIDE)
         .addStatement("val value = jsonParser.valueAsString")
-        .addStatement("return formatter.parseDateTime(value)", formatterProperty)
+        .addStatement("return Instant.parse(value)")
         .build()
-      val deserializerType = TypeSpec.objectBuilder("DateTimeDeserializer")
-        .superclass(ParameterizedTypeName.get(classOf[JsonDeserializer[DateTime]], classOf[DateTime]))
-        .addFunction(deserializeFunction)
+      val deserializerInstantType = TypeSpec.objectBuilder("InstantDeserializer")
+        .superclass(ParameterizedTypeName.get(classOf[JsonDeserializer[Instant]], classOf[Instant]))
+        .addFunction(deserializeInstant)
         .build()
 
 
-      val serializeFunction = FunSpec.builder("serialize")
-        .addParameter("value", classOf[DateTime])
+      val serializeInstant = FunSpec.builder("serialize")
+        .addParameter("value", classOf[Instant])
         .addParameter("jsonGenerator", classOf[JsonGenerator])
         .addParameter("serializerProvider", classOf[SerializerProvider])
         .addModifiers(KModifier.OVERRIDE)
-        .addStatement("jsonGenerator.writeString(value.toString(formatter))")
+        .addStatement("jsonGenerator.writeString(value.toString())")
         .build()
-      val serializerType = TypeSpec.objectBuilder("DateTimeSerializer")
-        .superclass(ParameterizedTypeName.get(classOf[JsonSerializer[DateTime]], classOf[DateTime]))
-        .addFunction(serializeFunction)
+      val serializerInstantType = TypeSpec.objectBuilder("InstantSerializer")
+        .superclass(ParameterizedTypeName.get(classOf[JsonSerializer[Instant]], classOf[Instant]))
+        .addFunction(serializeInstant)
         .build()
 
+      val deserializeLocalDate = FunSpec.builder("deserialize")
+        .addParameter("jsonParser", classOf[JsonParser])
+        .addParameter("deserializationContext", classOf[DeserializationContext])
+        .returns(classOf[LocalDate])
+        .addModifiers(KModifier.OVERRIDE)
+        .addStatement("val value = jsonParser.valueAsString")
+        .addStatement("return LocalDate.parse(value)")
+        .build()
+      val deserializerLocalDateType = TypeSpec.objectBuilder("LocalDateDeserializer")
+        .superclass(ParameterizedTypeName.get(classOf[JsonDeserializer[LocalDate]], classOf[LocalDate]))
+        .addFunction(deserializeLocalDate)
+        .build()
+
+
+      val serializeLocalDate = FunSpec.builder("serialize")
+        .addParameter("value", classOf[LocalDate])
+        .addParameter("jsonGenerator", classOf[JsonGenerator])
+        .addParameter("serializerProvider", classOf[SerializerProvider])
+        .addModifiers(KModifier.OVERRIDE)
+        .addStatement("jsonGenerator.writeString(value.toString())")
+        .build()
+      val serializerLocalDateType = TypeSpec.objectBuilder("LocalDateSerializer")
+        .superclass(ParameterizedTypeName.get(classOf[JsonSerializer[LocalDate]], classOf[LocalDate]))
+        .addFunction(serializeLocalDate)
+        .build()
 
       val className = sharedObjectMapperClassName
       val deserializationFeatureClassName = classOf[DeserializationFeature].getName
@@ -341,8 +361,10 @@ class KotlinGenerator
         .addStatement("mapper.registerModule(com.fasterxml.jackson.datatype.joda.JodaModule())")
         .addStatement(s"mapper.configure(${deserializationFeatureClassName}.FAIL_ON_UNKNOWN_PROPERTIES, false)")
         .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)")
-        .addStatement("module.addDeserializer(DateTime::class.java, DateTimeDeserializer)")
-        .addStatement("module.addSerializer(DateTime::class.java, DateTimeSerializer)")
+        .addStatement("module.addDeserializer(Instant::class.java, InstantDeserializer)")
+        .addStatement("module.addSerializer(Instant::class.java, InstantSerializer)")
+        .addStatement("module.addDeserializer(LocalDate::class.java, LocalDateDeserializer)")
+        .addStatement("module.addSerializer(LocalDate::class.java, LocalDateSerializer)")
         .addStatement("mapper.registerModule(module)")
         .addStatement("return mapper")
         .build()
@@ -354,10 +376,11 @@ class KotlinGenerator
       val builder = TypeSpec.objectBuilder(className)
         .addModifiers(KModifier.PUBLIC)
         .addKdoc(kdocClassMessage)
-        .addProperty(formatterProperty)
         .addProperty(moduleProperty)
-        .addType(deserializerType)
-        .addType(serializerType)
+        .addType(deserializerInstantType)
+        .addType(serializerInstantType)
+        .addType(deserializerLocalDateType)
+        .addType(serializerLocalDateType)
         .addFunction(createFunSpec)
       makeFile(className, builder)
     }

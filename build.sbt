@@ -80,7 +80,8 @@ lazy val kotlinGenerator = project
   .settings(
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.3",
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.3",
+      //"com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.3",
+      "org.threeten" % "threetenbp" % "1.3.6",
       "com.squareup" % "kotlinpoet" % "0.7.0",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.30" % "test",
