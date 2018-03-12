@@ -296,10 +296,10 @@ trait ParserGenerator extends CodeGenerator {
       * is a keyword, we append Instance (back ticks will not compile)
       */
     private[this] def parserName(field: ScalaField): String = {
-      ScalaUtil.isKeyword(field.originalName) match {
+      Text.initLowerCase(ScalaUtil.isKeyword(field.originalName) match {
         case true => Text.snakeToCamelCase(field.originalName) + "Instance"
         case false => field.name
-      }
+      })
     }
 
     private[this] def generateUnion(union: ScalaUnion): String = {
