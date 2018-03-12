@@ -47,24 +47,6 @@ object MockClientGenerator {
 
   }
 
-  object Http4s017 extends CodeGenerator {
-
-    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service)
-      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Http4s017(ssd.namespaces.base, None)).invoke()
-    }
-
-  }
-
-  object Http4s018 extends CodeGenerator {
-
-    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service)
-      new Http4s018MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Http4s018(ssd.namespaces.base, None)).invoke()
-    }
-
-  }
-
 }
 
 class MockClientGenerator(
