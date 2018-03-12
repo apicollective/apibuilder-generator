@@ -10,7 +10,7 @@ class Http4s018MockClientGenerator(
   config: ScalaClientMethodConfig
 ) extends MockClientGenerator(ssd, userAgent, config) {
 
-  override val clientCode: String = {
+  override def clientCode: String = {
     Seq(
       s"class Client[F[_]: cats.Applicative] extends ${ssd.namespaces.interfaces}.Client[F] {",
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
