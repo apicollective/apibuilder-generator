@@ -313,8 +313,8 @@ case class Play2Json(
     val serializations = model.fields.map { field =>
       val beLazy = hasReferenceToModel(field.datatype)
 
-      field.datatype match {
-        case ScalaDatatype.Option(inner) => {
+      (field.datatype, field.default) match {
+        case (ScalaDatatype.Option(inner), _) => {
           val path = s"""(__ \\ "${field.originalName}")"""
           val reader = {
             if (beLazy)
@@ -325,7 +325,19 @@ case class Play2Json(
 
           s"$path.$reader"
         }
-        case datatype => {
+        case (datatype, Some(default)) if field.required => {
+          val path = s"""(__ \\ "${field.originalName}")"""
+          val reader = {
+            if (beLazy)
+              s"""lazyRead(play.api.libs.json.Reads.withDefault[${datatype.name}](Json.parse("$default").as[${datatype.name}])"""
+            else
+              s"""readWithDefault[${datatype.name}](Json.parse("$default").as[${datatype.name}])"""
+          }
+
+          s"$path.$reader"
+        }
+        case (datatype, _) => {
+
           val path = s"""(__ \\ "${field.originalName}")"""
           val reader = {
             if (beLazy)
