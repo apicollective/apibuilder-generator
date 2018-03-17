@@ -184,7 +184,6 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 """)
     override val canSerializeUuid = true
     override val implicitArgs: Option[String] = None
-    override val asyncType: String = "scalaz.concurrent.Task"
     override val asyncSuccess: String = "now"
     override val requestUriMethod: Option[String] = None //Some("getUri.toJavaNetURI")
     override val expectsInjectedWsClient = false

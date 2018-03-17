@@ -65,6 +65,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   object PostResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends PostResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends PostResponse
   }
 
   def post(
@@ -86,6 +87,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
         case Right(req) =>
           post(_req, req.id, req.model, req.enum, req.opt, req.list, req.map).flatMap {
             case PostResponse.HTTP200(headers) => Ok(headers: _*)
+            case PostResponse.UndocumentedResponse(response) => response
           }
         case Left(_) => BadRequest()
       }
@@ -102,6 +104,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
             } yield {
                 post(_req, id, model, enum, opt, list, map).flatMap {
                   case PostResponse.HTTP200(headers) => Ok(headers: _*)
+                  case PostResponse.UndocumentedResponse(response) => response
                 }
               }
             responseOpt.getOrElse(BadRequest())
