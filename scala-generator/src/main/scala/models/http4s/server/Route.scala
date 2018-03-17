@@ -12,8 +12,6 @@ case class Literal(name: String) extends PathSegment
 case class PlainString(name: String) extends PathSegment
 case class Extracted(name: String, parameter: ScalaParameter) extends PathSegment
 
-case class StatusCode(code: Int, datatype: Option[String])
-
 case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation, config: ScalaClientMethodConfigs.Http4s) {
   val pathSegments: Array[PathSegment] = op.path.split("/").filterNot(_.isEmpty).map { segment =>
     if(!segment.startsWith(":")) {
@@ -34,13 +32,14 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
   val statusCodes: Seq[StatusCode] = {
     op.responses.flatMap { response =>
       response.code  match {
-        case ResponseCodeInt(value)  if HttpStatusCodes.contains(value) =>
-          val returnType = if (response.isUnit) {
-            None
-          } else {
-            Some(response.datatype.name)
+        case ResponseCodeInt(value) =>
+          HttpStatusCodes(value).map { status =>
+            if (response.isUnit) {
+              status
+            } else {
+              status.withBodyType(response.datatype.name)
+            }
           }
-          Some(StatusCode(value, returnType))
         case _ => None
       }
     }
@@ -58,12 +57,8 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
   def operation(): Seq[String] = {
 
-    val responses = statusCodes.map { case StatusCode(code, datatype) =>
-      datatype.fold(
-        s"""case class HTTP$code(headers: Seq[org.http4s.Header] = Nil) extends $responseTrait""".stripMargin
-      )(typ =>
-        s"""case class HTTP$code(value: $typ, headers: Seq[org.http4s.Header] = Nil) extends $responseTrait""".stripMargin
-      )
+    val responses = statusCodes.map { s =>
+      s"""case class HTTP${s.code}(${s.responseParams(config)}) extends $responseTrait""".stripMargin
     }
 
     val params =
@@ -134,14 +129,13 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
     val verFilter = version.fold("")(_ => " if apiVersionMatch(_req)")
 
-    def route(prefix:String) = Seq(s"  ${op.name}(${args(prefix)}).flatMap {"
-                  ) ++ statusCodes.collect {
-                    case StatusCode(code, Some(_)) =>
-                    s"    case $responseTrait.HTTP$code(value, headers) => ${HttpStatusCodes.apply(code)}(value${config.headerString(").map(_.putHeaders(")}"
-                    case StatusCode(code, None) =>
-                    s"    case $responseTrait.HTTP$code(headers) => ${HttpStatusCodes.apply(code)}(${config.headerString(").map(_.putHeaders(")}"
-                  } ++ Seq(
-                    s"  }")
+    def route(prefix:String) = {
+      Seq(s"  ${op.name}(${args(prefix)}).flatMap {") ++
+      statusCodes.map { case s =>
+        s"    case $responseTrait.HTTP${s.code}(${s.responseExtractor(config)}) => ${s.name}(${s.applyArgs(config)})"
+      } ++
+      Seq(s"  }")
+    }
 
     val prefix = Seq(s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>")
 
