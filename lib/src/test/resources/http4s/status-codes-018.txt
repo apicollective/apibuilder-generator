@@ -103,5 +103,7 @@ trait FooRoutes[F[_]] extends Matchers[F] {
       get401(_req).flatMap {
         case Get401Response.HTTP401(value, authenticate, headers) => Unauthorized(authenticate, value, headers: _*)
       }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

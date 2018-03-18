@@ -104,5 +104,7 @@ trait FooRoutes {
       get401(_req).flatMap {
         case Get401Response.HTTP401(value, challenge, challenges, headers) => Unauthorized(challenge, challenges: _*).putHeaders(headers: _*)
       }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

@@ -158,5 +158,7 @@ trait ModelRoutes {
       getQueryModelImported(_req, id).flatMap {
         case GetQueryModelImportedResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
       }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

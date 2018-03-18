@@ -501,5 +501,7 @@ trait ModelRoutes {
       getInvalidById(_req, id).flatMap {
         case GetInvalidByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
       }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

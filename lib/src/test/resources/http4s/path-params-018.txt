@@ -500,5 +500,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
       getInvalidById(_req, id).flatMap {
         case GetInvalidByIdResponse.HTTP200(headers) => Ok(headers: _*)
       }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

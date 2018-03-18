@@ -140,5 +140,7 @@ trait ModelRoutes {
         case GetMultipleResponse.HTTP204(headers) => NoContent().putHeaders(headers: _*)
         case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value).putHeaders(headers: _*)
       }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

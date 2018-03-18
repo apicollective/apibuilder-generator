@@ -139,5 +139,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
         case GetMultipleResponse.HTTP204(headers) => NoContent(headers: _*)
         case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value, headers: _*)
       }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

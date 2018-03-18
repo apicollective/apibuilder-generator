@@ -108,5 +108,7 @@ trait ModelRoutes {
             responseOpt.getOrElse(BadRequest())
       }
     }
+    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }
