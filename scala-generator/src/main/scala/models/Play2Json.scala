@@ -329,9 +329,9 @@ case class Play2Json(
           val path = s"""(__ \\ "${field.originalName}")"""
           val reader = {
             if (beLazy)
-              s"""lazyRead(play.api.libs.json.Reads.withDefault[${datatype.name}](Json.parse("$default").as[${datatype.name}])"""
+              s"""lazyRead(play.api.libs.json.Reads.withDefault[${datatype.name}]($default)"""
             else
-              s"""readWithDefault[${datatype.name}](Json.parse("$default").as[${datatype.name}])"""
+              s"""readWithDefault[${datatype.name}]($default)"""
           }
 
           s"$path.$reader"

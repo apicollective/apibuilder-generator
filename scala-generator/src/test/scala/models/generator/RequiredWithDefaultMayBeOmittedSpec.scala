@@ -15,21 +15,12 @@ class RequiredWithDefaultMayBeOmittedSpec extends FunSpec with Matchers {
       "unions": [],
       "resources": [],
 
-      "models": [
-        {
-          "name": "user",
-          "plural": "users",
-          "attributes": [],
-          "fields": [
-            { "name": "age", "type": "string", "required": true, "default": "21", "attributes": [] }
-          ]
-        }
-      ]
+      "models": []
   """)
 
   it("allows a required, defaulted field (attributes) to be omitted") {
     val service = TestHelper.service(json)
-    val svc = new ScalaService(service)
+    service.attributes should be(Nil)
   }
 
 }
