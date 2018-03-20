@@ -1,55 +1,103 @@
 package scala.models.http4s.server
 
-object HttpStatusCodes {
-  def apply: Map[Int, String] = Map(
-    100 -> "Continue",
-    101 -> "SwitchingProtocols",
-    102 -> "Processing",
-    200 -> "Ok",
-    201 -> "Created",
-    202 -> "Accepted",
-    203 -> "NonAuthoritativeInformation",
-    204 -> "NoContent",
-    205 -> "ResetContent",
-    206 -> "PartialContent",
-    207 -> "MultiStatus",
-    108 -> "AlreadyReported",
-    226 -> "IMUsed",
-    300 -> "MultipleChoices",
-    301 -> "MovedPermanently",
-    302 -> "Found",
-    303 -> "SeeOther",
-    304 -> "NotModified",
-    305 -> "UseProxy",
-    307 -> "TemporaryRedirect",
-    208 -> "PermanentRedirect",
-    400 -> "BadRequest",
-    401 -> "Unauthorized",
-    402 -> "PaymentRequired",
-    403 -> "Forbidden",
-    404 -> "NotFound",
-    405 -> "MethodNotAllowed",
-    406 -> "NotAcceptable",
-    407 -> "ProxyAuthenticationRequired",
-    408 -> "RequestTimeout",
-    409 -> "Conflict",
-    410 -> "Gone",
-    411 -> "LengthRequired",
-    412 -> "PreconditionFailed",
-    413 -> "PayloadTooLarge",
-    414 -> "UriTooLong",
-    415 -> "UnsupportedMediaType",
-    416 -> "RangeNotSatisfiable",
-    417 -> "ExpectationFailed",
-    422 -> "UnprocessableEntity",
-    423 -> "Locked",
-    424 -> "FailedDependency",
-    426 -> "UpgradeRequired",
-    428 -> "PreconditionRequired",
-    429 -> "TooManyRequests",
-    431 -> "RequestHeaderFieldsTooLarge",
-    451 -> "UnavailableForLegalReasons"
-  )
+import scala.generator.ScalaClientMethodConfigs
 
-  def contains(i: Int): Boolean = apply.contains(i)
+trait StatusCode {
+  def code: Int
+  def name: String
+  def bodyType: Option[String] = None
+  def withBodyType(typ: String): StatusCode = this
+  def responseParams(config: ScalaClientMethodConfigs.Http4s): String = (params(config).map { case (name, typ) => s"$name: $typ" } ++ Seq("headers: Seq[org.http4s.Header] = Nil")).mkString(", ")
+  def responseExtractor(config: ScalaClientMethodConfigs.Http4s): String = (params(config).map(_._1) ++ Seq("headers")).mkString(", ")
+  def applyArgs(config: ScalaClientMethodConfigs.Http4s): String = config match {
+    case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
+      params(config).map(_._1).mkString(", ") + ").putHeaders(headers: _*"
+    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+      (params(config).map(_._1) ++ Seq("headers: _*")).mkString(", ")
+  }
+  protected def params(config: ScalaClientMethodConfigs.Http4s): Seq[(String, String)] = bodyType.toSeq.map(typ => "value" -> typ)
+}
+
+case class EmptyStatusCode(code: Int, name: String) extends StatusCode
+
+case class EntityStatusCode(code: Int, name: String, override val bodyType: Option[String] = None) extends StatusCode {
+  override def withBodyType(typ: String) = this.copy(bodyType = Some(typ))
+}
+
+case class LocationStatusCode(code: Int, name: String) extends StatusCode {
+  override def params(config: ScalaClientMethodConfigs.Http4s) = Seq("location" -> "org.http4s.Uri")
+}
+
+case class WWWAuthenticateStatusCode(code: Int, name: String, override val bodyType: Option[String] = None) extends StatusCode {
+  override def withBodyType(typ: String) = this.copy(bodyType = Some(typ))
+  override def params(config: ScalaClientMethodConfigs.Http4s) = super.params(config) ++ (config match {
+    case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
+      Seq("challenge" -> "org.http4s.Challenge", "challenges" -> "Seq[org.http4s.Challenge] = Nil")
+    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+      Seq("authenticate" -> "org.http4s.headers.`WWW-Authenticate`")
+  })
+  override def applyArgs(config: ScalaClientMethodConfigs.Http4s) = config match {
+    case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
+      "challenge, challenges: _*).putHeaders(headers: _*"
+    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+      bodyType.fold(
+        "authenticate, headers: _*"
+      )(_ =>
+        "authenticate, value, headers: _*"
+      )
+  }
+}
+
+object HttpStatusCodes {
+  private val all = Seq(
+    EmptyStatusCode(100, "Continue"),
+    EmptyStatusCode(101, "SwitchingProtocols"),
+    EmptyStatusCode(102, "Processing"),
+    EntityStatusCode(200, "Ok"),
+    EntityStatusCode(201, "Created"),
+    EntityStatusCode(202, "Accepted"),
+    EntityStatusCode(203, "NonAuthoritativeInformation"),
+    EmptyStatusCode(204, "NoContent"),
+    EmptyStatusCode(205, "ResetContent"),
+    EntityStatusCode(206, "PartialContent"),
+    EntityStatusCode(207, "MultiStatus"),
+    EntityStatusCode(208, "AlreadyReported"),
+    EntityStatusCode(226, "IMUsed"),
+    LocationStatusCode(300, "MultipleChoices"),
+    LocationStatusCode(301, "MovedPermanently"),
+    LocationStatusCode(302, "Found"),
+    LocationStatusCode(303, "SeeOther"),
+    EmptyStatusCode(304, "NotModified"),
+    EmptyStatusCode(305, "UseProxy"),
+    LocationStatusCode(307, "TemporaryRedirect"),
+    LocationStatusCode(308, "PermanentRedirect"),
+    EntityStatusCode(400, "BadRequest"),
+    WWWAuthenticateStatusCode(401, "Unauthorized"),
+    EntityStatusCode(402, "PaymentRequired"),
+    EntityStatusCode(403, "Forbidden"),
+    EntityStatusCode(404, "NotFound"),
+    EntityStatusCode(405, "MethodNotAllowed"),
+    EntityStatusCode(406, "NotAcceptable"),
+    EntityStatusCode(407, "ProxyAuthenticationRequired"),
+    EntityStatusCode(408, "RequestTimeout"),
+    EntityStatusCode(409, "Conflict"),
+    EntityStatusCode(410, "Gone"),
+    EntityStatusCode(411, "LengthRequired"),
+    EntityStatusCode(412, "PreconditionFailed"),
+    EntityStatusCode(413, "PayloadTooLarge"),
+    EntityStatusCode(414, "UriTooLong"),
+    EntityStatusCode(415, "UnsupportedMediaType"),
+    EntityStatusCode(416, "RangeNotSatisfiable"),
+    EntityStatusCode(417, "ExpectationFailed"),
+    EntityStatusCode(422, "UnprocessableEntity"),
+    EntityStatusCode(423, "Locked"),
+    EntityStatusCode(424, "FailedDependency"),
+    EntityStatusCode(426, "UpgradeRequired"),
+    EntityStatusCode(428, "PreconditionRequired"),
+    EntityStatusCode(429, "TooManyRequests"),
+    EntityStatusCode(431, "RequestHeaderFieldsTooLarge"),
+    EntityStatusCode(451, "UnavailableForLegalReasons")
+  ).map(s => s.code -> s).toMap
+
+  def apply(code: Int): Option[StatusCode] = all.get(code)
 }

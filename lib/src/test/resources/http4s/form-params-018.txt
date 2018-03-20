@@ -85,7 +85,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
       _req.attemptAs[PostRequest].value.flatMap{
         case Right(req) =>
           post(_req, req.id, req.model, req.enum, req.opt, req.list, req.map).flatMap {
-            case PostResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+            case PostResponse.HTTP200(headers) => Ok(headers: _*)
           }
         case Left(_) => BadRequest()
       }
@@ -101,7 +101,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
               map <- req.getFirst("map").flatMap(f => _root_.io.circe.parser.decode[Map[String, String]](f).toOption)
             } yield {
                 post(_req, id, model, enum, opt, list, map).flatMap {
-                  case PostResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+                  case PostResponse.HTTP200(headers) => Ok(headers: _*)
                 }
               }
             responseOpt.getOrElse(BadRequest())

@@ -101,7 +101,9 @@ object TestHelper extends Matchers {
     run.cancel
     val parser = global.newUnitParser(scalaSourceCode)
     parser.parse()
-    reporter.errorCount shouldBe 0
+    withClue(reporter.infos.toString) {
+      reporter.errorCount shouldBe 0
+    }
   }
 
   def assertEqualsFile(filename: String, contents: String): Unit = {
