@@ -325,7 +325,7 @@ case class Play2Json(
 
           s"$path.$reader"
         }
-        case (datatype, Some(default)) if field.required => {
+        case (datatype, Some(default)) if !field.required => {
           val path = s"""(__ \\ "${field.originalName}")"""
           val reader = {
             if (beLazy)
