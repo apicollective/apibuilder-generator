@@ -338,7 +338,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
 
   def originalName: String = field.name
 
-  val `type`: Datatype = ssd.datatypeResolver.parse(field.`type`, required).getOrElse {
+  val `type`: Datatype = ssd.datatypeResolver.parse(field.`type`, required || field.default.isDefined).getOrElse {
     sys.error(ssd.errorParsingType(field.`type`, s"model[$modelName] field[$name]"))
   }
 
