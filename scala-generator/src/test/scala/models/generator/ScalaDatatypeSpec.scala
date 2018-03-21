@@ -49,6 +49,17 @@ class ScalaDatatypeSpec extends FunSpec with Matchers {
     nestMap(string, 3).toVariableName should be("values")
   }
 
+  it("DateIso8601Joda sanity check") {
+    DateIso8601Joda.asString("myVar") shouldBe "myVar.toString"
+    DateIso8601Joda.default("2020-12-31") shouldBe "new _root_.org.joda.time.LocalDate(2020, 12, 31)"
+    DateIso8601Joda.name shouldBe "_root_.org.joda.time.LocalDate"
+  }
+
+  it("DateIso8601Java sanity check") {
+    DateIso8601Java.asString("myVar") shouldBe "myVar.toString"
+    DateIso8601Java.default("2020-12-31") shouldBe "_root_.java.time.LocalDate.parse(\"2020-12-31\")"
+    DateIso8601Java.name shouldBe "_root_.java.time.LocalDate"
+  }
 }
 
 
