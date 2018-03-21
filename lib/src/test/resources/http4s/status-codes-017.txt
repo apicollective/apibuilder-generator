@@ -45,6 +45,7 @@ trait FooRoutes {
   object Get200Response {
     case class HTTP200(value: String, headers: Seq[org.http4s.Header] = Nil) extends Get200Response
     case class HTTP401(challenge: org.http4s.Challenge, challenges: Seq[org.http4s.Challenge] = Nil, headers: Seq[org.http4s.Header] = Nil) extends Get200Response
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends Get200Response
   }
 
   def get200(
@@ -55,6 +56,7 @@ trait FooRoutes {
 
   object Get205Response {
     case class HTTP205(headers: Seq[org.http4s.Header] = Nil) extends Get205Response
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends Get205Response
   }
 
   def get205(
@@ -65,6 +67,7 @@ trait FooRoutes {
 
   object Get300Response {
     case class HTTP300(location: org.http4s.Uri, headers: Seq[org.http4s.Header] = Nil) extends Get300Response
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends Get300Response
   }
 
   def get300(
@@ -75,6 +78,7 @@ trait FooRoutes {
 
   object Get401Response {
     case class HTTP401(value: String, challenge: org.http4s.Challenge, challenges: Seq[org.http4s.Challenge] = Nil, headers: Seq[org.http4s.Header] = Nil) extends Get401Response
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends Get401Response
   }
 
   def get401(
@@ -88,21 +92,25 @@ trait FooRoutes {
       get200(_req).flatMap {
         case Get200Response.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
         case Get200Response.HTTP401(challenge, challenges, headers) => Unauthorized(challenge, challenges: _*).putHeaders(headers: _*)
+        case Get200Response.UndocumentedResponse(response) => response
       }
 
     case _req @ GET -> Root / "foos" / "205" if apiVersionMatch(_req) =>
       get205(_req).flatMap {
         case Get205Response.HTTP205(headers) => ResetContent().putHeaders(headers: _*)
+        case Get205Response.UndocumentedResponse(response) => response
       }
 
     case _req @ GET -> Root / "foos" / "300" if apiVersionMatch(_req) =>
       get300(_req).flatMap {
         case Get300Response.HTTP300(location, headers) => MultipleChoices(location).putHeaders(headers: _*)
+        case Get300Response.UndocumentedResponse(response) => response
       }
 
     case _req @ GET -> Root / "foos" / "401" if apiVersionMatch(_req) =>
       get401(_req).flatMap {
         case Get401Response.HTTP401(value, challenge, challenges, headers) => Unauthorized(challenge, challenges: _*).putHeaders(headers: _*)
+        case Get401Response.UndocumentedResponse(response) => response
       }
   }
 }

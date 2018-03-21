@@ -59,7 +59,9 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
     val responses = statusCodes.map { s =>
       s"""case class HTTP${s.code}(${s.responseParams(config)}) extends $responseTrait""".stripMargin
-    }
+    } ++ Seq(
+      s"""case class UndocumentedResponse(response: ${config.asyncType}[${config.responseClass}]) extends $responseTrait""".stripMargin
+    )
 
     val params =
       Seq(Some(s"_req: ${config.requestClass}")) ++
@@ -134,7 +136,10 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       statusCodes.map { case s =>
         s"    case $responseTrait.HTTP${s.code}(${s.responseExtractor(config)}) => ${s.name}(${s.applyArgs(config)})"
       } ++
-      Seq(s"  }")
+      Seq(
+        s"    case $responseTrait.UndocumentedResponse(response) => response",
+        s"  }"
+      )
     }
 
     val prefix = Seq(s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>")

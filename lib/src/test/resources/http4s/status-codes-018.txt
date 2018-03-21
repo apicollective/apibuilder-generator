@@ -44,6 +44,7 @@ trait FooRoutes[F[_]] extends Matchers[F] {
   object Get200Response {
     case class HTTP200(value: String, headers: Seq[org.http4s.Header] = Nil) extends Get200Response
     case class HTTP401(authenticate: org.http4s.headers.`WWW-Authenticate`, headers: Seq[org.http4s.Header] = Nil) extends Get200Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get200Response
   }
 
   def get200(
@@ -54,6 +55,7 @@ trait FooRoutes[F[_]] extends Matchers[F] {
 
   object Get205Response {
     case class HTTP205(headers: Seq[org.http4s.Header] = Nil) extends Get205Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get205Response
   }
 
   def get205(
@@ -64,6 +66,7 @@ trait FooRoutes[F[_]] extends Matchers[F] {
 
   object Get300Response {
     case class HTTP300(location: org.http4s.Uri, headers: Seq[org.http4s.Header] = Nil) extends Get300Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get300Response
   }
 
   def get300(
@@ -74,6 +77,7 @@ trait FooRoutes[F[_]] extends Matchers[F] {
 
   object Get401Response {
     case class HTTP401(value: String, authenticate: org.http4s.headers.`WWW-Authenticate`, headers: Seq[org.http4s.Header] = Nil) extends Get401Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get401Response
   }
 
   def get401(
@@ -87,21 +91,25 @@ trait FooRoutes[F[_]] extends Matchers[F] {
       get200(_req).flatMap {
         case Get200Response.HTTP200(value, headers) => Ok(value, headers: _*)
         case Get200Response.HTTP401(authenticate, headers) => Unauthorized(authenticate, headers: _*)
+        case Get200Response.UndocumentedResponse(response) => response
       }
 
     case _req @ GET -> Root / "foos" / "205" if apiVersionMatch(_req) =>
       get205(_req).flatMap {
         case Get205Response.HTTP205(headers) => ResetContent(headers: _*)
+        case Get205Response.UndocumentedResponse(response) => response
       }
 
     case _req @ GET -> Root / "foos" / "300" if apiVersionMatch(_req) =>
       get300(_req).flatMap {
         case Get300Response.HTTP300(location, headers) => MultipleChoices(location, headers: _*)
+        case Get300Response.UndocumentedResponse(response) => response
       }
 
     case _req @ GET -> Root / "foos" / "401" if apiVersionMatch(_req) =>
       get401(_req).flatMap {
         case Get401Response.HTTP401(value, authenticate, headers) => Unauthorized(authenticate, value, headers: _*)
+        case Get401Response.UndocumentedResponse(response) => response
       }
   }
 }
