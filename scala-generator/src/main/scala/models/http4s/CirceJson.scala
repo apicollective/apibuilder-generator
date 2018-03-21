@@ -149,26 +149,44 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
   private[models] def decodersAndEncoders(model: ScalaModel): String = {
     decoders(model) ++ "\n\n" ++ encoders(model)
   }
+  
   private[models] def decoders(model: ScalaModel): String = {
+    // backticks don't work correctly as enumerator names in for comprehensions
+    def nobt(fieldName:String) = fieldName.replaceAll("`", "__")
     Seq(
       s"${implicitDecoderDef(model.name)} = Decoder.instance { c =>",
       s" for {",
       model.fields.map { field =>
         field.datatype match {
           case ScalaDatatype.Option(inner) => {
-            s"""${field.name} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
+            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
+          }
+          case datatype if field.default.isDefined && !field.required => {
+            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${datatype.name}]]"""
           }
           case datatype => {
-            s"""${field.name} <- c.downField("${field.originalName}").as[${datatype.name}]"""
+            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[${datatype.name}]"""
           }
         }
       }.mkString("\n").indent(4),
       s"  } yield {",
-      s"    ${model.name}(",
-      model.fields.map { field =>
-        s"""${field.name} = ${field.name}"""
+      s"    val ret = ${model.name}(",
+
+      model
+        .fields
+        .filter(f=> f.default.isEmpty || f.required)
+        .map {field =>
+        s"""${nobt(field.name)} = ${field.name}"""
       }.mkString(",\n").indent(6),
+
       s"    )",
+      s"    Some(ret)",
+      model.fields
+        .filter(f=> f.default.isDefined && !f.required)
+        .map{ field =>
+          s""".map(m=> ${nobt(field.name)}.map(d=> m.copy(${field.name}=d)).getOrElse(m))"""
+        }.mkString("\n").indent(6),
+      s"      .get",
       s"  }",
       s"}"
     ).mkString("\n")
@@ -179,7 +197,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"${implicitEncoderDef(model.name)} = Encoder.instance { t =>",
       s"  Json.fromFields(Seq(",
       model.fields.map { field =>
-        if (field.required) {
+        if (field.required || field.default.isDefined) {
           s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
         } else {
           s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""

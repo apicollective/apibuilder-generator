@@ -1,11 +1,11 @@
 package models
 
-import go.models.GoClientGenerator
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{FunSpec, Matchers}
+import ruby.models.RubyClientGenerator
 
-class DefaultsSpec extends FunSpec with Matchers {
-  it("") {
+class RubyReceiverDefaultsSpec extends FunSpec with Matchers {
+  it("should produce models with defaults") {
     val json = models.TestHelper.buildJson(
       """
       "imports": [],
@@ -35,7 +35,7 @@ class DefaultsSpec extends FunSpec with Matchers {
               "name": "guid",
               "type": "uuid",
               "required": false,
-              "default" : "abcd-ef01-2345-6789-abcd",
+              "default" : "abcdef01-2345-6789-abcd-ef0123456789",
               "attributes": []
           }, {
               "name": "name",
@@ -106,7 +106,21 @@ class DefaultsSpec extends FunSpec with Matchers {
 
     val form = InvocationForm(models.TestHelper.service(json.format()))
 
-    val Right(res) = GoClientGenerator.invoke(form)
-    println(res)
+    val Right(res) = RubyClientGenerator.invoke(form)
+
+    res.head.contents.contains("""            def initialize(incoming={})
+                                 |              opts = HttpClient::Helper.symbolize_keys(incoming)
+                                 |              @guid = HttpClient::Preconditions.assert_class('guid', HttpClient::Helper.to_uuid((x = opts.delete(:guid); x.nil? ? UUID.new("abcdef01-2345-6789-abcd-ef0123456789") : x)), String)
+                                 |              @name = HttpClient::Preconditions.assert_class('name', (x = opts.delete(:name); x.nil? ? "M3" : x), String)
+                                 |              @type = (x = (x = opts.delete(:type); x.nil? ? "coupe" : x); x.is_a?(::Test::Apidoc::Apidoctest::V0::Models::CarType) ? x : ::Test::Apidoc::Apidoctest::V0::Models::CarType.apply(x))
+                                 |              @curb_weight = HttpClient::Preconditions.assert_class('curb_weight', (x = opts.delete(:curb_weight); x.nil? ? 3500 : x), Integer)
+                                 |              @serial = HttpClient::Preconditions.assert_class('serial', (x = opts.delete(:serial); x.nil? ? 45678901234 : x), Integer)
+                                 |              @final_drive = HttpClient::Preconditions.assert_class('final_drive', (x = opts.delete(:final_drive); x.nil? ? 3.85 : x), Numeric)
+                                 |              @msrp = HttpClient::Preconditions.assert_class('msrp', HttpClient::Helper.to_big_decimal((x = opts.delete(:msrp); x.nil? ? 45999.99 : x)), BigDecimal)
+                                 |              @is_flashy = HttpClient::Preconditions.assert_boolean('is_flashy', (x = opts.delete(:is_flashy); x.nil? ? true : x))
+                                 |              @markets = HttpClient::Preconditions.assert_class('markets', (x = opts.delete(:markets); x.nil? ? ["USA","CAN"] : x), Array).map { |v| HttpClient::Preconditions.assert_class('markets', v, String) }
+                                 |              @launched_on = HttpClient::Preconditions.assert_class('launched_on', HttpClient::Helper.to_date_iso8601((x = opts.delete(:launched_on); x.nil? ? Date.parse("1986-02-01") : x)), Date)
+                                 |              @timestamp = HttpClient::Preconditions.assert_class('timestamp', HttpClient::Helper.to_date_time_iso8601((x = opts.delete(:timestamp); x.nil? ? DateTime.parse("2018-03-21T02:20:52+00:00") : x)), DateTime)
+                                 |            end""".stripMargin) should be(true)
   }
 }

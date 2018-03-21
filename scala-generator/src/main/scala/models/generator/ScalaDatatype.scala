@@ -118,7 +118,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue): String = toBigDecimal(json).toLong.toString
+    override protected def default(json: JsValue): String = toBigDecimal(json).toLong.toString + 'L'
   }
 
   case object DateIso8601Joda extends ScalaPrimitive {
