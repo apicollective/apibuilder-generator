@@ -64,7 +64,7 @@ package com.gilt.test.v0.models {
     implicit def jsonReadsTestUser: play.api.libs.json.Reads[User] = {
       (
         (__ \ "email").read[String] and
-        (__ \ "role").readWithDefault[String]("admin") and
+        (__ \ "role").read[String] and
         (__ \ "groups").read[Seq[String]] and
         (__ \ "permissions").read[Seq[String]]
       )(User.apply _)
@@ -90,8 +90,8 @@ package com.gilt.test.v0.models {
     implicit def jsonReadsTestUserPatch: play.api.libs.json.Reads[UserPatch] = {
       (
         (__ \ "groups").readNullable[Seq[String]] and
-        (__ \ "permissions").readWithDefault[Seq[String]](Nil) and
-        (__ \ "preferences").readWithDefault[Seq[String]](scala.List("foo"))
+        (__ \ "permissions").read[Seq[String]] and
+        (__ \ "preferences").read[Seq[String]]
       )(UserPatch.apply _)
     }
 
