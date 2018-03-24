@@ -408,8 +408,8 @@ trait ModelRoutes {
         case GetStringByIdResponse.UndocumentedResponse(response) => response
       }
 
-    case _req @ GET -> Root / "named_string" / named_id if apiVersionMatch(_req) =>
-      getNamedStringByNamedId(_req, named_id).flatMap {
+    case _req @ GET -> Root / "named_string" / namedId if apiVersionMatch(_req) =>
+      getNamedStringByNamedId(_req, namedId).flatMap {
         case GetNamedStringByNamedIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
         case GetNamedStringByNamedIdResponse.UndocumentedResponse(response) => response
       }
@@ -534,8 +534,8 @@ trait ModelRoutes {
         case GetEnumByIdResponse.UndocumentedResponse(response) => response
       }
 
-    case _req @ GET -> Root / "named_enum" / EnumVal(named_id) if apiVersionMatch(_req) =>
-      getNamedEnumByNamedId(_req, named_id).flatMap {
+    case _req @ GET -> Root / "named_enum" / EnumVal(namedId) if apiVersionMatch(_req) =>
+      getNamedEnumByNamedId(_req, namedId).flatMap {
         case GetNamedEnumByNamedIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
         case GetNamedEnumByNamedIdResponse.UndocumentedResponse(response) => response
       }
