@@ -142,7 +142,9 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       )
     }
 
-    val prefix = Seq(s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>")
+    def prefix(filter: String) = s"case _req @ ${op.method} -> $path$queryStart$query$filter =>"
+
+    val verFilterPrefix = Seq(prefix(verFilter))
 
     val decodingParameters:Seq[String] = {
       op.nonHeaderParameters.map { field =>
@@ -188,7 +190,11 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       route("")
     }
 
-    prefix ++ decoding
+    val missingVersionHeaderCase = version.fold(Seq(""))(_ =>
+                                                  Seq(prefix(s" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined") ++ "\n" ++
+                                                    s"""  BadRequest(s"Missing required request header: $${ApiVersion.ApiVersionMajor}.")"""))
+
+    verFilterPrefix ++ decoding ++ missingVersionHeaderCase
 
   }
 
