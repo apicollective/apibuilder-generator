@@ -93,23 +93,31 @@ trait FooRoutes[F[_]] extends Matchers[F] {
         case Get200Response.HTTP401(authenticate, headers) => Unauthorized(authenticate, headers: _*)
         case Get200Response.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "foos" / "200" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "foos" / "205" if apiVersionMatch(_req) =>
       get205(_req).flatMap {
         case Get205Response.HTTP205(headers) => ResetContent(headers: _*)
         case Get205Response.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "foos" / "205" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "foos" / "300" if apiVersionMatch(_req) =>
       get300(_req).flatMap {
         case Get300Response.HTTP300(location, headers) => MultipleChoices(location, headers: _*)
         case Get300Response.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "foos" / "300" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "foos" / "401" if apiVersionMatch(_req) =>
       get401(_req).flatMap {
         case Get401Response.HTTP401(value, authenticate, headers) => Unauthorized(authenticate, value, headers: _*)
         case Get401Response.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "foos" / "401" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }
