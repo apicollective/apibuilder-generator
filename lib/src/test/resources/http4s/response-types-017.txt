@@ -111,26 +111,36 @@ trait ModelRoutes {
       getString(_req).flatMap {
         case GetStringResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
       }
+    case _req @ GET -> Root / "string" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "enum" if apiVersionMatch(_req) =>
       getEnum(_req).flatMap {
         case GetEnumResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
       }
+    case _req @ GET -> Root / "enum" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "model" if apiVersionMatch(_req) =>
       getModel(_req).flatMap {
         case GetModelResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
       }
+    case _req @ GET -> Root / "model" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "list" if apiVersionMatch(_req) =>
       getList(_req).flatMap {
         case GetListResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
       }
+    case _req @ GET -> Root / "list" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "map" if apiVersionMatch(_req) =>
       getMap(_req).flatMap {
         case GetMapResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
       }
+    case _req @ GET -> Root / "map" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "multiple" if apiVersionMatch(_req) =>
       getMultiple(_req).flatMap {
@@ -140,7 +150,7 @@ trait ModelRoutes {
         case GetMultipleResponse.HTTP204(headers) => NoContent().putHeaders(headers: _*)
         case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value).putHeaders(headers: _*)
       }
-    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+    case _req @ GET -> Root / "multiple" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

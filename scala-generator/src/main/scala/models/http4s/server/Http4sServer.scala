@@ -112,8 +112,6 @@ case class Http4sServer(form: InvocationForm,
          |
          |  def service()${config.asyncTypeParam().map(p => s"(implicit sync: Sync[F])").getOrElse("")} = ${config.httpServiceClass} {
          |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indent(4)}
-         |    case _req if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
-         |      BadRequest(s"Missing required request header: $${ApiVersion.ApiVersionMajor}.")
          |  }
          |}
          |""".stripMargin
