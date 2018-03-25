@@ -11,12 +11,7 @@
   },
   "namespace": "me.gheine.foo.v0",
   "version": "0.0.1-dev",
-  "info": {
-    "contact": {
-      "name": "Team WHAM!",
-      "url": "#wham"
-    }
-  },
+  "info": {},
   "headers": [],
   "imports": [],
   "enums": [],
@@ -87,15 +82,12 @@
               "attributes": []
             }
           ],
-          "attributes": [],
-          "description": "Healthcheck endpoint"
+          "attributes": []
         }
       ],
       "attributes": [],
       "path": "/foo/:snake_path/:kebab-path"
     }
   ],
-  "attributes": [],
-  "base_url": "https://localhost.com",
-  "description": "An Inventory API for all HBC banners"
+  "attributes": []
 }
