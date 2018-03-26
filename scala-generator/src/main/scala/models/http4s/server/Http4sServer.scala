@@ -46,9 +46,9 @@ object Http4sServer {
           val minPart = param.param.minimum.fold("")(v => s"$v")
           val maxPart = param.param.maximum.fold("")(v => s"To$v")
           val defPart = param.param.default.fold("")(v => s"Def${ScalaUtil.toClassName(v)}")
-          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}$minPart$maxPart${defPart}Matcher", ScalaUtil.quoteNameIfKeyword(param.name))
+          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}$minPart$maxPart${defPart}Matcher", param.asScalaVal)
         case sp: ScalaPrimitive =>
-          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}Matcher", ScalaUtil.quoteNameIfKeyword(param.name))
+          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}Matcher", param.asScalaVal)
         case ScalaDatatype.List(nested) =>
           val extractor = recurse(nested, "List", false)
           QueryExtractor(extractor.name, s"cats.data.Validated.Valid(${extractor.handler})")
