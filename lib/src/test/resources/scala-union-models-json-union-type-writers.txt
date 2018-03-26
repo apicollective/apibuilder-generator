@@ -6,8 +6,8 @@ def jsObjectUser(obj: test.apidoc.apidoctest.v0.models.User): play.api.libs.json
   }
 }
 
-implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = {
-  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.User] {
+implicit def jsonWritesApiDocTestUser: play.api.libs.json.OWrites[User] = {
+  new play.api.libs.json.OWrites[test.apidoc.apidoctest.v0.models.User] {
     def writes(obj: test.apidoc.apidoctest.v0.models.User) = {
       jsObjectUser(obj)
     }
