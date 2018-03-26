@@ -492,12 +492,12 @@ trait ModelRoutes {
     case _req @ GET -> Root / "string" :? IdStringMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
-    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(named_id) if apiVersionMatch(_req) =>
-      getNamedString(_req, named_id).flatMap {
+    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(namedId) if apiVersionMatch(_req) =>
+      getNamedString(_req, namedId).flatMap {
         case GetNamedStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
         case GetNamedStringResponse.UndocumentedResponse(response) => response
       }
-    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(named_id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(namedId) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "string_with_min" :? IdString10Matcher(id) if apiVersionMatch(_req) =>
@@ -708,12 +708,12 @@ trait ModelRoutes {
     case _req @ GET -> Root / "enum" :? IdEnumMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
-    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(named_id) if apiVersionMatch(_req) =>
-      getNamedEnum(_req, named_id).flatMap {
+    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(namedId) if apiVersionMatch(_req) =>
+      getNamedEnum(_req, namedId).flatMap {
         case GetNamedEnumResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
         case GetNamedEnumResponse.UndocumentedResponse(response) => response
       }
-    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(named_id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(namedId) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "enum_with_min_and_max" :? IdEnum10To30DefValueMatcher(id) if apiVersionMatch(_req) =>
