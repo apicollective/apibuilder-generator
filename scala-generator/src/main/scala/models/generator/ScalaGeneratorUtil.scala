@@ -79,10 +79,10 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
     } else {
       val listParams = params.map(p => p -> p.datatype).collect {
         case (p, ScalaDatatype.Option(ScalaDatatype.List(inner))) => {
-          s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.getOrElse(Nil).map("${p.originalName}" -> ${inner.asString("_")})"""
+          s"""  ${p.asScalaVal}.getOrElse(Nil).map("${p.originalName}" -> ${inner.asString("_")})"""
         }
         case (p, ScalaDatatype.List(inner)) => {
-          s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${inner.asString("_")})"""
+          s"""  ${p.asScalaVal}.map("${p.originalName}" -> ${inner.asString("_")})"""
         }
       }
       val arrayParamString = listParams.mkString(" ++\n")
@@ -93,7 +93,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
           s"val $fieldName = Seq(",
           singleValueParams.map(p => p -> p.datatype).collect {
             case (p, ScalaDatatype.Option(inner)) => {
-              s"""  ${ScalaUtil.quoteNameIfKeyword(p.name)}.map("${p.originalName}" -> ${inner.asString("_")})"""
+              s"""  ${p.asScalaVal}.map("${p.originalName}" -> ${inner.asString("_")})"""
             }
             case (p, dt) => s"""  Some("${p.originalName}" -> ${dt.asString(p.name)})"""
           }.mkString(",\n"),
@@ -117,7 +117,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
   def pathParams(op: ScalaOperation): String = {
     val pairs = op.pathParameters.map { p =>
       require(p.location == ParameterLocation.Path, "Only singletons can be path parameters.")
-      p.originalName -> PathParamHelper.urlEncode(p.name, p.datatype)
+      p.originalName -> PathParamHelper.urlEncode(p.asScalaVal, p.datatype)
     }
     val tmp: String = pairs.foldLeft(op.path) {
       case (path, (name, value)) =>
@@ -154,8 +154,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
 
     } else {
       val params = op.formParameters.map { param =>
-        val varName = ScalaUtil.quoteNameIfKeyword(param.name)
-        val value = encodeValue(varName, param.datatype)
+        val value = encodeValue(param.asScalaVal, param.datatype)
         s""""${param.originalName}" -> play.api.libs.json.Json.toJson(${value})"""
       }.mkString(",\n")
       Some(
