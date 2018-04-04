@@ -107,7 +107,13 @@ class ScalaClientMethodGenerator (
           if (response.isUnit) {
             s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r.${config.responseStatusMethod}))"
           } else {
-            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))"
+            config match {
+              case _@(_: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015) =>
+                s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))"
+              case _ =>
+                val json = config.toJson("r", response.datatype.name)
+                s"case r => $json.flatMap(body => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r, None, body)))"
+            }
           }
         }
         case None => {
@@ -145,7 +151,13 @@ class ScalaClientMethodGenerator (
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r.${config.responseStatusMethod}))")
 
                 } else {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))")
+                  config match {
+                    case _@(_: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015) =>
+                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))")
+                    case _ =>
+                      val json = config.toJson("r", response.datatype.name)
+                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json.flatMap(body => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r, None, body)))")
+                  }
                 }
               }
             }
@@ -169,6 +181,31 @@ class ScalaClientMethodGenerator (
     }
   }
 
+  private def errorClasses(): Seq[String] =
+    ssd.resources.flatMap(_.operations).flatMap(_.responses).filter(r => !r.isSuccess).map { response =>
+      require(!response.isSuccess)
+      if (response.isUnit) {
+        unitExceptionClass(response.errorClassName)
+      } else {
+        exceptionClass(response.errorClassName, response.datatype.name, response.errorVariableName)
+      }
+    }.distinct.sorted
+
+  private def exceptionClass(
+                                className: String,
+                                responseDataType: String,
+                                variableName: Option[String]
+                              ): String = {
+
+    Seq(
+      s"case class $className(",
+      s"  response: ${config.responseClass},",
+      s"  message: Option[String] = None" + variableName.map(v => s",\n  $v: $responseDataType").getOrElse(""),
+      s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))"""
+    ).mkString("\n")
+
+  }
+
   override protected def modelErrorClasses(): Seq[String] =
     config match {
       case _ @ (_:ScalaClientMethodConfigs.Http4s017 | _:ScalaClientMethodConfigs.Http4s015) => super.modelErrorClasses()
@@ -178,7 +215,7 @@ class ScalaClientMethodGenerator (
   def modelErrors(): String =
     config match {
       case _ @ (_:ScalaClientMethodConfigs.Http4s017 | _:ScalaClientMethodConfigs.Http4s015) => ""
-      case _ => s"\n\nobject errors {\n\n${super.modelErrorClasses().mkString("\n\n")}\n}"
+      case _ => s"\n\nobject errors {\n\n${errorClasses().mkString("\n\n")}\n}"
     }
 
 }
