@@ -32,6 +32,18 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
     }
   """
 
+  val capModel = """
+    {
+      "name": "name",
+      "plural": "names",
+      "attributes": [],
+      "fields": [
+        { "name": "First", "type": "string", "required": false, "attributes": [] },
+        { "name": "Last", "type": "string", "required": false, "attributes": [] }
+      ]
+    }
+  """
+
   case class ServiceBuilder(
     unions: Seq[String] = Nil,
     models: Seq[String] = Nil,
@@ -116,6 +128,20 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
         files.map(_.name) should be(fileNames)
         models.TestHelper.assertEqualsFile("/generator/anorm/name-conversions-26.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/name.txt", files.last.contents)
+      }
+    }
+  }
+
+  it("model with capitalized fields") {
+    val form = ServiceBuilder(models = Seq(capModel)).form
+    ParserGenerator26.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(fileNames)
+        models.TestHelper.assertEqualsFile("/generator/anorm/cap-name-conversions-26.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/cap-name.txt", files.last.contents)
       }
     }
   }

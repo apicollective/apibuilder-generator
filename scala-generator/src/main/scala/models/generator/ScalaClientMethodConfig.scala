@@ -171,7 +171,7 @@ private lazy val defaultAsyncHttpClient = {
   }
 
 
-  trait Http4s extends ScalaClientMethodConfig {
+  sealed trait Http4s extends ScalaClientMethodConfig {
     override def pathEncode(value: String): String = value
     override val responseStatusMethod = "status.code"
     override val responseBodyMethod = """body"""
@@ -184,7 +184,6 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 """)
     override val canSerializeUuid = true
     override val implicitArgs: Option[String] = None
-    override val asyncType: String = "scalaz.concurrent.Task"
     override val asyncSuccess: String = "now"
     override val requestUriMethod: Option[String] = None //Some("getUri.toJavaNetURI")
     override val expectsInjectedWsClient = false
@@ -213,7 +212,6 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
                                              |def closeAsyncHttpClient(): Unit = {
                                              |  asyncHttpClient.shutdownNow()
                                              |}""".stripMargin)
-    def headerString(prefix: String): String
     def matchersImport: String
     def httpClient: String
   }
@@ -224,7 +222,6 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "scalaz.\\/-"
     override val monadTransformerInvoke = "run"
     override def asyncFailure: String = "fail"
-    override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
     override val matchersImport: String = "\n  import Matchers._\n"
     override val httpClient: String = "asyncHttpClient"
   }
@@ -235,7 +232,6 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
     override def asyncFailure: String = "fail"
-    override def headerString(prefix: String): String = ").putHeaders(headers: _*)"
 
     override val matchersImport: String = "\n  import Matchers._\n"
     override val httpClient: String = "asyncHttpClient"
@@ -276,7 +272,6 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
                                            |import cats.implicits._""".stripMargin
 
     override val closeClient = None
-    override def headerString(prefix: String) = s"${prefix}headers: _*))"
 
     override val matcherKind: String = "trait"
     override val matchersImport: String = ""

@@ -4,10 +4,11 @@ import scala.generator.mock.MockClientGenerator
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
 
-import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfigs}
+import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
 import scala.models.ApidocComments
 import scala.models.http4s.server.Http4sServer
 import generator.ServiceFileNames
+import models.http4s.mock.Http4s018MockClientGenerator
 
 object Http4s015Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s015(namespace, baseUrl)
@@ -19,10 +20,16 @@ object Http4s017Generator extends Generator {
 
 object Http4s018Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s018(namespace, baseUrl)
+
+  override def generateMockClientCode(form: InvocationForm, ssd: ScalaService, config: ScalaClientMethodConfig): String =
+    new Http4s018MockClientGenerator(ssd, form.userAgent, config).generateCode()
 }
 
 trait Generator extends CodeGenerator {
   def mkConfig(namespace: String, baseUrl: Option[String]): ScalaClientMethodConfigs.Http4s
+
+  def generateMockClientCode(form: InvocationForm, ssd: ScalaService, config: ScalaClientMethodConfig) =
+    new MockClientGenerator(ssd, form.userAgent, config).generateCode()
 
   override def invoke(form: InvocationForm) = Right(generateCode(form = form, addHeader = true))
 
@@ -41,7 +48,7 @@ trait Generator extends CodeGenerator {
     val caseClasses = header + ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
     val json = CirceJson(ssd).generate()
     val client = Http4sClient(form, ssd, config).generate()
-    val mock = header + new MockClientGenerator(ssd, form.userAgent, config).generateCode()
+    val mock = header + generateMockClientCode(form, ssd, config)
 
     val modelAndJson =
       s"""$caseClasses

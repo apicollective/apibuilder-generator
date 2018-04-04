@@ -62,8 +62,8 @@ class KotlinUtilTest
     dataTypeFromField("boolean", "com.foobar.example").toString should be ("kotlin.Boolean")
     dataTypeFromField("long", "com.foobar.example").toString should be ("kotlin.Long")
     dataTypeFromField("uuid", "com.foobar.example").toString should be ("java.util.UUID")
-    dataTypeFromField("date-iso8601", "com.foobar.example").toString should be ("org.joda.time.DateTime")
-    dataTypeFromField("date-time-iso8601", "com.foobar.example").toString should be ("org.joda.time.DateTime")
+    dataTypeFromField("date-iso8601", "com.foobar.example").toString should be ("org.threeten.bp.LocalDate")
+    dataTypeFromField("date-time-iso8601", "com.foobar.example").toString should be ("org.threeten.bp.Instant")
   }
 
   "isModelNameWithPackage" should "return correctly" in {
@@ -83,7 +83,8 @@ class KotlinUtilTest
 
   it should "handle maps" in {
     dataTypeFromField("map[long]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, kotlin.Long>")
-    dataTypeFromField("map[date-time-iso8601]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, org.joda.time.DateTime>")
+    dataTypeFromField("map[date-time-iso8601]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, org.threeten.bp.Instant>")
+    dataTypeFromField("map[date-iso8601]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, org.threeten.bp.LocalDate>")
     dataTypeFromField("map[string]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, kotlin.String>")
     dataTypeFromField("map[CustomType]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, com.foobar.example.CustomType>")
   }

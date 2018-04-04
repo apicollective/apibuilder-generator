@@ -51,15 +51,6 @@ case class NingClientGenerator(
     Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Client", source, Some("Scala")))
   }
 
-  private[ning] def toJson(klass: String): String = {
-    Seq(
-      s"""play.api.libs.json.Json.parse(response.getResponseBody("UTF-8")).validate[${klass}] match {""",
-      s"""  case play.api.libs.json.JsSuccess(x, _) => x""",
-      s"""  case play.api.libs.json.JsError(errors) => sys.error("Invalid json: " + errors.mkString(" "))""",
-      s"}"
-    ).mkString("\n")
-  }
-
   private def client(): String = {
     val headers = Headers(form)
     val headerString = headers.scala.map { case (name, value) =>
@@ -88,7 +79,15 @@ ${methodGenerator.accessors().indent(4)}
 ${methodGenerator.objects().indent(4)}
 
     def _logRequest(request: Request): Unit = {
-      logger.info("_logRequest: " + request)
+      if (logger.isInfoEnabled) {
+        logger.info("_logRequest: " + request)
+      }
+    }
+
+    def _logResponse(response: Response): Unit = {
+      if (logger.isInfoEnabled) {
+        logger.info("_logResponse: status=" + response.getStatusCode + ", responseBody: " + response.${config.responseBodyMethod})
+      }
     }
 
     def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): RequestBuilder = {
@@ -143,7 +142,10 @@ ${headerString.indent(8)}
       val result = scala.concurrent.Promise[com.ning.http.client.Response]()
       asyncHttpClient.executeRequest(finalRequest,
         new AsyncCompletionHandler[Unit]() {
-          override def onCompleted(r: com.ning.http.client.Response) = result.success(r)
+          override def onCompleted(r: com.ning.http.client.Response) = {
+            _logResponse(r)
+            result.success(r)
+          }
           override def onThrowable(t: Throwable) = result.failure(t)
         }
       )

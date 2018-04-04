@@ -54,7 +54,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
       additionalImports.mkString("\n").indent(2),
-      ssd.unions.map { generateUnionTraitWithDocAndDiscriminator }.mkString("\n\n").indent(2),
+      ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(u, ssd.unionsForUnion(u)) }.mkString("\n\n").indent(2),
       "",
       ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
       generatedClasses,
@@ -65,16 +65,16 @@ trait ScalaCaseClasses extends CodeGenerator {
     Seq(ServiceFileNames.toFile(ssd.service.namespace, ssd.service.organization.key, ssd.service.application.key, ssd.service.version, "Models", source, Some("Scala")))
   }
 
-  def generateUnionTraitWithDocAndDiscriminator(union: ScalaUnion): String = {
+  def generateUnionTraitWithDocAndDiscriminator(union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
     val disc = generateUnionDiscriminatorTrait(union) match {
       case None => ""
       case Some(code) => s"\n\n$code"
     }
 
-    ScalaGeneratorUtil.scaladoc(union.description, Nil) + generateUnionTrait(union) + disc
+    ScalaGeneratorUtil.scaladoc(union.description, Nil) + generateUnionTrait(union, unions) + disc
   }
 
-  def generateUnionTrait(union: ScalaUnion): String = {
+  def generateUnionTrait(union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
     // TODO: handle primitive types
 
     Seq(
@@ -82,7 +82,7 @@ trait ScalaCaseClasses extends CodeGenerator {
         case "" => None
         case v => Some(v)
       },
-      Some(s"sealed trait ${union.name} extends _root_.scala.Product with _root_.scala.Serializable")
+      Some(s"sealed trait ${union.name}" + ScalaUtil.extendsClause(unions.map(_.name)).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
     ).flatten.mkString("\n")
   }
 
@@ -100,7 +100,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
     Seq(
       Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
-      Some(s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).map(s => s" $s").getOrElse(""))
+      Some(s"case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(unions.map(_.name)).getOrElse(""))
     ).flatten.mkString("\n")
   }
 

@@ -63,6 +63,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   object GetPathEnumLocalByIdResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetPathEnumLocalByIdResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetPathEnumLocalByIdResponse
   }
 
   def getPathEnumLocalById(
@@ -74,6 +75,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   object GetPathEnumImportedByIdResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetPathEnumImportedByIdResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetPathEnumImportedByIdResponse
   }
 
   def getPathEnumImportedById(
@@ -85,6 +87,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   object GetQueryEnumLocalResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetQueryEnumLocalResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetQueryEnumLocalResponse
   }
 
   def getQueryEnumLocal(
@@ -96,6 +99,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   object GetQueryEnumImportedResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetQueryEnumImportedResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetQueryEnumImportedResponse
   }
 
   def getQueryEnumImported(
@@ -107,6 +111,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   object GetQueryModelLocalResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetQueryModelLocalResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetQueryModelLocalResponse
   }
 
   def getQueryModelLocal(
@@ -118,6 +123,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   object GetQueryModelImportedResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetQueryModelImportedResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetQueryModelImportedResponse
   }
 
   def getQueryModelImported(
@@ -130,32 +136,50 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
   def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
     case _req @ GET -> Root / "path-enum-local" / EnumVal(id) if apiVersionMatch(_req) =>
       getPathEnumLocalById(_req, id).flatMap {
-        case GetPathEnumLocalByIdResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+        case GetPathEnumLocalByIdResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetPathEnumLocalByIdResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "path-enum-local" / EnumVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "path-enum-imported" / IoApibuilderHttp4sImportedModelsEnumVal(id) if apiVersionMatch(_req) =>
       getPathEnumImportedById(_req, id).flatMap {
-        case GetPathEnumImportedByIdResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+        case GetPathEnumImportedByIdResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetPathEnumImportedByIdResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "path-enum-imported" / IoApibuilderHttp4sImportedModelsEnumVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "query-enum-local" :? IdEnumMatcher(id) if apiVersionMatch(_req) =>
       getQueryEnumLocal(_req, id).flatMap {
-        case GetQueryEnumLocalResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+        case GetQueryEnumLocalResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryEnumLocalResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "query-enum-local" :? IdEnumMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "query-enum-imported" :? IdIoApibuilderHttp4sImportedModelsEnumMatcher(id) if apiVersionMatch(_req) =>
       getQueryEnumImported(_req, id).flatMap {
-        case GetQueryEnumImportedResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+        case GetQueryEnumImportedResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryEnumImportedResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "query-enum-imported" :? IdIoApibuilderHttp4sImportedModelsEnumMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "query-model-local" :? IdModelMatcher(id) if apiVersionMatch(_req) =>
       getQueryModelLocal(_req, id).flatMap {
-        case GetQueryModelLocalResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+        case GetQueryModelLocalResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryModelLocalResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "query-model-local" :? IdModelMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "query-model-imported" :? IdIoApibuilderHttp4sImportedModelsModelMatcher(id) if apiVersionMatch(_req) =>
       getQueryModelImported(_req, id).flatMap {
-        case GetQueryModelImportedResponse.HTTP200(headers) => Ok().map(_.putHeaders(headers: _*))
+        case GetQueryModelImportedResponse.HTTP200(headers) => Ok(headers: _*)
+        case GetQueryModelImportedResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "query-model-imported" :? IdIoApibuilderHttp4sImportedModelsModelMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

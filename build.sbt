@@ -34,7 +34,8 @@ lazy val generator = project
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
-    routesImport += "io.apibuilder.generator.v0.Bindables._",
+    routesImport += "io.apibuilder.generator.v0.Bindables.Core._",
+    routesImport += "io.apibuilder.generator.v0.Bindables.Models._",
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
@@ -79,12 +80,13 @@ lazy val kotlinGenerator = project
   .settings(
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.3",
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.3",
+      //"com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.3",
+      "org.threeten" % "threetenbp" % "1.3.6",
       "com.squareup" % "kotlinpoet" % "0.7.0",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
-      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.21" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.4" % "test",
-      "org.mockito" % "mockito-all" % "1.10.19" % "test"
+      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.31" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+      "org.mockito" % "mockito-inline" % "2.15.0" % "test"
     )
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 95.3))
@@ -95,8 +97,8 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "3.0.4" % "test",
-    "org.mockito" % "mockito-all" % "1.10.19" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+    "org.mockito" % "mockito-inline" % "2.15.0" % "test",
     "com.github.javaparser" % "javaparser-core" % "3.5.10" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "com.squareup" % "javapoet" % "1.10.0",

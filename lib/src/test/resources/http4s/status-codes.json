@@ -1,0 +1,122 @@
+{
+  "apidoc": {
+    "version": "0.14.9"
+  },
+  "name": "status-codes",
+  "organization": {
+    "key": "gheine"
+  },
+  "application": {
+    "key": "status-codes"
+  },
+  "namespace": "me.gheine.status.codes.v0",
+  "version": "0.0.1-dev",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [],
+  "models": [
+    {
+      "name": "foo",
+      "plural": "foos",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "foo",
+      "plural": "foos",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/foos/200",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "string",
+              "attributes": []
+            },
+            {
+              "code": {
+                "integer": {
+                  "value": 401
+                }
+              },
+              "type": "unit",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        },
+        {
+          "method": "GET",
+          "path": "/foos/205",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 205
+                }
+              },
+              "type": "string",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        },
+        {
+          "method": "GET",
+          "path": "/foos/300",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 300
+                }
+              },
+              "type": "string",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        },
+        {
+          "method": "GET",
+          "path": "/foos/401",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 401
+                }
+              },
+              "type": "string",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/foos"
+    }
+  ],
+  "attributes": []
+}

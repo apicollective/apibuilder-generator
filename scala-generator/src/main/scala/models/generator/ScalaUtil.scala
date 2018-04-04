@@ -23,7 +23,7 @@ object ScalaUtil {
   def extendsClause(unions: Seq[String]): Option[String] = {
     unions match {
       case Nil => None
-      case _ => Some("extends " + unions.sorted.mkString(" with "))
+      case _ => Some(" extends " + unions.sorted.mkString(" with "))
     }
   }
 
