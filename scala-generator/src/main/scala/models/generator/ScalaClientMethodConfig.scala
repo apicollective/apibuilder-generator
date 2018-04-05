@@ -184,7 +184,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 """)
     override val canSerializeUuid = true
     override val implicitArgs: Option[String] = None
-    override val asyncSuccess: String = "now"
+    override def asyncSuccess: String = "now"
     override val requestUriMethod: Option[String] = None //Some("getUri.toJavaNetURI")
     override val expectsInjectedWsClient = false
     override def formatBaseUrl(url: Option[String]): String = s"val baseUrl: org.http4s.Uri" + url.fold("")(u => s" = org.http4s.Uri.unsafeFromString(${ScalaUtil.wrapInQuotes(u)})")
