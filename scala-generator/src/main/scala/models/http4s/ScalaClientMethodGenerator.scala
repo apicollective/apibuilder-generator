@@ -197,11 +197,13 @@ class ScalaClientMethodGenerator (
                                 variableName: Option[String]
                               ): String = {
 
+    val body = variableName.map(v => s"{\n  lazy val $v = ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(body)\n}").getOrElse("")
+
     Seq(
       s"case class $className(",
       s"  response: ${config.responseClass},",
-      s"  message: Option[String] = None" + variableName.map(v => s",\n  $v: $responseDataType").getOrElse(""),
-      s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))"""
+      s"  message: Option[String] = None" + variableName.map(v => s",\n  body: $responseDataType").getOrElse(""),
+      s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$body"""
     ).mkString("\n")
 
   }
