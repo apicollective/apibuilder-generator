@@ -108,7 +108,7 @@ class ScalaClientMethodGenerator (
             s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r.${config.responseStatusMethod}))"
           } else {
             config match {
-              case _@(_: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015) =>
+              case _: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015 =>
                 s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))"
               case _ =>
                 val json = config.toJson("r", response.datatype.name)
@@ -152,7 +152,7 @@ class ScalaClientMethodGenerator (
 
                 } else {
                   config match {
-                    case _@(_: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015) =>
+                    case _: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015 =>
                       Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new errors.${response.errorClassName}(r))")
                     case _ =>
                       val json = config.toJson("r", response.datatype.name)
@@ -187,26 +187,20 @@ class ScalaClientMethodGenerator (
       if (response.isUnit) {
         unitExceptionClass(response.errorClassName)
       } else {
-        exceptionClass(response.errorClassName, response.datatype.name, response.errorVariableName)
+        val variableName = response.errorVariableName
+        val className = response.errorClassName
+        val responseDataType = response.datatype.name
+
+        val body = variableName.map(v => s"{\n  lazy val $v = ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(body)\n}").getOrElse("")
+
+        Seq(
+          s"case class $className(",
+          s"  response: ${config.responseClass},",
+          s"  message: Option[String] = None" + variableName.map(v => s",\n  body: $responseDataType").getOrElse(""),
+          s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$body"""
+        ).mkString("\n")
       }
     }.distinct.sorted
-
-  private def exceptionClass(
-                                className: String,
-                                responseDataType: String,
-                                variableName: Option[String]
-                              ): String = {
-
-    val body = variableName.map(v => s"{\n  lazy val $v = ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(body)\n}").getOrElse("")
-
-    Seq(
-      s"case class $className(",
-      s"  response: ${config.responseClass},",
-      s"  message: Option[String] = None" + variableName.map(v => s",\n  body: $responseDataType").getOrElse(""),
-      s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$body"""
-    ).mkString("\n")
-
-  }
 
   override protected def modelErrorClasses(): Seq[String] =
     config match {
