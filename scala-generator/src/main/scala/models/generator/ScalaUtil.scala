@@ -85,7 +85,11 @@ object ScalaUtil {
   }
 
   def scalaDefault(value: String, datatype: ScalaDatatype): String = try {
-    datatype.default(value)
+    datatype match {
+      case ScalaDatatype.Option(inner) => s"Some(${inner.default(value)})"
+      case _ => datatype.default(value)
+    }
+
   } catch {
     case e: Exception => {
       throw new RuntimeException(s"parsing default `$value` for datatype $datatype", e)

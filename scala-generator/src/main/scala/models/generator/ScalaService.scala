@@ -3,6 +3,8 @@ package scala.generator
 import io.apibuilder.spec.v0.models._
 import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
+import play.api.libs.json.JsString
+
 import scala.models.Util
 
 object ScalaService {
@@ -127,7 +129,7 @@ case class ScalaUnionType(
 object ScalaUnionType {
 
   def apply(ssd: ScalaService, union: Union, t: UnionType): ScalaUnionType = {
-    val `type` = ssd.datatypeResolver.parse(t.`type`, true).getOrElse {
+    val `type` = ssd.datatypeResolver.parse(t.`type`).getOrElse {
       sys.error(ssd.errorParsingType(t.`type`, s"union type[$t]"))
     }
     val dt: ScalaDatatype = ssd.scalaDatatype(`type`)
@@ -185,7 +187,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 class ScalaBody(ssd: ScalaService, val body: Body) {
 
   val datatype: ScalaDatatype = {
-    val t = ssd.datatypeResolver.parse(body.`type`, true).getOrElse {
+    val t = ssd.datatypeResolver.parse(body.`type`).getOrElse {
       sys.error(ssd.errorParsingType(body.`type`, s"body[$body]"))
     }
     ssd.scalaDatatype(t)
@@ -296,7 +298,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
 
   val code: ResponseCode = response.code
 
-  val `type`: Datatype = ssd.datatypeResolver.parse(response.`type`, true).getOrElse {
+  val `type`: Datatype = ssd.datatypeResolver.parse(response.`type`).getOrElse {
     sys.error(ssd.errorParsingType(response.`type`, s"response[$response]"))
   }
 
@@ -338,7 +340,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
 
   def originalName: String = field.name
 
-  val `type`: Datatype = ssd.datatypeResolver.parse(field.`type`, required || field.default.isDefined).getOrElse {
+  val `type`: Datatype = ssd.datatypeResolver.parse(field.`type`, shouldModelConcreteType).getOrElse {
     sys.error(ssd.errorParsingType(field.`type`, s"model[$modelName] field[$name]"))
   }
 
@@ -346,13 +348,48 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
 
   def description: Option[String] = field.description
 
-  def required: Boolean = field.required
-
   def default: Option[String] = field.default.map(ScalaUtil.scalaDefault(_, datatype))
 
   def definition(varName: String = name): String = {
     datatype.definition(varName, default, field.deprecation)
   }
+
+  /**
+    * A Scala type can be modeled in one of two ways:
+    *  - Wire Friendly, in which the model captures the optionality of data on the wire.
+    *  - Developer Friendly, in which the model ignores optionality if defaults are in play.
+    *
+    * This materializes in the behavior of not-required fields with defaults.
+    *
+    * In a developer friendly model, such fields
+    * are modeled as concrete types (String, List[T], JsObject) as the default implies that an omitted value will be
+    * filled in when marshalling and/or unmarshalling the object, and thus never be null.
+    *
+    * In a wire friendly model, such fields are modeled wrapped in an Option. If omitted when creating the model, a default
+    * will be applied, and a default will be applied when unmarshalling the object as well. The Option exists so that a
+    * sender can choose to omit the data (rather than applying a sender-side default) and thus defer the defaulting
+    * behavior to the server.
+    *
+    * The global default is developer friendly. Wire friendly behavior can be introduced to any field by adding an
+    * attribute to the field's spec, <pre>"attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]</pre>
+    */
+  def shouldModelConcreteType: Boolean = {
+    val wireFriendly = field.attributes.exists(a =>
+      a.name == "scala_generator" &&
+        a.value.fields.exists(
+          f=> f._1 == "model_hint" && f._2 == JsString("wire_friendly")
+        )
+    )
+
+    (field.required, field.default, wireFriendly) match {
+      case (true,  _,       _)     => true
+      case (false, None,    _)     => false
+      case (false, Some(_), true)  => false
+      case (false, Some(_), false) => true
+    }
+  }
+
+  def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.nonEmpty
 }
 
 class ScalaParameter(ssd: ScalaService, val param: Parameter) {

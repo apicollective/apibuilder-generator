@@ -97,7 +97,7 @@ case class DatatypeResolver(
     * 
     * @param value: Examples: "string", "uuid"
     */
-  def parse(value: String, required: Boolean): Try[Datatype] = {
+  def parse(value: String, makePrimitiveType: Boolean = true): Try[Datatype] = {
     val dt = value match {
       case "boolean" => Success(Datatype.Primitive.Boolean)
       case "double" => Success(Datatype.Primitive.Double)
@@ -112,14 +112,14 @@ case class DatatypeResolver(
       case "unit" => Success(Datatype.Primitive.Unit)
       case "uuid" => Success(Datatype.Primitive.Uuid)
 
-      case ListRx(inner) => parse(inner, true).map(Datatype.Container.List)
-      case MapRx(inner) => parse(inner, true).map(Datatype.Container.Map)
+      case ListRx(inner) => parse(inner).map(Datatype.Container.List)
+      case MapRx(inner) => parse(inner).map(Datatype.Container.Map)
       case MapDefaultRx() => Success(Datatype.Container.Map(Datatype.Primitive.String))
 
       case UserDefined(dt) => Success(dt)
     }
 
-    if (required) dt else dt.map(Datatype.Container.Option)
+    if (makePrimitiveType) dt else dt.map(Datatype.Container.Option)
   }
 
 }

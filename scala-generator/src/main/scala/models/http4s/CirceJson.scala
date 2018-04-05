@@ -161,7 +161,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
           case ScalaDatatype.Option(inner) => {
             s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
           }
-          case datatype if field.default.isDefined && !field.required => {
+          case datatype if field.shouldApplyDefaultOnRead => {
             s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${datatype.name}]]"""
           }
           case datatype => {
@@ -174,7 +174,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
 
       model
         .fields
-        .filter(f=> f.default.isEmpty || f.required)
+        .filterNot(_.shouldApplyDefaultOnRead)
         .map {field =>
         s"""${nobt(field.name)} = ${field.name}"""
       }.mkString(",\n").indent(6),
@@ -182,7 +182,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"    )",
       s"    Some(ret)",
       model.fields
-        .filter(f=> f.default.isDefined && !f.required)
+        .filter(f=> f.shouldApplyDefaultOnRead)
         .map{ field =>
           s""".map(m=> ${nobt(field.name)}.map(d=> m.copy(${field.name}=d)).getOrElse(m))"""
         }.mkString("\n").indent(6),
@@ -197,10 +197,10 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"${implicitEncoderDef(model.name)} = Encoder.instance { t =>",
       s"  Json.fromFields(Seq(",
       model.fields.map { field =>
-        if (field.required || field.default.isDefined) {
-          s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
-        } else {
+        if (field.shouldModelConcreteType) {
           s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""
+        } else {
+          s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
         }
       }.mkString(",\n").indent(4),
       s"  ).flatten)",
