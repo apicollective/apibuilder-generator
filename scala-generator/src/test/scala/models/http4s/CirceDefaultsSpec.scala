@@ -30,37 +30,35 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                  |    launchedOn: _root_.java.time.LocalDate = _root_.java.time.LocalDate.parse("1986-02-01"),
                                  |    timestamp: _root_.java.time.Instant = _root_.java.time.Instant.parse("2018-03-21T02:20:52Z")""".stripMargin) should be(true)
 
-    jsOnly.contents.contains("""for {
-                                 |        guid <- c.downField("guid").as[Option[_root_.java.util.UUID]]
-                                 |        name <- c.downField("name").as[Option[String]]
-                                 |        __type__ <- c.downField("type").as[Option[test.apidoc.apidoctest.v0.models.CarType]]
-                                 |        curbWeight <- c.downField("curb_weight").as[Option[Int]]
-                                 |        serial <- c.downField("serial").as[Option[Long]]
-                                 |        finalDrive <- c.downField("final_drive").as[Option[Double]]
-                                 |        msrp <- c.downField("msrp").as[Option[BigDecimal]]
-                                 |        isFlashy <- c.downField("is_flashy").as[Option[Boolean]]
-                                 |        markets <- c.downField("markets").as[Option[Seq[String]]]
-                                 |        launchedOn <- c.downField("launched_on").as[Option[_root_.java.time.LocalDate]]
-                                 |        timestamp <- c.downField("timestamp").as[Option[_root_.java.time.Instant]]
-                                 |      } yield {
-                                 |        val ret = Model(
-                                 |
-                                 |        )
-                                 |        Some(ret)
-                                 |          .map(m=> guid.map(d=> m.copy(guid=d)).getOrElse(m))
-                                 |          .map(m=> name.map(d=> m.copy(name=d)).getOrElse(m))
-                                 |          .map(m=> __type__.map(d=> m.copy(`type`=d)).getOrElse(m))
-                                 |          .map(m=> curbWeight.map(d=> m.copy(curbWeight=d)).getOrElse(m))
-                                 |          .map(m=> serial.map(d=> m.copy(serial=d)).getOrElse(m))
-                                 |          .map(m=> finalDrive.map(d=> m.copy(finalDrive=d)).getOrElse(m))
-                                 |          .map(m=> msrp.map(d=> m.copy(msrp=d)).getOrElse(m))
-                                 |          .map(m=> isFlashy.map(d=> m.copy(isFlashy=d)).getOrElse(m))
-                                 |          .map(m=> markets.map(d=> m.copy(markets=d)).getOrElse(m))
-                                 |          .map(m=> launchedOn.map(d=> m.copy(launchedOn=d)).getOrElse(m))
-                                 |          .map(m=> timestamp.map(d=> m.copy(timestamp=d)).getOrElse(m))
-                                 |          .get
-                                 |      }
-                                 |    }""".stripMargin) should be(true)
+    jsOnly.contents.contains("""    implicit def decodeApiDocTestModel: Decoder[Model] = Decoder.instance { c =>
+                               |     for {
+                               |        guid <- c.downField("guid").as[Option[_root_.java.util.UUID]]
+                               |        name <- c.downField("name").as[Option[String]]
+                               |        __type__ <- c.downField("type").as[Option[test.apidoc.apidoctest.v0.models.CarType]]
+                               |        curbWeight <- c.downField("curb_weight").as[Option[Int]]
+                               |        serial <- c.downField("serial").as[Option[Long]]
+                               |        finalDrive <- c.downField("final_drive").as[Option[Double]]
+                               |        msrp <- c.downField("msrp").as[Option[BigDecimal]]
+                               |        isFlashy <- c.downField("is_flashy").as[Option[Boolean]]
+                               |        markets <- c.downField("markets").as[Option[Seq[String]]]
+                               |        launchedOn <- c.downField("launched_on").as[Option[_root_.java.time.LocalDate]]
+                               |        timestamp <- c.downField("timestamp").as[Option[_root_.java.time.Instant]]
+                               |      } yield {
+                               |        Model(
+                               |          guid = guid.getOrElse(_root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd")),
+                               |          name = name.getOrElse("M3"),
+                               |          __type__ = `type`.getOrElse(test.apidoc.apidoctest.v0.models.CarType.Coupe),
+                               |          curbWeight = curbWeight.getOrElse(3500),
+                               |          serial = serial.getOrElse(45678901234L),
+                               |          finalDrive = finalDrive.getOrElse(3.85),
+                               |          msrp = msrp.getOrElse(45999.99),
+                               |          isFlashy = isFlashy.getOrElse(true),
+                               |          markets = markets.getOrElse(scala.List("USA","CAN")),
+                               |          launchedOn = launchedOn.getOrElse(_root_.java.time.LocalDate.parse("1986-02-01")),
+                               |          timestamp = timestamp.getOrElse(_root_.java.time.Instant.parse("2018-03-21T02:20:52Z"))
+                               |        )
+                               |      }
+                               |    }""".stripMargin) should be(true)
   }
 
 
@@ -99,22 +97,19 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        launchedOn <- c.downField("launched_on").as[Option[_root_.java.time.LocalDate]]
                                |        timestamp <- c.downField("timestamp").as[Option[_root_.java.time.Instant]]
                                |      } yield {
-                               |        val ret = Model(
-                               |
+                               |        Model(
+                               |          guid = guid.getOrElse(_root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd")),
+                               |          name = name.getOrElse("M3"),
+                               |          __type__ = `type`.getOrElse(test.apidoc.apidoctest.v0.models.CarType.Coupe),
+                               |          curbWeight = curbWeight.getOrElse(3500),
+                               |          serial = serial.getOrElse(45678901234L),
+                               |          finalDrive = finalDrive.getOrElse(3.85),
+                               |          msrp = msrp.getOrElse(45999.99),
+                               |          isFlashy = isFlashy.getOrElse(true),
+                               |          markets = markets.getOrElse(scala.List("USA","CAN")),
+                               |          launchedOn = launchedOn.getOrElse(_root_.java.time.LocalDate.parse("1986-02-01")),
+                               |          timestamp = timestamp.getOrElse(_root_.java.time.Instant.parse("2018-03-21T02:20:52Z"))
                                |        )
-                               |        Some(ret)
-                               |          .map(m=> guid.map(d=> m.copy(guid=d)).getOrElse(m))
-                               |          .map(m=> name.map(d=> m.copy(name=d)).getOrElse(m))
-                               |          .map(m=> __type__.map(d=> m.copy(`type`=d)).getOrElse(m))
-                               |          .map(m=> curbWeight.map(d=> m.copy(curbWeight=d)).getOrElse(m))
-                               |          .map(m=> serial.map(d=> m.copy(serial=d)).getOrElse(m))
-                               |          .map(m=> finalDrive.map(d=> m.copy(finalDrive=d)).getOrElse(m))
-                               |          .map(m=> msrp.map(d=> m.copy(msrp=d)).getOrElse(m))
-                               |          .map(m=> isFlashy.map(d=> m.copy(isFlashy=d)).getOrElse(m))
-                               |          .map(m=> markets.map(d=> m.copy(markets=d)).getOrElse(m))
-                               |          .map(m=> launchedOn.map(d=> m.copy(launchedOn=d)).getOrElse(m))
-                               |          .map(m=> timestamp.map(d=> m.copy(timestamp=d)).getOrElse(m))
-                               |          .get
                                |      }
                                |    }""".stripMargin) should be(true)
   }
@@ -154,24 +149,20 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        launchedOn <- c.downField("launched_on").as[Option[_root_.java.time.LocalDate]]
                                |        timestamp <- c.downField("timestamp").as[Option[_root_.java.time.Instant]]
                                |      } yield {
-                               |        val ret = Model(
-                               |
+                               |        Model(
+                               |          guid = guid.getOrElse(Some(_root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd"))),
+                               |          name = name.getOrElse(Some("M3")),
+                               |          __type__ = `type`.getOrElse(Some(test.apidoc.apidoctest.v0.models.CarType.Coupe)),
+                               |          curbWeight = curbWeight.getOrElse(Some(3500)),
+                               |          serial = serial.getOrElse(Some(45678901234L)),
+                               |          finalDrive = finalDrive.getOrElse(Some(3.85)),
+                               |          msrp = msrp.getOrElse(Some(45999.99)),
+                               |          isFlashy = isFlashy.getOrElse(Some(true)),
+                               |          markets = markets.getOrElse(Some(scala.List("USA","CAN"))),
+                               |          launchedOn = launchedOn.getOrElse(Some(_root_.java.time.LocalDate.parse("1986-02-01"))),
+                               |          timestamp = timestamp.getOrElse(Some(_root_.java.time.Instant.parse("2018-03-21T02:20:52Z")))
                                |        )
-                               |        Some(ret)
-                               |          .map(m=> guid.map(d=> m.copy(guid=d)).getOrElse(m))
-                               |          .map(m=> name.map(d=> m.copy(name=d)).getOrElse(m))
-                               |          .map(m=> __type__.map(d=> m.copy(`type`=d)).getOrElse(m))
-                               |          .map(m=> curbWeight.map(d=> m.copy(curbWeight=d)).getOrElse(m))
-                               |          .map(m=> serial.map(d=> m.copy(serial=d)).getOrElse(m))
-                               |          .map(m=> finalDrive.map(d=> m.copy(finalDrive=d)).getOrElse(m))
-                               |          .map(m=> msrp.map(d=> m.copy(msrp=d)).getOrElse(m))
-                               |          .map(m=> isFlashy.map(d=> m.copy(isFlashy=d)).getOrElse(m))
-                               |          .map(m=> markets.map(d=> m.copy(markets=d)).getOrElse(m))
-                               |          .map(m=> launchedOn.map(d=> m.copy(launchedOn=d)).getOrElse(m))
-                               |          .map(m=> timestamp.map(d=> m.copy(timestamp=d)).getOrElse(m))
-                               |          .get
-                               |      }
-                               |    }""".stripMargin) should be(true)
+                               |      }""".stripMargin) should be(true)
   }
 
   it("Should produce models with no defaults and all fields optional when required = false , default = null") {
@@ -209,7 +200,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        launchedOn <- c.downField("launched_on").as[Option[_root_.java.time.LocalDate]]
                                |        timestamp <- c.downField("timestamp").as[Option[_root_.java.time.Instant]]
                                |      } yield {
-                               |        val ret = Model(
+                               |        Model(
                                |          guid = guid,
                                |          name = name,
                                |          __type__ = `type`,
@@ -222,9 +213,6 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |          launchedOn = launchedOn,
                                |          timestamp = timestamp
                                |        )
-                               |        Some(ret)
-                               |
-                               |          .get
                                |      }
                                |    }""".stripMargin) should be(true)
   }
@@ -265,7 +253,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        launchedOn <- c.downField("launched_on").as[_root_.java.time.LocalDate]
                                |        timestamp <- c.downField("timestamp").as[_root_.java.time.Instant]
                                |      } yield {
-                               |        val ret = Model(
+                               |        Model(
                                |          guid = guid,
                                |          name = name,
                                |          __type__ = `type`,
@@ -278,9 +266,6 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |          launchedOn = launchedOn,
                                |          timestamp = timestamp
                                |        )
-                               |        Some(ret)
-                               |
-                               |          .get
                                |      }
                                |    }""".stripMargin) should be(true)
   }

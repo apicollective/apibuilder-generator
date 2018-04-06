@@ -170,23 +170,18 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
         }
       }.mkString("\n").indent(4),
       s"  } yield {",
-      s"    val ret = ${model.name}(",
+      s"    ${model.name}(",
 
       model
         .fields
-        .filterNot(_.shouldApplyDefaultOnRead)
         .map {field =>
-        s"""${nobt(field.name)} = ${field.name}"""
+          if (field.shouldApplyDefaultOnRead){
+            s"""${nobt(field.name)} = ${field.name}.getOrElse(${field.default.get})"""
+          } else {
+            s"""${nobt(field.name)} = ${field.name}"""
+          }
       }.mkString(",\n").indent(6),
-
       s"    )",
-      s"    Some(ret)",
-      model.fields
-        .filter(f=> f.shouldApplyDefaultOnRead)
-        .map{ field =>
-          s""".map(m=> ${nobt(field.name)}.map(d=> m.copy(${field.name}=d)).getOrElse(m))"""
-        }.mkString("\n").indent(6),
-      s"      .get",
       s"  }",
       s"}"
     ).mkString("\n")
