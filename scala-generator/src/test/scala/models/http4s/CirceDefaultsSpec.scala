@@ -1,11 +1,9 @@
 package models.http4s
 
 import io.apibuilder.generator.v0.models.InvocationForm
+import models.FieldDefaultHelper._
 import org.scalatest.{FunSpec, Matchers}
 
-import models.FieldDefaultHelper._
-
-import scala.models.Play2StandaloneModelsJson
 import scala.models.http4s.Http4s018Generator
 
 class CirceDefaultsSpec extends FunSpec with Matchers {

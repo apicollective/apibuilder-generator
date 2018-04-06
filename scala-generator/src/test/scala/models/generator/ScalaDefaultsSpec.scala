@@ -1,12 +1,9 @@
 package models.generator
-import akka.http.scaladsl.model
 import io.apibuilder.generator.v0.models.InvocationForm
+import models.FieldDefaultHelper._
 import org.scalatest.{FunSpec, Matchers}
 
-import models.FieldDefaultHelper._
-
-import scala.models.{Play25ClientGenerator, Play26ClientGenerator, Play2StandaloneModelsJson}
-import scala.models.http4s.Http4s018Generator
+import scala.models.Play2StandaloneModelsJson
 
 class ScalaDefaultsSpec extends FunSpec with Matchers {
   it("Should produce models with defaults and scala_generator.model_hint missing") {
