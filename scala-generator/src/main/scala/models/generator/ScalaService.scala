@@ -402,6 +402,8 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
 
   def originalName: String = param.name
 
+  def asScalaVal: String = ScalaUtil.quoteNameIfKeyword(name)
+
   def datatype: ScalaDatatype = ssd.scalaDatatype(`type`)
 
   def description: String = param.description.getOrElse(name)

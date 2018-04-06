@@ -44,6 +44,7 @@ trait ModelRoutes {
 
   object GetStringResponse {
     case class HTTP200(value: String, headers: Seq[org.http4s.Header] = Nil) extends GetStringResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetStringResponse
   }
 
   def getString(
@@ -54,6 +55,7 @@ trait ModelRoutes {
 
   object GetEnumResponse {
     case class HTTP200(value: io.apibuilder.http4s.test.models.Enum, headers: Seq[org.http4s.Header] = Nil) extends GetEnumResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetEnumResponse
   }
 
   def getEnum(
@@ -64,6 +66,7 @@ trait ModelRoutes {
 
   object GetModelResponse {
     case class HTTP200(value: io.apibuilder.http4s.test.models.Model, headers: Seq[org.http4s.Header] = Nil) extends GetModelResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetModelResponse
   }
 
   def getModel(
@@ -74,6 +77,7 @@ trait ModelRoutes {
 
   object GetListResponse {
     case class HTTP200(value: Seq[Int], headers: Seq[org.http4s.Header] = Nil) extends GetListResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetListResponse
   }
 
   def getList(
@@ -84,6 +88,7 @@ trait ModelRoutes {
 
   object GetMapResponse {
     case class HTTP200(value: Map[String, _root_.java.util.UUID], headers: Seq[org.http4s.Header] = Nil) extends GetMapResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetMapResponse
   }
 
   def getMap(
@@ -98,6 +103,7 @@ trait ModelRoutes {
     case class HTTP202(value: String, headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
     case class HTTP204(headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
     case class HTTP206(value: Seq[io.apibuilder.http4s.test.models.Model], headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetMultipleResponse
   }
 
   def getMultiple(
@@ -110,27 +116,42 @@ trait ModelRoutes {
     case _req @ GET -> Root / "string" if apiVersionMatch(_req) =>
       getString(_req).flatMap {
         case GetStringResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetStringResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "string" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "enum" if apiVersionMatch(_req) =>
       getEnum(_req).flatMap {
         case GetEnumResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetEnumResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "enum" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "model" if apiVersionMatch(_req) =>
       getModel(_req).flatMap {
         case GetModelResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetModelResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "model" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "list" if apiVersionMatch(_req) =>
       getList(_req).flatMap {
         case GetListResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetListResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "list" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "map" if apiVersionMatch(_req) =>
       getMap(_req).flatMap {
         case GetMapResponse.HTTP200(value, headers) => Ok(value).putHeaders(headers: _*)
+        case GetMapResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "map" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "multiple" if apiVersionMatch(_req) =>
       getMultiple(_req).flatMap {
@@ -139,6 +160,9 @@ trait ModelRoutes {
         case GetMultipleResponse.HTTP202(value, headers) => Accepted(value).putHeaders(headers: _*)
         case GetMultipleResponse.HTTP204(headers) => NoContent().putHeaders(headers: _*)
         case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value).putHeaders(headers: _*)
+        case GetMultipleResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "multiple" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

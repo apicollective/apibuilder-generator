@@ -46,9 +46,9 @@ object Http4sServer {
           val minPart = param.param.minimum.fold("")(v => s"$v")
           val maxPart = param.param.maximum.fold("")(v => s"To$v")
           val defPart = param.param.default.fold("")(v => s"Def${ScalaUtil.toClassName(v)}")
-          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}$minPart$maxPart${defPart}Matcher", param.originalName)
+          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}$minPart$maxPart${defPart}Matcher", param.asScalaVal)
         case sp: ScalaPrimitive =>
-          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}Matcher", param.name)
+          QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}Matcher", param.asScalaVal)
         case ScalaDatatype.List(nested) =>
           val extractor = recurse(nested, "List", false)
           QueryExtractor(extractor.name, s"cats.data.Validated.Valid(${extractor.handler})")
@@ -157,7 +157,7 @@ case class Http4sServer(form: InvocationForm,
 
   def genPathExtractors(routes: List[Route]): Seq[String] = {
     val distinctParams: Seq[(PathExtractor, ScalaParameter)] = routes.flatMap(_.pathSegments).collect {
-      case Extracted(_, param) => Http4sServer.pathExtractor(ssd, param) -> param
+      case Extracted(param) => Http4sServer.pathExtractor(ssd, param) -> param
     }.toMap.toList.sortBy(_._1.name)
 
     distinctParams.map { case (extractor, param) =>

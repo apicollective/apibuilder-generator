@@ -1,0 +1,93 @@
+{
+  "apidoc": {
+    "version": "0.12.65"
+  },
+  "name": "foo",
+  "organization": {
+    "key": "gheine"
+  },
+  "application": {
+    "key": "foo"
+  },
+  "namespace": "me.gheine.foo.v0",
+  "version": "0.0.1-dev",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [],
+  "models": [
+    {
+      "name": "foo",
+      "plural": "foos",
+      "fields": [
+        {
+          "name": "snake_id",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "kebab-id",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "foo",
+      "plural": "foos",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/foo/:snake_path/:kebab-path",
+          "parameters": [
+            {
+              "name": "snake_path",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "kebab-path",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "snake_query",
+              "type": "string",
+              "location": "Query",
+              "required": true
+            },
+            {
+              "name": "kebab-query",
+              "type": "string",
+              "location": "Query",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "foo",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "path": "/foo/:snake_path/:kebab-path"
+    }
+  ],
+  "attributes": []
+}

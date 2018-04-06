@@ -125,6 +125,7 @@ trait ModelRoutes {
 
   object GetStringResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetStringResponse
   }
 
   def getString(
@@ -136,6 +137,7 @@ trait ModelRoutes {
 
   object GetNamedStringResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetNamedStringResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetNamedStringResponse
   }
 
   def getNamedString(
@@ -147,6 +149,7 @@ trait ModelRoutes {
 
   object GetStringWithMinResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringWithMinResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetStringWithMinResponse
   }
 
   def getStringWithMin(
@@ -158,6 +161,7 @@ trait ModelRoutes {
 
   object GetStringWithMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringWithMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetStringWithMaxResponse
   }
 
   def getStringWithMax(
@@ -169,6 +173,7 @@ trait ModelRoutes {
 
   object GetStringWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetStringWithMinAndMaxResponse
   }
 
   def getStringWithMinAndMax(
@@ -180,6 +185,7 @@ trait ModelRoutes {
 
   object GetOptionalStringResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetOptionalStringResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetOptionalStringResponse
   }
 
   def getOptionalString(
@@ -191,6 +197,7 @@ trait ModelRoutes {
 
   object GetOptionalStringWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetOptionalStringWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetOptionalStringWithMinAndMaxResponse
   }
 
   def getOptionalStringWithMinAndMax(
@@ -202,6 +209,7 @@ trait ModelRoutes {
 
   object GetListStringResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetListStringResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetListStringResponse
   }
 
   def getListString(
@@ -213,6 +221,7 @@ trait ModelRoutes {
 
   object GetListStringWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetListStringWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetListStringWithMinAndMaxResponse
   }
 
   def getListStringWithMinAndMax(
@@ -224,6 +233,7 @@ trait ModelRoutes {
 
   object GetOptionalListStringResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetOptionalListStringResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetOptionalListStringResponse
   }
 
   def getOptionalListString(
@@ -235,6 +245,7 @@ trait ModelRoutes {
 
   object GetOptionalListStringWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetOptionalListStringWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetOptionalListStringWithMinAndMaxResponse
   }
 
   def getOptionalListStringWithMinAndMax(
@@ -246,6 +257,7 @@ trait ModelRoutes {
 
   object GetIntResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetIntResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetIntResponse
   }
 
   def getInt(
@@ -257,6 +269,7 @@ trait ModelRoutes {
 
   object GetIntWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetIntWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetIntWithMinAndMaxResponse
   }
 
   def getIntWithMinAndMax(
@@ -268,6 +281,7 @@ trait ModelRoutes {
 
   object GetLongResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetLongResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetLongResponse
   }
 
   def getLong(
@@ -279,6 +293,7 @@ trait ModelRoutes {
 
   object GetLongWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetLongWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetLongWithMinAndMaxResponse
   }
 
   def getLongWithMinAndMax(
@@ -290,6 +305,7 @@ trait ModelRoutes {
 
   object GetBooleanResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetBooleanResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetBooleanResponse
   }
 
   def getBoolean(
@@ -301,6 +317,7 @@ trait ModelRoutes {
 
   object GetBooleanWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetBooleanWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetBooleanWithMinAndMaxResponse
   }
 
   def getBooleanWithMinAndMax(
@@ -312,6 +329,7 @@ trait ModelRoutes {
 
   object GetDoubleResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDoubleResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDoubleResponse
   }
 
   def getDouble(
@@ -323,6 +341,7 @@ trait ModelRoutes {
 
   object GetDoubleWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDoubleWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDoubleWithMinAndMaxResponse
   }
 
   def getDoubleWithMinAndMax(
@@ -334,6 +353,7 @@ trait ModelRoutes {
 
   object GetDecimalResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDecimalResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDecimalResponse
   }
 
   def getDecimal(
@@ -345,6 +365,7 @@ trait ModelRoutes {
 
   object GetDecimalWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDecimalWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDecimalWithMinAndMaxResponse
   }
 
   def getDecimalWithMinAndMax(
@@ -356,6 +377,7 @@ trait ModelRoutes {
 
   object GetDateResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDateResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDateResponse
   }
 
   def getDate(
@@ -367,6 +389,7 @@ trait ModelRoutes {
 
   object GetDateWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDateWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDateWithMinAndMaxResponse
   }
 
   def getDateWithMinAndMax(
@@ -378,6 +401,7 @@ trait ModelRoutes {
 
   object GetDatetimeResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDatetimeResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDatetimeResponse
   }
 
   def getDatetime(
@@ -389,6 +413,7 @@ trait ModelRoutes {
 
   object GetDatetimeWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDatetimeWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetDatetimeWithMinAndMaxResponse
   }
 
   def getDatetimeWithMinAndMax(
@@ -400,6 +425,7 @@ trait ModelRoutes {
 
   object GetUuidResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetUuidResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetUuidResponse
   }
 
   def getUuid(
@@ -411,6 +437,7 @@ trait ModelRoutes {
 
   object GetUuidWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetUuidWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetUuidWithMinAndMaxResponse
   }
 
   def getUuidWithMinAndMax(
@@ -422,6 +449,7 @@ trait ModelRoutes {
 
   object GetEnumResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetEnumResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetEnumResponse
   }
 
   def getEnum(
@@ -433,6 +461,7 @@ trait ModelRoutes {
 
   object GetNamedEnumResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetNamedEnumResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetNamedEnumResponse
   }
 
   def getNamedEnum(
@@ -444,6 +473,7 @@ trait ModelRoutes {
 
   object GetEnumWithMinAndMaxResponse {
     case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetEnumWithMinAndMaxResponse
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends GetEnumWithMinAndMaxResponse
   }
 
   def getEnumWithMinAndMax(
@@ -457,151 +487,241 @@ trait ModelRoutes {
     case _req @ GET -> Root / "string" :? IdStringMatcher(id) if apiVersionMatch(_req) =>
       getString(_req, id).flatMap {
         case GetStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "string" :? IdStringMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
-    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(named_id) if apiVersionMatch(_req) =>
-      getNamedString(_req, named_id).flatMap {
+    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(namedId) if apiVersionMatch(_req) =>
+      getNamedString(_req, namedId).flatMap {
         case GetNamedStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetNamedStringResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "named_string" :? NamedIdStringMatcher(namedId) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "string_with_min" :? IdString10Matcher(id) if apiVersionMatch(_req) =>
       getStringWithMin(_req, id).flatMap {
         case GetStringWithMinResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMinResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "string_with_min" :? IdString10Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "string_with_max" :? IdStringTo10Matcher(id) if apiVersionMatch(_req) =>
       getStringWithMax(_req, id).flatMap {
         case GetStringWithMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "string_with_max" :? IdStringTo10Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "string_with_min_and_max" :? IdString10To30DefDefaultMatcher(id) if apiVersionMatch(_req) =>
       getStringWithMinAndMax(_req, id).flatMap {
         case GetStringWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "string_with_min_and_max" :? IdString10To30DefDefaultMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "optional_string" :? IdOptStringMatcher(id) if apiVersionMatch(_req) =>
       getOptionalString(_req, id).flatMap {
         case GetOptionalStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetOptionalStringResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "optional_string" :? IdOptStringMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "optional_string_with_min_and_max" :? IdOptString10To30Matcher(id) if apiVersionMatch(_req) =>
       getOptionalStringWithMinAndMax(_req, id).flatMap {
         case GetOptionalStringWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetOptionalStringWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "optional_string_with_min_and_max" :? IdOptString10To30Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "list_string" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getListString(_req, id).flatMap {
         case GetListStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetListStringResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "list_string" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "list_string_with_min_and_max" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getListStringWithMinAndMax(_req, id).flatMap {
         case GetListStringWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetListStringWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "list_string_with_min_and_max" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "optional_list_string" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getOptionalListString(_req, id).flatMap {
         case GetOptionalListStringResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetOptionalListStringResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "optional_list_string" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "optional_list_string_with_min_and_max" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if apiVersionMatch(_req) =>
       getOptionalListStringWithMinAndMax(_req, id).flatMap {
         case GetOptionalListStringWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetOptionalListStringWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "optional_list_string_with_min_and_max" :? IdListStringMatcher(cats.data.Validated.Valid(id)) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "int" :? IdIntMatcher(id) if apiVersionMatch(_req) =>
       getInt(_req, id).flatMap {
         case GetIntResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetIntResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "int" :? IdIntMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "int_with_min_and_max" :? IdInt10To30Def20Matcher(id) if apiVersionMatch(_req) =>
       getIntWithMinAndMax(_req, id).flatMap {
         case GetIntWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetIntWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "int_with_min_and_max" :? IdInt10To30Def20Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "long" :? IdLongMatcher(id) if apiVersionMatch(_req) =>
       getLong(_req, id).flatMap {
         case GetLongResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetLongResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "long" :? IdLongMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "long_with_min_and_max" :? IdLong10To30Def20Matcher(id) if apiVersionMatch(_req) =>
       getLongWithMinAndMax(_req, id).flatMap {
         case GetLongWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetLongWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "long_with_min_and_max" :? IdLong10To30Def20Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "boolean" :? IdBooleanMatcher(id) if apiVersionMatch(_req) =>
       getBoolean(_req, id).flatMap {
         case GetBooleanResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetBooleanResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "boolean" :? IdBooleanMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "boolean_with_min_and_max" :? IdBoolean10To30DefTrueMatcher(id) if apiVersionMatch(_req) =>
       getBooleanWithMinAndMax(_req, id).flatMap {
         case GetBooleanWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetBooleanWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "boolean_with_min_and_max" :? IdBoolean10To30DefTrueMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "double" :? IdDoubleMatcher(id) if apiVersionMatch(_req) =>
       getDouble(_req, id).flatMap {
         case GetDoubleResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDoubleResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "double" :? IdDoubleMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "double_with_min_and_max" :? IdDouble10To30Def314Matcher(id) if apiVersionMatch(_req) =>
       getDoubleWithMinAndMax(_req, id).flatMap {
         case GetDoubleWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDoubleWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "double_with_min_and_max" :? IdDouble10To30Def314Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "decimal" :? IdBigDecimalMatcher(id) if apiVersionMatch(_req) =>
       getDecimal(_req, id).flatMap {
         case GetDecimalResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDecimalResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "decimal" :? IdBigDecimalMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "decimal_with_min_and_max" :? IdBigDecimal10To30Def314Matcher(id) if apiVersionMatch(_req) =>
       getDecimalWithMinAndMax(_req, id).flatMap {
         case GetDecimalWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDecimalWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "decimal_with_min_and_max" :? IdBigDecimal10To30Def314Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "date" :? IdLocalDateMatcher(id) if apiVersionMatch(_req) =>
       getDate(_req, id).flatMap {
         case GetDateResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDateResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "date" :? IdLocalDateMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "date_with_min_and_max" :? IdLocalDate10To30Def19991231Matcher(id) if apiVersionMatch(_req) =>
       getDateWithMinAndMax(_req, id).flatMap {
         case GetDateWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDateWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "date_with_min_and_max" :? IdLocalDate10To30Def19991231Matcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "datetime" :? IdInstantMatcher(id) if apiVersionMatch(_req) =>
       getDatetime(_req, id).flatMap {
         case GetDatetimeResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDatetimeResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "datetime" :? IdInstantMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "datetime_with_min_and_max" :? IdInstant10To30Def19991231t235959zMatcher(id) if apiVersionMatch(_req) =>
       getDatetimeWithMinAndMax(_req, id).flatMap {
         case GetDatetimeWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDatetimeWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "datetime_with_min_and_max" :? IdInstant10To30Def19991231t235959zMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "uuid" :? IdUUIDMatcher(id) if apiVersionMatch(_req) =>
       getUuid(_req, id).flatMap {
         case GetUuidResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetUuidResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "uuid" :? IdUUIDMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "uuid_with_min_and_max" :? IdUUID10To30DefE86bdef2B6a64c0aAb74594cdce3d86fMatcher(id) if apiVersionMatch(_req) =>
       getUuidWithMinAndMax(_req, id).flatMap {
         case GetUuidWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetUuidWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "uuid_with_min_and_max" :? IdUUID10To30DefE86bdef2B6a64c0aAb74594cdce3d86fMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "enum" :? IdEnumMatcher(id) if apiVersionMatch(_req) =>
       getEnum(_req, id).flatMap {
         case GetEnumResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetEnumResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "enum" :? IdEnumMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
-    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(named_id) if apiVersionMatch(_req) =>
-      getNamedEnum(_req, named_id).flatMap {
+    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(namedId) if apiVersionMatch(_req) =>
+      getNamedEnum(_req, namedId).flatMap {
         case GetNamedEnumResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetNamedEnumResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "named_enum" :? NamedIdEnumMatcher(namedId) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "enum_with_min_and_max" :? IdEnum10To30DefValueMatcher(id) if apiVersionMatch(_req) =>
       getEnumWithMinAndMax(_req, id).flatMap {
         case GetEnumWithMinAndMaxResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetEnumWithMinAndMaxResponse.UndocumentedResponse(response) => response
       }
+    case _req @ GET -> Root / "enum_with_min_and_max" :? IdEnum10To30DefValueMatcher(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
   }
 }

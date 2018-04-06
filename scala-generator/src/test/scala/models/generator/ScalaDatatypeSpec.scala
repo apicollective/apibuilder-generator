@@ -49,6 +49,29 @@ class ScalaDatatypeSpec extends FunSpec with Matchers {
     nestMap(string, 3).toVariableName should be("values")
   }
 
+  it("DateIso8601Joda sanity check") {
+    DateIso8601Joda.asString("myVar") shouldBe "myVar.toString"
+    DateIso8601Joda.default("2020-12-31") shouldBe "new _root_.org.joda.time.LocalDate(2020, 12, 31)"
+    DateIso8601Joda.name shouldBe "_root_.org.joda.time.LocalDate"
+  }
+
+  it("DateIso8601Java sanity check") {
+    DateIso8601Java.asString("myVar") shouldBe "myVar.toString"
+    DateIso8601Java.default("2020-12-31") shouldBe "_root_.java.time.LocalDate.parse(\"2020-12-31\")"
+    DateIso8601Java.name shouldBe "_root_.java.time.LocalDate"
+  }
+
+  it("DateTimeIso8601Joda sanity check") {
+    DateTimeIso8601Joda.asString("myVar") shouldBe "_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(myVar)"
+    DateTimeIso8601Joda.default("2020-12-31") shouldBe "_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(\"2020-12-31\")"
+    DateTimeIso8601Joda.name shouldBe "_root_.org.joda.time.DateTime"
+  }
+
+  it("DateTimeIso8601Java sanity check") {
+    DateTimeIso8601Java.asString("myVar") shouldBe "myVar.toString"
+    DateTimeIso8601Java.default("2020-12-31") shouldBe "_root_.java.time.Instant.parse(\"2020-12-31\")"
+    DateTimeIso8601Java.name shouldBe "_root_.java.time.Instant"
+  }
 }
 
 
