@@ -229,67 +229,67 @@ object FieldDefaultHelper {
               "type": "uuid",
               "required": false,
               "default" : "abcd-ef01-2345-6789-abcd",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           }, {
               "name": "name",
               "type": "string",
               "required": false,
               "default": "M3",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           }, {
               "name": "type",
               "type": "car_type",
               "required": false,
               "default": "coupe",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           }, {
               "name": "curb_weight",
               "type": "integer",
               "required": false,
               "default": "3500",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           },{
               "name": "serial",
               "type": "long",
               "required": false,
               "default": "45678901234",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           }, {
               "name": "final_drive",
               "type": "double",
               "required": false,
               "default": "3.85",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           }, {
               "name": "msrp",
               "type": "decimal",
               "required": false,
               "default": "45999.99",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           }, {
               "name": "is_flashy",
               "type": "boolean",
               "required": false,
               "default": "true",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           },{
               "name": "markets",
               "type": "[string]",
               "required": false,
               "default": "[\"USA\",\"CAN\"]",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           },{
               "name": "launched_on",
               "type": "date-iso8601",
               "required": false,
               "default": "1986-02-01",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           },{
               "name": "timestamp",
               "type": "date-time-iso8601",
               "required": false,
               "default": "2018-03-21T02:20:52Z",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]
           }],
           "attributes": [],
           "description": "Model of a car."
@@ -329,67 +329,67 @@ object FieldDefaultHelper {
               "type": "uuid",
               "required": false,
               "default" : "abcd-ef01-2345-6789-abcd",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           }, {
               "name": "name",
               "type": "string",
               "required": false,
               "default": "M3",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           }, {
               "name": "type",
               "type": "car_type",
               "required": false,
               "default": "coupe",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           }, {
               "name": "curb_weight",
               "type": "integer",
               "required": false,
               "default": "3500",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           },{
               "name": "serial",
               "type": "long",
               "required": false,
               "default": "45678901234",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           }, {
               "name": "final_drive",
               "type": "double",
               "required": false,
               "default": "3.85",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           }, {
               "name": "msrp",
               "type": "decimal",
               "required": false,
               "default": "45999.99",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           }, {
               "name": "is_flashy",
               "type": "boolean",
               "required": false,
               "default": "true",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           },{
               "name": "markets",
               "type": "[string]",
               "required": false,
               "default": "[\"USA\",\"CAN\"]",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           },{
               "name": "launched_on",
               "type": "date-iso8601",
               "required": false,
               "default": "1986-02-01",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           },{
               "name": "timestamp",
               "type": "date-time-iso8601",
               "required": false,
               "default": "2018-03-21T02:20:52Z",
-              "attributes": [{"name": "scala_generator", "value": {"model_hint": "developer_friendly"}}]
+              "attributes": [{"name": "scala_generator", "value": {"model_hint": "required"}}]
           }],
           "attributes": [],
           "description": "Model of a car."

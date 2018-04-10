@@ -62,7 +62,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
   }
 
 
-  it("Should produce models with defaults and scala_generator.model_hint == developer_friendly") {
+  it("Should produce models with defaults and scala_generator.model_hint == required") {
     val json = models.TestHelper.buildJson(requiredFalseWithDefaultsHintDeveloperFriendly)
 
     val form = InvocationForm(models.TestHelper.service(json.format()))
@@ -114,7 +114,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |    }""".stripMargin) should be(true)
   }
 
-  it("Should produce models with defaults and scala_generator . model_hint == wire_friendly") {
+  it("Should produce models with defaults and scala_generator . model_hint == optional") {
     val json = models.TestHelper.buildJson(requiredFalseWithDefaultsHintWireFriendly)
 
     val form = InvocationForm(models.TestHelper.service(json.format()))

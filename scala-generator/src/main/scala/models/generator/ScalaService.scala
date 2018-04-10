@@ -371,13 +371,13 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     * behavior to the server.
     *
     * The global default is developer friendly. Wire friendly behavior can be introduced to any field by adding an
-    * attribute to the field's spec, <pre>"attributes": [{"name": "scala_generator", "value": {"model_hint": "wire_friendly"}}]</pre>
+    * attribute to the field's spec, <pre>"attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]</pre>
     */
   def shouldModelConcreteType: Boolean = {
     val wireFriendly = field.attributes.exists(a =>
       a.name == "scala_generator" &&
         a.value.fields.exists(
-          f=> f._1 == "model_hint" && f._2 == JsString("wire_friendly")
+          f=> f._1 == "model_hint" && f._2 == JsString("optional")
         )
     )
 
