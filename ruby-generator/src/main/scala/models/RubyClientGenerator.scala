@@ -842,7 +842,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
     model.fields.foreach { field =>
       val varName = RubyUtil.quoteNameIfKeyword(field.name)
-      sb.append(s"    @$varName = ${parseArgument(field.name, field.`type`, field.required, field.default, enumAsString = false)}")
+      sb.append(s"    @$varName = ${parseArgument(field.name, field.`type`, field.required || field.default.isDefined, field.default, enumAsString = false)}")
     }
 
     sb.append("  end\n")
@@ -864,7 +864,7 @@ ${headers.rubyModuleConstants.indent(2)}
     sb.append("    {")
     sb.append(
       model.fields.map { field =>
-        val datatype = datatypeResolver.parse(field.`type`, field.required).get
+        val datatype = datatypeResolver.parse(field.`type`, field.required || field.default.isDefined).get
         val varName = RubyUtil.quoteNameIfKeyword(field.name)
         val value = asHash(varName, datatype)
         s":${field.name} => $value"

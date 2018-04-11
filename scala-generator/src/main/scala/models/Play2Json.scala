@@ -312,31 +312,19 @@ case class Play2Json(
 
     val serializations = model.fields.map { field =>
       val beLazy = hasReferenceToModel(field.datatype)
+      val path = s"""(__ \\ "${field.originalName}")"""
 
-      field.datatype match {
-        case ScalaDatatype.Option(inner) => {
-          val path = s"""(__ \\ "${field.originalName}")"""
-          val reader = {
-            if (beLazy)
-              s"""lazyReadNullable(play.api.libs.json.Reads.of[${inner.name}])"""
-            else
-              s"""readNullable[${inner.name}]"""
-          }
-
-          s"$path.$reader"
-        }
-        case datatype => {
-          val path = s"""(__ \\ "${field.originalName}")"""
-          val reader = {
-            if (beLazy)
-              s"""lazyRead(play.api.libs.json.Reads.of[${datatype.name}])"""
-            else
-              s"""read[${datatype.name}]"""
-          }
-
-          s"$path.$reader"
-        }
+      val reader = (field.datatype, field.shouldApplyDefaultOnRead, beLazy) match {
+        case (ScalaDatatype.Option(inner), true, true)   => s"""lazyReadNullable(play.api.libs.json.Reads.withDefault[${inner.name}](${field.default.get})"""
+        case (ScalaDatatype.Option(inner), true, false)  => s"""readNullableWithDefault[${inner.name}](${field.default.get})"""
+        case (ScalaDatatype.Option(inner), false, true)  => s"""lazyReadNullable(play.api.libs.json.Reads.of[${inner.name}])"""
+        case (ScalaDatatype.Option(inner), false, false) => s"""readNullable[${inner.name}]"""
+        case (datatype, true, true)                      => s"""lazyRead(play.api.libs.json.Reads.withDefault[${datatype.name}](${field.default.get})"""
+        case (datatype, true, false)                     => s"""readWithDefault[${datatype.name}](${field.default.get})"""
+        case (datatype, false, true)                     => s"""lazyRead(play.api.libs.json.Reads.of[${datatype.name}])"""
+        case (datatype, false, false)                    => s"""read[${datatype.name}]"""
       }
+      s"$path.$reader"
     }
 
     model.fields match {
@@ -423,7 +411,6 @@ case class Play2Json(
       case _ => false
     }
   }
-
 
   /**
    * Returns a JSON Object containing only this value

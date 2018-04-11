@@ -166,11 +166,11 @@ class ScalaUtilSpec extends FunSpec with Matchers {
     }
 
     it ("default: 124, datatype: long") {
-      ScalaUtil.scalaDefault("124", ScalaPrimitive.Long) should be("124")
+      ScalaUtil.scalaDefault("124", ScalaPrimitive.Long) should be("124L")
     }
 
     it ("default: -124, datatype: long") {
-      ScalaUtil.scalaDefault("-124", ScalaPrimitive.Long) should be("-124")
+      ScalaUtil.scalaDefault("-124", ScalaPrimitive.Long) should be("-124L")
     }
 
     describe ("default: 2014-03-14, datatype: date-iso8601") {

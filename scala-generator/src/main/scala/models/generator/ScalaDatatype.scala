@@ -118,7 +118,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
 
-    override protected def default(json: JsValue): String = toBigDecimal(json).toLong.toString
+    override protected def default(json: JsValue): String = toBigDecimal(json).toLong.toString + 'L'
   }
 
   case object DateIso8601Joda extends ScalaPrimitive {
@@ -354,9 +354,10 @@ object ScalaDatatype {
       default: scala.Option[String],
       deprecation: scala.Option[Deprecation]
     ): String = {
-      require(default.isEmpty, s"no defaults allowed on options: ${default}")
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"${deprecationString(deprecation)}$varName: $name = None"
+      default.fold(s"${deprecationString(deprecation)}$varName: $name = None") { default =>
+        s"${deprecationString(deprecation)}$varName: $name = $default"
+      }
     }
 
     // override, since options contain at most one element
@@ -424,6 +425,7 @@ case class ScalaTypeResolver(
         val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces, name)
         ScalaPrimitive.Union(ns, n)
       }
+      case e => sys.error(s"Unknown datatype: $e")
     }
   }
 
