@@ -20,10 +20,11 @@ case class Play2JsonCommon(ssd: ScalaService) {
     }
   }
 
-  def implicitWriter(name: String, qualifiedName: String, methodName: String) = {
+  def implicitWriter(name: String, qualifiedName: String, methodName: String, isObject: Boolean) = {
+    val writerClass = if(isObject) "OWrites" else "Writes"
     Seq(
-      s"${implicitWriterDef(name)} = {",
-      s"  new play.api.libs.json.Writes[$qualifiedName] {",
+      s"${implicitWriterDef(name, writerClass)} = {",
+      s"  new play.api.libs.json.$writerClass[$qualifiedName] {",
       s"    def writes(obj: $qualifiedName) = {",
       s"      $methodName(obj)",
       "    }",
@@ -46,10 +47,10 @@ case class Play2JsonCommon(ssd: ScalaService) {
     s"jsonWrites${ssd.name}$name"
   }
 
-  def implicitWriterDef(name: String): String = {
+  def implicitWriterDef(name: String, writerClass: String): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     val methodName = implicitWriterName(name)
-    s"implicit def $methodName: play.api.libs.json.Writes[$name]"
+    s"implicit def $methodName: play.api.libs.json.$writerClass[$name]"
   }
   
 }
@@ -79,7 +80,7 @@ case class Play2Json(
   private[models] def enumReadersAndWriters(enum: ScalaEnum): String = {
     val jsObjectWriterMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
     val jsValueWriterMethod = play2JsonCommon.implicitWriterName(enum.name)
-    val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethod)
+    val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethod, isObject = false)
 
     Seq(
       s"implicit val jsonReads${ssd.name}${enum.name} = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
@@ -175,7 +176,7 @@ case class Play2Json(
         case None => writersWithoutDiscriminator(union)
         case Some(discriminator) => writersWithDiscriminator(union, discriminator)
       },
-      play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method)
+      play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method, isObject = true)
     ).mkString("\n\n")
   }
 
@@ -374,7 +375,7 @@ case class Play2Json(
       case Nil => {
         Seq(
           base,
-          play2JsonCommon.implicitWriter(model.name, model.qualifiedName, method)
+          play2JsonCommon.implicitWriter(model.name, model.qualifiedName, method, isObject = true)
         ).mkString("\n\n")
       }
       case _ => {

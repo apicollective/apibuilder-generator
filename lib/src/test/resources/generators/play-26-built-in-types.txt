@@ -135,8 +135,8 @@ package apibuilder.models {
       )
     }
 
-    implicit def jsonWritesBuiltInTypesArray: play.api.libs.json.Writes[Array] = {
-      new play.api.libs.json.Writes[apibuilder.models.Array] {
+    implicit def jsonWritesBuiltInTypesArray: play.api.libs.json.OWrites[Array] = {
+      new play.api.libs.json.OWrites[apibuilder.models.Array] {
         def writes(obj: apibuilder.models.Array) = {
           jsObjectArray(obj)
         }
@@ -206,8 +206,8 @@ package apibuilder.models {
       })
     }
 
-    implicit def jsonWritesBuiltInTypesOptarray: play.api.libs.json.Writes[Optarray] = {
-      new play.api.libs.json.Writes[apibuilder.models.Optarray] {
+    implicit def jsonWritesBuiltInTypesOptarray: play.api.libs.json.OWrites[Optarray] = {
+      new play.api.libs.json.OWrites[apibuilder.models.Optarray] {
         def writes(obj: apibuilder.models.Optarray) = {
           jsObjectOptarray(obj)
         }
@@ -277,8 +277,8 @@ package apibuilder.models {
       })
     }
 
-    implicit def jsonWritesBuiltInTypesOptional: play.api.libs.json.Writes[Optional] = {
-      new play.api.libs.json.Writes[apibuilder.models.Optional] {
+    implicit def jsonWritesBuiltInTypesOptional: play.api.libs.json.OWrites[Optional] = {
+      new play.api.libs.json.OWrites[apibuilder.models.Optional] {
         def writes(obj: apibuilder.models.Optional) = {
           jsObjectOptional(obj)
         }
@@ -317,8 +317,8 @@ package apibuilder.models {
       )
     }
 
-    implicit def jsonWritesBuiltInTypesRequired: play.api.libs.json.Writes[Required] = {
-      new play.api.libs.json.Writes[apibuilder.models.Required] {
+    implicit def jsonWritesBuiltInTypesRequired: play.api.libs.json.OWrites[Required] = {
+      new play.api.libs.json.OWrites[apibuilder.models.Required] {
         def writes(obj: apibuilder.models.Required) = {
           jsObjectRequired(obj)
         }
