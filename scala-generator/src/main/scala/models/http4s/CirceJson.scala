@@ -193,9 +193,9 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"  Json.fromFields(Seq(",
       model.fields.map { field =>
         if (field.shouldModelConcreteType) {
-          s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""
-        } else {
           s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
+        } else {
+          s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""
         }
       }.mkString(",\n").indent(4),
       s"  ).flatten)",
