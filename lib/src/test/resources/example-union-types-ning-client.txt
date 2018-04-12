@@ -304,8 +304,8 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.OWrites[Foobar] = {
-      new play.api.libs.json.OWrites[io.apibuilder.example.union.types.v0.models.Foobar] {
+    implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.Foobar] {
         def writes(obj: io.apibuilder.example.union.types.v0.models.Foobar) = {
           jsObjectFoobar(obj)
         }
@@ -334,8 +334,8 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.OWrites[User] = {
-      new play.api.libs.json.OWrites[io.apibuilder.example.union.types.v0.models.User] {
+    implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.User] {
         def writes(obj: io.apibuilder.example.union.types.v0.models.User) = {
           jsObjectUser(obj)
         }

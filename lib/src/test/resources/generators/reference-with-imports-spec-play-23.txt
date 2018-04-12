@@ -240,8 +240,8 @@ package io.apibuilder.reference.api.v0.models {
       )
     }
 
-    implicit def jsonWritesApidocReferenceApiBig: play.api.libs.json.OWrites[Big] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.Big] {
+    implicit def jsonWritesApidocReferenceApiBig: play.api.libs.json.Writes[Big] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Big] {
         def writes(obj: io.apibuilder.reference.api.v0.models.Big) = {
           jsObjectBig(obj)
         }
@@ -258,8 +258,8 @@ package io.apibuilder.reference.api.v0.models {
       )
     }
 
-    implicit def jsonWritesApidocReferenceApiEcho: play.api.libs.json.OWrites[Echo] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.Echo] {
+    implicit def jsonWritesApidocReferenceApiEcho: play.api.libs.json.Writes[Echo] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Echo] {
         def writes(obj: io.apibuilder.reference.api.v0.models.Echo) = {
           jsObjectEcho(obj)
         }
@@ -280,8 +280,8 @@ package io.apibuilder.reference.api.v0.models {
       )
     }
 
-    implicit def jsonWritesApidocReferenceApiError: play.api.libs.json.OWrites[Error] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.Error] {
+    implicit def jsonWritesApidocReferenceApiError: play.api.libs.json.Writes[Error] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Error] {
         def writes(obj: io.apibuilder.reference.api.v0.models.Error) = {
           jsObjectError(obj)
         }
@@ -298,8 +298,8 @@ package io.apibuilder.reference.api.v0.models {
       )
     }
 
-    implicit def jsonWritesApidocReferenceApiGroup: play.api.libs.json.OWrites[Group] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.Group] {
+    implicit def jsonWritesApidocReferenceApiGroup: play.api.libs.json.Writes[Group] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Group] {
         def writes(obj: io.apibuilder.reference.api.v0.models.Group) = {
           jsObjectGroup(obj)
         }
@@ -324,8 +324,8 @@ package io.apibuilder.reference.api.v0.models {
       )
     }
 
-    implicit def jsonWritesApidocReferenceApiMember: play.api.libs.json.OWrites[Member] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.Member] {
+    implicit def jsonWritesApidocReferenceApiMember: play.api.libs.json.Writes[Member] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Member] {
         def writes(obj: io.apibuilder.reference.api.v0.models.Member) = {
           jsObjectMember(obj)
         }
@@ -346,8 +346,8 @@ package io.apibuilder.reference.api.v0.models {
       )
     }
 
-    implicit def jsonWritesApidocReferenceApiOrganization: play.api.libs.json.OWrites[Organization] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.Organization] {
+    implicit def jsonWritesApidocReferenceApiOrganization: play.api.libs.json.Writes[Organization] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Organization] {
         def writes(obj: io.apibuilder.reference.api.v0.models.Organization) = {
           jsObjectOrganization(obj)
         }
@@ -376,8 +376,8 @@ package io.apibuilder.reference.api.v0.models {
       })
     }
 
-    implicit def jsonWritesApidocReferenceApiUser: play.api.libs.json.OWrites[User] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.User] {
+    implicit def jsonWritesApidocReferenceApiUser: play.api.libs.json.Writes[User] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.User] {
         def writes(obj: io.apibuilder.reference.api.v0.models.User) = {
           jsObjectUser(obj)
         }
@@ -394,8 +394,8 @@ package io.apibuilder.reference.api.v0.models {
       )
     }
 
-    implicit def jsonWritesApidocReferenceApiUserList: play.api.libs.json.OWrites[UserList] = {
-      new play.api.libs.json.OWrites[io.apibuilder.reference.api.v0.models.UserList] {
+    implicit def jsonWritesApidocReferenceApiUserList: play.api.libs.json.Writes[UserList] = {
+      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.UserList] {
         def writes(obj: io.apibuilder.reference.api.v0.models.UserList) = {
           jsObjectUserList(obj)
         }
