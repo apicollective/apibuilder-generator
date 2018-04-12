@@ -176,9 +176,9 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
         .fields
         .map {field =>
           if (field.shouldApplyDefaultOnRead){
-            s"""${nobt(field.name)} = ${field.name}.getOrElse(${field.default.get})"""
+            s"""${field.name} = ${nobt(field.name)}.getOrElse(${field.default.get})"""
           } else {
-            s"""${nobt(field.name)} = ${field.name}"""
+            s"""${field.name} = ${nobt(field.name)}"""
           }
       }.mkString(",\n").indent(6),
       s"    )",

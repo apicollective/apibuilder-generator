@@ -47,7 +47,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        Model(
                                |          guid = guid.getOrElse(_root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd")),
                                |          name = name.getOrElse("M3"),
-                               |          __type__ = `type`.getOrElse(test.apidoc.apidoctest.v0.models.CarType.Coupe),
+                               |          `type` = __type__.getOrElse(test.apidoc.apidoctest.v0.models.CarType.Coupe),
                                |          curbWeight = curbWeight.getOrElse(3500),
                                |          serial = serial.getOrElse(45678901234L),
                                |          finalDrive = finalDrive.getOrElse(3.85),
@@ -100,7 +100,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        Model(
                                |          guid = guid.getOrElse(_root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd")),
                                |          name = name.getOrElse("M3"),
-                               |          __type__ = `type`.getOrElse(test.apidoc.apidoctest.v0.models.CarType.Coupe),
+                               |          `type` = __type__.getOrElse(test.apidoc.apidoctest.v0.models.CarType.Coupe),
                                |          curbWeight = curbWeight.getOrElse(3500),
                                |          serial = serial.getOrElse(45678901234L),
                                |          finalDrive = finalDrive.getOrElse(3.85),
@@ -152,7 +152,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        Model(
                                |          guid = guid.getOrElse(Some(_root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd"))),
                                |          name = name.getOrElse(Some("M3")),
-                               |          __type__ = `type`.getOrElse(Some(test.apidoc.apidoctest.v0.models.CarType.Coupe)),
+                               |          `type` = __type__.getOrElse(Some(test.apidoc.apidoctest.v0.models.CarType.Coupe)),
                                |          curbWeight = curbWeight.getOrElse(Some(3500)),
                                |          serial = serial.getOrElse(Some(45678901234L)),
                                |          finalDrive = finalDrive.getOrElse(Some(3.85)),
@@ -203,7 +203,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        Model(
                                |          guid = guid,
                                |          name = name,
-                               |          __type__ = `type`,
+                               |          `type` = __type__,
                                |          curbWeight = curbWeight,
                                |          serial = serial,
                                |          finalDrive = finalDrive,
@@ -256,7 +256,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |        Model(
                                |          guid = guid,
                                |          name = name,
-                               |          __type__ = `type`,
+                               |          `type` = __type__,
                                |          curbWeight = curbWeight,
                                |          serial = serial,
                                |          finalDrive = finalDrive,
