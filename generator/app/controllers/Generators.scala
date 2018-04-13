@@ -43,7 +43,8 @@ object Generators {
         key = "anorm_2_x_parsers",
         name = "Anorm 2.x parsers",
         description = Some("Generates anorm parsers. Depends on apidoc_0_x_libs generators. See https://www.playframework.com/documentation/2.4.x/ScalaAnorm"),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.anorm.ParserGenerator24)
@@ -53,7 +54,8 @@ object Generators {
         key = "anorm_2_6_parsers",
         name = "Anorm 2.6 parsers",
         description = Some("Generates anorm parsers. Depends on apidoc_0_x_libs generators. See https://www.playframework.com/documentation/2.6.x/ScalaAnorm"),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.anorm.ParserGenerator26)
@@ -103,7 +105,8 @@ object Generators {
         key = "play_2_2_client",
         name = "Play 2.2 client",
         description = Some("Play Framework 2.2 client based on <a href='http://www.playframework.com/documentation/2.2.x/ScalaWS''>WS API</a>. Note this client does NOT support HTTP PATCH. If you need PATCH, we recommend using the ning client instead, which uses play-json underneath so should require minimal new dependencies in Play."),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play22ClientGenerator)
@@ -113,7 +116,8 @@ object Generators {
         key = "play_2_3_client",
         name = "Play 2.3 client",
         description = Some("Play Framework 2.3 client based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaWS'>WS API</a>."),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play23ClientGenerator)
@@ -123,7 +127,8 @@ object Generators {
         key = "play_2_4_client",
         name = "Play 2.4 client",
         description = Some("Play Framework 2.4 client based on <a href='http://www.playframework.com/documentation/2.4.x/ScalaWS'>WS API</a>. Primary change from 2.3.x is WSRequestHolder has been deprecated (replaced by WSRequest)."),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play24ClientGenerator)
@@ -133,7 +138,8 @@ object Generators {
         key = "play_2_5_client",
         name = "Play 2.5 client",
         description = Some("Play Framework 2.5 client based on <a href='http://www.playframework.com/documentation/2.5.x/ScalaWS'>WS API</a>. Primary change from 2.4.x is to explicit accept the WSClient as it is now injected."),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play25ClientGenerator)
@@ -143,7 +149,8 @@ object Generators {
         key = "play_2_6_client",
         name = "Play 2.6 client",
         description = Some("Play Framework 2.6 client based on <a href='http://www.playframework.com/documentation/2.6.x/ScalaWS'>WS API</a>."),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play26ClientGenerator)
@@ -153,7 +160,8 @@ object Generators {
         key = "play_2_x_json",
         name = "Play 2.x json",
         description = Some("Generate play 2.x case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play2Models)
@@ -163,7 +171,8 @@ object Generators {
         key = "play_2_x_standalone_json",
         name = "Play 2.x standalone json",
         description = Some("Generate case class with json serialization based on play-json, but do NOT include any other features that depend on the play framework (like QueryStringBindable)"),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play2StandaloneModelsJson)
@@ -183,7 +192,8 @@ object Generators {
         key = "scala_models",
         name = "Scala models",
         description = Some("Generate scala models from the API description."),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.generator.ScalaCaseClasses)
@@ -274,7 +284,8 @@ object Generators {
         key = "play_2_4_mock_client",
         name = "Play 2.4 Mock Client",
         description = Some("Provides a mock client with non functional, but compiling stubs, that can serve as a baseline for testing"),
-        language = Some("Java, Scala")
+        language = Some("Java, Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play24)
@@ -284,7 +295,8 @@ object Generators {
         key = "play_2_5_mock_client",
         name = "Play 2.5 Mock Client",
         description = Some("Provides a mock client with non functional, but compiling stubs, that can serve as a baseline for testing"),
-        language = Some("Java, Scala")
+        language = Some("Java, Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play25)
@@ -294,7 +306,8 @@ object Generators {
         key = "play_2_6_mock_client",
         name = "Play 2.6 Mock Client",
         description = Some("Provides a mock client with non functional, but compiling stubs, that can serve as a baseline for testing"),
-        language = Some("Java, Scala")
+        language = Some("Java, Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play26)
@@ -304,7 +317,8 @@ object Generators {
         key = "http4s_0_15",
         name = "Http4s 0.15 / 0.16",
         description = Some("Http4s 0.15 and 0.16 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.15/client/'>http4s client</a>"),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s015Generator)
@@ -314,7 +328,8 @@ object Generators {
         key = "http4s_0_17",
         name = "Http4s 0.17",
         description = Some("Http4s 0.17 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.17/client/'>http4s client</a>"),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s017Generator)
@@ -324,7 +339,8 @@ object Generators {
         key = "http4s_0_18",
         name = "Http4s 0.18",
         description = Some("Http4s 0.18 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.18/client/'>http4s client</a>"),
-        language = Some("Scala")
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s018Generator)
