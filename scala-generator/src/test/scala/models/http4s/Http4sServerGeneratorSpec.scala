@@ -149,4 +149,16 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
       models.TestHelper.assertEqualsFile("/http4s/status-codes-018.txt", scalaSourceCode)
     }
   }
+
+  describe("snake and kebab case fields and params") {
+    it("http4s 0.18 server") {
+      val service = models.TestHelper.parseFile(s"/http4s/kebab-and-snake-case.json")
+      val server = Http4sServer(new InvocationForm(service, Seq.empty, None),
+        new ScalaService(service),
+        new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
+      val scalaSourceCode = server.generate()
+      assertValidScalaSourceCode(scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/kebab-and-snake-case-018.txt", scalaSourceCode)
+    }
+  }
 }

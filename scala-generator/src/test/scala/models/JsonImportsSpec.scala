@@ -1,7 +1,6 @@
 package scala.models
 
-import scala.generator.ScalaService
-import org.scalatest.{ Matchers, FunSpec }
+import org.scalatest.{FunSpec, Matchers}
 
 class JsonImportsSpec extends FunSpec with Matchers {
 

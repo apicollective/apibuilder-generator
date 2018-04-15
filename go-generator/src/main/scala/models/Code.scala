@@ -1,12 +1,11 @@
 package go.models
 
-import io.apibuilder.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, Service, Union}
-import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import Formatter._
+import go.models.Formatter._
+import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType, Union}
 import lib.Datatype
 import lib.generator.GeneratorUtil
-import lib.Text
+
 import scala.collection.mutable
 
 case class Code(form: InvocationForm) {
@@ -119,6 +118,16 @@ case class Code(form: InvocationForm) {
     val publicName = importBuilder.publicName(model.name)
     val privateName = GoUtil.privateName(model.name)
 
+    val defaults = model.fields.flatMap { f =>
+      (f.default, f.required) match {
+        case (Some(d), false) => {
+          val publicFieldName = importBuilder.publicName(f.name)
+          Defaults.mkGolangDefault(f.default, datatype(f.`type`, true), service, importBuilder).map(d=> s"$privateName.$publicFieldName = $d")
+        }
+        case _ => None
+      }
+    }
+
     Seq(
       GoUtil.textToComment(model.description) + s"type $publicName struct {",
       model.fields.map { f =>
@@ -127,7 +136,7 @@ case class Code(form: InvocationForm) {
         val json = Seq(
           (publicName == f.name) match {
             case true => None
-            case fasle => Some(f.name)
+            case false => Some(f.name)
           },
           f.required match {
             case true => None
@@ -140,7 +149,7 @@ case class Code(form: InvocationForm) {
 
         Seq(
           Some(publicName),
-          Some(GoType(importBuilder, datatype(f.`type`, f.required)).klass.localName),
+          Some(GoType(importBuilder, datatype(f.`type`, f.required || f.default.isDefined)).klass.localName),
           json
         ).flatten.mkString(" ")
       }.mkString("\n").table().indent(1),
@@ -149,9 +158,9 @@ case class Code(form: InvocationForm) {
       "",
       Seq(
         s"func ${publicName}FromMap(data interface{}) $publicName {",
-	Seq(
+	        Seq(
           "b, err := json.Marshal(data)",
-	  "if err == nil {",
+	        "if err == nil {",
           s"return ${publicName}FromJson(${bytes}.NewReader(b))".indent(1),
           "} else {",
           "panic(err)".indent(1),
@@ -159,15 +168,17 @@ case class Code(form: InvocationForm) {
         ).mkString("\n").indent(1),
         "}"
       ).mkString("\n"),
-
       "",
       Seq(
         s"func ${publicName}FromJson(bytes ${io}.Reader) $publicName {",
+        (Seq(
+          s"var $privateName $publicName"
+        ) ++
+        defaults ++
         Seq(
-          s"var $privateName $publicName",
           s"${json}.NewDecoder(bytes).Decode(&$privateName)",
           s"return $privateName"
-        ).mkString("\n").indent(1),
+        )).mkString("\n").indent(1),
         "}"
       ).mkString("\n")
 
@@ -220,7 +231,7 @@ case class Code(form: InvocationForm) {
           case Some(discriminator) => {
             Seq(
 	      s"var el map[string]interface{}",
-	      s"${json}.NewDecoder(bytes).Decode(&el)",
+	      s"${json}.Unmarshallbytes).Decode(&el)",
               s"""switch el["$discriminator"] {""",
 
               (
@@ -554,7 +565,7 @@ case class Code(form: InvocationForm) {
               case fields => {
                 Some(
                   fields.map { field =>
-                    val fieldGoType = GoType(importBuilder, datatype(field.`type`, field.required))
+                    val fieldGoType = GoType(importBuilder, datatype(field.`type`, field.required || field.default.isDefined))
                     val fieldName = importBuilder.publicName(field.name)
                     val fullName = s"${varName}.$fieldName"
 

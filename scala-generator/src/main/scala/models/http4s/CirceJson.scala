@@ -149,24 +149,37 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
   private[models] def decodersAndEncoders(model: ScalaModel): String = {
     decoders(model) ++ "\n\n" ++ encoders(model)
   }
+  
   private[models] def decoders(model: ScalaModel): String = {
+    // backticks don't work correctly as enumerator names in for comprehensions
+    def nobt(fieldName:String) = fieldName.replaceAll("`", "__")
     Seq(
       s"${implicitDecoderDef(model.name)} = Decoder.instance { c =>",
       s" for {",
       model.fields.map { field =>
         field.datatype match {
           case ScalaDatatype.Option(inner) => {
-            s"""${field.name} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
+            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
+          }
+          case datatype if field.shouldApplyDefaultOnRead => {
+            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${datatype.name}]]"""
           }
           case datatype => {
-            s"""${field.name} <- c.downField("${field.originalName}").as[${datatype.name}]"""
+            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[${datatype.name}]"""
           }
         }
       }.mkString("\n").indent(4),
       s"  } yield {",
       s"    ${model.name}(",
-      model.fields.map { field =>
-        s"""${field.name} = ${field.name}"""
+
+      model
+        .fields
+        .map {field =>
+          if (field.shouldApplyDefaultOnRead){
+            s"""${field.name} = ${nobt(field.name)}.getOrElse(${field.default.get})"""
+          } else {
+            s"""${field.name} = ${nobt(field.name)}"""
+          }
       }.mkString(",\n").indent(6),
       s"    )",
       s"  }",
@@ -179,7 +192,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
       s"${implicitEncoderDef(model.name)} = Encoder.instance { t =>",
       s"  Json.fromFields(Seq(",
       model.fields.map { field =>
-        if (field.required) {
+        if (field.shouldModelConcreteType) {
           s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
         } else {
           s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""

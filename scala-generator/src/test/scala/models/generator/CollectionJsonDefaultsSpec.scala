@@ -28,6 +28,7 @@ class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
+
         models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-play-23.txt", sourceFiles.head.contents)
       }
     }

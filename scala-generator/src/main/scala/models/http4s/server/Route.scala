@@ -10,7 +10,7 @@ import scala.models.http4s.ScalaService
 sealed trait PathSegment
 case class Literal(name: String) extends PathSegment
 case class PlainString(name: String) extends PathSegment
-case class Extracted(name: String, parameter: ScalaParameter) extends PathSegment
+case class Extracted(parameter: ScalaParameter) extends PathSegment
 
 case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation, config: ScalaClientMethodConfigs.Http4s) {
   val pathSegments: Array[PathSegment] = op.path.split("/").filterNot(_.isEmpty).map { segment =>
@@ -20,8 +20,8 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       val truncated = segment.drop(1) //ScalaUtil.toVariable(segment.drop(1))
       op.pathParameters.find(_.originalName == truncated).fold(Literal(segment): PathSegment) { scalaParameter =>
         scalaParameter.datatype match {
-          case ScalaPrimitive.String if scalaParameter.param.minimum.isEmpty && scalaParameter.param.maximum.isEmpty => PlainString(truncated)
-          case _: ScalaPrimitive => Extracted(truncated, scalaParameter)
+          case ScalaPrimitive.String if scalaParameter.param.minimum.isEmpty && scalaParameter.param.maximum.isEmpty => PlainString(scalaParameter.asScalaVal)
+          case _: ScalaPrimitive => Extracted(scalaParameter)
         }
       }
     }
@@ -50,7 +50,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       case ScalaDatatype.Option(container: ScalaDatatype.Container) => container.name
       case other => other.name
     }
-    Some(s"${ScalaUtil.quoteNameIfKeyword(field.name)}: $typ")
+    Some(s"${field.asScalaVal}: $typ")
   }
 
   val requestCaseClassName = s"${op.name.capitalize}Request"
@@ -65,17 +65,17 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
     val params =
       Seq(Some(s"_req: ${config.requestClass}")) ++
-        nonHeaderParameters ++
-        Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
+      nonHeaderParameters ++
+      Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
 
     val requestCaseClass = s"$requestCaseClassName(${nonHeaderParameters.flatten.mkString(", ")})"
 
     val requestDecoder = Seq(s"implicit val ${requestCaseClassName}Decoder: _root_.io.circe.Decoder[$requestCaseClassName] = _root_.io.circe.Decoder.instance { a =>",
                              s"  for {",
-                             op.nonHeaderParameters.map(p => s"""    ${p.name} <- a.downField("${p.originalName}").as[${p.datatype.name}]""").mkString("\n"),
+                             op.nonHeaderParameters.map(p => s"""    ${p.asScalaVal} <- a.downField("${p.originalName}").as[${p.datatype.name}]""").mkString("\n"),
                              s"  } yield {",
                              s"    $requestCaseClassName(",
-                             op.nonHeaderParameters.map(p => s"""      ${p.name} = ${p.name}""").mkString(",\n"),
+                             op.nonHeaderParameters.map(p => s"""      ${p.asScalaVal} = ${p.asScalaVal}""").mkString(",\n"),
                              s"    )",
                              s"  }",
                              s"}")
@@ -87,8 +87,8 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
         s"") ++ requestDecoder ++ Seq("")
     }
 
-      requestCaseClassAndDecoder ++
-      Seq(
+    requestCaseClassAndDecoder ++
+    Seq(
       s"sealed trait $responseTrait",
       s"",
       s"object ${op.name.capitalize}Response {",
@@ -103,7 +103,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
 
   def route(version: Option[Int]): Seq[String] = {
 
-    def nonHeaderParameters(prefix:String) = op.nonHeaderParameters.map(field => Some(s"$prefix${ScalaUtil.quoteNameIfKeyword(field.originalName)}"))
+    def nonHeaderParameters(prefix:String) = op.nonHeaderParameters.map(field => Some(s"$prefix${field.asScalaVal}"))
 
     def args(prefix:String) = (
       Seq(Some("_req")) ++
@@ -116,7 +116,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
         pathSegments.collect {
           case Literal(n) => s""""$n""""
           case PlainString(n) => s"$n"
-          case Extracted(name, param) => s"${Http4sServer.pathExtractor(ssd, param).name}($name)"
+          case Extracted(param) => s"${Http4sServer.pathExtractor(ssd, param).name}(${param.asScalaVal})"
         }
       ).mkString(" / ")
 
@@ -142,11 +142,13 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       )
     }
 
-    val prefix = Seq(s"case _req @ ${op.method} -> $path$queryStart$query$verFilter =>")
+    def prefix(filter: String) = s"case _req @ ${op.method} -> $path$queryStart$query$filter =>"
+
+    val verFilterPrefix = Seq(prefix(verFilter))
 
     val decodingParameters:Seq[String] = {
       op.nonHeaderParameters.map { field =>
-        val name = ScalaUtil.quoteNameIfKeyword(field.name)
+        val name = field.asScalaVal
         val originalName = ScalaUtil.quoteNameIfKeyword(field.originalName)
         val datatype = field.datatype.name
 
@@ -188,7 +190,11 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       route("")
     }
 
-    prefix ++ decoding
+    val missingVersionHeaderCase = version.fold(Seq(""))(_ =>
+                                                  Seq(prefix(s" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined") ++ "\n" ++
+                                                    s"""  BadRequest(s"Missing required request header: $${ApiVersion.ApiVersionMajor}.")"""))
+
+    verFilterPrefix ++ decoding ++ missingVersionHeaderCase
 
   }
 

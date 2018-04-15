@@ -9,7 +9,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
   override def pathParams(op: ScalaOperation): String = {
     val pairs = op.pathParameters.map { p =>
       require(p.location == ParameterLocation.Path, "Only singletons can be path parameters.")
-      s":${p.originalName}" -> urlEncode(p.name, p.datatype)
+      s":${p.originalName}" -> urlEncode(p.asScalaVal, p.datatype)
     }.toMap
     val path = op.path.split("/").map(_.trim).filter(!_.isEmpty).map { e => pairs.get(e).getOrElse(s""""${e.takeWhile(_ != '#')}"""") }
     path.mkString("Seq(", ", ", ")").trim
@@ -41,8 +41,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
 
     } else {
       val params = op.formParameters.map { param =>
-        val varName = ScalaUtil.quoteNameIfKeyword(param.name)
-        val value = encodeValue(varName, param.datatype)
+        val value = encodeValue(param.asScalaVal, param.datatype)
         s""""${param.originalName}" -> ${value}.asJson"""
       }.mkString(",\n")
       Some(
