@@ -28,7 +28,7 @@ object TestHelper extends Matchers {
     val body = s"""
       "apidoc": { "version": "$specVersion" },
       "base_url": "http://localhost:9000",
-      "name": "Api Doc Test",
+      "name": "API Builder Test",
       "organization": { "key": "test" },
       "application": { "key": "apidoc-test" },
       "namespace": "test.apidoc.apidoctest.v0",

@@ -51,12 +51,12 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
 
   object Types {
     import test.apidoc.apidoctest.v0.models.json._
-    implicit val columnToSeqApiDocTestGuestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
-    implicit val columnToMapApiDocTestGuestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
-    implicit val columnToSeqApiDocTestRegisteredUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
-    implicit val columnToMapApiDocTestRegisteredUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
-    implicit val columnToSeqApiDocTestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] }
-    implicit val columnToMapApiDocTestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] }
+    implicit val columnToSeqAPIBuilderTestGuestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
+    implicit val columnToMapAPIBuilderTestGuestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.GuestUser]] }
+    implicit val columnToSeqAPIBuilderTestRegisteredUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
+    implicit val columnToMapAPIBuilderTestRegisteredUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.RegisteredUser]] }
+    implicit val columnToSeqAPIBuilderTestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] }
+    implicit val columnToMapAPIBuilderTestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] }
   }
 
   object Standard {

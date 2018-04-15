@@ -1,4 +1,4 @@
-implicit val jsonReadsApiDocTestAgeGroup = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.AgeGroup] {
+implicit val jsonReadsAPIBuilderTestAgeGroup = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.AgeGroup] {
   def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[test.apidoc.apidoctest.v0.models.AgeGroup] = {
     js match {
       case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.AgeGroup(v.value))
@@ -12,7 +12,7 @@ implicit val jsonReadsApiDocTestAgeGroup = new play.api.libs.json.Reads[test.api
   }
 }
 
-def jsonWritesApiDocTestAgeGroup(obj: test.apidoc.apidoctest.v0.models.AgeGroup) = {
+def jsonWritesAPIBuilderTestAgeGroup(obj: test.apidoc.apidoctest.v0.models.AgeGroup) = {
   play.api.libs.json.JsString(obj.toString)
 }
 
@@ -20,15 +20,15 @@ def jsObjectAgeGroup(obj: test.apidoc.apidoctest.v0.models.AgeGroup) = {
   play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
 }
 
-implicit def jsonWritesApiDocTestAgeGroup: play.api.libs.json.Writes[AgeGroup] = {
+implicit def jsonWritesAPIBuilderTestAgeGroup: play.api.libs.json.Writes[AgeGroup] = {
   new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.AgeGroup] {
     def writes(obj: test.apidoc.apidoctest.v0.models.AgeGroup) = {
-      jsonWritesApiDocTestAgeGroup(obj)
+      jsonWritesAPIBuilderTestAgeGroup(obj)
     }
   }
 }
 
-implicit val jsonReadsApiDocTestGenre = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.Genre] {
+implicit val jsonReadsAPIBuilderTestGenre = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.Genre] {
   def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[test.apidoc.apidoctest.v0.models.Genre] = {
     js match {
       case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.Genre(v.value))
@@ -42,7 +42,7 @@ implicit val jsonReadsApiDocTestGenre = new play.api.libs.json.Reads[test.apidoc
   }
 }
 
-def jsonWritesApiDocTestGenre(obj: test.apidoc.apidoctest.v0.models.Genre) = {
+def jsonWritesAPIBuilderTestGenre(obj: test.apidoc.apidoctest.v0.models.Genre) = {
   play.api.libs.json.JsString(obj.toString)
 }
 
@@ -50,10 +50,10 @@ def jsObjectGenre(obj: test.apidoc.apidoctest.v0.models.Genre) = {
   play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
 }
 
-implicit def jsonWritesApiDocTestGenre: play.api.libs.json.Writes[Genre] = {
+implicit def jsonWritesAPIBuilderTestGenre: play.api.libs.json.Writes[Genre] = {
   new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.Genre] {
     def writes(obj: test.apidoc.apidoctest.v0.models.Genre) = {
-      jsonWritesApiDocTestGenre(obj)
+      jsonWritesAPIBuilderTestGenre(obj)
     }
   }
 }
