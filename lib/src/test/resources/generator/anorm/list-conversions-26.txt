@@ -52,8 +52,8 @@ package test.apidoc.apidoctest.v0.anorm.conversions {
 
   object Types {
     import test.apidoc.apidoctest.v0.models.json._
-    implicit val columnToSeqApiDocTestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] }
-    implicit val columnToMapApiDocTestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] }
+    implicit val columnToSeqAPIBuilderTestUser: Column[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Seq[_root_.test.apidoc.apidoctest.v0.models.User]] }
+    implicit val columnToMapAPIBuilderTestUser: Column[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] = Util.parser { _.as[Map[String, _root_.test.apidoc.apidoctest.v0.models.User]] }
   }
 
   object Standard {

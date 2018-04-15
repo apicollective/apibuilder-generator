@@ -1,4 +1,4 @@
-implicit def jsonReadsApiDocTestGuestUser: play.api.libs.json.Reads[GuestUser] = {
+implicit def jsonReadsAPIBuilderTestGuestUser: play.api.libs.json.Reads[GuestUser] = {
   (
     (__ \ "id").read[Long] and
     (__ \ "email").read[String] and
@@ -18,7 +18,7 @@ def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser): play.api
   })
 }
 
-implicit def jsonReadsApiDocTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
+implicit def jsonReadsAPIBuilderTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
   (
     (__ \ "id").read[Long] and
     (__ \ "email").read[String] and
@@ -38,11 +38,11 @@ def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser)
   })
 }
 
-implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
+implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[User] = {
   (
-    (__ \ "registered_user").read(jsonReadsApiDocTestRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
+    (__ \ "registered_user").read(jsonReadsAPIBuilderTestRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
     orElse
-    (__ \ "guest_user").read(jsonReadsApiDocTestGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
+    (__ \ "guest_user").read(jsonReadsAPIBuilderTestGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
     orElse
     play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
   )
@@ -56,7 +56,7 @@ def jsObjectUser(obj: test.apidoc.apidoctest.v0.models.User): play.api.libs.json
   }
 }
 
-implicit def jsonWritesApiDocTestUser: play.api.libs.json.Writes[User] = {
+implicit def jsonWritesAPIBuilderTestUser: play.api.libs.json.Writes[User] = {
   new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.User] {
     def writes(obj: test.apidoc.apidoctest.v0.models.User) = {
       jsObjectUser(obj)

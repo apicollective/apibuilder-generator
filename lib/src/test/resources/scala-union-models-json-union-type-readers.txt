@@ -1,8 +1,8 @@
-implicit def jsonReadsApiDocTestUser: play.api.libs.json.Reads[User] = {
+implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[User] = {
   (
-    (__ \ "registered_user").read(jsonReadsApiDocTestRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
+    (__ \ "registered_user").read(jsonReadsAPIBuilderTestRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
     orElse
-    (__ \ "guest_user").read(jsonReadsApiDocTestGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
+    (__ \ "guest_user").read(jsonReadsAPIBuilderTestGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
     orElse
     play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
   )

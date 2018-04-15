@@ -1,6 +1,6 @@
-implicit def jsonReadsApiDocTestInnerType: play.api.libs.json.Reads[InnerType] = {
+implicit def jsonReadsAPIBuilderTestInnerType: play.api.libs.json.Reads[InnerType] = {
   (
-    (__ \ "string_model").read(jsonReadsApiDocTestStringModel).asInstanceOf[play.api.libs.json.Reads[InnerType]]
+    (__ \ "string_model").read(jsonReadsAPIBuilderTestStringModel).asInstanceOf[play.api.libs.json.Reads[InnerType]]
     orElse
     play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.InnerTypeUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[InnerType]]
   )

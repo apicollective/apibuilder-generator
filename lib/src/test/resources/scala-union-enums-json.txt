@@ -1,8 +1,8 @@
-implicit def jsonReadsApiDocTestUserType: play.api.libs.json.Reads[UserType] = {
+implicit def jsonReadsAPIBuilderTestUserType: play.api.libs.json.Reads[UserType] = {
   (
-    (__ \ "member_type").read(jsonReadsApiDocTestMemberType).asInstanceOf[play.api.libs.json.Reads[UserType]]
+    (__ \ "member_type").read(jsonReadsAPIBuilderTestMemberType).asInstanceOf[play.api.libs.json.Reads[UserType]]
     orElse
-    (__ \ "role_type").read(jsonReadsApiDocTestRoleType).asInstanceOf[play.api.libs.json.Reads[UserType]]
+    (__ \ "role_type").read(jsonReadsAPIBuilderTestRoleType).asInstanceOf[play.api.libs.json.Reads[UserType]]
     orElse
     play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.UserTypeUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[UserType]]
   )
@@ -16,7 +16,7 @@ def jsObjectUserType(obj: test.apidoc.apidoctest.v0.models.UserType): play.api.l
   }
 }
 
-implicit def jsonWritesApiDocTestUserType: play.api.libs.json.Writes[UserType] = {
+implicit def jsonWritesAPIBuilderTestUserType: play.api.libs.json.Writes[UserType] = {
   new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.UserType] {
     def writes(obj: test.apidoc.apidoctest.v0.models.UserType) = {
       jsObjectUserType(obj)
