@@ -1,12 +1,7 @@
 package go.models
 
-import java.time.LocalDate
-
-import go.models.ImportBuilder
-import io.apibuilder.spec.v0.models.{Field, Service}
+import io.apibuilder.spec.v0.models.Service
 import lib.Datatype
-import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import play.api.libs.json._
 
 object Defaults {

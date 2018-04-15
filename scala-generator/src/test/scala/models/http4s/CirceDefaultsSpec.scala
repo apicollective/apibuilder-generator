@@ -30,7 +30,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                  |    launchedOn: _root_.java.time.LocalDate = _root_.java.time.LocalDate.parse("1986-02-01"),
                                  |    timestamp: _root_.java.time.Instant = _root_.java.time.Instant.parse("2018-03-21T02:20:52Z")""".stripMargin) should be(true)
 
-    jsOnly.contents.contains("""    implicit def decodeApiDocTestModel: Decoder[Model] = Decoder.instance { c =>
+    jsOnly.contents.contains("""    implicit def decodeAPIBuilderTestModel: Decoder[Model] = Decoder.instance { c =>
                                |     for {
                                |        guid <- c.downField("guid").as[Option[_root_.java.util.UUID]]
                                |        name <- c.downField("name").as[Option[String]]
