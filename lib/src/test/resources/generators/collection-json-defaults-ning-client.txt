@@ -5,14 +5,14 @@
 package com.gilt.test.v0.models {
 
   @deprecated("to be merged with members")
-  case class User(
+  final case class User(
     email: String,
     role: String = "admin",
     groups: Seq[String],
     @deprecated permissions: Seq[String]
   )
 
-  case class UserPatch(
+  final case class UserPatch(
     groups: _root_.scala.Option[Seq[String]] = None,
     permissions: Seq[String] = Nil,
     preferences: Seq[String] = scala.List("foo")
@@ -300,7 +300,7 @@ package com.gilt.test.v0 {
 
   sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
-    case class Basic(username: String, password: Option[String] = None) extends Authorization
+    final case class Basic(username: String, password: Option[String] = None) extends Authorization
   }
 
   package interfaces {
@@ -332,7 +332,7 @@ package com.gilt.test.v0 {
 
   package errors {
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
+    final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
 
   }
 

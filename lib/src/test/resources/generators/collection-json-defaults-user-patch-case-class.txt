@@ -1,4 +1,4 @@
-case class UserPatch(
+final case class UserPatch(
   groups: _root_.scala.Option[Seq[String]] = None,
   permissions: Seq[String] = Nil,
   preferences: Seq[String] = scala.List("foo")

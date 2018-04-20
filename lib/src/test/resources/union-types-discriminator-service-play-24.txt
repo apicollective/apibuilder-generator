@@ -18,7 +18,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     case object SystemUser extends UserDiscriminator { override def toString = "system_user" }
     case object String extends UserDiscriminator { override def toString = "string" }
 
-    case class UNDEFINED(override val toString: String) extends UserDiscriminator
+    final case class UNDEFINED(override val toString: String) extends UserDiscriminator
 
     val all: scala.List[UserDiscriminator] = scala.List(RegisteredUser, GuestUser, SystemUser, String)
 
@@ -33,12 +33,12 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
   /**
    * @param id Internal unique identifier for this user.
    */
-  case class GuestUser(
+  final case class GuestUser(
     id: String,
     email: _root_.scala.Option[String] = None
   ) extends User
 
-  case class RegisteredUser(
+  final case class RegisteredUser(
     id: String,
     email: String
   ) extends User
@@ -51,7 +51,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
-  case class UserUndefinedType(
+  final case class UserUndefinedType(
     description: String
   ) extends User
 
@@ -59,7 +59,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
   /**
    * Wrapper class to support the union types containing the datatype[string]
    */
-  case class UserString(
+  final case class UserString(
     value: String
   ) extends User
 
@@ -79,7 +79,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends SystemUser
+    final case class UNDEFINED(override val toString: String) extends SystemUser
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -305,7 +305,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
 
     }
 
-    case class ApibuilderQueryStringBindable[T](
+    final case class ApibuilderQueryStringBindable[T](
       converters: ApibuilderTypeConverter[T]
     ) extends QueryStringBindable[T] {
 
@@ -328,7 +328,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
       }
     }
 
-    case class ApibuilderPathBindable[T](
+    final case class ApibuilderPathBindable[T](
       converters: ApibuilderTypeConverter[T]
     ) extends PathBindable[T] {
 
@@ -508,7 +508,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
 
   sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
-    case class Basic(username: String, password: Option[String] = None) extends Authorization
+    final case class Basic(username: String, password: Option[String] = None) extends Authorization
   }
 
   package interfaces {
@@ -540,9 +540,9 @@ package io.apibuilder.example.union.types.discriminator.v0 {
 
     import io.apibuilder.example.union.types.discriminator.v0.models.json._
 
-    case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
+    final case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
+    final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
 
   }
 

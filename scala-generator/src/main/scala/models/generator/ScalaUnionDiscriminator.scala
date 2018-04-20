@@ -45,7 +45,7 @@ case class ScalaUnionDiscriminator(
           Some(s"""case object ${typ.name} extends $className { override def toString = "${typ.discriminatorName}" }""")
         ).flatten.mkString("\n")
       }.mkString("\n"),
-      s"case class UNDEFINED(override val toString: String) extends $className",
+      s"final case class UNDEFINED(override val toString: String) extends $className",
       s"val all: scala.List[$className] = scala.List(" + union.types.map(_.name).mkString(", ") + ")",
       s"private[this] val byName: Map[String, $className] = all.map(x => x.toString.toLowerCase -> x).toMap",
       s"def apply(value: String): $className = fromString(value).getOrElse(UNDEFINED(value))",

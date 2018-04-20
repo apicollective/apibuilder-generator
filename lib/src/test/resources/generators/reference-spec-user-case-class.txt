@@ -1,4 +1,4 @@
-case class User(
+final case class User(
   guid: _root_.java.util.UUID,
   email: String,
   active: Boolean,

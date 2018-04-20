@@ -1,4 +1,4 @@
-case class Member(
+final case class Member(
   guid: _root_.java.util.UUID,
   organization: io.apibuilder.reference.api.v0.models.Organization,
   user: io.apibuilder.reference.api.v0.models.User,
