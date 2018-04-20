@@ -2,14 +2,14 @@ package test.apidoc.apidoctest.v0.models {
 
   sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
 
-  case class GuestUser(
+  final case class GuestUser(
     id: Long,
     email: String,
     name: _root_.scala.Option[String] = None,
     bar: String
   ) extends User
 
-  case class RegisteredUser(
+  final case class RegisteredUser(
     id: Long,
     email: String,
     name: _root_.scala.Option[String] = None,
@@ -24,7 +24,7 @@ package test.apidoc.apidoctest.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
-  case class UserUndefinedType(
+  final case class UserUndefinedType(
     description: String
   ) extends User
 

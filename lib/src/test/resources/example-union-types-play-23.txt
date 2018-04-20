@@ -22,7 +22,7 @@ package io.apibuilder.example.union.types.v0.models {
     @deprecated 
     case object Uuid extends UserDiscriminator { override def toString = "uuid" }
 
-    case class UNDEFINED(override val toString: String) extends UserDiscriminator
+    final case class UNDEFINED(override val toString: String) extends UserDiscriminator
 
     val all: scala.List[UserDiscriminator] = scala.List(RegisteredUser, GuestUser, Uuid)
 
@@ -37,7 +37,7 @@ package io.apibuilder.example.union.types.v0.models {
   /**
    * @param guid Internal unique identifier for this user.
    */
-  case class GuestUser(
+  final case class GuestUser(
     guid: _root_.java.util.UUID,
     email: String
   ) extends User
@@ -45,7 +45,7 @@ package io.apibuilder.example.union.types.v0.models {
   /**
    * @param guid Internal unique identifier for this user.
    */
-  case class RegisteredUser(
+  final case class RegisteredUser(
     guid: _root_.java.util.UUID,
     email: String,
     preference: io.apibuilder.example.union.types.v0.models.Foobar
@@ -59,7 +59,7 @@ package io.apibuilder.example.union.types.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
-  case class FoobarUndefinedType(
+  final case class FoobarUndefinedType(
     description: String
   ) extends Foobar
 
@@ -71,7 +71,7 @@ package io.apibuilder.example.union.types.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
-  case class UserUndefinedType(
+  final case class UserUndefinedType(
     description: String
   ) extends User
 
@@ -79,7 +79,7 @@ package io.apibuilder.example.union.types.v0.models {
   /**
    * Wrapper class to support the union types containing the datatype[uuid]
    */
-  case class UserUuid(
+  final case class UserUuid(
     value: _root_.java.util.UUID
   ) extends User
 
@@ -98,7 +98,7 @@ package io.apibuilder.example.union.types.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends Bar
+    final case class UNDEFINED(override val toString: String) extends Bar
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -131,7 +131,7 @@ package io.apibuilder.example.union.types.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends Foo
+    final case class UNDEFINED(override val toString: String) extends Foo
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -420,7 +420,7 @@ package io.apibuilder.example.union.types.v0 {
 
     }
 
-    case class ApibuilderQueryStringBindable[T](
+    final case class ApibuilderQueryStringBindable[T](
       converters: ApibuilderTypeConverter[T]
     ) extends QueryStringBindable[T] {
 
@@ -443,7 +443,7 @@ package io.apibuilder.example.union.types.v0 {
       }
     }
 
-    case class ApibuilderPathBindable[T](
+    final case class ApibuilderPathBindable[T](
       converters: ApibuilderTypeConverter[T]
     ) extends PathBindable[T] {
 
@@ -623,7 +623,7 @@ package io.apibuilder.example.union.types.v0 {
 
   sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
-    case class Basic(username: String, password: Option[String] = None) extends Authorization
+    final case class Basic(username: String, password: Option[String] = None) extends Authorization
   }
 
   package interfaces {
@@ -655,9 +655,9 @@ package io.apibuilder.example.union.types.v0 {
 
     import io.apibuilder.example.union.types.v0.models.json._
 
-    case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
+    final case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
+    final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
 
   }
 

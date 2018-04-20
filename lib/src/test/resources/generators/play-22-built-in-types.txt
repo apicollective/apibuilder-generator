@@ -4,7 +4,7 @@
  */
 package apibuilder.models {
 
-  case class Array(
+  final case class Array(
     boolean: Seq[Boolean],
     dateiso8601: Seq[_root_.org.joda.time.LocalDate],
     datetimeiso8601: Seq[_root_.org.joda.time.DateTime],
@@ -18,7 +18,7 @@ package apibuilder.models {
     uuid: Seq[_root_.java.util.UUID]
   )
 
-  case class Optarray(
+  final case class Optarray(
     boolean: _root_.scala.Option[Seq[Boolean]] = None,
     dateiso8601: _root_.scala.Option[Seq[_root_.org.joda.time.LocalDate]] = None,
     datetimeiso8601: _root_.scala.Option[Seq[_root_.org.joda.time.DateTime]] = None,
@@ -32,7 +32,7 @@ package apibuilder.models {
     uuid: _root_.scala.Option[Seq[_root_.java.util.UUID]] = None
   )
 
-  case class Optional(
+  final case class Optional(
     boolean: _root_.scala.Option[Boolean] = None,
     dateiso8601: _root_.scala.Option[_root_.org.joda.time.LocalDate] = None,
     datetimeiso8601: _root_.scala.Option[_root_.org.joda.time.DateTime] = None,
@@ -46,7 +46,7 @@ package apibuilder.models {
     uuid: _root_.scala.Option[_root_.java.util.UUID] = None
   )
 
-  case class Required(
+  final case class Required(
     boolean: Boolean,
     dateiso8601: _root_.org.joda.time.LocalDate,
     datetimeiso8601: _root_.org.joda.time.DateTime,
@@ -380,7 +380,7 @@ package apibuilder {
 
     }
 
-    case class ApibuilderQueryStringBindable[T](
+    final case class ApibuilderQueryStringBindable[T](
       converters: ApibuilderTypeConverter[T]
     ) extends QueryStringBindable[T] {
 
@@ -403,7 +403,7 @@ package apibuilder {
       }
     }
 
-    case class ApibuilderPathBindable[T](
+    final case class ApibuilderPathBindable[T](
       converters: ApibuilderTypeConverter[T]
     ) extends PathBindable[T] {
 
@@ -599,7 +599,7 @@ package apibuilder {
 
   sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
-    case class Basic(username: String, password: Option[String] = None) extends Authorization
+    final case class Basic(username: String, password: Option[String] = None) extends Authorization
   }
 
   package interfaces {
@@ -640,7 +640,7 @@ package apibuilder {
 
   package errors {
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
+    final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
 
   }
 

@@ -15,7 +15,7 @@ class ScalaDefaultsSpec extends FunSpec with Matchers {
 
     val jsOnly = res.head
 
-    jsOnly.contents.contains("""  case class Model(
+    jsOnly.contents.contains("""  final case class Model(
                                |    guid: _root_.java.util.UUID = _root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd"),
                                |    name: String = "M3",
                                |    `type`: test.apidoc.apidoctest.v0.models.CarType = test.apidoc.apidoctest.v0.models.CarType.Coupe,
@@ -39,7 +39,7 @@ class ScalaDefaultsSpec extends FunSpec with Matchers {
 
     val jsOnly = res.head
 
-    jsOnly.contents.contains("""  case class Model(
+    jsOnly.contents.contains("""  final case class Model(
                                |    guid: _root_.java.util.UUID = _root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd"),
                                |    name: String = "M3",
                                |    `type`: test.apidoc.apidoctest.v0.models.CarType = test.apidoc.apidoctest.v0.models.CarType.Coupe,
@@ -63,7 +63,7 @@ class ScalaDefaultsSpec extends FunSpec with Matchers {
 
     val jsOnly = res.head
 
-    jsOnly.contents.contains("""  case class Model(
+    jsOnly.contents.contains("""  final case class Model(
                                |    guid: _root_.scala.Option[_root_.java.util.UUID] = Some(_root_.java.util.UUID.fromString("abcd-ef01-2345-6789-abcd")),
                                |    name: _root_.scala.Option[String] = Some("M3"),
                                |    `type`: _root_.scala.Option[test.apidoc.apidoctest.v0.models.CarType] = Some(test.apidoc.apidoctest.v0.models.CarType.Coupe),
@@ -87,7 +87,7 @@ class ScalaDefaultsSpec extends FunSpec with Matchers {
 
     val jsOnly = res.head
 
-    jsOnly.contents.contains("""  case class Model(
+    jsOnly.contents.contains("""  final case class Model(
                                |    guid: _root_.scala.Option[_root_.java.util.UUID] = None,
                                |    name: _root_.scala.Option[String] = None,
                                |    `type`: _root_.scala.Option[test.apidoc.apidoctest.v0.models.CarType] = None,
@@ -114,7 +114,7 @@ class ScalaDefaultsSpec extends FunSpec with Matchers {
 
     val jsOnly = res.head
 
-    jsOnly.contents.contains("""  case class Model(
+    jsOnly.contents.contains("""  final case class Model(
                                |    guid: _root_.java.util.UUID,
                                |    name: String,
                                |    `type`: test.apidoc.apidoctest.v0.models.CarType,

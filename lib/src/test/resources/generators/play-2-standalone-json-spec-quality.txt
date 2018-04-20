@@ -7,7 +7,7 @@ package com.gilt.quality.v0.models {
   /**
    * @param adjournedAt Defaults to the time of the request
    */
-  case class AdjournForm(
+  final case class AdjournForm(
     adjournedAt: _root_.scala.Option[_root_.org.joda.time.DateTime] = None
   )
 
@@ -20,24 +20,24 @@ package com.gilt.quality.v0.models {
    * @param incident Summary of the incident to review.
    * @param task What needs to be reviewed at this meeting for this incident.
    */
-  case class AgendaItem(
+  final case class AgendaItem(
     id: Long,
     meeting: com.gilt.quality.v0.models.Meeting,
     incident: com.gilt.quality.v0.models.Incident,
     task: com.gilt.quality.v0.models.Task
   )
 
-  case class AgendaItemForm(
+  final case class AgendaItemForm(
     meetingId: Long,
     incidentId: Long,
     task: com.gilt.quality.v0.models.Task
   )
 
-  case class AuthenticationForm(
+  final case class AuthenticationForm(
     email: String
   )
 
-  case class EmailMessage(
+  final case class EmailMessage(
     subject: String,
     body: String
   )
@@ -46,7 +46,7 @@ package com.gilt.quality.v0.models {
    * @param code Machine readable code for this specific error message
    * @param message Description of the error
    */
-  case class Error(
+  final case class Error(
     code: String,
     message: String
   )
@@ -55,7 +55,7 @@ package com.gilt.quality.v0.models {
    * Stores metadata about external services that can be integrated with the quality
    * app
    */
-  case class ExternalService(
+  final case class ExternalService(
     id: Long,
     organization: com.gilt.quality.v0.models.Organization,
     name: com.gilt.quality.v0.models.ExternalServiceName,
@@ -63,7 +63,7 @@ package com.gilt.quality.v0.models {
     username: String
   )
 
-  case class ExternalServiceForm(
+  final case class ExternalServiceForm(
     name: com.gilt.quality.v0.models.ExternalServiceName,
     url: String,
     username: String,
@@ -77,7 +77,7 @@ package com.gilt.quality.v0.models {
    * 
    * @param key Unique token identifying this response
    */
-  case class Followup(
+  final case class Followup(
     key: String,
     plan: com.gilt.quality.v0.models.Plan,
     sentAt: _root_.org.joda.time.DateTime
@@ -88,14 +88,14 @@ package com.gilt.quality.v0.models {
    * This gives teams the ability to say: Yes, completed. Not yet. or No, won't do.
    * After 3 consecutive no replies, we assume not doing.
    */
-  case class FollowupResponse(
+  final case class FollowupResponse(
     followup: com.gilt.quality.v0.models.Followup,
     response: com.gilt.quality.v0.models.Response,
     createdAt: _root_.org.joda.time.DateTime,
     createdBy: com.gilt.quality.v0.models.User
   )
 
-  case class Healthcheck(
+  final case class Healthcheck(
     @deprecated("please use audience.label instead") status: String
   )
 
@@ -105,7 +105,7 @@ package com.gilt.quality.v0.models {
    * @param smileyUrl URL for the smiley icon
    * @param frownyUrl URL for the frowny icon
    */
-  case class Icons(
+  final case class Icons(
     smileyUrl: String,
     frownyUrl: String
   )
@@ -120,7 +120,7 @@ package com.gilt.quality.v0.models {
    * @param team Team responsible for resolution of this incident
    * @param tags Optional list of tags to apply to this incident
    */
-  case class Incident(
+  final case class Incident(
     id: Long,
     organization: com.gilt.quality.v0.models.Organization,
     summary: String,
@@ -138,7 +138,7 @@ package com.gilt.quality.v0.models {
    * @param description Full description of the incident
    * @param tags Optional list of tags to apply to this incident
    */
-  case class IncidentForm(
+  final case class IncidentForm(
     teamKey: _root_.scala.Option[String] = None,
     severity: com.gilt.quality.v0.models.Severity,
     summary: String,
@@ -149,12 +149,12 @@ package com.gilt.quality.v0.models {
   /**
    * Used to move an incident to another organization
    */
-  case class IncidentOrganizationChange(
+  final case class IncidentOrganizationChange(
     incidentId: Long,
     organizationKey: String
   )
 
-  case class IncidentSummary(
+  final case class IncidentSummary(
     id: Long,
     severity: com.gilt.quality.v0.models.Severity,
     summary: String
@@ -174,14 +174,14 @@ package com.gilt.quality.v0.models {
    *        explicitly by a person, or will automatically occur a few hours after the
    *        meeting's scheduled time.
    */
-  case class Meeting(
+  final case class Meeting(
     id: Long,
     organization: com.gilt.quality.v0.models.Organization,
     scheduledAt: _root_.org.joda.time.DateTime,
     adjournedAt: _root_.scala.Option[_root_.org.joda.time.DateTime] = None
   )
 
-  case class MeetingForm(
+  final case class MeetingForm(
     scheduledAt: _root_.org.joda.time.DateTime
   )
 
@@ -190,7 +190,7 @@ package com.gilt.quality.v0.models {
    * meeting. General idea is given a meeting id and an incident id, returns the
    * previous and next incident IDs, if any
    */
-  case class MeetingPager(
+  final case class MeetingPager(
     meeting: com.gilt.quality.v0.models.Meeting,
     priorIncident: _root_.scala.Option[com.gilt.quality.v0.models.Incident] = None,
     nextIncident: _root_.scala.Option[com.gilt.quality.v0.models.Incident] = None
@@ -203,7 +203,7 @@ package com.gilt.quality.v0.models {
    * @param key Used as a unique key for this organization that is URL safe.
    * @param name The name of this organization.
    */
-  case class Organization(
+  final case class Organization(
     key: String,
     name: String
   )
@@ -211,7 +211,7 @@ package com.gilt.quality.v0.models {
   /**
    * @param key Defaults to a url friendy version of the name
    */
-  case class OrganizationForm(
+  final case class OrganizationForm(
     name: String,
     key: _root_.scala.Option[String] = None
   )
@@ -223,7 +223,7 @@ package com.gilt.quality.v0.models {
    * @param body Full description of the incident
    * @param grade Grade given to this plan on a scale of 0 (bad) to 100 (good)
    */
-  case class Plan(
+  final case class Plan(
     id: Long,
     incidentId: Long,
     body: String,
@@ -231,7 +231,7 @@ package com.gilt.quality.v0.models {
     createdAt: _root_.org.joda.time.DateTime
   )
 
-  case class PlanForm(
+  final case class PlanForm(
     incidentId: Long,
     body: String
   )
@@ -247,7 +247,7 @@ package com.gilt.quality.v0.models {
    * @param totalPlans Number of plans attached to reported incidents in the time span requested.
    * @param plans Last plans to display grades for.
    */
-  case class Statistic(
+  final case class Statistic(
     team: com.gilt.quality.v0.models.Team,
     totalGrades: Long,
     averageGrade: _root_.scala.Option[Int] = None,
@@ -262,14 +262,14 @@ package com.gilt.quality.v0.models {
    * 
    * @param id Internal unique identifier for this subscription record
    */
-  case class Subscription(
+  final case class Subscription(
     id: Long,
     organization: com.gilt.quality.v0.models.Organization,
     user: com.gilt.quality.v0.models.User,
     publication: com.gilt.quality.v0.models.Publication
   )
 
-  case class SubscriptionForm(
+  final case class SubscriptionForm(
     organizationKey: String,
     userGuid: _root_.java.util.UUID,
     publication: com.gilt.quality.v0.models.Publication
@@ -286,7 +286,7 @@ package com.gilt.quality.v0.models {
    * @param icons Set of icons used on the site for this team (e.g. smiley and frowney faces).
    *        Teams inherit a default set of icons if not otherwise provided.
    */
-  case class Team(
+  final case class Team(
     organization: com.gilt.quality.v0.models.Organization,
     key: String,
     email: _root_.scala.Option[String] = None,
@@ -296,14 +296,14 @@ package com.gilt.quality.v0.models {
   /**
    * @param key Unique identifier for this team
    */
-  case class TeamForm(
+  final case class TeamForm(
     key: String,
     email: _root_.scala.Option[String] = None,
     smileyUrl: _root_.scala.Option[String] = None,
     frownyUrl: _root_.scala.Option[String] = None
   )
 
-  case class TeamMember(
+  final case class TeamMember(
     team: com.gilt.quality.v0.models.Team,
     user: com.gilt.quality.v0.models.User
   )
@@ -311,12 +311,12 @@ package com.gilt.quality.v0.models {
   /**
    * Statistics on each team's quality metrics, number of issues
    */
-  case class TeamMemberSummary(
+  final case class TeamMemberSummary(
     team: com.gilt.quality.v0.models.Team,
     numberMembers: Long
   )
 
-  case class UpdateTeamForm(
+  final case class UpdateTeamForm(
     email: _root_.scala.Option[String] = None,
     smileyUrl: _root_.scala.Option[String] = None,
     frownyUrl: _root_.scala.Option[String] = None
@@ -327,12 +327,12 @@ package com.gilt.quality.v0.models {
    * 
    * @param guid Internal unique identifier for this user.
    */
-  case class User(
+  final case class User(
     guid: _root_.java.util.UUID,
     email: String
   )
 
-  case class UserForm(
+  final case class UserForm(
     email: String
   )
 
@@ -358,7 +358,7 @@ package com.gilt.quality.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends ExternalServiceName
+    final case class UNDEFINED(override val toString: String) extends ExternalServiceName
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -418,7 +418,7 @@ package com.gilt.quality.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends Publication
+    final case class UNDEFINED(override val toString: String) extends Publication
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -453,7 +453,7 @@ package com.gilt.quality.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends Response
+    final case class UNDEFINED(override val toString: String) extends Response
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -487,7 +487,7 @@ package com.gilt.quality.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends Severity
+    final case class UNDEFINED(override val toString: String) extends Severity
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -531,7 +531,7 @@ package com.gilt.quality.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends Task
+    final case class UNDEFINED(override val toString: String) extends Task
 
     /**
      * all returns a list of all the valid, known values. We use

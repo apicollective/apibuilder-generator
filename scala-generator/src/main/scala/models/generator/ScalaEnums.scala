@@ -35,7 +35,7 @@ case class ScalaEnums(
  * We use all CAPS for the variable name to avoid collisions
  * with the camel cased values above.
  */
-case class UNDEFINED(override val toString: String) extends ${enum.name}
+final case class UNDEFINED(override val toString: String) extends ${enum.name}
 
 /**
  * all returns a list of all the valid, known values. We use

@@ -14,7 +14,7 @@ object AgeGroup {
    * We use all CAPS for the variable name to avoid collisions
    * with the camel cased values above.
    */
-  case class UNDEFINED(override val toString: String) extends AgeGroup
+  final case class UNDEFINED(override val toString: String) extends AgeGroup
 
   /**
    * all returns a list of all the valid, known values. We use
@@ -48,7 +48,7 @@ object Genre {
    * We use all CAPS for the variable name to avoid collisions
    * with the camel cased values above.
    */
-  case class UNDEFINED(override val toString: String) extends Genre
+  final case class UNDEFINED(override val toString: String) extends Genre
 
   /**
    * all returns a list of all the valid, known values. We use

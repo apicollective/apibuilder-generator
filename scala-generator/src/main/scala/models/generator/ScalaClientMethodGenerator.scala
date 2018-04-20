@@ -86,7 +86,7 @@ class ScalaClientMethodGenerator(
   }
 
   protected def failedRequestClass(): String = {
-    """case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")"""
+    """final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")"""
   }
 
   /**
@@ -126,7 +126,7 @@ class ScalaClientMethodGenerator(
     }
 
     Seq(
-      s"case class $className(",
+      s"final case class $className(",
       s"  response: ${config.responseClass},",
       s"  message: Option[String] = None",
       s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$bodyString"""
@@ -137,7 +137,7 @@ class ScalaClientMethodGenerator(
   protected def unitExceptionClass(
     className: String
   ): String = {
-    s"case class $className(status: Int)" + """ extends Exception(s"HTTP $status")"""
+    s"final case class $className(status: Int)" + """ extends Exception(s"HTTP $status")"""
   }
 
   def methods(resource: ScalaResource): Seq[ScalaClientMethod] = {

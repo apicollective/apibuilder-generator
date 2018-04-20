@@ -100,7 +100,7 @@ object ApibuilderTypes {
 
 }
 
-case class ApibuilderQueryStringBindable[T](
+final case class ApibuilderQueryStringBindable[T](
   converters: ApibuilderTypeConverter[T]
 ) extends QueryStringBindable[T] {
 
@@ -123,7 +123,7 @@ case class ApibuilderQueryStringBindable[T](
   }
 }
 
-case class ApibuilderPathBindable[T](
+final case class ApibuilderPathBindable[T](
   converters: ApibuilderTypeConverter[T]
 ) extends PathBindable[T] {
 

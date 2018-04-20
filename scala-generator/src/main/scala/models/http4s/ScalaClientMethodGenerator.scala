@@ -33,7 +33,7 @@ class ScalaClientMethodGenerator (
   }
 
   override protected def failedRequestClass(): String = {
-    """case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None, parent: Exception = null) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message", parent)"""
+    """final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None, parent: Exception = null) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message", parent)"""
   }
 
   override def methods(resource: ScalaResource): Seq[ScalaClientMethod] = {
@@ -194,7 +194,7 @@ class ScalaClientMethodGenerator (
         val body = variableName.map(v => s"{\n  lazy val $v = ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(body)\n}").getOrElse("")
 
         Seq(
-          s"case class $className(",
+          s"final case class $className(",
           s"  response: ${config.responseClass},",
           s"  message: Option[String] = None" + variableName.map(v => s",\n  body: $responseDataType").getOrElse(""),
           s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$body"""

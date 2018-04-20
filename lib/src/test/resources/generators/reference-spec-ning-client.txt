@@ -7,7 +7,7 @@ package io.apibuilder.reference.api.v0.models {
   /**
    * A model with a lot of fields.
    */
-  case class Big(
+  final case class Big(
     f1: String,
     f2: String,
     f3: String,
@@ -31,14 +31,14 @@ package io.apibuilder.reference.api.v0.models {
     f21: String
   )
 
-  case class Echo(
+  final case class Echo(
     value: String
   )
 
   /**
    * Models an API error.
    */
-  case class Error(
+  final case class Error(
     code: String,
     message: String
   )
@@ -46,23 +46,23 @@ package io.apibuilder.reference.api.v0.models {
   /**
    * A group of users in an organization.
    */
-  case class Group(
+  final case class Group(
     members: Seq[io.apibuilder.reference.api.v0.models.User]
   )
 
-  case class Member(
+  final case class Member(
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.reference.api.v0.models.Organization,
     user: io.apibuilder.reference.api.v0.models.User,
     role: String
   )
 
-  case class Organization(
+  final case class Organization(
     guid: _root_.java.util.UUID,
     name: String
   )
 
-  case class User(
+  final case class User(
     guid: _root_.java.util.UUID,
     email: String,
     active: Boolean,
@@ -70,7 +70,7 @@ package io.apibuilder.reference.api.v0.models {
     tags: _root_.scala.Option[Map[String, String]] = None
   )
 
-  case class UserList(
+  final case class UserList(
     users: Seq[io.apibuilder.reference.api.v0.models.User]
   )
 
@@ -96,7 +96,7 @@ package io.apibuilder.reference.api.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    case class UNDEFINED(override val toString: String) extends AgeGroup
+    final case class UNDEFINED(override val toString: String) extends AgeGroup
 
     /**
      * all returns a list of all the valid, known values. We use
@@ -776,7 +776,7 @@ package io.apibuilder.reference.api.v0 {
 
   sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable
   object Authorization {
-    case class Basic(username: String, password: Option[String] = None) extends Authorization
+    final case class Basic(username: String, password: Option[String] = None) extends Authorization
   }
 
   package interfaces {
@@ -896,14 +896,14 @@ package io.apibuilder.reference.api.v0 {
 
     import io.apibuilder.reference.api.v0.models.json._
 
-    case class ErrorsResponse(
+    final case class ErrorsResponse(
       response: _root_.com.ning.http.client.Response,
       message: Option[String] = None
     ) extends Exception(message.getOrElse(response.getStatusCode + ": " + response.getResponseBody("UTF-8"))){
       lazy val errors = _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Error]", response, _.validate[Seq[io.apibuilder.reference.api.v0.models.Error]])
     }
 
-    case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
+    final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message")
 
   }
 
