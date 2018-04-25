@@ -333,9 +333,13 @@ case class Play2Json(
       }
       case fields => {
         Seq(
-          "(",
-          serializations.mkString(" and\n").indent(2),
-          s")(${model.name}.apply _)"
+          "for {",
+          (fields zip serializations)
+            .map { case (field, reader) =>
+              s"${field.name} <- $reader".indent(2)
+            }
+            .mkString("\n"),
+          s"} yield ${model.name}(${fields.map(_.name).mkString(", ")})"
         ).mkString("\n")
       }
     }
