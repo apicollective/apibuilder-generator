@@ -204,6 +204,30 @@
           "type": "string",
           "required": true,
           "attributes": []
+        },
+        {
+          "name": "f22",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "f23",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "f24",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "f25",
+          "type": "string",
+          "required": true,
+          "attributes": []
         }
       ],
       "attributes": [],

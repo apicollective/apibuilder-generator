@@ -28,7 +28,11 @@ package io.apibuilder.reference.api.v0.models {
     f18: String,
     f19: String,
     f20: String,
-    f21: String
+    f21: String,
+    f22: String,
+    f23: String,
+    f24: String,
+    f25: String
   )
 
   final case class Echo(
@@ -211,7 +215,11 @@ package io.apibuilder.reference.api.v0.models {
         f19 <- (__ \ "f19").read[String]
         f20 <- (__ \ "f20").read[String]
         f21 <- (__ \ "f21").read[String]
-      } yield Big(f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21)
+        f22 <- (__ \ "f22").read[String]
+        f23 <- (__ \ "f23").read[String]
+        f24 <- (__ \ "f24").read[String]
+        f25 <- (__ \ "f25").read[String]
+      } yield Big(f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25)
     }
 
     def jsObjectBig(obj: io.apibuilder.reference.api.v0.models.Big): play.api.libs.json.JsObject = {
@@ -236,7 +244,11 @@ package io.apibuilder.reference.api.v0.models {
         "f18" -> play.api.libs.json.JsString(obj.f18),
         "f19" -> play.api.libs.json.JsString(obj.f19),
         "f20" -> play.api.libs.json.JsString(obj.f20),
-        "f21" -> play.api.libs.json.JsString(obj.f21)
+        "f21" -> play.api.libs.json.JsString(obj.f21),
+        "f22" -> play.api.libs.json.JsString(obj.f22),
+        "f23" -> play.api.libs.json.JsString(obj.f23),
+        "f24" -> play.api.libs.json.JsString(obj.f24),
+        "f25" -> play.api.libs.json.JsString(obj.f25)
       )
     }
 
