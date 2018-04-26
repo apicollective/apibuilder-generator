@@ -1,10 +1,10 @@
 implicit def jsonReadsAPIBuilderTestGuestUser: play.api.libs.json.Reads[GuestUser] = {
-  (
-    (__ \ "id").read[Long] and
-    (__ \ "email").read[String] and
-    (__ \ "name").readNullable[String] and
-    (__ \ "bar").read[String]
-  )(GuestUser.apply _)
+  for {
+    id <- (__ \ "id").read[Long]
+    email <- (__ \ "email").read[String]
+    name <- (__ \ "name").readNullable[String]
+    bar <- (__ \ "bar").read[String]
+  } yield GuestUser(id, email, name, bar)
 }
 
 def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser): play.api.libs.json.JsObject = {
@@ -19,12 +19,12 @@ def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser): play.api
 }
 
 implicit def jsonReadsAPIBuilderTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
-  (
-    (__ \ "id").read[Long] and
-    (__ \ "email").read[String] and
-    (__ \ "name").readNullable[String] and
-    (__ \ "foo").read[String]
-  )(RegisteredUser.apply _)
+  for {
+    id <- (__ \ "id").read[Long]
+    email <- (__ \ "email").read[String]
+    name <- (__ \ "name").readNullable[String]
+    foo <- (__ \ "foo").read[String]
+  } yield RegisteredUser(id, email, name, foo)
 }
 
 def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser): play.api.libs.json.JsObject = {

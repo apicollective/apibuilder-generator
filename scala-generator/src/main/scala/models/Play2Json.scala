@@ -328,16 +328,19 @@ case class Play2Json(
     }
 
     model.fields match {
-      case field :: Nil => {
+      case field :: Nil =>
         serializations.head + s""".map { x => new ${model.name}(${field.name} = x) }"""
-      }
-      case fields => {
-        Seq(
-          "(",
-          serializations.mkString(" and\n").indent(2),
-          s")(${model.name}.apply _)"
-        ).mkString("\n")
-      }
+
+      case fields =>
+        val constructorCall = s"${model.name}(${fields.map(_.name).mkString(", ")})"
+
+        val forComprehensions = (fields zip serializations).map { case (field, reader) =>
+          s"${field.name} <- $reader".indent(2)
+        }
+
+        s"""for {
+           |${forComprehensions.mkString("\n")}
+           |} yield $constructorCall""".stripMargin
     }
   }
 

@@ -285,11 +285,11 @@ module Io
             # A model with a lot of fields.
             class Big
 
-              attr_reader :f1, :f2, :f3, :f4, :f5, :f6, :f7, :f8, :f9, :f10, :f11, :f12, :f13, :f14, :f15, :f16, :f17, :f18, :f19, :f20, :f21
+              attr_reader :f1, :f2, :f3, :f4, :f5, :f6, :f7, :f8, :f9, :f10, :f11, :f12, :f13, :f14, :f15, :f16, :f17, :f18, :f19, :f20, :f21, :f22, :f23, :f24, :f25
 
               def initialize(incoming={})
                 opts = HttpClient::Helper.symbolize_keys(incoming)
-                HttpClient::Preconditions.require_keys(opts, [:f1, :f2, :f3, :f4, :f5, :f6, :f7, :f8, :f9, :f10, :f11, :f12, :f13, :f14, :f15, :f16, :f17, :f18, :f19, :f20, :f21], 'Big')
+                HttpClient::Preconditions.require_keys(opts, [:f1, :f2, :f3, :f4, :f5, :f6, :f7, :f8, :f9, :f10, :f11, :f12, :f13, :f14, :f15, :f16, :f17, :f18, :f19, :f20, :f21, :f22, :f23, :f24, :f25], 'Big')
                 @f1 = HttpClient::Preconditions.assert_class('f1', opts.delete(:f1), String)
                 @f2 = HttpClient::Preconditions.assert_class('f2', opts.delete(:f2), String)
                 @f3 = HttpClient::Preconditions.assert_class('f3', opts.delete(:f3), String)
@@ -311,6 +311,10 @@ module Io
                 @f19 = HttpClient::Preconditions.assert_class('f19', opts.delete(:f19), String)
                 @f20 = HttpClient::Preconditions.assert_class('f20', opts.delete(:f20), String)
                 @f21 = HttpClient::Preconditions.assert_class('f21', opts.delete(:f21), String)
+                @f22 = HttpClient::Preconditions.assert_class('f22', opts.delete(:f22), String)
+                @f23 = HttpClient::Preconditions.assert_class('f23', opts.delete(:f23), String)
+                @f24 = HttpClient::Preconditions.assert_class('f24', opts.delete(:f24), String)
+                @f25 = HttpClient::Preconditions.assert_class('f25', opts.delete(:f25), String)
               end
 
               def to_json
@@ -343,7 +347,11 @@ module Io
                   :f18 => f18,
                   :f19 => f19,
                   :f20 => f20,
-                  :f21 => f21
+                  :f21 => f21,
+                  :f22 => f22,
+                  :f23 => f23,
+                  :f24 => f24,
+                  :f25 => f25
                 }
               end
 

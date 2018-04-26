@@ -104,19 +104,19 @@ package apibuilder.models {
     }
 
     implicit def jsonReadsBuiltInTypesArray: play.api.libs.json.Reads[Array] = {
-      (
-        (__ \ "boolean").read[Seq[Boolean]] and
-        (__ \ "dateiso8601").read[Seq[_root_.org.joda.time.LocalDate]] and
-        (__ \ "datetimeiso8601").read[Seq[_root_.org.joda.time.DateTime]] and
-        (__ \ "decimal").read[Seq[BigDecimal]] and
-        (__ \ "double").read[Seq[Double]] and
-        (__ \ "integer").read[Seq[Int]] and
-        (__ \ "json").read[Seq[_root_.play.api.libs.json.JsValue]] and
-        (__ \ "long").read[Seq[Long]] and
-        (__ \ "object").read[Seq[_root_.play.api.libs.json.JsObject]] and
-        (__ \ "string").read[Seq[String]] and
-        (__ \ "uuid").read[Seq[_root_.java.util.UUID]]
-      )(Array.apply _)
+      for {
+        boolean <- (__ \ "boolean").read[Seq[Boolean]]
+        dateiso8601 <- (__ \ "dateiso8601").read[Seq[_root_.org.joda.time.LocalDate]]
+        datetimeiso8601 <- (__ \ "datetimeiso8601").read[Seq[_root_.org.joda.time.DateTime]]
+        decimal <- (__ \ "decimal").read[Seq[BigDecimal]]
+        double <- (__ \ "double").read[Seq[Double]]
+        integer <- (__ \ "integer").read[Seq[Int]]
+        json <- (__ \ "json").read[Seq[_root_.play.api.libs.json.JsValue]]
+        long <- (__ \ "long").read[Seq[Long]]
+        `object` <- (__ \ "object").read[Seq[_root_.play.api.libs.json.JsObject]]
+        string <- (__ \ "string").read[Seq[String]]
+        uuid <- (__ \ "uuid").read[Seq[_root_.java.util.UUID]]
+      } yield Array(boolean, dateiso8601, datetimeiso8601, decimal, double, integer, json, long, `object`, string, uuid)
     }
 
     def jsObjectArray(obj: apibuilder.models.Array): play.api.libs.json.JsObject = {
@@ -144,19 +144,19 @@ package apibuilder.models {
     }
 
     implicit def jsonReadsBuiltInTypesOptarray: play.api.libs.json.Reads[Optarray] = {
-      (
-        (__ \ "boolean").readNullable[Seq[Boolean]] and
-        (__ \ "dateiso8601").readNullable[Seq[_root_.org.joda.time.LocalDate]] and
-        (__ \ "datetimeiso8601").readNullable[Seq[_root_.org.joda.time.DateTime]] and
-        (__ \ "decimal").readNullable[Seq[BigDecimal]] and
-        (__ \ "double").readNullable[Seq[Double]] and
-        (__ \ "integer").readNullable[Seq[Int]] and
-        (__ \ "json").readNullable[Seq[_root_.play.api.libs.json.JsValue]] and
-        (__ \ "long").readNullable[Seq[Long]] and
-        (__ \ "object").readNullable[Seq[_root_.play.api.libs.json.JsObject]] and
-        (__ \ "string").readNullable[Seq[String]] and
-        (__ \ "uuid").readNullable[Seq[_root_.java.util.UUID]]
-      )(Optarray.apply _)
+      for {
+        boolean <- (__ \ "boolean").readNullable[Seq[Boolean]]
+        dateiso8601 <- (__ \ "dateiso8601").readNullable[Seq[_root_.org.joda.time.LocalDate]]
+        datetimeiso8601 <- (__ \ "datetimeiso8601").readNullable[Seq[_root_.org.joda.time.DateTime]]
+        decimal <- (__ \ "decimal").readNullable[Seq[BigDecimal]]
+        double <- (__ \ "double").readNullable[Seq[Double]]
+        integer <- (__ \ "integer").readNullable[Seq[Int]]
+        json <- (__ \ "json").readNullable[Seq[_root_.play.api.libs.json.JsValue]]
+        long <- (__ \ "long").readNullable[Seq[Long]]
+        `object` <- (__ \ "object").readNullable[Seq[_root_.play.api.libs.json.JsObject]]
+        string <- (__ \ "string").readNullable[Seq[String]]
+        uuid <- (__ \ "uuid").readNullable[Seq[_root_.java.util.UUID]]
+      } yield Optarray(boolean, dateiso8601, datetimeiso8601, decimal, double, integer, json, long, `object`, string, uuid)
     }
 
     def jsObjectOptarray(obj: apibuilder.models.Optarray): play.api.libs.json.JsObject = {
@@ -215,19 +215,19 @@ package apibuilder.models {
     }
 
     implicit def jsonReadsBuiltInTypesOptional: play.api.libs.json.Reads[Optional] = {
-      (
-        (__ \ "boolean").readNullable[Boolean] and
-        (__ \ "dateiso8601").readNullable[_root_.org.joda.time.LocalDate] and
-        (__ \ "datetimeiso8601").readNullable[_root_.org.joda.time.DateTime] and
-        (__ \ "decimal").readNullable[BigDecimal] and
-        (__ \ "double").readNullable[Double] and
-        (__ \ "integer").readNullable[Int] and
-        (__ \ "json").readNullable[_root_.play.api.libs.json.JsValue] and
-        (__ \ "long").readNullable[Long] and
-        (__ \ "object").readNullable[_root_.play.api.libs.json.JsObject] and
-        (__ \ "string").readNullable[String] and
-        (__ \ "uuid").readNullable[_root_.java.util.UUID]
-      )(Optional.apply _)
+      for {
+        boolean <- (__ \ "boolean").readNullable[Boolean]
+        dateiso8601 <- (__ \ "dateiso8601").readNullable[_root_.org.joda.time.LocalDate]
+        datetimeiso8601 <- (__ \ "datetimeiso8601").readNullable[_root_.org.joda.time.DateTime]
+        decimal <- (__ \ "decimal").readNullable[BigDecimal]
+        double <- (__ \ "double").readNullable[Double]
+        integer <- (__ \ "integer").readNullable[Int]
+        json <- (__ \ "json").readNullable[_root_.play.api.libs.json.JsValue]
+        long <- (__ \ "long").readNullable[Long]
+        `object` <- (__ \ "object").readNullable[_root_.play.api.libs.json.JsObject]
+        string <- (__ \ "string").readNullable[String]
+        uuid <- (__ \ "uuid").readNullable[_root_.java.util.UUID]
+      } yield Optional(boolean, dateiso8601, datetimeiso8601, decimal, double, integer, json, long, `object`, string, uuid)
     }
 
     def jsObjectOptional(obj: apibuilder.models.Optional): play.api.libs.json.JsObject = {
@@ -286,19 +286,19 @@ package apibuilder.models {
     }
 
     implicit def jsonReadsBuiltInTypesRequired: play.api.libs.json.Reads[Required] = {
-      (
-        (__ \ "boolean").read[Boolean] and
-        (__ \ "dateiso8601").read[_root_.org.joda.time.LocalDate] and
-        (__ \ "datetimeiso8601").read[_root_.org.joda.time.DateTime] and
-        (__ \ "decimal").read[BigDecimal] and
-        (__ \ "double").read[Double] and
-        (__ \ "integer").read[Int] and
-        (__ \ "json").read[_root_.play.api.libs.json.JsValue] and
-        (__ \ "long").read[Long] and
-        (__ \ "object").read[_root_.play.api.libs.json.JsObject] and
-        (__ \ "string").read[String] and
-        (__ \ "uuid").read[_root_.java.util.UUID]
-      )(Required.apply _)
+      for {
+        boolean <- (__ \ "boolean").read[Boolean]
+        dateiso8601 <- (__ \ "dateiso8601").read[_root_.org.joda.time.LocalDate]
+        datetimeiso8601 <- (__ \ "datetimeiso8601").read[_root_.org.joda.time.DateTime]
+        decimal <- (__ \ "decimal").read[BigDecimal]
+        double <- (__ \ "double").read[Double]
+        integer <- (__ \ "integer").read[Int]
+        json <- (__ \ "json").read[_root_.play.api.libs.json.JsValue]
+        long <- (__ \ "long").read[Long]
+        `object` <- (__ \ "object").read[_root_.play.api.libs.json.JsObject]
+        string <- (__ \ "string").read[String]
+        uuid <- (__ \ "uuid").read[_root_.java.util.UUID]
+      } yield Required(boolean, dateiso8601, datetimeiso8601, decimal, double, integer, json, long, `object`, string, uuid)
     }
 
     def jsObjectRequired(obj: apibuilder.models.Required): play.api.libs.json.JsObject = {

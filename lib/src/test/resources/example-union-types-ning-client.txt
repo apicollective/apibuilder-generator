@@ -253,10 +253,10 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[GuestUser] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String]
-      )(GuestUser.apply _)
+      for {
+        guid <- (__ \ "guid").read[_root_.java.util.UUID]
+        email <- (__ \ "email").read[String]
+      } yield GuestUser(guid, email)
     }
 
     def jsObjectGuestUser(obj: io.apibuilder.example.union.types.v0.models.GuestUser): play.api.libs.json.JsObject = {
@@ -267,11 +267,11 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String] and
-        (__ \ "preference").read[io.apibuilder.example.union.types.v0.models.Foobar]
-      )(RegisteredUser.apply _)
+      for {
+        guid <- (__ \ "guid").read[_root_.java.util.UUID]
+        email <- (__ \ "email").read[String]
+        preference <- (__ \ "preference").read[io.apibuilder.example.union.types.v0.models.Foobar]
+      } yield RegisteredUser(guid, email, preference)
     }
 
     def jsObjectRegisteredUser(obj: io.apibuilder.example.union.types.v0.models.RegisteredUser): play.api.libs.json.JsObject = {

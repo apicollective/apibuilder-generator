@@ -95,12 +95,12 @@ class Play2JsonSpec extends FunSpec with Matchers {
       val ssd = ScalaService(models.TestHelper.service(json2))
       val model = ssd.models.head
       Play2Json(ssd).fieldReaders(model) should be (
-        """(
-          |  (__ \ "one").read[Seq[String]] and
-          |  (__ \ "two").read[Int] and
-          |  (__ \ "three").read[_root_.org.joda.time.LocalDate] and
-          |  (__ \ "four").read[Boolean]
-          |)(B.apply _)""".stripMargin)
+        """for {
+          |  one <- (__ \ "one").read[Seq[String]]
+          |  two <- (__ \ "two").read[Int]
+          |  three <- (__ \ "three").read[_root_.org.joda.time.LocalDate]
+          |  four <- (__ \ "four").read[Boolean]
+          |} yield B(one, two, three, four)""".stripMargin)
     }
   }
 
@@ -159,12 +159,12 @@ class Play2JsonSpec extends FunSpec with Matchers {
       val ssd = ScalaService(models.TestHelper.service(json2))
       val model = ssd.models.head
       Play2Json(ssd).fieldReaders(model) should be (
-        """(
-          |  (__ \ "one").readWithDefault[Seq[String]](Nil) and
-          |  (__ \ "two").readWithDefault[Int](7) and
-          |  (__ \ "three").readWithDefault[_root_.org.joda.time.LocalDate](new _root_.org.joda.time.LocalDate(2008, 9, 15)) and
-          |  (__ \ "four").readWithDefault[Boolean](true)
-          |)(B.apply _)""".stripMargin)
+        """for {
+          |  one <- (__ \ "one").readWithDefault[Seq[String]](Nil)
+          |  two <- (__ \ "two").readWithDefault[Int](7)
+          |  three <- (__ \ "three").readWithDefault[_root_.org.joda.time.LocalDate](new _root_.org.joda.time.LocalDate(2008, 9, 15))
+          |  four <- (__ \ "four").readWithDefault[Boolean](true)
+          |} yield B(one, two, three, four)""".stripMargin)
     }
   }
 

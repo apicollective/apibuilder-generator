@@ -28,7 +28,11 @@ package io.apibuilder.reference.api.v0.models {
     f18: String,
     f19: String,
     f20: String,
-    f21: String
+    f21: String,
+    f22: String,
+    f23: String,
+    f24: String,
+    f25: String
   )
 
   final case class Echo(
@@ -189,29 +193,33 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiBig: play.api.libs.json.Reads[Big] = {
-      (
-        (__ \ "f1").read[String] and
-        (__ \ "f2").read[String] and
-        (__ \ "f3").read[String] and
-        (__ \ "f4").read[String] and
-        (__ \ "f5").read[String] and
-        (__ \ "f6").read[String] and
-        (__ \ "f7").read[String] and
-        (__ \ "f8").read[String] and
-        (__ \ "f9").read[String] and
-        (__ \ "f10").read[String] and
-        (__ \ "f11").read[String] and
-        (__ \ "f12").read[String] and
-        (__ \ "f13").read[String] and
-        (__ \ "f14").read[String] and
-        (__ \ "f15").read[String] and
-        (__ \ "f16").read[String] and
-        (__ \ "f17").read[String] and
-        (__ \ "f18").read[String] and
-        (__ \ "f19").read[String] and
-        (__ \ "f20").read[String] and
-        (__ \ "f21").read[String]
-      )(Big.apply _)
+      for {
+        f1 <- (__ \ "f1").read[String]
+        f2 <- (__ \ "f2").read[String]
+        f3 <- (__ \ "f3").read[String]
+        f4 <- (__ \ "f4").read[String]
+        f5 <- (__ \ "f5").read[String]
+        f6 <- (__ \ "f6").read[String]
+        f7 <- (__ \ "f7").read[String]
+        f8 <- (__ \ "f8").read[String]
+        f9 <- (__ \ "f9").read[String]
+        f10 <- (__ \ "f10").read[String]
+        f11 <- (__ \ "f11").read[String]
+        f12 <- (__ \ "f12").read[String]
+        f13 <- (__ \ "f13").read[String]
+        f14 <- (__ \ "f14").read[String]
+        f15 <- (__ \ "f15").read[String]
+        f16 <- (__ \ "f16").read[String]
+        f17 <- (__ \ "f17").read[String]
+        f18 <- (__ \ "f18").read[String]
+        f19 <- (__ \ "f19").read[String]
+        f20 <- (__ \ "f20").read[String]
+        f21 <- (__ \ "f21").read[String]
+        f22 <- (__ \ "f22").read[String]
+        f23 <- (__ \ "f23").read[String]
+        f24 <- (__ \ "f24").read[String]
+        f25 <- (__ \ "f25").read[String]
+      } yield Big(f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25)
     }
 
     def jsObjectBig(obj: io.apibuilder.reference.api.v0.models.Big): play.api.libs.json.JsObject = {
@@ -236,7 +244,11 @@ package io.apibuilder.reference.api.v0.models {
         "f18" -> play.api.libs.json.JsString(obj.f18),
         "f19" -> play.api.libs.json.JsString(obj.f19),
         "f20" -> play.api.libs.json.JsString(obj.f20),
-        "f21" -> play.api.libs.json.JsString(obj.f21)
+        "f21" -> play.api.libs.json.JsString(obj.f21),
+        "f22" -> play.api.libs.json.JsString(obj.f22),
+        "f23" -> play.api.libs.json.JsString(obj.f23),
+        "f24" -> play.api.libs.json.JsString(obj.f24),
+        "f25" -> play.api.libs.json.JsString(obj.f25)
       )
     }
 
@@ -267,10 +279,10 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiError: play.api.libs.json.Reads[Error] = {
-      (
-        (__ \ "code").read[String] and
-        (__ \ "message").read[String]
-      )(Error.apply _)
+      for {
+        code <- (__ \ "code").read[String]
+        message <- (__ \ "message").read[String]
+      } yield Error(code, message)
     }
 
     def jsObjectError(obj: io.apibuilder.reference.api.v0.models.Error): play.api.libs.json.JsObject = {
@@ -307,12 +319,12 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiMember: play.api.libs.json.Reads[Member] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "organization").read[io.apibuilder.reference.api.v0.models.Organization] and
-        (__ \ "user").read[io.apibuilder.reference.api.v0.models.User] and
-        (__ \ "role").read[String]
-      )(Member.apply _)
+      for {
+        guid <- (__ \ "guid").read[_root_.java.util.UUID]
+        organization <- (__ \ "organization").read[io.apibuilder.reference.api.v0.models.Organization]
+        user <- (__ \ "user").read[io.apibuilder.reference.api.v0.models.User]
+        role <- (__ \ "role").read[String]
+      } yield Member(guid, organization, user, role)
     }
 
     def jsObjectMember(obj: io.apibuilder.reference.api.v0.models.Member): play.api.libs.json.JsObject = {
@@ -333,10 +345,10 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiOrganization: play.api.libs.json.Reads[Organization] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "name").read[String]
-      )(Organization.apply _)
+      for {
+        guid <- (__ \ "guid").read[_root_.java.util.UUID]
+        name <- (__ \ "name").read[String]
+      } yield Organization(guid, name)
     }
 
     def jsObjectOrganization(obj: io.apibuilder.reference.api.v0.models.Organization): play.api.libs.json.JsObject = {
@@ -355,13 +367,13 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiUser: play.api.libs.json.Reads[User] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String] and
-        (__ \ "active").read[Boolean] and
-        (__ \ "age_group").read[io.apibuilder.reference.api.v0.models.AgeGroup] and
-        (__ \ "tags").readNullable[Map[String, String]]
-      )(User.apply _)
+      for {
+        guid <- (__ \ "guid").read[_root_.java.util.UUID]
+        email <- (__ \ "email").read[String]
+        active <- (__ \ "active").read[Boolean]
+        ageGroup <- (__ \ "age_group").read[io.apibuilder.reference.api.v0.models.AgeGroup]
+        tags <- (__ \ "tags").readNullable[Map[String, String]]
+      } yield User(guid, email, active, ageGroup, tags)
     }
 
     def jsObjectUser(obj: io.apibuilder.reference.api.v0.models.User): play.api.libs.json.JsObject = {
