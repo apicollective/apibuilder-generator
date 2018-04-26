@@ -12,10 +12,13 @@ object JsonImports {
   def apply(service: Service): Seq[String] = {
     (
       Seq(s"import ${Namespaces(service.namespace).models}.json._") ++
-      service.imports.map { imp =>
-        s"import ${Namespaces(imp.namespace).models}.json._"
-      }
+      serviceImports(service)
     ).sorted
   }
+
+  def serviceImports(service: Service): Seq[String] =
+    service.imports.map { imp =>
+      s"import ${Namespaces(imp.namespace).models}.json._"
+    }
 
 }
