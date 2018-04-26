@@ -171,10 +171,10 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Reads[GuestUser] = {
-      (
-        (__ \ "id").read[String] and
-        (__ \ "email").readNullable[String]
-      )(GuestUser.apply _)
+      for {
+        id <- (__ \ "id").read[String]
+        email <- (__ \ "email").readNullable[String]
+      } yield GuestUser(id, email)
     }
 
     def jsObjectGuestUser(obj: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser): play.api.libs.json.JsObject = {
@@ -187,10 +187,10 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
-      (
-        (__ \ "id").read[String] and
-        (__ \ "email").read[String]
-      )(RegisteredUser.apply _)
+      for {
+        id <- (__ \ "id").read[String]
+        email <- (__ \ "email").read[String]
+      } yield RegisteredUser(id, email)
     }
 
     def jsObjectRegisteredUser(obj: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser): play.api.libs.json.JsObject = {

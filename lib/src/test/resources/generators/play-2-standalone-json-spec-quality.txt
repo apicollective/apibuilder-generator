@@ -762,12 +762,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityAgendaItem: play.api.libs.json.Reads[AgendaItem] = {
-      (
-        (__ \ "id").read[Long] and
-        (__ \ "meeting").read[com.gilt.quality.v0.models.Meeting] and
-        (__ \ "incident").read[com.gilt.quality.v0.models.Incident] and
-        (__ \ "task").read[com.gilt.quality.v0.models.Task]
-      )(AgendaItem.apply _)
+      for {
+        id <- (__ \ "id").read[Long]
+        meeting <- (__ \ "meeting").read[com.gilt.quality.v0.models.Meeting]
+        incident <- (__ \ "incident").read[com.gilt.quality.v0.models.Incident]
+        task <- (__ \ "task").read[com.gilt.quality.v0.models.Task]
+      } yield AgendaItem(id, meeting, incident, task)
     }
 
     def jsObjectAgendaItem(obj: com.gilt.quality.v0.models.AgendaItem): play.api.libs.json.JsObject = {
@@ -788,11 +788,11 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityAgendaItemForm: play.api.libs.json.Reads[AgendaItemForm] = {
-      (
-        (__ \ "meeting_id").read[Long] and
-        (__ \ "incident_id").read[Long] and
-        (__ \ "task").read[com.gilt.quality.v0.models.Task]
-      )(AgendaItemForm.apply _)
+      for {
+        meetingId <- (__ \ "meeting_id").read[Long]
+        incidentId <- (__ \ "incident_id").read[Long]
+        task <- (__ \ "task").read[com.gilt.quality.v0.models.Task]
+      } yield AgendaItemForm(meetingId, incidentId, task)
     }
 
     def jsObjectAgendaItemForm(obj: com.gilt.quality.v0.models.AgendaItemForm): play.api.libs.json.JsObject = {
@@ -830,10 +830,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityEmailMessage: play.api.libs.json.Reads[EmailMessage] = {
-      (
-        (__ \ "subject").read[String] and
-        (__ \ "body").read[String]
-      )(EmailMessage.apply _)
+      for {
+        subject <- (__ \ "subject").read[String]
+        body <- (__ \ "body").read[String]
+      } yield EmailMessage(subject, body)
     }
 
     def jsObjectEmailMessage(obj: com.gilt.quality.v0.models.EmailMessage): play.api.libs.json.JsObject = {
@@ -852,10 +852,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityError: play.api.libs.json.Reads[Error] = {
-      (
-        (__ \ "code").read[String] and
-        (__ \ "message").read[String]
-      )(Error.apply _)
+      for {
+        code <- (__ \ "code").read[String]
+        message <- (__ \ "message").read[String]
+      } yield Error(code, message)
     }
 
     def jsObjectError(obj: com.gilt.quality.v0.models.Error): play.api.libs.json.JsObject = {
@@ -874,13 +874,13 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityExternalService: play.api.libs.json.Reads[ExternalService] = {
-      (
-        (__ \ "id").read[Long] and
-        (__ \ "organization").read[com.gilt.quality.v0.models.Organization] and
-        (__ \ "name").read[com.gilt.quality.v0.models.ExternalServiceName] and
-        (__ \ "url").read[String] and
-        (__ \ "username").read[String]
-      )(ExternalService.apply _)
+      for {
+        id <- (__ \ "id").read[Long]
+        organization <- (__ \ "organization").read[com.gilt.quality.v0.models.Organization]
+        name <- (__ \ "name").read[com.gilt.quality.v0.models.ExternalServiceName]
+        url <- (__ \ "url").read[String]
+        username <- (__ \ "username").read[String]
+      } yield ExternalService(id, organization, name, url, username)
     }
 
     def jsObjectExternalService(obj: com.gilt.quality.v0.models.ExternalService): play.api.libs.json.JsObject = {
@@ -902,12 +902,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityExternalServiceForm: play.api.libs.json.Reads[ExternalServiceForm] = {
-      (
-        (__ \ "name").read[com.gilt.quality.v0.models.ExternalServiceName] and
-        (__ \ "url").read[String] and
-        (__ \ "username").read[String] and
-        (__ \ "password").read[String]
-      )(ExternalServiceForm.apply _)
+      for {
+        name <- (__ \ "name").read[com.gilt.quality.v0.models.ExternalServiceName]
+        url <- (__ \ "url").read[String]
+        username <- (__ \ "username").read[String]
+        password <- (__ \ "password").read[String]
+      } yield ExternalServiceForm(name, url, username, password)
     }
 
     def jsObjectExternalServiceForm(obj: com.gilt.quality.v0.models.ExternalServiceForm): play.api.libs.json.JsObject = {
@@ -928,11 +928,11 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityFollowup: play.api.libs.json.Reads[Followup] = {
-      (
-        (__ \ "key").read[String] and
-        (__ \ "plan").read[com.gilt.quality.v0.models.Plan] and
-        (__ \ "sent_at").read[_root_.org.joda.time.DateTime]
-      )(Followup.apply _)
+      for {
+        key <- (__ \ "key").read[String]
+        plan <- (__ \ "plan").read[com.gilt.quality.v0.models.Plan]
+        sentAt <- (__ \ "sent_at").read[_root_.org.joda.time.DateTime]
+      } yield Followup(key, plan, sentAt)
     }
 
     def jsObjectFollowup(obj: com.gilt.quality.v0.models.Followup): play.api.libs.json.JsObject = {
@@ -952,12 +952,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityFollowupResponse: play.api.libs.json.Reads[FollowupResponse] = {
-      (
-        (__ \ "followup").read[com.gilt.quality.v0.models.Followup] and
-        (__ \ "response").read[com.gilt.quality.v0.models.Response] and
-        (__ \ "created_at").read[_root_.org.joda.time.DateTime] and
-        (__ \ "created_by").read[com.gilt.quality.v0.models.User]
-      )(FollowupResponse.apply _)
+      for {
+        followup <- (__ \ "followup").read[com.gilt.quality.v0.models.Followup]
+        response <- (__ \ "response").read[com.gilt.quality.v0.models.Response]
+        createdAt <- (__ \ "created_at").read[_root_.org.joda.time.DateTime]
+        createdBy <- (__ \ "created_by").read[com.gilt.quality.v0.models.User]
+      } yield FollowupResponse(followup, response, createdAt, createdBy)
     }
 
     def jsObjectFollowupResponse(obj: com.gilt.quality.v0.models.FollowupResponse): play.api.libs.json.JsObject = {
@@ -996,10 +996,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityIcons: play.api.libs.json.Reads[Icons] = {
-      (
-        (__ \ "smiley_url").read[String] and
-        (__ \ "frowny_url").read[String]
-      )(Icons.apply _)
+      for {
+        smileyUrl <- (__ \ "smiley_url").read[String]
+        frownyUrl <- (__ \ "frowny_url").read[String]
+      } yield Icons(smileyUrl, frownyUrl)
     }
 
     def jsObjectIcons(obj: com.gilt.quality.v0.models.Icons): play.api.libs.json.JsObject = {
@@ -1018,17 +1018,17 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityIncident: play.api.libs.json.Reads[Incident] = {
-      (
-        (__ \ "id").read[Long] and
-        (__ \ "organization").read[com.gilt.quality.v0.models.Organization] and
-        (__ \ "summary").read[String] and
-        (__ \ "description").readNullable[String] and
-        (__ \ "team").readNullable[com.gilt.quality.v0.models.Team] and
-        (__ \ "severity").read[com.gilt.quality.v0.models.Severity] and
-        (__ \ "tags").readNullable[Seq[String]] and
-        (__ \ "plan").readNullable[com.gilt.quality.v0.models.Plan] and
-        (__ \ "created_at").read[_root_.org.joda.time.DateTime]
-      )(Incident.apply _)
+      for {
+        id <- (__ \ "id").read[Long]
+        organization <- (__ \ "organization").read[com.gilt.quality.v0.models.Organization]
+        summary <- (__ \ "summary").read[String]
+        description <- (__ \ "description").readNullable[String]
+        team <- (__ \ "team").readNullable[com.gilt.quality.v0.models.Team]
+        severity <- (__ \ "severity").read[com.gilt.quality.v0.models.Severity]
+        tags <- (__ \ "tags").readNullable[Seq[String]]
+        plan <- (__ \ "plan").readNullable[com.gilt.quality.v0.models.Plan]
+        createdAt <- (__ \ "created_at").read[_root_.org.joda.time.DateTime]
+      } yield Incident(id, organization, summary, description, team, severity, tags, plan, createdAt)
     }
 
     def jsObjectIncident(obj: com.gilt.quality.v0.models.Incident): play.api.libs.json.JsObject = {
@@ -1065,13 +1065,13 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityIncidentForm: play.api.libs.json.Reads[IncidentForm] = {
-      (
-        (__ \ "team_key").readNullable[String] and
-        (__ \ "severity").read[com.gilt.quality.v0.models.Severity] and
-        (__ \ "summary").read[String] and
-        (__ \ "description").readNullable[String] and
-        (__ \ "tags").readNullable[Seq[String]]
-      )(IncidentForm.apply _)
+      for {
+        teamKey <- (__ \ "team_key").readNullable[String]
+        severity <- (__ \ "severity").read[com.gilt.quality.v0.models.Severity]
+        summary <- (__ \ "summary").read[String]
+        description <- (__ \ "description").readNullable[String]
+        tags <- (__ \ "tags").readNullable[Seq[String]]
+      } yield IncidentForm(teamKey, severity, summary, description, tags)
     }
 
     def jsObjectIncidentForm(obj: com.gilt.quality.v0.models.IncidentForm): play.api.libs.json.JsObject = {
@@ -1101,10 +1101,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityIncidentOrganizationChange: play.api.libs.json.Reads[IncidentOrganizationChange] = {
-      (
-        (__ \ "incident_id").read[Long] and
-        (__ \ "organization_key").read[String]
-      )(IncidentOrganizationChange.apply _)
+      for {
+        incidentId <- (__ \ "incident_id").read[Long]
+        organizationKey <- (__ \ "organization_key").read[String]
+      } yield IncidentOrganizationChange(incidentId, organizationKey)
     }
 
     def jsObjectIncidentOrganizationChange(obj: com.gilt.quality.v0.models.IncidentOrganizationChange): play.api.libs.json.JsObject = {
@@ -1123,11 +1123,11 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityIncidentSummary: play.api.libs.json.Reads[IncidentSummary] = {
-      (
-        (__ \ "id").read[Long] and
-        (__ \ "severity").read[com.gilt.quality.v0.models.Severity] and
-        (__ \ "summary").read[String]
-      )(IncidentSummary.apply _)
+      for {
+        id <- (__ \ "id").read[Long]
+        severity <- (__ \ "severity").read[com.gilt.quality.v0.models.Severity]
+        summary <- (__ \ "summary").read[String]
+      } yield IncidentSummary(id, severity, summary)
     }
 
     def jsObjectIncidentSummary(obj: com.gilt.quality.v0.models.IncidentSummary): play.api.libs.json.JsObject = {
@@ -1147,12 +1147,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityMeeting: play.api.libs.json.Reads[Meeting] = {
-      (
-        (__ \ "id").read[Long] and
-        (__ \ "organization").read[com.gilt.quality.v0.models.Organization] and
-        (__ \ "scheduled_at").read[_root_.org.joda.time.DateTime] and
-        (__ \ "adjourned_at").readNullable[_root_.org.joda.time.DateTime]
-      )(Meeting.apply _)
+      for {
+        id <- (__ \ "id").read[Long]
+        organization <- (__ \ "organization").read[com.gilt.quality.v0.models.Organization]
+        scheduledAt <- (__ \ "scheduled_at").read[_root_.org.joda.time.DateTime]
+        adjournedAt <- (__ \ "adjourned_at").readNullable[_root_.org.joda.time.DateTime]
+      } yield Meeting(id, organization, scheduledAt, adjournedAt)
     }
 
     def jsObjectMeeting(obj: com.gilt.quality.v0.models.Meeting): play.api.libs.json.JsObject = {
@@ -1193,11 +1193,11 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityMeetingPager: play.api.libs.json.Reads[MeetingPager] = {
-      (
-        (__ \ "meeting").read[com.gilt.quality.v0.models.Meeting] and
-        (__ \ "prior_incident").readNullable[com.gilt.quality.v0.models.Incident] and
-        (__ \ "next_incident").readNullable[com.gilt.quality.v0.models.Incident]
-      )(MeetingPager.apply _)
+      for {
+        meeting <- (__ \ "meeting").read[com.gilt.quality.v0.models.Meeting]
+        priorIncident <- (__ \ "prior_incident").readNullable[com.gilt.quality.v0.models.Incident]
+        nextIncident <- (__ \ "next_incident").readNullable[com.gilt.quality.v0.models.Incident]
+      } yield MeetingPager(meeting, priorIncident, nextIncident)
     }
 
     def jsObjectMeetingPager(obj: com.gilt.quality.v0.models.MeetingPager): play.api.libs.json.JsObject = {
@@ -1222,10 +1222,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityOrganization: play.api.libs.json.Reads[Organization] = {
-      (
-        (__ \ "key").read[String] and
-        (__ \ "name").read[String]
-      )(Organization.apply _)
+      for {
+        key <- (__ \ "key").read[String]
+        name <- (__ \ "name").read[String]
+      } yield Organization(key, name)
     }
 
     def jsObjectOrganization(obj: com.gilt.quality.v0.models.Organization): play.api.libs.json.JsObject = {
@@ -1244,10 +1244,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityOrganizationForm: play.api.libs.json.Reads[OrganizationForm] = {
-      (
-        (__ \ "name").read[String] and
-        (__ \ "key").readNullable[String]
-      )(OrganizationForm.apply _)
+      for {
+        name <- (__ \ "name").read[String]
+        key <- (__ \ "key").readNullable[String]
+      } yield OrganizationForm(name, key)
     }
 
     def jsObjectOrganizationForm(obj: com.gilt.quality.v0.models.OrganizationForm): play.api.libs.json.JsObject = {
@@ -1268,13 +1268,13 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityPlan: play.api.libs.json.Reads[Plan] = {
-      (
-        (__ \ "id").read[Long] and
-        (__ \ "incident_id").read[Long] and
-        (__ \ "body").read[String] and
-        (__ \ "grade").readNullable[Int] and
-        (__ \ "created_at").read[_root_.org.joda.time.DateTime]
-      )(Plan.apply _)
+      for {
+        id <- (__ \ "id").read[Long]
+        incidentId <- (__ \ "incident_id").read[Long]
+        body <- (__ \ "body").read[String]
+        grade <- (__ \ "grade").readNullable[Int]
+        createdAt <- (__ \ "created_at").read[_root_.org.joda.time.DateTime]
+      } yield Plan(id, incidentId, body, grade, createdAt)
     }
 
     def jsObjectPlan(obj: com.gilt.quality.v0.models.Plan): play.api.libs.json.JsObject = {
@@ -1298,10 +1298,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityPlanForm: play.api.libs.json.Reads[PlanForm] = {
-      (
-        (__ \ "incident_id").read[Long] and
-        (__ \ "body").read[String]
-      )(PlanForm.apply _)
+      for {
+        incidentId <- (__ \ "incident_id").read[Long]
+        body <- (__ \ "body").read[String]
+      } yield PlanForm(incidentId, body)
     }
 
     def jsObjectPlanForm(obj: com.gilt.quality.v0.models.PlanForm): play.api.libs.json.JsObject = {
@@ -1320,15 +1320,15 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityStatistic: play.api.libs.json.Reads[Statistic] = {
-      (
-        (__ \ "team").read[com.gilt.quality.v0.models.Team] and
-        (__ \ "total_grades").read[Long] and
-        (__ \ "average_grade").readNullable[Int] and
-        (__ \ "total_open_incidents").read[Long] and
-        (__ \ "total_incidents").read[Long] and
-        (__ \ "total_plans").read[Long] and
-        (__ \ "plans").readNullable[Seq[com.gilt.quality.v0.models.Plan]]
-      )(Statistic.apply _)
+      for {
+        team <- (__ \ "team").read[com.gilt.quality.v0.models.Team]
+        totalGrades <- (__ \ "total_grades").read[Long]
+        averageGrade <- (__ \ "average_grade").readNullable[Int]
+        totalOpenIncidents <- (__ \ "total_open_incidents").read[Long]
+        totalIncidents <- (__ \ "total_incidents").read[Long]
+        totalPlans <- (__ \ "total_plans").read[Long]
+        plans <- (__ \ "plans").readNullable[Seq[com.gilt.quality.v0.models.Plan]]
+      } yield Statistic(team, totalGrades, averageGrade, totalOpenIncidents, totalIncidents, totalPlans, plans)
     }
 
     def jsObjectStatistic(obj: com.gilt.quality.v0.models.Statistic): play.api.libs.json.JsObject = {
@@ -1357,12 +1357,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualitySubscription: play.api.libs.json.Reads[Subscription] = {
-      (
-        (__ \ "id").read[Long] and
-        (__ \ "organization").read[com.gilt.quality.v0.models.Organization] and
-        (__ \ "user").read[com.gilt.quality.v0.models.User] and
-        (__ \ "publication").read[com.gilt.quality.v0.models.Publication]
-      )(Subscription.apply _)
+      for {
+        id <- (__ \ "id").read[Long]
+        organization <- (__ \ "organization").read[com.gilt.quality.v0.models.Organization]
+        user <- (__ \ "user").read[com.gilt.quality.v0.models.User]
+        publication <- (__ \ "publication").read[com.gilt.quality.v0.models.Publication]
+      } yield Subscription(id, organization, user, publication)
     }
 
     def jsObjectSubscription(obj: com.gilt.quality.v0.models.Subscription): play.api.libs.json.JsObject = {
@@ -1383,11 +1383,11 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualitySubscriptionForm: play.api.libs.json.Reads[SubscriptionForm] = {
-      (
-        (__ \ "organization_key").read[String] and
-        (__ \ "user_guid").read[_root_.java.util.UUID] and
-        (__ \ "publication").read[com.gilt.quality.v0.models.Publication]
-      )(SubscriptionForm.apply _)
+      for {
+        organizationKey <- (__ \ "organization_key").read[String]
+        userGuid <- (__ \ "user_guid").read[_root_.java.util.UUID]
+        publication <- (__ \ "publication").read[com.gilt.quality.v0.models.Publication]
+      } yield SubscriptionForm(organizationKey, userGuid, publication)
     }
 
     def jsObjectSubscriptionForm(obj: com.gilt.quality.v0.models.SubscriptionForm): play.api.libs.json.JsObject = {
@@ -1407,12 +1407,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityTeam: play.api.libs.json.Reads[Team] = {
-      (
-        (__ \ "organization").read[com.gilt.quality.v0.models.Organization] and
-        (__ \ "key").read[String] and
-        (__ \ "email").readNullable[String] and
-        (__ \ "icons").read[com.gilt.quality.v0.models.Icons]
-      )(Team.apply _)
+      for {
+        organization <- (__ \ "organization").read[com.gilt.quality.v0.models.Organization]
+        key <- (__ \ "key").read[String]
+        email <- (__ \ "email").readNullable[String]
+        icons <- (__ \ "icons").read[com.gilt.quality.v0.models.Icons]
+      } yield Team(organization, key, email, icons)
     }
 
     def jsObjectTeam(obj: com.gilt.quality.v0.models.Team): play.api.libs.json.JsObject = {
@@ -1435,12 +1435,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityTeamForm: play.api.libs.json.Reads[TeamForm] = {
-      (
-        (__ \ "key").read[String] and
-        (__ \ "email").readNullable[String] and
-        (__ \ "smiley_url").readNullable[String] and
-        (__ \ "frowny_url").readNullable[String]
-      )(TeamForm.apply _)
+      for {
+        key <- (__ \ "key").read[String]
+        email <- (__ \ "email").readNullable[String]
+        smileyUrl <- (__ \ "smiley_url").readNullable[String]
+        frownyUrl <- (__ \ "frowny_url").readNullable[String]
+      } yield TeamForm(key, email, smileyUrl, frownyUrl)
     }
 
     def jsObjectTeamForm(obj: com.gilt.quality.v0.models.TeamForm): play.api.libs.json.JsObject = {
@@ -1469,10 +1469,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityTeamMember: play.api.libs.json.Reads[TeamMember] = {
-      (
-        (__ \ "team").read[com.gilt.quality.v0.models.Team] and
-        (__ \ "user").read[com.gilt.quality.v0.models.User]
-      )(TeamMember.apply _)
+      for {
+        team <- (__ \ "team").read[com.gilt.quality.v0.models.Team]
+        user <- (__ \ "user").read[com.gilt.quality.v0.models.User]
+      } yield TeamMember(team, user)
     }
 
     def jsObjectTeamMember(obj: com.gilt.quality.v0.models.TeamMember): play.api.libs.json.JsObject = {
@@ -1491,10 +1491,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityTeamMemberSummary: play.api.libs.json.Reads[TeamMemberSummary] = {
-      (
-        (__ \ "team").read[com.gilt.quality.v0.models.Team] and
-        (__ \ "number_members").read[Long]
-      )(TeamMemberSummary.apply _)
+      for {
+        team <- (__ \ "team").read[com.gilt.quality.v0.models.Team]
+        numberMembers <- (__ \ "number_members").read[Long]
+      } yield TeamMemberSummary(team, numberMembers)
     }
 
     def jsObjectTeamMemberSummary(obj: com.gilt.quality.v0.models.TeamMemberSummary): play.api.libs.json.JsObject = {
@@ -1513,11 +1513,11 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityUpdateTeamForm: play.api.libs.json.Reads[UpdateTeamForm] = {
-      (
-        (__ \ "email").readNullable[String] and
-        (__ \ "smiley_url").readNullable[String] and
-        (__ \ "frowny_url").readNullable[String]
-      )(UpdateTeamForm.apply _)
+      for {
+        email <- (__ \ "email").readNullable[String]
+        smileyUrl <- (__ \ "smiley_url").readNullable[String]
+        frownyUrl <- (__ \ "frowny_url").readNullable[String]
+      } yield UpdateTeamForm(email, smileyUrl, frownyUrl)
     }
 
     def jsObjectUpdateTeamForm(obj: com.gilt.quality.v0.models.UpdateTeamForm): play.api.libs.json.JsObject = {
@@ -1544,10 +1544,10 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityUser: play.api.libs.json.Reads[User] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String]
-      )(User.apply _)
+      for {
+        guid <- (__ \ "guid").read[_root_.java.util.UUID]
+        email <- (__ \ "email").read[String]
+      } yield User(guid, email)
     }
 
     def jsObjectUser(obj: com.gilt.quality.v0.models.User): play.api.libs.json.JsObject = {
