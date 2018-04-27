@@ -74,7 +74,7 @@ object Generators {
       metaData = Generator(
         key = "async_http_2_5_client",
         name = "Async Http Client 2.5",
-        description = Some("Async Http Client v.2.5.x - see https://github.com/AsyncHttpClient/async-http-client"),
+        description = Some("Async Http Client v. 2.5.x - see https://github.com/AsyncHttpClient/async-http-client"),
         language = Some("Java, Scala")
       ),
       status = lib.generator.Status.Alpha,
