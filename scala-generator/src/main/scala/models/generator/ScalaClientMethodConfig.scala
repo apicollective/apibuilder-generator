@@ -161,11 +161,9 @@ private lazy val defaultAsyncHttpClient = {
     def ningPackage: String = "com.ning.http.client"
     def additionalImports: String = ", AsyncHttpClientConfig"
     def realmBuilder(username: String, password: String) =
-      s"""
-         |new Realm.RealmBuilder()
-         |  .setPrincipal($username)
-         |  .setPassword($password)
-       """.stripMargin
+      s"""|new Realm.RealmBuilder()
+          |  .setPrincipal($username)
+          |  .setPassword($password)""".stripMargin
   }
 
   case class Ning18(namespace: String, baseUrl: Option[String]) extends Ning {

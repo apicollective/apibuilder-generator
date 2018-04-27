@@ -69,7 +69,7 @@ case class NingClientGenerator(
     val methodGenerator = new ScalaClientMethodGenerator(config, ssd)
 
     s"""package ${ssd.namespaces.base} {
-  import ${config.ningPackage}.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response ${config.additionalImports}}
+  import ${config.ningPackage}.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response${config.additionalImports}}
 
 ${headers.objectConstants.indent(2)}
 
@@ -110,7 +110,7 @@ ${headerString.indent(8)}
       auth.fold(builder) {
         case Authorization.Basic(username, passwordOpt) => {
           builder.setRealm(
-${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indent(14)}
+${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indent(12)}
               .setUsePreemptiveAuth(true)
               .setScheme(Realm.AuthScheme.BASIC)
               .build()

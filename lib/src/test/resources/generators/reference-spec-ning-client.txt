@@ -418,7 +418,7 @@ package io.apibuilder.reference.api.v0.models {
 
 
 package io.apibuilder.reference.api.v0 {
-  import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, AsyncHttpClientConfig, Realm, Request, RequestBuilder, Response}
+  import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response, AsyncHttpClientConfig}
 
   object Constants {
 
