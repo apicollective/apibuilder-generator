@@ -14,9 +14,9 @@ case class CirceJson(
     import io.circe.Decoder._
     import io.circe.Encoder._
     import scala.util.Try
-    import io.circe._
+    import io.circe.{Json, JsonObject, Encoder, Decoder, DecodingFailure}
     import io.circe.syntax._
-${JsonImports.serviceImports(ssd.service).mkString("\n").indent(4)}
+${JsonImports(ssd.service).mkString("\n").indent(4)}
 
     // Make Scala 2.11 Either monadic
     private[${ssd.namespaces.last}] implicit def eitherOps[A,B](e: Either[A,B]) = cats.implicits.catsSyntaxEither(e)
