@@ -1,9 +1,9 @@
 package scala.generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import scala.models.Play23ClientGenerator
-import scala.models.ning.Ning18ClientGenerator
 
+import scala.models.Play23ClientGenerator
+import scala.models.ning.{AsyncHttpClientGenerator, Ning18ClientGenerator}
 import models.TestHelper
 import org.scalatest.{FunSpec, Matchers}
 
@@ -44,6 +44,15 @@ class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
     }
   }
 
+  it("generates expected code for async http client") {
+    AsyncHttpClientGenerator.invoke(InvocationForm(service = models.TestHelper.collectionJsonDefaultsService)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-ahc-client.txt", sourceFiles.head.contents)
+      }
+    }
+  }
 }
 
 

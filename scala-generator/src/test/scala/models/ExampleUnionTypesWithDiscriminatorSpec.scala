@@ -1,7 +1,6 @@
 package scala.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import ning.Ning18ClientGenerator
 import org.scalatest.{Matchers, FunSpec}
 
 class ExampleUnionTypesWithDiscriminatorSpec extends FunSpec with Matchers {
