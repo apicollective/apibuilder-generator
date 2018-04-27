@@ -30,6 +30,15 @@ object Ning19ClientGenerator extends CodeGenerator {
 
 }
 
+object AsyncHttpClientGenerator extends CodeGenerator {
+
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+    val config = ScalaClientMethodConfigs.AsyncHttpClient(Namespaces.quote(form.service.namespace), form.service.baseUrl)
+    NingClientGenerator(config, form).invoke()
+  }
+
+}
+
 case class NingClientGenerator(
   config: ScalaClientMethodConfigs.Ning,
   form: InvocationForm
@@ -60,7 +69,7 @@ case class NingClientGenerator(
     val methodGenerator = new ScalaClientMethodGenerator(config, ssd)
 
     s"""package ${ssd.namespaces.base} {
-  import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, AsyncHttpClientConfig, Realm, Request, RequestBuilder, Response}
+  import ${config.ningPackage}.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response ${config.additionalImports}}
 
 ${headers.objectConstants.indent(2)}
 
@@ -101,9 +110,7 @@ ${headerString.indent(8)}
       auth.fold(builder) {
         case Authorization.Basic(username, passwordOpt) => {
           builder.setRealm(
-            new Realm.RealmBuilder()
-              .setPrincipal(username)
-              .setPassword(passwordOpt.getOrElse(""))
+${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indent(14)}
               .setUsePreemptiveAuth(true)
               .setScheme(Realm.AuthScheme.BASIC)
               .build()
@@ -119,7 +126,7 @@ ${headerString.indent(8)}
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.ning.http.client.Response] = {
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[${config.ningPackage}.Response] = {
       val allHeaders = body match {
         case None => requestHeaders
         case Some(_) => _withJsonContentType(requestHeaders)
@@ -139,10 +146,10 @@ ${headerString.indent(8)}
       val finalRequest = requestWithParamsAndBody.build()
       _logRequest(finalRequest)
 
-      val result = scala.concurrent.Promise[com.ning.http.client.Response]()
+      val result = scala.concurrent.Promise[${config.ningPackage}.Response]()
       asyncHttpClient.executeRequest(finalRequest,
         new AsyncCompletionHandler[Unit]() {
-          override def onCompleted(r: com.ning.http.client.Response) = {
+          override def onCompleted(r: ${config.ningPackage}.Response) = {
             _logResponse(r)
             result.success(r)
           }

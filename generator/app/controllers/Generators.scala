@@ -72,6 +72,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "async_http_2_5_client",
+        name = "Async Http Client 2.5",
+        description = Some("Async Http Client v.2.5.x - see https://github.com/AsyncHttpClient/async-http-client"),
+        language = Some("Java, Scala")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.ning.AsyncHttpClientGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "ning_1_9_client",
         name = "Ning Async Http Client 1.9",
         description = Some("Ning Async Http v. 1.9.x Client - see https://sonatype.github.io/async-http-client"),
