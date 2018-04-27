@@ -118,7 +118,7 @@ package com.gilt.test.v0.models {
 
 
 package com.gilt.test.v0 {
-  import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response, AsyncHttpClientConfig}
+  import org.asynchttpclient.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response, DefaultAsyncHttpClient, DefaultAsyncHttpClientConfig}
 
   object Constants {
 
@@ -156,7 +156,7 @@ package com.gilt.test.v0 {
 
         _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 201 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
-          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201", requestUri = Some(r.getUri))
+          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201", requestUri = Some(r.getUri.toJavaNetURI))
         }
       }
 
@@ -167,7 +167,7 @@ package com.gilt.test.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User] = {
         _executeRequest("GET", s"/users/${_root_.com.gilt.test.v0.PathSegment.encode(email, "UTF-8")}", requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
-          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri.toJavaNetURI))
         }
       }
 
@@ -179,7 +179,7 @@ package com.gilt.test.v0 {
 
         _executeRequest("PATCH", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
           case r if r.getStatusCode == 200 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
-          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
+          case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri.toJavaNetURI))
         }
       }
     }
@@ -192,7 +192,7 @@ package com.gilt.test.v0 {
 
     def _logResponse(response: Response): Unit = {
       if (logger.isInfoEnabled) {
-        logger.info("_logResponse: status=" + response.getStatusCode + ", responseBody: " + response.getResponseBody("UTF-8"))
+        logger.info("_logResponse: status=" + response.getStatusCode + ", responseBody: " + response.getResponseBody(java.nio.charset.Charset.forName("UTF-8")))
       }
     }
 
@@ -209,9 +209,7 @@ package com.gilt.test.v0 {
       auth.fold(builder) {
         case Authorization.Basic(username, passwordOpt) => {
           builder.setRealm(
-            new Realm.RealmBuilder()
-              .setPrincipal(username)
-              .setPassword(passwordOpt.getOrElse(""))
+            new Realm.Builder(username, passwordOpt.getOrElse(""))
               .setUsePreemptiveAuth(true)
               .setScheme(Realm.AuthScheme.BASIC)
               .build()
@@ -227,7 +225,7 @@ package com.gilt.test.v0 {
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.ning.http.client.Response] = {
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[org.asynchttpclient.Response] = {
       val allHeaders = body match {
         case None => requestHeaders
         case Some(_) => _withJsonContentType(requestHeaders)
@@ -236,7 +234,7 @@ package com.gilt.test.v0 {
       val request = _requestBuilder(method, path, allHeaders)
 
       queryParameters.foreach { pair =>
-        request.addQueryParameter(pair._1, pair._2)
+        request.addQueryParam(pair._1, pair._2)
       }
 
       val requestWithParamsAndBody = body.fold(request) { b =>
@@ -247,10 +245,10 @@ package com.gilt.test.v0 {
       val finalRequest = requestWithParamsAndBody.build()
       _logRequest(finalRequest)
 
-      val result = scala.concurrent.Promise[com.ning.http.client.Response]()
+      val result = scala.concurrent.Promise[org.asynchttpclient.Response]()
       asyncHttpClient.executeRequest(finalRequest,
         new AsyncCompletionHandler[Unit]() {
-          override def onCompleted(r: com.ning.http.client.Response) = {
+          override def onCompleted(r: org.asynchttpclient.Response) = {
             _logResponse(r)
             result.success(r)
           }
@@ -276,22 +274,20 @@ package com.gilt.test.v0 {
   object Client {
 
     private lazy val defaultAsyncHttpClient = {
-      new AsyncHttpClient(
-        new AsyncHttpClientConfig.Builder()
-          .setExecutorService(java.util.concurrent.Executors.newCachedThreadPool())
-          .build()
+      new DefaultAsyncHttpClient(
+        new DefaultAsyncHttpClientConfig.Builder().build()
       )
     }
 
     def parseJson[T](
       className: String,
-      r: _root_.com.ning.http.client.Response,
+      r: _root_.org.asynchttpclient.Response,
       f: (play.api.libs.json.JsValue => play.api.libs.json.JsResult[T])
     ): T = {
-      f(play.api.libs.json.Json.parse(r.getResponseBody("UTF-8"))) match {
+      f(play.api.libs.json.Json.parse(r.getResponseBody(java.nio.charset.Charset.forName("UTF-8")))) match {
         case play.api.libs.json.JsSuccess(x, _) => x
         case play.api.libs.json.JsError(errors) => {
-          throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), requestUri = Some(r.getUri))
+          throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Invalid json for class[" + className + "]: " + errors.mkString(" "), requestUri = Some(r.getUri.toJavaNetURI))
         }
       }
     }

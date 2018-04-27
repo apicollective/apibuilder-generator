@@ -154,20 +154,38 @@ private lazy val defaultAsyncHttpClient = {
     override val implicitArgs = Some("(implicit ec: scala.concurrent.ExecutionContext)")
     override val asyncType: String = "scala.concurrent.Future"
     override val asyncSuccess: String = "successful"
+    override val requestUriMethod = Some("getUri.toJavaNetURI")
+    override val expectsInjectedWsClient = false
 
-    def addQueryParamMethod(): String
+    def addQueryParamMethod: String = "addQueryParam"
+    def ningPackage: String = "com.ning.http.client"
+    def additionalImports: String = ", AsyncHttpClientConfig"
+    def realmBuilder(username: String, password: String) =
+      s"""|new Realm.RealmBuilder()
+          |  .setPrincipal($username)
+          |  .setPassword($password)""".stripMargin
   }
 
   case class Ning18(namespace: String, baseUrl: Option[String]) extends Ning {
-    override def addQueryParamMethod(): String = "addQueryParameter"
+    override def addQueryParamMethod: String = "addQueryParameter"
     override val requestUriMethod = Some("getUri")
-    override val expectsInjectedWsClient = false
   }
 
-  case class Ning19(namespace: String, baseUrl: Option[String]) extends Ning {
-    override def addQueryParamMethod(): String = "addQueryParam"
-    override val requestUriMethod = Some("getUri.toJavaNetURI")
-    override val expectsInjectedWsClient = false
+  case class Ning19(namespace: String, baseUrl: Option[String]) extends Ning
+
+  case class AsyncHttpClient(namespace: String, baseUrl: Option[String]) extends Ning {
+    override def ningPackage: String = "org.asynchttpclient"
+    override val responseBodyMethod = """getResponseBody(java.nio.charset.Charset.forName("UTF-8"))"""
+    override val responseClass = "_root_.org.asynchttpclient.Response"
+    override def additionalImports: String = ", DefaultAsyncHttpClient, DefaultAsyncHttpClientConfig"
+    override def realmBuilder(username: String, password: String) = s"new Realm.Builder($username, $password)"
+    override val extraClientObjectMethods = Some("""
+private lazy val defaultAsyncHttpClient = {
+  new DefaultAsyncHttpClient(
+    new DefaultAsyncHttpClientConfig.Builder().build()
+  )
+}
+""")
   }
 
 
