@@ -106,7 +106,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "io.reactivex.rxjava2" % "rxjava" % "2.1.3"
   ),
   libraryDependencies += guice,
-  scalacOptions += "-feature",
+  scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified"),
   sources in (Compile,doc) := Seq.empty,
   publishArtifact in (Compile, packageDoc) := false
 )
