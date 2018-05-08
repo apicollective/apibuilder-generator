@@ -95,15 +95,10 @@ trait KotlinUtil {
   }
 
   def toClassName(modelName: String): String = {
-    // We don't support upper case class names so if a word is upper case then make it lower case
-    def checkForUpperCase(word: String): String =
-      if (word == word.toUpperCase) word.toLowerCase
-      else word
-
     if(isModelNameWithPackage(modelName)){
       capitalizeModelNameWithPackage(modelName)
     } else {
-      Text.safeName(Text.splitIntoWords(modelName).map { checkForUpperCase(_).capitalize }.mkString)
+      capitalizeModelName(modelName)
     }
   }
 
@@ -111,8 +106,17 @@ trait KotlinUtil {
     modelName.toLowerCase.equals(modelName) && modelName.contains(".")
   }
 
+  def capitalizeModelName(modelName: String): String ={
+    // We don't support upper case class names so if a word is upper case then make it lower case
+    def checkForUpperCase(word: String): String =
+      if (word == word.toUpperCase) word.toLowerCase
+      else word
+
+    Text.safeName(Text.splitIntoWords(modelName).map { checkForUpperCase(_).capitalize }.mkString)
+  }
+
   def capitalizeModelNameWithPackage(modelName: String): String ={
-    (Seq(modelName.split("\\.").reverse.head.capitalize) ++ modelName.split("\\.").reverse.tail).reverse.mkString(".")
+    (Seq(capitalizeModelName(modelName.split("\\.").reverse.head)) ++ modelName.split("\\.").reverse.tail).reverse.mkString(".")
   }
 
   def isParameterArray(modelName: String): Boolean = {
