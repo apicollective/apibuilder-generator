@@ -200,7 +200,7 @@ trait KotlinUtil {
     if (input == undefinedEnumName) {
       input
     } else {
-      Text.safeName(input.replaceAll("\\.", "_")).toUpperCase
+      Text.safeName(input.replaceAll("\\.", "_").replaceAll("-","_")).toUpperCase
     }
   }
 
