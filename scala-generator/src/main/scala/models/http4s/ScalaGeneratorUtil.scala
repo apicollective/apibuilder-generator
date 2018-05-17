@@ -42,13 +42,13 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
     } else {
       val params = op.formParameters.map { param =>
         val value = encodeValue(param.asScalaVal, param.datatype)
-        s""""${param.originalName}" -> ${value}.asJson"""
+        s""""${param.originalName}" -> ${value}.asJson.noSpaces"""
       }.mkString(",\n")
       Some(
         Seq(
-          "val payload = Map(",
+          "val payload = { import io.circe.syntax._ ; org.http4s.UrlForm(",
           params.indent,
-          ")"
+          ") }"
         ).mkString("\n")
       )
     }

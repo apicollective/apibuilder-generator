@@ -73,7 +73,7 @@ ${headerString.indent(6)}
                                        uri = uri,
                                        headers = headers)
 
-      val authReq = auth.fold(request) {
+      val reqAndMaybeAuth = auth.fold(request) {
         case Authorization.Basic(username, passwordOpt) => {
           val userpass = s"$$username:$${passwordOpt.getOrElse("")}"
           val token = java.util.Base64.getEncoder.encodeToString(userpass.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1))
@@ -82,9 +82,11 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val authBody = body.fold(${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess}(authReq))(authReq.withBody)
 
-      ${config.httpClient}.fetch(modifyRequest(authBody))(handler)
+
+      val reqAndMaybeAuthAndBody = body.fold(${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess}(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+
+      ${config.httpClient}.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }${methodGenerator.modelErrors().indent(4)}
   }
 

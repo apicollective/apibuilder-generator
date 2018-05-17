@@ -64,7 +64,7 @@ class ScalaClientMethodGenerator (
         args.append("requestHeaders = (requestHeaders ++ headerParameters)")
       }
 
-      val reqType = op.body.fold("Unit")(b => b.datatype.name)
+      val reqType = if (op.formParameters.nonEmpty) "org.http4s.UrlForm" else op.body.fold("Unit")(b => b.datatype.name)
 
       val hasOptionResult = featureMigration.hasImplicit404s match {
         case true => {
