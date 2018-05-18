@@ -225,7 +225,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def asyncTypeImport: String = ""
     def routeExtends: Option[String] = None
     def matchersExtends: Option[String] = None
-    def clientImports: String = """import org.http4s.client.blaze._"""
+    def clientImports: String = """import org.http4s.client.blaze._
+                                  |import io.circe.syntax._""".stripMargin
     def closeClient: Option[String] = Some("""
                                              |def closeAsyncHttpClient(): Unit = {
                                              |  asyncHttpClient.shutdownNow()
@@ -287,7 +288,8 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val routeExtends: Option[String] = Some(s" extends Matchers[$asyncType]")
     override val matchersExtends = Some(s" extends Http4sDsl[$asyncType]")
     override val clientImports: String = """import cats.effect._
-                                           |import cats.implicits._""".stripMargin
+                                           |import cats.implicits._
+                                           |import io.circe.syntax._""".stripMargin
 
     override val closeClient = None
 
