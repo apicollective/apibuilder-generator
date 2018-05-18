@@ -103,7 +103,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      scalaSourceCode should include ("_executeRequest[org.http4s.UrlForm,")
+      scalaSourceCode should include ("formBody = formPayload,")
       scalaSourceCode should include (""""active" -> active.asJson.noSpaces""")
     }
   }

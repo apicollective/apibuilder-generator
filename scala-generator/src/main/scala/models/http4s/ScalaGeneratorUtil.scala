@@ -37,7 +37,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
         encodeValue(varName, body.datatype)
       }
 
-      Some(s"val payload = $payload")
+      Some(s"val (payload, formPayload) = (Some($payload), None)")
 
     } else {
       val params = op.formParameters.map { param =>
@@ -46,7 +46,8 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
       }.mkString(",\n")
       Some(
         Seq(
-          "val payload = { import io.circe.syntax._ ; org.http4s.UrlForm(",
+          "val payload = None",
+          "val formPayload = Some { import io.circe.syntax._ ; org.http4s.UrlForm(",
           params.indent,
           ") }"
         ).mkString("\n")
