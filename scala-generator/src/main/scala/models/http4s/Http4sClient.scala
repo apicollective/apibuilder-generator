@@ -50,7 +50,8 @@ ${headerString.indent(6)}
       path: Seq[String],
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
-      body: Option[T] = None
+      body: Option[T] = None,
+      formBody : Option[org.http4s.UrlForm] = None
     )(handler: ${config.responseClass} => ${config.asyncType}[U]
     )(implicit encoder: io.circe.Encoder[T]): ${config.asyncType}[U] = {
       import org.http4s.QueryParamEncoder._
@@ -73,7 +74,7 @@ ${headerString.indent(6)}
                                        uri = uri,
                                        headers = headers)
 
-      val authReq = auth.fold(request) {
+      val reqAndMaybeAuth = auth.fold(request) {
         case Authorization.Basic(username, passwordOpt) => {
           val userpass = s"$$username:$${passwordOpt.getOrElse("")}"
           val token = java.util.Base64.getEncoder.encodeToString(userpass.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1))
@@ -82,9 +83,11 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val authBody = body.fold(${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess}(authReq))(authReq.withBody)
+      val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
+        formBody.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+      } else body.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
 
-      ${config.httpClient}.fetch(modifyRequest(authBody))(handler)
+      ${config.httpClient}.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }${methodGenerator.modelErrors().indent(4)}
   }
 

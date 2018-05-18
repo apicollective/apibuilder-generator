@@ -50,7 +50,7 @@ class ScalaClientMethodGenerator (
 
       payload.foreach { v =>
         code.append(v)
-        args.append("body = Some(payload)")
+        args.append("body = payload, formBody = formPayload")
       }
 
       queryParameters.foreach { v =>

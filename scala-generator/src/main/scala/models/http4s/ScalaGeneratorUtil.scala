@@ -37,18 +37,19 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
         encodeValue(varName, body.datatype)
       }
 
-      Some(s"val payload = $payload")
+      Some(s"val (payload, formPayload) = (Some($payload), None)")
 
     } else {
       val params = op.formParameters.map { param =>
         val value = encodeValue(param.asScalaVal, param.datatype)
-        s""""${param.originalName}" -> ${value}.asJson"""
+        s""""${param.originalName}" -> ${value}.asJson.noSpaces"""
       }.mkString(",\n")
       Some(
         Seq(
-          "val payload = Map(",
+          "val payload = None",
+          "val formPayload = Some(org.http4s.UrlForm(",
           params.indent,
-          ")"
+          "))"
         ).mkString("\n")
       )
     }

@@ -94,5 +94,17 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
 
       scalaSourceCode should not include ("import cats.implicits._")
     }
+
+    it("Generator produces valid url form marshalling code") {
+      val service = models.TestHelper.referenceApiService
+      val ssd = new ScalaService(service)
+      val invocationForm = new InvocationForm(service, Seq.empty, None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None)
+      val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
+      val scalaSourceCode = client.generate()
+      assertValidScalaSourceCode(scalaSourceCode)
+      scalaSourceCode should include ("formBody = formPayload,")
+      scalaSourceCode should include (""""active" -> active.asJson.noSpaces""")
+    }
   }
 }
