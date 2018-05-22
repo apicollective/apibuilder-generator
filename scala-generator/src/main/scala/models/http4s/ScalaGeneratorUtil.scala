@@ -1,7 +1,6 @@
 package scala.models.http4s
 
-import scala.generator.{ScalaPrimitive, ScalaClientMethodConfig, ScalaUtil, ScalaOperation, ScalaDatatype}
-
+import scala.generator.{ScalaClientMethodConfig, ScalaDatatype, ScalaOperation, ScalaPrimitive, ScalaUtil}
 import io.apibuilder.spec.v0.models.ParameterLocation
 import lib.Text._
 
@@ -42,7 +41,18 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
     } else {
       val params = op.formParameters.map { param =>
         val value = encodeValue(param.asScalaVal, param.datatype)
-        s""""${param.originalName}" -> ${value}.asJson.noSpaces"""
+
+        //TODO: This is unfinished, just enough to cover known use cases.  Not sure what it means, for example, to send json, or some object as form parameter.  Also for dates we should probably do .toJson then strip the quotes.
+
+        if (param.`type`.isInstanceOf[lib.Datatype.UserDefined.Enum]){
+          s""""${param.originalName}" -> ${value}.toString"""
+        } else if(param.`type` == lib.Datatype.Primitive.String){
+          s""""${param.originalName}" -> ${value}"""
+        } else {
+          s""""${param.originalName}" -> ${value}.asJson.noSpaces"""
+        }
+
+
       }.mkString(",\n")
       Some(
         Seq(

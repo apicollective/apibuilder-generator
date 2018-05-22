@@ -84,7 +84,7 @@ lazy val kotlinGenerator = project
       "org.threeten" % "threetenbp" % "1.3.6",
       "com.squareup" % "kotlinpoet" % "0.7.0",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
-      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.31" % "test",
+      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.41" % "test",
       "org.scalatest" %% "scalatest" % "3.0.5" % "test",
       "org.mockito" % "mockito-core" % "2.18.3" % "test"
     )
