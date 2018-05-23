@@ -6,13 +6,13 @@ import play.api.mvc._
 import play.api.libs.json._
 import lib.generator.{CodeGenTarget, CodeGenerator}
 
-class Generators extends Controller {
+class Generators extends InjectedController {
 
   def get(
     key: Option[String] = None,
     limit: Integer = 100,
     offset: Integer = 0
-  ) = Action { request: Request[AnyContent] =>
+  ) = Action {
     val generators = Generators.targets.
       filter(t => t.codeGenerator.isDefined && t.status != lib.generator.Status.Proposal).
       filter(t => key.isEmpty || key == Some(t.metaData.key)).
@@ -21,7 +21,7 @@ class Generators extends Controller {
     Ok(Json.toJson(generators.drop(offset).take(limit)))
   }
 
-  def getByKey(key: String) = Action { request: Request[AnyContent] =>
+  def getByKey(key: String) = Action {
     Generators.findGenerator(key) match {
       case Some((target, _)) => Ok(Json.toJson(target.metaData))
       case _ => NotFound

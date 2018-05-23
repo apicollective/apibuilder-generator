@@ -6,7 +6,7 @@ import lib.Validation
 import play.api.libs.json._
 import play.api.mvc._
 
-class Invocations extends Controller {
+class Invocations extends InjectedController {
 
   def postByKey(key: String) = Action(parse.json(maxLength = 1024 * 1024)) { request: Request[JsValue] =>
     Generators.findGenerator(key) match {
