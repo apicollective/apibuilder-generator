@@ -150,11 +150,12 @@ package com.gilt.test.v0 {
     object Users extends Users {
       override def post(
         user: com.gilt.test.v0.models.User,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User] = {
         val payload = play.api.libs.json.Json.toJson(user)
 
-        _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 201 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
           case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201", requestUri = Some(r.getUri.toJavaNetURI))
         }
@@ -163,9 +164,10 @@ package com.gilt.test.v0 {
       @deprecated("to be removed")
       override def getByEmail(
         @deprecated email: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User] = {
-        _executeRequest("GET", s"/users/${_root_.com.gilt.test.v0.PathSegment.encode(email, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/users/${_root_.com.gilt.test.v0.PathSegment.encode(email, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
           case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri.toJavaNetURI))
         }
@@ -173,11 +175,12 @@ package com.gilt.test.v0 {
 
       override def patch(
         userPatch: com.gilt.test.v0.models.UserPatch,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User] = {
         val payload = play.api.libs.json.Json.toJson(userPatch)
 
-        _executeRequest("PATCH", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("PATCH", s"/users", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.com.gilt.test.v0.Client.parseJson("com.gilt.test.v0.models.User", r, _.validate[com.gilt.test.v0.models.User])
           case r => throw com.gilt.test.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri.toJavaNetURI))
         }
@@ -196,8 +199,8 @@ package com.gilt.test.v0 {
       }
     }
 
-    def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): RequestBuilder = {
-      val builder = new RequestBuilder(method)
+    def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): _root_.com.ning.http.client.RequestBuilder = {
+      val builder = new _root_.com.ning.http.client.RequestBuilder(method)
         .setUrl(baseUrl + path)
         .addHeader("User-Agent", Constants.UserAgent)
         .addHeader("X-Apidoc-Version", Constants.Version)
@@ -224,7 +227,8 @@ package com.gilt.test.v0 {
       path: String,
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
-      body: Option[play.api.libs.json.JsValue] = None
+      body: Option[play.api.libs.json.JsValue] = None,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[org.asynchttpclient.Response] = {
       val allHeaders = body match {
         case None => requestHeaders
@@ -242,7 +246,7 @@ package com.gilt.test.v0 {
         request.setBody(serialized)
       }
 
-      val finalRequest = requestWithParamsAndBody.build()
+      val finalRequest = requestModifier(requestWithParamsAndBody).build()
       _logRequest(finalRequest)
 
       val result = scala.concurrent.Promise[org.asynchttpclient.Response]()
@@ -311,18 +315,21 @@ package com.gilt.test.v0 {
   trait Users {
     def post(
       user: com.gilt.test.v0.models.User,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User]
 
     @deprecated("to be removed")
     def getByEmail(
       @deprecated email: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User]
 
     def patch(
       userPatch: com.gilt.test.v0.models.UserPatch,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.gilt.test.v0.models.User]
   }
 

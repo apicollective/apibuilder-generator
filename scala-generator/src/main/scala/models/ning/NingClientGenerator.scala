@@ -99,8 +99,8 @@ ${methodGenerator.objects().indent(4)}
       }
     }
 
-    def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): RequestBuilder = {
-      val builder = new RequestBuilder(method)
+    def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): ${config.requestBuilderClass} = {
+      val builder = new ${config.requestBuilderClass}(method)
         .setUrl(baseUrl + path)
 ${headerString.indent(8)}
 
@@ -125,7 +125,8 @@ ${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indent(12)}
       path: String,
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
-      body: Option[play.api.libs.json.JsValue] = None
+      body: Option[play.api.libs.json.JsValue] = None,
+      requestModifier: ${config.requestBuilderClass} => ${config.requestBuilderClass} = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[${config.ningPackage}.Response] = {
       val allHeaders = body match {
         case None => requestHeaders
@@ -143,7 +144,7 @@ ${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indent(12)}
         request.setBody(serialized)
       }
 
-      val finalRequest = requestWithParamsAndBody.build()
+      val finalRequest = requestModifier(requestWithParamsAndBody).build()
       _logRequest(finalRequest)
 
       val result = scala.concurrent.Promise[${config.ningPackage}.Response]()
@@ -177,7 +178,8 @@ ${PlayScalaClientCommon(config).indent(2)}
 ${methodGenerator.traitsAndErrors().indent(2)}
 
 ${PathSegment.definition.indent(2)}
-}"""
+}
+"""
   }
 
 }

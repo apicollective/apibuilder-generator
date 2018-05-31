@@ -37,6 +37,11 @@ trait ScalaClientMethodConfig {
     */
   def responseClass: String
 
+  /**
+    * The class name for building the Request object.
+    */
+  def requestBuilderClass: String
+
   /** Whether or not play.api.libs.ws.WS exists as a static object, or if
     * play.api.libs.ws.WSClient is expected to be passed in.
     */
@@ -102,6 +107,7 @@ object ScalaClientMethodConfigs {
 
   case class Play22(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.Response"
+    override val requestBuilderClass = "play.api.libs.ws.WS.WSRequestHolder"
     override val requestUriMethod = Some("ahcResponse.getUri")
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = false
@@ -109,6 +115,7 @@ object ScalaClientMethodConfigs {
 
   case class Play23(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestBuilderClass = "play.api.libs.ws.WSRequestHolder"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = true
@@ -116,6 +123,7 @@ object ScalaClientMethodConfigs {
 
   case class Play24(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestBuilderClass = "play.api.libs.ws.WSRequest"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = true
@@ -123,6 +131,7 @@ object ScalaClientMethodConfigs {
 
   case class Play25(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestBuilderClass = "play.api.libs.ws.WSRequest"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
@@ -130,6 +139,7 @@ object ScalaClientMethodConfigs {
 
   case class Play26(namespace: String, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestBuilderClass = "play.api.libs.ws.WSRequest"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
@@ -140,6 +150,7 @@ object ScalaClientMethodConfigs {
     override val responseStatusMethod = "getStatusCode"
     override val responseBodyMethod = """getResponseBody("UTF-8")"""
     override val responseClass = "_root_.com.ning.http.client.Response"
+    override val requestBuilderClass = "_root_.com.ning.http.client.RequestBuilder"
     override val extraClientCtorArgs = Some(",\n  asyncHttpClient: AsyncHttpClient = Client.defaultAsyncHttpClient")
     override val extraClientObjectMethods = Some("""
 private lazy val defaultAsyncHttpClient = {
@@ -194,6 +205,7 @@ private lazy val defaultAsyncHttpClient = {
     override val responseStatusMethod = "status.code"
     override val responseBodyMethod = """body"""
     override val responseClass = "org.http4s.Response"
+    override val requestBuilderClass: String = "org.http4s.Request"
     override def extraClientCtorArgs: Option[String] = Some(",\n  asyncHttpClient: org.http4s.client.Client = Client.defaultAsyncHttpClient")
     override val extraClientObjectMethods = Some("""
 implicit def circeJsonDecoder[A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
@@ -213,7 +225,6 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def rightType: String
     def monadTransformerInvoke: String
     def asyncFailure: String
-    def requestClass: String = "org.http4s.Request"
     def messageClass: String = "org.http4s.Message"
     def httpServiceClass: String = "org.http4s.HttpService"
     def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$datatypeName]"
@@ -269,7 +280,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
       """)
     override val asyncSuccess: String = "pure"
     override def asyncFailure: String = "raiseError"
-    override def requestClass: String = s"org.http4s.Request[$asyncType]"
+    override val requestBuilderClass: String = s"org.http4s.Request[$asyncType]"
     override def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$asyncType, $datatypeName]"
     override def messageClass: String = s"org.http4s.Message[$asyncType]"
     override def httpServiceClass: String = s"org.http4s.HttpService[$asyncType]"

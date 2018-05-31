@@ -41,7 +41,7 @@ ${headerString.indent(6)}
 
     def apiHeaders: Seq[(String, String)] = defaultApiHeaders
 
-    def modifyRequest(request: ${config.asyncType}[${config.requestClass}]): ${config.asyncType}[${config.requestClass}] = request
+    def modifyRequest(request: ${config.asyncType}[${config.requestBuilderClass}]): ${config.asyncType}[${config.requestBuilderClass}] = request
 
     implicit def circeJsonEncoder[${config.asyncTypeParam(Some("Sync")).map(p => p + ", ").getOrElse("")}A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
 
@@ -51,7 +51,8 @@ ${headerString.indent(6)}
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[T] = None,
-      formBody : Option[org.http4s.UrlForm] = None
+      formBody: Option[org.http4s.UrlForm] = None,
+      requestModifier: ${config.requestBuilderClass} => ${config.requestBuilderClass} = identity
     )(handler: ${config.responseClass} => ${config.asyncType}[U]
     )(implicit encoder: io.circe.Encoder[T]): ${config.asyncType}[U] = {
       import org.http4s.QueryParamEncoder._
@@ -70,9 +71,7 @@ ${headerString.indent(6)}
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
       val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
 
-      val request = ${config.requestClass}(method = m,
-                                       uri = uri,
-                                       headers = headers)
+      val request = ${config.requestBuilderClass}(method = m, uri = uri, headers = headers)
 
       val reqAndMaybeAuth = auth.fold(request) {
         case Authorization.Basic(username, passwordOpt) => {
@@ -83,9 +82,11 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
+      val decoratedRequest = requestModifier(reqAndMaybeAuth)
+
       val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
-        formBody.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
-      } else body.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+        formBody.fold(Sync[F].pure(decoratedRequest))(decoratedRequest.withBody)
+      } else body.fold(Sync[F].pure(decoratedRequest))(decoratedRequest.withBody)
 
       ${config.httpClient}.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }${methodGenerator.modelErrors().indent(4)}
