@@ -35,8 +35,14 @@ class KotlinGenerator
 
     private val sharedJacksonSpace = modelsNameSpace
     private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
+
+    //Errors
     private val errorsHelperClassName = "ErrorsHelper"
     private val commonNetworkErrorsClassName = "CommonNetworkErrors"
+    private val commonNetworkHttpErrorsList = Seq(
+      (404, "ServerNotFound"),
+      (500, "ServerError"),
+    )
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -389,12 +395,13 @@ class KotlinGenerator
 
     def generateErrorsHelper(): File = {
 
+      val fileName = errorsHelperClassName
+
       //sealed class CommonNetworkErrors
       val commonNetworkErrorsClass = new ClassName(modelsNameSpace, commonNetworkErrorsClassName)
       val builder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
         .addKdoc(kdocClassMessage)
-
 
       builder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClass).build())
       builder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClass).build())
@@ -408,7 +415,8 @@ class KotlinGenerator
               "    is %T -> {\n" +
               "        val body: String? = e.response().errorBody()?.string()\n" +
               "        when (e.code()) {\n" +
-              "            500 -> ServerError\n" +
+               commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
+              //"            500 -> ServerError\n" +
               "            else -> UnknownNetworkError\n" +
               "        }\n" +
               "    }\n"+
@@ -420,39 +428,6 @@ class KotlinGenerator
 
         build())
 
-      val fileName = errorsHelperClassName
-      /*val createCodeBlock = CodeBlock.builder()
-        .addStatement("val mapper = com.fasterxml.jackson.databind.ObjectMapper()")
-        .addStatement("mapper.registerModule(com.fasterxml.jackson.module.kotlin.KotlinModule())")
-        .addStatement("mapper.registerModule(com.fasterxml.jackson.datatype.joda.JodaModule())")
-        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.FAIL_ON_UNKNOWN_PROPERTIES, false)")
-        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)")
-        .addStatement("module.addDeserializer(Instant::class.java, InstantDeserializer)")
-        .addStatement("module.addSerializer(Instant::class.java, InstantSerializer)")
-        .addStatement("module.addDeserializer(LocalDate::class.java, LocalDateDeserializer)")
-        .addStatement("module.addSerializer(LocalDate::class.java, LocalDateSerializer)")
-        .addStatement("mapper.registerModule(module)")
-        .addStatement("return mapper")
-        .build()*/
-
-      /*val serverErrorSpec = PropertySpec.
-
-      builder.addp
-
-      val createFunSpec = FunSpec.builder("create")
-        .addCode(createCodeBlock)
-        .addModifiers(KModifier.PUBLIC)
-        .returns(classOf[com.fasterxml.jackson.databind.ObjectMapper])
-        .build()*/
-      /*val builder = TypeSpec.objectBuilder(fileName)
-        .addModifiers(KModifier.PUBLIC)
-        .addKdoc(kdocClassMessage)
-        .addProperty(moduleProperty)
-        .addType(deserializerInstantType)
-        .addType(serializerInstantType)
-        .addType(deserializerLocalDateType)
-        .addType(serializerLocalDateType)
-        .addFunction(createFunSpec)*/
       makeFile(fileName, builder)
     }
 
