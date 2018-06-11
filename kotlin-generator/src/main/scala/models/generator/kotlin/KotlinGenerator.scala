@@ -35,6 +35,8 @@ class KotlinGenerator
 
     private val sharedJacksonSpace = modelsNameSpace
     private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
+    private val errorsHelperClassName = "ErrorsHelper"
+    private val commonNetworkErrorsClassName = "CommonNetworkErrors"
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -385,11 +387,85 @@ class KotlinGenerator
       makeFile(className, builder)
     }
 
+    def generateErrorsHelper(): File = {
+
+      //sealed class CommonNetworkErrors
+      val commonNetworkErrorsClass = new ClassName(modelsNameSpace, commonNetworkErrorsClassName)
+      val builder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
+        .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
+        .addKdoc(kdocClassMessage)
+
+
+      builder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClass).build())
+      builder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClass).build())
+      builder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClass).build())
+      builder.addType(TypeSpec.objectBuilder("UnknownNetworkError").superclass(commonNetworkErrorsClass).build())
+
+      builder.companionObject(TypeSpec.companionObjectBuilder()
+          .addFunction(FunSpec.builder("processCommonNetworkError")
+              .addParameter(ParameterSpec.builder("e", new ClassName("kotlin", "Throwable"), KModifier.PUBLIC).build())
+              .addCode("return when (e) {" +
+              "    is %T -> {\n" +
+              "        val body: String? = e.response().errorBody()?.string()\n" +
+              "        when (e.code()) {\n" +
+              "            500 -> ServerError\n" +
+              "            else -> UnknownNetworkError\n" +
+              "        }\n" +
+              "    }\n"+
+              "    is %T -> ServerTimeout\n" +
+              "    else -> UnknownNetworkError\n"
+              , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
+              .returns(commonNetworkErrorsClass)
+            .build())
+
+        build())
+
+      val fileName = errorsHelperClassName
+      /*val createCodeBlock = CodeBlock.builder()
+        .addStatement("val mapper = com.fasterxml.jackson.databind.ObjectMapper()")
+        .addStatement("mapper.registerModule(com.fasterxml.jackson.module.kotlin.KotlinModule())")
+        .addStatement("mapper.registerModule(com.fasterxml.jackson.datatype.joda.JodaModule())")
+        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.FAIL_ON_UNKNOWN_PROPERTIES, false)")
+        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)")
+        .addStatement("module.addDeserializer(Instant::class.java, InstantDeserializer)")
+        .addStatement("module.addSerializer(Instant::class.java, InstantSerializer)")
+        .addStatement("module.addDeserializer(LocalDate::class.java, LocalDateDeserializer)")
+        .addStatement("module.addSerializer(LocalDate::class.java, LocalDateSerializer)")
+        .addStatement("mapper.registerModule(module)")
+        .addStatement("return mapper")
+        .build()*/
+
+      /*val serverErrorSpec = PropertySpec.
+
+      builder.addp
+
+      val createFunSpec = FunSpec.builder("create")
+        .addCode(createCodeBlock)
+        .addModifiers(KModifier.PUBLIC)
+        .returns(classOf[com.fasterxml.jackson.databind.ObjectMapper])
+        .build()*/
+      /*val builder = TypeSpec.objectBuilder(fileName)
+        .addModifiers(KModifier.PUBLIC)
+        .addKdoc(kdocClassMessage)
+        .addProperty(moduleProperty)
+        .addType(deserializerInstantType)
+        .addType(serializerInstantType)
+        .addType(deserializerLocalDateType)
+        .addType(serializerLocalDateType)
+        .addFunction(createFunSpec)*/
+      makeFile(fileName, builder)
+    }
+
+
     def generateEnums(enums: Seq[Enum]): Seq[File] = {
       enums.map(generateEnum(_))
     }
 
     def generateSourceFiles(service: Service): Seq[File] = {
+
+      val generatedErrorsHelper = Seq(generateErrorsHelper())
+
+
       val generatedEnums = generateEnums(service.enums)
 
       val generatedUnionTypes = service.unions.map(generateUnionType(_))
@@ -403,10 +479,11 @@ class KotlinGenerator
 
       val generatedResources = service.resources.map(generateResource(_))
 
-      generatedEnums ++
+        generatedEnums ++
         generatedUnionTypes ++
         generatedModels ++
         generatedObjectMapper ++
+        generatedErrorsHelper ++
         generatedResources
     }
 
