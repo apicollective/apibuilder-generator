@@ -398,16 +398,16 @@ class KotlinGenerator
       val fileName = errorsHelperClassName
 
       //sealed class CommonNetworkErrors
-      val commonNetworkErrorsClassName = "CommonNetworkErrors"
-      val commonNetworkErrorsClass = new ClassName(modelsNameSpace, commonNetworkErrorsClassName)
-      val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
+      val commonNetworkErrorsClassNameString = "CommonNetworkErrors"
+      val commonNetworkErrorsClassName = new ClassName(modelsNameSpace, commonNetworkErrorsClassNameString)
+      val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassNameString)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
         .addKdoc(kdocClassMessage)
 
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClass).build())
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClass).build())
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClass).build())
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("UnknownNetworkError").superclass(commonNetworkErrorsClass).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClassName).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClassName).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClassName).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("UnknownNetworkError").superclass(commonNetworkErrorsClassName).build())
 
       commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
           .addFunction(FunSpec.builder("processCommonNetworkError")
@@ -424,7 +424,7 @@ class KotlinGenerator
               "    is %T -> ServerTimeout\n" +
               "    else -> UnknownNetworkError\n"
               , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
-              .returns(commonNetworkErrorsClass)
+              .returns(commonNetworkErrorsClassName)
             .build())
 
         build())
@@ -474,21 +474,53 @@ class KotlinGenerator
         .addType(commonErrorEitherType)
 
 
-      
-      //data class for ApiNetworkCallResponse Type
-      val apiNetworkCallResponseTypeClassName = "ApiNetworkCallResponse"
-      val apiNetworkCallResponseTypeClass = new ClassName(modelsNameSpace, apiNetworkCallResponseTypeClassName)
 
+      //data class for ApiNetworkCallResponse Type
+      val apiNetworkCallResponseTypeClassNameString = "ApiNetworkCallResponse"
+      val apiNetworkCallResponseTypeClassName = new ClassName(modelsNameSpace, apiNetworkCallResponseTypeClassNameString)
+
+      val n = TypeVariableName.get("N")
+      val e = TypeVariableName.get("E")
+
+      val allErrorsFun = FunSpec.builder("toAllErrors")
+        .addParameter(ParameterSpec.builder("t", classOf[Throwable]).build())
+        .returns(ParameterizedTypeName.get(eitherErrorTypeClassName, e, commonNetworkErrorsClassName))
+        .addStatement("val callError = toCallErrors(t)")
+        .addCode("return if (callError == null) {\n" +
+          "            val genericNetworkError = CommonNetworkErrors.processGenericNetworkError(e)\n" + "" +
+          "            EitherCallOrCommonNetworkError.CommomNetworkError(genericNetworkError)\n" + "" +
+          "        } else {\n" + "" +
+          "            EitherCallOrCommonNetworkError.CallError(callError)\n" + "" +
+          "        }\n")
+        .build()
+
+      val throwableTypeName = classToClassName(classOf[Throwable]).asInstanceOf[TypeName]
+
+      val singleParameterizedByN = ParameterizedTypeName.get(classToClassName(classOf[Single[Void]]), n)
+      val throwableToELambda = LambdaTypeName.get(null, Array(throwableTypeName), e)
       val apiNetworkCallResponseBuilder = TypeSpec.classBuilder(apiNetworkCallResponseTypeClassName)
         .addModifiers(KModifier.PUBLIC, KModifier.DATA)
+        .addTypeVariable(n)
+        .addTypeVariable(e)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("networkSingle", singleParameterizedByN)
+          .addParameter("toCallErrors", throwableToELambda)
+          .build())
+        .addProperty(PropertySpec.builder("networkSingle", singleParameterizedByN)
+          .initializer("networkSingle")
+          .build())
+        .addProperty(PropertySpec.builder("toCallErrors", throwableToELambda)
+          .initializer("toCallErrors")
+          .build())
+        .addFunction(allErrorsFun)
         .addKdoc(kdocClassMessage)
 
 
       //output file
       val fileBuilder = FileSpec.builder(modelsNameSpace, fileName)
+        .addType(apiNetworkCallResponseBuilder.build())
         .addType(commonNetworkErrorsBuilder.build())
         .addType(eitherErrorBuilder.build())
-        .addType(apiNetworkCallResponseBuilder.build())
       makeFile(fileName, fileBuilder)
     }
 
