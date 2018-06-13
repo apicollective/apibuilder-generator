@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import io.reactivex.Single
+import lib.Datatype
 import lib.generator.CodeGenerator
 import org.threeten.bp.{Instant, LocalDate}
 
@@ -293,7 +294,43 @@ class KotlinGenerator
             val retrofitWrappedClassname = getRetrofitReturnTypeWrapperClass()
             method.returns(ParameterizedTypeName.get(retrofitWrappedClassname, returnType))
           })
+
           builder.addFunction(method.build)
+
+
+          //Error responses
+          val callErrorResponseSealedClassName = new ClassName(modelsNameSpace, methodName + "ErrorResponses")
+          val callErrorResopnseSealedClassBuilder = TypeSpec.classBuilder(callErrorResponseSealedClassName)
+            .addModifiers(KModifier.SEALED)
+
+          operation.description.map(description => {
+            callErrorResopnseSealedClassBuilder.addKdoc("Error Responses for " + description)
+          })
+
+          val errorResponses = operation.responses.filter(response => {
+            response.code.isInstanceOf[ResponseCodeInt] &&
+              response.code.asInstanceOf[ResponseCodeInt].value >= 300
+          })
+
+          errorResponses.map( errorResponse => {
+            if(errorResponse.`type` == Datatype.Primitive.Unit){
+              callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder("Error" + errorResponse.code.toString).superclass(callErrorResponseSealedClassName).build())
+            } else {
+              val errorPayloadType = dataTypeFromField(errorResponse.`type`, modelsNameSpace)
+              val errorResponseDataClass = TypeSpec.classBuilder("Error" + errorResponse.code.toString)
+                .addModifiers(KModifier.DATA)
+                .primaryConstructor(FunSpec.constructorBuilder().addParameter("errorPayload", errorPayloadType).build())
+                .addProperty(PropertySpec.builder("errorPayload", errorPayloadType)
+                  .initializer("errorPayload")
+                  .build())
+                .superclass(callErrorResponseSealedClassName)
+                .build()
+              callErrorResopnseSealedClassBuilder.addType(errorResponseDataClass)
+            }
+          })
+          builder.addType(callErrorResopnseSealedClassBuilder.build())
+
+
         })
       }
 
@@ -404,6 +441,7 @@ class KotlinGenerator
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
         .addKdoc(kdocClassMessage)
 
+      //XXX this should come from the list above.
       commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClassName).build())
       commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClassName).build())
       commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClassName).build())
