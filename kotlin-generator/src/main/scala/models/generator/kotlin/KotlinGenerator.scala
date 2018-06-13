@@ -478,21 +478,28 @@ class KotlinGenerator
       commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClassName).build())
       commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("UnknownNetworkError").superclass(commonNetworkErrorsClassName).build())
 
+      val processCommonFuncBody = CodeBlock.builder()
+        .beginControlFlow("return when (t)")
+
+           .add(
+            "    is %T -> {\n" +
+            "        val body: String? = t.response().errorBody()?.string()\n" +
+            "        when (t.code()) {\n" +
+            commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
+            //"            500 -> ServerError\n" +
+            "            else -> UnknownNetworkError\n" +
+            "        }\n" +
+            "    }\n"+
+            "    is %T -> ServerTimeOut\n" +
+            "    else -> UnknownNetworkError\n"
+            , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
+        .endControlFlow()
+        .build()
+
       commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
           .addFunction(FunSpec.builder("processCommonNetworkError")
               .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
-              .addCode("return when (t) {\n" +
-              "    is %T -> {\n" +
-              "        val body: String? = t.response().errorBody()?.string()\n" +
-              "        when (t.code()) {\n" +
-               commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
-              //"            500 -> ServerError\n" +
-              "            else -> UnknownNetworkError\n" +
-              "        }\n" +
-              "    }\n"+
-              "    is %T -> ServerTimeOut\n" +
-              "    else -> UnknownNetworkError\n"
-              , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
+              .addCode(processCommonFuncBody)
               .returns(commonNetworkErrorsClassName)
             .build())
 
