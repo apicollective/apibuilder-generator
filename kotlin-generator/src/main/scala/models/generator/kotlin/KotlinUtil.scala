@@ -208,4 +208,8 @@ trait KotlinUtil {
     namespace.split("\\.").map { checkForReservedWord }.mkString(".")
   }
 
+  def getThrowableClassName() : ClassName = {
+    new ClassName("kotlin", "Throwable")
+  }
+
 }

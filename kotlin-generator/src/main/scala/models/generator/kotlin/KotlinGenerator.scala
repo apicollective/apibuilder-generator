@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, Version}
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
 import com.squareup.kotlinpoet._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
@@ -299,36 +300,66 @@ class KotlinGenerator
 
 
           //Error responses
-          val callErrorResponseSealedClassName = new ClassName(modelsNameSpace, methodName + "ErrorResponses")
-          val callErrorResopnseSealedClassBuilder = TypeSpec.classBuilder(callErrorResponseSealedClassName)
-            .addModifiers(KModifier.SEALED)
-
-          operation.description.map(description => {
-            callErrorResopnseSealedClassBuilder.addKdoc("Error Responses for " + description)
-          })
-
           val errorResponses = operation.responses.filter(response => {
             response.code.isInstanceOf[ResponseCodeInt] &&
               response.code.asInstanceOf[ResponseCodeInt].value >= 300
           })
+          if (errorResponses.nonEmpty) {
+            val callErrorResponseSealedClassName = new ClassName(modelsNameSpace + "." + className, methodName + "ErrorResponses")
+            val callErrorResopnseSealedClassBuilder = TypeSpec.classBuilder(callErrorResponseSealedClassName)
+              .addModifiers(KModifier.SEALED)
 
-          errorResponses.map( errorResponse => {
-            if(errorResponse.`type` == Datatype.Primitive.Unit){
-              callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder("Error" + errorResponse.code.toString).superclass(callErrorResponseSealedClassName).build())
-            } else {
-              val errorPayloadType = dataTypeFromField(errorResponse.`type`, modelsNameSpace)
-              val errorResponseDataClass = TypeSpec.classBuilder("Error" + errorResponse.code.toString)
-                .addModifiers(KModifier.DATA)
-                .primaryConstructor(FunSpec.constructorBuilder().addParameter("errorPayload", errorPayloadType).build())
-                .addProperty(PropertySpec.builder("errorPayload", errorPayloadType)
-                  .initializer("errorPayload")
-                  .build())
-                .superclass(callErrorResponseSealedClassName)
-                .build()
-              callErrorResopnseSealedClassBuilder.addType(errorResponseDataClass)
-            }
-          })
-          builder.addType(callErrorResopnseSealedClassBuilder.build())
+            operation.description.map(description => {
+              callErrorResopnseSealedClassBuilder.addKdoc("Error Responses for " + methodName + " - " + description)
+            })
+
+            val companionObject = TypeSpec.companionObjectBuilder()
+            val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
+            val throwableToErrorTypesLambda = LambdaTypeName.get(null, Array(throwableTypeName), callErrorResponseSealedClassName.asNullable())
+            val toErrorCodeBlockBuilder = CodeBlock.builder()
+              toErrorCodeBlockBuilder.add("{\n" +
+                "t ->\n" +
+              "                when (t) {\n" + "" +
+              "                    is %T -> {\n" +
+              "                        val body: String? = t.response().errorBody()?.string()\n" +
+              "                            when (t.code()) {\n"
+
+              , classOf[HttpException])
+
+            errorResponses.map(errorResponse => {
+              val responseCodeString = errorResponse.code.asInstanceOf[ResponseCodeInt].value.toString
+              val errorTypeNameString = "Error" + responseCodeString
+              if (errorResponse.`type` == Datatype.Primitive.Unit) {
+                callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
+              } else {
+                val errorPayloadType = dataTypeFromField(errorResponse.`type`, modelsNameSpace).asInstanceOf[ClassName]
+                val errorPayloadNameString = "data"
+                val errorResponseDataClass = TypeSpec.classBuilder(errorTypeNameString)
+                  .addModifiers(KModifier.DATA)
+                  .primaryConstructor(FunSpec.constructorBuilder().addParameter(errorPayloadNameString, errorPayloadType).build())
+                  .addProperty(PropertySpec.builder(errorPayloadNameString, errorPayloadType)
+                    .initializer(errorPayloadNameString)
+                    .build())
+                  .superclass(callErrorResponseSealedClassName)
+                  .build()
+
+                //422 -> body?.let { Error422(Errors.parseJson(body)) } ?: run { null }
+                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { " + errorTypeNameString + "(" + errorPayloadType.simpleName() + ".parseJson(body)) } ?: run { null }\n")
+
+                callErrorResopnseSealedClassBuilder.addType(errorResponseDataClass)
+              }
+            })
+            toErrorCodeBlockBuilder.add("                        else -> null\n" + "" +
+              "                        }\n" +
+              "                    }\n" +
+              "                    else -> null\n" +
+              "                }\n" +
+              "            }\n"
+            )
+            companionObject.addProperty(PropertySpec.builder("toError", throwableToErrorTypesLambda).initializer(toErrorCodeBlockBuilder.build()).build())
+            callErrorResopnseSealedClassBuilder.addType(companionObject.build())
+            builder.addType(callErrorResopnseSealedClassBuilder.build())
+        }
 
 
         })
@@ -449,17 +480,17 @@ class KotlinGenerator
 
       commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
           .addFunction(FunSpec.builder("processCommonNetworkError")
-              .addParameter(ParameterSpec.builder("e", new ClassName("kotlin", "Throwable"), KModifier.PUBLIC).build())
-              .addCode("return when (e) {" +
+              .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
+              .addCode("return when (t) {\n" +
               "    is %T -> {\n" +
-              "        val body: String? = e.response().errorBody()?.string()\n" +
-              "        when (e.code()) {\n" +
+              "        val body: String? = t.response().errorBody()?.string()\n" +
+              "        when (t.code()) {\n" +
                commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
               //"            500 -> ServerError\n" +
               "            else -> UnknownNetworkError\n" +
               "        }\n" +
               "    }\n"+
-              "    is %T -> ServerTimeout\n" +
+              "    is %T -> ServerTimeOut\n" +
               "    else -> UnknownNetworkError\n"
               , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
               .returns(commonNetworkErrorsClassName)
@@ -521,18 +552,18 @@ class KotlinGenerator
       val e = TypeVariableName.get("E")
 
       val allErrorsFun = FunSpec.builder("toAllErrors")
-        .addParameter(ParameterSpec.builder("t", classOf[Throwable]).build())
+        .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
         .returns(ParameterizedTypeName.get(eitherErrorTypeClassName, e, commonNetworkErrorsClassName))
         .addStatement("val callError = toCallErrors(t)")
         .addCode("return if (callError == null) {\n" +
-          "            val genericNetworkError = CommonNetworkErrors.processGenericNetworkError(e)\n" + "" +
-          "            EitherCallOrCommonNetworkError.CommomNetworkError(genericNetworkError)\n" + "" +
+          "            val genericNetworkError = CommonNetworkErrors.processCommonNetworkError(t)\n" + "" +
+          "            EitherCallOrCommonNetworkError.CommonNetworkError(genericNetworkError)\n" + "" +
           "        } else {\n" + "" +
           "            EitherCallOrCommonNetworkError.CallError(callError)\n" + "" +
           "        }\n")
         .build()
 
-      val throwableTypeName = classToClassName(classOf[Throwable]).asInstanceOf[TypeName]
+      val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
 
       val singleParameterizedByN = ParameterizedTypeName.get(classToClassName(classOf[Single[Void]]), n)
       val throwableToELambda = LambdaTypeName.get(null, Array(throwableTypeName), e)
@@ -557,8 +588,8 @@ class KotlinGenerator
       //output file
       val fileBuilder = FileSpec.builder(modelsNameSpace, fileName)
         .addType(apiNetworkCallResponseBuilder.build())
-        .addType(commonNetworkErrorsBuilder.build())
         .addType(eitherErrorBuilder.build())
+        .addType(commonNetworkErrorsBuilder.build())
       makeFile(fileName, fileBuilder)
     }
 
