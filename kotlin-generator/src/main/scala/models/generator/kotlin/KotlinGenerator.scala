@@ -38,7 +38,6 @@ class KotlinGenerator
 
     //Errors
     private val errorsHelperClassName = "ErrorsHelper"
-    private val commonNetworkErrorsClassName = "CommonNetworkErrors"
     private val commonNetworkHttpErrorsList = Seq(
       (404, "ServerNotFound"),
       (500, "ServerError"),
@@ -393,22 +392,24 @@ class KotlinGenerator
       makeFile(className, builder)
     }
 
+
     def generateErrorsHelper(): File = {
 
       val fileName = errorsHelperClassName
 
       //sealed class CommonNetworkErrors
+      val commonNetworkErrorsClassName = "CommonNetworkErrors"
       val commonNetworkErrorsClass = new ClassName(modelsNameSpace, commonNetworkErrorsClassName)
-      val builder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
+      val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
         .addKdoc(kdocClassMessage)
 
-      builder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClass).build())
-      builder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClass).build())
-      builder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClass).build())
-      builder.addType(TypeSpec.objectBuilder("UnknownNetworkError").superclass(commonNetworkErrorsClass).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClass).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClass).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClass).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("UnknownNetworkError").superclass(commonNetworkErrorsClass).build())
 
-      builder.companionObject(TypeSpec.companionObjectBuilder()
+      commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
           .addFunction(FunSpec.builder("processCommonNetworkError")
               .addParameter(ParameterSpec.builder("e", new ClassName("kotlin", "Throwable"), KModifier.PUBLIC).build())
               .addCode("return when (e) {" +
@@ -428,7 +429,67 @@ class KotlinGenerator
 
         build())
 
-      makeFile(fileName, builder)
+
+      //sealed class for Either Type
+      val eitherErrorTypeClassNameString = "EitherCallOrCommonNetworkError"
+      val eitherErrorTypeClassName = new ClassName(modelsNameSpace, eitherErrorTypeClassNameString)
+      val callErrorEitherErrorTypeClassNameString = "CallError"
+      val callErrorEitherErrorTypeClassName = new ClassName(modelsNameSpace, callErrorEitherErrorTypeClassNameString)
+      val commonErrorEitherErrorTypeClassNameString = "CommonNetworkError"
+      val commonErrorEitherErrorTypeClassName = new ClassName(modelsNameSpace, commonErrorEitherErrorTypeClassNameString)
+
+      val c = TypeVariableName.get("C", KModifier.OUT)
+      val g = TypeVariableName.get("G", KModifier.OUT)
+      val nothing = TypeVariableName.get("Nothing")
+
+
+      val callErrorEitherType = TypeSpec.classBuilder(callErrorEitherErrorTypeClassName)
+        .addModifiers(KModifier.DATA)
+        .addTypeVariable(c)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("error", c).build())
+        .addProperty(PropertySpec.builder("error", c)
+          .initializer("error")
+          .build())
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, c, nothing))
+        .build()
+
+      val commonErrorEitherType = TypeSpec.classBuilder(commonErrorEitherErrorTypeClassName)
+        .addModifiers(KModifier.DATA)
+        .addTypeVariable(g)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("error", g).build())
+        .addProperty(PropertySpec.builder("error", g)
+          .initializer("error")
+          .build())
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, nothing, g))
+        .build()
+
+      val eitherErrorBuilder = TypeSpec.classBuilder(eitherErrorTypeClassName)
+        .addTypeVariable(c)
+        .addTypeVariable(g)
+        .addModifiers(KModifier.SEALED)
+        .addKdoc(kdocClassMessage)
+        .addType(callErrorEitherType)
+        .addType(commonErrorEitherType)
+
+
+      
+      //data class for ApiNetworkCallResponse Type
+      val apiNetworkCallResponseTypeClassName = "ApiNetworkCallResponse"
+      val apiNetworkCallResponseTypeClass = new ClassName(modelsNameSpace, apiNetworkCallResponseTypeClassName)
+
+      val apiNetworkCallResponseBuilder = TypeSpec.classBuilder(apiNetworkCallResponseTypeClassName)
+        .addModifiers(KModifier.PUBLIC, KModifier.DATA)
+        .addKdoc(kdocClassMessage)
+
+
+      //output file
+      val fileBuilder = FileSpec.builder(modelsNameSpace, fileName)
+        .addType(commonNetworkErrorsBuilder.build())
+        .addType(eitherErrorBuilder.build())
+        .addType(apiNetworkCallResponseBuilder.build())
+      makeFile(fileName, fileBuilder)
     }
 
 
@@ -462,12 +523,24 @@ class KotlinGenerator
         generatedResources
     }
 
+    //write one file with a single class
     def makeFile(name: String, typeSpecBuilder: TypeSpec.Builder): File = {
       val typeSpec = typeSpecBuilder.build
       val kFile = FileSpec.get(modelsNameSpace, typeSpec)
       val sw = new StringWriter(1024)
       try {
         kFile.writeTo(sw)
+        File(s"${name}.kt", Some(modelsDirectoryPath), sw.toString)
+      } finally {
+        sw.close()
+      }
+    }
+
+    //write one file with multiple classes
+    def makeFile(name: String, fileBuilder: FileSpec.Builder): File = {
+      val sw = new StringWriter(1024)
+      try {
+        fileBuilder.build().writeTo(sw)
         File(s"${name}.kt", Some(modelsDirectoryPath), sw.toString)
       } finally {
         sw.close()
