@@ -320,9 +320,15 @@ class KotlinGenerator
           builder.addFunction(method.build)
 
 
-          /* ----- Error responses --------*/
-          /* ----- --------------- --------*/
-          /* ----- --------------- --------*/
+          /* ----- Error responses --------
+          Since we want to keep Rx's success/error format, and we can't make retrofit return something custom,
+          we create for each resource that has non 200 error responses defined
+          - a sealed class that has all the error types
+          - a lambda that converts retrofit's exception into above sealed class
+          - a convenience method getCallAndErrors to return both the rx single, and the lambda.
+          the client of this generated code is responsible for calling the lambda to get all the error responses
+          */
+
 
           val errorResponses = operation.responses.filter(response => {
             response.code.isInstanceOf[ResponseCodeInt] &&
@@ -356,7 +362,7 @@ class KotlinGenerator
 
 
 
-            val commonUnknownNetworkErrorType = new ClassName(commonNetworkErrorsClassName.getCanonicalName, serverUnknownErrorClassName) //make commonstring with generateErrorsHelper XXX tODO
+            val commonUnknownNetworkErrorType = new ClassName(commonNetworkErrorsClassName.getCanonicalName, serverUnknownErrorClassName)
 
             errorResponses.map(errorResponse => {
               val responseCodeString = errorResponse.code.asInstanceOf[ResponseCodeInt].value.toString
@@ -394,7 +400,7 @@ class KotlinGenerator
 
             //combined function
 
-            val combinedFunction = FunSpec.builder("getCallCombined")
+            val combinedFunction = FunSpec.builder("getCallAndErrorLambda")
               .addParameter("client", new ClassName(modelsNameSpace, className))
 
 
@@ -518,7 +524,7 @@ class KotlinGenerator
       //sealed class CommonNetworkErrors
       val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
-        .addKdoc(kdocClassMessage)
+        .addKdoc(s"Common generic errors that are expected to happen are not defined in apibuilder.json\n" + kdocClassMessage)
 
       commonNetworkHttpErrorsList.map({
         e => commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(e._2).superclass(commonNetworkErrorsClassName).build())
@@ -584,9 +590,9 @@ class KotlinGenerator
       val eitherErrorBuilder = TypeSpec.classBuilder(eitherErrorTypeClassName)
         .addTypeVariable(c)
         .addModifiers(KModifier.SEALED)
-        .addKdoc(kdocClassMessage)
         .addType(callErrorEitherType)
         .addType(commonErrorEitherType)
+        .addKdoc(s"Either type that combines CommonNetworkErrors with network errors for a specific call (as defined in apibuilder.json)\n" + kdocClassMessage)
 
 
 
@@ -612,7 +618,7 @@ class KotlinGenerator
         .addProperty(PropertySpec.builder("toError", throwableToELambda)
           .initializer("toError")
           .build())
-        .addKdoc(kdocClassMessage)
+        .addKdoc(s"Utility data class to combine a call and it's error responses\n" + kdocClassMessage)
 
 
       //output file
