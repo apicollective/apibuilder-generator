@@ -45,7 +45,7 @@ class KotlinGeneratorTest
 
   private def enumFileExists(files: Seq[File], enumName: String): Boolean = {
     files.exists(file => {
-      file.contents.contains(s"enum class ${enumName}") && file.contents.contains("UNDEFINED")
+      file.contents.contains(s"enum class ${enumName}")
     })
   }
 }
