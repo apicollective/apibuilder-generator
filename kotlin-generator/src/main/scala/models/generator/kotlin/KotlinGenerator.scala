@@ -515,7 +515,6 @@ class KotlinGenerator
       val commonErrorEitherErrorTypeClassName = new ClassName(modelsNameSpace, commonErrorEitherErrorTypeClassNameString)
 
       val c = TypeVariableName.get("C", KModifier.OUT)
-      val g = TypeVariableName.get("G", KModifier.OUT)
       val nothing = TypeVariableName.get("Nothing")
 
 
@@ -527,23 +526,21 @@ class KotlinGenerator
         .addProperty(PropertySpec.builder("error", c)
           .initializer("error")
           .build())
-        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, c, nothing))
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, c))
         .build()
 
       val commonErrorEitherType = TypeSpec.classBuilder(commonErrorEitherErrorTypeClassName)
         .addModifiers(KModifier.DATA)
-        .addTypeVariable(g)
         .primaryConstructor(FunSpec.constructorBuilder()
-          .addParameter("error", g).build())
-        .addProperty(PropertySpec.builder("error", g)
+          .addParameter("error", commonNetworkErrorsClassName).build())
+        .addProperty(PropertySpec.builder("error", commonNetworkErrorsClassName)
           .initializer("error")
           .build())
-        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, nothing, g))
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, nothing))
         .build()
 
       val eitherErrorBuilder = TypeSpec.classBuilder(eitherErrorTypeClassName)
         .addTypeVariable(c)
-        .addTypeVariable(g)
         .addModifiers(KModifier.SEALED)
         .addKdoc(kdocClassMessage)
         .addType(callErrorEitherType)
@@ -558,18 +555,6 @@ class KotlinGenerator
       val n = TypeVariableName.get("N")
       val e = TypeVariableName.get("E")
 
-      val allErrorsFun = FunSpec.builder("toAllErrors")
-        .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
-        .returns(ParameterizedTypeName.get(eitherErrorTypeClassName, e, commonNetworkErrorsClassName))
-        .addStatement("val callError = toCallErrors(t)")
-        .addCode("return if (callError == null) {\n" +
-          "            val genericNetworkError = CommonNetworkErrors.processCommonNetworkError(t)\n" + "" +
-          "            EitherCallOrCommonNetworkError.CommonNetworkError(genericNetworkError)\n" + "" +
-          "        } else {\n" + "" +
-          "            EitherCallOrCommonNetworkError.CallError(callError)\n" + "" +
-          "        }\n")
-        .build()
-
       val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
 
       val singleParameterizedByN = ParameterizedTypeName.get(classToClassName(classOf[Single[Void]]), n)
@@ -580,15 +565,14 @@ class KotlinGenerator
         .addTypeVariable(e)
         .primaryConstructor(FunSpec.constructorBuilder()
           .addParameter("networkSingle", singleParameterizedByN)
-          .addParameter("toCallErrors", throwableToELambda)
+          .addParameter("toError", throwableToELambda)
           .build())
         .addProperty(PropertySpec.builder("networkSingle", singleParameterizedByN)
           .initializer("networkSingle")
           .build())
-        .addProperty(PropertySpec.builder("toCallErrors", throwableToELambda)
-          .initializer("toCallErrors")
+        .addProperty(PropertySpec.builder("toError", throwableToELambda)
+          .initializer("toError")
           .build())
-        .addFunction(allErrorsFun)
         .addKdoc(kdocClassMessage)
 
 
