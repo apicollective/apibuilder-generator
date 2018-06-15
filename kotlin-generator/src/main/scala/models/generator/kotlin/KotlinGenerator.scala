@@ -41,10 +41,24 @@ class KotlinGenerator
 
     //Errors
     private val errorsHelperClassName = "ErrorsHelper"
+
+    val commonNetworkErrorsClassName = new ClassName(modelsNameSpace, "CommonNetworkErrors")
+    val eitherErrorTypeClassName = new ClassName(modelsNameSpace, "EitherCallOrCommonNetworkError")
+    val callErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CallError")
+    val commonErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CommonNetworkError")
+
+    val apiNetworkCallResponseTypeClassName = new ClassName(modelsNameSpace, "ApiNetworkCallResponse")
+    val errorResponsesString = "ErrorResponses"
+    private val processCommonNetworkErrorString = "processCommonNetworkError"
+
+
     private val commonNetworkHttpErrorsList = Seq(
       (404, "ServerNotFound"),
       (500, "ServerError"),
     )
+    private val serverTimeOutErrorClassName = "ServerTimeOut"
+    private val serverUnknownErrorClassName = "UnknownNetworkError"
+
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -316,21 +330,9 @@ class KotlinGenerator
           })
           if (errorResponses.nonEmpty) {
 
-            //these lines repeated from generateErrorsHelper, fix!!! XXX TODO
-            val commonNetworkErrorsClassNameString = "CommonNetworkErrors"
-            val commonNetworkErrorsClassName = new ClassName(modelsNameSpace, commonNetworkErrorsClassNameString)
-            val eitherErrorTypeClassNameString = "EitherCallOrCommonNetworkError"
-            val eitherErrorTypeClassName = new ClassName(modelsNameSpace, eitherErrorTypeClassNameString)
-            val callErrorEitherErrorTypeClassNameString = "CallError"
-            val callErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, callErrorEitherErrorTypeClassNameString)
-            val commonErrorEitherErrorTypeClassNameString = "CommonNetworkError"
-            val commonErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, commonErrorEitherErrorTypeClassNameString)
-            // till here XXX TODO
-
             val callObjectName = new ClassName(modelsNameSpace + "." + className, methodName.capitalize + "Call")
             val callObjectBuilder = TypeSpec.objectBuilder(callObjectName)
 
-            val errorResponsesString = "ErrorResponses"
             val callErrorResponseSealedClassName = new ClassName(callObjectName.getCanonicalName, errorResponsesString)
             val callErrorResopnseSealedClassBuilder = TypeSpec.classBuilder(callErrorResponseSealedClassName)
               .addModifiers(KModifier.SEALED)
@@ -354,7 +356,7 @@ class KotlinGenerator
 
 
 
-            val commonUnknownNetworkErrorType = new ClassName(commonNetworkErrorsClassName.getCanonicalName, "UnknownNetworkError") //make commonstring with generateErrorsHelper
+            val commonUnknownNetworkErrorType = new ClassName(commonNetworkErrorsClassName.getCanonicalName, serverUnknownErrorClassName) //make commonstring with generateErrorsHelper XXX tODO
 
             errorResponses.map(errorResponse => {
               val responseCodeString = errorResponse.code.asInstanceOf[ResponseCodeInt].value.toString
@@ -373,7 +375,6 @@ class KotlinGenerator
                   .superclass(callErrorResponseSealedClassName)
                   .build()
 
-                //422 -> body?.let { Error422(Errors.parseJson(body)) } ?: run { null }
                 toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadType.simpleName() + ".parseJson(body))) } ?: %T(%T) \n",
                   callErrorEitherErrorTypeClassName,
                   commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
@@ -381,10 +382,10 @@ class KotlinGenerator
                 callErrorResopnseSealedClassBuilder.addType(errorResponseDataClass)
               }
             })
-            toErrorCodeBlockBuilder.add("                        else -> %T(%T.processCommonNetworkError(t))\n", commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
+            toErrorCodeBlockBuilder.add("                        else -> %T(%T." + processCommonNetworkErrorString + "(t))\n", commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
             toErrorCodeBlockBuilder.add("                        }\n" +
               "                    }\n" +
-              "                    else -> %T(%T.processCommonNetworkError(t))\n" +
+              "                    else -> %T(%T." + processCommonNetworkErrorString + "(t))\n" +
               "                }\n" +
               "            }\n"
             , commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
@@ -402,7 +403,7 @@ class KotlinGenerator
                 combinedFunction.addParameter(param)
               }
             )
-            combinedFunction.addStatement("return %T(client." + methodName + "(" + parametersCache.map({ _.getName }).mkString(",") +"), toError)" , new ClassName(modelsNameSpace, "ApiNetworkCallResponse"))
+            combinedFunction.addStatement("return %T(client." + methodName + "(" + parametersCache.map({ _.getName }).mkString(",") +"), toError)" , apiNetworkCallResponseTypeClassName)
 
 
             callObjectBuilder.addFunction(combinedFunction.build())
@@ -515,17 +516,16 @@ class KotlinGenerator
       val fileName = errorsHelperClassName
 
       //sealed class CommonNetworkErrors
-      val commonNetworkErrorsClassNameString = "CommonNetworkErrors"
-      val commonNetworkErrorsClassName = new ClassName(modelsNameSpace, commonNetworkErrorsClassNameString)
-      val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassNameString)
+      val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
         .addKdoc(kdocClassMessage)
 
-      //XXX this should come from the list above.
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerError").superclass(commonNetworkErrorsClassName).build())
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerNotFound").superclass(commonNetworkErrorsClassName).build())
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("ServerTimeOut").superclass(commonNetworkErrorsClassName).build())
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder("UnknownNetworkError").superclass(commonNetworkErrorsClassName).build())
+      commonNetworkHttpErrorsList.map({
+        e => commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(e._2).superclass(commonNetworkErrorsClassName).build())
+      })
+
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(serverTimeOutErrorClassName).superclass(commonNetworkErrorsClassName).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(serverUnknownErrorClassName).superclass(commonNetworkErrorsClassName).build())
 
       val processCommonFuncBody = CodeBlock.builder()
         .beginControlFlow("return when (t)")
@@ -536,17 +536,17 @@ class KotlinGenerator
             "        when (t.code()) {\n" +
             commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
             //"            500 -> ServerError\n" +
-            "            else -> UnknownNetworkError\n" +
+            "            else -> " + serverUnknownErrorClassName + "\n" +
             "        }\n" +
             "    }\n"+
-            "    is %T -> ServerTimeOut\n" +
-            "    else -> UnknownNetworkError\n"
+            "    is %T -> " + serverTimeOutErrorClassName + "\n" +
+            "    else -> " + serverUnknownErrorClassName + "\n"
             , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
         .endControlFlow()
         .build()
 
       commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
-          .addFunction(FunSpec.builder("processCommonNetworkError")
+          .addFunction(FunSpec.builder(processCommonNetworkErrorString)
               .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
               .addCode(processCommonFuncBody)
               .returns(commonNetworkErrorsClassName)
@@ -556,13 +556,6 @@ class KotlinGenerator
 
 
       //sealed class for Either Type
-      val eitherErrorTypeClassNameString = "EitherCallOrCommonNetworkError"
-      val eitherErrorTypeClassName = new ClassName(modelsNameSpace, eitherErrorTypeClassNameString)
-      val callErrorEitherErrorTypeClassNameString = "CallError"
-      val callErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, callErrorEitherErrorTypeClassNameString)
-      val commonErrorEitherErrorTypeClassNameString = "CommonNetworkError"
-      val commonErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, commonErrorEitherErrorTypeClassNameString)
-
       val c = TypeVariableName.get("C", KModifier.OUT)
       val nothing = TypeVariableName.get("Nothing")
 
@@ -598,9 +591,6 @@ class KotlinGenerator
 
 
       //data class for ApiNetworkCallResponse Type
-      val apiNetworkCallResponseTypeClassNameString = "ApiNetworkCallResponse"
-      val apiNetworkCallResponseTypeClassName = new ClassName(modelsNameSpace, apiNetworkCallResponseTypeClassNameString)
-
       val n = TypeVariableName.get("N")
       val e = TypeVariableName.get("E")
 
