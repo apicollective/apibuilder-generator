@@ -370,7 +370,7 @@ class KotlinGenerator
               if (errorResponse.`type` == Datatype.Primitive.Unit) {
                 callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
               } else {
-                val errorPayloadType = dataTypeFromField(errorResponse.`type`, modelsNameSpace).asInstanceOf[ClassName]
+                val errorPayloadType = dataTypeFromField(errorResponse.`type`, modelsNameSpace)
                 val errorPayloadNameString = "data"
                 val errorResponseDataClass = TypeSpec.classBuilder(errorTypeNameString)
                   .addModifiers(KModifier.DATA)
@@ -381,7 +381,12 @@ class KotlinGenerator
                   .superclass(callErrorResponseSealedClassName)
                   .build()
 
-                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadType.simpleName() + ".parseJson(body))) } ?: %T(%T) \n",
+                val errorPayloadTypeString = errorPayloadType match {
+                  case cn: ClassName => cn.simpleName()
+                  case pt: ParameterizedTypeName => pt.toString()
+                  case _ => errorPayloadType.toString()
+                }
+                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + ".parseJson(body))) } ?: %T(%T) \n",
                   callErrorEitherErrorTypeClassName,
                   commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
 
