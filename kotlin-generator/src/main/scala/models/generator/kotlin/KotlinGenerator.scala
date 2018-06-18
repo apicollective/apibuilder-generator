@@ -53,8 +53,7 @@ class KotlinGenerator
 
 
     private val commonNetworkHttpErrorsList = Seq(
-      (404, "ServerNotFound"),
-      (500, "ServerError"),
+      ("in 500..599", "ServerError"),
     )
     private val serverTimeOutErrorClassName = "ServerTimeOut"
     private val serverUnknownErrorClassName = "UnknownNetworkError"
@@ -548,7 +547,6 @@ class KotlinGenerator
             "        val body: String? = t.response().errorBody()?.string()\n" +
             "        when (t.code()) {\n" +
             commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
-            //"            500 -> ServerError\n" +
             "            else -> " + serverUnknownErrorClassName + "\n" +
             "        }\n" +
             "    }\n"+
