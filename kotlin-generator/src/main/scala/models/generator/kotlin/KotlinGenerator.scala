@@ -253,15 +253,6 @@ class KotlinGenerator
 
           method.addAnnotation(methodAnnotation)
 
-          operation.body.map(body => {
-            val bodyType = dataTypeFromField(body.`type`, modelsNameSpace)
-
-            val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
-            val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
-            parameter.addAnnotation(annotation)
-            method.addParameter(parameter.build())
-          })
-
           val parametersCache = ListBuffer[ParameterSpec]()
 
           operation.parameters.foreach(parameter => {
@@ -285,6 +276,17 @@ class KotlinGenerator
               method.addParameter(param.build)
 
             })
+          })
+
+          operation.body.map(body => {
+            val bodyType = dataTypeFromField(body.`type`, modelsNameSpace)
+            val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
+
+            parametersCache += (parameter.build())
+
+            val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
+            parameter.addAnnotation(annotation)
+            method.addParameter(parameter.build())
           })
 
           /*
