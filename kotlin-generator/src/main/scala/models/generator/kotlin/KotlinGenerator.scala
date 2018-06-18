@@ -6,14 +6,17 @@ import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, Version}
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
 import com.squareup.kotlinpoet._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import io.reactivex.Single
+import lib.Datatype
 import lib.generator.CodeGenerator
 import org.threeten.bp.{Instant, LocalDate}
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 
 class KotlinGenerator
   extends CodeGenerator
@@ -35,6 +38,26 @@ class KotlinGenerator
 
     private val sharedJacksonSpace = modelsNameSpace
     private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
+
+    //Errors
+    private val errorsHelperClassName = "ErrorsHelper"
+
+    val commonNetworkErrorsClassName = new ClassName(modelsNameSpace, "CommonNetworkErrors")
+    val eitherErrorTypeClassName = new ClassName(modelsNameSpace, "EitherCallOrCommonNetworkError")
+    val callErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CallError")
+    val commonErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CommonNetworkError")
+
+    val apiNetworkCallResponseTypeClassName = new ClassName(modelsNameSpace, "ApiNetworkCallResponse")
+    val errorResponsesString = "ErrorResponses"
+    private val processCommonNetworkErrorString = "processCommonNetworkError"
+
+
+    private val commonNetworkHttpErrorsList = Seq(
+      ("in 500..599", "ServerError"),
+    )
+    private val serverTimeOutErrorClassName = "ServerTimeOut"
+    private val serverUnknownErrorClassName = "UnknownNetworkError"
+
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -229,14 +252,7 @@ class KotlinGenerator
 
           method.addAnnotation(methodAnnotation)
 
-          operation.body.map(body => {
-            val bodyType = dataTypeFromField(body.`type`, modelsNameSpace)
-
-            val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
-            val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
-            parameter.addAnnotation(annotation)
-            method.addParameter(parameter.build())
-          })
+          val parametersCache = ListBuffer[ParameterSpec]()
 
           operation.parameters.foreach(parameter => {
 
@@ -251,10 +267,25 @@ class KotlinGenerator
             maybeAnnotationClass.map(annotationClass => {
               val parameterType: TypeName = dataTypeFromField(parameter.`type`, modelsNameSpace)
               val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNullable() else parameterType.asNullable())
+
+              parametersCache += (param.build())
+
               val annotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + parameter.name + "\"").build
               param.addAnnotation(annotation)
               method.addParameter(param.build)
+
             })
+          })
+
+          operation.body.map(body => {
+            val bodyType = dataTypeFromField(body.`type`, modelsNameSpace)
+            val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
+
+            parametersCache += (parameter.build())
+
+            val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
+            parameter.addAnnotation(annotation)
+            method.addParameter(parameter.build())
           })
 
           /*
@@ -286,7 +317,113 @@ class KotlinGenerator
             val retrofitWrappedClassname = getRetrofitReturnTypeWrapperClass()
             method.returns(ParameterizedTypeName.get(retrofitWrappedClassname, returnType))
           })
+
           builder.addFunction(method.build)
+
+
+          /* ----- Error responses --------
+          Since we want to keep Rx's success/error format, and we can't make retrofit return something custom,
+          we create for each resource that has non 200 error responses defined
+          - a sealed class that has all the error types
+          - a lambda that converts retrofit's exception into above sealed class
+          - a convenience method getCallAndErrors to return both the rx single, and the lambda.
+          the client of this generated code is responsible for calling the lambda to get all the error responses
+          */
+
+
+          val errorResponses = operation.responses.filter(response => {
+            response.code.isInstanceOf[ResponseCodeInt] &&
+              response.code.asInstanceOf[ResponseCodeInt].value >= 300
+          })
+          if (errorResponses.nonEmpty) {
+
+            val callObjectName = new ClassName(modelsNameSpace + "." + className, methodName.capitalize + "Call")
+            val callObjectBuilder = TypeSpec.objectBuilder(callObjectName)
+
+            val callErrorResponseSealedClassName = new ClassName(callObjectName.getCanonicalName, errorResponsesString)
+            val callErrorResopnseSealedClassBuilder = TypeSpec.classBuilder(callErrorResponseSealedClassName)
+              .addModifiers(KModifier.SEALED)
+
+            operation.description.map(description => {
+              callErrorResopnseSealedClassBuilder.addKdoc("Error Responses for " + methodName + " - " + description)
+            })
+
+            val companionObject = TypeSpec.companionObjectBuilder()
+            val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
+            val throwableToErrorTypesLambda = LambdaTypeName.get(null, Array(throwableTypeName), ParameterizedTypeName.get(eitherErrorTypeClassName, callErrorResponseSealedClassName))
+            val toErrorCodeBlockBuilder = CodeBlock.builder()
+              toErrorCodeBlockBuilder.add("{\n" +
+                "t ->\n" +
+              "                when (t) {\n" + "" +
+              "                    is %T -> {\n" +
+              "                        val body: String? = t.response().errorBody()?.string()\n" +
+              "                            when (t.code()) {\n"
+
+              , classOf[HttpException])
+
+
+
+            val commonUnknownNetworkErrorType = new ClassName(commonNetworkErrorsClassName.getCanonicalName, serverUnknownErrorClassName)
+
+            errorResponses.map(errorResponse => {
+              val responseCodeString = errorResponse.code.asInstanceOf[ResponseCodeInt].value.toString
+              val errorTypeNameString = "Error" + responseCodeString
+              if (errorResponse.`type` == Datatype.Primitive.Unit) {
+                callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
+              } else {
+                val errorPayloadType = dataTypeFromField(errorResponse.`type`, modelsNameSpace)
+                val errorPayloadNameString = "data"
+                val errorResponseDataClass = TypeSpec.classBuilder(errorTypeNameString)
+                  .addModifiers(KModifier.DATA)
+                  .primaryConstructor(FunSpec.constructorBuilder().addParameter(errorPayloadNameString, errorPayloadType).build())
+                  .addProperty(PropertySpec.builder(errorPayloadNameString, errorPayloadType)
+                    .initializer(errorPayloadNameString)
+                    .build())
+                  .superclass(callErrorResponseSealedClassName)
+                  .build()
+
+                val errorPayloadTypeString = errorPayloadType match {
+                  case cn: ClassName => cn.simpleName()
+                  case pt: ParameterizedTypeName => pt.toString()
+                  case _ => errorPayloadType.toString()
+                }
+                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + ".parseJson(body))) } ?: %T(%T) \n",
+                  callErrorEitherErrorTypeClassName,
+                  commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
+
+                callErrorResopnseSealedClassBuilder.addType(errorResponseDataClass)
+              }
+            })
+            toErrorCodeBlockBuilder.add("                        else -> %T(%T." + processCommonNetworkErrorString + "(t))\n", commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
+            toErrorCodeBlockBuilder.add("                        }\n" +
+              "                    }\n" +
+              "                    else -> %T(%T." + processCommonNetworkErrorString + "(t))\n" +
+              "                }\n" +
+              "            }\n"
+            , commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
+
+            callObjectBuilder.addProperty(PropertySpec.builder("toError", throwableToErrorTypesLambda).initializer(toErrorCodeBlockBuilder.build()).build())
+
+            //combined function
+
+            val combinedFunction = FunSpec.builder("getCallAndErrorLambda")
+              .addParameter("client", new ClassName(modelsNameSpace, className))
+
+
+            parametersCache.toList.foreach(
+              param => {
+                combinedFunction.addParameter(param)
+              }
+            )
+            combinedFunction.addStatement("return %T(client." + methodName + "(" + parametersCache.map({ _.getName }).mkString(",") +"), toError)" , apiNetworkCallResponseTypeClassName)
+
+
+            callObjectBuilder.addFunction(combinedFunction.build())
+            callObjectBuilder.addType(callErrorResopnseSealedClassBuilder.build())
+            builder.addType(callObjectBuilder.build())
+        }
+
+
         })
       }
 
@@ -385,11 +522,128 @@ class KotlinGenerator
       makeFile(className, builder)
     }
 
+
+    def generateErrorsHelper(): File = {
+
+      val fileName = errorsHelperClassName
+
+      //sealed class CommonNetworkErrors
+      val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
+        .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
+        .addKdoc(s"Common generic errors that are expected to happen are not defined in apibuilder.json\n" + kdocClassMessage)
+
+      commonNetworkHttpErrorsList.map({
+        e => commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(e._2).superclass(commonNetworkErrorsClassName).build())
+      })
+
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(serverTimeOutErrorClassName).superclass(commonNetworkErrorsClassName).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(serverUnknownErrorClassName).superclass(commonNetworkErrorsClassName).build())
+
+      val processCommonFuncBody = CodeBlock.builder()
+        .beginControlFlow("return when (t)")
+
+           .add(
+            "    is %T -> {\n" +
+            "        val body: String? = t.response().errorBody()?.string()\n" +
+            "        when (t.code()) {\n" +
+            commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
+            "            else -> " + serverUnknownErrorClassName + "\n" +
+            "        }\n" +
+            "    }\n"+
+            "    is %T -> " + serverTimeOutErrorClassName + "\n" +
+            "    else -> " + serverUnknownErrorClassName + "\n"
+            , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
+        .endControlFlow()
+        .build()
+
+      commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
+          .addFunction(FunSpec.builder(processCommonNetworkErrorString)
+              .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
+              .addCode(processCommonFuncBody)
+              .returns(commonNetworkErrorsClassName)
+            .build())
+
+        build())
+
+
+      //sealed class for Either Type
+      val c = TypeVariableName.get("C", KModifier.OUT)
+      val nothing = TypeVariableName.get("Nothing")
+
+
+      val callErrorEitherType = TypeSpec.classBuilder(callErrorEitherErrorTypeClassName)
+        .addModifiers(KModifier.DATA)
+        .addTypeVariable(c)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("error", c).build())
+        .addProperty(PropertySpec.builder("error", c)
+          .initializer("error")
+          .build())
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, c))
+        .build()
+
+      val commonErrorEitherType = TypeSpec.classBuilder(commonErrorEitherErrorTypeClassName)
+        .addModifiers(KModifier.DATA)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("error", commonNetworkErrorsClassName).build())
+        .addProperty(PropertySpec.builder("error", commonNetworkErrorsClassName)
+          .initializer("error")
+          .build())
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, nothing))
+        .build()
+
+      val eitherErrorBuilder = TypeSpec.classBuilder(eitherErrorTypeClassName)
+        .addTypeVariable(c)
+        .addModifiers(KModifier.SEALED)
+        .addType(callErrorEitherType)
+        .addType(commonErrorEitherType)
+        .addKdoc(s"Either type that combines CommonNetworkErrors with network errors for a specific call (as defined in apibuilder.json)\n" + kdocClassMessage)
+
+
+
+      //data class for ApiNetworkCallResponse Type
+      val n = TypeVariableName.get("N")
+      val e = TypeVariableName.get("E")
+
+      val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
+
+      val singleParameterizedByN = ParameterizedTypeName.get(classToClassName(classOf[Single[Void]]), n)
+      val throwableToELambda = LambdaTypeName.get(null, Array(throwableTypeName), e)
+      val apiNetworkCallResponseBuilder = TypeSpec.classBuilder(apiNetworkCallResponseTypeClassName)
+        .addModifiers(KModifier.PUBLIC, KModifier.DATA)
+        .addTypeVariable(n)
+        .addTypeVariable(e)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("networkSingle", singleParameterizedByN)
+          .addParameter("toError", throwableToELambda)
+          .build())
+        .addProperty(PropertySpec.builder("networkSingle", singleParameterizedByN)
+          .initializer("networkSingle")
+          .build())
+        .addProperty(PropertySpec.builder("toError", throwableToELambda)
+          .initializer("toError")
+          .build())
+        .addKdoc(s"Utility data class to combine a call and it's error responses\n" + kdocClassMessage)
+
+
+      //output file
+      val fileBuilder = FileSpec.builder(modelsNameSpace, fileName)
+        .addType(apiNetworkCallResponseBuilder.build())
+        .addType(eitherErrorBuilder.build())
+        .addType(commonNetworkErrorsBuilder.build())
+      makeFile(fileName, fileBuilder)
+    }
+
+
     def generateEnums(enums: Seq[Enum]): Seq[File] = {
       enums.map(generateEnum(_))
     }
 
     def generateSourceFiles(service: Service): Seq[File] = {
+
+      val generatedErrorsHelper = Seq(generateErrorsHelper())
+
+
       val generatedEnums = generateEnums(service.enums)
 
       val generatedUnionTypes = service.unions.map(generateUnionType(_))
@@ -403,19 +657,32 @@ class KotlinGenerator
 
       val generatedResources = service.resources.map(generateResource(_))
 
-      generatedEnums ++
+        generatedEnums ++
         generatedUnionTypes ++
         generatedModels ++
         generatedObjectMapper ++
+        generatedErrorsHelper ++
         generatedResources
     }
 
+    //write one file with a single class
     def makeFile(name: String, typeSpecBuilder: TypeSpec.Builder): File = {
       val typeSpec = typeSpecBuilder.build
       val kFile = FileSpec.get(modelsNameSpace, typeSpec)
       val sw = new StringWriter(1024)
       try {
         kFile.writeTo(sw)
+        File(s"${name}.kt", Some(modelsDirectoryPath), sw.toString)
+      } finally {
+        sw.close()
+      }
+    }
+
+    //write one file with multiple classes
+    def makeFile(name: String, fileBuilder: FileSpec.Builder): File = {
+      val sw = new StringWriter(1024)
+      try {
+        fileBuilder.build().writeTo(sw)
         File(s"${name}.kt", Some(modelsDirectoryPath), sw.toString)
       } finally {
         sw.close()
