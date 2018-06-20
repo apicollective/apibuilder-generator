@@ -1,11 +1,12 @@
 package models.generator
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models.{EnumValue, Union, Field, Service, Model, Enum}
-
+import io.apibuilder.spec.v0.models.{Enum, EnumValue, Field, Model, Service, Union, UnionType}
 import lib.Text
-import lib.generator.{GeneratorUtil, CodeGenerator}
+import lib.generator.{CodeGenerator, GeneratorUtil}
 import models.generator.JavaDatatypes.NativeDatatype
+
+import scala.util.{Success, Try}
 
 /**
  *
@@ -49,8 +50,8 @@ object JavaClasses extends CodeGenerator {
       val generatedUndefinedUnionTypes = service.unions.map { generateUndefinedUnionType }
 
       val generatedNativeWrappers = service.unions.flatMap { union =>
-        union.types.collect {
-          case native: NativeDatatype => generateNativeWrapper(union, native)
+        union.types.map(toJavaDatatype(_)).flatten.collect {
+          case ndt: NativeDatatype => generateNativeWrapper(union, ndt)
         }
       }
 
@@ -64,6 +65,10 @@ object JavaClasses extends CodeGenerator {
         generatedUndefinedUnionTypes ++
         generatedNativeWrappers ++
         generatedModels
+    }
+
+    private def toJavaDatatype(unionType: UnionType): Option[JavaDatatype] = {
+      datatypeResolver.parse(unionType.`type`, true).map(JavaDatatype(_)).toOption
     }
 
     def generateEnum(enum: Enum): File = {

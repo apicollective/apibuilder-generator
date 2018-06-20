@@ -13,7 +13,9 @@ class JavaClassesSpec extends FunSpec with Matchers with MockitoSugar {
 
   val testHeader = """/** Test Header */"""
   val userDefinedModel = Model("user_defined", "", None, None, Seq.empty[Field])
-  val testService = Service(mock[Apidoc], "test_service", mock[Organization], mock[Application], "com.jkenny.test", "", info = mock[Info], models = Seq(userDefinedModel))
+  val org = Organization("org" + System.currentTimeMillis)
+  val app = Application("app" + System.currentTimeMillis)
+  val testService = Service(Apidoc("1.0.0"), "test_service", org, app, "com.jkenny.test", "", info = io.apibuilder.spec.v0.models.Info(None, None), models = Seq(userDefinedModel))
   val generator = new Generator(testService, Some(testHeader))
 
   describe("generateEnum") {
