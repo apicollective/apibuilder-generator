@@ -53,7 +53,7 @@ lazy val rubyGenerator = project
   .in(file("ruby-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 89.5))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 86.5))
 
 lazy val javaGenerator = project
   .in(file("java-generator"))
