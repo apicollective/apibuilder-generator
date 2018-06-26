@@ -70,12 +70,16 @@ class KotlinGenerator
 
       enum.description.map(builder.addKdoc(_))
 
-      val allEnumValues = enum.values ++ Seq(io.apibuilder.spec.v0.models.EnumValue(undefinedEnumName, Some(undefinedEnumName)))
 
-      allEnumValues.foreach(value => {
+
+      enum.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
         builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("\"" + value.name + "\"").addAnnotation(annotation.build()).build())
       })
+
+      val annotationJsonEnumDefaultValue = AnnotationSpec.builder(classOf[JsonEnumDefaultValue]).build()
+      val annotationJsonProperty = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + undefinedEnumName + "\"").build()
+      builder.addEnumConstant(toEnumName(undefinedEnumName), TypeSpec.anonymousClassBuilder("\"" + undefinedEnumName + "\"").addAnnotation(annotationJsonEnumDefaultValue).addAnnotation(annotationJsonProperty).build())
 
       val nameField = "jsonProperty"
       val nameFieldType = ClassName.bestGuess("kotlin.String")
@@ -497,7 +501,7 @@ class KotlinGenerator
         .addStatement("mapper.registerModule(com.fasterxml.jackson.module.kotlin.KotlinModule())")
         .addStatement("mapper.registerModule(com.fasterxml.jackson.datatype.joda.JodaModule())")
         .addStatement(s"mapper.configure(${deserializationFeatureClassName}.FAIL_ON_UNKNOWN_PROPERTIES, false)")
-        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)")
+        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, true)")
         .addStatement("module.addDeserializer(Instant::class.java, InstantDeserializer)")
         .addStatement("module.addSerializer(Instant::class.java, InstantSerializer)")
         .addStatement("module.addDeserializer(LocalDate::class.java, LocalDateDeserializer)")
