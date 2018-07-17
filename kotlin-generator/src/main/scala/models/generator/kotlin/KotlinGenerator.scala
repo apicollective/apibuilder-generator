@@ -71,7 +71,6 @@ class KotlinGenerator
       enum.description.map(builder.addKdoc(_))
 
 
-
       enum.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
         builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("\"" + value.name + "\"").addAnnotation(annotation.build()).build())
@@ -127,9 +126,9 @@ class KotlinGenerator
         jsonSubTypesAnnotationBuilder
           .addMember("%L",
             AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-            .addMember("value = %L", dataTypeFromField(u.`type`, modelsNameSpace) + "::class")
-            .addMember("name = %S", u.`type`)
-            .build()
+              .addMember("value = %L", dataTypeFromField(u.`type`, modelsNameSpace) + "::class")
+              .addMember("name = %S", u.`type`)
+              .build()
           )
       })
 
@@ -233,7 +232,20 @@ class KotlinGenerator
 
         maybeAnnotationClass.map(annotationClass => {
 
-          val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + retrofitPath + "\"").build()
+          val deleteWithBody = annotationClass == classOf[retrofit2.http.DELETE] && operation.body.isDefined
+
+          val methodAnnotation =
+          //Retrofit does not like DELETE method with body, so we have to define it differently
+            if (deleteWithBody) {
+              AnnotationSpec.builder(classOf[retrofit2.http.HTTP])
+                .addMember("path=\"" + retrofitPath + "\"")
+                .addMember("method = \"DELETE\"")
+                .addMember("hasBody = true")
+                .build()
+            } else {
+              AnnotationSpec.builder(annotationClass).addMember("value=\"" + retrofitPath + "\"").build()
+            }
+
           val methodName =
             if (operation.path == "/")
               toMethodName(operation.method.toString.toLowerCase)
@@ -245,6 +257,10 @@ class KotlinGenerator
           operation.description.map(description => {
             method.addKdoc(description)
           })
+
+          if (deleteWithBody) {
+            method.addKdoc(" Note: Retrofit does not like @DELETE with body, so it's defined as @HTTP instead")
+          }
 
           operation.deprecation.map(deprecation => {
             val deprecationAnnotation = AnnotationSpec.builder(classOf[Deprecated]).build
@@ -356,15 +372,14 @@ class KotlinGenerator
             val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
             val throwableToErrorTypesLambda = LambdaTypeName.get(null, Array(throwableTypeName), ParameterizedTypeName.get(eitherErrorTypeClassName, callErrorResponseSealedClassName))
             val toErrorCodeBlockBuilder = CodeBlock.builder()
-              toErrorCodeBlockBuilder.add("{\n" +
-                "t ->\n" +
+            toErrorCodeBlockBuilder.add("{\n" +
+              "t ->\n" +
               "                when (t) {\n" + "" +
               "                    is %T -> {\n" +
               "                        val body: String? = t.response().errorBody()?.string()\n" +
               "                            when (t.code()) {\n"
 
               , classOf[HttpException])
-
 
 
             val commonUnknownNetworkErrorType = new ClassName(commonNetworkErrorsClassName.getCanonicalName, serverUnknownErrorClassName)
@@ -404,7 +419,7 @@ class KotlinGenerator
               "                    else -> %T(%T." + processCommonNetworkErrorString + "(t))\n" +
               "                }\n" +
               "            }\n"
-            , commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
+              , commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
 
             callObjectBuilder.addProperty(PropertySpec.builder("toError", throwableToErrorTypesLambda).initializer(toErrorCodeBlockBuilder.build()).build())
 
@@ -419,13 +434,15 @@ class KotlinGenerator
                 combinedFunction.addParameter(param)
               }
             )
-            combinedFunction.addStatement("return %T(client." + methodName + "(" + parametersCache.map({ _.getName }).mkString(",") +"), toError)" , apiNetworkCallResponseTypeClassName)
+            combinedFunction.addStatement("return %T(client." + methodName + "(" + parametersCache.map({
+              _.getName
+            }).mkString(",") + "), toError)", apiNetworkCallResponseTypeClassName)
 
 
             callObjectBuilder.addFunction(combinedFunction.build())
             callObjectBuilder.addType(callErrorResopnseSealedClassBuilder.build())
             builder.addType(callObjectBuilder.build())
-        }
+          }
 
 
         })
@@ -546,26 +563,26 @@ class KotlinGenerator
       val processCommonFuncBody = CodeBlock.builder()
         .beginControlFlow("return when (t)")
 
-           .add(
-            "    is %T -> {\n" +
+        .add(
+          "    is %T -> {\n" +
             "        val body: String? = t.response().errorBody()?.string()\n" +
             "        when (t.code()) {\n" +
             commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
             "            else -> " + serverUnknownErrorClassName + "\n" +
             "        }\n" +
-            "    }\n"+
+            "    }\n" +
             "    is %T -> " + serverTimeOutErrorClassName + "\n" +
             "    else -> " + serverUnknownErrorClassName + "\n"
-            , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
+          , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
         .endControlFlow()
         .build()
 
       commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
-          .addFunction(FunSpec.builder(processCommonNetworkErrorString)
-              .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
-              .addCode(processCommonFuncBody)
-              .returns(commonNetworkErrorsClassName)
-            .build())
+        .addFunction(FunSpec.builder(processCommonNetworkErrorString)
+          .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
+          .addCode(processCommonFuncBody)
+          .returns(commonNetworkErrorsClassName)
+          .build())
 
         build())
 
@@ -602,7 +619,6 @@ class KotlinGenerator
         .addType(callErrorEitherType)
         .addType(commonErrorEitherType)
         .addKdoc(s"Either type that combines CommonNetworkErrors with network errors for a specific call (as defined in apibuilder.json)\n" + kdocClassMessage)
-
 
 
       //data class for ApiNetworkCallResponse Type
@@ -661,7 +677,7 @@ class KotlinGenerator
 
       val generatedResources = service.resources.map(generateResource(_))
 
-        generatedEnums ++
+      generatedEnums ++
         generatedUnionTypes ++
         generatedModels ++
         generatedObjectMapper ++
