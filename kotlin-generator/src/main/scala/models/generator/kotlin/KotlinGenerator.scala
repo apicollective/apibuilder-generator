@@ -232,20 +232,7 @@ class KotlinGenerator
 
         maybeAnnotationClass.map(annotationClass => {
 
-          val deleteWithBody = annotationClass == classOf[retrofit2.http.DELETE] && operation.body.isDefined
-
-          val methodAnnotation =
-          //Retrofit does not like DELETE method with body, so we have to define it differently
-            if (deleteWithBody) {
-              AnnotationSpec.builder(classOf[retrofit2.http.HTTP])
-                .addMember("path=\"" + retrofitPath + "\"")
-                .addMember("method = \"DELETE\"")
-                .addMember("hasBody = true")
-                .build()
-            } else {
-              AnnotationSpec.builder(annotationClass).addMember("value=\"" + retrofitPath + "\"").build()
-            }
-
+          val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + retrofitPath + "\"").build()
           val methodName =
             if (operation.path == "/")
               toMethodName(operation.method.toString.toLowerCase)
@@ -257,10 +244,6 @@ class KotlinGenerator
           operation.description.map(description => {
             method.addKdoc(description)
           })
-
-          if (deleteWithBody) {
-            method.addKdoc(" Note: Retrofit does not like @DELETE with body, so it's defined as @HTTP instead")
-          }
 
           operation.deprecation.map(deprecation => {
             val deprecationAnnotation = AnnotationSpec.builder(classOf[Deprecated]).build
