@@ -33,8 +33,8 @@ class KotlinGenerator
   class GeneratorHelper(service: Service) {
 
     private val nameSpace = makeNameSpace(service.namespace)
-    private val modelsNameSpace = nameSpace + ".models"
-    private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
+    private val modelsNameSpace = toModelsNameSpace(nameSpace)
+    private val enumsNameSpace = toEnumsNameSpace(nameSpace)
 
     private val sharedJacksonSpace = modelsNameSpace
     private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
@@ -70,7 +70,6 @@ class KotlinGenerator
 
       enum.description.map(builder.addKdoc(_))
 
-
       enum.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
         builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("\"" + value.name + "\"").addAnnotation(annotation.build()).build())
@@ -94,12 +93,12 @@ class KotlinGenerator
       toStringMethod.addStatement(s"return $nameField")
       builder.addFunction(toStringMethod.build)
 
-      makeFile(className, builder)
+      makeFile(enumsNameSpace, className, builder)
     }
 
     def getRetrofitReturnTypeWrapperClass(): ClassName = classToClassName(classOf[Single[Void]])
 
-    def generateUnionType(union: Union): File = {
+    def generateUnionType(union: Union, service: Service): File = {
       val className = toClassName(union.name)
 
       val builder = TypeSpec.interfaceBuilder(className)
@@ -126,7 +125,7 @@ class KotlinGenerator
         jsonSubTypesAnnotationBuilder
           .addMember("%L",
             AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-              .addMember("value = %L", dataTypeFromField(u.`type`, modelsNameSpace) + "::class")
+              .addMember("value = %L", dataTypeFromField(u.`type`, nameSpace, service) + "::class")
               .addMember("name = %S", u.`type`)
               .build()
           )
@@ -135,10 +134,12 @@ class KotlinGenerator
       builder.addAnnotation(jsonSubTypesAnnotationBuilder.build())
 
       union.description.map(builder.addKdoc(_))
-      makeFile(className, builder)
+      makeFile(modelsNameSpace, className, builder)
     }
 
-    def generateModel(model: Model, relatedUnions: Seq[Union]): File = {
+
+
+    def generateModel(model: Model, relatedUnions: Seq[Union], service: Service): File = {
       val className = toClassName(model.name)
 
       val builder = TypeSpec.classBuilder(className)
@@ -170,7 +171,7 @@ class KotlinGenerator
         val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
-        val kotlinDataType = dataTypeFromField(field.`type`, modelsNameSpace)
+        val kotlinDataType = dataTypeFromField(field.`type`, nameSpace, service)
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
         val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
@@ -200,7 +201,7 @@ class KotlinGenerator
       builder.companionObject(companionBuilder.build())
 
 
-      makeFile(className, builder)
+      makeFile(modelsNameSpace, className, builder)
     }
 
     def generateResource(resource: Resource): File = {
@@ -285,7 +286,7 @@ class KotlinGenerator
             }
 
             maybeAnnotationClass.map(annotationClass => {
-              val parameterType: TypeName = dataTypeFromField(parameter.`type`, modelsNameSpace)
+              val parameterType: TypeName = dataTypeFromField(parameter.`type`, nameSpace, service)
               val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNullable() else parameterType.asNullable())
 
               parametersCache += (param.build())
@@ -298,7 +299,7 @@ class KotlinGenerator
           })
 
           operation.body.map(body => {
-            val bodyType = dataTypeFromField(body.`type`, modelsNameSpace)
+            val bodyType = dataTypeFromField(body.`type`, nameSpace, service)
             val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
 
             parametersCache += (parameter.build())
@@ -333,7 +334,7 @@ class KotlinGenerator
           })
 
           maybeSuccessfulResponse.map(successfulResponse => {
-            val returnType = dataTypeFromField(successfulResponse.`type`, modelsNameSpace)
+            val returnType = dataTypeFromField(successfulResponse.`type`, nameSpace, service)
             val retrofitWrappedClassname = getRetrofitReturnTypeWrapperClass()
             method.returns(ParameterizedTypeName.get(retrofitWrappedClassname, returnType))
           })
@@ -390,7 +391,7 @@ class KotlinGenerator
               if (errorResponse.`type` == Datatype.Primitive.Unit) {
                 callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
               } else {
-                val errorPayloadType = dataTypeFromField(errorResponse.`type`, modelsNameSpace)
+                val errorPayloadType = dataTypeFromField(errorResponse.`type`, nameSpace, service)
                 val errorPayloadNameString = "data"
                 val errorResponseDataClass = TypeSpec.classBuilder(errorTypeNameString)
                   .addModifiers(KModifier.DATA)
@@ -448,7 +449,7 @@ class KotlinGenerator
         })
       }
 
-      makeFile(className, builder)
+      makeFile(modelsNameSpace, className, builder)
     }
 
     def emptyCodeBlock(): CodeBlock = CodeBlock.builder().build()
@@ -540,7 +541,7 @@ class KotlinGenerator
         .addType(deserializerLocalDateType)
         .addType(serializerLocalDateType)
         .addFunction(createFunSpec)
-      makeFile(className, builder)
+      makeFile(modelsNameSpace, className, builder)
     }
 
 
@@ -666,11 +667,11 @@ class KotlinGenerator
 
       val generatedEnums = generateEnums(service.enums)
 
-      val generatedUnionTypes = service.unions.map(generateUnionType(_))
+      val generatedUnionTypes = service.unions.map(union => generateUnionType(union, service))
 
       val generatedModels = service.models.map { model =>
         val relatedUnions = service.unions.filter(_.types.exists(_.`type` == model.name))
-        generateModel(model, relatedUnions)
+        generateModel(model, relatedUnions, service)
       }
 
       val generatedObjectMapper = Seq(generateJacksonObjectMapper())
@@ -686,13 +687,13 @@ class KotlinGenerator
     }
 
     //write one file with a single class
-    def makeFile(name: String, typeSpecBuilder: TypeSpec.Builder): File = {
+    def makeFile(packageName: String, name: String, typeSpecBuilder: TypeSpec.Builder): File = {
       val typeSpec = typeSpecBuilder.build
-      val kFile = FileSpec.get(modelsNameSpace, typeSpec)
+      val kFile = FileSpec.get(packageName, typeSpec)
       val sw = new StringWriter(1024)
       try {
         kFile.writeTo(sw)
-        File(s"${name}.kt", Some(modelsDirectoryPath), sw.toString)
+        File(s"${name}.kt", Some(createDirectoryPath(packageName)), sw.toString)
       } finally {
         sw.close()
       }
@@ -703,7 +704,7 @@ class KotlinGenerator
       val sw = new StringWriter(1024)
       try {
         fileBuilder.build().writeTo(sw)
-        File(s"${name}.kt", Some(modelsDirectoryPath), sw.toString)
+        File(s"${name}.kt", Some(createDirectoryPath(modelsNameSpace)), sw.toString)
       } finally {
         sw.close()
       }
