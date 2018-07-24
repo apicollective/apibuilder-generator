@@ -407,7 +407,7 @@ class KotlinGenerator
                   case pt: ParameterizedTypeName => pt.toString()
                   case _ => errorPayloadType.toString()
                 }
-                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + ".parseJson(body))) } ?: %T(%T) \n",
+                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
                   callErrorEitherErrorTypeClassName,
                   commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
 
@@ -555,11 +555,41 @@ class KotlinGenerator
         .addKdoc(s"Common generic errors that are expected to happen are not defined in apibuilder.json\n" + kdocClassMessage)
 
       commonNetworkHttpErrorsList.map({
-        e => commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(e._2).superclass(commonNetworkErrorsClassName).build())
+        e => commonNetworkErrorsBuilder.addType(TypeSpec.classBuilder(e._2).addModifiers(KModifier.DATA).superclass(commonNetworkErrorsClassName)
+          .primaryConstructor(FunSpec.constructorBuilder()
+            .addParameter("httpCode", getKotlinIntClassName())
+            .addParameter("responseDump", getKotlinStringClassName())
+            .build())
+          .addProperty(PropertySpec.builder("httpCode", getKotlinIntClassName())
+            .initializer("httpCode")
+            .build())
+          .addProperty(PropertySpec.builder("responseDump", getKotlinStringClassName())
+            .initializer("responseDump")
+            .build())
+          .build())
       })
 
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(serverTimeOutErrorClassName).superclass(commonNetworkErrorsClassName).build())
-      commonNetworkErrorsBuilder.addType(TypeSpec.objectBuilder(serverUnknownErrorClassName).superclass(commonNetworkErrorsClassName).build())
+      commonNetworkErrorsBuilder.addType(TypeSpec.classBuilder(serverTimeOutErrorClassName).addModifiers(KModifier.DATA).superclass(commonNetworkErrorsClassName)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("responseDump", getKotlinStringClassName())
+          .build())
+        .addProperty(PropertySpec.builder("responseDump", getKotlinStringClassName())
+          .initializer("responseDump")
+          .build())
+        .build())
+
+      commonNetworkErrorsBuilder.addType(TypeSpec.classBuilder(serverUnknownErrorClassName).addModifiers(KModifier.DATA).superclass(commonNetworkErrorsClassName)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("httpCode", getKotlinIntClassName())
+          .addParameter("responseDump", getKotlinStringClassName())
+          .build())
+        .addProperty(PropertySpec.builder("httpCode", getKotlinIntClassName())
+          .initializer("httpCode")
+          .build())
+        .addProperty(PropertySpec.builder("responseDump", getKotlinStringClassName())
+          .initializer("responseDump")
+          .build())
+        .build())
 
       val processCommonFuncBody = CodeBlock.builder()
         .beginControlFlow("return when (t)")
@@ -568,12 +598,14 @@ class KotlinGenerator
           "    is %T -> {\n" +
             "        val body: String? = t.response().errorBody()?.string()\n" +
             "        when (t.code()) {\n" +
-            commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2).mkString("\n") + "\n" +
-            "            else -> " + serverUnknownErrorClassName + "\n" +
+            commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2 + "(t.code(), t.message())").mkString("\n") + "\n" + //                        in 500..599 -> ServerError(t.code(), t.message())
+            "            else -> " + serverUnknownErrorClassName + "(t.code(), t.message())" + "\n" +
             "        }\n" +
             "    }\n" +
-            "    is %T -> " + serverTimeOutErrorClassName + "\n" +
-            "    else -> " + serverUnknownErrorClassName + "\n"
+            "    is %T -> " + serverTimeOutErrorClassName + "(t.message?: \"Server Timeout Error, t.message() was null\")" + "\n" + //                is SocketTimeoutException -> ServerTimeOut(t.message?: "Server Timeout Error, t.message() was null")
+
+            "    else -> " + serverUnknownErrorClassName + "(-1, t.message?: \"Unknown Network Error, t.message() was null\")" + "\n" //                else -> UnknownNetworkError(-1, t.message?: "Unknown Network Error, t.message() was null")
+
           , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
         .endControlFlow()
         .build()
