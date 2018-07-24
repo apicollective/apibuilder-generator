@@ -225,4 +225,12 @@ trait KotlinUtil {
     new ClassName("kotlin", "Throwable")
   }
 
+  def getKotlinIntClassName() : ClassName = {
+    new ClassName("kotlin", "Int")
+  }
+
+  def getKotlinStringClassName() : ClassName = {
+    new ClassName("kotlin", "String")
+  }
+
 }
