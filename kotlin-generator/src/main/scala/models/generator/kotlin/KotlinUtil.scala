@@ -1,7 +1,8 @@
 package models.generator.kotlin
 
-import lib.Text
 import com.squareup.kotlinpoet._
+import io.apibuilder.spec.v0.models.{Enum, Service}
+import lib.Text
 
 trait KotlinUtil {
   val undefinedEnumName = "UNDEFINED"
@@ -161,20 +162,32 @@ trait KotlinUtil {
     "uuid" -> new ClassName("java.util","UUID")
   )
 
-  def dataTypeFromField(`type`: String, modelsNameSpace: String): TypeName = {
+
+
+  def dataTypeFromField(`type`: String, serviceNameSpace: String, service: Service): TypeName = {
+    dataTypeFromField(`type`, serviceNameSpace, service.enums)
+  }
+
+  protected def dataTypeFromField(`type`: String, serviceNameSpace: String, allEnums: Seq[Enum]): TypeName = {
     dataTypes.get(`type`).getOrElse{
       val name = toParamName(`type`, false)
       if(isParameterArray(`type`)) {
-        ParameterizedTypeName.get(new ClassName("kotlin.collections", "List"), dataTypeFromField(getArrayType(`type`), modelsNameSpace))
+        ParameterizedTypeName.get(new ClassName("kotlin.collections", "List"), dataTypeFromField(getArrayType(`type`), serviceNameSpace, allEnums))
       }
       else if (isParameterMap(`type`)) {
-        ParameterizedTypeName.get(new ClassName("kotlin.collections", "Map"), new ClassName("kotlin", "String"), dataTypeFromField(getMapType(`type`), modelsNameSpace))
+        ParameterizedTypeName.get(new ClassName("kotlin.collections", "Map"), new ClassName("kotlin", "String"), dataTypeFromField(getMapType(`type`), serviceNameSpace, allEnums))
       }
       else {
-        new ClassName(modelsNameSpace, name)
+        val isLocalEnum = allEnums.exists(enum => enum.name == `type`)
+        val nameSpace: String = if(isLocalEnum) toEnumsNameSpace(serviceNameSpace) else toModelsNameSpace(serviceNameSpace)
+        new ClassName(nameSpace, name)
       }
     }
   }
+
+  def toModelsNameSpace(nameSpace: String): String = nameSpace + ".models"
+
+  def toEnumsNameSpace(nameSpace: String): String = nameSpace + ".enums"
 
   def toParamName(modelName: String, startingWithLowercase: Boolean): String = {
     val paramStartingWithUppercase = if (isParameterArray(modelName)){
