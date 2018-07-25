@@ -388,10 +388,15 @@ class KotlinGenerator
             errorResponses.map(errorResponse => {
               val responseCodeString = errorResponse.code.asInstanceOf[ResponseCodeInt].value.toString
               val errorTypeNameString = "Error" + responseCodeString
-              if (errorResponse.`type` == Datatype.Primitive.Unit) {
+
+              if (errorResponse.`type` == Datatype.Primitive.Unit.name) {
+                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + ")\n",
+                  callErrorEitherErrorTypeClassName)
                 callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
               } else {
                 val errorPayloadType = dataTypeFromField(errorResponse.`type`, nameSpace, service)
+
+
                 val errorPayloadNameString = "data"
                 val errorResponseDataClass = TypeSpec.classBuilder(errorTypeNameString)
                   .addModifiers(KModifier.DATA)
@@ -407,10 +412,17 @@ class KotlinGenerator
                   case pt: ParameterizedTypeName => pt.toString()
                   case _ => errorPayloadType.toString()
                 }
-                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
-                  callErrorEitherErrorTypeClassName,
-                  commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
 
+
+                if (dataTypes.keySet.contains(errorResponse.`type`)) {
+                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${errorPayloadTypeString + "::class.java"}))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
+                    callErrorEitherErrorTypeClassName,
+                    commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
+                } else {
+                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
+                    callErrorEitherErrorTypeClassName,
+                    commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
+                }
                 callErrorResopnseSealedClassBuilder.addType(errorResponseDataClass)
               }
             })
