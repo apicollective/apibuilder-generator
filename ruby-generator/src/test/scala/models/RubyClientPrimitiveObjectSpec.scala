@@ -57,17 +57,17 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with Matchers {
 
       it("singleton") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("object"), None)
-        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-singleton.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-singleton", code)
       }
 
       it("list") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("[object]"), None)
-        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-list.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-list", code)
       }
 
       it("map") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateModel(model("map[object]"), None)
-        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-map.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-map", code)
       }
 
     }
@@ -146,17 +146,17 @@ class RubyClientPrimitiveObjectSpec extends FunSpec with Matchers {
 
       it("singleton") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("object"), "r")
-        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-singleton.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-singleton", code)
       }
 
       it("list") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("[object]"), "r")
-        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-list.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-list", code)
       }
 
       it("map") {
         val code = RubyClientGenerator(InvocationForm(service("object"))).generateResponses(operation("map[object]"), "r")
-        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-map.txt", code)
+        models.TestHelper.assertEqualsFile("/generators/ruby-client-primitive-object-response-map", code)
       }
 
     }

@@ -64,7 +64,7 @@ class ScalaUnionSpec extends FunSpec with Matchers {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(sourceFiles) => {
           sourceFiles.size shouldBe 1
-          models.TestHelper.assertEqualsFile("/scala-union-models-case-classes.txt", sourceFiles.head.contents)
+          models.TestHelper.assertEqualsFile("/scala-union-models-case-classes", sourceFiles.head.contents)
         }
       }
     }
@@ -72,18 +72,18 @@ class ScalaUnionSpec extends FunSpec with Matchers {
     it("generates valid readers for the union type itself") {
       val user = ssd.unions.find(_.name == "User").get
       val code = Play2Json(ssd).readers(user)
-      models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-readers.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-readers", code)
     }
 
     it("generates valid writers for the union type itself") {
       val user = ssd.unions.find(_.name == "User").get
       val code = Play2Json(ssd).writers(user)
-      models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-writers.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-writers", code)
     }
 
     it("codegen") {
       val code = Play2Json(ssd).generateModelsAndUnions()
-      models.TestHelper.assertEqualsFile("/scala-union-models-json.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-models-json", code)
     }
   }
 
@@ -135,7 +135,7 @@ class ScalaUnionSpec extends FunSpec with Matchers {
 
     it("codegen") {
       val code = Play2Json(ssd).generateModelsAndUnions()
-      models.TestHelper.assertEqualsFile("/scala-union-enums-json.txt", code)
+      models.TestHelper.assertEqualsFile("/scala-union-enums-json", code)
     }
   }
 

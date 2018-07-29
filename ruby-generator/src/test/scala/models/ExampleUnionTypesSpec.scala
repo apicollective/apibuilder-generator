@@ -12,7 +12,7 @@ class ExampleUnionTypesSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/example-union-types-ruby-client.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/example-union-types-ruby-client", sourceFiles.head.contents)
       }
     }
   }

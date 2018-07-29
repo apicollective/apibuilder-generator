@@ -16,7 +16,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s015(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/path-params-015.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/path-params-015", scalaSourceCode)
     }
 
     it("http4s 0.17 server") {
@@ -26,7 +26,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/path-params-017.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/path-params-017", scalaSourceCode)
     }
 
     it("http4s 0.18 server") {
@@ -36,7 +36,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/path-params-018.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/path-params-018", scalaSourceCode)
     }
   }
 
@@ -48,7 +48,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/query-params-017.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/query-params-017", scalaSourceCode)
     }
 
     it("http4s 0.18 server") {
@@ -58,7 +58,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/query-params-018.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/query-params-018", scalaSourceCode)
     }
   }
 
@@ -70,7 +70,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/form-params-017.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/form-params-017", scalaSourceCode)
     }
 
     it("http4s 0.18 server") {
@@ -80,7 +80,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/form-params-018.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/form-params-018", scalaSourceCode)
     }
   }
 
@@ -92,7 +92,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/response-types-017.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/response-types-017", scalaSourceCode)
     }
 
     it("http4s 0.18 server") {
@@ -102,7 +102,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/response-types-018.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/response-types-018", scalaSourceCode)
     }
   }
 
@@ -114,7 +114,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/imported-types-017.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/imported-types-017", scalaSourceCode)
     }
 
     it("http4s 0.18 server") {
@@ -124,7 +124,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/imported-types-018.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/imported-types-018", scalaSourceCode)
     }
   }
 
@@ -136,7 +136,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/status-codes-017.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/status-codes-017", scalaSourceCode)
     }
 
     it("http4s 0.18 server") {
@@ -146,7 +146,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/status-codes-018.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/status-codes-018", scalaSourceCode)
     }
   }
 
@@ -158,7 +158,7 @@ class Http4sServerGeneratorSpec extends FunSpec with Matchers {
         new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None))
       val scalaSourceCode = server.generate()
       assertValidScalaSourceCode(scalaSourceCode)
-      models.TestHelper.assertEqualsFile("/http4s/kebab-and-snake-case-018.txt", scalaSourceCode)
+      models.TestHelper.assertEqualsFile("/http4s/kebab-and-snake-case-018", scalaSourceCode)
     }
   }
 }

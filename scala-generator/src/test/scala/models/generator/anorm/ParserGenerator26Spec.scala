@@ -112,8 +112,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/reference-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/reference.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/reference-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/reference", files.last.contents)
       }
     }
   }
@@ -126,8 +126,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/name-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/name.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/name-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/name", files.last.contents)
       }
     }
   }
@@ -140,8 +140,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/cap-name-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/cap-name.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/cap-name-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/cap-name", files.last.contents)
       }
     }
   }
@@ -166,8 +166,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/user-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/user.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/user-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/user", files.last.contents)
       }
     }
   }
@@ -201,8 +201,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/enum-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/enum.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/enum-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/enum", files.last.contents)
       }
     }
   }
@@ -226,8 +226,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/list-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/list.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/list-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/list", files.last.contents)
       }
     }
   }
@@ -269,8 +269,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/union-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/union-parsers.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/union-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/union-parsers", files.last.contents)
       }
     }
   }
@@ -293,8 +293,8 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       }
       case Right(files) => {
         files.map(_.name) should be(fileNames)
-        models.TestHelper.assertEqualsFile("/generator/anorm/location-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/location-parsers.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/location-conversions-26", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/location-parsers", files.last.contents)
       }
     }
   }

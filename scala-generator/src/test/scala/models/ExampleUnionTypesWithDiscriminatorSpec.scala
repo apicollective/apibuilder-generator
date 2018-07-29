@@ -12,7 +12,7 @@ class ExampleUnionTypesWithDiscriminatorSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/union-types-discriminator-service-play-24.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/union-types-discriminator-service-play-24", sourceFiles.head.contents)
       }
     }
   }

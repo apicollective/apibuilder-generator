@@ -76,8 +76,9 @@ class Play2RouteGeneratorSpec extends FunSpec with Matchers {
           sourceFiles.size shouldBe 1
           models.TestHelper.assertEqualsFile(
             "/generators/play-2-route-reference-api.routes",
-            sourceFiles.head.contents
-         ) 
+            sourceFiles.head.contents,
+            extension = None
+         )
         }
       }
     }

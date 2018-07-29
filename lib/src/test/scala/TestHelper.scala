@@ -106,16 +106,20 @@ object TestHelper extends Matchers {
     }
   }
 
-  def assertEqualsFile(filename: String, contents: String): Unit = {
-    val actualPath = resolvePath(filename)
+  def assertEqualsFile(filename: String, contents: String, extension: Option[String] = Some("txt")): Unit = {
+    val extensionString = extension.fold("")("." + _)
+
+    val fullFileName = filename + extensionString
+
+    val actualPath = resolvePath(fullFileName)
     val current = readFile(actualPath).trim
     if (current != contents.trim) {
       import sys.process._
 
-      val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
+      val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename) + extensionString
       TestHelper.writeToFile(expectedPath, contents.trim)
       // TestHelper.writeToFile(actualPath, contents.trim)
-      
+
       val cmd = s"diff $expectedPath $actualPath"
       println(cmd)
       cmd.!

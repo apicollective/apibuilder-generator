@@ -63,7 +63,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with Matchers {
           case Left(errors) => fail(errors.mkString(", "))
           case Right(sourceFiles) => {
             sourceFiles.size shouldBe 1
-            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-singleton.txt", sourceFiles.head.contents)
+            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-singleton", sourceFiles.head.contents)
           }
         }
       }
@@ -73,7 +73,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with Matchers {
           case Left(errors) => fail(errors.mkString(", "))
           case Right(sourceFiles) => {
             sourceFiles.size shouldBe 1
-            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-list.txt", sourceFiles.head.contents)
+            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-list", sourceFiles.head.contents)
           }
         }
       }
@@ -83,7 +83,7 @@ class ScalaPrimitiveObjectSpec extends FunSpec with Matchers {
           case Left(errors) => fail(errors.mkString(", "))
           case Right(sourceFiles) => {
             sourceFiles.size shouldBe 1
-            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-map.txt", sourceFiles.head.contents)
+            models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-map", sourceFiles.head.contents)
           }
         }
       }
@@ -167,17 +167,17 @@ class ScalaPrimitiveObjectSpec extends FunSpec with Matchers {
 
       it("singleton") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("object"))
-        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-singleton.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-singleton", generator.objects)
       }
 
       it("list") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("[object]"))
-        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-list.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-list", generator.objects)
       }
 
       it("map") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("map[object]"))
-        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-map.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-map", generator.objects)
       }
 
     }

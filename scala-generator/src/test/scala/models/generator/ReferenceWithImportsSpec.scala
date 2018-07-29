@@ -14,13 +14,13 @@ class ReferenceWithImportsSpec extends FunSpec with Matchers {
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get
     val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
-    models.TestHelper.assertEqualsFile("/generators/reference-spec-user-case-class.txt", code)
+    models.TestHelper.assertEqualsFile("/generators/reference-spec-user-case-class", code)
   }
 
   it("member case classes") {
     val model = ssd.models.find(_.name == "Member").get
     val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
-    models.TestHelper.assertEqualsFile("/generators/reference-spec-member-case-class.txt", code)
+    models.TestHelper.assertEqualsFile("/generators/reference-spec-member-case-class", code)
   }
 
   it("generates expected code for play 2.3 client") {
@@ -30,7 +30,7 @@ class ReferenceWithImportsSpec extends FunSpec with Matchers {
         sourceFiles.size shouldBe 1
         val sourceCode = sourceFiles.head.contents
         TestHelper.assertValidScalaSourceCode(sourceCode)
-        TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-play-23.txt", sourceCode)
+        TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-play-23", sourceCode)
       }
     }
   }
@@ -42,7 +42,7 @@ class ReferenceWithImportsSpec extends FunSpec with Matchers {
         sourceFiles.size shouldBe 1
         val sourceCode = sourceFiles.head.contents
         TestHelper.assertValidScalaSourceCode(sourceCode)
-        TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-ning-client.txt", sourceCode)
+        TestHelper.assertEqualsFile("/generators/reference-with-imports-spec-ning-client", sourceCode)
       }
     }
   }

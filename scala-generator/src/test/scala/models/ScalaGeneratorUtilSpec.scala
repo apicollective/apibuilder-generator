@@ -73,7 +73,7 @@ val queryParameters = optionalMessages.getOrElse(Nil).map("optional_messages" ->
     val operation = ssd.resources.find(_.plural == "Users").get.operations.find(op => op.method == Method.Get && op.path == "/users").get
 
     models.TestHelper.assertEqualsFile(
-      "/generators/play-2-route-util-reference-get-users.txt",
+      "/generators/play-2-route-util-reference-get-users",
       play2Util.queryParameters("queryParameters", operation.queryParameters).get
     )
   }

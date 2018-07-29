@@ -38,7 +38,7 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
         )
       )
 
-      models.TestHelper.assertEqualsFile("/ruby-gem-enums.txt", RubyClientGenerator.generateEnum(enum, None))
+      models.TestHelper.assertEqualsFile("/ruby-gem-enums", RubyClientGenerator.generateEnum(enum, None))
     }
 
     it("for enum with spaces") {
@@ -53,7 +53,7 @@ class RubyClientGeneratorSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/ruby-client-generator-gilt-0.0.1-test.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/ruby-client-generator-gilt-0.0.1-test", sourceFiles.head.contents)
       }
     }
   }
