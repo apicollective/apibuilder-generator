@@ -356,7 +356,7 @@ object ScalaDatatype {
     override def definition(
       originalVarName: String,
       default: scala.Option[String],
-      deprecation: scala.Option[Deprecation],
+      deprecation: scala.Option[Deprecation]
     ): String = {
       super.definition(
         originalVarName,
