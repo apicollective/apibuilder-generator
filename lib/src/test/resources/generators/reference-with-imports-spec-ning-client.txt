@@ -37,7 +37,7 @@ package io.apibuilder.reference.api.v0.models {
 
   final case class Echo(
     value: String
-  )
+  ) extends AnyVal
 
   /**
    * Models an API error.
@@ -52,7 +52,7 @@ package io.apibuilder.reference.api.v0.models {
    */
   final case class Group(
     members: Seq[io.apibuilder.reference.api.v0.models.User]
-  )
+  ) extends AnyVal
 
   final case class Member(
     guid: _root_.java.util.UUID,
@@ -76,7 +76,7 @@ package io.apibuilder.reference.api.v0.models {
 
   final case class UserList(
     users: Seq[io.apibuilder.reference.api.v0.models.User]
-  )
+  ) extends AnyVal
 
   sealed trait AgeGroup extends _root_.scala.Product with _root_.scala.Serializable
 

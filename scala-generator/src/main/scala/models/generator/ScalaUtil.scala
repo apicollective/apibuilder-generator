@@ -28,7 +28,12 @@ object ScalaUtil {
   }
 
   def textToComment(text: Seq[String]): String = {
-    "/**\n * " + text.mkString("\n * ") + "\n */"
+    val commentText = text.zipWithIndex.map {
+      case ("", _)   => s" *"
+      case (line, _) => s" * $line"
+    }.mkString("\n")
+
+    "/**\n" + commentText + "\n */"
   }
 
   def textToComment(text: String): String = {

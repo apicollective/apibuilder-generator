@@ -26,9 +26,13 @@ sealed trait ScalaDatatype {
     deprecation: Option[Deprecation]
   ): String = {
     val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-    default.fold(s"${deprecationString(deprecation)}$varName: $name") { default =>
-      s"$varName: $name = $default"
-    }
+
+    val defaultString = default.map(" = " + _).getOrElse("")
+    val depString = deprecationString(deprecation)
+
+    val baseString = s"$varName: $name"
+
+    depString + baseString + defaultString
   }
 
   def default(value: String): String = {
@@ -352,12 +356,13 @@ object ScalaDatatype {
     override def definition(
       originalVarName: String,
       default: scala.Option[String],
-      deprecation: scala.Option[Deprecation]
+      deprecation: scala.Option[Deprecation],
     ): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      default.fold(s"${deprecationString(deprecation)}$varName: $name = None") { default =>
-        s"${deprecationString(deprecation)}$varName: $name = $default"
-      }
+      super.definition(
+        originalVarName,
+        default.orElse(Some("None")),
+        deprecation
+      )
     }
 
     // override, since options contain at most one element

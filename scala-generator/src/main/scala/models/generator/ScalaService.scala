@@ -178,7 +178,17 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val fields: List[ScalaField] = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
-  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
+  val isValueClass: Boolean = fields match {
+    case field :: Nil =>
+      field.`type` match {
+        case _: Datatype.Primitive => true
+        case _: Datatype.Container => true
+        case _: Datatype.UserDefined => false //for now
+      }
+    case _ => false
+  }
+
+  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition))
 
   val deprecation: Option[Deprecation] = model.deprecation
 
@@ -269,18 +279,18 @@ class ScalaOperation(val ssd: ScalaService, operation: Operation, resource: Scal
 
   def argList(additionalArgs: Seq[String] = Nil): Option[String] = body match {
     case None => {
-      ScalaUtil.fieldsToArgList(nonHeaderParameters.map(_.definition()) ++ headerParameters.map(_.definition()) ++ additionalArgs)
+      ScalaUtil.fieldsToArgList(nonHeaderParameters.map(_.definition) ++ headerParameters.map(_.definition) ++ additionalArgs)
     }
 
     case Some(b) => {
       val bodyVarName = b.datatype.toVariableName
 
       ScalaUtil.fieldsToArgList(
-        nonHeaderParameters.filter(_.param.required).map(_.definition()) ++
+        nonHeaderParameters.filter(_.param.required).map(_.definition) ++
         Seq(s"%s: %s".format(ScalaUtil.quoteNameIfKeyword(bodyVarName), b.datatype.name)) ++
-        headerParameters.filter(_.param.required).map(_.definition()) ++
-        nonHeaderParameters.filter(!_.param.required).map(_.definition()) ++
-        headerParameters.filter(!_.param.required).map(_.definition()) ++
+        headerParameters.filter(_.param.required).map(_.definition) ++
+        nonHeaderParameters.filter(!_.param.required).map(_.definition) ++
+        headerParameters.filter(!_.param.required).map(_.definition) ++
         additionalArgs
       )
     }
@@ -350,8 +360,8 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
 
   def default: Option[String] = field.default.map(ScalaUtil.scalaDefault(_, datatype))
 
-  def definition(varName: String = name): String = {
-    datatype.definition(varName, default, field.deprecation)
+  def definition: String = {
+    datatype.definition(name, default, field.deprecation)
   }
 
   /**
@@ -412,8 +422,8 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
 
   def required: Boolean = param.required
 
-  def definition(varName: String = name): String = {
-    datatype.definition(varName, default, param.deprecation)
+  def definition: String = {
+    datatype.definition(name, default, param.deprecation)
   }
 
   def location: ParameterLocation = param.location

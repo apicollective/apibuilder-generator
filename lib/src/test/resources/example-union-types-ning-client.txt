@@ -19,7 +19,7 @@ package io.apibuilder.example.union.types.v0.models {
 
     case object RegisteredUser extends UserDiscriminator { override def toString = "registered_user" }
     case object GuestUser extends UserDiscriminator { override def toString = "guest_user" }
-    @deprecated 
+    @deprecated
     case object Uuid extends UserDiscriminator { override def toString = "uuid" }
 
     final case class UNDEFINED(override val toString: String) extends UserDiscriminator
@@ -55,7 +55,7 @@ package io.apibuilder.example.union.types.v0.models {
    * Provides future compatibility in clients - in the future, when a type is added
    * to the union Foobar, it will need to be handled in the client code. This
    * implementation will deserialize these future types as an instance of this class.
-   * 
+   *
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
@@ -67,7 +67,7 @@ package io.apibuilder.example.union.types.v0.models {
    * Provides future compatibility in clients - in the future, when a type is added
    * to the union User, it will need to be handled in the client code. This
    * implementation will deserialize these future types as an instance of this class.
-   * 
+   *
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */

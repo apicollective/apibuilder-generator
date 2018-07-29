@@ -38,7 +38,7 @@ case class ScalaUnionDiscriminator(
       union.types.map { typ =>
         Seq(
           typ.description.map { desc => ScalaUtil.textToComment(desc) },
-          ScalaUtil.deprecationString(typ.deprecation) match {
+          ScalaUtil.deprecationString(typ.deprecation).trim match {
             case "" => None
             case v => Some(v)
           },

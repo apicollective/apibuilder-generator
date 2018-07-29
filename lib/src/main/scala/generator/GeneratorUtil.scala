@@ -99,7 +99,7 @@ object GeneratorUtil {
 
   /**
    * Turns a URL path to a camelcased method name.
-   * 
+   *
    * @param resourcePath The path to the resource itself, if known
    * @param resourceOperationPaths The full set of paths to all operations. This is
    *        used to compute a resource path (longest common string) if resource path
@@ -152,15 +152,6 @@ object GeneratorUtil {
     } else {
       method.toString.toLowerCase + notNamed.mkString("And") + "By" + named.mkString("And")
     }
-  }
-
-  /**
-    * Creates a canonical form for the specified name. Eg
-    * MembershipRequest and membership-request both end up as
-    * membership_request
-    */
-  private def formatName(name: String): String = {
-    Text.splitIntoWords(Text.camelCaseToUnderscore(name)).mkString("_")
   }
 
   /**

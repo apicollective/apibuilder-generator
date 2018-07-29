@@ -2,6 +2,6 @@ package test.apidoc.apidoctest.v0.models {
 
   final case class Content(
     data: _root_.play.api.libs.json.JsObject
-  )
+  ) extends AnyVal
 
 }
