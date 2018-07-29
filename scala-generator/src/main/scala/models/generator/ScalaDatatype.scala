@@ -359,9 +359,9 @@ object ScalaDatatype {
       deprecation: scala.Option[Deprecation]
     ): String = {
       super.definition(
-        originalVarName,
-        default.orElse(Some("None")),
-        deprecation
+        originalVarName = originalVarName,
+        default = default.orElse(Some("None")),
+        deprecation = deprecation
       )
     }
 
