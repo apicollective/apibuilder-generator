@@ -240,6 +240,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "java_pojo_client",
+        name = "Java POJO Client",
+        description = Some("Generate Java POJO models."),
+        language = Some("Java")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.javapojos.JavaPOJOClasses)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "android_kotlin_rx2_client",
         name = "Android Kotlin RxJava2 Client",
         description = Some("Generate Kotlin models and Retrofit 2 + RxJava2 client for Android from the API description."),
