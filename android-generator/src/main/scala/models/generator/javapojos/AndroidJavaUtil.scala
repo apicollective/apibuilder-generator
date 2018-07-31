@@ -1,4 +1,4 @@
-package models.generator.android
+package models.generator.javapojos
 
 import lib.Text
 import com.squareup.javapoet._

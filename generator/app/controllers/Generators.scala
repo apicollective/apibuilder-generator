@@ -226,7 +226,7 @@ object Generators {
         language = Some("Java")
       ),
       status = lib.generator.Status.InDevelopment,
-      codeGenerator = Some(models.generator.android.AndroidRxClasses)
+      codeGenerator = Some(models.generator.javapojos.AndroidRxClasses)
     ),
     CodeGenTarget(
       metaData = Generator(
@@ -236,7 +236,7 @@ object Generators {
         language = Some("Java")
       ),
       status = lib.generator.Status.InDevelopment,
-      codeGenerator = Some(models.generator.android.AndroidClasses)
+      codeGenerator = Some(models.generator.javapojos.AndroidClasses)
     ),
     CodeGenTarget(
       metaData = Generator(

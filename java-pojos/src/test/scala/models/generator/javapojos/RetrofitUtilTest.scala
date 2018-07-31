@@ -1,7 +1,6 @@
-package models.generator.android
+package models.generator.javapojos
 
 import org.scalatest.{Matchers, FlatSpec}
-import RetrofitUtil._
 
 class RetrofitUtilTest
   extends FlatSpec

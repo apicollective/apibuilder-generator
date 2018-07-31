@@ -1,4 +1,4 @@
-package models.generator.android
+package models.generator.javapojos
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{FunSpec, Matchers}

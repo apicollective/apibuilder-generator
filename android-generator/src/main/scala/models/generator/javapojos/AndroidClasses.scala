@@ -1,4 +1,4 @@
-package models.generator.android
+package models.generator.javapojos
 
 import com.squareup.javapoet.ClassName
 import retrofit2.Call

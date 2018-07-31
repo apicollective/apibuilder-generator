@@ -1,4 +1,4 @@
-package models.generator.android
+package models.generator.javapojos
 
 import java.io.IOException
 import javax.lang.model.element.Modifier

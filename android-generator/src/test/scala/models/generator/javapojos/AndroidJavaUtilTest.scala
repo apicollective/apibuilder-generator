@@ -1,11 +1,11 @@
-package models.generator.android
+package models.generator.javapojos
 
 import org.scalatest.{FlatSpec, Matchers}
 
-class JavaPOJOUtilTest
+class AndroidJavaUtilTest
   extends FlatSpec
   with Matchers
-  with JavaPOJOUtil{
+  with AndroidJavaUtil{
 
   "toParameterName" should "convert array" in {
     toParamName("[some_param]", false) should be("SomeParam")
