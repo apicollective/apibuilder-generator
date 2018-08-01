@@ -1,4 +1,4 @@
-package models.generator.javapojos
+package models.generator.android
 
 import com.squareup.javapoet.ClassName
 import io.reactivex.Single

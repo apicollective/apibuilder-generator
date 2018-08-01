@@ -1,4 +1,4 @@
-package models.generator.javapojos
+package models.generator.android
 
 import lib.Constants
 
