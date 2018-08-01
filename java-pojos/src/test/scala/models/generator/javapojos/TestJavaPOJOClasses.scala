@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import com.github.javaparser.JavaParser
 
 
-class TestAndroidClasses
+class TestJavaPOJOClasses
   extends FunSpec
     with Matchers {
 
@@ -126,7 +126,7 @@ class TestAndroidClasses
       }]
       """)
 
-    val result = AndroidClasses.invoke(InvocationForm(models.TestHelper.service(json.format())))
+    val result = JavaPOJOClasses.invoke(InvocationForm(models.TestHelper.service(json.format())))
 
     result.isRight should be(true)
     val files = result.right.get
