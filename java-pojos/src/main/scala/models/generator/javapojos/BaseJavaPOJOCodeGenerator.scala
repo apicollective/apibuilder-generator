@@ -142,9 +142,6 @@ trait BaseJavaPOJOCodeGenerator extends CodeGenerator with JavaPOJOUtil {
       val constructorWithParams = MethodSpec.constructorBuilder()
       builder.addMethod(constructorWithParams.build())
 
-      val toStringMethod = MethodSpec.methodBuilder("toString").addAnnotation(classOf[Override]).addModifiers(Modifier.PUBLIC).returns(nameFieldType)
-      builder.addMethod(toStringMethod.build)
-
       makeFile(className, builder)
 
     }
@@ -190,7 +187,7 @@ trait BaseJavaPOJOCodeGenerator extends CodeGenerator with JavaPOJOUtil {
 
         val javaDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
-        val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL)
+        val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PRIVATE)
         builder.addField(fieldBuilder.build)
 
         val methodName = Text.snakeToCamelCase(s"get_${fieldSnakeCaseName}")
