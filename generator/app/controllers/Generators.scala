@@ -240,6 +240,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "java_aws_lambda_pojo_client",
+        name = "Java AWS Lambda POJO Client",
+        description = Some("Generate Java POJO models for use with AWS Lambdas."),
+        language = Some("Java")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.javaAwsLambdaPojos.JavaAwsLambdaPOJOClasses)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "android_kotlin_rx2_client",
         name = "Android Kotlin RxJava2 Client",
         description = Some("Generate Kotlin models and Retrofit 2 + RxJava2 client for Android from the API description."),
