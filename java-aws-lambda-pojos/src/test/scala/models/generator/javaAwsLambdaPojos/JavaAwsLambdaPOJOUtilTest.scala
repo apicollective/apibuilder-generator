@@ -1,11 +1,11 @@
-package models.generator.javapojos
+package models.generator.javaAwsLambdaPojos
 
 import org.scalatest.{FlatSpec, Matchers}
 
-class JavaPOJOUtilTest
+class JavaAwsLambdaPOJOUtilTest
   extends FlatSpec
   with Matchers
-  with JavaPOJOUtil{
+  with JavaAwsLambdaPOJOUtil{
 
   "toParameterName" should "convert array" in {
     toParamName("[some_param]", false) should be("SomeParam")

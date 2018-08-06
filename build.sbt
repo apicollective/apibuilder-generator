@@ -29,8 +29,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaPOJOGenerator)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaPOJOGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -43,8 +43,8 @@ lazy val generator = project
     )
   )
 
-lazy val javaPOJOGenerator = project
-  .in(file("java-pojos"))
+lazy val javaAwsLambdaPojos = project
+  .in(file("java-aws-lambda-pojos"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(Seq(ScoverageKeys.coverageMinimum := 0.0))

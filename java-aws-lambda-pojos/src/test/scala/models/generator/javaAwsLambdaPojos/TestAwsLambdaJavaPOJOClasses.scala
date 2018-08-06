@@ -1,11 +1,11 @@
-package models.generator.javapojos
+package models.generator.javaAwsLambdaPojos
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{FunSpec, Matchers}
 import com.github.javaparser.JavaParser
 
 
-class TestJavaPOJOClasses
+class TestAwsLambdaJavaPOJOClasses
   extends FunSpec
     with Matchers {
 
@@ -126,7 +126,7 @@ class TestJavaPOJOClasses
       }]
       """)
 
-    val result = JavaPOJOClasses.invoke(InvocationForm(models.TestHelper.service(json.format())))
+    val result = JavaAwsLambdaPOJOClasses.invoke(InvocationForm(models.TestHelper.service(json.format())))
 
     result.isRight should be(true)
     val files = result.right.get

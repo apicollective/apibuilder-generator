@@ -1,9 +1,9 @@
-package models.generator.javapojos
+package models.generator.javaAwsLambdaPojos
 
 import lib.Text
 import com.squareup.javapoet._
 
-trait JavaPOJOUtil {
+trait JavaAwsLambdaPOJOUtil {
   private val ReservedWords = Set(
     "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
     "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto",

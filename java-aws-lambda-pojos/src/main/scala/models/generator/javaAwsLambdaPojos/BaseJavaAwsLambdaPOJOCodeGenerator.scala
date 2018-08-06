@@ -1,4 +1,4 @@
-package models.generator.javapojos
+package models.generator.javaAwsLambdaPojos
 
 import java.io.IOException
 import javax.lang.model.element.Modifier
@@ -19,7 +19,7 @@ import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 import scala.collection.JavaConverters._
 
 
-trait BaseJavaPOJOCodeGenerator extends CodeGenerator with JavaPOJOUtil {
+trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambdaPOJOUtil {
 
   def getJavaDocFileHeader() : String //abstract
 

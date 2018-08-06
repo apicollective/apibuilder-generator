@@ -240,13 +240,13 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
-        key = "java_pojo_client",
-        name = "Java POJO Client",
-        description = Some("Generate Java POJO models."),
+        key = "java_aws_lambda_pojo_client",
+        name = "Java AWS Lambda POJO Client",
+        description = Some("Generate Java POJO models for use with AWS Lambdas."),
         language = Some("Java")
       ),
       status = lib.generator.Status.InDevelopment,
-      codeGenerator = Some(models.generator.javapojos.JavaPOJOClasses)
+      codeGenerator = Some(models.generator.javaAwsLambdaPojos.JavaAwsLambdaPOJOClasses)
     ),
     CodeGenTarget(
       metaData = Generator(
