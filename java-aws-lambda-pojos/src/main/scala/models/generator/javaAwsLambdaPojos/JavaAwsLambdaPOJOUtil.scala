@@ -84,7 +84,7 @@ trait JavaAwsLambdaPOJOUtil {
 
   val dataTypes = Map[String, TypeName](
     "boolean" -> ClassName.get("java.lang", "Boolean"),
-    "date-iso8601" -> ClassName.get("java.util.Date", "Date"),
+    "date-iso8601" -> ClassName.get("java.util", "Date"),
     "date-time-iso8601" -> ClassName.get("org.joda.time", "DateTime"),
     "decimal" -> ClassName.get("java.math","BigDecimal"),
     "double" -> ClassName.get("java.lang","Double"),

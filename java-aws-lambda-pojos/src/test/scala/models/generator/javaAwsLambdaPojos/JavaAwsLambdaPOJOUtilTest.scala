@@ -66,7 +66,7 @@ class JavaAwsLambdaPOJOUtilTest
     dataTypeFromField("boolean", "com.apidoc.example").toString should be ("java.lang.Boolean")
     dataTypeFromField("long", "com.apidoc.example").toString should be ("java.lang.Long")
     dataTypeFromField("uuid", "com.apidoc.example").toString should be ("java.util.UUID")
-    dataTypeFromField("date-iso8601", "com.apidoc.example").toString should be ("org.joda.time.DateTime")
+    dataTypeFromField("date-iso8601", "com.apidoc.example").toString should be ("java.util.Date")
     dataTypeFromField("date-time-iso8601", "com.apidoc.example").toString should be ("org.joda.time.DateTime")
   }
 
