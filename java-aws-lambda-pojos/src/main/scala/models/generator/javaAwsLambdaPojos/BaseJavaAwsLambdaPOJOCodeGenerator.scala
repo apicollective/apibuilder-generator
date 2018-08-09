@@ -187,7 +187,7 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
 
         val javaDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
-        val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PRIVATE)
+        val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PROTECTED)
         builder.addField(fieldBuilder.build)
 
         val methodName = Text.snakeToCamelCase(s"get_${fieldSnakeCaseName}")
