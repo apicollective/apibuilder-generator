@@ -47,7 +47,12 @@ lazy val javaAwsLambdaPojos = project
   .in(file("java-aws-lambda-pojos"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 0.0))
+  .settings(
+    Seq(ScoverageKeys.coverageMinimum := 0.0),
+    libraryDependencies += "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.9.6"
+  )
+
+
 lazy val scalaGenerator = project
   .in(file("scala-generator"))
   .dependsOn(lib, lib % "test->test")
