@@ -1,10 +1,10 @@
 package models.generator.javaAwsLambdaPojos
 
 import java.io.IOException
-import javax.lang.model.element.Modifier
 
+import javax.lang.model.element.Modifier
 import com.fasterxml.jackson.annotation._
-import com.fasterxml.jackson.core.{ Version}
+import com.fasterxml.jackson.core.Version
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.squareup.javapoet.AnnotationSpec.Builder
@@ -15,6 +15,7 @@ import lib.Text
 import lib.generator.CodeGenerator
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
+import com.amazonaws.services.dynamodbv2.datamodeling._
 
 import scala.collection.JavaConverters._
 
@@ -158,8 +159,16 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
       makeFile(className, builder)
     }
 
-    def generateModel(model: Model, relatedUnions: Seq[Union]): File = {
+    def isDynamoDbModel(model: Model): Boolean = {
+      model.attributes.map(attribute => {
+        attribute.name match {
+          case "DynamoDBTable" => true
+          case "DynamoDBDocument" => true
+        }
+      }).foldLeft(false)((x,y) => {x||y})
+    }
 
+    def generateModel(model: Model, relatedUnions: Seq[Union]): File = {
 
       val className = toClassName(model.name)
 
@@ -170,14 +179,29 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
 
       model.description.map(builder.addJavadoc(_))
 
+      model.attributes.foreach(attribute => {
+        attribute.name match {
+          case "DynamoDBTable" =>{
+            val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBTable])
+            jsonAnnotationBuilder.addMember("tableName","$S",(attribute.value \ "tableName").as[String])
+            builder.addAnnotation(jsonAnnotationBuilder.build)
+          }
+          case "DynamoDBDocument"=>{
+            val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBDocument])
+            builder.addAnnotation(jsonAnnotationBuilder.build)
+          }
+          case _=> {}
+        }
+
+      })
+
       val constructorWithParams = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC)
 
       val constructorWithoutParams = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC)
 
-
       val unionClassTypeNames = relatedUnions.map { u => ClassName.get(modelsNameSpace, toClassName(u.name)) }
       builder.addSuperinterfaces(unionClassTypeNames.asJava)
-
+      val shouldAnnotateAsDyanmoDb = isDynamoDbModel(model)
 
       model.fields.foreach(field => {
 
@@ -193,6 +217,28 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
         val methodName = Text.snakeToCamelCase(s"get_${fieldSnakeCaseName}")
 
         val getterBuilder = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC)
+
+        field.attributes.foreach(attribute => {
+          attribute.name match {
+            case "DynamoDBRangeKey" =>{
+              val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBRangeKey])
+              jsonAnnotationBuilder.addMember("attributeName","$S",(attribute.value \ "attributeName").as[String])
+              getterBuilder.addAnnotation(jsonAnnotationBuilder.build)
+            }
+            case "DynamoDBHashKey"=>{
+              val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBHashKey])
+              jsonAnnotationBuilder.addMember("attributeName","$S",(attribute.value \ "attributeName").as[String])
+              getterBuilder.addAnnotation(jsonAnnotationBuilder.build)
+            }
+            case _ =>
+          }
+        })
+
+        if(shouldAnnotateAsDyanmoDb && field.attributes.length == 0){
+          val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBAttribute])
+          getterBuilder.addAnnotation(jsonAnnotationBuilder.build)
+        }
+
         getterBuilder.returns(javaDataType)
         getterBuilder.addStatement(s"return ${fieldCamelCaseName}")
         field.description.map(getterBuilder.addJavadoc(_))
