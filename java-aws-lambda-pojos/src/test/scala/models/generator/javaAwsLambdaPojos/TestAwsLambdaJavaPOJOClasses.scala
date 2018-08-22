@@ -130,11 +130,9 @@ class TestAwsLambdaJavaPOJOClasses
 
     result.isRight should be(true)
     val files = result.right.get
-    files.size should be(4)
+    files.size should be(2)
     files(0).name should be("CarType.java")
     files(1).name should be("Model.java")
-    files(2).name should be("ApiBuilderObjectMapper.java")
-    files(3).name should be("ModelsClient.java")
     files.foreach { file => JavaParser.parse(file.contents) }
   }
 
