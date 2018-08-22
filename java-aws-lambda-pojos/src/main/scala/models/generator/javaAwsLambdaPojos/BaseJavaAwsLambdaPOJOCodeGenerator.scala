@@ -46,8 +46,6 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
     private val modelsNameSpace = nameSpace + ".models"
     private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
 
-    private val sharedObjectMapperClassName = "ApiBuilderObjectMapper"
-
 
     private val apiDocComments = {
       val s = JAVADOC_CLASS_MESSAGE + "\n"
@@ -73,54 +71,9 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
         generateModel(model, relatedUnions)
       }
 
-      val generatedObjectMapper = Seq(generateObjectMapper)
-
-      val generatedResources = service.resources.map {
-        generateResource
-      }
-
       generatedEnums ++
         generatedUnionTypes ++
-        generatedModels ++
-        generatedObjectMapper ++
-        generatedResources
-    }
-
-
-    def generateObjectMapper: File = {
-
-      def formatter: FieldSpec.Builder = {
-        FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-          .initializer("$T.dateTimeParser()", classOf[ISODateTimeFormat])
-      }
-
-
-      val builder =
-        TypeSpec.classBuilder(sharedObjectMapperClassName)
-          .superclass(classOf[ObjectMapper])
-          .addModifiers(Modifier.PUBLIC)
-          .addJavadoc(apiDocComments)
-
-      builder.addField(formatter.build)
-
-      val modifierField = FieldSpec.builder(classOf[ObjectMapper], "MAPPER").addModifiers(Modifier.PRIVATE).addModifiers(Modifier.FINAL).addModifiers(Modifier.STATIC)
-      builder.addField(modifierField.build)
-
-      builder.addStaticBlock(CodeBlock.builder
-        .addStatement("SimpleModule module = new $T(new $T(1, 0, 0, null, null, null))", classOf[SimpleModule], classOf[Version])
-        .addStatement("MAPPER = new ObjectMapper()")
-        .addStatement("MAPPER.setPropertyNamingStrategy($T.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)", classOf[PropertyNamingStrategy])
-        .addStatement("MAPPER.configure($T.FAIL_ON_UNKNOWN_PROPERTIES, false)", classOf[DeserializationFeature])
-        .addStatement("MAPPER.configure($T.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)", classOf[DeserializationFeature])
-        .addStatement("MAPPER.registerModule(module)")
-        .build)
-
-      val getterBuilder = MethodSpec.methodBuilder("getInstance").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC)
-      getterBuilder.returns(classOf[ObjectMapper])
-      getterBuilder.addStatement(s"return MAPPER")
-      builder.addMethod(getterBuilder.build)
-
-      File(s"${sharedObjectMapperClassName}.java", Some(nameSpace + "/javaPojos"), builder.build().toString)
+        generatedModels
     }
 
     def generateEnum(enum: Enum): File = {
@@ -262,20 +215,6 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
 
     }
 
-
-
-    def generateResource(resource: Resource): File = {
-
-      val className = toClassName(resource.plural) + "Client"
-
-      val builder =
-        TypeSpec.interfaceBuilder(className)
-          .addModifiers(Modifier.PUBLIC)
-          .addJavadoc(apiDocComments)
-
-
-      makeFile(className, builder)
-    }
 
     private def toMap(cc: AnyRef): Map[String, Any] =
       (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
