@@ -101,7 +101,7 @@ trait JavaAwsLambdaPOJOUtil {
     dataTypes.get(`type`).getOrElse{
       val name = toParamName(`type`, false)
       if(isParameterArray(`type`))
-        ArrayTypeName.of(dataTypeFromField(getArrayType(`type`), modelsNameSpace))
+        ParameterizedTypeName.get(ClassName.get("java.util", "List"), ClassName.get(modelsNameSpace, name))
       else if (isParameterMap(`type`))
         ParameterizedTypeName.get(ClassName.get("java.util", "Map"), ClassName.get("java.lang", "String"), dataTypeFromField(getMapType(`type`), modelsNameSpace))
       else
