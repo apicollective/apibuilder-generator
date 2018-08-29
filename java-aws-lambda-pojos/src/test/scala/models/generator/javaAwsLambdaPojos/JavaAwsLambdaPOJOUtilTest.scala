@@ -80,9 +80,9 @@ class JavaAwsLambdaPOJOUtilTest
   }
 
   it should "handle arrays" in {
-    dataTypeFromField("[long]", "com.apidoc.example").toString should be ("java.lang.Long[]")
-    dataTypeFromField("[string]", "com.apidoc.example").toString should be ("java.lang.String[]")
-    dataTypeFromField("[CustomType]", "com.apidoc.example").toString should be ("com.apidoc.example.CustomType[]")
+    dataTypeFromField("[long]", "com.apidoc.example").toString should be ("java.util.List<java.lang.Long>")
+    dataTypeFromField("[string]", "com.apidoc.example").toString should be ("java.util.List<java.lang.String>")
+    dataTypeFromField("[CustomType]", "com.apidoc.example").toString should be ("java.util.List<com.apidoc.example.CustomType>")
   }
 
   it should "handle maps" in {
@@ -94,7 +94,7 @@ class JavaAwsLambdaPOJOUtilTest
 
   it should "handle map and array combinations" in {
     dataTypeFromField("map[map[CustomType]]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.util.Map<java.lang.String, com.apidoc.example.CustomType>>")
-    dataTypeFromField("map[map[[CustomType]]]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.util.Map<java.lang.String, com.apidoc.example.CustomType[]>>")
+    dataTypeFromField("map[map[[CustomType]]]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.List<com.apidoc.example.CustomType>>>")
   }
 
   "replaceEnumsPrefixWithModels" should "replace enums prefix correctly" in {

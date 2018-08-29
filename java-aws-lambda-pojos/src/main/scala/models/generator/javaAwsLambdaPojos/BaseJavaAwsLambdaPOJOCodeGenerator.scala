@@ -3,19 +3,14 @@ package models.generator.javaAwsLambdaPojos
 import java.io.IOException
 
 import javax.lang.model.element.Modifier
-import com.fasterxml.jackson.annotation._
-import com.fasterxml.jackson.core.Version
-import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.squareup.javapoet.AnnotationSpec.Builder
 import com.squareup.javapoet._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.{Enum, Method, Model, ParameterLocation, Resource, ResponseCodeInt, Service, Union}
 import lib.Text
 import lib.generator.CodeGenerator
-import org.joda.time.DateTime
-import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 import com.amazonaws.services.dynamodbv2.datamodeling._
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum
 
 import scala.collection.JavaConverters._
 
@@ -84,6 +79,17 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
         TypeSpec.enumBuilder(className)
           .addModifiers(Modifier.PUBLIC)
           .addJavadoc(apiDocComments)
+
+      enum.attributes.foreach(attribute => {
+        attribute.name match {
+          case "DynamoDBTypeConvertedEnum" =>{
+            val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBTypeConvertedEnum])
+            builder.addAnnotation(jsonAnnotationBuilder.build)
+          }
+          case _=> {}
+        }
+
+      })
 
       enum.description.map(builder.addJavadoc(_))
 
