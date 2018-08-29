@@ -133,7 +133,7 @@ trait JavaAwsLambdaPOJOUtil {
   }
 
   def toEnumName(input: String): String = {
-    Text.safeName(input.replaceAll("\\.","_").replaceAll("-","_")).toUpperCase()
+    Text.safeName(input.replaceAll("\\.","_").replaceAll("-","_"))
   }
 
   def makeNameSpace(namespace: String): String = {
