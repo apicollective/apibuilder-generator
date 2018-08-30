@@ -72,12 +72,12 @@ class KotlinGenerator
 
       enum.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
-        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("\"" + value.name + "\"").addAnnotation(annotation.build()).build())
+        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder().addAnnotation(annotation.build()).build())
       })
 
       val annotationJsonEnumDefaultValue = AnnotationSpec.builder(classOf[JsonEnumDefaultValue]).build()
       val annotationJsonProperty = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + undefinedEnumName + "\"").build()
-      builder.addEnumConstant(toEnumName(undefinedEnumName), TypeSpec.anonymousClassBuilder("\"" + undefinedEnumName + "\"").addAnnotation(annotationJsonEnumDefaultValue).addAnnotation(annotationJsonProperty).build())
+      builder.addEnumConstant(toEnumName(undefinedEnumName), TypeSpec.anonymousClassBuilder().addAnnotation(annotationJsonEnumDefaultValue).addAnnotation(annotationJsonProperty).build())
 
       val nameField = "jsonProperty"
       val nameFieldType = ClassName.bestGuess("kotlin.String")
@@ -196,10 +196,9 @@ class KotlinGenerator
       val fromBuilder = FunSpec.builder("parseJson").addModifiers(KModifier.PUBLIC).addParameter("json", ClassName.bestGuess("kotlin.String"))
       val modelType = ClassName.bestGuess(modelsNameSpace + "." + className)
       fromBuilder.returns(modelType)
-      fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue( json, ${modelType.simpleName() + "::class.java"})")
+      fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue( json, ${modelType.getSimpleName() + "::class.java"})")
       companionBuilder.addFunction(fromBuilder.build)
-      builder.companionObject(companionBuilder.build())
-
+      builder.addType(companionBuilder.build())
 
       makeFile(modelsNameSpace, className, builder)
     }
@@ -408,7 +407,7 @@ class KotlinGenerator
                   .build()
 
                 val errorPayloadTypeString = errorPayloadType match {
-                  case cn: ClassName => cn.simpleName()
+                  case cn: ClassName => cn.getSimpleName()
                   case pt: ParameterizedTypeName => pt.toString()
                   case _ => errorPayloadType.toString()
                 }
@@ -622,7 +621,7 @@ class KotlinGenerator
         .endControlFlow()
         .build()
 
-      commonNetworkErrorsBuilder.companionObject(TypeSpec.companionObjectBuilder()
+      commonNetworkErrorsBuilder.addType(TypeSpec.companionObjectBuilder()
         .addFunction(FunSpec.builder(processCommonNetworkErrorString)
           .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
           .addCode(processCommonFuncBody)
