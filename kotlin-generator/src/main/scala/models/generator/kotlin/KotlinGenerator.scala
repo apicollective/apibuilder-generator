@@ -33,6 +33,7 @@ class KotlinGenerator
   class GeneratorHelper(service: Service) {
 
     private val nameSpace = makeNameSpace(service.namespace)
+    private val sharedNameSpace = "io.apibuilder.app"
     private val modelsNameSpace = toModelsNameSpace(nameSpace)
     private val enumsNameSpace = toEnumsNameSpace(nameSpace)
 
@@ -42,12 +43,12 @@ class KotlinGenerator
     //Errors
     private val errorsHelperClassName = "ErrorsHelper"
 
-    val commonNetworkErrorsClassName = new ClassName(modelsNameSpace, "CommonNetworkErrors")
-    val eitherErrorTypeClassName = new ClassName(modelsNameSpace, "EitherCallOrCommonNetworkError")
+    val commonNetworkErrorsClassName = new ClassName(sharedNameSpace, "CommonNetworkErrors")
+    val eitherErrorTypeClassName = new ClassName(sharedNameSpace, "EitherCallOrCommonNetworkError")
     val callErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CallError")
     val commonErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CommonNetworkError")
 
-    val apiNetworkCallResponseTypeClassName = new ClassName(modelsNameSpace, "ApiNetworkCallResponse")
+    val apiNetworkCallResponseTypeClassName = new ClassName(sharedNameSpace, "ApiNetworkCallResponse")
     val errorResponsesString = "ErrorResponses"
     private val processCommonNetworkErrorString = "processCommonNetworkError"
 
@@ -691,7 +692,7 @@ class KotlinGenerator
 
 
       //output file
-      val fileBuilder = FileSpec.builder(modelsNameSpace, fileName)
+      val fileBuilder = FileSpec.builder(sharedNameSpace, fileName)
         .addType(apiNetworkCallResponseBuilder.build())
         .addType(eitherErrorBuilder.build())
         .addType(commonNetworkErrorsBuilder.build())
@@ -745,9 +746,11 @@ class KotlinGenerator
     //write one file with multiple classes
     def makeFile(name: String, fileBuilder: FileSpec.Builder): File = {
       val sw = new StringWriter(1024)
+      val fileSpec = fileBuilder.build()
+      val packageName = fileSpec.getPackageName()
       try {
-        fileBuilder.build().writeTo(sw)
-        File(s"${name}.kt", Some(createDirectoryPath(modelsNameSpace)), sw.toString)
+        fileSpec.writeTo(sw)
+        File(s"${name}.kt", Some(createDirectoryPath(packageName)), sw.toString)
       } finally {
         sw.close()
       }
