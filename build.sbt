@@ -48,7 +48,7 @@ lazy val javaAwsLambdaPojos = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimum := 0.0),
+    Seq(ScoverageKeys.coverageMinimum := 69.5),
     libraryDependencies += "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.163"
   )
 
