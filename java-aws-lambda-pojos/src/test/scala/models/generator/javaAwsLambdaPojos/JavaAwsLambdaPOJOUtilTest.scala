@@ -67,7 +67,7 @@ class JavaAwsLambdaPOJOUtilTest
     dataTypeFromField("long", "com.apidoc.example").toString should be ("java.lang.Long")
     dataTypeFromField("uuid", "com.apidoc.example").toString should be ("java.util.UUID")
     dataTypeFromField("date-iso8601", "com.apidoc.example").toString should be ("java.util.Date")
-    dataTypeFromField("date-time-iso8601", "com.apidoc.example").toString should be ("org.joda.time.DateTime")
+    dataTypeFromField("date-time-iso8601", "com.apidoc.example").toString should be ("java.util.Date")
   }
 
   "isModelNameWithPackage" should "return correctly" in {
@@ -87,7 +87,7 @@ class JavaAwsLambdaPOJOUtilTest
 
   it should "handle maps" in {
     dataTypeFromField("map[long]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.lang.Long>")
-    dataTypeFromField("map[date-time-iso8601]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, org.joda.time.DateTime>")
+    dataTypeFromField("map[date-time-iso8601]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.util.Date>")
     dataTypeFromField("map[string]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, java.lang.String>")
     dataTypeFromField("map[CustomType]", "com.apidoc.example").toString should be ("java.util.Map<java.lang.String, com.apidoc.example.CustomType>")
   }

@@ -11,6 +11,8 @@ import lib.Text
 import lib.generator.CodeGenerator
 import com.amazonaws.services.dynamodbv2.datamodeling._
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum
+import me.geso.tinyvalidator.constraints._
+import lombok.Data
 
 import scala.collection.JavaConverters._
 
@@ -138,6 +140,8 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
 
       model.description.map(builder.addJavadoc(_))
 
+      builder.addAnnotation(classOf[Data])
+
       model.attributes.foreach(attribute => {
         attribute.name match {
           case "DynamoDBTable" =>{
@@ -171,7 +175,9 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
         val javaDataType = dataTypeFromField(field.`type`, modelsNameSpace)
 
         val fieldBuilder = FieldSpec.builder(javaDataType, fieldCamelCaseName).addModifiers(Modifier.PROTECTED)
-        builder.addField(fieldBuilder.build)
+        if(field.required){
+          fieldBuilder.addAnnotation(classOf[NotNull])
+        }
 
         val methodName = Text.snakeToCamelCase(s"get_${fieldSnakeCaseName}")
 
@@ -189,9 +195,29 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
               jsonAnnotationBuilder.addMember("attributeName","$S",(attribute.value \ "attributeName").as[String])
               getterBuilder.addAnnotation(jsonAnnotationBuilder.build)
             }
+            case "size"=> {
+              val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[Size])
+              //What follows is some very strange behavior required to placate Scala's type system.
+              jsonAnnotationBuilder.addMember("min","$L",new Integer((attribute.value \ "min").as[Int]))
+              jsonAnnotationBuilder.addMember("max","$L",new Integer((attribute.value \ "max").as[Int]))
+              fieldBuilder.addAnnotation(jsonAnnotationBuilder.build)
+            }
+            case "pattern"=> {
+              val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[Pattern])
+              jsonAnnotationBuilder.addMember("regexp","$S",(attribute.value \ "regexp").as[String])
+              fieldBuilder.addAnnotation(jsonAnnotationBuilder.build)
+            }
+            case "httpUrl"=> {
+              fieldBuilder.addAnnotation(classOf[HttpUrl])
+            }
+            case "email"=>{
+              fieldBuilder.addAnnotation(classOf[Email])
+            }
             case _ =>
           }
         })
+
+        builder.addField(fieldBuilder.build)
 
         if(shouldAnnotateAsDyanmoDb && field.attributes.length == 0){
           val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBAttribute])

@@ -62,7 +62,15 @@ class TestAwsLambdaJavaPOJOClasses
               "name": "curb_weight",
               "type": "integer",
               "required": true,
-              "attributes": []
+              "attributes": [
+              {
+                "name": "size",
+                "value": {
+                "min": 1,
+                "max": 5000
+              }
+             }
+            ]
           }],
           "attributes": [],
           "description": "Model of a car."
