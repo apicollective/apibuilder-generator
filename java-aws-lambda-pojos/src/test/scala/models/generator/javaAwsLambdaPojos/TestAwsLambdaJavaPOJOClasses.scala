@@ -3,11 +3,20 @@ package models.generator.javaAwsLambdaPojos
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{FunSpec, Matchers}
 import com.github.javaparser.JavaParser
+import com.github.javaparser.ast.{CompilationUnit, NodeList}
+import com.github.javaparser.ast.body.{AnnotationDeclaration, FieldDeclaration, MethodDeclaration}
+import com.github.javaparser.ast.expr.{AnnotationExpr, MemberValuePair, NormalAnnotationExpr}
 
+import scala.collection.JavaConverters._
+import scala.compat.java8.OptionConverters._
 
 class TestAwsLambdaJavaPOJOClasses
   extends FunSpec
     with Matchers {
+
+  def memberValuePairsToSimpleMap(pairs: java.util.List[MemberValuePair]): Map[String,String] = {
+    (for(i <- 0 until pairs.size()) yield (pairs.get(i).getNameAsString -> pairs.get(i).getValue.toString)).toMap
+  }
 
   describe("for a model with 2 enum fields") {
 
@@ -47,12 +56,32 @@ class TestAwsLambdaJavaPOJOClasses
               "name": "guid",
               "type": "uuid",
               "required": true,
-              "attributes": []
+              "attributes": [
+                {
+                 "name": "DynamoDBHashKey",
+                 "value": {
+                   "attributeName": "modelId"
+                 }
+               }
+              ]
           }, {
               "name": "name",
               "type": "string",
               "required": true,
-              "attributes": []
+              "attributes": [
+                {
+                 "name": "pattern",
+                 "value": {
+                    "regexp": "[A-Z][a-z]+"
+                 }
+                },
+                {
+                  "name": "DynamoDBRangeKey",
+                  "value": {
+                    "attributeName": "name"
+                  }
+                }
+              ]
           }, {
               "name": "type",
               "type": "car_type",
@@ -72,7 +101,14 @@ class TestAwsLambdaJavaPOJOClasses
              }
             ]
           }],
-          "attributes": [],
+          "attributes": [
+             {
+              "name": "DynamoDBTable",
+              "value": {
+                "tableName": "models"
+             }
+           }
+          ],
           "description": "Model of a car."
       }],
       "resources": [{
@@ -141,7 +177,66 @@ class TestAwsLambdaJavaPOJOClasses
     files.size should be(2)
     files(0).name should be("CarType.java")
     files(1).name should be("Model.java")
-    files.foreach { file => JavaParser.parse(file.contents) }
+
+    val carTypeCompiled = JavaParser.parse(files(0).contents)
+    val modelCompiled = JavaParser.parse(files(1).contents)
+
+    val javaAnnotations = modelCompiled.findAll(classOf[NormalAnnotationExpr])
+    val annotations: Set[String] = (for(i <- 0 until javaAnnotations.size()) yield javaAnnotations.get(i).getNameAsString).toSet
+    it("should label DynamoDBTable")(assert(annotations.contains("DynamoDBTable")))
+
+    val fields = modelCompiled.findAll(classOf[FieldDeclaration]).asScala
+
+    fields.map(field => {
+      assert(field.isProtected)
+      val javaAnnotations: NodeList[AnnotationExpr] = field.getAnnotations
+      val annotations: Set[String] = (for(i <- 0 until javaAnnotations.size()) yield javaAnnotations.get(i).getNameAsString).toSet
+      assert(annotations.contains("NotNull"))
+      field.getVariables.get(0).getNameAsString match {
+        case "curb_weight" => it("should annotate sized variables")(assert(annotations.contains("Size")))
+        case "name" => it("should annotate regex patterns")(assert(annotations.contains("Pattern")))
+        case _ =>
+      }
+    })
+
+    val methods = modelCompiled.findAll(classOf[MethodDeclaration]).asScala
+
+    methods.map(method => {
+      val javaAnnotations: NodeList[AnnotationExpr] = method.getAnnotations
+      val annotations: Set[String] = (for(i <- 0 until javaAnnotations.size()) yield javaAnnotations.get(i).getNameAsString).toSet
+
+      method.getNameAsString match {
+        case "getGuid" => it("should annotate DynamoDBHashKey")(assert(annotations.contains("DynamoDBHashKey")))
+        case "getModel"=> it("should annotate DynamoDBRangeKey")(assert(annotations.contains("DynamoDBRangeKey")))
+        case _ =>
+      }
+    })
+
+    //walk the javaAnnotations and confirm that they have the right members
+    for(i <- 0 until javaAnnotations.size()){
+      val annotationExpr = javaAnnotations.get(i)
+      val pairs = memberValuePairsToSimpleMap(annotationExpr.getPairs)
+      annotationExpr.getNameAsString match {
+        case "Size" => {
+          it("should have the minimum size")(assert(pairs.get("min").get == "1"))
+          it("should have the maximum size")(assert(pairs.get("max").get == "5000"))
+        }
+        case "Pattern" => {
+          it("should have any regexes we added")(assert(pairs.get("regexp").get == "\"[A-Z][a-z]+\""))
+        }
+        case "DynamoDBTable" => {
+          it("should have the correct table name")(assert(pairs.get("tableName").get == "\"models\""))
+        }
+        case "DynamoDBRangeKey" => {
+          it("should have the correct range key annotation")(assert(pairs.get("attributeName").get == "\"name\""))
+        }
+        case "DynamoDBHashKey" => {
+          it("should have the correct hash key annotation")(assert(pairs.get("attributeName").get == "\"modelId\""))
+        }
+        case _ =>
+      }
+    }
+
   }
 
 }
