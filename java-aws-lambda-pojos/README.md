@@ -60,3 +60,55 @@ For those arguments you need to include one of the following attributes in their
     }
 }
 ```
+TinyValidator Annotation
+------
+Additionally the generator uses [TinyValidator](https://github.com/tokuhirom/tinyvalidator) to suppport validation. Any field marked as required will be annotated with
+
+```
+@NotNull
+```
+
+Other annotations need to be specified in the field's attributes thusly:
+
+```
+{
+    "name": "size",
+    "value": {
+    "min": 1,
+    "max": 5000
+},
+{
+    "name": "pattern",
+    "value": {
+        "regexp": "[A-Z][a-z]+"
+    }
+},
+{
+    "name": "email",
+    "value":{
+    
+    }
+},
+{
+    "name": "httpUrl",
+    "value": {
+    
+    }
+}
+```
+
+These will produce the annotations
+
+```
+@Size(
+      min = 1,
+      max = 5000
+      )
+@Pattern(
+    regexp = "[A-Z][a-z]+"
+    )
+@Email
+@HttpUrl
+```
+
+respectively
