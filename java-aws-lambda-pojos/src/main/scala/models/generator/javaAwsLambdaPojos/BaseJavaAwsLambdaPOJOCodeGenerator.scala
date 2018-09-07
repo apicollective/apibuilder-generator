@@ -11,6 +11,7 @@ import lib.Text
 import lib.generator.CodeGenerator
 import com.amazonaws.services.dynamodbv2.datamodeling._
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import me.geso.tinyvalidator.constraints._
 import lombok.Data
 
@@ -141,6 +142,9 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
       model.description.map(builder.addJavadoc(_))
 
       builder.addAnnotation(classOf[Data])
+      val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[JsonIgnoreProperties])
+      jsonAnnotationBuilder.addMember("ignoreUnknown",CodeBlock.builder().add("true").build)
+      builder.addAnnotation(jsonAnnotationBuilder.build)
 
       model.attributes.foreach(attribute => {
         attribute.name match {

@@ -184,6 +184,7 @@ class TestAwsLambdaJavaPOJOClasses
     val javaAnnotations = modelCompiled.findAll(classOf[NormalAnnotationExpr])
     val annotations: Set[String] = (for(i <- 0 until javaAnnotations.size()) yield javaAnnotations.get(i).getNameAsString).toSet
     it("should label DynamoDBTable")(assert(annotations.contains("DynamoDBTable")))
+    it("should label all classes with JsonIgnoreProperties")(assert(annotations.contains("JsonIgnoreProperties")))
 
     val fields = modelCompiled.findAll(classOf[FieldDeclaration]).asScala
 
