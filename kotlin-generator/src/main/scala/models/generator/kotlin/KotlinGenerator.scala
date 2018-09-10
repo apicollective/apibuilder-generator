@@ -127,7 +127,7 @@ class KotlinGenerator
           .addMember("%L",
             AnnotationSpec.builder(classOf[JsonSubTypes.Type])
               .addMember("value = %L", dataTypeFromField(u.`type`, nameSpace, service) + "::class")
-              .addMember("name = %S", u.`type`)
+              .addMember("name = %S", u.discriminatorValue)
               .build()
           )
       })
