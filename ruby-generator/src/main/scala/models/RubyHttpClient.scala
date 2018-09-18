@@ -186,10 +186,10 @@ module HttpClient
 
       request = klass.send(:new, uri)
 
-      curl = ['curl']
-      if klass != Net::HTTP::Get
-        curl << "-X%s" % klass.name.split("::").last.upcase
-      end
+      # DEBUG curl = ['curl']
+      # DEBUG if klass != Net::HTTP::Get
+        # DEBUG curl << "-X%s" % klass.name.split("::").last.upcase
+      # DEBUG end
 
       if @body
         # DEBUG path = "/tmp/rest_client.tmp"
@@ -199,7 +199,7 @@ module HttpClient
       end
 
       if @auth
-        curl << "-u \"%s:%s\"" % [@auth.username, @auth.password]
+        # DEBUG curl << "-u \"%s:%s\"" % [@auth.username, @auth.password]
         Preconditions.check_state(!@header_keys_lower_case.include?("authorization"),
                                   "Cannot specify both an Authorization header and an auth instance")
         user_pass = "%s:%s" % [@auth.username, @auth.password]
@@ -208,11 +208,11 @@ module HttpClient
       end
 
       @headers.each { |key, value|
-        curl <<  "-H \"%s: %s\"" % [key, value]
+        # DEBUG curl <<  "-H \"%s: %s\"" % [key, value]
         request.add_field(key, value)
       }
 
-      curl << "'%s%s'" % [@base_uri, path]
+      # DEBUG curl << "'%s%s'" % [@base_uri, @path]
       # DEBUG puts curl.join(" ")
 
       raw_response = @http_handler.instance(@base_uri, request.path).execute(request)
