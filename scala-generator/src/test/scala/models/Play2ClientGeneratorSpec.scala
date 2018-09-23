@@ -158,6 +158,37 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("Play 2.7.x generator basic output") {
+    val service = models.TestHelper.generatorApiService
+    val ssd = new ScalaService(service)
+    val invocationForm = InvocationForm(service, Seq.empty, None)
+    val play27Config = ScalaClientMethodConfigs.Play27("whatever", None)
+    val output = Play27ClientGenerator.invoke(invocationForm).right.get
+
+    it("is valid scala code") {
+      TestHelper.assertValidScalaSourceFiles(output)
+    }
+
+    it("has non deprecated request with-methods") {
+      val rawContent = output.map(_.contents).mkString("\n")
+      rawContent.contains("addHttpHeaders(").shouldBe(true)
+      rawContent.contains("addQueryStringParameters(").shouldBe(true)
+      rawContent.contains("withHeaders(").shouldBe(false)
+      rawContent.contains("withQueryString(").shouldBe(false)
+    }
+
+    it("generates built-in types") {
+      val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
+      Play27ClientGenerator.invoke(InvocationForm(service = service)) match {
+        case Left(errors) => fail(errors.mkString(", "))
+        case Right(sourceFiles) => {
+          sourceFiles.size shouldBe 1
+          models.TestHelper.assertEqualsFile("/generators/play-27-built-in-types.txt", sourceFiles.head.contents)
+        }
+      }
+    }
+  }
+
 /*
   it("model, enum and union use case - https://github.com/mbryzek/apidoc/issues/384") {
     val json = models.TestHelper.readFile("lib/src/test/resources/generators/play-2-union-model-enum-service.json")
