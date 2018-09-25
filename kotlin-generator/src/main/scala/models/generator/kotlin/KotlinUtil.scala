@@ -233,4 +233,8 @@ trait KotlinUtil {
     new ClassName("kotlin", "String")
   }
 
+  def getKotlinPairClassName(): ClassName = {
+    new ClassName("kotlin", "Pair")
+  }
+
 }
