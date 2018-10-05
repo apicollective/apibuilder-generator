@@ -237,7 +237,7 @@ class JavaClassesSpec extends FunSpec with Matchers with MockitoSugar {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 4
-        models.TestHelper.assertEqualsFile("/generators/java-built-in-types.txt", sourceFiles.map(_.contents).mkString("\n"))
+        models.TestHelper.assertEqualsFile("/generators/java-built-in-types", sourceFiles.map(_.contents).mkString("\n"))
       }
     }
   }

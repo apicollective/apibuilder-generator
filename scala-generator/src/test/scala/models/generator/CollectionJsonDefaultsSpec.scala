@@ -14,13 +14,13 @@ class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get
     val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
-    models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-case-class.txt", code)
+    models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-case-class", code)
   }
 
   it("user_patch case classes") {
     val model = ssd.models.find(_.name == "UserPatch").get
     val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
-    models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-patch-case-class.txt", code)
+    models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-patch-case-class", code)
   }
 
   it("generates expected code for play 2.3 client") {
@@ -29,7 +29,7 @@ class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
 
-        models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-play-23.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-play-23", sourceFiles.head.contents)
       }
     }
   }
@@ -39,7 +39,7 @@ class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-ning-client.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-ning-client", sourceFiles.head.contents)
       }
     }
   }
@@ -49,7 +49,7 @@ class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-ahc-client.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-ahc-client", sourceFiles.head.contents)
       }
     }
   }

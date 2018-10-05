@@ -12,7 +12,7 @@ class ResponsesWithUnitTypeSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/example-response-with-unit-type.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/example-response-with-unit-type", sourceFiles.head.contents)
       }
     }
   }

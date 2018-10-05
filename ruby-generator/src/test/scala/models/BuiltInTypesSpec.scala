@@ -12,7 +12,7 @@ class BuiltInTypesSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/generators/ruby-built-in-types.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/generators/ruby-built-in-types", sourceFiles.head.contents)
       }
     }
   }

@@ -13,7 +13,7 @@ class ExampleUnionTypesSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/example-union-types-play-23.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/example-union-types-play-23", sourceFiles.head.contents)
       }
     }
   }
@@ -23,7 +23,7 @@ class ExampleUnionTypesSpec extends FunSpec with Matchers {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(sourceFiles) => {
         sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/example-union-types-ning-client.txt", sourceFiles.head.contents)
+        models.TestHelper.assertEqualsFile("/example-union-types-ning-client", sourceFiles.head.contents)
       }
     }
   }

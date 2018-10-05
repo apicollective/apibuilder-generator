@@ -15,7 +15,7 @@ class Play2StandaloneModelsJsonSpec extends FunSpec with Matchers {
         val scalaSourceCode = files.head.contents
         models.TestHelper.assertValidScalaSourceCode(scalaSourceCode)
         models.TestHelper.assertEqualsFile(
-          "/generators/play-2-standalone-json-spec-quality.txt",
+          "/generators/play-2-standalone-json-spec-quality",
           scalaSourceCode
         )
       }

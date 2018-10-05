@@ -23,7 +23,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
     errorResponse.datatype.name should be("Seq[io.apibuilder.generator.v0.models.Error]")
 
     val contents = new ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
-    models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package.txt", contents)
+    models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package", contents)
   }
 
   it("only generates error wrappers for model classes (not primitives)") {
@@ -72,7 +72,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
 
     val ssd = ScalaService(models.TestHelper.service(json))
     val contents = new ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
-    models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
+    models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models", contents)
   }
 
   describe("Play 2.2.x generator basic output") {
@@ -82,7 +82,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(sourceFiles) => {
           sourceFiles.size shouldBe 1
-          models.TestHelper.assertEqualsFile("/generators/play-22-built-in-types.txt", sourceFiles.head.contents)
+          models.TestHelper.assertEqualsFile("/generators/play-22-built-in-types", sourceFiles.head.contents)
         }
       }
     }
@@ -95,7 +95,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(sourceFiles) => {
           sourceFiles.size shouldBe 1
-          models.TestHelper.assertEqualsFile("/generators/play-23-built-in-types.txt", sourceFiles.head.contents)
+          models.TestHelper.assertEqualsFile("/generators/play-23-built-in-types", sourceFiles.head.contents)
         }
       }
     }
@@ -108,7 +108,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(sourceFiles) => {
           sourceFiles.size shouldBe 1
-          models.TestHelper.assertEqualsFile("/generators/play-24-built-in-types.txt", sourceFiles.head.contents)
+          models.TestHelper.assertEqualsFile("/generators/play-24-built-in-types", sourceFiles.head.contents)
         }
       }
     }
@@ -121,7 +121,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(sourceFiles) => {
           sourceFiles.size shouldBe 1
-          models.TestHelper.assertEqualsFile("/generators/play-25-built-in-types.txt", sourceFiles.head.contents)
+          models.TestHelper.assertEqualsFile("/generators/play-25-built-in-types", sourceFiles.head.contents)
         }
       }
     }
@@ -152,7 +152,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(sourceFiles) => {
           sourceFiles.size shouldBe 1
-          models.TestHelper.assertEqualsFile("/generators/play-26-built-in-types.txt", sourceFiles.head.contents)
+          models.TestHelper.assertEqualsFile("/generators/play-26-built-in-types", sourceFiles.head.contents)
         }
       }
     }
@@ -163,7 +163,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
     val json = models.TestHelper.readFile("lib/src/test/resources/generators/play-2-union-model-enum-service.json")
     val ssd = ScalaService(models.TestHelper.service(json))
     val contents = ScalaClientMethodGenerator(clientMethodConfig, ssd).errorPackage()
-    models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models.txt", contents)
+    models.TestHelper.assertEqualsFile("/generators/play2-client-generator-spec-errors-package-no-models", contents)
   }
  */
 }
