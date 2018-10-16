@@ -738,9 +738,9 @@ module Io
                 end
 
                 if @body
-                  # DEBUG path = "/tmp/rest_client.tmp"
-                  # DEBUG File.open(path, "w") { |os| os << @body.to_s }
-                  # DEBUG curl << "-d@%s" % path
+                  # DEBUG tmpfile = "/tmp/rest_client.tmp"
+                  # DEBUG File.open(tmpfile, "w") { |os| os << @body.to_s }
+                  # DEBUG curl << "-d@%s" % tmpfile
                   request.body = @body
                 end
 
