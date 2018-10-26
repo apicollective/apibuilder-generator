@@ -5,7 +5,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-val scalaVer = "2.12.6"
+val scalaVer = "2.12.7"
 
 scalaVersion in ThisBuild := scalaVer
 
@@ -61,7 +61,7 @@ lazy val scalaGenerator = project
   .in(file("scala-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 80.7))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 85.0))
 
 lazy val rubyGenerator = project
   .in(file("ruby-generator"))
@@ -96,12 +96,12 @@ lazy val kotlinGenerator = project
       "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.6",
       //"com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.6",
       "org.threeten" % "threetenbp" % "1.3.6",
-      "com.squareup" % "kotlinpoet" % "1.0.0-RC1",
+      "com.squareup" % "kotlinpoet" % "1.0.0-RC2",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.41" % "test",
       "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-      "org.mockito" % "mockito-core" % "2.21.0" % "test"
+      "org.mockito" % "mockito-core" % "2.23.0" % "test"
     )
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 95.15, ScoverageKeys.coverageFailOnMinimum := true))
@@ -113,7 +113,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-    "org.mockito" % "mockito-core" % "2.21.0" % "test",
+    "org.mockito" % "mockito-core" % "2.23.0" % "test",
     "com.github.javaparser" % "javaparser-core" % "3.5.10" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "com.squareup" % "javapoet" % "1.11.1",

@@ -1059,10 +1059,10 @@ ${headers.rubyModuleConstants.indent(2)}
   // TODO should be encapsulated in the RubyDatatype model
   private def asHash(varName: String, dt: Datatype): String = {
     dt match {
-      case _: Datatype.Primitive => varName
-      case Datatype.Container.List(_: Datatype.Primitive) => varName
-      case Datatype.Container.Map(_: Datatype.Primitive) => varName
-      case Datatype.Container.Option(_: Datatype.Primitive) => varName
+      case p: Datatype.Primitive => primitiveAsHash(varName, p)
+      case Datatype.Container.List(p: Datatype.Primitive) => primitiveAsHash(varName, p)
+      case Datatype.Container.Map(p: Datatype.Primitive) => primitiveAsHash(varName, p)
+      case Datatype.Container.Option(p: Datatype.Primitive) => primitiveAsHash(varName, p)
 
       case Datatype.Container.List(inner) =>
         s"$varName.map { |o| ${asHash("o", inner)} }"
@@ -1076,6 +1076,12 @@ ${headers.rubyModuleConstants.indent(2)}
       case Datatype.UserDefined.Enum(_) => s"$varName.value"
 
       case _: Datatype.UserDefined => s"$varName.to_hash"
+    }
+  }
+  private[this] def primitiveAsHash(varName: String, p: Datatype.Primitive): String = {
+    p.name match {
+      case "decimal" => s"${varName}.to_f.to_s"
+      case _ => varName
     }
   }
 

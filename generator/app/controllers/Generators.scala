@@ -375,6 +375,17 @@ object Generators {
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s018Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "http4s_0_19",
+        name = "Http4s 0.19",
+        description = Some("Http4s 0.19 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.19/client/'>http4s client</a>"),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.http4s.Http4s019Generator)
     )
   ).sortBy(_.metaData.key)
 }

@@ -3,7 +3,6 @@ package io.apibuilder.http4s.test.server
 import org.http4s.dsl.{io => _, _}
 import cats.effect._
 import cats.implicits._
-import scala.language.higherKinds
 import io.apibuilder.http4s.imported.models.json._
 import io.apibuilder.http4s.test.models.json._
 
@@ -134,7 +133,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
 
-  def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
+  def service()(implicit sync: Sync[F]) = org.http4s.HttpRoutes.of[F] {
     case _req @ GET -> Root / "path-enum-local" / EnumVal(id) if apiVersionMatch(_req) =>
       getPathEnumLocalById(_req, id).flatMap {
         case GetPathEnumLocalByIdResponse.HTTP200(headers) => Ok(headers: _*)

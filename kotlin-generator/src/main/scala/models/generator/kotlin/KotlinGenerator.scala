@@ -97,7 +97,9 @@ class KotlinGenerator
       makeFile(enumsNameSpace, className, builder)
     }
 
-    def getRetrofitReturnTypeWrapperClass(): ClassName = classToClassName(classOf[Single[Void]])
+    def getRetrofitSingleTypeWrapperClass(): ClassName = classToClassName(classOf[Single[Void]])
+
+    def getRetrofitResponseTypeWrapperClass(): ClassName = classToClassName(classOf[retrofit2.Response[Void]])
 
     def generateUnionType(union: Union, service: Service): File = {
       val className = toClassName(union.name)
@@ -176,10 +178,10 @@ class KotlinGenerator
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
         val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
-        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
+        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNull() else kotlinDataType.asNullable())
         constructorWithParams.addParameter(constructorParameter.build)
         propSpecs.add(
-          PropertySpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
+          PropertySpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNull() else kotlinDataType.asNullable())
             .initializer(fieldCamelCaseName)
             .addAnnotation(annotation.build())
             .addAnnotation(getterAnnotation.build())
@@ -287,7 +289,7 @@ class KotlinGenerator
 
             maybeAnnotationClass.map(annotationClass => {
               val parameterType: TypeName = dataTypeFromField(parameter.`type`, nameSpace, service)
-              val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNullable() else parameterType.asNullable())
+              val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNull() else parameterType.asNullable())
 
               parametersCache += (param.build())
 
@@ -335,8 +337,12 @@ class KotlinGenerator
 
           maybeSuccessfulResponse.map(successfulResponse => {
             val returnType = dataTypeFromField(successfulResponse.`type`, nameSpace, service)
-            val retrofitWrappedClassname = getRetrofitReturnTypeWrapperClass()
-            method.returns(ParameterizedTypeName.get(retrofitWrappedClassname, returnType))
+            method.returns(
+              ParameterizedTypeName.get(
+                getRetrofitSingleTypeWrapperClass(),
+                ParameterizedTypeName.get(
+                  getRetrofitResponseTypeWrapperClass,
+                  returnType)))
           })
 
           builder.addFunction(method.build)
@@ -447,17 +453,24 @@ class KotlinGenerator
                 combinedFunction.addParameter(param)
               }
             )
-            combinedFunction.addStatement("return %T(client." + methodName + "(" + parametersCache.map({
+            combinedFunction.addStatement("return %T(\n" +
+              "   client." + methodName + "(" + parametersCache.map({
               _.getName
-            }).mkString(",") + "), toError)", apiNetworkCallResponseTypeClassName)
+              }).mkString(",") + ")\n"
+              + "     .map{ response -> \n"
+              + "         if(response.isSuccessful)\n"
+              + "           response.body()?.let { body -> Pair(body, response.code())}\n"
+              + "         else\n"
+              + "           throw HttpException(response)}\n"
+              + "     .map{it}\n"
+              + ", toError)", apiNetworkCallResponseTypeClassName)
+
 
 
             callObjectBuilder.addFunction(combinedFunction.build())
             callObjectBuilder.addType(callErrorResopnseSealedClassBuilder.build())
             builder.addType(callObjectBuilder.build())
           }
-
-
         })
       }
 
@@ -672,23 +685,31 @@ class KotlinGenerator
 
       val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
 
-      val singleParameterizedByN = ParameterizedTypeName.get(classToClassName(classOf[Single[Void]]), n)
+      val singleParameterized =
+        ParameterizedTypeName.get(
+          getRetrofitSingleTypeWrapperClass,
+          ParameterizedTypeName.get(
+            getKotlinPairClassName(),
+            n,
+            getKotlinIntClassName())
+        )
+
       val throwableToELambda = LambdaTypeName.get(null, Array(throwableTypeName), e)
       val apiNetworkCallResponseBuilder = TypeSpec.classBuilder(apiNetworkCallResponseTypeClassName)
         .addModifiers(KModifier.PUBLIC, KModifier.DATA)
         .addTypeVariable(n)
         .addTypeVariable(e)
         .primaryConstructor(FunSpec.constructorBuilder()
-          .addParameter("networkSingle", singleParameterizedByN)
+          .addParameter("networkSingle", singleParameterized)
           .addParameter("toError", throwableToELambda)
           .build())
-        .addProperty(PropertySpec.builder("networkSingle", singleParameterizedByN)
+        .addProperty(PropertySpec.builder("networkSingle", singleParameterized)
           .initializer("networkSingle")
           .build())
         .addProperty(PropertySpec.builder("toError", throwableToELambda)
           .initializer("toError")
           .build())
-        .addKdoc(s"Utility data class to combine a call and it's error responses\n" + kdocClassMessage)
+        .addKdoc(s"Utility data class to combine a call with its response code and its error responses\n" + kdocClassMessage)
 
 
       //output file

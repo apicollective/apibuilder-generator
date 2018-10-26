@@ -66,6 +66,30 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should not include ("fs2.Task")
       scalaSourceCode should not include ("cats.effect.IO")
       scalaSourceCode should include ("Response[F]")
+      scalaSourceCode should include ("import scala.language.higherKinds")
+      scalaSourceCode should include ("org.http4s.circe.jsonOf[F,")
+      scalaSourceCode should include ("org.http4s.circe.jsonEncoderOf[F,")
+      scalaSourceCode should include (" Left")
+      scalaSourceCode should include (" Right")
+      scalaSourceCode should include (".raiseError")
+      scalaSourceCode should include (".pure")
+    }
+
+    it("Http4s 0.19 generator produces valid Scala source code") {
+      val service = models.TestHelper.generatorApiService
+      val ssd = new ScalaService(service)
+      val invocationForm = new InvocationForm(service, Seq.empty, None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s019(namespace = "whatever", baseUrl = None)
+      val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
+      val scalaSourceCode = client.generate()
+      assertValidScalaSourceCode(scalaSourceCode)
+      scalaSourceCode should not include ("org.joda")
+      scalaSourceCode should not include ("scalaz.concurrent.Task")
+      scalaSourceCode should not include ("-\\/")
+      scalaSourceCode should not include ("\\/-")
+      scalaSourceCode should not include ("fs2.Task")
+      scalaSourceCode should not include ("cats.effect.IO")
+      scalaSourceCode should include ("Response[F]")
       scalaSourceCode should include ("org.http4s.circe.jsonOf[F,")
       scalaSourceCode should include ("org.http4s.circe.jsonEncoderOf[F,")
       scalaSourceCode should include (" Left")
@@ -95,11 +119,23 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should not include ("import cats.implicits._")
     }
 
-    it("Generator produces valid url form marshalling code") {
+    it("Http4s 0.18 generator produces valid url form marshalling code") {
       val service = models.TestHelper.referenceApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
       val clientMethodConfig = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None)
+      val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
+      val scalaSourceCode = client.generate()
+      assertValidScalaSourceCode(scalaSourceCode)
+      scalaSourceCode should include ("formBody = formPayload,")
+      scalaSourceCode should include (""""active" -> active.asJson.noSpaces""")
+    }
+
+    it("Http4s 0.19 generator produces valid url form marshalling code") {
+      val service = models.TestHelper.referenceApiService
+      val ssd = new ScalaService(service)
+      val invocationForm = new InvocationForm(service, Seq.empty, None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s019(namespace = "whatever", baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
