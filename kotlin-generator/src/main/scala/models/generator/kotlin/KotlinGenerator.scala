@@ -178,10 +178,10 @@ class KotlinGenerator
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
         val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
-        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
+        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNull() else kotlinDataType.asNullable())
         constructorWithParams.addParameter(constructorParameter.build)
         propSpecs.add(
-          PropertySpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
+          PropertySpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNull() else kotlinDataType.asNullable())
             .initializer(fieldCamelCaseName)
             .addAnnotation(annotation.build())
             .addAnnotation(getterAnnotation.build())
@@ -289,7 +289,7 @@ class KotlinGenerator
 
             maybeAnnotationClass.map(annotationClass => {
               val parameterType: TypeName = dataTypeFromField(parameter.`type`, nameSpace, service)
-              val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNullable() else parameterType.asNullable())
+              val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNull() else parameterType.asNullable())
 
               parametersCache += (param.build())
 
