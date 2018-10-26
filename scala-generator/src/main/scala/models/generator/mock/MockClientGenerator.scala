@@ -4,7 +4,6 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text._
-import models.http4s.mock.Http4s018MockClientGenerator
 
 import scala.models.ApidocComments
 import scala.generator._

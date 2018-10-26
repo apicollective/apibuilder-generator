@@ -1,0 +1,123 @@
+package me.gheine.status.codes.v0.server
+
+import org.http4s.dsl.{io => _, _}
+import cats.effect._
+import cats.implicits._
+import me.gheine.status.codes.v0.models.json._
+
+private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
+
+  implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
+
+  implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.Instant] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[java.time.Instant](p => java.time.Instant.parse(p.value))("java.time.Instant")
+
+  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.LocalDate] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[java.time.LocalDate](p => java.time.LocalDate.parse(p.value))("java.time.LocalDate")
+
+  implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[java.util.UUID](p => java.util.UUID.fromString(p.value))("java.util.UUID")
+
+
+  object ApiVersion {
+    val ApiVersionMajor = {
+      "X-Apidoc-Version-Major".ci
+    }
+
+    def apply(req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
+      case Some(v) if v.value == "0" => true
+      case _ => false
+    }
+  }
+
+
+}
+
+trait FooRoutes[F[_]] extends Matchers[F] {
+
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
+
+  sealed trait Get200Response
+
+  object Get200Response {
+    case class HTTP200(value: String, headers: Seq[org.http4s.Header] = Nil) extends Get200Response
+    case class HTTP401(authenticate: org.http4s.headers.`WWW-Authenticate`, headers: Seq[org.http4s.Header] = Nil) extends Get200Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get200Response
+  }
+
+  def get200(
+    _req: org.http4s.Request[F]
+  ): F[Get200Response]
+
+  sealed trait Get205Response
+
+  object Get205Response {
+    case class HTTP205(headers: Seq[org.http4s.Header] = Nil) extends Get205Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get205Response
+  }
+
+  def get205(
+    _req: org.http4s.Request[F]
+  ): F[Get205Response]
+
+  sealed trait Get300Response
+
+  object Get300Response {
+    case class HTTP300(location: org.http4s.Uri, headers: Seq[org.http4s.Header] = Nil) extends Get300Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get300Response
+  }
+
+  def get300(
+    _req: org.http4s.Request[F]
+  ): F[Get300Response]
+
+  sealed trait Get401Response
+
+  object Get401Response {
+    case class HTTP401(value: String, authenticate: org.http4s.headers.`WWW-Authenticate`, headers: Seq[org.http4s.Header] = Nil) extends Get401Response
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends Get401Response
+  }
+
+  def get401(
+    _req: org.http4s.Request[F]
+  ): F[Get401Response]
+
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
+
+  def service()(implicit sync: Sync[F]) = org.http4s.HttpRoutes.of[F] {
+    case _req @ GET -> Root / "foos" / "200" if apiVersionMatch(_req) =>
+      get200(_req).flatMap {
+        case Get200Response.HTTP200(value, headers) => Ok(value, headers: _*)
+        case Get200Response.HTTP401(authenticate, headers) => Unauthorized(authenticate, headers: _*)
+        case Get200Response.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "foos" / "200" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "foos" / "205" if apiVersionMatch(_req) =>
+      get205(_req).flatMap {
+        case Get205Response.HTTP205(headers) => ResetContent(headers: _*)
+        case Get205Response.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "foos" / "205" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "foos" / "300" if apiVersionMatch(_req) =>
+      get300(_req).flatMap {
+        case Get300Response.HTTP300(location, headers) => MultipleChoices(location, headers: _*)
+        case Get300Response.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "foos" / "300" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "foos" / "401" if apiVersionMatch(_req) =>
+      get401(_req).flatMap {
+        case Get401Response.HTTP401(value, authenticate, headers) => Unauthorized(authenticate, value, headers: _*)
+        case Get401Response.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "foos" / "401" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+  }
+}
