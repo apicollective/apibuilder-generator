@@ -86,7 +86,7 @@ trait FooRoutes[F[_]] extends Matchers[F] {
 
   def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
 
-  def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
+  def service()(implicit sync: Sync[F]) = org.http4s.HttpRoutes.of[F] {
     case _req @ GET -> Root / "foos" / "200" if apiVersionMatch(_req) =>
       get200(_req).flatMap {
         case Get200Response.HTTP200(value, headers) => Ok(value, headers: _*)

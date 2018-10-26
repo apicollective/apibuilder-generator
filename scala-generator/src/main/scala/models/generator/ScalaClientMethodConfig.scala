@@ -316,7 +316,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override def requestClass: String = s"org.http4s.Request[$asyncType]"
     override def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$asyncType, $datatypeName]"
     override def messageClass: String = s"org.http4s.Message[$asyncType]"
-    override def httpServiceClass: String = s"org.http4s.HttpService[$asyncType]"
+    override def httpServiceClass: String = s"org.http4s.HttpRoutes.of[$asyncType]"
     override def generateCirceJsonOf(datatypeName: String): String = s"org.http4s.circe.jsonOf[$asyncType, $datatypeName]"
     override def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$asyncType, $datatypeName]"
 

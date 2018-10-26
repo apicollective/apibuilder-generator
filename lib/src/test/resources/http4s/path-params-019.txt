@@ -400,7 +400,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
 
-  def service()(implicit sync: Sync[F]) = org.http4s.HttpService[F] {
+  def service()(implicit sync: Sync[F]) = org.http4s.HttpRoutes.of[F] {
     case _req @ GET -> Root / "string" / id if apiVersionMatch(_req) =>
       getStringById(_req, id).flatMap {
         case GetStringByIdResponse.HTTP200(headers) => Ok(headers: _*)
