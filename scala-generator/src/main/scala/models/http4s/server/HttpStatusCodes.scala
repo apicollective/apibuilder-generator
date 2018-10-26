@@ -12,7 +12,7 @@ trait StatusCode {
   def applyArgs(config: ScalaClientMethodConfigs.Http4s): String = config match {
     case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
       params(config).map(_._1).mkString(", ") + ").putHeaders(headers: _*"
-    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+    case ScalaClientMethodConfigs.Http4s018(_, _) | ScalaClientMethodConfigs.Http4s019(_, _) =>
       (params(config).map(_._1) ++ Seq("headers: _*")).mkString(", ")
   }
   protected def params(config: ScalaClientMethodConfigs.Http4s): Seq[(String, String)] = bodyType.toSeq.map(typ => "value" -> typ)
@@ -33,13 +33,13 @@ case class WWWAuthenticateStatusCode(code: Int, name: String, override val bodyT
   override def params(config: ScalaClientMethodConfigs.Http4s) = super.params(config) ++ (config match {
     case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
       Seq("challenge" -> "org.http4s.Challenge", "challenges" -> "Seq[org.http4s.Challenge] = Nil")
-    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+    case ScalaClientMethodConfigs.Http4s018(_, _) | ScalaClientMethodConfigs.Http4s019(_, _) =>
       Seq("authenticate" -> "org.http4s.headers.`WWW-Authenticate`")
   })
   override def applyArgs(config: ScalaClientMethodConfigs.Http4s) = config match {
     case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
       "challenge, challenges: _*).putHeaders(headers: _*"
-    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+    case ScalaClientMethodConfigs.Http4s018(_, _) | ScalaClientMethodConfigs.Http4s019(_, _)=>
       bodyType.fold(
         "authenticate, headers: _*"
       )(_ =>

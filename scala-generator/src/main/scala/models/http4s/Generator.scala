@@ -25,6 +25,13 @@ object Http4s018Generator extends Generator {
     new Http4s018MockClientGenerator(ssd, form.userAgent, config).generateCode()
 }
 
+object Http4s019Generator extends Generator {
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s018(namespace, baseUrl)
+
+  override def generateMockClientCode(form: InvocationForm, ssd: ScalaService, config: ScalaClientMethodConfig): String =
+    new Http4s018MockClientGenerator(ssd, form.userAgent, config).generateCode()
+}
+
 trait Generator extends CodeGenerator {
   def mkConfig(namespace: String, baseUrl: Option[String]): ScalaClientMethodConfigs.Http4s
 
