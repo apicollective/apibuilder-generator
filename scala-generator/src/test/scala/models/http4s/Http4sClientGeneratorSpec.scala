@@ -66,6 +66,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should not include ("fs2.Task")
       scalaSourceCode should not include ("cats.effect.IO")
       scalaSourceCode should include ("Response[F]")
+      scalaSourceCode should include ("import scala.language.higherKinds")
       scalaSourceCode should include ("org.http4s.circe.jsonOf[F,")
       scalaSourceCode should include ("org.http4s.circe.jsonEncoderOf[F,")
       scalaSourceCode should include (" Left")

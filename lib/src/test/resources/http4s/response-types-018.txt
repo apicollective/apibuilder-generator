@@ -3,6 +3,7 @@ package io.apibuilder.http4s.test.server
 import org.http4s.dsl.{io => _, _}
 import cats.effect._
 import cats.implicits._
+import scala.language.higherKinds
 import io.apibuilder.http4s.test.models.json._
 
 private[server] trait Matchers[F[_]] extends Http4sDsl[F] {

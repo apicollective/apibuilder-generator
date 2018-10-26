@@ -280,7 +280,8 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
       s"""
          |import org.http4s.dsl.{io => _, _}
          |import cats.effect._
-         |import cats.implicits._""".stripMargin
+         |import cats.implicits._
+         |import scala.language.higherKinds""".stripMargin
 
 
     override val routeKind = "trait"
@@ -289,7 +290,8 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val matchersExtends = Some(s" extends Http4sDsl[$asyncType]")
     override val clientImports: String = """import cats.effect._
                                            |import cats.implicits._
-                                           |import io.circe.syntax._""".stripMargin
+                                           |import io.circe.syntax._
+                                           |import scala.language.higherKinds""".stripMargin
 
     override val closeClient = None
 
