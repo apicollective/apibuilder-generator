@@ -135,6 +135,13 @@ object ScalaClientMethodConfigs {
     override val canSerializeUuid = true
   }
 
+  case class Play27(namespace: String, baseUrl: Option[String]) extends Play {
+    override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestUriMethod: Option[String] = None
+    override val expectsInjectedWsClient = true
+    override val canSerializeUuid = true
+  }
+
   trait Ning extends ScalaClientMethodConfig {
     override def pathEncode(value: String) = s"""_root_.$namespace.PathSegment.encode($value, "UTF-8")"""
     override val responseStatusMethod = "getStatusCode"
@@ -279,6 +286,52 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$asyncType, $datatypeName]"
     override def messageClass: String = s"org.http4s.Message[$asyncType]"
     override def httpServiceClass: String = s"org.http4s.HttpService[$asyncType]"
+    override def generateCirceJsonOf(datatypeName: String): String = s"org.http4s.circe.jsonOf[$asyncType, $datatypeName]"
+    override def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$asyncType, $datatypeName]"
+
+    override def serverImports: String =
+      s"""
+         |import org.http4s.dsl.{io => _, _}
+         |import cats.effect._
+         |import cats.implicits._
+         |import scala.language.higherKinds""".stripMargin
+
+
+    override val routeKind = "trait"
+    override def wrappedAsyncType(instance: String = "") = Some(s"$instance[$asyncType]")
+    override val routeExtends: Option[String] = Some(s" extends Matchers[$asyncType]")
+    override val matchersExtends = Some(s" extends Http4sDsl[$asyncType]")
+    override val clientImports: String = """import cats.effect._
+                                           |import cats.implicits._
+                                           |import io.circe.syntax._
+                                           |import scala.language.higherKinds""".stripMargin
+
+    override val closeClient = None
+
+    override val matcherKind: String = "trait"
+    override val matchersImport: String = ""
+    override val httpClient: String = "httpClient"
+
+    override val asyncTypeImport: String = "import cats.effect._"
+  }
+
+  case class Http4s019(namespace: String, baseUrl: Option[String]) extends Http4s {
+    override val asyncType = "F"
+    override def asyncTypeParam(constraint: Option[String] = None) = Some(s"F[_]${constraint.map(c => s": $c").getOrElse("")}")
+    override val leftType = "Left"
+    override val rightType = "Right"
+    override val monadTransformerInvoke = "value"
+    override val responseClass = s"org.http4s.Response[$asyncType]"
+    override val extraClientCtorArgs: Option[String] = Some(s",\n  httpClient: org.http4s.client.Client[$asyncType]")
+    override val extraClientObjectMethods = Some(s"""
+implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]
+      """)
+    override val asyncSuccess: String = "pure"
+    override def asyncFailure: String = "raiseError"
+    override def requestClass: String = s"org.http4s.Request[$asyncType]"
+    override def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$asyncType, $datatypeName]"
+    override def messageClass: String = s"org.http4s.Message[$asyncType]"
+    override def httpServiceClass: String = s"org.http4s.HttpRoutes.of[$asyncType]"
     override def generateCirceJsonOf(datatypeName: String): String = s"org.http4s.circe.jsonOf[$asyncType, $datatypeName]"
     override def generateCirceJsonEncoderOf(datatypeName: String): String = s"org.http4s.circe.jsonEncoderOf[$asyncType, $datatypeName]"
 

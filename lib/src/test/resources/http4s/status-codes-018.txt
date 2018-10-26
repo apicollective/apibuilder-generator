@@ -3,6 +3,7 @@ package me.gheine.status.codes.v0.server
 import org.http4s.dsl.{io => _, _}
 import cats.effect._
 import cats.implicits._
+import scala.language.higherKinds
 import me.gheine.status.codes.v0.models.json._
 
 private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
