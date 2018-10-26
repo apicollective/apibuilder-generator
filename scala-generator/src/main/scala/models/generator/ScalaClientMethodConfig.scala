@@ -214,6 +214,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def monadTransformerInvoke: String
     def asyncFailure: String
     def requestClass: String = "org.http4s.Request"
+    def requestType:  String = s"$asyncType[$requestClass]"
     def messageClass: String = "org.http4s.Message"
     def httpServiceClass: String = "org.http4s.HttpService"
     def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$datatypeName]"
@@ -231,6 +232,12 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
                                              |def closeAsyncHttpClient(): Unit = {
                                              |  asyncHttpClient.shutdownNow()
                                              |}""".stripMargin)
+
+    def reqAndMaybeAuthAndBody: String = """
+                                            |val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
+                                            |formBody.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+                                            |} else body.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)"""
+
     def matchersImport: String
     def httpClient: String
   }
@@ -314,6 +321,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val asyncSuccess: String = "pure"
     override def asyncFailure: String = "raiseError"
     override def requestClass: String = s"org.http4s.Request[$asyncType]"
+    override def requestType:  String = requestClass
     override def generateDecodeResult(datatypeName: String): String = s"org.http4s.DecodeResult[$asyncType, $datatypeName]"
     override def messageClass: String = s"org.http4s.Message[$asyncType]"
     override def httpServiceClass: String = s"org.http4s.HttpRoutes.of[$asyncType]"
@@ -342,5 +350,10 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val httpClient: String = "httpClient"
 
     override val asyncTypeImport: String = "import cats.effect._"
+
+    override def reqAndMaybeAuthAndBody: String = """
+                                           |val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
+                                           |formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
+                                           |} else body.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)"""
   }
 }
