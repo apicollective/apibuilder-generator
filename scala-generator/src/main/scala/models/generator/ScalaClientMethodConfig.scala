@@ -233,10 +233,9 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
                                              |  asyncHttpClient.shutdownNow()
                                              |}""".stripMargin)
 
-    def reqAndMaybeAuthAndBody: String = """
-                                            |val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
+    def reqAndMaybeAuthAndBody: String = """val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
                                             |formBody.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
-                                            |} else body.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)"""
+                                            |} else body.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)""".stripMargin
 
     def matchersImport: String
     def httpClient: String
@@ -351,9 +350,8 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
 
     override val asyncTypeImport: String = "import cats.effect._"
 
-    override def reqAndMaybeAuthAndBody: String = """
-                                           |val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
+    override def reqAndMaybeAuthAndBody: String = """val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
                                            |formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
-                                           |} else body.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)"""
+                                           |} else body.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)""".stripMargin
   }
 }
