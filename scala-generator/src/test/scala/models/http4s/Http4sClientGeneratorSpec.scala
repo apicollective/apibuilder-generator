@@ -75,11 +75,11 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should include (".pure")
     }
 
-    it("Http4s 0.19 generator produces valid Scala source code") {
+    it("Http4s 0.20 generator produces valid Scala source code") {
       val service = models.TestHelper.generatorApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s019(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
@@ -131,11 +131,11 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       scalaSourceCode should include (""""active" -> active.asJson.noSpaces""")
     }
 
-    it("Http4s 0.19 generator produces valid url form marshalling code") {
+    it("Http4s 0.20 generator produces valid url form marshalling code") {
       val service = models.TestHelper.referenceApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s019(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)

@@ -315,7 +315,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val asyncTypeImport: String = "import cats.effect._"
   }
 
-  case class Http4s019(namespace: String, baseUrl: Option[String]) extends Http4s {
+  case class Http4s020(namespace: String, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "F"
     override def asyncTypeParam(constraint: Option[String] = None) = Some(s"F[_]${constraint.map(c => s": $c").getOrElse("")}")
     override val leftType = "Left"

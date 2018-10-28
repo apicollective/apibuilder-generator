@@ -378,14 +378,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
-        key = "http4s_0_19",
-        name = "Http4s 0.19",
-        description = Some("Http4s 0.19 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.19/client/'>http4s client</a>"),
+        key = "http4s_0_20",
+        name = "Http4s 0.20",
+        description = Some(
+          """Http4s 0.20 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.20/client/'>http4s client</a>.
+            |Note: http4s 0.19 has been withdrawn by the authors due to issues with versioning. 0.20 is the supported http4s version.""".stripMargin),
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
-      codeGenerator = Some(scala.models.http4s.Http4s019Generator)
+      codeGenerator = Some(scala.models.http4s.Http4s020Generator)
     )
   ).sortBy(_.metaData.key)
 }
