@@ -335,13 +335,9 @@ class KotlinGenerator
               response.code.asInstanceOf[ResponseCodeInt].value < 299
           })
 
-          var isUnitResponse = false
 
           maybeSuccessfulResponse.map(successfulResponse => {
             val returnType = dataTypeFromField(successfulResponse.`type`, nameSpace, service)
-            if(successfulResponse.`type` == Datatype.Primitive.Unit.name){
-              isUnitResponse = true
-            }
             method.returns(
               ParameterizedTypeName.get(
                 getRetrofitSingleTypeWrapperClass(),
@@ -349,6 +345,10 @@ class KotlinGenerator
                   getRetrofitResponseTypeWrapperClass,
                   returnType)))
           })
+
+          val isUnitResponse = maybeSuccessfulResponse.map(successfulResponse =>
+            successfulResponse.`type` == Datatype.Primitive.Unit.name
+          ).getOrElse(false)
 
           builder.addFunction(method.build)
 
