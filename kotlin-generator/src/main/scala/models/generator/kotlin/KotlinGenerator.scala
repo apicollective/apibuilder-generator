@@ -335,6 +335,7 @@ class KotlinGenerator
               response.code.asInstanceOf[ResponseCodeInt].value < 299
           })
 
+
           maybeSuccessfulResponse.map(successfulResponse => {
             val returnType = dataTypeFromField(successfulResponse.`type`, nameSpace, service)
             method.returns(
@@ -344,6 +345,10 @@ class KotlinGenerator
                   getRetrofitResponseTypeWrapperClass,
                   returnType)))
           })
+
+          val isUnitResponse = maybeSuccessfulResponse.map(successfulResponse =>
+            successfulResponse.`type` == Datatype.Primitive.Unit.name
+          ).getOrElse(false)
 
           builder.addFunction(method.build)
 
@@ -453,13 +458,15 @@ class KotlinGenerator
                 combinedFunction.addParameter(param)
               }
             )
+
+            val succesParseString = if (isUnitResponse) { "           Pair(Unit, response.code())\n" } else { "           response.body()?.let { body -> Pair(body, response.code())}\n" }
             combinedFunction.addStatement("return %T(\n" +
               "   client." + methodName + "(" + parametersCache.map({
               _.getName
               }).mkString(",") + ")\n"
               + "     .map{ response -> \n"
               + "         if(response.isSuccessful)\n"
-              + "           response.body()?.let { body -> Pair(body, response.code())}\n"
+              + succesParseString
               + "         else\n"
               + "           throw HttpException(response)}\n"
               + "     .map{it}\n"
