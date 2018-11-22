@@ -339,6 +339,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override def serverImports: String =
       s"""
          |import org.http4s.dsl.{io => _, _}
+         |import org.http4s.implicits._ 
          |import cats.effect._
          |import cats.implicits._""".stripMargin
 
