@@ -83,26 +83,17 @@ object TestHelper extends Matchers {
 
   def assertValidScalaSourceFile(file: File): Unit = {
     file.name.length shouldBe > (0)
-    assertValidScalaSourceCode(file.contents)
+    assertValidScalaSourceCode(file.contents, Some(file.name))
   }
 
-  def assertValidScalaSourceCode(scalaSourceCode: String): Unit = {
-    import scala.tools.nsc.Global
-    import scala.tools.nsc.Settings
-    import scala.tools.nsc.reporters.StoreReporter
+  def assertValidScalaSourceCode(scalaSourceCode: String, filename: Option[String] = None): Unit = {
+    import scala.meta._
 
-    val settings = new Settings
-    settings.embeddedDefaults(getClass.getClassLoader)
-    settings.usejavacp.value = true
-    val reporter = new StoreReporter
-    val global = Global(settings, reporter)
-    val run = new global.Run
-    global.phase = run.parserPhase
-    run.cancel
-    val parser = global.newUnitParser(scalaSourceCode)
-    parser.parse()
-    withClue(reporter.infos.toString) {
-      reporter.errorCount shouldBe 0
+    val virtualFile = Input.VirtualFile(filename.getOrElse("filename.scala"), scalaSourceCode)
+    val parseResult = virtualFile.parse[Source]
+    parseResult.toEither match {
+      case Left(parseError) => fail(s"Not valid Scala source. ${parseError.toString()}")
+      case Right(sourceTree) => { /* cool, we have valid source code */ }
     }
   }
 

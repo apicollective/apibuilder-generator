@@ -99,9 +99,9 @@ lazy val kotlinGenerator = project
       "com.squareup" % "kotlinpoet" % "1.0.0-RC2",
       "com.squareup.retrofit2" % "retrofit" % "2.3.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
-      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.2.41" % "test",
+      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.3.10" % "test",
       "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-      "org.mockito" % "mockito-core" % "2.23.0" % "test"
+      "org.mockito" % "mockito-core" % "2.23.4" % "test"
     )
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 95.15, ScoverageKeys.coverageFailOnMinimum := true))
@@ -113,9 +113,10 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-    "org.mockito" % "mockito-core" % "2.23.0" % "test",
+    "org.mockito" % "mockito-core" % "2.23.4" % "test",
     "com.github.javaparser" % "javaparser-core" % "3.5.10" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
+    "org.scalameta" %% "scalameta" % "4.0.0" % "test",
     "com.squareup" % "javapoet" % "1.11.1",
     "com.squareup.retrofit2" % "retrofit" % "2.3.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.1.3"

@@ -38,11 +38,12 @@ class TestHelperSpec extends FunSpec with Matchers {
           |class Foobar extends MyTrait
           |
         """.stripMargin
-      TestHelper.assertValidScalaSourceCode(code)
+      TestHelper.assertValidScalaSourceCode(code, None)
     }
 
     it("throws exception when source code is invalid") {
-      intercept[TestFailedException] { TestHelper.assertValidScalaSourceCode("invalid Scala code") }
+      val ex = intercept[TestFailedException] { TestHelper.assertValidScalaSourceCode("invalid Scala code", Some("Invalid.scala")) }
+      ex.getMessage should startWith ("Not valid Scala source")
     }
   }
 }
