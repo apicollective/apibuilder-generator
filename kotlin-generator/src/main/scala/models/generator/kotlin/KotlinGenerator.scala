@@ -178,10 +178,10 @@ class KotlinGenerator
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
         val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
-        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNull() else kotlinDataType.asNullable())
+        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, kotlinDataType.copy(!field.required, kotlinDataType.getAnnotations))
         constructorWithParams.addParameter(constructorParameter.build)
         propSpecs.add(
-          PropertySpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNull() else kotlinDataType.asNullable())
+          PropertySpec.builder(fieldCamelCaseName, kotlinDataType.copy(!field.required, kotlinDataType.getAnnotations))
             .initializer(fieldCamelCaseName)
             .addAnnotation(annotation.build())
             .addAnnotation(getterAnnotation.build())
@@ -289,7 +289,7 @@ class KotlinGenerator
 
             maybeAnnotationClass.map(annotationClass => {
               val parameterType: TypeName = dataTypeFromField(parameter.`type`, nameSpace, service)
-              val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNull() else parameterType.asNullable())
+              val param = ParameterSpec.builder(toParamName(parameter.name, true), parameterType.copy(!parameter.required, parameterType.getAnnotations))
 
               parametersCache += (param.build())
 
@@ -426,11 +426,11 @@ class KotlinGenerator
 
 
                 if (dataTypes.keySet.contains(errorResponse.`type`)) {
-                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${errorPayloadTypeString + "::class.java"}))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
+                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${errorPayloadTypeString + "::class.java"}))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
                     callErrorEitherErrorTypeClassName,
                     commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
                 } else {
-                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
+                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
                     callErrorEitherErrorTypeClassName,
                     commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
                 }
