@@ -50,9 +50,9 @@ lazy val javaAwsLambdaPojos = project
   .settings(
     Seq(ScoverageKeys.coverageMinimum := 69.5),
     libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.163",
-      "me.geso" % "tinyvalidator" % "0.9.0",
-      "org.projectlombok" % "lombok" % "1.18.2"
+      "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.461",
+      "me.geso" % "tinyvalidator" % "0.9.1",
+      "org.projectlombok" % "lombok" % "1.18.4"
     )
   )
 
@@ -93,11 +93,10 @@ lazy val kotlinGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.6",
-      //"com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.6",
-      "org.threeten" % "threetenbp" % "1.3.6",
-      "com.squareup" % "kotlinpoet" % "1.0.0-RC2",
-      "com.squareup.retrofit2" % "retrofit" % "2.3.0",
+      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.7",
+      "org.threeten" % "threetenbp" % "1.3.8",
+      "com.squareup" % "kotlinpoet" % "1.0.0-RC3",
+      "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.3.10" % "test",
       "org.scalatest" %% "scalatest" % "3.0.5" % "test",
@@ -114,14 +113,14 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % "3.0.5" % "test",
     "org.mockito" % "mockito-core" % "2.23.4" % "test",
-    "com.github.javaparser" % "javaparser-core" % "3.5.10" % "test",
+    "com.github.javaparser" % "javaparser-core" % "3.8.3" % "test",
     "org.scala-lang" % "scala-compiler" % scalaVer % "test",
     "org.scalameta" %% "scalameta" % "4.0.0" % "test",
     "com.squareup" % "javapoet" % "1.11.1",
-    "com.squareup.retrofit2" % "retrofit" % "2.3.0",
-    "io.reactivex.rxjava2" % "rxjava" % "2.1.3"
+    "com.squareup.retrofit2" % "retrofit" % "2.5.0",
+    "io.reactivex.rxjava2" % "rxjava" % "2.2.4"
   ),
-  libraryDependencies += guice,
+ libraryDependencies += guice,
   scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified"),
   sources in (Compile,doc) := Seq.empty,
   publishArtifact in (Compile, packageDoc) := false
