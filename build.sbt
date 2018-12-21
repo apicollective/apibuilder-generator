@@ -93,7 +93,7 @@ lazy val kotlinGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.7",
+      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.8",
       "org.threeten" % "threetenbp" % "1.3.8",
       "com.squareup" % "kotlinpoet" % "1.0.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
