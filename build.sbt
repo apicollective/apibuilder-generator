@@ -118,10 +118,11 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalameta" %% "scalameta" % "4.0.0" % "test",
     "com.squareup" % "javapoet" % "1.11.1",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
-    "io.reactivex.rxjava2" % "rxjava" % "2.2.4"
+    "org.typelevel" %% "cats-core" % "1.5.0",
+    "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
   ),
  libraryDependencies += guice,
-  scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified"),
+  scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified", "-Ypartial-unification"),
   sources in (Compile,doc) := Seq.empty,
   publishArtifact in (Compile, packageDoc) := false
 )
