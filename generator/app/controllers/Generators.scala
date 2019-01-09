@@ -395,7 +395,7 @@ object Generators {
         name = "Play 2.6"
       ),
       status = lib.generator.Status.InDevelopment,
-      codeGenerator = None
+      codeGenerator = Some(scala.models.play.Play26Generator)
     )
   ).sortBy(_.metaData.key)
 }
