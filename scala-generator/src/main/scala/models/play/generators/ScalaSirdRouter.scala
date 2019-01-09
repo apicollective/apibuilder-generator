@@ -9,9 +9,6 @@ import scala.generator._
 
 object ScalaSirdRouter extends CodeGenerator {
 
-  def extractor(enum: ScalaEnum): String =
-    s"""val ${enum.datatype.toVariableName} = new PathBindableExtractor[${enum.qualifiedName}]"""
-
   def handler(operation: ScalaOperation): String = {
     val name = operation.name
     val arguments = (operation.pathParameters ++ operation.queryParameters)
@@ -27,7 +24,9 @@ object ScalaSirdRouter extends CodeGenerator {
       case ScalaPrimitive.Double => Some("double")
       case ScalaPrimitive.Integer => Some("int")
       case ScalaPrimitive.Long => Some("long")
-      case enum: ScalaPrimitive.Enum => Some(s"Extractors.${enum.toVariableName}")
+      case ScalaPrimitive.DateTimeIso8601Joda => Some("Bindables.Core.pathBindableExtractorDateTimeIso8601")
+      case ScalaPrimitive.DateIso8601Joda => Some("Bindables.Core.pathBindableExtractorDateIso8601")
+      case enum: ScalaPrimitive.Enum => Some(s"Bindables.Models.pathBindableExtractor${enum.shortName}")
       case _ => None
     }
 
@@ -106,7 +105,7 @@ object ScalaSirdRouter extends CodeGenerator {
 
   def contents(service: ScalaService) = {
     val packagePrefix = service.namespaces.base
-    val extractors = service.enums.map(extractor)
+    val bindables = scala.models.Play2Bindables(service).build
     val routers = service.resources.map(router)
 
     s"""
@@ -117,11 +116,7 @@ object ScalaSirdRouter extends CodeGenerator {
       |import play.api.routing.sird._
       |import play.api.routing.Router.Routes
       |
-      |object Extractors {
-      |  import io.flow.marketing.gateway.v0.Bindables.Models._
-      |
-      |  ${extractors.mkString("\n  ")}
-      |}
+      |${bindables}
       |
       |${routers.mkString("\n")}
     """.stripMargin.trim
