@@ -12,6 +12,7 @@ case class Play2Bindables(ssd: ScalaService) {
       "object Bindables {",
       Seq(
         "import play.api.mvc.{PathBindable, QueryStringBindable}",
+        "import play.api.routing.sird.PathBindableExtractor",
         buildImports(),
         buildObjectCore(),
         buildObjectModels().getOrElse(""),
@@ -26,9 +27,11 @@ case class Play2Bindables(ssd: ScalaService) {
 object Core {
   implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
   implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
+  val pathBindableExtractorDateTimeIso8601 = new PathBindableExtractor[_root_.org.joda.time.DateTime]
 
   implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
   implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
+  val pathBindableExtractorDateIso8601 = new PathBindableExtractor[_root_.org.joda.time.LocalDate]
 }
 """.trim
   }
@@ -42,7 +45,8 @@ object Core {
           s"object Models {",
           Seq(
             ssd.namespaces.importStatements(ssd.service).sorted.mkString("\n"),
-            ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n")
+            ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n"),
+            ssd.enums.map { e => buildExtractor(e.name) }.mkString("\n")
           ).filter(_.nonEmpty).mkString("\n\n").indent(2),
           "}"
         ).mkString("\n")
@@ -170,6 +174,13 @@ final case class ApibuilderPathBindable[T](
       s"  override def validValues: Seq[$fullyQualifiedName] = $fullyQualifiedName.all",
       s"}"
     ).mkString("\n")
+  }
+
+  private[models] def buildExtractor(
+    enumName: String
+  ): String = {
+    val fullyQualifiedName = ssd.enumClassName(enumName)
+    s"val pathBindableExtractor$enumName = new PathBindableExtractor[$fullyQualifiedName]"
   }
 
   private[this] def exampleEnumValue(enumName: String): ScalaEnumValue = {
