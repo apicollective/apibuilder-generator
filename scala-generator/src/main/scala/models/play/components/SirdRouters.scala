@@ -3,6 +3,7 @@ package scala.models.play.components
 import cats.data._
 import cats.implicits._
 import scala.generator._
+import scala.models.play.Helpers._
 
 class SirdRouters(service: ScalaService) extends Component {
 
@@ -97,7 +98,7 @@ class SirdRouters(service: ScalaService) extends Component {
     for {
       routes <- resource.operations.toList.traverse(route)
       handlers = resource.operations.map(handler)
-      name = ScalaUtil.toClassName(resource.resource.`type`)
+      name = ScalaUtil.toClassName(resource.resource.plural)
 
     } yield s"""
         |trait ${name}Routes extends SimpleRouter {

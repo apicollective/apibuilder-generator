@@ -5,11 +5,11 @@ import scala.generator.ScalaService
 import scala.models.play.components
 import scala.models.play.Helpers._
 
-class Bindables(scalaService: ScalaService) extends File {
+class Controllers(scalaService: ScalaService) extends File {
 
-  def name() = "Bindables.scala"
+  def name() = "Controllers.scala"
   def content(): ValidatedNel[String, String] =
-    new components.Bindables(scalaService)
+    new components.Controllers(scalaService)
       .code
       .map { code =>
         s"""
