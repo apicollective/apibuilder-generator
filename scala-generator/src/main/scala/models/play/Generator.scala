@@ -10,18 +10,14 @@ object Play26Generator extends CodeGenerator {
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val scalaService = new ScalaService(form.service)
 
-    val bindablesFile = new files.Bindables(scalaService)
-    val sirdRoutersFile = new files.SirdRouters(scalaService)
-    val controllersFile = new files.Controllers(scalaService)
-
-    (bindablesFile.content(), sirdRoutersFile.content(), controllersFile.content())
-      .mapN { case (sirdRoutersFileContent, bindablesFileContent, controllersFileContent) =>
-        Seq(
-          File(bindablesFile.name, contents = bindablesFileContent),
-          File(sirdRoutersFile.name, contents = sirdRoutersFileContent),
-          File(controllersFile.name, contents = controllersFileContent),
-        )
-      }
+    List(
+      new files.Bindables(scalaService),
+      new files.BodyParsers(scalaService),
+      new files.Controllers(scalaService),
+      new files.Json(scalaService),
+      new files.SirdRouters(scalaService)
+    )
+      .traverse(_.file)
       .toEither
       .leftMap(_.toList)
   }

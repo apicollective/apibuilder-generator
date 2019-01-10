@@ -101,30 +101,28 @@ class SirdRouters(service: ScalaService) extends Component {
       name = ScalaUtil.toClassName(resource.resource.plural)
 
     } yield s"""
-        |trait ${name}Routes extends SimpleRouter {
-        |
-        |  ${handlers.mkString("\n").addMargin(2)}
-        |
-        |  override def routes: Routes = {
-        |    ${routes.mkString("\n").addMargin(4)}
-        |  }
-        |}
-      """
+      |trait ${name}Routes extends SimpleRouter {
+      |
+      |  ${handlers.mkString("\n").addMargin(2)}
+      |
+      |  override def routes: Routes = {
+      |    ${routes.mkString("\n").addMargin(4)}
+      |  }
+      |}
+    """
 
   def code(): ValidatedNel[String, String] =
     service.resources.toList.traverse(router)
       .map { routers =>
-        val packagePrefix = service.namespaces.base
-
         s"""
-          |object Routers {
+          |package object routers {
           |  import play.api.mvc.Handler
           |  import play.api.routing.SimpleRouter
           |  import play.api.routing.sird._
           |  import play.api.routing.Router.Routes
           |
-          |  import ${packagePrefix}.Bindables.Core._
-          |  import ${packagePrefix}.Bindables.Models._
+          |  import ${service.namespaces.base}.Bindables.Core._
+          |  import ${service.namespaces.base}.Bindables.Models._
           |
           |  ${routers.mkString("\n").addMargin(2)}
           |}

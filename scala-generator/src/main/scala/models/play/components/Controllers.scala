@@ -32,11 +32,11 @@ class Controllers(service: ScalaService) extends Component {
     val resultOptions = operation.responses.flatMap(resultOption(`type`, _))
 
     s"""
-    |sealed trait ${`type`}
-    |object ${`type`} {
-    |  ${resultOptions.mkString("\n").addMargin(2)}
-    |}
-  """
+      |sealed trait ${`type`}
+      |object ${`type`} {
+      |  ${resultOptions.mkString("\n").addMargin(2)}
+      |}
+    """
   }
 
   def controller(resource: ScalaResource): String = {
@@ -59,10 +59,10 @@ class Controllers(service: ScalaService) extends Component {
     val controllers = service.resources.map(controller)
 
     val str = s"""
-          |object Controllers {
-          |  ${controllers.mkString("\n").addMargin(2)}
-          |}
-        """
+      |package object controllers {
+      |  ${controllers.mkString("\n").addMargin(2)}
+      |}
+    """
 
     Validated.validNel(str)
   }
