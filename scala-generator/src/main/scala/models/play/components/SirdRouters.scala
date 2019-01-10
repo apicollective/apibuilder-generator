@@ -1,16 +1,10 @@
-// https://www.playframework.com/documentation/2.6.x/ScalaSirdRouter
-
-package scala.models.play.generators
-
+package scala.models.play.components
 
 import cats.data._
 import cats.implicits._
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models.{Operation, ParameterLocation, Resource}
-import lib.generator.{CodeGenerator, GeneratorUtil}
 import scala.generator._
 
-object ScalaSirdRouter extends CodeGenerator {
+class SirdRouters(service: ScalaService) extends Component {
 
   def handler(operation: ScalaOperation): String = {
     val name = operation.name
@@ -28,9 +22,9 @@ object ScalaSirdRouter extends CodeGenerator {
     case ScalaPrimitive.Double => Validated.validNel("double".some)
     case ScalaPrimitive.Integer => Validated.validNel("int".some)
     case ScalaPrimitive.Long => Validated.validNel("long".some)
-    case ScalaPrimitive.DateTimeIso8601Joda => Validated.validNel("Bindables.Core.pathBindableExtractorDateTimeIso8601".some)
-    case ScalaPrimitive.DateIso8601Joda => Validated.validNel("Bindables.Core.pathBindableExtractorDateIso8601".some)
-    case enum: ScalaPrimitive.Enum => Validated.validNel(s"Bindables.Models.pathBindableExtractor${enum.shortName}".some)
+    case ScalaPrimitive.DateTimeIso8601Joda => Validated.validNel("pathBindableExtractorDateTimeIso8601".some)
+    case ScalaPrimitive.DateIso8601Joda => Validated.validNel("pathBindableExtractorDateIso8601".some)
+    case enum: ScalaPrimitive.Enum => Validated.validNel(s"pathBindableExtractor${enum.shortName}".some)
     case _ => Validated.invalidNel(s"No extractor defined for '${`type`}')")
   }
 
@@ -108,41 +102,31 @@ object ScalaSirdRouter extends CodeGenerator {
     } yield s"""
         |trait ${name}Routes extends SimpleRouter {
         |
-        |  ${handlers.mkString("\n  ")}
+        |  ${handlers.mkString("\n").addMargin(2)}
         |
         |  override def routes: Routes = {
-        |    ${routes.mkString("\n    ")}
+        |    ${routes.mkString("\n").addMargin(4)}
         |  }
         |}
       """
 
-  def contents(service: ScalaService): ValidatedNel[String, String] =
+  def code(): ValidatedNel[String, String] =
     service.resources.toList.traverse(router)
       .map { routers =>
-        val bindables = scala.models.Play2Bindables(service).build
         val packagePrefix = service.namespaces.base
 
         s"""
-          |package ${packagePrefix}.routes
+          |object Routers {
+          |  import play.api.mvc.Handler
+          |  import play.api.routing.SimpleRouter
+          |  import play.api.routing.sird._
+          |  import play.api.routing.Router.Routes
           |
-          |import play.api.mvc.Handler
-          |import play.api.routing.SimpleRouter
-          |import play.api.routing.sird._
-          |import play.api.routing.Router.Routes
+          |  import ${packagePrefix}.Bindables.Core._
+          |  import ${packagePrefix}.Bindables.Models._
           |
-          |${bindables}
-          |
-          |${routers.mkString("\n")}
+          |  ${routers.mkString("\n").addMargin(2)}
+          |}
         """
       }
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val scalaService = new ScalaService(form.service)
-    contents(scalaService)
-      .map { contents =>
-        Seq(File("Routes.scala", contents = contents.stripMargin.trim))
-      }
-      .toEither
-      .leftMap(_.toList)
-  }
 }
