@@ -6,7 +6,19 @@ import scala.generator.ScalaService
 class Bindables(service: ScalaService) extends Component {
 
   def code(): ValidatedNel[String, String] = {
-    val code = scala.models.Play2Bindables(service).build
+    val bindables = scala.models.Play2Bindables(service)
+      .build
+      .split("\n")
+      .drop(1)
+      .dropRight(1)
+      .mkString("\n")
+
+    val code = s"""
+      |package object bindables {
+      |${bindables}
+      |}
+    """
+
     Validated.validNel(code)
   }
 

@@ -56,7 +56,7 @@ class JsonFormats(service: ScalaService) extends Component {
       |  import play.api.libs.json.{__, JsString, Writes}
       |  import play.api.libs.functional.syntax._
       |
-      |  import io.flow.marketing.gateway.v0.models._
+      |  import ${service.namespaces.base}.models._
       |  ${jsonImports(service).addMargin(2)}
       |
       |  ${uuid(service.namespaces.last).addMargin(2)}
@@ -67,7 +67,7 @@ class JsonFormats(service: ScalaService) extends Component {
       |
       |  ${gen.generateModelsAndUnions().addMargin(2)}
       |}
-    """
+    """.replaceAll(".models.json.", ".json.")
 
     Validated.validNel(code)
   }

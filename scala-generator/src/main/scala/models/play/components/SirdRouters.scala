@@ -121,8 +121,8 @@ class SirdRouters(service: ScalaService) extends Component {
           |  import play.api.routing.sird._
           |  import play.api.routing.Router.Routes
           |
-          |  import ${service.namespaces.base}.Bindables.Core._
-          |  import ${service.namespaces.base}.Bindables.Models._
+          |  import ${service.namespaces.base}.bindables.Core._
+          |  import ${service.namespaces.base}.bindables.Models._
           |
           |  ${routers.mkString("\n").addMargin(2)}
           |}
