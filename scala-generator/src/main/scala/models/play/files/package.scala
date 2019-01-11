@@ -7,20 +7,31 @@ import scala.generator.ScalaService
 import scala.models.play.components
 import scala.models.play.Helpers._
 
-class Bindables(scalaService: ScalaService) extends File(scalaService.namespaces.base, "Bindables.scala", new components.Bindables(scalaService))
-class BodyParsers(scalaService: ScalaService) extends File(scalaService.namespaces.base, "BodyParsers.scala", new components.BodyParsers(scalaService))
-class Controllers(scalaService: ScalaService) extends File(scalaService.namespaces.base, "Controllers.scala", new components.Controllers(scalaService))
-class Json(scalaService: ScalaService) extends File(scalaService.namespaces.base, "Json.scala", new components.Json(scalaService))
-class SirdRouters(scalaService: ScalaService) extends File(scalaService.namespaces.base, "SirdRouters.scala", new components.SirdRouters(scalaService))
+class Bindables(scalaService: ScalaService) extends File(scalaService, "Bindables", new components.Bindables(scalaService))
+class BodyParsers(scalaService: ScalaService) extends File(scalaService, "BodyParsers", new components.BodyParsers(scalaService))
+class Controllers(scalaService: ScalaService) extends File(scalaService, "Controllers", new components.Controllers(scalaService))
+class JsonFormats(scalaService: ScalaService) extends File(scalaService, "JsonFormats", new components.JsonFormats(scalaService))
+class Models(scalaService: ScalaService) extends File(scalaService, "Models", new components.Models(scalaService))
+class SirdRouters(scalaService: ScalaService) extends File(scalaService, "SirdRouters", new components.SirdRouters(scalaService))
 
-abstract class File(packageName: String, name: String, component: components.Component) {
+abstract class File(scalaService: ScalaService, name: String, component: components.Component) {
     def file: ValidatedNel[String, ModelFile] =
-        content.map(content => ModelFile(name, contents = content))
+        content.map { content =>
+            generator.ServiceFileNames.toFile(
+                scalaService.service.namespace,
+                scalaService.service.organization.key,
+                scalaService.service.application.key,
+                scalaService.service.version,
+                name,
+                content,
+                Some("Scala")
+            )
+        }
 
     def content(): ValidatedNel[String, String] =
         component.code.map { code =>
             s"""
-            |package ${packageName}
+            |package ${scalaService.namespaces.base}
             |
             |${code}
             """.clean

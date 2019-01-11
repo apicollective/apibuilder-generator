@@ -14,7 +14,8 @@ object Play26Generator extends CodeGenerator {
       new files.Bindables(scalaService),
       new files.BodyParsers(scalaService),
       new files.Controllers(scalaService),
-      new files.Json(scalaService),
+      new files.JsonFormats(scalaService),
+      new files.Models(scalaService),
       new files.SirdRouters(scalaService)
     )
       .traverse(_.file)

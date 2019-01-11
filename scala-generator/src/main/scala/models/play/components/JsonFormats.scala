@@ -4,7 +4,7 @@ import cats.data.{Validated, ValidatedNel}
 import scala.generator._
 import scala.models.play.Helpers._
 
-class Json(service: ScalaService) extends Component {
+class JsonFormats(service: ScalaService) extends Component {
 
   def uuid(packageName: String): String = s"""
     |private[${packageName}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
