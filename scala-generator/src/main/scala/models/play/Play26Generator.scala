@@ -5,7 +5,22 @@ import lib.generator.CodeGenerator
 
 object Play26Generator extends CodeGenerator {
 
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Left(Seq("Generator not implemented"))
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+    val values = List(
+      files.Client(form),
+      files.MockClient(form),
+      files.Models(form),
+      files.ModelsJson(form),
+      files.ModelsJsonBindables(form),
+      files.Routes(form),
+    )
+    .flatMap {
+      case Right(file) => List(file)
+      case Left(errors) =>
+        println(errors)
+        List.empty
+    }
 
+    Right(values)
+  }
 }
