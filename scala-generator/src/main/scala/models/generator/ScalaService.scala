@@ -1,18 +1,21 @@
 package scala.generator
 
 import io.apibuilder.spec.v0.models._
+
+import scala.models.{Config, JsonConfig, TimeConfig, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
 import play.api.libs.json.JsString
 
-import scala.models.Util
+import scala.generator.ScalaPrimitive.{DateIso8601Java, DateIso8601Joda, DateTimeIso8601Java, DateTimeIso8601Joda, JsonValueAsCirce, JsonValueAsPlay, ObjectAsCirce, ObjectAsPlay}
 
 object ScalaService {
-  def apply(service: Service) = new ScalaService(service)
+  def apply(service: Service, config: Config = Config.PlayDefaultConfig) = new ScalaService(service, config)
 }
 
 class ScalaService(
-  val service: Service
+  val service: Service,
+  config: Config = Config.PlayDefaultConfig,
 ) {
   val namespaces = Namespaces(service.namespace)
 
@@ -35,7 +38,22 @@ class ScalaService(
   val resources: Seq[ScalaResource] = service.resources.map { r => new ScalaResource(this, r) }
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
-    scalaTypeResolver.scalaDatatype(t)
+    def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
+      case ObjectAsPlay if config.jsonLib == JsonConfig.PlayJson => ObjectAsPlay
+      case ObjectAsPlay if config.jsonLib == JsonConfig.CirceJson => ObjectAsCirce
+      case JsonValueAsPlay if config.jsonLib == JsonConfig.PlayJson => JsonValueAsPlay
+      case JsonValueAsPlay if config.jsonLib == JsonConfig.CirceJson => JsonValueAsCirce
+      case DateIso8601Joda if config.timeLib == TimeConfig.JodaTime => DateIso8601Joda
+      case DateIso8601Joda if config.timeLib == TimeConfig.JavaTime => DateIso8601Java
+      case DateTimeIso8601Joda if config.timeLib == TimeConfig.JodaTime => DateTimeIso8601Joda
+      case DateTimeIso8601Joda if config.timeLib == TimeConfig.JavaTime => DateTimeIso8601Java
+      case ScalaDatatype.List(t) => ScalaDatatype.List(convertObjectType(t))
+      case ScalaDatatype.Map(t) => ScalaDatatype.Map(convertObjectType(t))
+      case ScalaDatatype.Option(t) => ScalaDatatype.Option(convertObjectType(t))
+      case o => o
+    }
+
+    convertObjectType(scalaTypeResolver.scalaDatatype(t))
   }
 
   def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {

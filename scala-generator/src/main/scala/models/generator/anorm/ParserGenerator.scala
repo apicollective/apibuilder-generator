@@ -1,7 +1,7 @@
 package scala.generator.anorm
 
 import scala.generator._
-import scala.models.ApidocComments
+import scala.models.{ApidocComments, Config}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -38,7 +38,7 @@ trait ParserGenerator extends CodeGenerator {
   val attributes: ParserGeneratorPlayVersionSpecificAttributes
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = new ScalaService(form.service)
+    val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
 
     val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
 

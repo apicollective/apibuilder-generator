@@ -21,7 +21,7 @@ trait Play2Models extends CodeGenerator {
     addBindables: Boolean,
     addHeader: Boolean
   ): Seq[File] = {
-    val ssd = ScalaService(form.service)
+    val ssd = ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
 
     val caseClasses = ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
     val prefix = underscoreAndDashToInitCap(ssd.name)
