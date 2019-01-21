@@ -19,8 +19,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     )
 
     it("http4s 0.15") {
-      val service = models.TestHelper.parseFile(s"/examples/apidoc-api.json")
-      val form = new InvocationForm(service, Seq.empty, None)
+      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s015Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
@@ -31,8 +30,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.17") {
-      val service = models.TestHelper.parseFile(s"/examples/apidoc-api.json")
-      val form = new InvocationForm(service, Seq.empty, None)
+      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s017Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
@@ -43,8 +41,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.18") {
-      val service = models.TestHelper.parseFile(s"/examples/apidoc-api.json")
-      val form = new InvocationForm(service, Seq.empty, None)
+      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s018Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
@@ -55,8 +52,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.20") {
-      val service = models.TestHelper.parseFile(s"/examples/apidoc-api.json")
-      val form = new InvocationForm(service, Seq.empty, None)
+      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s020Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
