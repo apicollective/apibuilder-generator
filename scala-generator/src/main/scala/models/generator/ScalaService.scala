@@ -39,17 +39,32 @@ class ScalaService(
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
     def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
-      case ObjectAsPlay if config.jsonLib == JsonConfig.PlayJson => ObjectAsPlay
-      case ObjectAsPlay if config.jsonLib == JsonConfig.CirceJson => ObjectAsCirce
-      case JsonValueAsPlay if config.jsonLib == JsonConfig.PlayJson => JsonValueAsPlay
-      case JsonValueAsPlay if config.jsonLib == JsonConfig.CirceJson => JsonValueAsCirce
-      case DateIso8601Joda if config.timeLib == TimeConfig.JodaTime => DateIso8601Joda
-      case DateIso8601Joda if config.timeLib == TimeConfig.JavaTime => DateIso8601Java
-      case DateTimeIso8601Joda if config.timeLib == TimeConfig.JodaTime => DateTimeIso8601Joda
-      case DateTimeIso8601Joda if config.timeLib == TimeConfig.JavaTime => DateTimeIso8601Java
+      case ObjectAsPlay => config.jsonLib match {
+        case JsonConfig.PlayJson => ObjectAsPlay
+        case JsonConfig.CirceJson => ObjectAsCirce
+      }
+
+      case JsonValueAsPlay => config.jsonLib match {
+        case JsonConfig.PlayJson => JsonValueAsPlay
+        case JsonConfig.CirceJson => JsonValueAsCirce
+      }
+
+      case DateIso8601Joda => config.timeLib match {
+        case TimeConfig.JodaTime => DateIso8601Joda
+        case TimeConfig.JavaTime => DateIso8601Java
+      }
+
+      case DateTimeIso8601Joda => config.timeLib match {
+        case TimeConfig.JodaTime => DateTimeIso8601Joda
+        case TimeConfig.JavaTime => DateTimeIso8601Java
+      }
+
       case ScalaDatatype.List(t) => ScalaDatatype.List(convertObjectType(t))
+
       case ScalaDatatype.Map(t) => ScalaDatatype.Map(convertObjectType(t))
+
       case ScalaDatatype.Option(t) => ScalaDatatype.Option(convertObjectType(t))
+
       case o => o
     }
 
