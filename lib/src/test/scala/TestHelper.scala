@@ -69,7 +69,7 @@ object TestHelper extends Matchers {
     }
     val cmd = s"find . -type f -name ${targetPath.getName}"
 
-    cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).toList match {
+    cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).filter(_.endsWith(filename)).toList match {
       case Nil => sys.error(s"Could not find source file named[$filename]")
       case one :: Nil => one
       case multiple => sys.error(s"Multiple source files named[$filename]: " + multiple.mkString(", "))

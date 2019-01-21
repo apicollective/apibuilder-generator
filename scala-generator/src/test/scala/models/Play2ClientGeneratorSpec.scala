@@ -3,8 +3,9 @@ package scala.models
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.Method
 import models.TestHelper
+import models.TestHelper.assertValidScalaSourceCode
 
-import scala.generator.{ScalaClientMethodConfigs, ScalaClientMethodGenerator, ScalaDatatype, ScalaPrimitive, ScalaService}
+import scala.generator.{ScalaClientMethodConfigs, ScalaClientMethodGenerator,ScalaService}
 import org.scalatest.{FunSpec, Matchers}
 
 class Play2ClientGeneratorSpec extends FunSpec with Matchers {
@@ -156,6 +157,15 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
         }
       }
     }
+
+    it("generates apidoc-api") {
+      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val Right(files) = Play26ClientGenerator.invoke(form)
+      files.size shouldBe 1
+      files(0).name shouldBe "BryzekApidocApiV0Client.scala"
+      assertValidScalaSourceCode(files(0).contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-26-apidoc-api.txt", files(0).contents)
+    }
   }
 
   describe("Play 2.7.x generator basic output") {
@@ -186,6 +196,15 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
           models.TestHelper.assertEqualsFile("/generators/play-27-built-in-types.txt", sourceFiles.head.contents)
         }
       }
+    }
+
+    it("generates apidoc-api") {
+      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val Right(files) = Play27ClientGenerator.invoke(form)
+      files.size shouldBe 1
+      files(0).name shouldBe "BryzekApidocApiV0Client.scala"
+      assertValidScalaSourceCode(files(0).contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-27-apidoc-api.txt", files(0).contents)
     }
   }
 
