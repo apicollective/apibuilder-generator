@@ -15,7 +15,7 @@ object ScalaService {
 
 class ScalaService(
   val service: Service,
-  config: Config = Config.PlayDefaultConfig,
+  val config: Config = Config.PlayDefaultConfig,
 ) {
   val namespaces = Namespaces(service.namespace)
 
