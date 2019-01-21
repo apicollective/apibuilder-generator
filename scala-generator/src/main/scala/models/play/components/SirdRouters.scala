@@ -1,131 +1,146 @@
 package scala.models.play.components
 
 import cats.data._
-import cats.implicits._
+import io.apibuilder.spec.v0.models._
 import scala.generator._
-import scala.models.play.Helpers._
 
-class SirdRouters(service: ScalaService) extends Component {
-
-  def handler(operation: ScalaOperation): String = {
+case class RouterHandler(operation: ScalaOperation) {
+  def syntax: String = {
     val name = operation.name
     val arguments = (operation.pathParameters ++ operation.queryParameters)
-      .map { arg => s"${arg.name}: ${arg.datatype.name}" }
+      .map { arg => s"${arg.asScalaVal}: ${arg.datatype.name}" }
 
-    s"""def ${name}(${arguments.mkString(", ")}): Handler"""
+    s"""def ${name}(${arguments.mkString(", ")}): _root_.play.api.mvc.Handler"""
   }
+}
 
-  def extractor(`type`: ScalaDatatype): ValidatedNel[String, Option[String]] = `type` match {
-    case ScalaDatatype.Option(inner) => extractor(inner)
-    case ScalaDatatype.List(inner) => extractor(inner)
-    case ScalaPrimitive.String => Validated.validNel(none[String])
-    case ScalaPrimitive.Boolean => Validated.validNel("bool".some)
-    case ScalaPrimitive.Double => Validated.validNel("double".some)
-    case ScalaPrimitive.Integer => Validated.validNel("int".some)
-    case ScalaPrimitive.Long => Validated.validNel("long".some)
-    case ScalaPrimitive.DateTimeIso8601Joda => Validated.validNel("pathBindableExtractorDateTimeIso8601".some)
-    case ScalaPrimitive.DateIso8601Joda => Validated.validNel("pathBindableExtractorDateIso8601".some)
-    case enum: ScalaPrimitive.Enum => Validated.validNel(s"pathBindableExtractor${enum.shortName}".some)
-    case _ => Validated.invalidNel(s"No extractor defined for '${`type`}')")
+case class RouterPatternMatch(operation: ScalaOperation, bindablesPackage: String) {
+  def variableName(arg: ScalaParameter, index: Int) = s"_${index}"
+
+  def extractor(arg: ScalaParameter, index: Int): String = {
+    @annotation.tailrec
+    def recursive(tpe: ScalaDatatype): Option[String] = tpe match {
+      case ScalaDatatype.Option(inner) => recursive(inner)
+      case ScalaDatatype.List(inner) => recursive(inner)
+      case ScalaPrimitive.Boolean => Some("bool")
+      case ScalaPrimitive.Double => Some("double")
+      case ScalaPrimitive.Integer => Some("int")
+      case ScalaPrimitive.Long => Some("long")
+      case ScalaPrimitive.DateTimeIso8601Joda => Some(s"${bindablesPackage}.Core.pathBindableExtractorDateTimeIso8601")
+      case ScalaPrimitive.DateIso8601Joda => Some(s"${bindablesPackage}.Core.pathBindableExtractorDateIso8601")
+      case ScalaPrimitive.Uuid => Some(s"${bindablesPackage}.Core.pathBindableExtractorUUID")
+      case enum: ScalaPrimitive.Enum => Some(s"${enum.namespaces.bindables}.Models.pathBindableExtractor${enum.shortName}")
+      case _ => None
+    }
+
+    val name = variableName(arg, index)
+    recursive(arg.datatype) match {
+      case Some(extractor) => s"""${extractor}(${name})"""
+      case None => name
+    }
   }
 
   def queryInterpolator(arg: ScalaParameter): String = arg.datatype match {
-    case _: ScalaDatatype.List => "q_s"
-    case _: ScalaDatatype.Option => "q_o"
+    case ScalaDatatype.List(_) => "q_s"
+    case ScalaDatatype.Option(inner) if inner.isInstanceOf[ScalaDatatype.List] => "q_s"
+    case ScalaDatatype.Option(_) => "q_o"
     case _ if arg.default.nonEmpty => "q_o"
     case _ => "q"
   }
 
-  def path(operation: ScalaOperation): ValidatedNel[String, String] =
-    operation.path
+  def getter(arg: ScalaParameter, index: Int): String = {
+    val name = variableName(arg, index)
+    arg.datatype match {
+      case ScalaDatatype.Option(inner) if inner.isInstanceOf[ScalaDatatype.List] => s"if(${name}.nonEmpty) Some(${name}) else None"
+      case ScalaDatatype.List(_) => name
+      case _ => arg.default.fold(name) { default => s"""${name}.getOrElse(${default})""" }
+    }
+  }
+
+  def path(path: String, argsWithIndex: List[(ScalaParameter, Int)]): String =
+    path
       .split("((?=/)|(?=\\.))")
       .toList
-      .traverse {
-        case segment if(!segment.startsWith("/:")) => Validated.validNel(segment)
-        case segment =>
-          operation.pathParameters
-            .find(_.originalName == segment.drop(2))
-            .toValidNel(s"Missing path parameter '${segment.drop(2)}'")
-            .andThen { arg =>
-              extractor(arg.datatype)
-                .map {
-                  case Some(extractor) => s"""${extractor}(${arg.name})"""
-                  case None => arg.name
-                }
-                .map { extractorAndArgument =>
-                  s"""/$${${extractorAndArgument}}"""
-                }
-            }
-      }
-      .map(_.mkString)
-
-  def query(operation: ScalaOperation): ValidatedNel[String, String] =
-    operation.queryParameters
-      .map { arg => (arg, queryInterpolator(arg)) }
-      .traverse { case (arg, interpolator) =>
-        extractor(arg.datatype)
-          .map {
-            case Some(extractor) => s"""${extractor}(${arg.name})"""
-            case None => arg.name
-          }
-          .map { extractorAndArgument =>
-            s"""${interpolator}"${arg.originalName}=$${${extractorAndArgument}}""""
-          }
-      }
       .map {
-        case Nil => ""
-        case args => args.mkString(" ? ", " & ", "")
+        case segment if(!segment.startsWith("/:")) => segment
+        case segment =>
+          argsWithIndex
+            .find(_._1.originalName == segment.drop(2))
+            .fold(segment) { case (arg, index) => s"""/$${${extractor(arg, index)}}""" }
       }
+      .mkString
 
-  def route(operation: ScalaOperation): ValidatedNel[String, String] =
-    (path(operation), query(operation))
-      .mapN { case (path, query) =>
-        val method = operation.method
-        val handlerName = operation.name
-        val handlerArguments = (operation.pathParameters ++ operation.queryParameters)
-          .map { arg =>
-            arg.default match {
-              case None => arg.name
-              case Some(default) => s"""${arg.name}.getOrElse(${default})"""
-            }
-          }
-          .mkString(", ")
+  def query(argsWithIndex: List[(ScalaParameter, Int)]): String = {
+    val queryArguments = argsWithIndex.map { case (arg, index) =>
+      val interpolator = queryInterpolator(arg)
+      val extractorAndArgument = extractor(arg, index)
 
-        s"""case ${method}(p"${path}"${query}) => ${handlerName}(${handlerArguments})"""
+      s"""${interpolator}"${arg.originalName}=$${${extractorAndArgument}}""""
+    }
+
+    queryArguments match {
+      case Nil => ""
+      case args => args.mkString(" ? ", " & ", "")
+    }
+  }
+
+  def syntax: String = {
+    val args = (operation.pathParameters ++ operation.queryParameters)
+      .zipWithIndex
+      .map { case (arg, index) => (arg, index + 1) }
+
+    val p = path(operation.path, args.filter(_._1.location == ParameterLocation.Path))
+    val q = query(args.filter(_._1.location == ParameterLocation.Query))
+
+    val method = operation.method
+    val handlerName = operation.name
+    val handlerArguments = args.map((getter _).tupled).mkString(", ")
+
+    s"""case ${method}(p"${p}"${q}) => ${handlerName}(${handlerArguments})"""
+  }
+}
+
+case class SimpleRouterTrait(resource: ScalaResource, handlers: List[RouterHandler], patternMatches: List[RouterPatternMatch]) {
+  def syntax = s"""
+    trait ${resource.plural}Routes extends _root_.play.api.routing.SimpleRouter {
+
+      ${handlers.map(_.syntax).mkString("\n")}
+
+      override def routes: _root_.play.api.routing.Router.Routes = {
+        ${patternMatches.map(_.syntax).mkString("\n")}
       }
+    }
+  """
+}
 
-  def router(resource: ScalaResource): ValidatedNel[String, String] =
-    for {
-      routes <- resource.operations.toList.traverse(route)
-      handlers = resource.operations.map(handler)
-      name = ScalaUtil.toClassName(resource.resource.plural)
+case class SirdRoutersPackage(packageObject: String, routers: List[SimpleRouterTrait]) {
+  def syntax = s"""
+    package ${packageObject.split('.').dropRight(1).mkString(".")}
 
-    } yield s"""
-      |trait ${name}Routes extends SimpleRouter {
-      |
-      |  ${handlers.mkString("\n").addMargin(2)}
-      |
-      |  override def routes: Routes = {
-      |    ${routes.mkString("\n").addMargin(4)}
-      |  }
-      |}
-    """
+    package object ${packageObject.split('.').last} {
+      import _root_.play.api.routing.sird._
 
-  def code(): ValidatedNel[String, String] =
-    service.resources.toList.traverse(router)
-      .map { routers =>
-        s"""
-          |package object routers {
-          |  import play.api.mvc.Handler
-          |  import play.api.routing.SimpleRouter
-          |  import play.api.routing.sird._
-          |  import play.api.routing.Router.Routes
-          |
-          |  import ${service.namespaces.base}.bindables.Core._
-          |  import ${service.namespaces.base}.bindables.Models._
-          |
-          |  ${routers.mkString("\n").addMargin(2)}
-          |}
-        """
+      ${routers.map(_.syntax).mkString("\n")}
+    }
+  """
+}
+
+object SirdRouters extends Component {
+
+  def sirdRoutersPackage(service: ScalaService) = {
+    val routers = service.resources
+      .map { resource =>
+        val handlers = resource.operations.map(RouterHandler).toList
+        val patternMatches = resource.operations.map(RouterPatternMatch(_, service.namespaces.bindables)).toList
+        SimpleRouterTrait(resource, handlers, patternMatches)
       }
+      .toList
+
+    SirdRoutersPackage(service.namespaces.routers, routers)
+  }
+
+  def code(service: ScalaService): ValidatedNel[String, String] = {
+    val syntax = sirdRoutersPackage(service).syntax
+    Validated.validNel(syntax)
+  }
 }

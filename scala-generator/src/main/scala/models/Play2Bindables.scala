@@ -32,6 +32,8 @@ object Core {
   implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
   implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
   val pathBindableExtractorDateIso8601 = new PathBindableExtractor[_root_.org.joda.time.LocalDate]
+
+  val pathBindableExtractorUUID = new PathBindableExtractor[_root_.java.util.UUID]
 }
 """.trim
   }

@@ -1,9 +1,10 @@
 package scala.models.play.components
 
 import cats.data._
+import scala.generator.ScalaService
 
 trait Component {
 
-    def code(): ValidatedNel[String, String]
+    def code(service: ScalaService): ValidatedNel[String, String]
 
 }

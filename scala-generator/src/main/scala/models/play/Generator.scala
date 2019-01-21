@@ -16,6 +16,8 @@ object Play26Generator extends CodeGenerator {
       new files.Controllers(scalaService),
       new files.JsonFormats(scalaService),
       new files.Models(scalaService),
+      new files.Results(scalaService),
+      new files.ResultsForPlay(scalaService),
       new files.SirdRouters(scalaService)
     )
       .traverse(_.file)
