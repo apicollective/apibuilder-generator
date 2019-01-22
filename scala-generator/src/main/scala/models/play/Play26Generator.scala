@@ -6,21 +6,28 @@ import lib.generator.CodeGenerator
 
 object Play26Generator extends CodeGenerator {
 
+  def prependHeader(contents: String, form: InvocationForm, formatHeader: scala.models.ApidocComments => String): String =
+    s"""
+      ${formatHeader(scala.models.ApidocComments(form.service.version, form.userAgent))}
+
+      ${contents}
+    """
+
   def file(form: InvocationForm, suffix: String, contents: String, extension: Option[String]): File =
-      generator.ServiceFileNames.toFile(
-          form.service.namespace,
-          form.service.organization.key,
-          form.service.application.key,
-          form.service.version,
-          suffix,
-          contents,
-          extension
-      )
+    generator.ServiceFileNames.toFile(
+      form.service.namespace,
+      form.service.organization.key,
+      form.service.application.key,
+      form.service.version,
+      suffix,
+      contents,
+      extension
+    )
 
   def formatScala(contents: String): Either[Throwable, String] = {
-      val config = org.scalafmt.config.ScalafmtConfig.default120
-      org.scalafmt.Scalafmt.format(contents, config)
-        .toEither
+    val config = org.scalafmt.config.ScalafmtConfig.default120
+    org.scalafmt.Scalafmt.format(contents, config)
+      .toEither
   }
 
   def scalaFiles(form: InvocationForm): Either[Seq[String], List[File]] =
@@ -32,12 +39,25 @@ object Play26Generator extends CodeGenerator {
       ("ModelsBodyParsers", files.ModelsBodyParsers.contents(form)),
       ("ModelsJson", files.ModelsJson.contents(form)),
     )
+    .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString)) }
     .traverse { case (suffix, contents) => formatScala(contents).map((suffix, _)) }
     .map(_.map { case (suffix, contents) => file(form, suffix, contents, Some("scala")) })
     .leftMap { t => Seq(t.toString) }
 
-  def routesFile(form: InvocationForm): File =
-    File("routes", None, files.Routes.contents(form))
+  def formatRoutes(contents: String): String =
+    contents
+      .trim
+      .lines
+      .map(_.trim)
+      .mkString("\n")
+
+  def routesFile(form: InvocationForm): File = {
+    val contents = files.Routes.contents(form)
+    val headed = prependHeader(contents, form, _.forPlayRoutes)
+    val formatted = formatRoutes(headed)
+
+    File("routes", None, formatted)
+  }
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = for {
     scalaFiles <- this.scalaFiles(form)
