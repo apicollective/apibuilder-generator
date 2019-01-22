@@ -62,7 +62,7 @@ lazy val scalaGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimum := 85.0),
+    Seq(ScoverageKeys.coverageMinimum := 80.0),
     libraryDependencies += "com.geirsson" %% "scalafmt-core" % "1.5.1"
   )
 
