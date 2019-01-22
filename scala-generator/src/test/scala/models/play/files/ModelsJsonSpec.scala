@@ -1,6 +1,7 @@
 package scala.models.play.files
 
 import org.scalatest.{FunSpec, Matchers}
+import scala.models.play.Helpers.compareWithoutWhiteSpaces
 
 class ModelsJsonSpec extends FunSpec with Matchers {
     it("generates reader, and writer for uuid") {
@@ -15,7 +16,7 @@ class ModelsJsonSpec extends FunSpec with Matchers {
 
         val result = ModelsJson.uuidFormat(namespaces)
 
-        result.replaceAll(" +", " ") should be(expected.replaceAll(" +", " "))
+        compareWithoutWhiteSpaces(expected, result)
     }
 
     it("generates reader, and writer for joda DateTime") {
@@ -37,7 +38,7 @@ class ModelsJsonSpec extends FunSpec with Matchers {
 
         val result = ModelsJson.jodaDateTimeFormat(namespaces)
 
-        result.replaceAll(" +", " ") should be(expected.replaceAll(" +", " "))
+        compareWithoutWhiteSpaces(expected, result)
     }
 
     it("generates reader, and writer for joda LocalDate") {
@@ -59,6 +60,6 @@ class ModelsJsonSpec extends FunSpec with Matchers {
 
         val result = ModelsJson.jodaLocalDateFormat(namespaces)
 
-        result.replaceAll(" +", " ") should be(expected.replaceAll(" +", " "))
+        compareWithoutWhiteSpaces(expected, result)
     }
 }
