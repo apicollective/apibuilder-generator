@@ -388,6 +388,14 @@ object Generators {
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s020Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "play_2_6",
+        name = "Play 2.6 (Gen. V2)"
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(scala.models.play.Play26Generator)
     )
   ).sortBy(_.metaData.key)
 }
