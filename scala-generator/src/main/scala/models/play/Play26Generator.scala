@@ -11,7 +11,7 @@ object Play26Generator extends CodeGenerator {
       files.MockClient(form),
       files.Models(form),
       files.ModelsJson(form),
-      files.ModelsJsonBindables(form),
+      files.ModelsBindables(form),
       files.Routes(form),
     )
     .flatMap {
