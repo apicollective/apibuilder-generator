@@ -22,7 +22,7 @@ case class Play2RouteGenerator(form: InvocationForm) {
   private[this] val GlobalPad = 5
 
   private[this] val service = form.service
-  private[this] val scalaService = ScalaService(service)
+  private[this] val scalaService = ScalaService(service, Config(form.attributes, Config.PlayDefaultConfig))
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     scalaService.resources.flatMap { resource =>

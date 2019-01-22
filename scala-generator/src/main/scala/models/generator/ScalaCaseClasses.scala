@@ -1,6 +1,6 @@
 package scala.generator
 
-import scala.models.ApidocComments
+import scala.models.{ApidocComments, Config}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
@@ -16,7 +16,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     form: InvocationForm,
     addHeader: Boolean = true
   ): Either[Seq[String], Seq[File]] = {
-    val ssd = new ScalaService(form.service)
+    val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
     Right(generateCode(ssd, form.userAgent, addHeader))
   }
 

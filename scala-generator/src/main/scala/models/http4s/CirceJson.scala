@@ -1,8 +1,9 @@
 package scala.models.http4s
 
 import lib.Text._
+
 import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaUnion, ScalaUnionType}
-import scala.models.JsonImports
+import scala.models.{JsonImports, TimeConfig}
 
 case class CirceJson(
   ssd: ScalaService
@@ -27,22 +28,39 @@ ${JsonImports(ssd.service).mkString("\n").indent(4)}
 
     private[${ssd.namespaces.last}] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
       Encoder.encodeString.contramap[_root_.java.util.UUID](_.toString)
-
-    private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.time.Instant.parse(str)))
-
-    private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.java.time.Instant] =
-      Encoder.encodeString.contramap[_root_.java.time.Instant](_.toString)
-
-    private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.java.time.LocalDate] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.time.LocalDate.parse(str)))
-
-    private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.java.time.LocalDate] =
-      Encoder.encodeString.contramap[_root_.java.time.LocalDate](_.toString)
-
-${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(generateTimeSerde(),generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
+  }
+
+  def generateTimeSerde(): String = {
+    ssd.config.timeLib match {
+      case TimeConfig.JodaTime => s"""
+        |private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.org.joda.time.DateTime] =
+        |  Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)))
+        |
+        |private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.org.joda.time.DateTime] =
+        |  Encoder.encodeString.contramap[_root_.org.joda.time.DateTime](org.joda.time.format.ISODateTimeFormat.dateTime.print)
+        |
+        |private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.org.joda.time.LocalDate] =
+        |  Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateParser.parseLocalDate(str)))
+        |
+        |private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.org.joda.time.LocalDate] =
+        |  Encoder.encodeString.contramap[_root_.org.joda.time.LocalDate](org.joda.time.format.ISODateTimeFormat.date.print)""".stripMargin('|')
+
+      case TimeConfig.JavaTime => s"""
+        |private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
+        |  Decoder.decodeString.emapTry(str => Try(_root_.java.time.Instant.parse(str)))
+        |
+        |private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.java.time.Instant] =
+        |  Encoder.encodeString.contramap[_root_.java.time.Instant](_.toString)
+        |
+        |private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.java.time.LocalDate] =
+        |  Decoder.decodeString.emapTry(str => Try(_root_.java.time.LocalDate.parse(str)))
+        |
+        |private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.java.time.LocalDate] =
+        |  Encoder.encodeString.contramap[_root_.java.time.LocalDate](_.toString)""".stripMargin('|')
+    }
   }
 
   def generateModels(): String = {
