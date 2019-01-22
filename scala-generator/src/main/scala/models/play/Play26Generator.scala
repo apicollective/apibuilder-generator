@@ -20,8 +20,9 @@ object Play26Generator extends CodeGenerator {
       files.Client(form),
       files.MockClient(form),
       files.Models(form),
-      files.ModelsJson(form),
       files.ModelsBindables(form),
+      files.ModelsBodyParsers(form),
+      files.ModelsJson(form),
       files.Routes(form),
     )
     .map(_.flatMap(format))
