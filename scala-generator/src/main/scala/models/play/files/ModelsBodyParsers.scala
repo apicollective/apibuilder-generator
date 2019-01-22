@@ -1,6 +1,6 @@
 package scala.models.play.files
 
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.InvocationForm
 
 object ModelsBodyParsers {
 
@@ -49,21 +49,4 @@ object ModelsBodyParsers {
         """
     }
 
-    def file(form: InvocationForm, contents: String): File =
-        generator.ServiceFileNames.toFile(
-            form.service.namespace,
-            form.service.organization.key,
-            form.service.application.key,
-            form.service.version,
-            "ModelsBodyParsers",
-            contents,
-            Some("Scala")
-        )
-
-    def apply(form: InvocationForm): Either[Seq[String], File] = {
-        val contents = this.contents(form)
-        val file = this.file(form, contents)
-
-        Right(file)
-    }
 }
