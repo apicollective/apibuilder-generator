@@ -37,6 +37,7 @@ object Play26Generator extends CodeGenerator {
       ("Models", files.Models.contents(form)),
       ("ModelsBindables", files.ModelsBindables.contents(form)),
       ("ModelsBodyParsers", files.ModelsBodyParsers.contents(form)),
+      ("ModelsGens", files.ModelsGens.contents(form)),
       ("ModelsJson", files.ModelsJson.contents(form)),
     )
     .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString)) }
