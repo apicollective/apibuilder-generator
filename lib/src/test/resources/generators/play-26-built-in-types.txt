@@ -70,38 +70,12 @@ package apibuilder.models {
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
     import apibuilder.models.json._
-
-    private[apibuilder] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
-
-    private[apibuilder] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
-      def writes(x: java.util.UUID) = JsString(x.toString)
-    }
-
-    private[apibuilder] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
-      import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-      dateTimeParser.parseDateTime(str)
-    }
-
-    private[apibuilder] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
-      def writes(x: org.joda.time.DateTime) = {
-        import org.joda.time.format.ISODateTimeFormat.dateTime
-        val str = dateTime.print(x)
-        JsString(str)
-      }
-    }
-
-    private[apibuilder] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
-      import org.joda.time.format.ISODateTimeFormat.dateParser
-      dateParser.parseLocalDate(str)
-    }
-
-    private[apibuilder] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
-      def writes(x: org.joda.time.LocalDate) = {
-        import org.joda.time.format.ISODateTimeFormat.date
-        val str = date.print(x)
-        JsString(str)
-      }
-    }
+    import play.api.libs.json.Writes._
+    import play.api.libs.json.Reads._
+    import play.api.libs.json.JodaReads._
+    import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
+    import play.api.libs.json.JodaWrites._
+    import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites
 
     implicit def jsonReadsBuiltInTypesArray: play.api.libs.json.Reads[Array] = {
       for {

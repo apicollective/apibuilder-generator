@@ -13,13 +13,14 @@ trait Play2Models extends CodeGenerator {
   override def invoke(
     form: InvocationForm
   ): Either[Seq[String], Seq[File]] = {
-    Right(generateCode(form = form, addBindables = true, addHeader = true))
+    Right(generateCode(form = form, addBindables = true, addHeader = true, useBuiltInImplicits = false))
   }
 
   def generateCode(
     form: InvocationForm,
     addBindables: Boolean,
-    addHeader: Boolean
+    addHeader: Boolean,
+    useBuiltInImplicits: Boolean,
   ): Seq[File] = {
     val ssd = ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
 
@@ -46,8 +47,26 @@ trait Play2Models extends CodeGenerator {
       }
     }
 
-    val timeSerde = ssd.config.timeLib match {
+    val serDes = ssd.config.timeLib match {
+      case TimeConfig.JavaTime =>
+        s"""import play.api.libs.json.Writes._
+           |import play.api.libs.json.Reads._""".stripMargin
+
+      case TimeConfig.JodaTime if useBuiltInImplicits =>
+        s"""import play.api.libs.json.Writes._
+           |import play.api.libs.json.Reads._
+           |import play.api.libs.json.JodaReads._
+           |import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
+           |import play.api.libs.json.JodaWrites._
+           |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites""".stripMargin
+
       case TimeConfig.JodaTime => s"""
+        |private[${ssd.namespaces.last}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
+        |
+        |private[${ssd.namespaces.last}] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
+        |  def writes(x: java.util.UUID) = JsString(x.toString)
+        |}
+        |
         |private[${ssd.namespaces.last}] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
         |  import org.joda.time.format.ISODateTimeFormat.dateTimeParser
         |  dateTimeParser.parseDateTime(str)
@@ -73,26 +92,6 @@ trait Play2Models extends CodeGenerator {
         |    JsString(str)
         |  }
         |}""".stripMargin
-      case TimeConfig.JavaTime => s"""
-        |private[${ssd.namespaces.last}] implicit val jsonReadsJavaInstant = __.read[String].map { str =>
-        |  _root_.java.time.Instant.parse(str)
-        |}
-        |
-        |private[${ssd.namespaces.last}] implicit val jsonWritesJavaInstant = new Writes[_root_.java.time.Instant] {
-        |  def writes(x: _root_.java.time.Instant) = {
-        |    JsString(x.toString)
-        |  }
-        |}
-        |
-        |private[${ssd.namespaces.last}] implicit val jsonReadsJavaLocalDate = __.read[String].map { str =>
-        |  _root_.java.time.LocalDate.parse(str)
-        |}
-        |
-        |private[${ssd.namespaces.last}] implicit val jsonWritesJavaLocalDate = new Writes[_root_.java.time.LocalDate] {
-        |  def writes(x: _root_.java.time.LocalDate) = {
-        |    JsString(x.toString)
-        |  }
-        |}""".stripMargin
     }
 
     val source = s"""$header$caseClasses
@@ -105,13 +104,7 @@ package ${ssd.namespaces.models} {
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
 ${JsonImports(form.service).mkString("\n").indent(4)}
-
-    private[${ssd.namespaces.last}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
-
-    private[${ssd.namespaces.last}] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
-      def writes(x: java.util.UUID) = JsString(x.toString)
-    }
-${timeSerde.indent(4)}
+${serDes.indent(4)}
 
 ${Seq(enumJson, modelAndUnionJson).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }

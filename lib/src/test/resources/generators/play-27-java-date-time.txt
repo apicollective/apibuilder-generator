@@ -71,32 +71,8 @@ package io.gregor.time.types.v0.models {
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
     import io.gregor.time.types.v0.models.json._
-
-    private[v0] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
-
-    private[v0] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
-      def writes(x: java.util.UUID) = JsString(x.toString)
-    }
-
-    private[v0] implicit val jsonReadsJavaInstant = __.read[String].map { str =>
-      _root_.java.time.Instant.parse(str)
-    }
-
-    private[v0] implicit val jsonWritesJavaInstant = new Writes[_root_.java.time.Instant] {
-      def writes(x: _root_.java.time.Instant) = {
-        JsString(x.toString)
-      }
-    }
-
-    private[v0] implicit val jsonReadsJavaLocalDate = __.read[String].map { str =>
-      _root_.java.time.LocalDate.parse(str)
-    }
-
-    private[v0] implicit val jsonWritesJavaLocalDate = new Writes[_root_.java.time.LocalDate] {
-      def writes(x: _root_.java.time.LocalDate) = {
-        JsString(x.toString)
-      }
-    }
+    import play.api.libs.json.Writes._
+    import play.api.libs.json.Reads._
 
     implicit def jsonReadsTimeTypesDateTimeModel: play.api.libs.json.Reads[DateTimeModel] = {
       for {

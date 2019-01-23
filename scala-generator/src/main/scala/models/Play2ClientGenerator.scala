@@ -13,7 +13,8 @@ case class PlayFrameworkVersion(
   requestHolderClass: String,
   authSchemeClass: String,
   supportsHttpPatch: Boolean,
-  useSpecificAddMethods: Boolean
+  useSpecificAddMethods: Boolean,
+  useBuiltInImplicits: Boolean,
 )
 
 object Play22ClientGenerator extends CodeGenerator {
@@ -24,7 +25,8 @@ object Play22ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
     authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
     supportsHttpPatch = false,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
+    useBuiltInImplicits = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -40,7 +42,8 @@ object Play23ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequestHolder",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
+    useBuiltInImplicits = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -56,7 +59,8 @@ object Play24ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
+    useBuiltInImplicits = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -72,7 +76,8 @@ object Play25ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
+    useBuiltInImplicits = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -88,7 +93,8 @@ object Play26ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = true
+    useSpecificAddMethods = true,
+    useBuiltInImplicits = true,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -104,7 +110,8 @@ object Play27ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = true
+    useSpecificAddMethods = true,
+    useBuiltInImplicits = true,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -137,7 +144,12 @@ case class Play2ClientGenerator(
   private def generateCode(): Seq[File] = {
     val source = ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
       Seq(
-        Play2Models.generateCode(form, addBindables = true, addHeader = false).map(_.contents).mkString("\n\n"),
+        Play2Models.generateCode(
+          form,
+          addBindables = true,
+          addHeader = false,
+          useBuiltInImplicits = version.useBuiltInImplicits
+        ).map(_.contents).mkString("\n\n"),
         client()
       ).mkString("\n\n")
 
