@@ -401,7 +401,7 @@ class KotlinGenerator
               val errorTypeNameString = "Error" + responseCodeString
 
               if (errorResponse.`type` == Datatype.Primitive.Unit.name) {
-                toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + ")\n",
+                toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + ")",
                   callErrorEitherErrorTypeClassName)
                 callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
               } else {
@@ -426,11 +426,11 @@ class KotlinGenerator
 
 
                 if (dataTypes.keySet.contains(errorResponse.`type`)) {
-                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${errorPayloadTypeString + "::class.java"}))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
+                  toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${errorPayloadTypeString + "::class.java"}))) } ?: %T(%T(" + responseCodeString + ", \"No Body\"))",
                     callErrorEitherErrorTypeClassName,
                     commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
                 } else {
-                  toErrorCodeBlockBuilder.add("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\")) \n",
+                  toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\"))",
                     callErrorEitherErrorTypeClassName,
                     commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
                 }
@@ -633,12 +633,16 @@ class KotlinGenerator
             commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2 + "(t.code(), t.message())").mkString("\n") + "\n" + //                        in 500..599 -> ServerError(t.code(), t.message())
             "            else -> " + serverUnknownErrorClassName + "(t.code(), t.message())" + "\n" +
             "        }\n" +
-            "    }\n" +
-            "    is %T -> " + serverTimeOutErrorClassName + "(t.message?: \"Server Timeout Error, t.message() was null\")" + "\n" + //                is SocketTimeoutException -> ServerTimeOut(t.message?: "Server Timeout Error, t.message() was null")
+            "    }\n"
+          , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException])
+        .addStatement(
+          "    is %T -> " + serverTimeOutErrorClassName + "(\nt.message?: \"Server Timeout Error, t.message() was null\"\n)" //                is SocketTimeoutException -> ServerTimeOut(t.message?: "Server Timeout Error, t.message() was null")
+          , classOf[java.net.SocketTimeoutException]
+        )
+        .addStatement(
+          "    else -> " + serverUnknownErrorClassName + "(\n-1, t.message?: \"Unknown Network Error, t.message() was null\"\n)" //                else -> UnknownNetworkError(-1, t.message?: "Unknown Network Error, t.message() was null")
+        )
 
-            "    else -> " + serverUnknownErrorClassName + "(-1, t.message?: \"Unknown Network Error, t.message() was null\")" + "\n" //                else -> UnknownNetworkError(-1, t.message?: "Unknown Network Error, t.message() was null")
-
-          , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException], classOf[java.net.SocketTimeoutException])
         .endControlFlow()
         .build()
 
