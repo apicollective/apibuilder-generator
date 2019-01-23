@@ -47,7 +47,7 @@ object Play26Generator extends CodeGenerator {
   def formatRoutes(contents: String): String =
     contents
       .trim
-      .lines
+      .split("\n")
       .map(_.trim)
       .mkString("\n")
 
