@@ -72,9 +72,9 @@ package apibuilder.models {
     import apibuilder.models.json._
     import play.api.libs.json.Writes._
     import play.api.libs.json.Reads._
-    import play.api.libs.json.JodaReads._
+    import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
     import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
-    import play.api.libs.json.JodaWrites._
+    import play.api.libs.json.JodaWrites.JodaDateTimeWrites
     import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites
 
     implicit def jsonReadsBuiltInTypesArray: play.api.libs.json.Reads[Array] = {

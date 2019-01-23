@@ -55,9 +55,9 @@ trait Play2Models extends CodeGenerator {
       case TimeConfig.JodaTime if useBuiltInImplicits =>
         s"""import play.api.libs.json.Writes._
            |import play.api.libs.json.Reads._
-           |import play.api.libs.json.JodaReads._
+           |import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
            |import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
-           |import play.api.libs.json.JodaWrites._
+           |import play.api.libs.json.JodaWrites.JodaDateTimeWrites
            |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites""".stripMargin
 
       case TimeConfig.JodaTime => s"""
