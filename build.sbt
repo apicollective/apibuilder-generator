@@ -62,7 +62,7 @@ lazy val scalaGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimum := 85.0),
+    Seq(ScoverageKeys.coverageMinimum := 80.0),
     scalacOptions += "-Ypartial-unification",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "1.5.0",

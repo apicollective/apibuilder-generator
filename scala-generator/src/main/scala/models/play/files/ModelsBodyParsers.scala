@@ -13,7 +13,7 @@ object ModelsBodyParsers {
 
 	def bodyParser(): String = s"""
 		private def bodyParser[A](parser: ${BodyParser}[${JsValue}])(implicit ec: ${ExecutionContext}, rds: ${JsReads}[A]): ${BodyParser}[A] =
-				parser.validate(_.validate[A].asEither.left.map(e => ${BadRequest}(${JsError}.toJson(e))))
+      parser.validate(_.validate[A].asEither.left.map(e => ${BadRequest}(${JsError}.toJson(e))))
 	"""
 
 	def bodyParser(enum: scala.generator.ScalaEnum): String = bodyParser(enum.name, enum.qualifiedName)
@@ -21,7 +21,7 @@ object ModelsBodyParsers {
 	def bodyParser(union: scala.generator.ScalaUnion): String = bodyParser(union.name, union.qualifiedName)
 	def bodyParser(suffix: String, tpe: String): String = s"""
 		def bodyParser${suffix}(parser: ${BodyParser}[${JsValue}])(implicit ec: ${ExecutionContext}, rds: ${JsReads}[${tpe}]): ${BodyParser}[${tpe}] =
-				bodyParser[${tpe}](parser)
+      bodyParser[${tpe}](parser)
 	"""
 
 	def contents(form: InvocationForm): String = {

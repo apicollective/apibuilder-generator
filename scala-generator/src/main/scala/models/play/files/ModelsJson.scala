@@ -5,42 +5,19 @@ import scala.generator.Namespaces
 
 object ModelsJson {
 
-  def uuidFormat(namespaces: Namespaces): String = s"""
-    private[${namespaces.last}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
-
-    private[${namespaces.last}] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
-        def writes(x: java.util.UUID) = JsString(x.toString)
-    }
+  def uuidFormat(): String = s"""
+    import play.api.libs.json.Reads.uuidReads
+    import play.api.libs.json.Writes.UuidWrites
   """
 
-  def jodaDateTimeFormat(namespaces: Namespaces): String = s"""
-    private[${namespaces.last}] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
-        import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-        dateTimeParser.parseDateTime(str)
-    }
-
-    private[${namespaces.last}] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
-        def writes(x: org.joda.time.DateTime) = {
-            import org.joda.time.format.ISODateTimeFormat.dateTime
-            val str = dateTime.print(x)
-            JsString(str)
-        }
-    }
+  def jodaDateTimeFormat(): String = s"""
+    import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
+    import play.api.libs.json.JodaWrites.JodaDateTimeWrites
   """
 
-  def jodaLocalDateFormat(namespaces: Namespaces): String = s"""
-    private[${namespaces.last}] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
-        import org.joda.time.format.ISODateTimeFormat.dateParser
-        dateParser.parseLocalDate(str)
-    }
-
-    private[${namespaces.last}] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
-        def writes(x: org.joda.time.LocalDate) = {
-            import org.joda.time.format.ISODateTimeFormat.date
-            val str = date.print(x)
-            JsString(str)
-        }
-    }
+  def jodaLocalDateFormat(): String = s"""
+    import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
+    import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites
   """
 
   def contents(form: InvocationForm): String = {
@@ -53,17 +30,17 @@ object ModelsJson {
 
       package object json {
 
-          import play.api.libs.json.{__, JsString, Writes}
-          import play.api.libs.functional.syntax._
+        import play.api.libs.json.{__, JsString, Writes}
+        import play.api.libs.functional.syntax._
 
-          ${imports.mkString("\n")}
+        ${uuidFormat()}
+        ${jodaDateTimeFormat()}
+        ${jodaLocalDateFormat()}
 
-          ${uuidFormat(scalaService.namespaces)}
-          ${jodaDateTimeFormat(scalaService.namespaces)}
-          ${jodaLocalDateFormat(scalaService.namespaces)}
+        ${imports.mkString("\n")}
 
-          ${gen.generateEnums()}
-          ${gen.generateModelsAndUnions()}
+        ${gen.generateEnums()}
+        ${gen.generateModelsAndUnions()}
 
       }
     """
