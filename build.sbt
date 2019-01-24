@@ -63,7 +63,11 @@ lazy val scalaGenerator = project
   .settings(commonSettings: _*)
   .settings(
     Seq(ScoverageKeys.coverageMinimum := 80.0),
-    libraryDependencies += "com.geirsson" %% "scalafmt-core" % "1.5.1"
+    scalacOptions += "-Ypartial-unification",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "1.5.0",
+      "com.geirsson" %% "scalafmt-core" % "1.5.1"
+    )
   )
 
 lazy val rubyGenerator = project

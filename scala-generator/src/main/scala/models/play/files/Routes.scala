@@ -1,16 +1,17 @@
 package scala.models.play.files
 
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.InvocationForm
 
 object Routes {
-    def apply(form: InvocationForm): Either[Seq[String], File] =
-        scala.models.Play2RouteGenerator
-            .invoke(form)
-            .flatMap { files =>
-                files.headOption
-                    .toRight {
-                        val error = s"Service[${form.service.organization.key}/${form.service.application.key}] cannot generate play routes"
-                        Seq(error)
-                    }
-            }
+
+  def contents(form: InvocationForm): String = {
+    val header = scala.models.ApidocComments(form.service.version, form.userAgent).forPlayRoutes + "\n"
+    scala.models.Play2RouteGenerator
+      .invoke(form)
+      .toOption
+      .flatMap(_.headOption)
+      .fold("")(_.contents)
+      .replaceAll(header, "")
+  }
+
 }
