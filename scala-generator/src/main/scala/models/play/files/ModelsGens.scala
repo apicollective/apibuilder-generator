@@ -46,9 +46,9 @@ object ModelsGens {
     private[${ns.last}] lazy val genJsValue: ${Gen}[${JsValue}] = ${Gen}.lzy {
       ${Gen}.oneOf(
         ${Arbitrary}.arbitrary[IndexedSeq[${JsValue}]].map(${JsArray}),
-        ${Arbitrary}.arbitrary[Boolean].map(play.api.libs.json.JsBoolean),
-        ${Gen}.const(play.api.libs.json.JsNull),
-        ${Arbitrary}.arbitrary[BigDecimal].map(play.api.libs.json.JsNumber),
+        ${Arbitrary}.arbitrary[Boolean].map(${JsBoolean}),
+        ${Gen}.const(${JsNull}),
+        ${Arbitrary}.arbitrary[BigDecimal].map(${JsNumber}),
         // ${Arbitrary}.arbitrary[${JsObject}],
         ${Arbitrary}.arbitrary[String].map(${JsString})
       )
@@ -80,7 +80,7 @@ object ModelsGens {
     case one :: Nil => s"lazy val gen${name}: ${Gen}[${tpe}] = ${one}"
     case list => s"""
       lazy val gen${name}: ${Gen}[${tpe}] = ${Gen}.lzy {
-        ${Gen}.oneOf(${oneOf.mkString(", ")})
+        ${Gen}.oneOf(${list.mkString(", ")})
       }
     """
   }
