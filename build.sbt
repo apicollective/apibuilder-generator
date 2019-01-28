@@ -15,7 +15,8 @@ lazy val generated = project
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      ws
+      ws,
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
     )
   )
 
@@ -24,7 +25,7 @@ lazy val generated = project
 // we end up not needing it.
 lazy val lib = project
   .in(file("lib"))
-  .dependsOn(generated)
+  .dependsOn(generated % "compile; test->test")
   .settings(commonSettings: _*)
 
 lazy val generator = project

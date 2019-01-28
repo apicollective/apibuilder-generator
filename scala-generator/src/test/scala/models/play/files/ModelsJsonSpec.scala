@@ -1,6 +1,7 @@
 package scala.models.play.files
 
 import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.prop.PropertyChecks
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
 
 class ModelsJsonSpec extends FunSpec with Matchers {
