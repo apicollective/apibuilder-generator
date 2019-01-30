@@ -1,4 +1,4 @@
-package postman.generator
+package generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.WordSpec

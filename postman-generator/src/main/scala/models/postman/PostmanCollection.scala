@@ -1,6 +1,7 @@
-package postman.models
+package models.postman
 
 import java.util.UUID
+
 import play.api.libs.json._
 
 /**
@@ -152,9 +153,6 @@ case class Script(
 
 
 object json {
-
-  import AuthType._
-  import EventType._
 
   implicit val header = Json.writes[PostmanHeader]
   implicit val requestBody = new Writes[PostmanRequestBody] {

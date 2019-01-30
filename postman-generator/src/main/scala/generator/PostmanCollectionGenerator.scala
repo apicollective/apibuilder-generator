@@ -1,4 +1,4 @@
-package postman.generator
+package generator
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
