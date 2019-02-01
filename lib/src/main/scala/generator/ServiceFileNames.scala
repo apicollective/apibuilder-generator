@@ -84,6 +84,12 @@ object ServiceFileNames {
         override def isCamelCased = false
         override def name = "text"
         override def extension = "txt"
+      },
+
+      new Language {
+        override def isCamelCased = false
+        override def name = "json"
+        override def extension = "json"
       }
     )
 
