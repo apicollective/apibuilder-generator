@@ -173,7 +173,7 @@ object Generators {
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Alpha,
+      status = lib.generator.Status.Beta,
       codeGenerator = Some(scala.models.Play27ClientGenerator)
     ),
     CodeGenTarget(
