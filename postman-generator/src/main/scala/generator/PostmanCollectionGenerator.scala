@@ -5,7 +5,6 @@ import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import lib.generator.CodeGenerator
-import models.ObjectReferenceAttribute
 import models.ObjectReferenceAttribute.ObjectReferenceAttrValue
 import models.postman._
 import models.postman.json._
@@ -52,7 +51,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
       description = service.description
     )
 
-    val baseUrl = service.baseUrl.getOrElse("https://api.flow.io")
+    val baseUrl = service.baseUrl.getOrElse(Variables.BaseUrlValue)
 
     val serviceSpecificHeaders = service.headers.map { header =>
       PostmanHeader(
@@ -70,7 +69,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
         Heuristics
           .idFieldHeuristic(resource)
           .map {
-            pathVar => PathVariable(pathVar, s"${resource.plural}-${pathVar}")
+            pathVar => PathVariable(pathVar, s"${resource.plural}-$pathVar")
           }
 
       val postmanItems = resource
@@ -88,7 +87,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
     val cleanupFolder: PostmanCollectionFolder = PredefinedCollectionItems.prepareCleanupFolder()
     val setupFolder: PostmanCollectionFolder = PredefinedCollectionItems.prepareSetupFolder()
 
-    val objReferenceAttrToOperationTuples = generateDependantOperations(resolvedService)
+    val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
     val requiredEntitiesSetupSteps = objReferenceAttrToOperationTuples.map {
       case (objRefAttr, operation) =>
         val postmanItem = buildPostmanItem(baseUrl, operation, serviceSpecificHeaders, examplesProvider, None)
@@ -117,74 +116,6 @@ object PostmanCollectionGenerator extends CodeGenerator {
     )
   }
 
-  private def generateDependantOperations(resolvedService: ResolvedService): Seq[(ObjectReferenceAttrValue, Operation)] = {
-
-    val service: Service = resolvedService.service
-    val serviceNamespaceToResources: Map[String, Seq[Resource]] = resolvedService.serviceNamespaceToResources
-
-    // TODO: think about the model that can have yet another id dependency in the endpoint that creates it - is it already covered?
-    def recurOps(typ: String): Seq[ObjectReferenceAttrValue] = {
-
-      service.models.find(_.name == typ) match {
-        case Some(model) =>
-          model.fields.flatMap {
-            case field if service.models.exists(_.name == field.`type`) =>
-              recurOps(field.`type`)
-            case field =>
-              val objRefAttrOpt = field.attributes.collectFirst {
-                case attr if attr.name.equalsIgnoreCase(ObjectReferenceAttribute.Key) => attr.value.asOpt[ObjectReferenceAttrValue]
-              }.flatten
-
-              objRefAttrOpt match {
-                case Some(objAttrRef) =>
-                  Seq(objAttrRef)
-                case None =>
-                  Nil
-              }
-          }
-        case None if service.unions.exists(_.name == typ) =>
-          val union = service.unions.find(_.name == typ).get
-          union.types.flatMap(u => recurOps(u.`type`))
-        case _ =>
-          Nil
-      }
-
-    }
-
-    val objRefAttrs = service.resources.flatMap { resource =>
-      resource.operations.flatMap { operation =>
-
-        operation.body.map { body =>
-
-          val typ = body.`type`
-          recurOps(typ)
-        }.getOrElse(Nil)
-      }
-    }
-
-    //  val objRefAttrs = for {
-    //    resource <- service.resources
-    //    operation <- resource.operations
-    //    body <- operation.body
-    //    dependantOps <- recurOps(body.`type`)
-    //  } yield dependantOps
-
-    val objRefAttrToOperation = objRefAttrs.map { objRefAttr =>
-      val operationOpt = serviceNamespaceToResources.getOrElse(objRefAttr.relatedServiceNamespace, Nil)
-        .find(_.`type` == objRefAttr.resourceType)
-        .map(_.operations).getOrElse(Nil)
-        .find(_.method.toString == objRefAttr.operationMethod)
-
-      (objRefAttr, operationOpt)
-    }
-      .collect {
-        case (objRefAttr, Some(operation)) =>
-          (objRefAttr, operation)
-      }
-
-    objRefAttrToOperation.distinct
-  }
-
   private def buildPostmanItem(
     baseUrl: String,
     operation: Operation,
@@ -199,7 +130,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
       name = Some(s"${operation.method} ${operation.path}"),
       description = operation.description,
       request = postmanRequest,
-      response = buildPostmanExampleResponses(postmanRequest, operation, modelExampleProvider)
+      response = PostmanExampleResponseBuilder.build(postmanRequest, operation, modelExampleProvider)
     )
   }
 
@@ -268,10 +199,6 @@ object PostmanCollectionGenerator extends CodeGenerator {
     modelExampleProvider: ExampleJson,
     pathVariableOpt: Option[PathVariable]
   ): PostmanRequest = {
-    val protocol = baseUrl.takeWhile(_ != ':')
-
-    // hardcoded fix
-    val rawHost = Variables.BaseUrl.stripPrefix(protocol).stripPrefix("://")
 
     val parameterMap = operation.parameters.groupBy(_.location)
 
@@ -350,53 +277,6 @@ object PostmanCollectionGenerator extends CodeGenerator {
         paramWithExample.default.get
       case _ =>
         "1" // TODO: set this default value according to the type
-    }
-  }
-
-  private def buildPostmanExampleResponses(
-    postmanRequest: PostmanRequest,
-    operation: Operation,
-    modelExampleProvider: ExampleJson
-  ): Seq[PostmanCollectionItemResponse] = {
-    operation.responses.flatMap { response =>
-
-      response.code match {
-        case ResponseCodeInt(responseCode) =>
-
-          val responseBodyExampleOpt =
-            if (response.`type`.equalsIgnoreCase("unit")) None
-            else modelExampleProvider.sample(response.`type`).map(Json.prettyPrint)
-
-          val postmanPreviewLangOpt = responseBodyExampleOpt.map(_ => "json")
-          val responseTypeSimpleName = {
-            val typ = response.`type`
-            val startIndex = typ.lastIndexOf('.') + 1
-            typ.slice(startIndex, typ.length)
-          }
-
-          val responseHeaders = response.headers.map { headers =>
-            headers.map { header =>
-              PostmanHeader(header.name, header.default, header.description)
-            }
-          }.getOrElse(Seq.empty)
-
-          val exampleResponse = PostmanCollectionItemResponse(
-            id = None,
-            name = Some(s"Example $responseCode - $responseTypeSimpleName"),
-            originalRequest = Some(postmanRequest),
-            header = responseHeaders,
-            body = responseBodyExampleOpt,
-            `_postman_previewlanguage` = postmanPreviewLangOpt,
-            status = None,
-            code = responseCode
-          )
-          Some(exampleResponse)
-
-        case unrecognized =>
-          println(s"Unrecognized response code in operation ${operation.method} ${operation.path} examples - $unrecognized. " +
-            s"Dropping this example from the result Postman Collection")
-          None
-      }
     }
   }
 
