@@ -1,18 +1,19 @@
 package generator
 
 import examples.ExampleJson
+import generator.Utils.Description
 import io.apibuilder.spec.v0.models.{Operation, ResponseCodeInt}
-import models.postman.{PostmanCollectionItemResponse, PostmanHeader, PostmanRequest}
+import io.flow.postman.collection.v210.v0.{models=>postman}
 import play.api.Logging
 import play.api.libs.json.Json
 
 object PostmanExampleResponseBuilder extends Logging {
 
   def build(
-    postmanRequest: PostmanRequest,
+    postmanRequest: postman.Request,
     operation: Operation,
     modelExampleProvider: ExampleJson
-  ): Seq[PostmanCollectionItemResponse] = {
+  ): Seq[postman.Response] = {
     operation.responses.flatMap { response =>
 
       response.code match {
@@ -22,7 +23,6 @@ object PostmanExampleResponseBuilder extends Logging {
             if (response.`type`.equalsIgnoreCase("unit")) None
             else modelExampleProvider.sample(response.`type`).map(Json.prettyPrint)
 
-          val postmanPreviewLangOpt = responseBodyExampleOpt.map(_ => "json")
           val responseTypeSimpleName = {
             val typ = response.`type`
             val startIndex = typ.lastIndexOf('.') + 1
@@ -31,19 +31,23 @@ object PostmanExampleResponseBuilder extends Logging {
 
           val responseHeaders = response.headers.map { headers =>
             headers.map { header =>
-              PostmanHeader(header.name, header.default, header.description)
+              postman.Header(
+                key = header.name,
+                value = header.default.getOrElse(""),
+                disabled = None,
+                description = header.description.map(Description(_)))
             }
           }.getOrElse(Seq.empty)
 
-          val exampleResponse = PostmanCollectionItemResponse(
+          val exampleResponse = postman.Response(
             id = None,
             name = Some(s"Example $responseCode - $responseTypeSimpleName"),
             originalRequest = Some(postmanRequest),
-            header = responseHeaders,
+            responseTime = None,
+            header = Some(responseHeaders),
             body = responseBodyExampleOpt,
-            `_postman_previewlanguage` = postmanPreviewLangOpt,
             status = None,
-            code = responseCode
+            code = Some(responseCode)
           )
           Some(exampleResponse)
 

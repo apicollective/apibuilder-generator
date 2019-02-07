@@ -1,78 +1,79 @@
 package generator
 
-import models.postman._
 import generator.Heuristics.PathVariable
+import io.flow.postman.collection.v210.v0.models._
 
 object PredefinedCollectionItems {
 
-  val requestUrl = PostmanRequestUrl(
-    raw = s"{{BASE_URL}}/organizations",
-    protocol = "",
-    host = Seq("{{BASE_URL}}"),
-    path = Seq("organizations"))
+  val requestUrl = Url(
+    raw = Some(s"{{BASE_URL}}/organizations"),
+    protocol = None,
+    host = Some(Seq("{{BASE_URL}}")),
+    path = Some(Seq("organizations"))
+  )
 
-  def prepareSetupFolder(): PostmanCollectionFolder = {
-    val step1 = PostmanCollectionItem(
+  def prepareSetupFolder(): Folder = {
+    val step1 = Item(
       id = None,
       name = Some("Step 1 - Get available organizations"),
       description = None,
-      request = PostmanRequest(
-        url = requestUrl,
-        method = "GET"
+      request = Request(
+        url = Some(requestUrl),
+        method = Some(Method.Get)
       ),
-      event = Seq(
-        Event(
-          EventType.test,
-          Script(Seq(
+      event = Some(Seq(Event(
+          EventType.Test,
+          Some(Script(Seq(
             """var jsonData = JSON.parse(responseBody);""",
             """var prodOrg = jsonData.filter(org => org.environment == "production");""",
             """postman.setEnvironmentVariable("organization-parent", prodOrg[0].id);""",
             """var randomId = Math.random().toString(36).substring(7);""",
             """pm.environment.set("ORGANIZATION", prodOrg[0].id + "-demo-" + randomId)"""
-          ))
+          ))))
         )
       )
     )
 
-    val step2 = PostmanCollectionItem(
+    val step2 = Item(
       id = None,
       name = Some("Step 2 - Create organization with randomized name"),
       description = None,
-      request = PostmanRequest(
-        url = requestUrl,
-        method = "POST",
-        body = Some(PostmanRequestBodyRaw(
+      request = Request(
+        url = Some(requestUrl),
+        method = Some(Method.Post),
+        body = Some(Body(Some {
           """{
             |  "parent_id" : "{{organization-parent}}",
             |  "environment": "sandbox",
             |  "name": "{{ORGANIZATION}}"
             |}
           """.stripMargin
+        }
         )),
-        headers = Seq(PostmanHeader("Content-Type", "application/json"))
+        header = Some(Seq(Header("Content-Type", "application/json")))
       )
     )
 
-    PostmanCollectionFolder(
+    Folder(
       name = "Setup",
       description = None,
       item = Seq(step1, step2)
     )
   }
 
-  def prepareCleanupFolder(): PostmanCollectionFolder = {
-    val cleanup = PostmanCollectionItem(
+  def prepareCleanupFolder(): Folder = {
+    val cleanup = Item(
       id = None,
       name = Some("Delete demo organization"),
       description = None,
-      request = PostmanRequest(
-        requestUrl.copy(path = requestUrl.path.:+("{{ORGANIZATION}}")),
-        method = "DELETE",
-        headers = Seq(PostmanHeader("Content-Type", "application/json"))
+      request = Request(
+        url = Some(requestUrl.copy(path = requestUrl.path.map(_.:+("{{ORGANIZATION}}")))),
+        method = Some(Method.Delete),
+        header = Some(Seq(Header("Content-Type", "application/json")))
       )
     )
 
-    PostmanCollectionFolder(
+    Folder(
       name = "Cleanup",
       description = None,
       item = Seq(cleanup)
@@ -81,19 +82,19 @@ object PredefinedCollectionItems {
 
   def testEventResponseStatusOk(testTitle: String): Event = {
     Event(
-      EventType.test,
-      Script(Seq(
+      EventType.Test,
+      Some(Script(Seq(
         s"""pm.test("$testTitle", function () {""",
         """    pm.response.to.be.success;""",
         """});"""
-      ))
+      )))
     )
   }
 
   def testPostStatusOk(testTitle: String, pathVariable: Option[PathVariable]): Event = {
     Event(
-      EventType.test,
-      Script{
+      EventType.Test,
+      Some(Script {
         val test = Seq(
           s"""pm.test("$testTitle", function () {""",
           """    pm.response.to.be.success;""",
@@ -110,6 +111,6 @@ object PredefinedCollectionItems {
 
         test ++ pathVariableSetup
       }
-    )
+    ))
   }
 }

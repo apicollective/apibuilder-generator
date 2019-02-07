@@ -54,13 +54,15 @@ class PostmanCollectionGeneratorSpec extends WordSpec {
             |[{
             |    "key": "organization",
             |    "value": "{{ORGANIZATION}}",
-            |    "description": "Type: uuid  | Required: true",
+            |    "description": {
+            |        "content":"Type: uuid  | Required: true"
+            |     },
             |    "disabled": false
             |}]
           """.stripMargin))
 
         (bulkCreateMemberRequest \ "method").as[String] shouldEqual "POST"
-        val bulkCreateMemberHeader = (bulkCreateMemberRequest \ "headers").as[JsArray].value.head
+        val bulkCreateMemberHeader = (bulkCreateMemberRequest \ "header").as[JsArray].value.head
         (bulkCreateMemberHeader \ "key").as[String] shouldEqual "Content-Type"
         (bulkCreateMemberHeader \ "value").as[String] shouldEqual "application/json"
       }
