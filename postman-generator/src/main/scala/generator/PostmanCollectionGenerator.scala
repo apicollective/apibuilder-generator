@@ -24,7 +24,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     form.importedServices match {
       case None if form.service.imports.nonEmpty =>
-        Left(Seq("Service imports need to be resolved before generating Postman Collection. However InvocationForm.importedServices is empty"))
+        Left(Seq("Service imports need to be resolved before generating Postman Collection. However, InvocationForm.importedServices is empty"))
       case None => invokeGenerator(form.service, Seq.empty)
       case Some(importedServices) => invokeGenerator(form.service, importedServices)
     }
@@ -81,7 +81,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
       val postmanItems = resource
         .operations
-        .map(buildPostmanItem(baseUrl, _, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
+        .map(PostmanItemBuilder.build(baseUrl, _, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
         .map(addItemTests(_, pathVariableOpt))
 
       postman.Folder(
@@ -97,7 +97,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
     val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
     val requiredEntitiesSetupSteps = objReferenceAttrToOperationTuples.map {
       case (objRefAttr, operation) =>
-        val postmanItem = buildPostmanItem(baseUrl, operation, serviceSpecificHeaders, examplesProvider, None)
+        val postmanItem = PostmanItemBuilder.build(baseUrl, operation, serviceSpecificHeaders, examplesProvider, None)
         val postmanItemWithTests = addItemTests(postmanItem, None)
 
         addDependencyItemVarSetting(objRefAttr, postmanItemWithTests)
@@ -109,7 +109,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
     postman.Collection(
       info = collectionInfo,
-      item = postmanCollectionFolders.:+(cleanupFolder).+:(setupFolderWithDependantEntities),
+      item = postmanCollectionFolders, // TODO: remove after fixing hardcodes .:+(cleanupFolder).+:(setupFolderWithDependantEntities),
       variable = Seq(
         Variable(
           key = Variables.BaseUrl,
@@ -129,31 +129,13 @@ object PostmanCollectionGenerator extends CodeGenerator {
     )
   }
 
-  private def buildPostmanItem(
-    baseUrl: String,
-    operation: Operation,
-    serviceSpecificHeaders: Seq[postman.Header],
-    modelExampleProvider: ExampleJson,
-    pathVariableOpt: Option[PathVariable]
-  ): postman.Item = {
-    val postmanRequest = buildPostmanRequest(baseUrl, operation, serviceSpecificHeaders, modelExampleProvider, pathVariableOpt)
-
-    postman.Item(
-      id = None,
-      name = Some(s"${operation.method} ${operation.path}"),
-      description = operation.description.map(Description(_)),
-      request = postmanRequest,
-      response = Some(PostmanExampleResponseBuilder.build(postmanRequest, operation, modelExampleProvider))
-    )
-  }
-
   private def addItemTests(item: postman.Item, pathVariableOpt: Option[PathVariable]): postman.Item = {
 
     def isParametrizedOnlyWithOrg(item: postman.Item): Boolean = {
       import item.request
 
       request.url.map { url =>
-        url.variable.size <= 1 &&
+        url.variable.size == 1 &&
           url.variable.headOption.forall(_.forall(_.name.getOrElse("") == s"{{${Variables.Organization}}}")) &&
           url.query.getOrElse(List.empty)
             .filterNot(_.disabled.getOrElse(false))
@@ -212,102 +194,6 @@ object PostmanCollectionGenerator extends CodeGenerator {
             item.copy(event = item.event.map(_ :+ eventToAdd))
         }
 
-  }
-
-  private def buildPostmanRequest(
-    baseUrl: String,
-    operation: Operation,
-    serviceSpecificHeaders: Seq[postman.Header],
-    modelExampleProvider: ExampleJson,
-    pathVariableOpt: Option[PathVariable]
-  ): postman.Request = {
-    val protocol = baseUrl.takeWhile(_ != ':')
-
-    // hardcoded fix
-    val rawHost = Variables.BaseUrl.stripPrefix(protocol).stripPrefix("://")
-
-    val parameterMap = operation.parameters.groupBy(_.location)
-
-    def getParameters(location: ParameterLocation): Seq[Parameter] =
-      parameterMap.getOrElse(location, default = Seq.empty)
-
-    def getDescription(p: Parameter): Option[String] =
-      p.description.orElse(Some(s"Type: ${p.`type`}  | Required: ${p.required}"))
-
-    val queryParams = getParameters(ParameterLocation.Query).map { p =>
-      postman.QueryParam(
-        key = Some(p.name),
-        value = p.example.orElse(p.default),
-        description = getDescription(p).map(Description(_)),
-        disabled = Some(!p.required))
-    }
-
-    val headersFromParams = getParameters(ParameterLocation.Header).map { p =>
-      postman.Header(
-        key = p.name,
-        value = p.example.orElse(p.default).getOrElse(""),
-        description = getDescription(p).map(Description(_))
-      )
-    }
-
-    val pathParams =
-      getParameters(ParameterLocation.Path).map { p =>
-        postman.Variable(
-          key = Some(p.name),
-          value = Some{
-            if (pathVariableOpt.filter(_.name == p.name).isDefined)
-              s"{{${pathVariableOpt.get.postmanVarName}}}"
-            else
-              generatePathParamValue(p)
-          },
-          description = getDescription(p).map(Description(_)),
-          disabled = Some(!p.required))
-      }
-
-    val postmanUrl = postman.Url(
-      raw = Some(s"{{${Variables.BaseUrl}}}" + operation.path),
-      protocol = None,
-      host = Some(Seq(s"{{${Variables.BaseUrl}}}")),
-      path = Some(operation.path.stripPrefix("/").split('/').toSeq),
-      query = Some(queryParams),
-      variable = Some(pathParams)
-    )
-
-    val requestBodyOpt = operation.body.flatMap { body =>
-      val jsonOpt = modelExampleProvider.sample(body.`type`)
-      jsonOpt.map { json =>
-        postman.Body(
-          Some(Json.prettyPrint(json)),
-          mode = Some(postman.BodyMode.Raw)
-        )
-      }
-    }
-
-    val headers: Seq[postman.Header] = requestBodyOpt.foldLeft(serviceSpecificHeaders ++ headersFromParams) { (headers, _)  =>
-      headers :+ postman.Header("Content-Type", "application/json", description = Some(Description("Required to send JSON body")))
-    }
-
-    postman.Request(
-      url = Option(postmanUrl),
-      method = Option(postman.Method(operation.method.toString)),
-      description = operation.description.map(Description(_)),
-      auth = None,
-      header = Some(headers),
-      body = requestBodyOpt
-    )
-  }
-
-  private def generatePathParamValue(parameter: Parameter): String = {
-    parameter match {
-      case organizationParam if organizationParam.name == "organization" =>
-        s"{{${Variables.Organization}}}"
-      case paramWithDefault if paramWithDefault.example.isDefined =>
-        paramWithDefault.example.get
-      case paramWithExample if paramWithExample.default.isDefined =>
-        paramWithExample.default.get
-      case _ =>
-        "1" // TODO: set this default value according to the type
-    }
   }
 
   private def writePostmanCollectionToFile(service: Service, fileName: String, postmanCollection: postman.Collection): File = {
