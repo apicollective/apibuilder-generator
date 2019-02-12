@@ -225,7 +225,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
     it("generates date-time with java.time") {
       val form = new InvocationForm(
         models.TestHelper.parseFile("/examples/date-time-types.json"),
-        Seq(Attribute("time", "java")),
+        Seq(Attribute("scala_generator.time_library", "java")),
         None
       )
       val Right(files) = Play27ClientGenerator.invoke(form)

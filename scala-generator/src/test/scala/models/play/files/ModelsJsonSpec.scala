@@ -30,7 +30,7 @@ class ModelsJsonSpec extends FunSpec with Matchers {
   it("generates models and joda json") {
     val form = InvocationForm(
       service = basicService,
-      attributes = Seq(Attribute("time", "joda"))
+      attributes = Seq(Attribute("scala_generator.time_library", "joda"))
     )
     ModelsJson.contents(form).replaceAll(" +", " ").replaceAll(" +\n", "\n").trim shouldBe
       """package x.models
