@@ -13,18 +13,7 @@ object ModelsJson {
   }
 
   def contents(form: InvocationForm): String = {
-        val scalaService = scala.generator.ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
-
-        val header = scala.models.ApidocComments(form.service.version, form.userAgent)
-        val imports = scala.models.JsonImports(form.service)
-
-  def jodaLocalDateFormat(): String = s"""
-    import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
-    import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites
-  """
-
-  def contents(form: InvocationForm): String = {
-    val scalaService = scala.generator.ScalaService(form.service)
+    val scalaService = scala.generator.ScalaService(form.service, Config(form.attributes, Config.PlayGen2DefaultConfig))
     val imports = scala.models.JsonImports(form.service)
     val gen = scala.models.Play2Json(scalaService)
 
@@ -36,11 +25,9 @@ object ModelsJson {
         import play.api.libs.json.{__, JsString, Writes}
         import play.api.libs.functional.syntax._
 
-        ${uuidFormat()}
-        ${jodaDateTimeFormat()}
-        ${jodaLocalDateFormat()}
+        ${implicits(scalaService)}
 
-                ${implicits(scalaService)}
+        ${imports.mkString("\n")}
 
         ${gen.generateEnums()}
         ${gen.generateModelsAndUnions()}
