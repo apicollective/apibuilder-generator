@@ -94,7 +94,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     it("http4s with joda 0.20") {
       val form = new InvocationForm(
         models.TestHelper.parseFile("/examples/date-time-types.json"),
-        Seq(Attribute("time", "joda")),
+        Seq(Attribute("scala_generator.time_library", "joda")),
         None
       )
       val Right(files) = Http4s020Generator.invoke(form)
