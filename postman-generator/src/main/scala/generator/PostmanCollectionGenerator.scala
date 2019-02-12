@@ -18,7 +18,6 @@ object PostmanCollectionGenerator extends CodeGenerator {
     val FlowToken = "FLOW_TOKEN"
     val Organization = "ORGANIZATION"
     val BaseUrl = "BASE_URL"
-    val BaseUrlValue = "https://api.flow.io"
   }
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
@@ -54,7 +53,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
       schema = "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     )
 
-    val baseUrl = service.baseUrl.getOrElse(Variables.BaseUrlValue)
+    val baseUrl = service.baseUrl
 
     val serviceSpecificHeaders = service.headers.map { header =>
       postman.Header(
@@ -81,7 +80,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
       val postmanItems = resource
         .operations
-        .map(PostmanItemBuilder.build(baseUrl, _, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
+        .map(PostmanItemBuilder.build( _, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
         .map(addItemTests(_, pathVariableOpt))
 
       postman.Folder(
@@ -97,7 +96,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
     val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
     val requiredEntitiesSetupSteps = objReferenceAttrToOperationTuples.map {
       case (objRefAttr, operation) =>
-        val postmanItem = PostmanItemBuilder.build(baseUrl, operation, serviceSpecificHeaders, examplesProvider, None)
+        val postmanItem = PostmanItemBuilder.build(operation, serviceSpecificHeaders, examplesProvider, None)
         val postmanItemWithTests = addItemTests(postmanItem, None)
 
         addDependencyItemVarSetting(objRefAttr, postmanItemWithTests)
@@ -113,7 +112,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
       variable = Seq(
         Variable(
           key = Variables.BaseUrl,
-          value = Variables.BaseUrlValue,
+          value = baseUrl.getOrElse(""),
           `type` = "string"
         )
       ),

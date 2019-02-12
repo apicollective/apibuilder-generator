@@ -198,12 +198,12 @@ class PostmanItemBuilderSpec extends WordSpec with Matchers {
 
     def serviceSpecificHeaders: Seq[postman.Header] = Seq.empty
 
-    def buildPostmanItem: postman.Item = PostmanItemBuilder.build(baseUrl, testOperation, serviceSpecificHeaders, exampleProvider, None)
+    def buildPostmanItem: postman.Item = PostmanItemBuilder.build(testOperation, serviceSpecificHeaders, exampleProvider, None)
 
     def commonAssertions(postmanItem: postman.Item): Assertion = {
       postmanItem.name shouldEqual Some(s"$method $path")
       postmanItem.description shouldEqual Some(Description(description))
-      postmanItem.request.url.get.raw shouldEqual /* TODO: after fix, it should be baseUrl, not a variable */ Some("{{BASE_URL}}" + path)
+      postmanItem.request.url.get.raw shouldEqual Some("{{BASE_URL}}" + path)
       postmanItem.event shouldEqual None
     }
 

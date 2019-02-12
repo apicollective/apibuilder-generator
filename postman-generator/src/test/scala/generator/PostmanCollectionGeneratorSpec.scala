@@ -77,7 +77,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
           |  },
           |  "variable" : [ {
           |    "type" : "string",
-          |    "value" : "https://api.flow.io",
+          |    "value" : "https://some.service.com",
           |    "key" : "BASE_URL"
           |  } ],
           |  "event" : [ ],
@@ -199,7 +199,8 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
             )
           )
         )
-      )
+      ),
+      baseUrl = Some("https://some.service.com")
     )
 
   }

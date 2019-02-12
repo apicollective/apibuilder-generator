@@ -12,13 +12,12 @@ import play.api.libs.json.Json
 object PostmanItemBuilder extends Logging {
 
   def build(
-    baseUrl: String,
     operation: Operation,
     serviceSpecificHeaders: Seq[postman.Header],
     modelExampleProvider: ExampleJson,
     pathVariableOpt: Option[PathVariable]
   ): postman.Item = {
-    val postmanRequest = buildPostmanRequest(baseUrl, operation, serviceSpecificHeaders, modelExampleProvider, pathVariableOpt)
+    val postmanRequest = buildPostmanRequest(operation, serviceSpecificHeaders, modelExampleProvider, pathVariableOpt)
 
     postman.Item(
       id = None,
@@ -30,16 +29,11 @@ object PostmanItemBuilder extends Logging {
   }
 
   private def buildPostmanRequest(
-    baseUrl: String,
     operation: Operation,
     serviceSpecificHeaders: Seq[postman.Header],
     modelExampleProvider: ExampleJson,
     pathVariableOpt: Option[PathVariable]
   ): postman.Request = {
-    val protocol = baseUrl.takeWhile(_ != ':')
-
-    // hardcoded fix
-    val rawHost = Variables.BaseUrl.stripPrefix(protocol).stripPrefix("://")
 
     val parameterMap = operation.parameters.groupBy(_.location)
 
