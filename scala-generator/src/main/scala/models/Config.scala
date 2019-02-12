@@ -36,6 +36,7 @@ case class Config(timeLib: TimeConfig, jsonLib: JsonConfig)
 
 object Config {
   val PlayDefaultConfig = Config(TimeConfig.JodaTime, JsonConfig.PlayJson)
+  val PlayGen2DefaultConfig = Config(TimeConfig.JavaTime, JsonConfig.PlayJson)
   val Http4sDefaultConfig = Config(TimeConfig.JavaTime, JsonConfig.CirceJson)
 
   def apply(attributes: Seq[Attribute], defaultConfig: Config): Config = {
