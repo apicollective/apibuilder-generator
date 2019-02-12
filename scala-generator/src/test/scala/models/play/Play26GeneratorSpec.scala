@@ -1,38 +1,36 @@
 package scala.models.play
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.gens._
 import io.apibuilder.spec.v0.models.{Application, Organization, Service}
 import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.prop.PropertyChecks
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
 
-class Play26GeneratorSpec extends FunSpec with Matchers {
+class Play26GeneratorSpec extends FunSpec with Matchers with PropertyChecks {
+
+  implicit val scalacheckConfig = generatorDrivenConfig.copy(sizeRange = 10)
 
   it("prependHeader should prepend a header") {
-    val contents = "CONTENT"
-    val form = InvocationForm(Service(null, null, null, null, null, "", null, info = null))
-    val expected = s"""
-        HEADER
+    forAll { (header: String, contents: String, form: InvocationForm) =>
+      val expected = s"""
+          ${header}
 
-        CONTENT
-    """
-    val result = Play26Generator.prependHeader(contents, form, _ => "HEADER")
+          ${contents}
+      """
 
-    compareWithoutWhiteSpaces(result, expected)
+      val result = Play26Generator.prependHeader(contents, form, _ => header)
+      compareWithoutWhiteSpaces(result, expected)
+    }
   }
 
   it("file should wrap generator.ServiceFileNames.toFile") {
-    val namespace = "namespace"
-    val organization = "organization"
-    val application = "application"
-    val version = "version"
-    val suffix = "suffix"
-    val contents = "contents"
-    val extension = Some("extension")
+    forAll { (form: InvocationForm, suffix: String, contents: String, extension: Option[String]) =>
+      val expected = generator.ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, suffix, contents, extension)
+      val result = Play26Generator.file(form, suffix, contents, extension)
 
-    val expected = generator.ServiceFileNames.toFile(namespace, organization, application, version, suffix, contents, extension)
-    val result = Play26Generator.file(InvocationForm(Service(null, null, Organization(organization), Application(application), namespace, version, info = null)), suffix, contents, extension)
-
-    result should be(expected)
+      result should be(expected)
+    }
   }
 
   ignore("formatScala should format valid scala code") {
@@ -50,14 +48,13 @@ class Play26GeneratorSpec extends FunSpec with Matchers {
   }
 
   it("formatRoutes should format routes") {
-    val contents = """
-    A
-    B
-    C
-    """
-    val expected = "A\nB\nC"
-    val result = Play26Generator.formatRoutes(contents)
+    forAll { (lines: List[String], spacesCount: Byte) =>
+      val spaces = " " * spacesCount
+      val contents = lines.mkString(spaces, s"${spaces}\n${spaces}", spaces)
+      val expected = lines.mkString("\n").trim
+      val result = Play26Generator.formatRoutes(contents)
 
-    result should be(expected)
+      result should be(expected)
+    }
   }
 }

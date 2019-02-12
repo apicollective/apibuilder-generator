@@ -3,6 +3,7 @@ package scala.models.play.files
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 import io.apibuilder.spec.v0.models.{Apidoc, Application, Info, Organization, Service}
 import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.prop.PropertyChecks
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
 
 class ModelsJsonSpec extends FunSpec with Matchers {
