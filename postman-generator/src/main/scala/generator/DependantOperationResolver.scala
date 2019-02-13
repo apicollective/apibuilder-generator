@@ -1,8 +1,8 @@
 package generator
 
 import io.apibuilder.spec.v0.models.{Operation, Resource, Service}
-import models.ObjectReferenceAttribute
-import models.ObjectReferenceAttribute.ObjectReferenceAttrValue
+import models.attributes.ObjectReferenceAttribute.ObjectReferenceAttrValue
+import models.attributes.ObjectReferenceAttribute
 import models.service.ResolvedService
 
 object DependantOperationResolver {

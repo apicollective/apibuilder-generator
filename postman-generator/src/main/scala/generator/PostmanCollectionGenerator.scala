@@ -5,12 +5,14 @@ import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import lib.generator.CodeGenerator
-import models.ObjectReferenceAttribute.ObjectReferenceAttrValue
-import io.flow.postman.collection.v210.v0.{models=>postman}
+import models.attributes.ObjectReferenceAttribute.ObjectReferenceAttrValue
+import io.flow.postman.collection.v210.v0.{models => postman}
 import io.flow.postman.collection.v210.v0.models.json._
 import models.service.{ResolvedService, ServiceImportResolver}
 import play.api.libs.json.Json
 import Utils._
+import models.attributes.PostmanBasicAuthAttribute
+import models.attributes.PostmanBasicAuthAttribute.PostmanBasicAuthAttrValue
 
 object PostmanCollectionGenerator extends CodeGenerator {
 
@@ -106,6 +108,19 @@ object PostmanCollectionGenerator extends CodeGenerator {
       item = setupFolder.item ++ requiredEntitiesSetupSteps
     )
 
+    val basicAuthOpt = service.attributes
+      .find(_.name.equalsIgnoreCase(PostmanBasicAuthAttribute.Key))
+      .flatMap(_.value.asOpt[PostmanBasicAuthAttrValue])
+      .map { basicAuth =>
+      postman.Auth(
+        `type` = postman.AuthEnum.Basic,
+        basic = Some(List(
+          postman.BasicAuth(key = "username", value = basicAuth.username),
+          postman.BasicAuth(key = "password", value = basicAuth.password)
+        ))
+      )
+    }
+
     postman.Collection(
       info = collectionInfo,
       item = postmanCollectionFolders, // TODO: remove after fixing hardcodes .:+(cleanupFolder).+:(setupFolderWithDependantEntities),
@@ -116,14 +131,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
           `type` = "string"
         )
       ),
-      auth =
-        Some(postman.Auth(
-        `type` = postman.AuthEnum.Basic,
-        basic = Some(List(
-          postman.BasicAuth(key = "username", value = s"{{${Variables.FlowToken}}}"),
-          postman.BasicAuth(key = "password", value = "")
-        ))
-      )),
+      auth = basicAuthOpt,
       event = Seq.empty
     )
   }

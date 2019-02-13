@@ -5,8 +5,11 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import io.flow.postman.collection.v210.v0.{models => postman}
 import io.flow.postman.collection.v210.v0.models.json.jsonReadsPostmanCollectionV210Collection
+import models.attributes.PostmanBasicAuthAttribute
+import models.attributes.PostmanBasicAuthAttribute.PostmanBasicAuthAttrValue
+import models.attributes.PostmanBasicAuthAttribute.postmanBasicAuthAttrValueFormat
 import org.scalatest.{Assertion, Matchers, WordSpec}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
 import scala.util.Try
 
@@ -31,7 +34,6 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       result.isRight shouldEqual true
 
       val generatedCollectionJson = Json.parse(result.right.get.head.contents)
-      // TODO: below JSON contains 'variable' and 'auth' elements that are hardcoded now. delete after fixing the logic
       generatedCollectionJson shouldEqual Json.parse(
         """
           |{
@@ -65,16 +67,6 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
           |    "name" : "complex-strings",
           |    "type" : "folder"
           |  } ],
-          |  "auth" : {
-          |    "type" : "basic",
-          |    "basic" : [ {
-          |      "value" : "{{FLOW_TOKEN}}",
-          |      "key" : "username"
-          |    }, {
-          |      "value" : "",
-          |      "key" : "password"
-          |    } ]
-          |  },
           |  "variable" : [ {
           |    "type" : "string",
           |    "value" : "https://some.service.com",
@@ -149,6 +141,30 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
         val responseExampleJson = Json.parse(getFirstAgeGroupEndpointResponseExample.body.get)
         val exampleGroup = (responseExampleJson \ "group").as[String]
         importedEnum.values.map(_.name) should contain(exampleGroup)
+      }
+    }
+
+    "add Basic Auth definition to the Collection if the specification contains postman-basic-auth attribute" in new TrivialServiceContext {
+      val basicAuthAttrValue = PostmanBasicAuthAttrValue(
+        username = "{{USER}}",
+        password = ""
+      )
+      val trivialServiceWithAuth = trivialService.copy(
+        attributes = Seq(
+          Attribute(name = PostmanBasicAuthAttribute.Key, value = Json.toJson(basicAuthAttrValue).as[JsObject])
+        )
+      )
+
+      val invocationForm = InvocationForm(trivialServiceWithAuth, importedServices = Some(Seq(referenceApiService)))
+      val result = PostmanCollectionGenerator.invoke(invocationForm)
+
+      assertResultCollectionJson(result) { collection =>
+        collection.auth.isDefined shouldEqual true
+        collection.auth.get.`type` shouldEqual postman.AuthEnum.Basic
+        collection.auth.get.basic.get shouldEqual Seq(
+          postman.BasicAuth(key = "username", value = basicAuthAttrValue.username),
+          postman.BasicAuth(key = "password", value = basicAuthAttrValue.password)
+        )
       }
     }
 

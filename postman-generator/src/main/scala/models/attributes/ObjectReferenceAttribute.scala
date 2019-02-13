@@ -1,4 +1,4 @@
-package models
+package models.attributes
 
 import _root_.play.api.libs.json.Json
 

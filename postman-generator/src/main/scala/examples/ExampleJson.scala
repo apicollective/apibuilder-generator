@@ -4,8 +4,8 @@ import java.util.UUID
 
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.spec.v0.models.json._
-import models.ObjectReferenceAttribute
-import models.ObjectReferenceAttribute.ObjectReferenceAttrValue
+import models.attributes.ObjectReferenceAttribute.ObjectReferenceAttrValue
+import models.attributes.ObjectReferenceAttribute
 import org.joda.time.{DateTime, LocalDate}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
