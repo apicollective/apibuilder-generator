@@ -5,6 +5,8 @@ import io.flow.postman.collection.v210.v0.models._
 
 object PredefinedCollectionItems {
 
+  import Utils._
+
   val requestUrl = Url(
     raw = Some(s"{{BASE_URL}}/organizations"),
     protocol = None,
@@ -14,9 +16,10 @@ object PredefinedCollectionItems {
 
   def prepareSetupFolder(): Folder = {
     val step1 = Item(
-      id = None,
-      name = Some("Step 1 - Get available organizations"),
-      description = None,
+      name = Some("Step 1 - Select parent organization"),
+      description = Some(Description(
+        """Fetch all organizations and select first production organization for a parent.
+          |Also selects randomized organization name and sets a postman variable.""".stripMargin)),
       request = Request(
         url = Some(requestUrl),
         method = Some(Method.Get)
@@ -35,7 +38,6 @@ object PredefinedCollectionItems {
     )
 
     val step2 = Item(
-      id = None,
       name = Some("Step 2 - Create organization with randomized name"),
       description = None,
       request = Request(
@@ -63,7 +65,6 @@ object PredefinedCollectionItems {
 
   def prepareCleanupFolder(): Folder = {
     val cleanup = Item(
-      id = None,
       name = Some("Delete demo organization"),
       description = None,
       request = Request(

@@ -1,10 +1,17 @@
 package models.attributes
 
-import _root_.play.api.libs.json.Json
+import play.api.libs.json.Json
 
-object ObjectReferenceAttribute {
+object PostmanAttributes {
 
-  val Key = "object-reference"
+  val BasicAuthKey = "postman-basic-auth"
+  val SetupKey = "postman-organization-setup"
+  val ObjectReferenceKey = "object-reference"
+
+  case class PostmanBasicAuthAttrValue(
+    username: String,
+    password: String
+  )
 
   case class ObjectReferenceAttrValue(
     relatedServiceNamespace: String,
@@ -16,5 +23,5 @@ object ObjectReferenceAttribute {
   }
 
   implicit val objectReferenceAttrValueFormats = Json.format[ObjectReferenceAttrValue]
-
+  implicit val postmanBasicAuthAttrValueFormat = Json.format[PostmanBasicAuthAttrValue]
 }

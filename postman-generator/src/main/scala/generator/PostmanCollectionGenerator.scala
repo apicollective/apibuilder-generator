@@ -5,14 +5,15 @@ import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import lib.generator.CodeGenerator
-import models.attributes.ObjectReferenceAttribute.ObjectReferenceAttrValue
+import models.attributes.PostmanAttributes.ObjectReferenceAttrValue
 import io.flow.postman.collection.v210.v0.{models => postman}
 import io.flow.postman.collection.v210.v0.models.json._
 import models.service.{ResolvedService, ServiceImportResolver}
 import play.api.libs.json.Json
 import Utils._
-import models.attributes.PostmanBasicAuthAttribute
-import models.attributes.PostmanBasicAuthAttribute.PostmanBasicAuthAttrValue
+import io.flow.postman.collection.v210.v0.models.Folder
+import models.attributes.PostmanAttributes
+import models.attributes.PostmanAttributes.PostmanBasicAuthAttrValue
 
 object PostmanCollectionGenerator extends CodeGenerator {
 
@@ -82,7 +83,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
       val postmanItems = resource
         .operations
-        .map(PostmanItemBuilder.build( _, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
+        .map(PostmanItemBuilder.build(_, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
         .map(addItemTests(_, pathVariableOpt))
 
       postman.Folder(
@@ -92,38 +93,38 @@ object PostmanCollectionGenerator extends CodeGenerator {
       )
     }
 
-    val cleanupFolder: postman.Folder = PredefinedCollectionItems.prepareCleanupFolder()
-    val setupFolder: postman.Folder = PredefinedCollectionItems.prepareSetupFolder()
-
-    val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
-    val requiredEntitiesSetupSteps = objReferenceAttrToOperationTuples.map {
-      case (objRefAttr, operation) =>
-        val postmanItem = PostmanItemBuilder.build(operation, serviceSpecificHeaders, examplesProvider, None)
-        val postmanItemWithTests = addItemTests(postmanItem, None)
-
-        addDependencyItemVarSetting(objRefAttr, postmanItemWithTests)
-    }
-
-    val setupFolderWithDependantEntities = setupFolder.copy(
-      item = setupFolder.item ++ requiredEntitiesSetupSteps
-    )
-
     val basicAuthOpt = service.attributes
-      .find(_.name.equalsIgnoreCase(PostmanBasicAuthAttribute.Key))
+      .find(_.name.equalsIgnoreCase(PostmanAttributes.BasicAuthKey))
       .flatMap(_.value.asOpt[PostmanBasicAuthAttrValue])
       .map { basicAuth =>
-      postman.Auth(
-        `type` = postman.AuthEnum.Basic,
-        basic = Some(List(
-          postman.BasicAuth(key = "username", value = basicAuth.username),
-          postman.BasicAuth(key = "password", value = basicAuth.password)
-        ))
-      )
-    }
+        postman.Auth(
+          `type` = postman.AuthEnum.Basic,
+          basic = Some(List(
+            postman.BasicAuth(key = "username", value = basicAuth.username),
+            postman.BasicAuth(key = "password", value = basicAuth.password)
+          ))
+        )
+      }
+
+    val shouldAddSetupFolder: Boolean =
+      service.attributes
+        .find(_.name.equalsIgnoreCase(PostmanAttributes.SetupKey))
+        .nonEmpty
+
+    val entitiesSetupFolderOpt = prepareEntitiesSetupFolders(resolvedService, serviceSpecificHeaders, examplesProvider)
+
+    val folders: Seq[Folder] =
+      (if (shouldAddSetupFolder) {
+        val cleanupFolder: postman.Folder = PredefinedCollectionItems.prepareCleanupFolder()
+        val setupFolder: postman.Folder = PredefinedCollectionItems.prepareSetupFolder()
+        (Option(setupFolder) :: entitiesSetupFolderOpt :: Nil).flatten ++ postmanCollectionFolders.toList ++ List(cleanupFolder)
+      } else {
+        entitiesSetupFolderOpt ++: postmanCollectionFolders
+      })
 
     postman.Collection(
       info = collectionInfo,
-      item = postmanCollectionFolders, // TODO: remove after fixing hardcodes .:+(cleanupFolder).+:(setupFolderWithDependantEntities),
+      item = folders,
       variable = Seq(
         Variable(
           key = Variables.BaseUrl,
@@ -134,6 +135,28 @@ object PostmanCollectionGenerator extends CodeGenerator {
       auth = basicAuthOpt,
       event = Seq.empty
     )
+  }
+
+  def prepareEntitiesSetupFolders(
+    resolvedService          : ResolvedService,
+    serviceSpecificHeaders   : Seq[postman.Header],
+    examplesProvider         : ExampleJson
+  ): Option[Folder] = {
+    val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
+    val requiredEntitiesSetupSteps = objReferenceAttrToOperationTuples.map {
+      case (objRefAttr, operation) =>
+        val postmanItem = PostmanItemBuilder.build(operation, serviceSpecificHeaders, examplesProvider, None)
+        val postmanItemWithTests = addItemTests(postmanItem, None)
+
+        addDependencyItemVarSetting(objRefAttr, postmanItemWithTests)
+    }
+    if (requiredEntitiesSetupSteps.nonEmpty) {
+      Some(
+        postman.Folder(
+          "Entities Setup",
+          item = requiredEntitiesSetupSteps
+        ))
+    } else None
   }
 
   private def addItemTests(item: postman.Item, pathVariableOpt: Option[PathVariable]): postman.Item = {

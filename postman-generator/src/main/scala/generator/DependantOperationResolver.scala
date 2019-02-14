@@ -1,8 +1,9 @@
 package generator
 
 import io.apibuilder.spec.v0.models.{Operation, Resource, Service}
-import models.attributes.ObjectReferenceAttribute.ObjectReferenceAttrValue
-import models.attributes.ObjectReferenceAttribute
+import models.attributes.PostmanAttributes.ObjectReferenceAttrValue
+import models.attributes.PostmanAttributes
+import models.attributes.PostmanAttributes._
 import models.service.ResolvedService
 
 object DependantOperationResolver {
@@ -31,7 +32,7 @@ object DependantOperationResolver {
               recurOps(field.`type`)
             case field =>
               val objRefAttrOpt = field.attributes.collectFirst {
-                case attr if attr.name.equalsIgnoreCase(ObjectReferenceAttribute.Key) => attr.value.asOpt[ObjectReferenceAttrValue]
+                case attr if attr.name.equalsIgnoreCase(PostmanAttributes.ObjectReferenceKey) => attr.value.asOpt[ObjectReferenceAttrValue]
               }.flatten
 
               objRefAttrOpt match {

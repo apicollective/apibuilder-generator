@@ -4,8 +4,8 @@ import java.util.UUID
 
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.spec.v0.models.json._
-import models.attributes.ObjectReferenceAttribute.ObjectReferenceAttrValue
-import models.attributes.ObjectReferenceAttribute
+import models.attributes.PostmanAttributes.ObjectReferenceAttrValue
+import models.attributes.PostmanAttributes
 import org.joda.time.{DateTime, LocalDate}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
@@ -74,7 +74,7 @@ case class ExampleJson(service: Service, selection: Selection) {
           map { field =>
 
             val objRefAttrOpt = field.attributes.collectFirst {
-              case attr if attr.name.equalsIgnoreCase(ObjectReferenceAttribute.Key) => attr.value.asOpt[ObjectReferenceAttrValue]
+              case attr if attr.name.equalsIgnoreCase(PostmanAttributes.ObjectReferenceKey) => attr.value.asOpt[ObjectReferenceAttrValue]
             }.flatten
 
             val value = objRefAttrOpt match {

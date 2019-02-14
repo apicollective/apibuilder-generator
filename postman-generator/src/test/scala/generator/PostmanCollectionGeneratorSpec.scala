@@ -5,9 +5,9 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import io.flow.postman.collection.v210.v0.{models => postman}
 import io.flow.postman.collection.v210.v0.models.json.jsonReadsPostmanCollectionV210Collection
-import models.attributes.PostmanBasicAuthAttribute
-import models.attributes.PostmanBasicAuthAttribute.PostmanBasicAuthAttrValue
-import models.attributes.PostmanBasicAuthAttribute.postmanBasicAuthAttrValueFormat
+import models.attributes.PostmanAttributes
+import models.attributes.PostmanAttributes.PostmanBasicAuthAttrValue
+import models.attributes.PostmanAttributes.postmanBasicAuthAttrValueFormat
 import org.scalatest.{Assertion, Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
 
@@ -151,7 +151,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       )
       val trivialServiceWithAuth = trivialService.copy(
         attributes = Seq(
-          Attribute(name = PostmanBasicAuthAttribute.Key, value = Json.toJson(basicAuthAttrValue).as[JsObject])
+          Attribute(name = PostmanAttributes.BasicAuthKey, value = Json.toJson(basicAuthAttrValue).as[JsObject])
         )
       )
 
@@ -168,6 +168,21 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       }
     }
 
+    "add Setup and Cleanup folders to the Collection if the specification contains `postman-organization-setup` attribute" in new TrivialServiceContext {
+      val trivialServiceWithFlag = trivialService.copy(
+        attributes = Seq(
+          Attribute("postman-organization-setup", JsObject.empty))
+      )
+      val invocationForm = InvocationForm(trivialServiceWithFlag, importedServices = Some(Seq(referenceApiService)))
+      val result = PostmanCollectionGenerator.invoke(invocationForm)
+
+      assertResultCollectionJson(result) { collection =>
+        val folderNames = collection.item.collect {
+          case folder: postman.Folder => folder.name
+        }
+        folderNames should contain allElementsOf (Seq("Setup", "Cleanup"))
+      }
+    }
   }
 
   private def assertResultCollectionJson(result: Either[Seq[String], Seq[File]])(collectionAssertion: postman.Collection => Assertion): Assertion = {
