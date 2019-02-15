@@ -1,14 +1,12 @@
-package models.service
+package generator
 
-import io.apibuilder.spec.v0.models.{Enum, Model, Resource, Service, Union}
+import io.apibuilder.spec.v0.models.{Enum, Field, Model, Resource, Service, Union, UnionType}
+import models.service.ResolvedService
 
 object ServiceImportResolver {
 
   type ImportedObjects = (Seq[Enum], Seq[Model], Seq[Union], Map[String, Seq[Resource]])
 
-  // TODO: investigate if this mechanism (from api-examples-poc repo) is valid
-  // another approach is visible in apibuilder repo, Versions.scala file
-  // (it's possible that enum/model namespaces and names are created with a bug)
   def resolveService(service: Service, importedServices: Seq[Service]): ResolvedService = {
 
     val (importedEnums, importedModels, importedUnions, importedServiceNamespaceToResourceMap): ImportedObjects =
@@ -40,34 +38,43 @@ object ServiceImportResolver {
         case Some(importedService) =>
           val importedServiceNamespace = importedService.namespace
 
+          def fixType[T](origTyp: String, update: String => T): T = {
+            val typeRx = """(\[?)(.*?)(\]?)""".r
+            origTyp match {
+              case typeRx(prefix, typ, suffix) =>
+                if (importedService.models.exists(_.name == typ)) {
+                  update(s"$prefix$importedServiceNamespace.models.$typ$suffix")
+                } else if (importedService.enums.exists(_.name == typ)) {
+                  update(s"$prefix$importedServiceNamespace.enums.$typ$suffix")
+                } else if (importedService.unions.exists(_.name == typ)) {
+                  update(s"$prefix$importedServiceNamespace.unions.$typ$suffix")
+                } else {
+                  update(origTyp)
+                }
+              case _ => update(origTyp)
+            }
+          }
+
+          def prefixModelFields(field: Field) = fixType(field.`type`, typ => field.copy(`type` = typ))
+
+          def prefixUnionType(unionType: UnionType) = fixType(unionType.`type`, typ => unionType.copy(`type` = typ))
+
           val enums = importedService.enums.map { enum =>
             enum.copy(name = s"$importedServiceNamespace.enums.${enum.name}")
           }
 
-          def isFieldTypeEnumReference(fieldType: String): Boolean = importedService.enums.map(_.name).contains(fieldType)
-
-          def isFieldTypeModelReference(fieldType: String): Boolean = importedService.models.map(_.name).contains(fieldType)
-
-          def isFieldTypeUnionReference(fieldType: String): Boolean = importedService.unions.map(_.name).contains(fieldType)
-
           val models = importedService.models.map { model =>
-            val updatedFields = model.fields.map {
-              case field if isFieldTypeEnumReference(field.`type`) =>
-                field.copy(`type` = s"$importedServiceNamespace.enums.${field.`type`}")
-              case field if isFieldTypeModelReference(field.`type`) =>
-                field.copy(`type` = s"$importedServiceNamespace.models.${field.`type`}")
-              case field if isFieldTypeUnionReference(field.`type`) =>
-                field.copy(`type` = s"$importedServiceNamespace.unions.${field.`type`}")
-              case otherField => otherField
-            }
             model.copy(
-              fields = updatedFields,
-              name = s"$importedServiceNamespace.models.${model.name}"
+              name = s"$importedServiceNamespace.models.${model.name}",
+              fields = model.fields.map(prefixModelFields)
             )
           }
 
           val unions = importedService.unions.map { union =>
-            union.copy(name = s"$importedServiceNamespace.unions.${union.name}")
+            union.copy(
+              name = s"$importedServiceNamespace.unions.${union.name}",
+              types = union.types.map(prefixUnionType)
+            )
           }
 
           val serviceNamespaceToResources = importedService.namespace -> importedService.resources

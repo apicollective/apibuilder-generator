@@ -8,7 +8,7 @@ import lib.generator.CodeGenerator
 import models.attributes.PostmanAttributes.ObjectReferenceAttrValue
 import io.flow.postman.collection.v210.v0.{models => postman}
 import io.flow.postman.collection.v210.v0.models.json._
-import models.service.{ResolvedService, ServiceImportResolver}
+import models.service.ResolvedService
 import play.api.libs.json.Json
 import Utils._
 import io.flow.postman.collection.v210.v0.models.Folder
@@ -35,11 +35,8 @@ object PostmanCollectionGenerator extends CodeGenerator {
   private def invokeGenerator(service: Service, importedServices: Seq[Service]): Either[Seq[String], Seq[File]] = {
 
     val resolvedService: ResolvedService = ServiceImportResolver.resolveService(service, importedServices)
-
     val postmanCollectionJson = generatePostmanCollection(resolvedService)
-
-    val postmanCollectionFileName = s"${service.name}-postman-collection.json"
-    val savedFile = writePostmanCollectionToFile(service, postmanCollectionFileName, postmanCollectionJson)
+    val savedFile = writePostmanCollectionToFile(service, postmanCollectionJson)
 
     Right(Seq(savedFile))
   }
@@ -226,7 +223,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
   }
 
-  private def writePostmanCollectionToFile(service: Service, fileName: String, postmanCollection: postman.Collection): File = {
+  private def writePostmanCollectionToFile(service: Service, postmanCollection: postman.Collection): File = {
 
     val postmanCollectionJson = Json.toJson(postmanCollection)
     val jsonPrettyPrint = Json.prettyPrint(postmanCollectionJson) + "\n"

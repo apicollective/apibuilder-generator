@@ -2,7 +2,7 @@ package generator
 
 import generator.Utils.Description
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.Attribute
 import io.flow.postman.collection.v210.v0.{models => postman}
 import io.flow.postman.collection.v210.v0.models.json.jsonReadsPostmanCollectionV210Collection
 import models.attributes.PostmanAttributes
@@ -15,6 +15,7 @@ import scala.util.Try
 
 class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
+  import TestFixtures._
   import models.TestHelper._
 
   "PostmanCollectionGenerator" should {
@@ -192,95 +193,6 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
     val postmanCollection = Json.parse(resultFile.contents).as[postman.Collection]
 
     collectionAssertion(postmanCollection)
-  }
-
-  trait TrivialServiceContext {
-    val trivialService = Service(
-      apidoc = Apidoc("0.1"),
-      name = "trivial",
-      organization = Organization("test-org"),
-      application = Application("test-app"),
-      namespace = "io.trivial",
-      version = "0.1",
-      info = Info(license = None, contact = None),
-      models = Seq(
-        Model(
-          name = "complex-string",
-          plural = "complex-strings",
-          fields = Seq(
-            Field(
-              name = "value",
-              `type` = "string",
-              example = Some("something"),
-              required = true
-            )
-          ))
-      ),
-      resources = Seq(
-        Resource(
-          `type` = "complex-string",
-          plural = "complex-strings",
-          operations = Seq(
-            Operation(
-              method = Method.Post,
-              path = "/complex-strings/new",
-              body = Some(
-                Body(`type` = "complex-string")
-              )
-            )
-          )
-        )
-      ),
-      baseUrl = Some("https://some.service.com")
-    )
-
-  }
-
-  trait TrivialServiceWithImportCtx extends TrivialServiceContext {
-    val importedEnum = referenceApiService.enums.find(_.name == "age_group")
-      .getOrElse(fail("age_group enum is expected in example reference-service.json"))
-    val importedEnumPath = s"${referenceApiService.namespace}.enums.age_group"
-
-    val trivialServiceWithImport = trivialService.copy(
-      imports = Seq(
-        Import(
-          uri = "some-uri",
-          namespace = referenceApiService.name,
-          organization = referenceApiService.organization,
-          application = referenceApiService.application,
-          version = referenceApiService.version,
-          enums = Seq("age_group")
-        )
-      ),
-      models = trivialService.models :+ Model(
-        name = "age",
-        plural = "ages",
-        fields = Seq(
-          Field(
-            name = "group",
-            `type` = importedEnumPath,
-            required = true
-          )
-        )
-      ),
-      resources = trivialService.resources :+ Resource(
-        `type` = "age",
-        plural = "ages",
-        operations = Seq(
-          Operation(
-            method = Method.Get,
-            path = "/ages/first",
-            responses = Seq(
-              Response(
-                code = ResponseCodeInt(200),
-                `type` = "age"
-              )
-            )
-          )
-        )
-      )
-    )
-
   }
 
 }
