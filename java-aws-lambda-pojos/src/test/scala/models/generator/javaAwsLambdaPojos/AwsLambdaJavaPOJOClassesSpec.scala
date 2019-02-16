@@ -6,7 +6,7 @@ import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.{CompilationUnit, NodeList}
 import com.github.javaparser.ast.body.{AnnotationDeclaration, FieldDeclaration, MethodDeclaration}
 import com.github.javaparser.ast.expr.{AnnotationExpr, MemberValuePair, NormalAnnotationExpr}
-
+import models.TestHelper.assertJodaTimeNotPresent
 import scala.collection.JavaConverters._
 import scala.compat.java8.OptionConverters._
 
@@ -175,6 +175,7 @@ class AwsLambdaJavaPOJOClassesSpec
     result.isRight should be(true)
     val files = result.right.get
     files.size should be(2)
+    assertJodaTimeNotPresent(files)
     files(0).name should be("CarType.java")
     files(1).name should be("Model.java")
 
