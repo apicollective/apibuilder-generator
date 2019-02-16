@@ -25,6 +25,7 @@ class KotlinGeneratorTest
         val invocationForm = new InvocationForm(service, Seq.empty, None)
         val generator = new KotlinGenerator()
         val files = generator.invoke(invocationForm).right.get
+        assertJodaTimeNotPresent(files)
         writeFiles(tmpDir, files)
         files.size shouldBe >(0)
         files.foreach(f => {
