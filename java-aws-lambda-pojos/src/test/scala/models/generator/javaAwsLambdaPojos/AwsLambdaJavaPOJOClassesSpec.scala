@@ -10,7 +10,7 @@ import com.github.javaparser.ast.expr.{AnnotationExpr, MemberValuePair, NormalAn
 import scala.collection.JavaConverters._
 import scala.compat.java8.OptionConverters._
 
-class TestAwsLambdaJavaPOJOClasses
+class AwsLambdaJavaPOJOClassesSpec
   extends FunSpec
     with Matchers {
 
