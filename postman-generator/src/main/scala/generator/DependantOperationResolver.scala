@@ -32,12 +32,17 @@ object DependantOperationResolver {
               recurOps(field.`type`)
             case field =>
               val objRefAttrOpt = field.attributes.collectFirst {
-                case attr if attr.name.equalsIgnoreCase(PostmanAttributes.ObjectReferenceKey) => attr.value.asOpt[ObjectReferenceAttrValue]
+                case attr if attr.name.equalsIgnoreCase(PostmanAttributes.ObjectReferenceKey) =>
+                  attr.value.asOpt[ObjectReferenceAttrValue]
               }.flatten
 
               objRefAttrOpt match {
                 case Some(objAttrRef) =>
-                  Seq(objAttrRef)
+                  val modelToLookup = if (objAttrRef.relatedServiceNamespace != service.namespace)
+                    s"${objAttrRef.relatedServiceNamespace}.models.${objAttrRef.resourceType}"
+                  else
+                    objAttrRef.resourceType // namespace from the main service, plain model name
+                  recurOps(modelToLookup) :+ objAttrRef
                 case None =>
                   Nil
               }

@@ -79,12 +79,14 @@ object ServiceImportResolver {
 
           val serviceNamespaceToResources = importedService.namespace -> importedService.resources
 
-          (
+          val newAcc = (
             importedObjectsAcc._1 ++ enums,
             importedObjectsAcc._2 ++ models,
             importedObjectsAcc._3 ++ unions,
             importedObjectsAcc._4 + serviceNamespaceToResources
           )
+
+          resolveRecursive(importedServices.tail, newAcc)
       }
     }
 

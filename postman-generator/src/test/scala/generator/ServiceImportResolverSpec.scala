@@ -116,6 +116,15 @@ class ServiceImportResolverSpec extends WordSpec with Matchers {
         assert(exampleProvided, s"// it should provide an example for ${union.name}")
       }
     }
+
+    "import multiple services" in new ResolvedServiceWithTwoImportsTestContext {
+      resultService.resources shouldEqual mainService.resources
+      result.serviceNamespaceToResources shouldEqual Map(
+        mainService.namespace -> mainService.resources,
+        importedService1.namespace -> importedService1.resources,
+        importedService2.namespace -> importedService2.resources
+      )
+    }
   }
 
   trait ResolvedServiceTestContext extends TrivialServiceWithImportCtx {
@@ -131,6 +140,15 @@ class ServiceImportResolverSpec extends WordSpec with Matchers {
     val importedService = models.TestHelper.generatorApiServiceWithUnionWithoutDescriminator
 
     lazy val result = ServiceImportResolver.resolveService(mainService, Seq(importedService))
+    lazy val resultService = result.service
+  }
+
+  trait ResolvedServiceWithTwoImportsTestContext extends TrivialServiceWithTwoImportsCtx {
+    val mainService = trivialServiceWithTwoImports
+    val importedService1 = models.TestHelper.referenceApiService
+    val importedService2 = models.TestHelper.generatorApiServiceWithUnionWithoutDescriminator
+
+    lazy val result = ServiceImportResolver.resolveService(mainService, Seq(importedService1, importedService2))
     lazy val resultService = result.service
   }
 

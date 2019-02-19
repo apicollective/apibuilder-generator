@@ -53,6 +53,35 @@ object TestFixtures {
       .getOrElse(throw new NoSuchElementException("age_group enum is expected in example reference-service.json"))
     val importedEnumPath = s"${referenceApiService.namespace}.enums.age_group"
 
+    val modelWithImportedEnum = Model(
+      name = "age",
+      plural = "ages",
+      fields = Seq(
+        Field(
+          name = "group",
+          `type` = importedEnumPath,
+          required = true
+        )
+      )
+    )
+
+    val resourceWithImportedEnum = Resource(
+      `type` = "age",
+      plural = "ages",
+      operations = Seq(
+        Operation(
+          method = Method.Get,
+          path = "/ages/first",
+          responses = Seq(
+            Response(
+              code = ResponseCodeInt(200),
+              `type` = "age"
+            )
+          )
+        )
+      )
+    )
+
     val trivialServiceWithImport = trivialService.copy(
       imports = Seq(
         Import(
@@ -64,33 +93,8 @@ object TestFixtures {
           enums = Seq("age_group")
         )
       ),
-      models = trivialService.models :+ Model(
-        name = "age",
-        plural = "ages",
-        fields = Seq(
-          Field(
-            name = "group",
-            `type` = importedEnumPath,
-            required = true
-          )
-        )
-      ),
-      resources = trivialService.resources :+ Resource(
-        `type` = "age",
-        plural = "ages",
-        operations = Seq(
-          Operation(
-            method = Method.Get,
-            path = "/ages/first",
-            responses = Seq(
-              Response(
-                code = ResponseCodeInt(200),
-                `type` = "age"
-              )
-            )
-          )
-        )
-      )
+      models = trivialService.models :+ modelWithImportedEnum,
+      resources = trivialService.resources :+ resourceWithImportedEnum
     )
 
   }
@@ -102,10 +106,39 @@ object TestFixtures {
       .getOrElse(throw new NoSuchElementException(s"$unionType is expected in example apidoc-example-union-types.json"))
     val importedUnionPath = s"${generatorApiServiceWithUnionWithoutDescriminator.namespace}.unions.$unionType"
 
+    val modelWithImportedUnion = Model(
+      name = "union",
+      plural = "unions",
+      fields = Seq(
+        Field(
+          name = "my-union",
+          `type` = importedUnionPath,
+          required = true
+        )
+      )
+    )
+
+    val resourceWithImportedUnion = Resource(
+      `type` = "union",
+      plural = "unions",
+      operations = Seq(
+        Operation(
+          method = Method.Get,
+          path = "/unions/my",
+          responses = Seq(
+            Response(
+              code = ResponseCodeInt(200),
+              `type` = "union"
+            )
+          )
+        )
+      )
+    )
+
     val trivialServiceWithUnionTypesImport = trivialService.copy(
       imports = Seq(
         Import(
-          uri = "some-uri",
+          uri = "some-uri-2",
           namespace = generatorApiServiceWithUnionWithoutDescriminator.name,
           organization = generatorApiServiceWithUnionWithoutDescriminator.organization,
           application = generatorApiServiceWithUnionWithoutDescriminator.application,
@@ -113,33 +146,16 @@ object TestFixtures {
           unions = Seq(unionType)
         )
       ),
-      models = trivialService.models :+ Model(
-        name = "union",
-        plural = "unions",
-        fields = Seq(
-          Field(
-            name = "my-union",
-            `type` = importedUnionPath,
-            required = true
-          )
-        )
-      ),
-      resources = trivialService.resources :+ Resource(
-        `type` = "union",
-        plural = "unions",
-        operations = Seq(
-          Operation(
-            method = Method.Get,
-            path = "/unions/my",
-            responses = Seq(
-              Response(
-                code = ResponseCodeInt(200),
-                `type` = "union"
-              )
-            )
-          )
-        )
-      )
+      models = trivialService.models :+ modelWithImportedUnion,
+      resources = trivialService.resources :+ resourceWithImportedUnion
+    )
+  }
+
+  trait TrivialServiceWithTwoImportsCtx extends TrivialServiceWithImportCtx with TrivialServiceWithUnionTypesImportCtx {
+    val trivialServiceWithTwoImports = trivialService.copy(
+      imports = trivialServiceWithImport.imports ++ trivialServiceWithUnionTypesImport.imports,
+      models = trivialService.models :+ modelWithImportedEnum :+ modelWithImportedUnion,
+      resources = trivialService.resources :+ resourceWithImportedEnum :+ resourceWithImportedUnion
     )
   }
 
