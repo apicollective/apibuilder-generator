@@ -18,5 +18,9 @@ code:
       version: latest
       generators:
         play_2_x_json: generated/app
+    postman-generator-attributes:
+      version: latest
+      generators:
+        play_2_x_json: generated/app
 
   

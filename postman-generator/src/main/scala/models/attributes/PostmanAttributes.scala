@@ -1,27 +1,17 @@
 package models.attributes
 
-import play.api.libs.json.Json
+import io.flow.postman.generator.attributes.v0.models.ObjectReference
 
 object PostmanAttributes {
 
-  val BasicAuthKey = "postman-basic-auth"
-  val SetupKey = "postman-organization-setup"
-  val ObjectReferenceKey = "object-reference"
-
-  case class PostmanBasicAuthAttrValue(
-    username: String,
-    password: String
-  )
-
-  case class ObjectReferenceAttrValue(
-    relatedServiceNamespace: String,
-    resourceType: String,
-    operationMethod: String,
-    identifierField: String) {
-    def toPostmanVariableName: String = s"$resourceType#$identifierField"
-    def toPostmanVariableRef: String = s"{{$toPostmanVariableName}}"
+  def postmanVariableNameFrom(objReference: ObjectReference): String = {
+    import objReference._
+    s"$resourceType#$identifierField"
   }
 
-  implicit val objectReferenceAttrValueFormats = Json.format[ObjectReferenceAttrValue]
-  implicit val postmanBasicAuthAttrValueFormat = Json.format[PostmanBasicAuthAttrValue]
+  def postmanVariableRefFrom(objectReference: ObjectReference): String = {
+    val variableName = postmanVariableNameFrom(objectReference)
+    s"{{$variableName}}"
+  }
+
 }

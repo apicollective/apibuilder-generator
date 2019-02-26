@@ -4,7 +4,9 @@ import java.util.UUID
 
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.spec.v0.models.json._
-import models.attributes.PostmanAttributes.ObjectReferenceAttrValue
+import io.flow.postman.generator.attributes.v0.models.AttributeName
+import io.flow.postman.generator.attributes.v0.models.ObjectReference
+import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesObjectReference
 import models.attributes.PostmanAttributes
 import org.joda.time.{DateTime, LocalDate}
 import org.joda.time.format.ISODateTimeFormat
@@ -74,16 +76,16 @@ case class ExampleJson(service: Service, selection: Selection) {
           map { field =>
 
             val objRefAttrOpt = field.attributes.collectFirst {
-              case attr if attr.name.equalsIgnoreCase(PostmanAttributes.ObjectReferenceKey) => attr.value.asOpt[ObjectReferenceAttrValue]
+              case attr if attr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString) => attr.value.asOpt[ObjectReference]
             }.flatten
 
             val value = objRefAttrOpt match {
               case Some(attrValue) if field.`type`.equalsIgnoreCase("string") =>
-                JsString(attrValue.toPostmanVariableRef)
+                JsString(PostmanAttributes.postmanVariableRefFrom(attrValue))
               case Some(attrValue) if field.`type`.equalsIgnoreCase("[string]") =>
-                Json.arr(JsString(attrValue.toPostmanVariableRef))
+                Json.arr(JsString(PostmanAttributes.postmanVariableRefFrom(attrValue)))
               case Some(attrValue) if field.`type`.equalsIgnoreCase("map[string]") =>
-                Json.obj(attrValue.toPostmanVariableRef -> JsString("bar"))
+                Json.obj(PostmanAttributes.postmanVariableRefFrom(attrValue) -> JsString("bar"))
               case _ =>
                 mockValue(field)
             }

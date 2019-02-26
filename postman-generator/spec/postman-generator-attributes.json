@@ -1,0 +1,60 @@
+{
+  "name": "Postman Generator Attributes",
+  "description": "Specification contains various ApiBuilder attributes, which are recognized by Postman Collection Generator",
+
+  "imports": [
+    { "uri": "https://app.apibuilder.io/apicollective/apibuilder-spec/latest/service.json" }
+  ],
+
+  "enums": {
+    "attribute_name": {
+      "values": [
+        { "name": "postman-basic-auth" },
+        { "name": "object-reference" },
+        { "name": "organization-setup" }
+      ]
+    }
+  },
+
+  "models": {
+    "basic_auth": {
+      "fields": [
+        {
+          "name": "username",
+          "type": "string",
+          "description": "Specifies the username to be used in Postman Collection auth definition. It may be also a variable reference."
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "description": "Specified the password to be used in Postman Collection auth definition. It may be also a variable reference. Leave this string empty, when only a username is needed."
+        }
+      ]
+    },
+
+    "object_reference": {
+      "fields": [
+        {
+          "name": "related_service_namespace",
+          "type": "string",
+          "description": "ApiBuilder service's namespace, in which a target operation is specified."
+        },
+        {
+          "name": "resource_type",
+          "type": "string",
+          "description": "Resource type, that holds a referenced operation."
+        },
+        {
+          "name": "operation_method",
+          "type": "io.apibuilder.spec.v0.enums.method",
+          "description": "Referenced operation method."
+        },
+        {
+          "name": "identifier_field",
+          "type": "string",
+          "description": "A field name. When the referenced operation is called, identifier_field is used to extract the corresponding field from the response JSON."
+        }
+      ]
+    }
+  }
+}

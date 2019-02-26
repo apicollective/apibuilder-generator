@@ -1,9 +1,9 @@
 package generator
 
 import io.apibuilder.spec.v0.models.{Operation, Resource, Service}
-import models.attributes.PostmanAttributes.ObjectReferenceAttrValue
-import models.attributes.PostmanAttributes
-import models.attributes.PostmanAttributes._
+import io.flow.postman.generator.attributes.v0.models.ObjectReference
+import io.flow.postman.generator.attributes.v0.models.AttributeName
+import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesObjectReference
 import models.service.ResolvedService
 
 object DependantOperationResolver {
@@ -17,13 +17,13 @@ object DependantOperationResolver {
     * @param resolvedService - service with all imports at hand
     * @return a sequence of custom attribute to dependant operation pairs
     */
-  def resolve(resolvedService: ResolvedService): Seq[(ObjectReferenceAttrValue, Operation)] = {
+  def resolve(resolvedService: ResolvedService): Seq[(ObjectReference, Operation)] = {
 
     val service: Service = resolvedService.service
     val serviceNamespaceToResources: Map[String, Seq[Resource]] = resolvedService.serviceNamespaceToResources
 
     // TODO: think about the model that can have yet another id dependency in the endpoint that creates it - is it already covered?
-    def recurOps(typ: String): Seq[ObjectReferenceAttrValue] = {
+    def recurOps(typ: String): Seq[ObjectReference] = {
 
       service.models.find(_.name == typ) match {
         case Some(model) =>
@@ -32,8 +32,8 @@ object DependantOperationResolver {
               recurOps(field.`type`)
             case field =>
               val objRefAttrOpt = field.attributes.collectFirst {
-                case attr if attr.name.equalsIgnoreCase(PostmanAttributes.ObjectReferenceKey) =>
-                  attr.value.asOpt[ObjectReferenceAttrValue]
+                case attr if attr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString) =>
+                  attr.value.asOpt[ObjectReference]
               }.flatten
 
               objRefAttrOpt match {
@@ -68,7 +68,7 @@ object DependantOperationResolver {
       val operationOpt = serviceNamespaceToResources.getOrElse(objRefAttr.relatedServiceNamespace, Nil)
         .find(_.`type` == objRefAttr.resourceType)
         .map(_.operations).getOrElse(Nil)
-        .find(_.method.toString == objRefAttr.operationMethod)
+        .find(_.method == objRefAttr.operationMethod)
 
       (objRefAttr, operationOpt)
     }

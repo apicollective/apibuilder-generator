@@ -3,11 +3,11 @@ package generator
 import generator.Utils.Description
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Attribute
-import io.flow.postman.collection.v210.v0.{models => postman}
-import io.flow.postman.collection.v210.v0.models.json.jsonReadsPostmanCollectionV210Collection
-import models.attributes.PostmanAttributes
-import models.attributes.PostmanAttributes.PostmanBasicAuthAttrValue
-import models.attributes.PostmanAttributes.postmanBasicAuthAttrValueFormat
+import io.flow.postman.v0.{models => postman}
+import io.flow.postman.v0.models.json.jsonReadsPostmanCollection
+import io.flow.postman.generator.attributes.v0.models.AttributeName
+import io.flow.postman.generator.attributes.v0.models.BasicAuth
+import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesBasicAuth
 import org.scalatest.{Assertion, Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
 
@@ -146,13 +146,13 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
     }
 
     "add Basic Auth definition to the Collection if the specification contains postman-basic-auth attribute" in new TrivialServiceContext {
-      val basicAuthAttrValue = PostmanBasicAuthAttrValue(
+      val basicAuthAttrValue = BasicAuth(
         username = "{{USER}}",
         password = ""
       )
       val trivialServiceWithAuth = trivialService.copy(
         attributes = Seq(
-          Attribute(name = PostmanAttributes.BasicAuthKey, value = Json.toJson(basicAuthAttrValue).as[JsObject])
+          Attribute(name = AttributeName.PostmanBasicAuth.toString, value = Json.toJson(basicAuthAttrValue).as[JsObject])
         )
       )
 
@@ -169,10 +169,10 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       }
     }
 
-    "add Setup and Cleanup folders to the Collection if the specification contains `postman-organization-setup` attribute" in new TrivialServiceContext {
+    "add Setup and Cleanup folders to the Collection if the specification contains `organization-setup` attribute" in new TrivialServiceContext {
       val trivialServiceWithFlag = trivialService.copy(
         attributes = Seq(
-          Attribute("postman-organization-setup", JsObject.empty))
+          Attribute("organization-setup", JsObject.empty))
       )
       val invocationForm = InvocationForm(trivialServiceWithFlag, importedServices = Some(Seq(referenceApiService)))
       val result = PostmanCollectionGenerator.invoke(invocationForm)

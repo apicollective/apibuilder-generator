@@ -3,7 +3,7 @@
  * Service version: 0.2.9
  * apibuilder 0.14.59 app.apibuilder.io/flow/postman/0.2.9/play_2_x_json
  */
-package io.flow.postman.collection.v210.v0.models {
+package io.flow.postman.v0.models {
 
   sealed trait Items extends _root_.scala.Product with _root_.scala.Serializable
 
@@ -30,8 +30,8 @@ package io.flow.postman.collection.v210.v0.models {
   }
 
   final case class Auth(
-    `type`: io.flow.postman.collection.v210.v0.models.AuthEnum,
-    basic: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.BasicAuth]] = None
+    `type`: io.flow.postman.v0.models.AuthEnum,
+    basic: _root_.scala.Option[Seq[io.flow.postman.v0.models.BasicAuth]] = None
   )
 
   final case class BasicAuth(
@@ -42,10 +42,10 @@ package io.flow.postman.collection.v210.v0.models {
 
   final case class Body(
     raw: _root_.scala.Option[String] = None,
-    mode: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.BodyMode] = None,
-    urlencoded: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.UrlEncoded]] = None,
-    file: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.File] = None,
-    formdata: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.FormParameter]] = None
+    mode: _root_.scala.Option[io.flow.postman.v0.models.BodyMode] = None,
+    urlencoded: _root_.scala.Option[Seq[io.flow.postman.v0.models.UrlEncoded]] = None,
+    file: _root_.scala.Option[io.flow.postman.v0.models.File] = None,
+    formdata: _root_.scala.Option[Seq[io.flow.postman.v0.models.FormParameter]] = None
   )
 
   /**
@@ -61,11 +61,11 @@ package io.flow.postman.collection.v210.v0.models {
    * @param auth Represents authentication helpers provided by Postman
    */
   final case class Collection(
-    info: io.flow.postman.collection.v210.v0.models.Info,
-    item: Seq[io.flow.postman.collection.v210.v0.models.Items],
-    event: Seq[io.flow.postman.collection.v210.v0.models.Event],
-    variable: Seq[io.flow.postman.collection.v210.v0.models.Variable],
-    auth: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Auth] = None
+    info: io.flow.postman.v0.models.Info,
+    item: Seq[io.flow.postman.v0.models.Items],
+    event: Seq[io.flow.postman.v0.models.Event],
+    variable: Seq[io.flow.postman.v0.models.Variable],
+    auth: _root_.scala.Option[io.flow.postman.v0.models.Auth] = None
   )
 
   /**
@@ -87,8 +87,8 @@ package io.flow.postman.collection.v210.v0.models {
    *        enabled
    */
   final case class Event(
-    listen: io.flow.postman.collection.v210.v0.models.EventType,
-    script: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Script] = None,
+    listen: io.flow.postman.v0.models.EventType,
+    script: _root_.scala.Option[io.flow.postman.v0.models.Script] = None,
     id: _root_.scala.Option[String] = None,
     disabled: _root_.scala.Option[Boolean] = None
   )
@@ -104,18 +104,18 @@ package io.flow.postman.collection.v210.v0.models {
    */
   final case class Folder(
     name: String,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None,
-    variable: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Variable]] = None,
-    item: Seq[io.flow.postman.collection.v210.v0.models.Item],
-    event: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Event]] = None,
-    auth: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Auth] = None
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None,
+    variable: _root_.scala.Option[Seq[io.flow.postman.v0.models.Variable]] = None,
+    item: Seq[io.flow.postman.v0.models.Item],
+    event: _root_.scala.Option[Seq[io.flow.postman.v0.models.Event]] = None,
+    auth: _root_.scala.Option[io.flow.postman.v0.models.Auth] = None
   ) extends Items
 
   final case class FormParameter(
     key: String,
     value: _root_.scala.Option[String] = None,
     disabled: _root_.scala.Option[Boolean] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None,
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None,
     contentType: _root_.scala.Option[String] = None,
     `type`: _root_.scala.Option[String] = None
   )
@@ -124,7 +124,7 @@ package io.flow.postman.collection.v210.v0.models {
     key: String,
     value: String,
     disabled: _root_.scala.Option[Boolean] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None
   )
 
   /**
@@ -148,7 +148,7 @@ package io.flow.postman.collection.v210.v0.models {
   final case class Info(
     name: String,
     postmanId: _root_.scala.Option[String] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None,
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None,
     version: _root_.scala.Option[String] = None,
     schema: String
   )
@@ -166,35 +166,35 @@ package io.flow.postman.collection.v210.v0.models {
   final case class Item(
     id: _root_.scala.Option[String] = None,
     name: _root_.scala.Option[String] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None,
-    variable: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Variable]] = None,
-    event: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Event]] = None,
-    request: io.flow.postman.collection.v210.v0.models.Request,
-    response: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Response]] = None
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None,
+    variable: _root_.scala.Option[Seq[io.flow.postman.v0.models.Variable]] = None,
+    event: _root_.scala.Option[Seq[io.flow.postman.v0.models.Event]] = None,
+    request: io.flow.postman.v0.models.Request,
+    response: _root_.scala.Option[Seq[io.flow.postman.v0.models.Response]] = None
   ) extends Items
 
   final case class QueryParam(
     key: _root_.scala.Option[String] = None,
     value: _root_.scala.Option[String] = None,
     disabled: _root_.scala.Option[Boolean] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None
   )
 
   final case class Request(
-    url: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Url] = None,
-    auth: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Auth] = None,
-    method: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Method] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None,
-    header: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Header]] = None,
-    body: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Body] = None
+    url: _root_.scala.Option[io.flow.postman.v0.models.Url] = None,
+    auth: _root_.scala.Option[io.flow.postman.v0.models.Auth] = None,
+    method: _root_.scala.Option[io.flow.postman.v0.models.Method] = None,
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None,
+    header: _root_.scala.Option[Seq[io.flow.postman.v0.models.Header]] = None,
+    body: _root_.scala.Option[io.flow.postman.v0.models.Body] = None
   )
 
   final case class Response(
     id: _root_.scala.Option[String] = None,
     name: _root_.scala.Option[String] = None,
-    originalRequest: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Request] = None,
+    originalRequest: _root_.scala.Option[io.flow.postman.v0.models.Request] = None,
     responseTime: _root_.scala.Option[String] = None,
-    header: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Header]] = None,
+    header: _root_.scala.Option[Seq[io.flow.postman.v0.models.Header]] = None,
     body: _root_.scala.Option[String] = None,
     status: _root_.scala.Option[String] = None,
     code: _root_.scala.Option[Int] = None
@@ -236,16 +236,16 @@ package io.flow.postman.collection.v210.v0.models {
     host: _root_.scala.Option[Seq[String]] = None,
     path: _root_.scala.Option[Seq[String]] = None,
     port: _root_.scala.Option[String] = None,
-    query: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.QueryParam]] = None,
+    query: _root_.scala.Option[Seq[io.flow.postman.v0.models.QueryParam]] = None,
     hash: _root_.scala.Option[String] = None,
-    variable: _root_.scala.Option[Seq[io.flow.postman.collection.v210.v0.models.Variable]] = None
+    variable: _root_.scala.Option[Seq[io.flow.postman.v0.models.Variable]] = None
   )
 
   final case class UrlEncoded(
     key: String,
     value: _root_.scala.Option[String] = None,
     disabled: _root_.scala.Option[Boolean] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None
   )
 
   /**
@@ -271,7 +271,7 @@ package io.flow.postman.collection.v210.v0.models {
     value: _root_.scala.Option[String] = None,
     `type`: _root_.scala.Option[String] = None,
     name: _root_.scala.Option[String] = None,
-    description: _root_.scala.Option[io.flow.postman.collection.v210.v0.models.Description] = None,
+    description: _root_.scala.Option[io.flow.postman.v0.models.Description] = None,
     system: _root_.scala.Option[Boolean] = None,
     disabled: _root_.scala.Option[Boolean] = None
   )
@@ -448,14 +448,14 @@ package io.flow.postman.collection.v210.v0.models {
 
 }
 
-package io.flow.postman.collection.v210.v0.models {
+package io.flow.postman.v0.models {
 
   package object json {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
-    import io.flow.postman.collection.v210.v0.models.json._
+    import io.flow.postman.v0.models.json._
 
     private[v0] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
@@ -489,13 +489,13 @@ package io.flow.postman.collection.v210.v0.models {
       }
     }
 
-    implicit val jsonReadsPostmanCollectionV210AuthEnum = new play.api.libs.json.Reads[io.flow.postman.collection.v210.v0.models.AuthEnum] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.collection.v210.v0.models.AuthEnum] = {
+    implicit val jsonReadsPostmanAuthEnum = new play.api.libs.json.Reads[io.flow.postman.v0.models.AuthEnum] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.v0.models.AuthEnum] = {
         js match {
-          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.AuthEnum(v.value))
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.AuthEnum(v.value))
           case _ => {
             (js \ "value").validate[String] match {
-              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.AuthEnum(v))
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.AuthEnum(v))
               case err: play.api.libs.json.JsError => err
             }
           }
@@ -503,29 +503,29 @@ package io.flow.postman.collection.v210.v0.models {
       }
     }
 
-    def jsonWritesPostmanCollectionV210AuthEnum(obj: io.flow.postman.collection.v210.v0.models.AuthEnum) = {
+    def jsonWritesPostmanAuthEnum(obj: io.flow.postman.v0.models.AuthEnum) = {
       play.api.libs.json.JsString(obj.toString)
     }
 
-    def jsObjectAuthEnum(obj: io.flow.postman.collection.v210.v0.models.AuthEnum) = {
+    def jsObjectAuthEnum(obj: io.flow.postman.v0.models.AuthEnum) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
 
-    implicit def jsonWritesPostmanCollectionV210AuthEnum: play.api.libs.json.Writes[AuthEnum] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.AuthEnum] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.AuthEnum) = {
-          jsonWritesPostmanCollectionV210AuthEnum(obj)
+    implicit def jsonWritesPostmanAuthEnum: play.api.libs.json.Writes[AuthEnum] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.AuthEnum] {
+        def writes(obj: io.flow.postman.v0.models.AuthEnum) = {
+          jsonWritesPostmanAuthEnum(obj)
         }
       }
     }
 
-    implicit val jsonReadsPostmanCollectionV210BodyMode = new play.api.libs.json.Reads[io.flow.postman.collection.v210.v0.models.BodyMode] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.collection.v210.v0.models.BodyMode] = {
+    implicit val jsonReadsPostmanBodyMode = new play.api.libs.json.Reads[io.flow.postman.v0.models.BodyMode] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.v0.models.BodyMode] = {
         js match {
-          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.BodyMode(v.value))
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.BodyMode(v.value))
           case _ => {
             (js \ "value").validate[String] match {
-              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.BodyMode(v))
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.BodyMode(v))
               case err: play.api.libs.json.JsError => err
             }
           }
@@ -533,29 +533,29 @@ package io.flow.postman.collection.v210.v0.models {
       }
     }
 
-    def jsonWritesPostmanCollectionV210BodyMode(obj: io.flow.postman.collection.v210.v0.models.BodyMode) = {
+    def jsonWritesPostmanBodyMode(obj: io.flow.postman.v0.models.BodyMode) = {
       play.api.libs.json.JsString(obj.toString)
     }
 
-    def jsObjectBodyMode(obj: io.flow.postman.collection.v210.v0.models.BodyMode) = {
+    def jsObjectBodyMode(obj: io.flow.postman.v0.models.BodyMode) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
 
-    implicit def jsonWritesPostmanCollectionV210BodyMode: play.api.libs.json.Writes[BodyMode] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.BodyMode] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.BodyMode) = {
-          jsonWritesPostmanCollectionV210BodyMode(obj)
+    implicit def jsonWritesPostmanBodyMode: play.api.libs.json.Writes[BodyMode] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.BodyMode] {
+        def writes(obj: io.flow.postman.v0.models.BodyMode) = {
+          jsonWritesPostmanBodyMode(obj)
         }
       }
     }
 
-    implicit val jsonReadsPostmanCollectionV210EventType = new play.api.libs.json.Reads[io.flow.postman.collection.v210.v0.models.EventType] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.collection.v210.v0.models.EventType] = {
+    implicit val jsonReadsPostmanEventType = new play.api.libs.json.Reads[io.flow.postman.v0.models.EventType] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.v0.models.EventType] = {
         js match {
-          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.EventType(v.value))
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.EventType(v.value))
           case _ => {
             (js \ "value").validate[String] match {
-              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.EventType(v))
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.EventType(v))
               case err: play.api.libs.json.JsError => err
             }
           }
@@ -563,29 +563,29 @@ package io.flow.postman.collection.v210.v0.models {
       }
     }
 
-    def jsonWritesPostmanCollectionV210EventType(obj: io.flow.postman.collection.v210.v0.models.EventType) = {
+    def jsonWritesPostmanEventType(obj: io.flow.postman.v0.models.EventType) = {
       play.api.libs.json.JsString(obj.toString)
     }
 
-    def jsObjectEventType(obj: io.flow.postman.collection.v210.v0.models.EventType) = {
+    def jsObjectEventType(obj: io.flow.postman.v0.models.EventType) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
 
-    implicit def jsonWritesPostmanCollectionV210EventType: play.api.libs.json.Writes[EventType] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.EventType] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.EventType) = {
-          jsonWritesPostmanCollectionV210EventType(obj)
+    implicit def jsonWritesPostmanEventType: play.api.libs.json.Writes[EventType] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.EventType] {
+        def writes(obj: io.flow.postman.v0.models.EventType) = {
+          jsonWritesPostmanEventType(obj)
         }
       }
     }
 
-    implicit val jsonReadsPostmanCollectionV210Method = new play.api.libs.json.Reads[io.flow.postman.collection.v210.v0.models.Method] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.collection.v210.v0.models.Method] = {
+    implicit val jsonReadsPostmanMethod = new play.api.libs.json.Reads[io.flow.postman.v0.models.Method] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.flow.postman.v0.models.Method] = {
         js match {
-          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.Method(v.value))
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.Method(v.value))
           case _ => {
             (js \ "value").validate[String] match {
-              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.Method(v))
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.Method(v))
               case err: play.api.libs.json.JsError => err
             }
           }
@@ -593,30 +593,30 @@ package io.flow.postman.collection.v210.v0.models {
       }
     }
 
-    def jsonWritesPostmanCollectionV210Method(obj: io.flow.postman.collection.v210.v0.models.Method) = {
+    def jsonWritesPostmanMethod(obj: io.flow.postman.v0.models.Method) = {
       play.api.libs.json.JsString(obj.toString)
     }
 
-    def jsObjectMethod(obj: io.flow.postman.collection.v210.v0.models.Method) = {
+    def jsObjectMethod(obj: io.flow.postman.v0.models.Method) = {
       play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
     }
 
-    implicit def jsonWritesPostmanCollectionV210Method: play.api.libs.json.Writes[Method] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Method] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Method) = {
-          jsonWritesPostmanCollectionV210Method(obj)
+    implicit def jsonWritesPostmanMethod: play.api.libs.json.Writes[Method] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Method] {
+        def writes(obj: io.flow.postman.v0.models.Method) = {
+          jsonWritesPostmanMethod(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Auth: play.api.libs.json.Reads[Auth] = {
+    implicit def jsonReadsPostmanAuth: play.api.libs.json.Reads[Auth] = {
       for {
-        `type` <- (__ \ "type").read[io.flow.postman.collection.v210.v0.models.AuthEnum]
-        basic <- (__ \ "basic").readNullable[Seq[io.flow.postman.collection.v210.v0.models.BasicAuth]]
+        `type` <- (__ \ "type").read[io.flow.postman.v0.models.AuthEnum]
+        basic <- (__ \ "basic").readNullable[Seq[io.flow.postman.v0.models.BasicAuth]]
       } yield Auth(`type`, basic)
     }
 
-    def jsObjectAuth(obj: io.flow.postman.collection.v210.v0.models.Auth): play.api.libs.json.JsObject = {
+    def jsObjectAuth(obj: io.flow.postman.v0.models.Auth): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "type" -> play.api.libs.json.JsString(obj.`type`.toString)
       ) ++ (obj.basic match {
@@ -625,15 +625,15 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Auth: play.api.libs.json.Writes[Auth] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Auth] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Auth) = {
+    implicit def jsonWritesPostmanAuth: play.api.libs.json.Writes[Auth] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Auth] {
+        def writes(obj: io.flow.postman.v0.models.Auth) = {
           jsObjectAuth(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210BasicAuth: play.api.libs.json.Reads[BasicAuth] = {
+    implicit def jsonReadsPostmanBasicAuth: play.api.libs.json.Reads[BasicAuth] = {
       for {
         key <- (__ \ "key").read[String]
         value <- (__ \ "value").read[String]
@@ -641,7 +641,7 @@ package io.flow.postman.collection.v210.v0.models {
       } yield BasicAuth(key, value, `type`)
     }
 
-    def jsObjectBasicAuth(obj: io.flow.postman.collection.v210.v0.models.BasicAuth): play.api.libs.json.JsObject = {
+    def jsObjectBasicAuth(obj: io.flow.postman.v0.models.BasicAuth): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "key" -> play.api.libs.json.JsString(obj.key),
         "value" -> play.api.libs.json.JsString(obj.value)
@@ -651,25 +651,25 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210BasicAuth: play.api.libs.json.Writes[BasicAuth] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.BasicAuth] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.BasicAuth) = {
+    implicit def jsonWritesPostmanBasicAuth: play.api.libs.json.Writes[BasicAuth] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.BasicAuth] {
+        def writes(obj: io.flow.postman.v0.models.BasicAuth) = {
           jsObjectBasicAuth(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Body: play.api.libs.json.Reads[Body] = {
+    implicit def jsonReadsPostmanBody: play.api.libs.json.Reads[Body] = {
       for {
         raw <- (__ \ "raw").readNullable[String]
-        mode <- (__ \ "mode").readNullable[io.flow.postman.collection.v210.v0.models.BodyMode]
-        urlencoded <- (__ \ "urlencoded").readNullable[Seq[io.flow.postman.collection.v210.v0.models.UrlEncoded]]
-        file <- (__ \ "file").readNullable[io.flow.postman.collection.v210.v0.models.File]
-        formdata <- (__ \ "formdata").readNullable[Seq[io.flow.postman.collection.v210.v0.models.FormParameter]]
+        mode <- (__ \ "mode").readNullable[io.flow.postman.v0.models.BodyMode]
+        urlencoded <- (__ \ "urlencoded").readNullable[Seq[io.flow.postman.v0.models.UrlEncoded]]
+        file <- (__ \ "file").readNullable[io.flow.postman.v0.models.File]
+        formdata <- (__ \ "formdata").readNullable[Seq[io.flow.postman.v0.models.FormParameter]]
       } yield Body(raw, mode, urlencoded, file, formdata)
     }
 
-    def jsObjectBody(obj: io.flow.postman.collection.v210.v0.models.Body): play.api.libs.json.JsObject = {
+    def jsObjectBody(obj: io.flow.postman.v0.models.Body): play.api.libs.json.JsObject = {
       (obj.raw match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("raw" -> play.api.libs.json.JsString(x))
@@ -692,25 +692,25 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Body: play.api.libs.json.Writes[Body] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Body] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Body) = {
+    implicit def jsonWritesPostmanBody: play.api.libs.json.Writes[Body] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Body] {
+        def writes(obj: io.flow.postman.v0.models.Body) = {
           jsObjectBody(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Collection: play.api.libs.json.Reads[Collection] = {
+    implicit def jsonReadsPostmanCollection: play.api.libs.json.Reads[Collection] = {
       for {
-        info <- (__ \ "info").read[io.flow.postman.collection.v210.v0.models.Info]
-        item <- (__ \ "item").read[Seq[io.flow.postman.collection.v210.v0.models.Items]]
-        event <- (__ \ "event").read[Seq[io.flow.postman.collection.v210.v0.models.Event]]
-        variable <- (__ \ "variable").read[Seq[io.flow.postman.collection.v210.v0.models.Variable]]
-        auth <- (__ \ "auth").readNullable[io.flow.postman.collection.v210.v0.models.Auth]
+        info <- (__ \ "info").read[io.flow.postman.v0.models.Info]
+        item <- (__ \ "item").read[Seq[io.flow.postman.v0.models.Items]]
+        event <- (__ \ "event").read[Seq[io.flow.postman.v0.models.Event]]
+        variable <- (__ \ "variable").read[Seq[io.flow.postman.v0.models.Variable]]
+        auth <- (__ \ "auth").readNullable[io.flow.postman.v0.models.Auth]
       } yield Collection(info, item, event, variable, auth)
     }
 
-    def jsObjectCollection(obj: io.flow.postman.collection.v210.v0.models.Collection): play.api.libs.json.JsObject = {
+    def jsObjectCollection(obj: io.flow.postman.v0.models.Collection): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "info" -> jsObjectInfo(obj.info),
         "item" -> play.api.libs.json.Json.toJson(obj.item),
@@ -722,22 +722,22 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Collection: play.api.libs.json.Writes[Collection] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Collection] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Collection) = {
+    implicit def jsonWritesPostmanCollection: play.api.libs.json.Writes[Collection] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Collection] {
+        def writes(obj: io.flow.postman.v0.models.Collection) = {
           jsObjectCollection(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Description: play.api.libs.json.Reads[Description] = {
+    implicit def jsonReadsPostmanDescription: play.api.libs.json.Reads[Description] = {
       for {
         content <- (__ \ "content").readNullable[String]
         `type` <- (__ \ "type").readNullable[String]
       } yield Description(content, `type`)
     }
 
-    def jsObjectDescription(obj: io.flow.postman.collection.v210.v0.models.Description): play.api.libs.json.JsObject = {
+    def jsObjectDescription(obj: io.flow.postman.v0.models.Description): play.api.libs.json.JsObject = {
       (obj.content match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("content" -> play.api.libs.json.JsString(x))
@@ -748,24 +748,24 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Description: play.api.libs.json.Writes[Description] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Description] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Description) = {
+    implicit def jsonWritesPostmanDescription: play.api.libs.json.Writes[Description] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Description] {
+        def writes(obj: io.flow.postman.v0.models.Description) = {
           jsObjectDescription(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Event: play.api.libs.json.Reads[Event] = {
+    implicit def jsonReadsPostmanEvent: play.api.libs.json.Reads[Event] = {
       for {
-        listen <- (__ \ "listen").read[io.flow.postman.collection.v210.v0.models.EventType]
-        script <- (__ \ "script").readNullable[io.flow.postman.collection.v210.v0.models.Script]
+        listen <- (__ \ "listen").read[io.flow.postman.v0.models.EventType]
+        script <- (__ \ "script").readNullable[io.flow.postman.v0.models.Script]
         id <- (__ \ "id").readNullable[String]
         disabled <- (__ \ "disabled").readNullable[Boolean]
       } yield Event(listen, script, id, disabled)
     }
 
-    def jsObjectEvent(obj: io.flow.postman.collection.v210.v0.models.Event): play.api.libs.json.JsObject = {
+    def jsObjectEvent(obj: io.flow.postman.v0.models.Event): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "listen" -> play.api.libs.json.JsString(obj.listen.toString)
       ) ++ (obj.script match {
@@ -782,22 +782,22 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Event: play.api.libs.json.Writes[Event] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Event] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Event) = {
+    implicit def jsonWritesPostmanEvent: play.api.libs.json.Writes[Event] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Event] {
+        def writes(obj: io.flow.postman.v0.models.Event) = {
           jsObjectEvent(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210File: play.api.libs.json.Reads[File] = {
+    implicit def jsonReadsPostmanFile: play.api.libs.json.Reads[File] = {
       for {
         src <- (__ \ "src").readNullable[String]
         content <- (__ \ "content").readNullable[String]
       } yield File(src, content)
     }
 
-    def jsObjectFile(obj: io.flow.postman.collection.v210.v0.models.File): play.api.libs.json.JsObject = {
+    def jsObjectFile(obj: io.flow.postman.v0.models.File): play.api.libs.json.JsObject = {
       (obj.src match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("src" -> play.api.libs.json.JsString(x))
@@ -808,26 +808,26 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210File: play.api.libs.json.Writes[File] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.File] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.File) = {
+    implicit def jsonWritesPostmanFile: play.api.libs.json.Writes[File] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.File] {
+        def writes(obj: io.flow.postman.v0.models.File) = {
           jsObjectFile(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Folder: play.api.libs.json.Reads[Folder] = {
+    implicit def jsonReadsPostmanFolder: play.api.libs.json.Reads[Folder] = {
       for {
         name <- (__ \ "name").read[String]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
-        variable <- (__ \ "variable").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Variable]]
-        item <- (__ \ "item").read[Seq[io.flow.postman.collection.v210.v0.models.Item]]
-        event <- (__ \ "event").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Event]]
-        auth <- (__ \ "auth").readNullable[io.flow.postman.collection.v210.v0.models.Auth]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
+        variable <- (__ \ "variable").readNullable[Seq[io.flow.postman.v0.models.Variable]]
+        item <- (__ \ "item").read[Seq[io.flow.postman.v0.models.Item]]
+        event <- (__ \ "event").readNullable[Seq[io.flow.postman.v0.models.Event]]
+        auth <- (__ \ "auth").readNullable[io.flow.postman.v0.models.Auth]
       } yield Folder(name, description, variable, item, event, auth)
     }
 
-    def jsObjectFolder(obj: io.flow.postman.collection.v210.v0.models.Folder): play.api.libs.json.JsObject = {
+    def jsObjectFolder(obj: io.flow.postman.v0.models.Folder): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "name" -> play.api.libs.json.JsString(obj.name),
         "item" -> play.api.libs.json.Json.toJson(obj.item)
@@ -849,18 +849,18 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonReadsPostmanCollectionV210FormParameter: play.api.libs.json.Reads[FormParameter] = {
+    implicit def jsonReadsPostmanFormParameter: play.api.libs.json.Reads[FormParameter] = {
       for {
         key <- (__ \ "key").read[String]
         value <- (__ \ "value").readNullable[String]
         disabled <- (__ \ "disabled").readNullable[Boolean]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
         contentType <- (__ \ "contentType").readNullable[String]
         `type` <- (__ \ "type").readNullable[String]
       } yield FormParameter(key, value, disabled, description, contentType, `type`)
     }
 
-    def jsObjectFormParameter(obj: io.flow.postman.collection.v210.v0.models.FormParameter): play.api.libs.json.JsObject = {
+    def jsObjectFormParameter(obj: io.flow.postman.v0.models.FormParameter): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "key" -> play.api.libs.json.JsString(obj.key)
       ) ++ (obj.value match {
@@ -885,24 +885,24 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210FormParameter: play.api.libs.json.Writes[FormParameter] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.FormParameter] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.FormParameter) = {
+    implicit def jsonWritesPostmanFormParameter: play.api.libs.json.Writes[FormParameter] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.FormParameter] {
+        def writes(obj: io.flow.postman.v0.models.FormParameter) = {
           jsObjectFormParameter(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Header: play.api.libs.json.Reads[Header] = {
+    implicit def jsonReadsPostmanHeader: play.api.libs.json.Reads[Header] = {
       for {
         key <- (__ \ "key").read[String]
         value <- (__ \ "value").read[String]
         disabled <- (__ \ "disabled").readNullable[Boolean]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
       } yield Header(key, value, disabled, description)
     }
 
-    def jsObjectHeader(obj: io.flow.postman.collection.v210.v0.models.Header): play.api.libs.json.JsObject = {
+    def jsObjectHeader(obj: io.flow.postman.v0.models.Header): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "key" -> play.api.libs.json.JsString(obj.key),
         "value" -> play.api.libs.json.JsString(obj.value)
@@ -916,25 +916,25 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Header: play.api.libs.json.Writes[Header] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Header] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Header) = {
+    implicit def jsonWritesPostmanHeader: play.api.libs.json.Writes[Header] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Header] {
+        def writes(obj: io.flow.postman.v0.models.Header) = {
           jsObjectHeader(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Info: play.api.libs.json.Reads[Info] = {
+    implicit def jsonReadsPostmanInfo: play.api.libs.json.Reads[Info] = {
       for {
         name <- (__ \ "name").read[String]
         postmanId <- (__ \ "postman_id").readNullable[String]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
         version <- (__ \ "version").readNullable[String]
         schema <- (__ \ "schema").read[String]
       } yield Info(name, postmanId, description, version, schema)
     }
 
-    def jsObjectInfo(obj: io.flow.postman.collection.v210.v0.models.Info): play.api.libs.json.JsObject = {
+    def jsObjectInfo(obj: io.flow.postman.v0.models.Info): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "name" -> play.api.libs.json.JsString(obj.name),
         "schema" -> play.api.libs.json.JsString(obj.schema)
@@ -952,27 +952,27 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Info: play.api.libs.json.Writes[Info] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Info] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Info) = {
+    implicit def jsonWritesPostmanInfo: play.api.libs.json.Writes[Info] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Info] {
+        def writes(obj: io.flow.postman.v0.models.Info) = {
           jsObjectInfo(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Item: play.api.libs.json.Reads[Item] = {
+    implicit def jsonReadsPostmanItem: play.api.libs.json.Reads[Item] = {
       for {
         id <- (__ \ "id").readNullable[String]
         name <- (__ \ "name").readNullable[String]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
-        variable <- (__ \ "variable").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Variable]]
-        event <- (__ \ "event").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Event]]
-        request <- (__ \ "request").read[io.flow.postman.collection.v210.v0.models.Request]
-        response <- (__ \ "response").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Response]]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
+        variable <- (__ \ "variable").readNullable[Seq[io.flow.postman.v0.models.Variable]]
+        event <- (__ \ "event").readNullable[Seq[io.flow.postman.v0.models.Event]]
+        request <- (__ \ "request").read[io.flow.postman.v0.models.Request]
+        response <- (__ \ "response").readNullable[Seq[io.flow.postman.v0.models.Response]]
       } yield Item(id, name, description, variable, event, request, response)
     }
 
-    def jsObjectItem(obj: io.flow.postman.collection.v210.v0.models.Item): play.api.libs.json.JsObject = {
+    def jsObjectItem(obj: io.flow.postman.v0.models.Item): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "request" -> jsObjectRequest(obj.request)
       ) ++ (obj.id match {
@@ -1001,16 +1001,16 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonReadsPostmanCollectionV210QueryParam: play.api.libs.json.Reads[QueryParam] = {
+    implicit def jsonReadsPostmanQueryParam: play.api.libs.json.Reads[QueryParam] = {
       for {
         key <- (__ \ "key").readNullable[String]
         value <- (__ \ "value").readNullable[String]
         disabled <- (__ \ "disabled").readNullable[Boolean]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
       } yield QueryParam(key, value, disabled, description)
     }
 
-    def jsObjectQueryParam(obj: io.flow.postman.collection.v210.v0.models.QueryParam): play.api.libs.json.JsObject = {
+    def jsObjectQueryParam(obj: io.flow.postman.v0.models.QueryParam): play.api.libs.json.JsObject = {
       (obj.key match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("key" -> play.api.libs.json.JsString(x))
@@ -1029,26 +1029,26 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210QueryParam: play.api.libs.json.Writes[QueryParam] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.QueryParam] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.QueryParam) = {
+    implicit def jsonWritesPostmanQueryParam: play.api.libs.json.Writes[QueryParam] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.QueryParam] {
+        def writes(obj: io.flow.postman.v0.models.QueryParam) = {
           jsObjectQueryParam(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Request: play.api.libs.json.Reads[Request] = {
+    implicit def jsonReadsPostmanRequest: play.api.libs.json.Reads[Request] = {
       for {
-        url <- (__ \ "url").readNullable[io.flow.postman.collection.v210.v0.models.Url]
-        auth <- (__ \ "auth").readNullable[io.flow.postman.collection.v210.v0.models.Auth]
-        method <- (__ \ "method").readNullable[io.flow.postman.collection.v210.v0.models.Method]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
-        header <- (__ \ "header").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Header]]
-        body <- (__ \ "body").readNullable[io.flow.postman.collection.v210.v0.models.Body]
+        url <- (__ \ "url").readNullable[io.flow.postman.v0.models.Url]
+        auth <- (__ \ "auth").readNullable[io.flow.postman.v0.models.Auth]
+        method <- (__ \ "method").readNullable[io.flow.postman.v0.models.Method]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
+        header <- (__ \ "header").readNullable[Seq[io.flow.postman.v0.models.Header]]
+        body <- (__ \ "body").readNullable[io.flow.postman.v0.models.Body]
       } yield Request(url, auth, method, description, header, body)
     }
 
-    def jsObjectRequest(obj: io.flow.postman.collection.v210.v0.models.Request): play.api.libs.json.JsObject = {
+    def jsObjectRequest(obj: io.flow.postman.v0.models.Request): play.api.libs.json.JsObject = {
       (obj.url match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("url" -> jsObjectUrl(x))
@@ -1075,28 +1075,28 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Request: play.api.libs.json.Writes[Request] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Request] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Request) = {
+    implicit def jsonWritesPostmanRequest: play.api.libs.json.Writes[Request] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Request] {
+        def writes(obj: io.flow.postman.v0.models.Request) = {
           jsObjectRequest(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Response: play.api.libs.json.Reads[Response] = {
+    implicit def jsonReadsPostmanResponse: play.api.libs.json.Reads[Response] = {
       for {
         id <- (__ \ "id").readNullable[String]
         name <- (__ \ "name").readNullable[String]
-        originalRequest <- (__ \ "originalRequest").readNullable[io.flow.postman.collection.v210.v0.models.Request]
+        originalRequest <- (__ \ "originalRequest").readNullable[io.flow.postman.v0.models.Request]
         responseTime <- (__ \ "responseTime").readNullable[String]
-        header <- (__ \ "header").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Header]]
+        header <- (__ \ "header").readNullable[Seq[io.flow.postman.v0.models.Header]]
         body <- (__ \ "body").readNullable[String]
         status <- (__ \ "status").readNullable[String]
         code <- (__ \ "code").readNullable[Int]
       } yield Response(id, name, originalRequest, responseTime, header, body, status, code)
     }
 
-    def jsObjectResponse(obj: io.flow.postman.collection.v210.v0.models.Response): play.api.libs.json.JsObject = {
+    def jsObjectResponse(obj: io.flow.postman.v0.models.Response): play.api.libs.json.JsObject = {
       (obj.id match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("id" -> play.api.libs.json.JsString(x))
@@ -1131,15 +1131,15 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Response: play.api.libs.json.Writes[Response] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Response] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Response) = {
+    implicit def jsonWritesPostmanResponse: play.api.libs.json.Writes[Response] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Response] {
+        def writes(obj: io.flow.postman.v0.models.Response) = {
           jsObjectResponse(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Script: play.api.libs.json.Reads[Script] = {
+    implicit def jsonReadsPostmanScript: play.api.libs.json.Reads[Script] = {
       for {
         exec <- (__ \ "exec").read[Seq[String]]
         `type` <- (__ \ "type").readWithDefault[String]("text/javascript")
@@ -1149,7 +1149,7 @@ package io.flow.postman.collection.v210.v0.models {
       } yield Script(exec, `type`, id, src, name)
     }
 
-    def jsObjectScript(obj: io.flow.postman.collection.v210.v0.models.Script): play.api.libs.json.JsObject = {
+    def jsObjectScript(obj: io.flow.postman.v0.models.Script): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "exec" -> play.api.libs.json.Json.toJson(obj.exec),
         "type" -> play.api.libs.json.JsString(obj.`type`)
@@ -1167,28 +1167,28 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Script: play.api.libs.json.Writes[Script] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Script] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Script) = {
+    implicit def jsonWritesPostmanScript: play.api.libs.json.Writes[Script] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Script] {
+        def writes(obj: io.flow.postman.v0.models.Script) = {
           jsObjectScript(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Url: play.api.libs.json.Reads[Url] = {
+    implicit def jsonReadsPostmanUrl: play.api.libs.json.Reads[Url] = {
       for {
         raw <- (__ \ "raw").readNullable[String]
         protocol <- (__ \ "protocol").readNullable[String]
         host <- (__ \ "host").readNullable[Seq[String]]
         path <- (__ \ "path").readNullable[Seq[String]]
         port <- (__ \ "port").readNullable[String]
-        query <- (__ \ "query").readNullable[Seq[io.flow.postman.collection.v210.v0.models.QueryParam]]
+        query <- (__ \ "query").readNullable[Seq[io.flow.postman.v0.models.QueryParam]]
         hash <- (__ \ "hash").readNullable[String]
-        variable <- (__ \ "variable").readNullable[Seq[io.flow.postman.collection.v210.v0.models.Variable]]
+        variable <- (__ \ "variable").readNullable[Seq[io.flow.postman.v0.models.Variable]]
       } yield Url(raw, protocol, host, path, port, query, hash, variable)
     }
 
-    def jsObjectUrl(obj: io.flow.postman.collection.v210.v0.models.Url): play.api.libs.json.JsObject = {
+    def jsObjectUrl(obj: io.flow.postman.v0.models.Url): play.api.libs.json.JsObject = {
       (obj.raw match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("raw" -> play.api.libs.json.JsString(x))
@@ -1223,24 +1223,24 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Url: play.api.libs.json.Writes[Url] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Url] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Url) = {
+    implicit def jsonWritesPostmanUrl: play.api.libs.json.Writes[Url] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Url] {
+        def writes(obj: io.flow.postman.v0.models.Url) = {
           jsObjectUrl(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210UrlEncoded: play.api.libs.json.Reads[UrlEncoded] = {
+    implicit def jsonReadsPostmanUrlEncoded: play.api.libs.json.Reads[UrlEncoded] = {
       for {
         key <- (__ \ "key").read[String]
         value <- (__ \ "value").readNullable[String]
         disabled <- (__ \ "disabled").readNullable[Boolean]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
       } yield UrlEncoded(key, value, disabled, description)
     }
 
-    def jsObjectUrlEncoded(obj: io.flow.postman.collection.v210.v0.models.UrlEncoded): play.api.libs.json.JsObject = {
+    def jsObjectUrlEncoded(obj: io.flow.postman.v0.models.UrlEncoded): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "key" -> play.api.libs.json.JsString(obj.key)
       ) ++ (obj.value match {
@@ -1257,28 +1257,28 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210UrlEncoded: play.api.libs.json.Writes[UrlEncoded] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.UrlEncoded] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.UrlEncoded) = {
+    implicit def jsonWritesPostmanUrlEncoded: play.api.libs.json.Writes[UrlEncoded] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.UrlEncoded] {
+        def writes(obj: io.flow.postman.v0.models.UrlEncoded) = {
           jsObjectUrlEncoded(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Variable: play.api.libs.json.Reads[Variable] = {
+    implicit def jsonReadsPostmanVariable: play.api.libs.json.Reads[Variable] = {
       for {
         id <- (__ \ "id").readNullable[String]
         key <- (__ \ "key").readNullable[String]
         value <- (__ \ "value").readNullable[String]
         `type` <- (__ \ "type").readNullable[String]
         name <- (__ \ "name").readNullable[String]
-        description <- (__ \ "description").readNullable[io.flow.postman.collection.v210.v0.models.Description]
+        description <- (__ \ "description").readNullable[io.flow.postman.v0.models.Description]
         system <- (__ \ "system").readNullable[Boolean]
         disabled <- (__ \ "disabled").readNullable[Boolean]
       } yield Variable(id, key, value, `type`, name, description, system, disabled)
     }
 
-    def jsObjectVariable(obj: io.flow.postman.collection.v210.v0.models.Variable): play.api.libs.json.JsObject = {
+    def jsObjectVariable(obj: io.flow.postman.v0.models.Variable): play.api.libs.json.JsObject = {
       (obj.id match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("id" -> play.api.libs.json.JsString(x))
@@ -1313,37 +1313,37 @@ package io.flow.postman.collection.v210.v0.models {
       })
     }
 
-    implicit def jsonWritesPostmanCollectionV210Variable: play.api.libs.json.Writes[Variable] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Variable] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Variable) = {
+    implicit def jsonWritesPostmanVariable: play.api.libs.json.Writes[Variable] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Variable] {
+        def writes(obj: io.flow.postman.v0.models.Variable) = {
           jsObjectVariable(obj)
         }
       }
     }
 
-    implicit def jsonReadsPostmanCollectionV210Items: play.api.libs.json.Reads[Items] = new play.api.libs.json.Reads[Items] {
+    implicit def jsonReadsPostmanItems: play.api.libs.json.Reads[Items] = new play.api.libs.json.Reads[Items] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[Items] = {
         (js \ "type").asOpt[String].getOrElse { sys.error("Union[Items] requires a discriminator named 'type' - this field was not found in the Json Value") } match {
-          case "item" => js.validate[io.flow.postman.collection.v210.v0.models.Item]
-          case "folder" => js.validate[io.flow.postman.collection.v210.v0.models.Folder]
-          case other => play.api.libs.json.JsSuccess(io.flow.postman.collection.v210.v0.models.ItemsUndefinedType(other))
+          case "item" => js.validate[io.flow.postman.v0.models.Item]
+          case "folder" => js.validate[io.flow.postman.v0.models.Folder]
+          case other => play.api.libs.json.JsSuccess(io.flow.postman.v0.models.ItemsUndefinedType(other))
         }
       }
     }
 
-    def jsObjectItems(obj: io.flow.postman.collection.v210.v0.models.Items): play.api.libs.json.JsObject = {
+    def jsObjectItems(obj: io.flow.postman.v0.models.Items): play.api.libs.json.JsObject = {
       obj match {
-        case x: io.flow.postman.collection.v210.v0.models.Item => jsObjectItem(x) ++ play.api.libs.json.Json.obj("type" -> "item")
-        case x: io.flow.postman.collection.v210.v0.models.Folder => jsObjectFolder(x) ++ play.api.libs.json.Json.obj("type" -> "folder")
+        case x: io.flow.postman.v0.models.Item => jsObjectItem(x) ++ play.api.libs.json.Json.obj("type" -> "item")
+        case x: io.flow.postman.v0.models.Folder => jsObjectFolder(x) ++ play.api.libs.json.Json.obj("type" -> "folder")
         case other => {
           sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
         }
       }
     }
 
-    implicit def jsonWritesPostmanCollectionV210Items: play.api.libs.json.Writes[Items] = {
-      new play.api.libs.json.Writes[io.flow.postman.collection.v210.v0.models.Items] {
-        def writes(obj: io.flow.postman.collection.v210.v0.models.Items) = {
+    implicit def jsonWritesPostmanItems: play.api.libs.json.Writes[Items] = {
+      new play.api.libs.json.Writes[io.flow.postman.v0.models.Items] {
+        def writes(obj: io.flow.postman.v0.models.Items) = {
           jsObjectItems(obj)
         }
       }
@@ -1351,7 +1351,7 @@ package io.flow.postman.collection.v210.v0.models {
   }
 }
 
-package io.flow.postman.collection.v210.v0 {
+package io.flow.postman.v0 {
 
   object Bindables {
 
@@ -1370,43 +1370,43 @@ package io.flow.postman.collection.v210.v0 {
     }
 
     object Models {
-      import io.flow.postman.collection.v210.v0.models._
+      import io.flow.postman.v0.models._
 
-      val authEnumConverter: ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.AuthEnum] = new ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.AuthEnum] {
-        override def convert(value: String): io.flow.postman.collection.v210.v0.models.AuthEnum = io.flow.postman.collection.v210.v0.models.AuthEnum(value)
-        override def convert(value: io.flow.postman.collection.v210.v0.models.AuthEnum): String = value.toString
-        override def example: io.flow.postman.collection.v210.v0.models.AuthEnum = io.flow.postman.collection.v210.v0.models.AuthEnum.Awsv4
-        override def validValues: Seq[io.flow.postman.collection.v210.v0.models.AuthEnum] = io.flow.postman.collection.v210.v0.models.AuthEnum.all
+      val authEnumConverter: ApibuilderTypeConverter[io.flow.postman.v0.models.AuthEnum] = new ApibuilderTypeConverter[io.flow.postman.v0.models.AuthEnum] {
+        override def convert(value: String): io.flow.postman.v0.models.AuthEnum = io.flow.postman.v0.models.AuthEnum(value)
+        override def convert(value: io.flow.postman.v0.models.AuthEnum): String = value.toString
+        override def example: io.flow.postman.v0.models.AuthEnum = io.flow.postman.v0.models.AuthEnum.Awsv4
+        override def validValues: Seq[io.flow.postman.v0.models.AuthEnum] = io.flow.postman.v0.models.AuthEnum.all
       }
-      implicit def pathBindableAuthEnum(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.collection.v210.v0.models.AuthEnum] = ApibuilderPathBindable(authEnumConverter)
-      implicit def queryStringBindableAuthEnum(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.collection.v210.v0.models.AuthEnum] = ApibuilderQueryStringBindable(authEnumConverter)
+      implicit def pathBindableAuthEnum(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.v0.models.AuthEnum] = ApibuilderPathBindable(authEnumConverter)
+      implicit def queryStringBindableAuthEnum(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.v0.models.AuthEnum] = ApibuilderQueryStringBindable(authEnumConverter)
 
-      val bodyModeConverter: ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.BodyMode] = new ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.BodyMode] {
-        override def convert(value: String): io.flow.postman.collection.v210.v0.models.BodyMode = io.flow.postman.collection.v210.v0.models.BodyMode(value)
-        override def convert(value: io.flow.postman.collection.v210.v0.models.BodyMode): String = value.toString
-        override def example: io.flow.postman.collection.v210.v0.models.BodyMode = io.flow.postman.collection.v210.v0.models.BodyMode.Raw
-        override def validValues: Seq[io.flow.postman.collection.v210.v0.models.BodyMode] = io.flow.postman.collection.v210.v0.models.BodyMode.all
+      val bodyModeConverter: ApibuilderTypeConverter[io.flow.postman.v0.models.BodyMode] = new ApibuilderTypeConverter[io.flow.postman.v0.models.BodyMode] {
+        override def convert(value: String): io.flow.postman.v0.models.BodyMode = io.flow.postman.v0.models.BodyMode(value)
+        override def convert(value: io.flow.postman.v0.models.BodyMode): String = value.toString
+        override def example: io.flow.postman.v0.models.BodyMode = io.flow.postman.v0.models.BodyMode.Raw
+        override def validValues: Seq[io.flow.postman.v0.models.BodyMode] = io.flow.postman.v0.models.BodyMode.all
       }
-      implicit def pathBindableBodyMode(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.collection.v210.v0.models.BodyMode] = ApibuilderPathBindable(bodyModeConverter)
-      implicit def queryStringBindableBodyMode(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.collection.v210.v0.models.BodyMode] = ApibuilderQueryStringBindable(bodyModeConverter)
+      implicit def pathBindableBodyMode(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.v0.models.BodyMode] = ApibuilderPathBindable(bodyModeConverter)
+      implicit def queryStringBindableBodyMode(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.v0.models.BodyMode] = ApibuilderQueryStringBindable(bodyModeConverter)
 
-      val eventTypeConverter: ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.EventType] = new ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.EventType] {
-        override def convert(value: String): io.flow.postman.collection.v210.v0.models.EventType = io.flow.postman.collection.v210.v0.models.EventType(value)
-        override def convert(value: io.flow.postman.collection.v210.v0.models.EventType): String = value.toString
-        override def example: io.flow.postman.collection.v210.v0.models.EventType = io.flow.postman.collection.v210.v0.models.EventType.Test
-        override def validValues: Seq[io.flow.postman.collection.v210.v0.models.EventType] = io.flow.postman.collection.v210.v0.models.EventType.all
+      val eventTypeConverter: ApibuilderTypeConverter[io.flow.postman.v0.models.EventType] = new ApibuilderTypeConverter[io.flow.postman.v0.models.EventType] {
+        override def convert(value: String): io.flow.postman.v0.models.EventType = io.flow.postman.v0.models.EventType(value)
+        override def convert(value: io.flow.postman.v0.models.EventType): String = value.toString
+        override def example: io.flow.postman.v0.models.EventType = io.flow.postman.v0.models.EventType.Test
+        override def validValues: Seq[io.flow.postman.v0.models.EventType] = io.flow.postman.v0.models.EventType.all
       }
-      implicit def pathBindableEventType(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.collection.v210.v0.models.EventType] = ApibuilderPathBindable(eventTypeConverter)
-      implicit def queryStringBindableEventType(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.collection.v210.v0.models.EventType] = ApibuilderQueryStringBindable(eventTypeConverter)
+      implicit def pathBindableEventType(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.v0.models.EventType] = ApibuilderPathBindable(eventTypeConverter)
+      implicit def queryStringBindableEventType(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.v0.models.EventType] = ApibuilderQueryStringBindable(eventTypeConverter)
 
-      val methodConverter: ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.Method] = new ApibuilderTypeConverter[io.flow.postman.collection.v210.v0.models.Method] {
-        override def convert(value: String): io.flow.postman.collection.v210.v0.models.Method = io.flow.postman.collection.v210.v0.models.Method(value)
-        override def convert(value: io.flow.postman.collection.v210.v0.models.Method): String = value.toString
-        override def example: io.flow.postman.collection.v210.v0.models.Method = io.flow.postman.collection.v210.v0.models.Method.Get
-        override def validValues: Seq[io.flow.postman.collection.v210.v0.models.Method] = io.flow.postman.collection.v210.v0.models.Method.all
+      val methodConverter: ApibuilderTypeConverter[io.flow.postman.v0.models.Method] = new ApibuilderTypeConverter[io.flow.postman.v0.models.Method] {
+        override def convert(value: String): io.flow.postman.v0.models.Method = io.flow.postman.v0.models.Method(value)
+        override def convert(value: io.flow.postman.v0.models.Method): String = value.toString
+        override def example: io.flow.postman.v0.models.Method = io.flow.postman.v0.models.Method.Get
+        override def validValues: Seq[io.flow.postman.v0.models.Method] = io.flow.postman.v0.models.Method.all
       }
-      implicit def pathBindableMethod(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.collection.v210.v0.models.Method] = ApibuilderPathBindable(methodConverter)
-      implicit def queryStringBindableMethod(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.collection.v210.v0.models.Method] = ApibuilderQueryStringBindable(methodConverter)
+      implicit def pathBindableMethod(implicit stringBinder: QueryStringBindable[String]): PathBindable[io.flow.postman.v0.models.Method] = ApibuilderPathBindable(methodConverter)
+      implicit def queryStringBindableMethod(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[io.flow.postman.v0.models.Method] = ApibuilderQueryStringBindable(methodConverter)
     }
 
     trait ApibuilderTypeConverter[T] {

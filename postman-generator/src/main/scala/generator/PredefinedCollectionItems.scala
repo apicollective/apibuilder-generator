@@ -1,7 +1,7 @@
 package generator
 
 import generator.Heuristics.PathVariable
-import io.flow.postman.collection.v210.v0.models._
+import io.flow.postman.v0.models._
 
 object PredefinedCollectionItems {
 

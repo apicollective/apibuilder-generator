@@ -1,8 +1,9 @@
 package generator
 
 import io.apibuilder.spec.v0.models._
-import models.attributes.PostmanAttributes
-import models.attributes.PostmanAttributes.{ObjectReferenceAttrValue, objectReferenceAttrValueFormats}
+import io.flow.postman.generator.attributes.v0.models.AttributeName
+import io.flow.postman.generator.attributes.v0.models.ObjectReference
+import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesObjectReference
 import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
 
@@ -22,10 +23,10 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
     }
 
     "resolve second level dependencies (dependency has its own dependency) in the right order" in new TestCtxWithImportedService {
-      val objRef2AttrValue = ObjectReferenceAttrValue(
+      val objRef2AttrValue = ObjectReference(
         relatedServiceNamespace = referenceApiService.namespace,
         resourceType = "group",
-        operationMethod = "GET",
+        operationMethod = Method("GET"),
         identifierField = "members[0].age_group"
       )
       val dependency2Target = getTargetOperation(referenceApiService, objRef2AttrValue)
@@ -41,10 +42,10 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
     }
 
     "resolve nested dependencies that span across 3 different services (main<-import1<-import2)" in new TestCtxWithTwoImportedServices {
-      val objRefToThirdServiceAttrValue = ObjectReferenceAttrValue(
+      val objRefToThirdServiceAttrValue = ObjectReference(
         relatedServiceNamespace = generatorApiServiceWithUnionWithoutDescriminator.namespace,
         resourceType = "user",
-        operationMethod = "POST",
+        operationMethod = Method("POST"),
         identifierField = "guid"
       )
       val dependencyToThirdServiceTarget = getTargetOperation(generatorApiServiceWithUnionWithoutDescriminator, objRefToThirdServiceAttrValue)
@@ -102,13 +103,13 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
 
   }
 
-  private def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReferenceAttrValue): Operation = {
+  private def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): Operation = {
     targetService
       .resources.find(_.`type` == objRefAttrValue.resourceType).get
-      .operations.find(_.method.toString == objRefAttrValue.operationMethod).get
+      .operations.find(_.method == objRefAttrValue.operationMethod).get
   }
 
-  private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ObjectReferenceAttrValue): Service = {
+  private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ObjectReference): Service = {
     val oldModel = service
       .models.find(_.name == modelName).get
 
@@ -117,7 +118,7 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       .copy(
         attributes = Seq(
           Attribute(
-            PostmanAttributes.ObjectReferenceKey,
+            AttributeName.ObjectReference.toString,
             Json.toJson(attributeValue).as[JsObject]
           )
         )
@@ -137,10 +138,10 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
 
   trait TestDependencies {
 
-    val objectRef1AttrValue = ObjectReferenceAttrValue(
+    val objectRef1AttrValue = ObjectReference(
       relatedServiceNamespace = referenceApiService.namespace,
       resourceType = "member",
-      operationMethod = "POST",
+      operationMethod = Method("POST"),
       identifierField = "guid"
     )
     val dependency1Target = getTargetOperation(referenceApiService, objectRef1AttrValue)
@@ -156,7 +157,7 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
           required = true,
           attributes = Seq(
             Attribute(
-              PostmanAttributes.ObjectReferenceKey,
+              AttributeName.ObjectReference.toString,
               Json.toJson(objectRef1AttrValue).as[JsObject]
             )
           )

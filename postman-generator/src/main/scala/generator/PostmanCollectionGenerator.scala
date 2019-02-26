@@ -5,15 +5,17 @@ import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import lib.generator.CodeGenerator
-import models.attributes.PostmanAttributes.ObjectReferenceAttrValue
-import io.flow.postman.collection.v210.v0.{models => postman}
-import io.flow.postman.collection.v210.v0.models.json._
+import io.flow.postman.generator.attributes.v0.models.AttributeName
+import io.flow.postman.generator.attributes.v0.models.ObjectReference
+import io.flow.postman.generator.attributes.v0.models.BasicAuth
+import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesBasicAuth
+import io.flow.postman.v0.{models => postman}
+import io.flow.postman.v0.models.json._
 import models.service.ResolvedService
 import play.api.libs.json.Json
 import Utils._
-import io.flow.postman.collection.v210.v0.models.Folder
+import io.flow.postman.v0.models.Folder
 import models.attributes.PostmanAttributes
-import models.attributes.PostmanAttributes.PostmanBasicAuthAttrValue
 
 object PostmanCollectionGenerator extends CodeGenerator {
 
@@ -91,8 +93,8 @@ object PostmanCollectionGenerator extends CodeGenerator {
     }
 
     val basicAuthOpt = service.attributes
-      .find(_.name.equalsIgnoreCase(PostmanAttributes.BasicAuthKey))
-      .flatMap(_.value.asOpt[PostmanBasicAuthAttrValue])
+      .find(_.name.equalsIgnoreCase(AttributeName.PostmanBasicAuth.toString))
+      .flatMap(_.value.asOpt[BasicAuth])
       .map { basicAuth =>
         postman.Auth(
           `type` = postman.AuthEnum.Basic,
@@ -105,7 +107,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
     val shouldAddSetupFolder: Boolean =
       service.attributes
-        .find(_.name.equalsIgnoreCase(PostmanAttributes.SetupKey))
+        .find(_.name.equalsIgnoreCase(AttributeName.OrganizationSetup.toString))
         .nonEmpty
 
     val entitiesSetupFolderOpt = prepareEntitiesSetupFolders(resolvedService, serviceSpecificHeaders, examplesProvider)
@@ -190,12 +192,12 @@ object PostmanCollectionGenerator extends CodeGenerator {
     }
   }
 
-  private def addDependencyItemVarSetting(objRefAttr: ObjectReferenceAttrValue, item: postman.Item): postman.Item = {
+  private def addDependencyItemVarSetting(objRef: ObjectReference, item: postman.Item): postman.Item = {
 
     val scriptExecFragment = Seq(
       """var jsonData = JSON.parse(responseBody);""",
-      s"""var id = jsonData["${objRefAttr.identifierField}"];""",
-      s"""if (id != null) pm.environment.set("${objRefAttr.toPostmanVariableName}", id);"""
+      s"""var id = jsonData["${objRef.identifierField}"];""",
+      s"""if (id != null) pm.environment.set("${PostmanAttributes.postmanVariableNameFrom(objRef)}", id);"""
     )
 
     item.

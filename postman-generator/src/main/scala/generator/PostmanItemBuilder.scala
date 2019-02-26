@@ -5,7 +5,7 @@ import generator.Heuristics.PathVariable
 import generator.PostmanCollectionGenerator.Variables
 import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
-import io.flow.postman.collection.v210.v0.{models => postman}
+import io.flow.postman.v0.{models => postman}
 import play.api.Logging
 import play.api.libs.json.Json
 
