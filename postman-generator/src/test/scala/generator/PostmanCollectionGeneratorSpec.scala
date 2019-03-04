@@ -63,7 +63,19 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
           |      },
           |      "response" : [ ],
           |      "name" : "POST /complex-strings/new",
-          |      "type" : "item"
+          |      "type" : "item",
+          |      "event": [
+          |      {
+          |          "listen": "test",
+          |          "script": {
+          |              "exec": [
+          |                  "pm.test(\"POST requests should return 2xx\", function () {",
+          |                  "    pm.response.to.be.success;",
+          |                  "});"
+          |              ],
+          |              "type": "text/javascript"
+          |          }
+          |      }]
           |    } ],
           |    "name" : "complex-strings",
           |    "type" : "folder"
@@ -132,7 +144,8 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
         }
         val ageGroupsFolder = postmanFolders.find(_.name == "ages").get
         val ageGroupsEndpoints = ageGroupsFolder.item
-        val getFirstAgeGroupEndpoint = ageGroupsEndpoints.find(_.name.exists(_.contains("/ages/first")))
+        val getFirstAgeGroupEndpoint =
+          ageGroupsEndpoints.find(_.name.exists(_.contains("/ages/first")))
           .getOrElse(fail("generated service does not contain GET /ages/first"))
 
         val getFirstAgeGroupEndpointResponseExample = getFirstAgeGroupEndpoint.response.get.head

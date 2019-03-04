@@ -1,11 +1,12 @@
 package generator
 
 import io.apibuilder.spec.v0.models._
-import io.flow.postman.generator.attributes.v0.models.AttributeName
-import io.flow.postman.generator.attributes.v0.models.ObjectReference
-import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesObjectReference
+import io.flow.postman.generator.attributes.v0.models.{AttributeName, ModelReference}
+import io.flow.postman.generator.attributes.v0.models.json._
+import models.attributes.PostmanAttributes._
 import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
+
 
 class DependantOperationResolverSpec extends WordSpec with Matchers {
 
@@ -17,13 +18,11 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       val resolvedService = ServiceImportResolver.resolveService(testMainService, Seq(referenceApiService))
       val result = DependantOperationResolver.resolve(resolvedService)
 
-      result shouldEqual Seq(
-        objectRef1AttrValue -> dependency1Target
-      )
+      result should === (List(objectRef1AttrValue.toExtended -> dependency1Target))
     }
 
     "resolve second level dependencies (dependency has its own dependency) in the right order" in new TestCtxWithImportedService {
-      val objRef2AttrValue = ObjectReference(
+      val objRef2AttrValue = ModelReference(
         relatedServiceNamespace = referenceApiService.namespace,
         resourceType = "group",
         operationMethod = Method("GET"),
@@ -35,14 +34,17 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       val resolvedService = ServiceImportResolver.resolveService(testMainService, Seq(testReferenceApiService))
       val result = DependantOperationResolver.resolve(resolvedService)
 
-      result shouldEqual Seq(
+
+      val expected: Seq[(ExtendedObjectReference, Operation)] = Seq(
         objRef2AttrValue -> dependency2Target,
         objectRef1AttrValue -> dependency1Target
-      )
+      ).toExtended
+
+      result should contain allElementsOf expected
     }
 
     "resolve nested dependencies that span across 3 different services (main<-import1<-import2)" in new TestCtxWithTwoImportedServices {
-      val objRefToThirdServiceAttrValue = ObjectReference(
+      val objRefToThirdServiceAttrValue = ModelReference(
         relatedServiceNamespace = generatorApiServiceWithUnionWithoutDescriminator.namespace,
         resourceType = "user",
         operationMethod = Method("POST"),
@@ -57,7 +59,7 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       result shouldEqual Seq(
         objRefToThirdServiceAttrValue -> dependencyToThirdServiceTarget,
         objectRef1AttrValue -> dependency1Target
-      )
+      ).toExtended
     }
 
     "resolve a dependency that exists in a nested model" in new TestCtxWithImportedService {
@@ -98,18 +100,27 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
 
       result shouldEqual Seq(
         objectRef1AttrValue -> dependency1Target
-      )
+      ).toExtended
     }
 
   }
 
-  private def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): Operation = {
+  implicit class SeqModelRefOperationExtend(seq: Seq[(ModelReference, Operation)]) {
+    def toExtended: Seq[(ExtendedObjectReference, Operation)] = {
+      seq.map {
+        case (ref, op) => (ref.toExtended, op)
+      }
+    }
+  }
+
+  private def getTargetOperation(targetService: Service, objRefAttrValue: ModelReference): Operation = {
+
     targetService
       .resources.find(_.`type` == objRefAttrValue.resourceType).get
       .operations.find(_.method == objRefAttrValue.operationMethod).get
   }
 
-  private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ObjectReference): Service = {
+  private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ModelReference): Service = {
     val oldModel = service
       .models.find(_.name == modelName).get
 
@@ -138,15 +149,16 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
 
   trait TestDependencies {
 
-    val objectRef1AttrValue = ObjectReference(
+    lazy val objectRef1AttrValue = ModelReference(
       relatedServiceNamespace = referenceApiService.namespace,
       resourceType = "member",
       operationMethod = Method("POST"),
       identifierField = "guid"
     )
-    val dependency1Target = getTargetOperation(referenceApiService, objectRef1AttrValue)
 
-    val trivialServiceModelWithDependency = Model(
+    lazy val dependency1Target = getTargetOperation(referenceApiService, objectRef1AttrValue)
+
+    lazy val trivialServiceModelWithDependency = Model(
       name = "complex-string",
       plural = "complex-strings",
       fields = Seq(
@@ -164,14 +176,12 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
         )
       )
     )
-
   }
 
   trait TestCtxWithImportedService extends TestDependencies with TestFixtures.TrivialServiceWithImportCtx {
     val testMainService = trivialServiceWithImport.copy(
       models = Seq(trivialServiceModelWithDependency)
     )
-
   }
 
   trait TestCtxWithTwoImportedServices extends TestDependencies with TestFixtures.TrivialServiceWithTwoImportsCtx {

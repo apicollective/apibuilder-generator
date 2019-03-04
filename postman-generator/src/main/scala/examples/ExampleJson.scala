@@ -5,14 +5,14 @@ import java.util.UUID
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.spec.v0.models.json._
 import io.flow.postman.generator.attributes.v0.models.AttributeName
-import io.flow.postman.generator.attributes.v0.models.ObjectReference
-import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesObjectReference
 import models.attributes.PostmanAttributes
+import models.attributes.PostmanAttributes.ExtendedObjectReference
 import org.joda.time.{DateTime, LocalDate}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
 
 import scala.util.Random
+import scala.util.hashing.MurmurHash3
 
 case object ExampleJson {
   val TrueStrings = Seq("t", "true", "y", "yes", "on", "1", "trueclass")
@@ -76,7 +76,7 @@ case class ExampleJson(service: Service, selection: Selection) {
           map { field =>
 
             val objRefAttrOpt = field.attributes.collectFirst {
-              case attr if attr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString) => attr.value.asOpt[ObjectReference]
+              case attr if attr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString) => attr.value.asOpt[ExtendedObjectReference]
             }.flatten
 
             val value = objRefAttrOpt match {
@@ -237,7 +237,7 @@ case class ExampleJson(service: Service, selection: Selection) {
           case Some(default) => primitiveExample(p, default)
           case None => {
             field.example match {
-              case None => mockPrimitive(p)
+              case None => mockPrimitive(p, Some(field))
               case Some(ex) => primitiveExample(p, ex)
             }
           }
@@ -246,7 +246,7 @@ case class ExampleJson(service: Service, selection: Selection) {
     }
   }
 
-  private[this] def mockPrimitive(p: Primitives): JsValue = {
+  private[this] def mockPrimitive(p: Primitives, fieldOpt: Option[Field] = None): JsValue = {
     p match {
       case Primitives.Boolean => JsBoolean(true)
       case Primitives.Double => JsNumber(1.0)
@@ -258,11 +258,11 @@ case class ExampleJson(service: Service, selection: Selection) {
       }
       case Primitives.DateTimeIso8601 => JsString(ISODateTimeFormat.dateTime.print(DateTime.now))
       case Primitives.Decimal => Json.toJson(BigDecimal("1"))
-      case Primitives.String => JsString(randomString)
+      case Primitives.String => JsString(randomString(fieldOpt))
       case Primitives.Object => Json.obj("foo" -> "bar")
       case Primitives.JsonValue => JsNull
       case Primitives.Unit => JsNull
-      case Primitives.Uuid => JsString(UUID.randomUUID.toString)
+      case Primitives.Uuid => JsString(UUID.randomUUID().toString)
     }
   }
 
@@ -355,8 +355,14 @@ case class ExampleJson(service: Service, selection: Selection) {
     }
   }
 
-  private[this] def randomString(): String = {
-    "lorem ipsum " + TokenGenerator.generate(6)
+  private[this] def randomString(fieldOpt: Option[Field] = None): String = {
+    val seed = {
+      fieldOpt
+        .map(_.name)
+        .getOrElse(Random.nextString(12))
+    }
+    val hash = MurmurHash3.stringHash(seed).toString.takeRight(6)
+    s"lorem ipsum $hash"
   }
 
 }

@@ -5,9 +5,7 @@ import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import lib.generator.CodeGenerator
-import io.flow.postman.generator.attributes.v0.models.AttributeName
-import io.flow.postman.generator.attributes.v0.models.ObjectReference
-import io.flow.postman.generator.attributes.v0.models.BasicAuth
+import io.flow.postman.generator.attributes.v0.models._
 import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesBasicAuth
 import io.flow.postman.v0.{models => postman}
 import io.flow.postman.v0.models.json._
@@ -16,13 +14,16 @@ import play.api.libs.json.Json
 import Utils._
 import io.flow.postman.v0.models.Folder
 import models.attributes.PostmanAttributes
+import org.scalactic.TripleEquals._
 
 object PostmanCollectionGenerator extends CodeGenerator {
 
-  object Variables {
-    val FlowToken = "FLOW_TOKEN"
-    val Organization = "ORGANIZATION"
+  import scala.languageFeature.implicitConversions._
+  import models.attributes.PostmanAttributes._
+
+  object Constants {
     val BaseUrl = "BASE_URL"
+    val EntitiesSetup =  "Entities Setup"
   }
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
@@ -71,27 +72,6 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
     val examplesProvider: ExampleJson = ExampleJson(service, Selection.All)
 
-    val postmanCollectionFolders = service.resources.map { resource =>
-
-      val pathVariableOpt =
-        Heuristics
-          .idFieldHeuristic(resource)
-          .map {
-            pathVar => PathVariable(pathVar, s"${resource.plural}-$pathVar")
-          }
-
-      val postmanItems = resource
-        .operations
-        .map(PostmanItemBuilder.build(_, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
-        .map(addItemTests(_, pathVariableOpt))
-
-      postman.Folder(
-        name = resource.plural,
-        description = resource.description.map(d => Description(d)),
-        item = postmanItems
-      )
-    }
-
     val basicAuthOpt = service.attributes
       .find(_.name.equalsIgnoreCase(AttributeName.PostmanBasicAuth.toString))
       .flatMap(_.value.asOpt[BasicAuth])
@@ -105,28 +85,35 @@ object PostmanCollectionGenerator extends CodeGenerator {
         )
       }
 
-    val shouldAddSetupFolder: Boolean =
-      service.attributes
-        .find(_.name.equalsIgnoreCase(AttributeName.OrganizationSetup.toString))
-        .nonEmpty
+    val entitiesSetupFolderOpt = prepareDependentEntitiesSetup(resolvedService, serviceSpecificHeaders, examplesProvider)
 
-    val entitiesSetupFolderOpt = prepareEntitiesSetupFolders(resolvedService, serviceSpecificHeaders, examplesProvider)
+    val postmanCollectionFolders = for {
+      resource <- service.resources
+      heuristicPathVariableOpt <- Seq(prepareHeuristicPathVar(resource))
+      postmanItems = prepareOperations(resource, heuristicPathVariableOpt, serviceSpecificHeaders, examplesProvider)
+    } yield {
+      postman.Folder(
+        name = resource.plural,
+        description = resource.description.map(d => Description(d)),
+        item = postmanItems
+      )
+    }
 
     val folders: Seq[Folder] =
-      (if (shouldAddSetupFolder) {
-        val cleanupFolder: postman.Folder = PredefinedCollectionItems.prepareCleanupFolder()
-        val setupFolder: postman.Folder = PredefinedCollectionItems.prepareSetupFolder()
+      if (shouldAddSetupFolder(service)) {
+        val cleanupFolder: Folder = PredefinedCollectionItems.prepareCleanupFolder()
+        val setupFolder: Folder = PredefinedCollectionItems.prepareSetupFolder()
         (Option(setupFolder) :: entitiesSetupFolderOpt :: Nil).flatten ++ postmanCollectionFolders.toList ++ List(cleanupFolder)
       } else {
         entitiesSetupFolderOpt ++: postmanCollectionFolders
-      })
+      }
 
     postman.Collection(
       info = collectionInfo,
       item = folders,
       variable = Seq(
-        Variable(
-          key = Variables.BaseUrl,
+        Utils.Variable(
+          key = Constants.BaseUrl,
           value = baseUrl.getOrElse(""),
           `type` = "string"
         )
@@ -136,93 +123,112 @@ object PostmanCollectionGenerator extends CodeGenerator {
     )
   }
 
-  def prepareEntitiesSetupFolders(
+  private def shouldAddSetupFolder(service: Service) = {
+    service.attributes
+      .find(_.name.equalsIgnoreCase(AttributeName.OrganizationSetup.toString))
+      .nonEmpty
+
+  }
+
+  def prepareHeuristicPathVar(resource: Resource): Option[PathVariable] = {
+    Heuristics
+      .idFieldHeuristic(resource)
+      .map {
+        pathVar => PathVariable(pathVar, s"${resource.plural}-$pathVar")
+      }
+  }
+
+  def prepareOperations(
+    resource: Resource,
+    pathVariableOpt: Option[PathVariable],
+    serviceSpecificHeaders: Seq[postman.Header],
+    examplesProvider: ExampleJson) = {
+
+    resource
+      .operations
+      .map(PostmanItemBuilder.build(_, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
+      .map(addItemTests(_))
+  }
+
+  /**
+    * Prepares dependency entities setup phase.
+    *
+    * @param resolvedService Service with all imports at hand.
+    * @param serviceSpecificHeaders Service specific headers.
+    * @param examplesProvider Examples generator.
+    * @return Dependent entities setup folder for postman.
+    */
+  def prepareDependentEntitiesSetup(
     resolvedService          : ResolvedService,
     serviceSpecificHeaders   : Seq[postman.Header],
     examplesProvider         : ExampleJson
   ): Option[Folder] = {
     val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
+
     val requiredEntitiesSetupSteps = objReferenceAttrToOperationTuples.map {
       case (objRefAttr, operation) =>
-        val postmanItem = PostmanItemBuilder.build(operation, serviceSpecificHeaders, examplesProvider, None)
-        val postmanItemWithTests = addItemTests(postmanItem, None)
 
-        addDependencyItemVarSetting(objRefAttr, postmanItemWithTests)
+        val postmanItem = PostmanItemBuilder.build(operation, serviceSpecificHeaders, examplesProvider, None)
+        val postmanItemWithTests = addItemTests(postmanItem)
+
+        addDependencyItemVarSetting(objRefAttr, postmanItemWithTests, None)
     }
     if (requiredEntitiesSetupSteps.nonEmpty) {
       Some(
         postman.Folder(
-          "Entities Setup",
+          Constants.EntitiesSetup,
           item = requiredEntitiesSetupSteps
         ))
     } else None
   }
 
-  private def addItemTests(item: postman.Item, pathVariableOpt: Option[PathVariable]): postman.Item = {
+  private def addItemTests(item: postman.Item): postman.Item = {
 
-    def isParametrizedOnlyWithOrg(item: postman.Item): Boolean = {
-      import item.request
-
-      request.url.map { url =>
-        url.variable.size == 1 &&
-          url.variable.headOption.forall(_.forall(_.name.getOrElse("") == s"{{${Variables.Organization}}}")) &&
-          url.query.getOrElse(List.empty)
-            .filterNot(_.disabled.getOrElse(false))
-            .forall(_.value.isDefined)
-      }.getOrElse(false)
-    }
-
-    def methodEquals(item: postman.Item, method: String): Boolean =
-      item.request.method.getOrElse("").toString.equalsIgnoreCase(method)
-
-    item match {
-      case simpleGet if methodEquals(simpleGet, "GET") && isParametrizedOnlyWithOrg(simpleGet) =>
-        val test = PredefinedCollectionItems.testEventResponseStatusOk(
-          "GET requests parametrized only by Organization should return 2xx"
-        )
-        item.copy(event = item.event.map(_ :+ test))
-      case simplePost if methodEquals(simplePost, "POST") && isParametrizedOnlyWithOrg(simplePost) =>
-        val test = PredefinedCollectionItems.testPostStatusOk(
-          "POST requests parametrized only by Organization should return 2xx",
-          pathVariableOpt
-        )
-        item.copy(event = item.event.map(_ :+ test))
-      case other =>
-        other
+    val method = item.request.method.getOrElse("").toString.toUpperCase
+    if (Seq("GET", "PUT", "POST").contains(method)) {
+      val test = PredefinedCollectionItems.testEventResponseStatusOk(
+        f"$method requests should return 2xx"
+      )
+      item.copy(event = Option(item.event.toSeq.flatten :+ test))
+    } else {
+      item
     }
   }
 
-  private def addDependencyItemVarSetting(objRef: ObjectReference, item: postman.Item): postman.Item = {
+  def addDependencyItemVarSetting(objRefAttr: ExtendedObjectReference, item: postman.Item, varNameOpt: Option[String]): postman.Item = {
+
+    import objRefAttr._
+
+    val varName = objRefAttr.path
+      .getOrElse(s"$resourceType#$identifierField")
+      .toString
 
     val scriptExecFragment = Seq(
       """var jsonData = JSON.parse(responseBody);""",
-      s"""var id = jsonData["${objRef.identifierField}"];""",
-      s"""if (id != null) pm.environment.set("${PostmanAttributes.postmanVariableNameFrom(objRef)}", id);"""
+      s"""var id = jsonData["${objRefAttr.identifierField}"];""",
+      s"""if (id != null) pm.environment.set("$varName", id);"""
     )
-
-    item.
-      event
+    item.event
       .getOrElse(Seq.empty)
-      .find(_.listen == postman.EventType.Test) match {
-          case Some(testEvent) =>
-            val updatedScript = testEvent.script.map(_.copy(
-              exec = testEvent.script.map(_.exec ++ scriptExecFragment).getOrElse(Seq.empty)
-            ))
-            val updatedTestEvent = testEvent.copy(script = updatedScript)
-            val updatedEvents =
-              item.event.getOrElse(Seq.empty)
-                .filterNot(_.listen == postman.EventType.Test) :+ updatedTestEvent
-            item.copy(event = Some(updatedEvents))
-          case None =>
-            val eventToAdd = postman.Event(
-              listen = postman.EventType.Test,
-              script = Some(postman.Script(
-                exec = scriptExecFragment
-              ))
-            )
-            item.copy(event = item.event.map(_ :+ eventToAdd))
-        }
-
+      .find(_.listen === postman.EventType.Test) match {
+      case Some(testEvent) =>
+        val updatedScript = testEvent.script.map(_.copy(
+          exec = testEvent.script.map(_.exec ++ scriptExecFragment).getOrElse(Seq.empty)
+        ))
+        val updatedTestEvent = testEvent.copy(script = updatedScript)
+        val updatedEvents =
+          item.event.getOrElse(Seq.empty)
+            .filterNot(_.listen === postman.EventType.Test) :+ updatedTestEvent
+        item.copy(event = Some(updatedEvents))
+      case None =>
+        val eventToAdd = postman.Event(
+          listen = postman.EventType.Test,
+          script = Some(postman.Script(
+            exec = scriptExecFragment
+          ))
+        )
+        item.copy(event = Some(Seq(eventToAdd)))
+    }
   }
 
   private def writePostmanCollectionToFile(service: Service, postmanCollection: postman.Collection): File = {

@@ -117,6 +117,12 @@ lazy val postmanGenerator = project
   .in(file("postman-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++=Seq(
+      "com.lihaoyi" %% "ammonite-ops" % "1.6.3",
+      "org.scalactic" %% "scalactic" % "3.0.5"
+    )
+  )
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name ~= ("apibuilder-generator-" + _),

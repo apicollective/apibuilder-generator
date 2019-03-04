@@ -2,7 +2,7 @@ package generator
 
 import examples.ExampleJson
 import generator.Heuristics.PathVariable
-import generator.PostmanCollectionGenerator.Variables
+import generator.PostmanCollectionGenerator.Constants
 import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
 import io.flow.postman.v0.{models => postman}
@@ -63,7 +63,7 @@ object PostmanItemBuilder extends Logging {
       getParameters(ParameterLocation.Path).map { p =>
         postman.Variable(
           key = Some(p.name),
-          value = Some{
+          value = Some {
             if (pathVariableOpt.filter(_.name == p.name).isDefined)
               s"{{${pathVariableOpt.get.postmanVarName}}}"
             else
@@ -74,9 +74,9 @@ object PostmanItemBuilder extends Logging {
       }
 
     val postmanUrl = postman.Url(
-      raw = Some(s"{{${Variables.BaseUrl}}}" + operation.path),
+      raw = Some(s"{{${Constants.BaseUrl}}}" + operation.path),
       protocol = None,
-      host = Some(Seq(s"{{${Variables.BaseUrl}}}")),
+      host = Some(Seq(s"{{${Constants.BaseUrl}}}")),
       path = Some(operation.path.stripPrefix("/").split('/').toSeq),
       query = Some(queryParams),
       variable = Some(pathParams)
@@ -107,15 +107,10 @@ object PostmanItemBuilder extends Logging {
   }
 
   private def generatePathParamValue(parameter: Parameter): String = {
-    parameter match {
-      case organizationParam if organizationParam.name == "organization" =>
-        s"{{${Variables.Organization}}}"
-      case paramWithDefault if paramWithDefault.example.isDefined =>
-        paramWithDefault.example.get
-      case paramWithExample if paramWithExample.default.isDefined =>
-        paramWithExample.default.get
-      case _ =>
-        "1" // TODO: set this default value according to the type
+    val defaults = List(parameter.example, parameter.default).flatten
+    defaults.headOption.getOrElse {
+      // Creating Postman Variable
+      s"{{${parameter.name.toUpperCase}}}"
     }
   }
 
