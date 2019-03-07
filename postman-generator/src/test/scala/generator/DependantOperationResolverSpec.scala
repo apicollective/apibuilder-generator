@@ -50,11 +50,16 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
         operationMethod = Method("POST"),
         identifierField = "guid"
       )
-      val dependencyToThirdServiceTarget = getTargetOperation(generatorApiServiceWithUnionWithoutDescriminator, objRefToThirdServiceAttrValue)
+      val dependencyToThirdServiceTarget = {
+        val operation = getTargetOperation(generatorApiServiceWithUnionWithoutDescriminator, objRefToThirdServiceAttrValue)
+        val updatedBody = operation.body.get.copy(`type` = objRefToThirdServiceAttrValue.relatedServiceNamespace + ".unions." + operation.body.get.`type`)
+        operation.copy(body = Some(updatedBody))
+      }
       val testReferenceApiService = addAttributeToModelField(referenceApiService, "member", "role", objRefToThirdServiceAttrValue)
 
       val resolvedService = ServiceImportResolver.resolveService(testMainServiceWithTwoImports, Seq(testReferenceApiService, generatorApiServiceWithUnionWithoutDescriminator))
       val result = DependantOperationResolver.resolve(resolvedService)
+
 
       result shouldEqual Seq(
         objRefToThirdServiceAttrValue -> dependencyToThirdServiceTarget,
@@ -77,13 +82,13 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
                 `type` = "string",
                 example = Some("something"),
                 required = true,
-                attributes = trivialServiceModelWithDependency.fields.head.attributes
+                attributes = modelWithDependency.fields.head.attributes
               )
             )
           ),
           Model( // artificial complex type on top of another complex type - resource references this model
-            name = trivialServiceModelWithDependency.name,
-            plural = trivialServiceModelWithDependency.plural,
+            name = modelWithDependency.name,
+            plural = modelWithDependency.plural,
             fields = Seq(
               Field(
                 name = "complex",
@@ -114,7 +119,6 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
   }
 
   private def getTargetOperation(targetService: Service, objRefAttrValue: ModelReference): Operation = {
-
     targetService
       .resources.find(_.`type` == objRefAttrValue.resourceType).get
       .operations.find(_.method == objRefAttrValue.operationMethod).get
@@ -147,46 +151,19 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
     )
   }
 
-  trait TestDependencies {
-
-    lazy val objectRef1AttrValue = ModelReference(
-      relatedServiceNamespace = referenceApiService.namespace,
-      resourceType = "member",
-      operationMethod = Method("POST"),
-      identifierField = "guid"
-    )
-
-    lazy val dependency1Target = getTargetOperation(referenceApiService, objectRef1AttrValue)
-
-    lazy val trivialServiceModelWithDependency = Model(
-      name = "complex-string",
-      plural = "complex-strings",
-      fields = Seq(
-        Field(
-          name = "value",
-          `type` = "string",
-          example = Some("something"),
-          required = true,
-          attributes = Seq(
-            Attribute(
-              AttributeName.ObjectReference.toString,
-              Json.toJson(objectRef1AttrValue).as[JsObject]
-            )
-          )
-        )
-      )
-    )
+  trait TestDependencies extends TestFixtures.TrivialServiceWithImportAndDependencyCtx {
+    val dependency1Target = getTargetOperation(referenceApiService, objectRef1AttrValue)
   }
 
   trait TestCtxWithImportedService extends TestDependencies with TestFixtures.TrivialServiceWithImportCtx {
     val testMainService = trivialServiceWithImport.copy(
-      models = Seq(trivialServiceModelWithDependency)
+      models = Seq(modelWithDependency)
     )
   }
 
   trait TestCtxWithTwoImportedServices extends TestDependencies with TestFixtures.TrivialServiceWithTwoImportsCtx {
     val testMainServiceWithTwoImports = trivialServiceWithTwoImports.copy(
-      models = Seq(trivialServiceModelWithDependency)
+      models = Seq(modelWithDependency)
     )
   }
 

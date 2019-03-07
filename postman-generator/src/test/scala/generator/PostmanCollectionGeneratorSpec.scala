@@ -1,5 +1,6 @@
 package generator
 
+import generator.PostmanCollectionGenerator.Constants
 import generator.Utils.Description
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Attribute
@@ -101,7 +102,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       val invocationForm = InvocationForm(referenceApiService, importedServices = None)
       val result = PostmanCollectionGenerator.invoke(invocationForm)
 
-      assertResultCollectionJson(result) { collection =>
+      assertResultCollection(result) { collection =>
         val postmanFolders = collection.item.collect {
           case folder: postman.Folder => folder
         }
@@ -138,7 +139,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       val invocationForm = InvocationForm(trivialServiceWithImport, importedServices = Some(Seq(referenceApiService)))
       val result = PostmanCollectionGenerator.invoke(invocationForm)
 
-      assertResultCollectionJson(result) { collection =>
+      assertResultCollection(result) { collection =>
         val postmanFolders = collection.item.collect {
           case folder: postman.Folder => folder
         }
@@ -172,7 +173,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       val invocationForm = InvocationForm(trivialServiceWithAuth, importedServices = Some(Seq(referenceApiService)))
       val result = PostmanCollectionGenerator.invoke(invocationForm)
 
-      assertResultCollectionJson(result) { collection =>
+      assertResultCollection(result) { collection =>
         collection.auth.isDefined shouldEqual true
         collection.auth.get.`type` shouldEqual postman.AuthEnum.Basic
         collection.auth.get.basic.get shouldEqual Seq(
@@ -190,16 +191,33 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       val invocationForm = InvocationForm(trivialServiceWithFlag, importedServices = Some(Seq(referenceApiService)))
       val result = PostmanCollectionGenerator.invoke(invocationForm)
 
-      assertResultCollectionJson(result) { collection =>
+      assertResultCollection(result) { collection =>
         val folderNames = collection.item.collect {
           case folder: postman.Folder => folder.name
         }
         folderNames should contain allElementsOf (Seq("Setup", "Cleanup"))
       }
     }
+
+    "add 'Entities Setup' folder with dependant entities creation if the right attributes are set" in new TrivialServiceWithImportAndDependencyCtx {
+      val invocationForm = InvocationForm(trivialServiceWithImportAndDependency, importedServices = Some(Seq(updatedReferenceApiService)))
+      val result = PostmanCollectionGenerator.invoke(invocationForm)
+
+      assertResultCollection(result) { collection =>
+        val entitiesSetupFolderOpt = collection.item.collectFirst {
+          case folder: postman.Folder if folder.name === Constants.EntitiesSetup => folder
+        }
+        entitiesSetupFolderOpt.isDefined shouldEqual true
+        val dependantEntitiesItems = entitiesSetupFolderOpt.get.item
+        dependantEntitiesItems.foreach { item =>
+          item.request.body.isDefined shouldEqual true
+        }
+        dependantEntitiesItems.nonEmpty shouldEqual true
+      }
+    }
   }
 
-  private def assertResultCollectionJson(result: Either[Seq[String], Seq[File]])(collectionAssertion: postman.Collection => Assertion): Assertion = {
+  private def assertResultCollection(result: Either[Seq[String], Seq[File]])(collectionAssertion: postman.Collection => Assertion): Assertion = {
     result.isRight shouldEqual true
     val resultFile = result.right.get.head
     resultFile.name.endsWith("postman_collection.json") shouldEqual true

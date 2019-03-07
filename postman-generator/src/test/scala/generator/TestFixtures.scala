@@ -1,6 +1,9 @@
 package generator
 
 import io.apibuilder.spec.v0.models._
+import io.flow.postman.generator.attributes.v0.models.{AttributeName, ModelReference}
+import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesModelReference
+import play.api.libs.json.{JsObject, Json}
 
 object TestFixtures {
 
@@ -97,6 +100,49 @@ object TestFixtures {
       resources = trivialService.resources :+ resourceWithImportedEnum
     )
 
+  }
+
+  trait TrivialServiceWithImportAndDependencyCtx extends TrivialServiceWithImportCtx {
+    private val membersResource = referenceApiService.resources(2)
+    private val postSingleMemberOp = membersResource.operations(0).copy(
+      parameters = Seq.empty,
+      body = Some(Body("member"))
+    )
+    private val updatedOperationsList = membersResource.operations.updated(0, postSingleMemberOp)
+    private val updatedMembersResource = membersResource.copy(operations = updatedOperationsList)
+    val updatedReferenceApiService = referenceApiService.copy(
+      resources = referenceApiService.resources.updated(2, updatedMembersResource)
+    )
+
+    val objectRef1AttrValue = ModelReference(
+      relatedServiceNamespace = referenceApiService.namespace,
+      resourceType = "member",
+      operationMethod = Method("POST"),
+      identifierField = "guid"
+    )
+
+    val modelWithDependency = Model(
+      name = "complex-string",
+      plural = "complex-strings",
+      fields = Seq(
+        Field(
+          name = "value",
+          `type` = "string",
+          example = Some("something"),
+          required = true,
+          attributes = Seq(
+            Attribute(
+              AttributeName.ObjectReference.toString,
+              Json.toJson(objectRef1AttrValue).as[JsObject]
+            )
+          )
+        )
+      )
+    )
+
+    val trivialServiceWithImportAndDependency = trivialServiceWithImport.copy(
+      models = trivialServiceWithImport.models.updated(0, modelWithDependency)
+    )
   }
   
   trait TrivialServiceWithUnionTypesImportCtx extends TrivialServiceContext {

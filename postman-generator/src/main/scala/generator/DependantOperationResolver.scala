@@ -5,10 +5,13 @@ import io.flow.postman.generator.attributes.v0.models.json._
 import io.flow.postman.generator.attributes.v0.models.{AttributeName, ModelReference, PathReference}
 import models.service.ResolvedService
 import org.scalactic.TripleEquals._
-import org.scalactic._
 import models.attributes.PostmanAttributes._
+import play.api.Logging
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 
-object DependantOperationResolver {
+import scala.reflect.{ClassTag, classTag}
+
+object DependantOperationResolver extends Logging {
 
   import scala.languageFeature.implicitConversions
 
@@ -33,7 +36,7 @@ object DependantOperationResolver {
       for {
         resource <- service.resources
         foundedPathAttr <- resource.attributes if foundedPathAttr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString)
-        pureAttr <- foundedPathAttr.value.asOpt[PathReference]
+        pureAttr <- tryAttributeReadsWithLogging[PathReference](foundedPathAttr.value)
       } yield {
           pureAttr.copy(
             path = resource.path.flatMap(findParamNameInPathString)
@@ -53,8 +56,9 @@ object DependantOperationResolver {
     for {
       attribute <- allAttributes
       operation <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
+      updatedOperation = addNamespaceToOperationBodyIfNecessary(resolvedService, operation, attribute.relatedServiceNamespace)
     } yield {
-      (attribute, operation)
+      (attribute, updatedOperation)
     }
   }
 
@@ -62,16 +66,22 @@ object DependantOperationResolver {
 
     field.attributes.collectFirst {
       case attr if attr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString) =>
-        attr.value.asOpt[ModelReference]
+        tryAttributeReadsWithLogging[ModelReference](attr.value)
     }.flatten
   }
 
   private def findOperationForAttribute(objRefAttr: ExtendedObjectReference, serviceNamespaceToResources: Map[String, Seq[Resource]]) = {
     serviceNamespaceToResources
-      .getOrElse(key = objRefAttr.relatedServiceNamespace, default = Nil)
-      .filter(_.`type` === objRefAttr.resourceType)
-      .flatMap(_.operations)
-      .find(_.method === objRefAttr.operationMethod)
+      .get(key = objRefAttr.relatedServiceNamespace) match {
+      case Some(resources) =>
+        resources
+          .filter(_.`type` === objRefAttr.resourceType)
+          .flatMap(_.operations)
+          .find(_.method === objRefAttr.operationMethod)
+      case None =>
+        logger.warn(s"ResolvedService namespace to resources map (includes imported services) does not contain key = ${objRefAttr.relatedServiceNamespace} / Can't find the referenced operation for $objRefAttr")
+        None
+    }
   }
 
   private def deepSearchModelsForAttributes(typ: String, service: Service): Seq[ModelReference] = {
@@ -118,6 +128,37 @@ object DependantOperationResolver {
       .map(str => regex.replaceAllIn(str, "$1"))
       .toList
       .headOption //TODO investigate few params like ":organization/order/:id" in one resource path. Is it valid/used anywhere ?
+  }
+
+  private def addNamespaceToOperationBodyIfNecessary(resolvedService: ResolvedService, operation: Operation, referencedServiceNamespace: String): Operation = {
+    operation.body match {
+      case Some(body) if referencedServiceNamespace === resolvedService.service.namespace =>
+        operation
+      case Some(body) if !body.`type`.startsWith(referencedServiceNamespace) =>
+        val typeToLookFor = body.`type`
+        val enumOpt = resolvedService.service.enums.find(o => o.name.startsWith(referencedServiceNamespace) && o.name.contains(typeToLookFor)).map(_.name)
+        val modelOpt = resolvedService.service.models.find(o => o.name.startsWith(referencedServiceNamespace) && o.name.contains(typeToLookFor)).map(_.name)
+        val unionOpt = resolvedService.service.unions.find(o => o.name.startsWith(referencedServiceNamespace) && o.name.contains(typeToLookFor)).map(_.name)
+        val newTypeSignature = unionOpt orElse modelOpt orElse enumOpt getOrElse {
+          logger.warn(s"ResolvedService does not contain the type returned by the operation - $typeToLookFor")
+          typeToLookFor
+        }
+        val updatedBody = body.copy(`type` = newTypeSignature)
+        operation.copy(body = Some(updatedBody))
+      case _ =>
+        operation
+    }
+  }
+
+  private def tryAttributeReadsWithLogging[A : Reads : ClassTag](json: JsValue): Option[A] = {
+    val reads = implicitly[Reads[A]]
+    reads.reads(json) match {
+      case JsSuccess(entity, _) =>
+        Some(entity)
+      case JsError(errors) =>
+        logger.warn(s"Attribute [${AttributeName.ObjectReference}] value $json could not be read as ${classTag[A].runtimeClass.getName} / Errors: $errors")
+        None
+    }
   }
 
 }
