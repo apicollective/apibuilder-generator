@@ -4,7 +4,9 @@ import java.util.UUID
 
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.spec.v0.models.json._
-import io.flow.postman.generator.attributes.v0.models.AttributeName
+import io.flow.postman.generator.attributes.v0.models.{AttributeName, ValueSubstitute}
+import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesValueSubstitute
+import models.AttributeValueReader
 import models.attributes.PostmanAttributes
 import models.attributes.PostmanAttributes.ExtendedObjectReference
 import org.joda.time.{DateTime, LocalDate}
@@ -75,20 +77,23 @@ case class ExampleJson(service: Service, selection: Selection) {
           filter { f => selection == Selection.All || f.required }.
           map { field =>
 
-            val objRefAttrOpt = field.attributes.collectFirst {
-              case attr if attr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString) => attr.value.asOpt[ExtendedObjectReference]
-            }.flatten
+            val objRefAttrOpt = AttributeValueReader.findAndReadFirst[ExtendedObjectReference](field.attributes, AttributeName.ObjectReference)
+            val ValueSubstituteAttrOpt = AttributeValueReader.findAndReadFirst[ValueSubstitute](field.attributes, AttributeName.ValueSubstitute)
 
-            val value = objRefAttrOpt match {
-              case Some(attrValue) if field.`type`.equalsIgnoreCase("string") =>
-                JsString(PostmanAttributes.postmanVariableRefFrom(attrValue))
-              case Some(attrValue) if field.`type`.equalsIgnoreCase("[string]") =>
-                Json.arr(JsString(PostmanAttributes.postmanVariableRefFrom(attrValue)))
-              case Some(attrValue) if field.`type`.equalsIgnoreCase("map[string]") =>
-                Json.obj(PostmanAttributes.postmanVariableRefFrom(attrValue) -> JsString("bar"))
-              case _ =>
+            val postmanVariableRefOpt = objRefAttrOpt.map(PostmanAttributes.postmanVariableRefFrom)
+            val ValueSubstituteOpt = ValueSubstituteAttrOpt.map(_.substitute)
+            val valueFromAttributesOpt = postmanVariableRefOpt orElse ValueSubstituteOpt
+
+            val value = valueFromAttributesOpt.map { valueFromAttributes =>
+              if (field.`type`.equalsIgnoreCase("string"))
+                JsString(valueFromAttributes)
+              else if (field.`type`.equalsIgnoreCase("[string]"))
+                Json.arr(JsString(valueFromAttributes))
+              else if (field.`type`.equalsIgnoreCase("map[string]"))
+                Json.obj(valueFromAttributes -> JsString("bar"))
+              else
                 mockValue(field)
-            }
+            }.getOrElse(mockValue(field))
 
             field.name -> value
           }: _*

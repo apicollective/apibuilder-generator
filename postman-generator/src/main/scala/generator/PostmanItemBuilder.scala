@@ -6,6 +6,7 @@ import generator.PostmanCollectionGenerator.Constants
 import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
 import io.flow.postman.v0.{models => postman}
+import org.scalactic.TripleEquals._
 import play.api.Logging
 import play.api.libs.json.Json
 
@@ -64,7 +65,7 @@ object PostmanItemBuilder extends Logging {
         postman.Variable(
           key = Some(p.name),
           value = Some {
-            if (pathVariableOpt.filter(_.name == p.name).isDefined)
+            if (pathVariableOpt.exists(_.name === p.name))
               s"{{${pathVariableOpt.get.postmanVarName}}}"
             else
               generatePathParamValue(p)
@@ -109,8 +110,8 @@ object PostmanItemBuilder extends Logging {
   private def generatePathParamValue(parameter: Parameter): String = {
     val defaults = List(parameter.example, parameter.default).flatten
     defaults.headOption.getOrElse {
-      // Creating Postman Variable
-      s"{{${parameter.name.toUpperCase}}}"
+      // Referencing Postman Variable
+      s"{{${parameter.name}}}"
     }
   }
 

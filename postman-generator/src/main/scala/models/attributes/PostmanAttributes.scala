@@ -4,6 +4,7 @@ import io.flow.postman.generator.attributes.v0.models._
 import play.api.libs.json._
 import io.flow.postman.generator.attributes.v0.models.json._
 import io.apibuilder.spec.v0.models.json._
+import play.api.libs.json.JsonNaming.SnakeCase
 
 import scala.language.implicitConversions
 
@@ -56,5 +57,6 @@ object PostmanAttributes {
     password: String
   )
 
+  implicit val config = JsonConfiguration(SnakeCase)
   implicit val ReferenceAttrValueFormats = Json.format[ExtendedObjectReference]
 }

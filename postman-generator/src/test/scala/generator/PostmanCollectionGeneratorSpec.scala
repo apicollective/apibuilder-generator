@@ -124,7 +124,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
         val bulkCreateMemberUrlVariable = bulkCreateMemberRequest.url.get.variable.get.head
         bulkCreateMemberUrlVariable.key shouldEqual Some("organization")
-        bulkCreateMemberUrlVariable.value shouldEqual Some("{{ORGANIZATION}}")
+        bulkCreateMemberUrlVariable.value shouldEqual Some("{{organization}}")
         bulkCreateMemberUrlVariable.description shouldEqual Some(Description("Type: uuid  | Required: true"))
         bulkCreateMemberUrlVariable.disabled shouldEqual Some(false)
 

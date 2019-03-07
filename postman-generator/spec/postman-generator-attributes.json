@@ -8,16 +8,19 @@
 
   "enums": {
     "attribute_name": {
+      "description": "A set of attribute names, that are recognized by Postman Generator",
       "values": [
         { "name": "postman-basic-auth" },
         { "name": "object-reference" },
-        { "name": "organization-setup" }
+        { "name": "organization-setup" },
+        { "name": "value-substitute"}
       ]
     }
   },
 
   "models": {
     "basic_auth": {
+      "description": "Attribute instructs the generator to add Basic Auth info to the whole Postman collection. Attribute should be defined on the root level of the ApiBuilder specification",
       "fields": [
         {
           "name": "username",
@@ -56,6 +59,7 @@
         }
       ]
     },
+
     "path_reference": {
       "fields": [
         {
@@ -83,6 +87,17 @@
           "type": "string",
           "description": "Path from resource",
           "required": false
+        }
+      ]
+    },
+
+    "value_substitute": {
+      "description": "Attribute instructs the generator to substitute a field value (when generating examples) with specified value or variable reference. Attribute should be attached to a field inside model.",
+      "fields": [
+        {
+          "name": "substitute",
+          "type": "string",
+          "description": "Value, which will be put into the field marked by this attribute. It may be also a variable reference."
         }
       ]
     }

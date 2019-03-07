@@ -8,7 +8,19 @@
             "description": {
               "content": "Create Organization"
             },
-            "header": [ ],
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+            },
             "url": {
               "path": [ "organizations" ],
               "query": [ ],
@@ -24,7 +36,19 @@
                 "description": {
                   "content": "Create Organization"
                 },
-                "header": [ ],
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+                },
                 "url": {
                   "path": [ "organizations" ],
                   "query": [ ],
@@ -74,7 +98,7 @@
                     "content": "Type: uuid  | Required: true"
                   },
                   "disabled": false,
-                  "value": "{{ORGANIZATION}}",
+                  "value": "{{organization}}",
                   "key": "organization"
                 }
               ],
@@ -99,7 +123,7 @@
                         "content": "Type: uuid  | Required: true"
                       },
                       "disabled": false,
-                      "value": "{{ORGANIZATION}}",
+                      "value": "{{organization}}",
                       "key": "organization"
                     }
                   ],
@@ -152,7 +176,7 @@
                     "content": "Type: uuid  | Required: true"
                   },
                   "disabled": false,
-                  "value": "{{ORGANIZATION}}",
+                  "value": "{{organization}}",
                   "key": "organization"
                 }
               ],
@@ -177,7 +201,7 @@
                         "content": "Type: uuid  | Required: true"
                       },
                       "disabled": false,
-                      "value": "{{ORGANIZATION}}",
+                      "value": "{{organization}}",
                       "key": "organization"
                     }
                   ],
@@ -222,7 +246,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"catalog_id\" : \"lorem ipsum 691503\"\n}"
+              "raw": "{\n  \"catalog_id\" : \"{{catalog#id}}\"\n}"
             },
             "url": {
               "path": [ ":organization", "order" ],
@@ -234,7 +258,7 @@
                     "content": "Type: uuid  | Required: true"
                   },
                   "disabled": false,
-                  "value": "{{ORGANIZATION}}",
+                  "value": "{{organization}}",
                   "key": "organization"
                 }
               ],
@@ -259,7 +283,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"catalog_id\" : \"lorem ipsum 691503\"\n}"
+                  "raw": "{\n  \"catalog_id\" : \"{{catalog#id}}\"\n}"
                 },
                 "url": {
                   "path": [ ":organization", "order" ],
@@ -271,7 +295,7 @@
                         "content": "Type: uuid  | Required: true"
                       },
                       "disabled": false,
-                      "value": "{{ORGANIZATION}}",
+                      "value": "{{organization}}",
                       "key": "organization"
                     }
                   ],
@@ -311,7 +335,19 @@
             "description": {
               "content": "Create Organization"
             },
-            "header": [ ],
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+            },
             "url": {
               "path": [ "organizations" ],
               "query": [ ],
@@ -327,7 +363,19 @@
                 "description": {
                   "content": "Create Organization"
                 },
-                "header": [ ],
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+                },
                 "url": {
                   "path": [ "organizations" ],
                   "query": [ ],

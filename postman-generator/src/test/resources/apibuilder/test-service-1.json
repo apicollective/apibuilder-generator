@@ -13,7 +13,6 @@
   "info": {},
   "name": "catalog",
   "base_url": "https://api.ecorp.io",
-  "info": {},
   "headers": [ ],
   "imports": [ ],
   "enums": [ ],
@@ -48,6 +47,29 @@
       ],
       "attributes": [ ],
       "description": "A model"
+    },
+    {
+      "name": "organization_form",
+      "plural": "organization_form",
+      "fields": [
+        {
+          "name": "parent_id",
+          "type": "string",
+          "required": true,
+          "attributes": [
+            {
+              "name": "value-substitute",
+              "value": {
+                "substitute": "{{ORGANIZATION-PARENT}}"
+              }
+            }
+          ],
+          "annotations": [ ],
+          "description": "Corresponds with the parent organization id."
+        }
+      ],
+      "attributes": [ ],
+      "description": "Represents a form to create a sandbox organization."
     },
     {
       "name": "order_form",
@@ -171,7 +193,11 @@
               },
               "type": "organization"
             }
-          ]
+          ],
+          "body": {
+            "type": "organization_form",
+            "attributes": [ ]
+          }
         }
       ]
     }
