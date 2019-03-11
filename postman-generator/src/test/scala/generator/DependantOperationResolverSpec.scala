@@ -1,7 +1,7 @@
 package generator
 
 import io.apibuilder.spec.v0.models._
-import io.flow.postman.generator.attributes.v0.models.{AttributeName, ModelReference}
+import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
 import io.flow.postman.generator.attributes.v0.models.json._
 import models.attributes.PostmanAttributes._
 import org.scalatest.{Matchers, WordSpec}
@@ -22,7 +22,7 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
     }
 
     "resolve second level dependencies (dependency has its own dependency) in the right order" in new TestCtxWithImportedService {
-      val objRef2AttrValue = ModelReference(
+      val objRef2AttrValue = ObjectReference(
         relatedServiceNamespace = referenceApiService.namespace,
         resourceType = "group",
         operationMethod = Method("GET"),
@@ -44,7 +44,7 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
     }
 
     "resolve nested dependencies that span across 3 different services (main<-import1<-import2)" in new TestCtxWithTwoImportedServices {
-      val objRefToThirdServiceAttrValue = ModelReference(
+      val objRefToThirdServiceAttrValue = ObjectReference(
         relatedServiceNamespace = generatorApiServiceWithUnionWithoutDescriminator.namespace,
         resourceType = "user",
         operationMethod = Method("POST"),
@@ -110,7 +110,7 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
 
   }
 
-  implicit class SeqModelRefOperationExtend(seq: Seq[(ModelReference, Operation)]) {
+  implicit class SeqObjectRefOperationExtend(seq: Seq[(ObjectReference, Operation)]) {
     def toExtended: Seq[(ExtendedObjectReference, Operation)] = {
       seq.map {
         case (ref, op) => (ref.toExtended, op)
@@ -118,13 +118,13 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
     }
   }
 
-  private def getTargetOperation(targetService: Service, objRefAttrValue: ModelReference): Operation = {
+  private def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): Operation = {
     targetService
       .resources.find(_.`type` == objRefAttrValue.resourceType).get
       .operations.find(_.method == objRefAttrValue.operationMethod).get
   }
 
-  private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ModelReference): Service = {
+  private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ObjectReference): Service = {
     val oldModel = service
       .models.find(_.name == modelName).get
 

@@ -1,8 +1,8 @@
 package generator
 
 import io.apibuilder.spec.v0.models._
-import io.flow.postman.generator.attributes.v0.models.{AttributeName, ModelReference}
-import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesModelReference
+import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
+import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesObjectReference
 import play.api.libs.json.{JsObject, Json}
 
 object TestFixtures {
@@ -114,7 +114,7 @@ object TestFixtures {
       resources = referenceApiService.resources.updated(2, updatedMembersResource)
     )
 
-    val objectRef1AttrValue = ModelReference(
+    val objectRef1AttrValue = ObjectReference(
       relatedServiceNamespace = referenceApiService.namespace,
       resourceType = "member",
       operationMethod = Method("POST"),

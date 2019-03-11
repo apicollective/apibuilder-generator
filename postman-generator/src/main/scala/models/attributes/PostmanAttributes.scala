@@ -1,62 +1,51 @@
 package models.attributes
 
-import io.flow.postman.generator.attributes.v0.models._
-import play.api.libs.json._
-import io.flow.postman.generator.attributes.v0.models.json._
-import io.apibuilder.spec.v0.models.json._
-import play.api.libs.json.JsonNaming.SnakeCase
+import io.apibuilder.spec.v0.models.Parameter
+import io.flow.postman.generator.attributes.v0.models.ObjectReference
 
 import scala.language.implicitConversions
 
 object PostmanAttributes {
 
   /**
-    * Allows to reason and operate on path and model references together.
+    * This class basically extends the auto-generated [[ObjectReference]]
+    * it contains one additional field with Postman variable name created by the generator
+    *
+    * As original auto-generated [[ObjectReference]] class is 'final case class'
+    * we need to keep [[ExtendedObjectReference]] up to date manually, because we can't 'extend' the parent for real.
     */
   case class ExtendedObjectReference(
     relatedServiceNamespace: String,
     resourceType: String,
     operationMethod: io.apibuilder.spec.v0.models.Method,
     identifierField: String,
-    path: Option[String] = None
+    postmanVariableName: PostmanVariableName
   )
 
-  implicit class ModelReferenceExtend(val m: ModelReference) extends AnyVal {
+  case class PostmanVariableName(name: String) {
+    def reference: String = s"{{$name}}"
+  }
+
+  implicit class ObjectReferenceExtend(val objRef: ObjectReference) extends AnyVal {
 
     def toExtended: ExtendedObjectReference = ExtendedObjectReference(
-      relatedServiceNamespace = m.relatedServiceNamespace,
-      resourceType = m.resourceType,
-      operationMethod = m.operationMethod,
-      identifierField = m.identifierField
+      relatedServiceNamespace = objRef.relatedServiceNamespace,
+      resourceType = objRef.resourceType,
+      operationMethod = objRef.operationMethod,
+      identifierField = objRef.identifierField,
+      postmanVariableName = postmanVariableNameFrom(objRef)
     )
   }
 
-  implicit class PathReferenceExtend(val p: PathReference) extends AnyVal {
-
-    def toExtended: ExtendedObjectReference = ExtendedObjectReference(
-        relatedServiceNamespace = p.relatedServiceNamespace,
-        resourceType = p.resourceType,
-        operationMethod = p.operationMethod,
-        identifierField = p.identifierField,
-        path = p.path
-      )
-  }
-
-  def postmanVariableNameFrom(objReference: ExtendedObjectReference): String = {
+  def postmanVariableNameFrom(objReference: ObjectReference): PostmanVariableName = {
     import objReference._
-    s"$resourceType#$identifierField"
+    val name = s"$resourceType#$identifierField"
+    PostmanVariableName(name)
   }
 
-  def postmanVariableRefFrom(objectReference: ExtendedObjectReference): String = {
-    val variableName = postmanVariableNameFrom(objectReference)
-    s"{{$variableName}}"
+  def postmanVariableNameFrom(parameter: Parameter): PostmanVariableName = {
+    val name = parameter.name
+    PostmanVariableName(name)
   }
 
-  final case class PostmanBasicAuthAttrValue(
-    username: String,
-    password: String
-  )
-
-  implicit val config = JsonConfiguration(SnakeCase)
-  implicit val ReferenceAttrValueFormats = Json.format[ExtendedObjectReference]
 }

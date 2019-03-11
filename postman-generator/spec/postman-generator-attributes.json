@@ -35,7 +35,7 @@
       ]
     },
 
-    "model_reference": {
+    "object_reference": {
       "fields": [
         {
           "name": "related_service_namespace",
@@ -56,37 +56,6 @@
           "name": "identifier_field",
           "type": "string",
           "description": "A field name. When the referenced operation is called, identifier_field is used to extract the corresponding field from the response JSON."
-        }
-      ]
-    },
-
-    "path_reference": {
-      "fields": [
-        {
-          "name": "related_service_namespace",
-          "type": "string",
-          "description": "ApiBuilder service's namespace, in which a target operation is specified."
-        },
-        {
-          "name": "resource_type",
-          "type": "string",
-          "description": "Resource type, that holds a referenced operation."
-        },
-        {
-          "name": "operation_method",
-          "type": "io.apibuilder.spec.v0.enums.method",
-          "description": "Referenced operation method."
-        },
-        {
-          "name": "identifier_field",
-          "type": "string",
-          "description": "A field name. When the referenced operation is called, identifier_field is used to extract the corresponding field from the response JSON."
-        },
-        {
-          "name": "path",
-          "type": "string",
-          "description": "Path from resource",
-          "required": false
         }
       ]
     },

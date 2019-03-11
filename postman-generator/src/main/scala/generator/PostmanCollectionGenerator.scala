@@ -13,7 +13,6 @@ import models.service.ResolvedService
 import play.api.libs.json.Json
 import Utils._
 import io.flow.postman.v0.models.Folder
-import models.attributes.PostmanAttributes
 import org.scalactic.TripleEquals._
 
 object PostmanCollectionGenerator extends CodeGenerator {
@@ -199,9 +198,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
 
     import objRefAttr._
 
-    val varName = objRefAttr.path
-      .getOrElse(s"$resourceType#$identifierField")
-      .toString
+    val varName = objRefAttr.postmanVariableName.name
 
     val scriptExecFragment = Seq(
       """var jsonData = JSON.parse(responseBody);""",

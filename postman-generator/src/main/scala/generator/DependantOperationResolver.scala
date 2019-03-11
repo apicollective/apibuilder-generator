@@ -1,8 +1,9 @@
 package generator
 
-import io.apibuilder.spec.v0.models.{Field, Operation, Resource, Service}
+import io.apibuilder.spec.v0.models._
 import io.flow.postman.generator.attributes.v0.models.json._
-import io.flow.postman.generator.attributes.v0.models.{AttributeName, ModelReference, PathReference}
+import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
+import models.AttributeValueReader
 import models.service.ResolvedService
 import org.scalactic.TripleEquals._
 import models.attributes.PostmanAttributes._
@@ -16,9 +17,10 @@ object DependantOperationResolver extends Logging {
   import scala.languageFeature.implicitConversions
 
   /**
-    * 1. Searches for special postman attributes [[ExtendedObjectReference]] in whole Service and it's imports.
+    * 1. Searches for special postman attributes [[ObjectReference]] in whole Service and it's imports.
     * 2. Recursively resolves a dependant operations for each specified attributes.
-    * 3. Returns a list of tuple from Attribute References [[ExtendedObjectReference]] and resolved Operation [[Operation]]
+    * 3. Assigns a Postman variable name for each reference and changes the type to [[ExtendedObjectReference]]
+    * 4. Returns a list of tuple from Extended Attribute References [[ExtendedObjectReference]] and resolved Operation [[Operation]]
     *
     * For instance, 'buy_book_form' has a required 'book_id' param, that references to an existing book.
     * If a valid Apibuilder attribute is attached to 'book_id' param in the specification,
@@ -32,15 +34,18 @@ object DependantOperationResolver extends Logging {
     val service: Service = resolvedService.service
     val serviceNamespaceToResources: Map[String, Seq[Resource]] = resolvedService.serviceNamespaceToResources
 
-    val attributesFromResources: Seq[PathReference] = {
+    val attributesFromResources: Seq[ExtendedObjectReference] = {
       for {
         resource <- service.resources
         foundedPathAttr <- resource.attributes if foundedPathAttr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString)
-        pureAttr <- tryAttributeReadsWithLogging[PathReference](foundedPathAttr.value)
+        pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttr.value)
+        extendedObjectReference = pureAttr.toExtended
+        parameterFromResourcePath = resource.path.flatMap(findParameterInPathString)
+        postmanVariableNameOpt = parameterFromResourcePath.map(postmanVariableNameFrom)
       } yield {
-          pureAttr.copy(
-            path = resource.path.flatMap(findParamNameInPathString)
-          )
+        postmanVariableNameOpt.fold(extendedObjectReference) { pathVariableName =>
+          extendedObjectReference.copy(postmanVariableName = pathVariableName)
+        }
       }
     }
 
@@ -48,10 +53,11 @@ object DependantOperationResolver extends Logging {
       resource <- service.resources
       operation <- resource.operations
       body <- operation.body.toSeq
-      attributes <- deepSearchModelsForAttributes(body.`type`, service)
-    } yield attributes
+      attribute <- deepSearchModelsForAttributes(body.`type`, service)
+      extendedAttribute = attribute.toExtended
+    } yield extendedAttribute
 
-    val allAttributes = attributesFromResources.map(_.toExtended) ++ attributesFromModel.map(_.toExtended)
+    val allAttributes = attributesFromResources ++ attributesFromModel
 
     for {
       attribute <- allAttributes
@@ -62,12 +68,8 @@ object DependantOperationResolver extends Logging {
     }
   }
 
-  private def findReferenceAttributeInModelField(field: Field): Option[ModelReference] = {
-
-    field.attributes.collectFirst {
-      case attr if attr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString) =>
-        tryAttributeReadsWithLogging[ModelReference](attr.value)
-    }.flatten
+  private def findReferenceAttributeInModelField(field: Field): Option[ObjectReference] = {
+    AttributeValueReader.findAndReadFirst[ObjectReference](field.attributes, AttributeName.ObjectReference)
   }
 
   private def findOperationForAttribute(objRefAttr: ExtendedObjectReference, serviceNamespaceToResources: Map[String, Seq[Resource]]) = {
@@ -84,9 +86,9 @@ object DependantOperationResolver extends Logging {
     }
   }
 
-  private def deepSearchModelsForAttributes(typ: String, service: Service): Seq[ModelReference] = {
+  private def deepSearchModelsForAttributes(typ: String, service: Service): Seq[ObjectReference] = {
 
-      def recurSearch(typ: String): Seq[ModelReference] = {
+      def recurSearch(typ: String): Seq[ObjectReference] = {
         service.models.find(_.name === typ) match {
           case Some(model) =>
             model.fields.flatMap {
@@ -121,13 +123,22 @@ object DependantOperationResolver extends Logging {
       recurSearch(typ)
   }
 
-  private def findParamNameInPathString(path: String): Option[String] = {
+  private def findParameterInPathString(path: String): Option[Parameter] = {
     val regex = """\:(\w+)[\/]{0,1}""".r
-    regex
+    val firstParameterNameOpt = regex
       .findAllIn(path)
       .map(str => regex.replaceAllIn(str, "$1"))
       .toList
       .headOption //TODO investigate few params like ":organization/order/:id" in one resource path. Is it valid/used anywhere ?
+
+    firstParameterNameOpt.map { paramName =>
+      Parameter(
+        name = paramName,
+        `type` = "string",
+        location = ParameterLocation.Path,
+        required = true
+      )
+    }
   }
 
   private def addNamespaceToOperationBodyIfNecessary(resolvedService: ResolvedService, operation: Operation, referencedServiceNamespace: String): Operation = {

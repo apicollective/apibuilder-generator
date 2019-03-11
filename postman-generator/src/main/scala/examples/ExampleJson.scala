@@ -4,11 +4,10 @@ import java.util.UUID
 
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.spec.v0.models.json._
-import io.flow.postman.generator.attributes.v0.models.{AttributeName, ValueSubstitute}
-import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesValueSubstitute
+import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference, ValueSubstitute}
+import io.flow.postman.generator.attributes.v0.models.json.{jsonReadsPostmanGeneratorAttributesObjectReference, jsonReadsPostmanGeneratorAttributesValueSubstitute}
 import models.AttributeValueReader
-import models.attributes.PostmanAttributes
-import models.attributes.PostmanAttributes.ExtendedObjectReference
+import models.attributes.PostmanAttributes.ObjectReferenceExtend
 import org.joda.time.{DateTime, LocalDate}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
@@ -77,12 +76,12 @@ case class ExampleJson(service: Service, selection: Selection) {
           filter { f => selection == Selection.All || f.required }.
           map { field =>
 
-            val objRefAttrOpt = AttributeValueReader.findAndReadFirst[ExtendedObjectReference](field.attributes, AttributeName.ObjectReference)
-            val ValueSubstituteAttrOpt = AttributeValueReader.findAndReadFirst[ValueSubstitute](field.attributes, AttributeName.ValueSubstitute)
+            val objRefAttrOpt = AttributeValueReader.findAndReadFirst[ObjectReference](field.attributes, AttributeName.ObjectReference)
+            val valueSubstituteAttrOpt = AttributeValueReader.findAndReadFirst[ValueSubstitute](field.attributes, AttributeName.ValueSubstitute)
 
-            val postmanVariableRefOpt = objRefAttrOpt.map(PostmanAttributes.postmanVariableRefFrom)
-            val ValueSubstituteOpt = ValueSubstituteAttrOpt.map(_.substitute)
-            val valueFromAttributesOpt = postmanVariableRefOpt orElse ValueSubstituteOpt
+            val postmanVariableRefOpt = objRefAttrOpt.map(_.toExtended.postmanVariableName.reference)
+            val valueSubstituteOpt = valueSubstituteAttrOpt.map(_.substitute)
+            val valueFromAttributesOpt = postmanVariableRefOpt orElse valueSubstituteOpt
 
             val value = valueFromAttributesOpt.map { valueFromAttributes =>
               if (field.`type`.equalsIgnoreCase("string"))

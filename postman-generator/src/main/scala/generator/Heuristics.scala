@@ -6,7 +6,10 @@ import io.apibuilder.spec.v0.models.Resource
 
 object Heuristics {
 
-  case class PathVariable(name: String, postmanVarName: String)
+  // TODO: unify heuristics mechanism with PostmanAttributes.PostmanVariableName type and its var name->reference logic
+  case class PathVariable(name: String, postmanVarName: String) {
+    def postmanVarRef: String = s"{{$postmanVarName}}"
+  }
 
   val IdFieldHeuristicThreshold = 3
 
