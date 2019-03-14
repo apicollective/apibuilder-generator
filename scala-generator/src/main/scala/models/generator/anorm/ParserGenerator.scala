@@ -1,7 +1,7 @@
 package scala.generator.anorm
 
 import scala.generator._
-import scala.models.{ApidocComments, Config}
+import scala.models.{ApidocComments, Config, TimeConfig}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -9,7 +9,7 @@ import lib.Text
 import lib.Text._
 
 object ParserGenerator24 extends ParserGenerator {
-  override val attributes = ParserGeneratorPlayVersionSpecificAttributes(
+  override def attributes(ssd: ScalaService) = ParserGeneratorPlayVersionSpecificAttributes(
     imports = Seq(
       "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
       "play.api.libs.json.{JsArray, JsObject, JsValue}",
@@ -19,14 +19,23 @@ object ParserGenerator24 extends ParserGenerator {
 }
 
 object ParserGenerator26 extends ParserGenerator {
-  override val attributes = ParserGeneratorPlayVersionSpecificAttributes(
-    imports = Seq(
-      "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
-      "play.api.libs.json.{JsArray, JsObject, JsValue}",
-      "scala.util.{Failure, Success, Try}",
-      "play.api.libs.json.JodaReads._"
+  override def attributes(ssd: ScalaService) = {
+    val timeImports = ssd.config.timeLib match {
+      case TimeConfig.JavaTime => Seq(
+
+      )
+      case TimeConfig.JodaTime => Seq(
+        "play.api.libs.json.JodaReads._",
+      )
+    }
+    ParserGeneratorPlayVersionSpecificAttributes(
+      imports = Seq(
+        "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
+        "play.api.libs.json.{JsArray, JsObject, JsValue}",
+        "scala.util.{Failure, Success, Try}",
+      ) ++ timeImports
     )
-  )
+  }
 }
 
 case class ParserGeneratorPlayVersionSpecificAttributes(
@@ -35,7 +44,7 @@ case class ParserGeneratorPlayVersionSpecificAttributes(
 
 trait ParserGenerator extends CodeGenerator {
 
-  val attributes: ParserGeneratorPlayVersionSpecificAttributes
+  def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
@@ -55,7 +64,7 @@ trait ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Conversions",
-              header ++ Conversions.code(ssd, attributes),
+              header ++ Conversions.code(ssd, attributes(ssd)),
               Some("Scala")
             ),
             ServiceFileNames.toFile(
