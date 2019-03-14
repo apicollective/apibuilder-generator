@@ -38,27 +38,6 @@ object ServiceImportResolver {
         case Some(importedService) =>
           val importedServiceNamespace = importedService.namespace
 
-          def fixType[T](origTyp: String, update: String => T): T = {
-            val typeRx = """(\[?)(.*?)(\]?)""".r
-            origTyp match {
-              case typeRx(prefix, typ, suffix) =>
-                if (importedService.models.exists(_.name == typ)) {
-                  update(s"$prefix$importedServiceNamespace.models.$typ$suffix")
-                } else if (importedService.enums.exists(_.name == typ)) {
-                  update(s"$prefix$importedServiceNamespace.enums.$typ$suffix")
-                } else if (importedService.unions.exists(_.name == typ)) {
-                  update(s"$prefix$importedServiceNamespace.unions.$typ$suffix")
-                } else {
-                  update(origTyp)
-                }
-              case _ => update(origTyp)
-            }
-          }
-
-          def prefixModelFields(field: Field) = fixType(field.`type`, typ => field.copy(`type` = typ))
-
-          def prefixUnionType(unionType: UnionType) = fixType(unionType.`type`, typ => unionType.copy(`type` = typ))
-
           val enums = importedService.enums.map { enum =>
             enum.copy(name = s"$importedServiceNamespace.enums.${enum.name}")
           }
@@ -66,14 +45,14 @@ object ServiceImportResolver {
           val models = importedService.models.map { model =>
             model.copy(
               name = s"$importedServiceNamespace.models.${model.name}",
-              fields = model.fields.map(prefixModelFields)
+              fields = model.fields.map(prefixModelFields(_: Field)(importedService))
             )
           }
 
           val unions = importedService.unions.map { union =>
             union.copy(
               name = s"$importedServiceNamespace.unions.${union.name}",
-              types = union.types.map(prefixUnionType)
+              types = union.types.map(prefixUnionType(_: UnionType)(importedService))
             )
           }
 
@@ -96,5 +75,26 @@ object ServiceImportResolver {
     )
   }
 
+  def fixType[T](origTyp: String, update: String => T)(importedService: Service): T = {
+    val importNamespace = importedService.namespace
 
+    val typeRx = """(\[?)(.*?)(\]?)""".r
+    origTyp match {
+      case typeRx(prefix, typ, suffix) =>
+        if (importedService.models.exists(_.name == typ)) {
+          update(s"$prefix$importNamespace.models.$typ$suffix")
+        } else if (importedService.enums.exists(_.name == typ)) {
+          update(s"$prefix$importNamespace.enums.$typ$suffix")
+        } else if (importedService.unions.exists(_.name == typ)) {
+          update(s"$prefix$importNamespace.unions.$typ$suffix")
+        } else {
+          update(origTyp)
+        }
+      case _ => update(origTyp)
+    }
+  }
+
+  def prefixModelFields(field: Field) = fixType(field.`type`, typ => field.copy(`type` = typ)) _
+
+  def prefixUnionType(unionType: UnionType) = fixType(unionType.`type`, typ => unionType.copy(`type` = typ)) _
 }
