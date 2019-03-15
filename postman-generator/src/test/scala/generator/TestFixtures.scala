@@ -109,7 +109,21 @@ object TestFixtures {
       body = Some(Body("member"))
     )
     private val updatedOperationsList = membersResource.operations.updated(0, postSingleMemberOp)
-    private val updatedMembersResource = membersResource.copy(operations = updatedOperationsList)
+    private val extraDeleteOpPath = "/members/:id/delete"
+    private val extraDeleteOp = Operation(
+      method = Method.Delete,
+      path = extraDeleteOpPath,
+      parameters = Seq(
+        Parameter(
+          name = "id",
+          `type` = "string",
+          location = ParameterLocation.Path,
+          required = true
+        )
+      ),
+      body = None
+    )
+    private val updatedMembersResource = membersResource.copy(operations = updatedOperationsList :+ extraDeleteOp)
     val updatedReferenceApiService = referenceApiService.copy(
       resources = referenceApiService.resources.updated(2, updatedMembersResource)
     )
@@ -118,7 +132,8 @@ object TestFixtures {
       relatedServiceNamespace = referenceApiService.namespace,
       resourceType = "member",
       operationMethod = Method("POST"),
-      identifierField = "guid"
+      identifierField = "guid",
+      deleteOperationPath = Some(extraDeleteOpPath)
     )
 
     val modelWithDependency = Model(

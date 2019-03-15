@@ -110,7 +110,8 @@
             "related_service_namespace": "io.ecorp.api.v0",
             "resource_type": "organization",
             "operation_method": "POST",
-            "identifier_field": "id"
+            "identifier_field": "id",
+            "delete_operation_path": "/organizations/:id"
           }
         }
       ],
@@ -198,6 +199,24 @@
             "type": "organization_form",
             "attributes": [ ]
           }
+        },
+        {
+          "method": "DELETE",
+          "description": "Delete Organization",
+          "path": "/organizations/:id",
+          "attributes": [ ],
+          "parameters": [ ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            }
+          ]
         }
       ]
     }
@@ -206,7 +225,7 @@
     {
       "name": "postman-basic-auth",
       "value": {
-        "username": "{{FLOW_TOKEN}}",
+        "username": "{{MY_TOKEN}}",
         "password": ""
       }
     }

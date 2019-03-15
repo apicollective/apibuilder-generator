@@ -19,6 +19,7 @@ object PostmanAttributes {
     resourceType: String,
     operationMethod: io.apibuilder.spec.v0.models.Method,
     identifierField: String,
+    deleteOperationPath: Option[String],
     postmanVariableName: PostmanVariableName
   )
 
@@ -33,6 +34,7 @@ object PostmanAttributes {
       resourceType = objRef.resourceType,
       operationMethod = objRef.operationMethod,
       identifierField = objRef.identifierField,
+      deleteOperationPath = objRef.deleteOperationPath,
       postmanVariableName = postmanVariableNameFrom(objRef)
     )
   }

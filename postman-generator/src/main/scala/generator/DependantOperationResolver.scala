@@ -7,6 +7,7 @@ import models.AttributeValueReader
 import models.service.ResolvedService
 import org.scalactic.TripleEquals._
 import models.attributes.PostmanAttributes._
+import models.operation.DependantOperations
 import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 
@@ -20,7 +21,7 @@ object DependantOperationResolver extends Logging {
     * 1. Searches for special postman attributes [[ObjectReference]] in whole Service and it's imports.
     * 2. Recursively resolves a dependant operations for each specified attributes.
     * 3. Assigns a Postman variable name for each reference and changes the type to [[ExtendedObjectReference]]
-    * 4. Returns a list of tuple from Extended Attribute References [[ExtendedObjectReference]] and resolved Operation [[Operation]]
+    * 4. Returns a list of tuple from Extended Attribute References [[ExtendedObjectReference]] and dependant Operations [[DependantOperations]]
     *
     * For instance, 'buy_book_form' has a required 'book_id' param, that references to an existing book.
     * If a valid Apibuilder attribute is attached to 'book_id' param in the specification,
@@ -29,7 +30,7 @@ object DependantOperationResolver extends Logging {
     * @param resolvedService - service with all imports at hand
     * @return a sequence of custom attribute to dependant operation pairs
     */
-  def resolve(resolvedService: ResolvedService): Seq[(ExtendedObjectReference, Operation)] = {
+  def resolve(resolvedService: ResolvedService): Seq[(ExtendedObjectReference, DependantOperations)] = {
 
     val service: Service = resolvedService.service
     val serviceNamespaceToResources: Map[String, Seq[Resource]] = resolvedService.serviceNamespaceToResources
@@ -61,10 +62,14 @@ object DependantOperationResolver extends Logging {
 
     for {
       attribute <- allAttributes
-      operation <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
-      updatedOperation = addNamespaceToOperationBodyIfNecessary(resolvedService, operation, attribute.relatedServiceNamespace)
+      dependantOperations <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
+      updatedReferencedOp =
+        addNamespaceToOperationBodyIfNecessary(resolvedService, dependantOperations.referencedOperation, attribute.relatedServiceNamespace)
+      updatedDeleteOp = dependantOperations.deleteOperationOpt
+        .map(addNamespaceToOperationBodyIfNecessary(resolvedService, _, attribute.relatedServiceNamespace))
+      updatedDependantOperations = DependantOperations(updatedReferencedOp, updatedDeleteOp)
     } yield {
-      (attribute, updatedOperation)
+      (attribute, updatedDependantOperations)
     }
   }
 
@@ -76,10 +81,20 @@ object DependantOperationResolver extends Logging {
     serviceNamespaceToResources
       .get(key = objRefAttr.relatedServiceNamespace) match {
       case Some(resources) =>
-        resources
-          .filter(_.`type` === objRefAttr.resourceType)
-          .flatMap(_.operations)
-          .find(_.method === objRefAttr.operationMethod)
+        val operations =
+          resources
+            .filter(_.`type` === objRefAttr.resourceType)
+            .flatMap(_.operations)
+
+        val referencedOperationOpt = operations.find(_.method === objRefAttr.operationMethod)
+        val deleteOperationOpt = for {
+          deleteOpPath <- objRefAttr.deleteOperationPath
+          deleteOp <- operations.find(o => o.method === Method.Delete && o.path === deleteOpPath)
+        } yield deleteOp
+
+        referencedOperationOpt.map { referencedOperation =>
+          DependantOperations(referencedOperation, deleteOperationOpt)
+        }
       case None =>
         logger.warn(s"ResolvedService namespace to resources map (includes imported services) does not contain key = ${objRefAttr.relatedServiceNamespace} / Can't find the referenced operation for $objRefAttr")
         None

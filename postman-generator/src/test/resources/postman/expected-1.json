@@ -406,9 +406,149 @@
             }
           ],
           "type": "item"
+        },
+        {
+          "description": {
+            "content": "Delete Organization"
+          },
+          "name": "DELETE /organizations/:id",
+          "request": {
+            "description": {
+              "content": "Delete Organization"
+            },
+            "header": [
+            ],
+            "method": "DELETE",
+            "url": {
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "organizations",
+                ":id"
+              ],
+              "query": [
+              ],
+              "raw": "{{BASE_URL}}/organizations/:id",
+              "variable": [
+              ]
+            }
+          },
+          "response": [
+            {
+              "code": 204,
+              "header": [
+              ],
+              "name": "Example 204 - unit",
+              "originalRequest": {
+                "description": {
+                  "content": "Delete Organization"
+                },
+                "header": [
+                ],
+                "method": "DELETE",
+                "url": {
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "organizations",
+                    ":id"
+                  ],
+                  "query": [
+                  ],
+                  "raw": "{{BASE_URL}}/organizations/:id",
+                  "variable": [
+                  ]
+                }
+              }
+            }
+          ],
+          "type": "item"
         }
       ],
       "name": "organizations",
+      "type": "folder"
+    },
+    {
+      "item": [
+        {
+          "description": {
+            "content": "Delete Organization"
+          },
+          "name": "DELETE /organizations/:id",
+          "request": {
+            "description": {
+              "content": "Delete Organization"
+            },
+            "header": [
+            ],
+            "method": "DELETE",
+            "url": {
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "organizations",
+                ":id"
+              ],
+              "query": [
+              ],
+              "raw": "{{BASE_URL}}/organizations/:id",
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "key": "id",
+                  "value": "{{organization}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "code": 204,
+              "header": [
+              ],
+              "name": "Example 204 - unit",
+              "originalRequest": {
+                "description": {
+                  "content": "Delete Organization"
+                },
+                "header": [
+                ],
+                "method": "DELETE",
+                "url": {
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "organizations",
+                    ":id"
+                  ],
+                  "query": [
+                  ],
+                  "raw": "{{BASE_URL}}/organizations/:id",
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "key": "id",
+                      "value": "{{organization}}"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "type": "item"
+        }
+      ],
+      "name": "Entities Cleanup",
       "type": "folder"
     }
   ],
@@ -416,7 +556,7 @@
     "type": "basic",
     "basic": [
       {
-        "value": "{{FLOW_TOKEN}}",
+        "value": "{{MY_TOKEN}}",
         "key": "username"
       }, {
         "value": "",

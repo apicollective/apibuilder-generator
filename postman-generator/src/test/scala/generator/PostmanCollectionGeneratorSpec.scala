@@ -9,6 +9,7 @@ import io.flow.postman.v0.models.json.jsonReadsPostmanCollection
 import io.flow.postman.generator.attributes.v0.models.AttributeName
 import io.flow.postman.generator.attributes.v0.models.BasicAuth
 import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesBasicAuth
+import io.flow.postman.v0.models.Method
 import org.scalatest.{Assertion, Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
 
@@ -183,36 +184,35 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       }
     }
 
-    "add Setup and Cleanup folders to the Collection if the specification contains `organization-setup` attribute" in new TrivialServiceContext {
-      val trivialServiceWithFlag = trivialService.copy(
-        attributes = Seq(
-          Attribute("organization-setup", JsObject.empty))
-      )
-      val invocationForm = InvocationForm(trivialServiceWithFlag, importedServices = Some(Seq(referenceApiService)))
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
-
-      assertResultCollection(result) { collection =>
-        val folderNames = collection.item.collect {
-          case folder: postman.Folder => folder.name
-        }
-        folderNames should contain allElementsOf (Seq("Setup", "Cleanup"))
-      }
-    }
-
-    "add 'Entities Setup' folder with dependant entities creation if the right attributes are set" in new TrivialServiceWithImportAndDependencyCtx {
+    "add 'Entities Setup' and 'Entities Cleanup' folders with dependant entities if the right object-reference attributes are set" in new TrivialServiceWithImportAndDependencyCtx {
       val invocationForm = InvocationForm(trivialServiceWithImportAndDependency, importedServices = Some(Seq(updatedReferenceApiService)))
       val result = PostmanCollectionGenerator.invoke(invocationForm)
 
       assertResultCollection(result) { collection =>
-        val entitiesSetupFolderOpt = collection.item.collectFirst {
-          case folder: postman.Folder if folder.name === Constants.EntitiesSetup => folder
+        val folders = collection.item.collect {
+          case folder: postman.Folder => folder
         }
-        entitiesSetupFolderOpt.isDefined shouldEqual true
-        val dependantEntitiesItems = entitiesSetupFolderOpt.get.item
-        dependantEntitiesItems.foreach { item =>
+
+        folders.map(_.name) should contain allElementsOf Seq(Constants.EntitiesSetup, Constants.EntitiesCleanup)
+        val entitiesSetupFolder = folders.find(_.name === Constants.EntitiesSetup).get
+        val entitiesSetupItems = entitiesSetupFolder.item
+        entitiesSetupItems.foreach { item =>
           item.request.body.isDefined shouldEqual true
         }
-        dependantEntitiesItems.nonEmpty shouldEqual true
+        entitiesSetupItems.nonEmpty shouldEqual true
+
+        val entitiesCleanupFolder = folders.find(_.name === Constants.EntitiesCleanup).get
+        val entitiesCleanupItems = entitiesCleanupFolder.item
+        entitiesCleanupItems.foreach { item =>
+          item.request.method shouldEqual Some(Method.Delete)
+          val postmanUrlPathParams = item.request.url.get.variable.get
+          postmanUrlPathParams.foreach { pathParam =>
+            pathParam.value.isDefined shouldEqual true
+            pathParam.value.get.startsWith("{{") shouldEqual true
+            pathParam.value.get.endsWith("}}") shouldEqual true
+          }
+        }
+        entitiesCleanupItems.nonEmpty shouldEqual true
       }
     }
   }

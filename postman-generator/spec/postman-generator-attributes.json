@@ -12,7 +12,6 @@
       "values": [
         { "name": "postman-basic-auth" },
         { "name": "object-reference" },
-        { "name": "organization-setup" },
         { "name": "value-substitute"}
       ]
     }
@@ -36,6 +35,7 @@
     },
 
     "object_reference": {
+      "description": "Attribute instructs the generator to add a setup step with the referenced entity creation. This attribute should be attached to the field (that holds an identifier) inside model or to the resource path (that holds one path param).",
       "fields": [
         {
           "name": "related_service_namespace",
@@ -56,6 +56,12 @@
           "name": "identifier_field",
           "type": "string",
           "description": "A field name. When the referenced operation is called, identifier_field is used to extract the corresponding field from the response JSON."
+        },
+        {
+          "name": "delete_operation_path",
+          "type": "string",
+          "description": "Optionally, the referenced entity's DELETE operation path can be put here. This needs to be a full operation path (taken from the service.json). If specified, the generator will add a cleanup step for the referenced object.",
+          "required": false
         }
       ]
     },

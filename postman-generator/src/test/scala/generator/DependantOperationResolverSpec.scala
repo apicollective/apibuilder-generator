@@ -4,6 +4,7 @@ import io.apibuilder.spec.v0.models._
 import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
 import io.flow.postman.generator.attributes.v0.models.json._
 import models.attributes.PostmanAttributes._
+import models.operation.DependantOperations
 import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
 
@@ -21,6 +22,18 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       result should === (List(objectRef1AttrValue.toExtended -> dependency1Target))
     }
 
+    "resolve simple dependency with a cleanup step" in new TestCtxWithImportedService {
+      val resolvedService = ServiceImportResolver.resolveService(testMainService, Seq(updatedReferenceApiService))
+      val result = DependantOperationResolver.resolve(resolvedService)
+
+      val cleanupOp = getTargetOperation(updatedReferenceApiService, objectRef1AttrValue).deleteOperationOpt.get
+
+      result.nonEmpty shouldEqual true
+      val dependantOperations = result.head._2
+      dependantOperations.deleteOperationOpt.isDefined shouldEqual true
+      dependantOperations.deleteOperationOpt.get shouldEqual cleanupOp
+    }
+
     "resolve second level dependencies (dependency has its own dependency) in the right order" in new TestCtxWithImportedService {
       val objRef2AttrValue = ObjectReference(
         relatedServiceNamespace = referenceApiService.namespace,
@@ -35,7 +48,7 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       val result = DependantOperationResolver.resolve(resolvedService)
 
 
-      val expected: Seq[(ExtendedObjectReference, Operation)] = Seq(
+      val expected: Seq[(ExtendedObjectReference, DependantOperations)] = Seq(
         objRef2AttrValue -> dependency2Target,
         objectRef1AttrValue -> dependency1Target
       ).toExtended
@@ -51,9 +64,11 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
         identifierField = "guid"
       )
       val dependencyToThirdServiceTarget = {
-        val operation = getTargetOperation(generatorApiServiceWithUnionWithoutDescriminator, objRefToThirdServiceAttrValue)
-        val updatedBody = operation.body.get.copy(`type` = objRefToThirdServiceAttrValue.relatedServiceNamespace + ".unions." + operation.body.get.`type`)
-        operation.copy(body = Some(updatedBody))
+        val dependantOperations = getTargetOperation(generatorApiServiceWithUnionWithoutDescriminator, objRefToThirdServiceAttrValue)
+        val referencedOperation = dependantOperations.referencedOperation
+        val updatedBody = referencedOperation.body.get.copy(`type` = objRefToThirdServiceAttrValue.relatedServiceNamespace + ".unions." + referencedOperation.body.get.`type`)
+        val updatedReferencedOperation = referencedOperation.copy(body = Some(updatedBody))
+        dependantOperations.copy(referencedOperation = updatedReferencedOperation)
       }
       val testReferenceApiService = addAttributeToModelField(referenceApiService, "member", "role", objRefToThirdServiceAttrValue)
 
@@ -110,18 +125,27 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
 
   }
 
-  implicit class SeqObjectRefOperationExtend(seq: Seq[(ObjectReference, Operation)]) {
-    def toExtended: Seq[(ExtendedObjectReference, Operation)] = {
+  implicit class SeqObjectRefOperationExtend(seq: Seq[(ObjectReference, DependantOperations)]) {
+    def toExtended: Seq[(ExtendedObjectReference, DependantOperations)] = {
       seq.map {
         case (ref, op) => (ref.toExtended, op)
       }
     }
   }
 
-  private def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): Operation = {
-    targetService
-      .resources.find(_.`type` == objRefAttrValue.resourceType).get
-      .operations.find(_.method == objRefAttrValue.operationMethod).get
+  private def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): DependantOperations = {
+    val targetResource =
+      targetService
+        .resources.find(_.`type` === objRefAttrValue.resourceType).get
+
+    val referencedOp = targetResource
+      .operations.find(_.method === objRefAttrValue.operationMethod).get
+    val deleteOpOption = objRefAttrValue.deleteOperationPath.flatMap { deleteOpPath =>
+      targetResource
+        .operations.find(_.path === deleteOpPath)
+    }
+
+    DependantOperations(referencedOp, deleteOpOption)
   }
 
   private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ObjectReference): Service = {
