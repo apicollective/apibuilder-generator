@@ -846,7 +846,7 @@ trait MembershipRequestRoutes[F[_]] extends Matchers[F] {
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ POST -> Root / "membership_requests" if apiVersionMatch(_req) =>
-    if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {
+    if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.application.json)) {
       _req.attemptAs[PostRequest].value.flatMap{
         case Right(req) =>
           post(_req, req.orgGuid, req.userGuid, req.role).flatMap {
@@ -1563,7 +1563,7 @@ trait UserRoutes[F[_]] extends Matchers[F] {
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ POST -> Root / "users" / "authenticate" if apiVersionMatch(_req) =>
-    if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {
+    if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.application.json)) {
       _req.attemptAs[PostAuthenticateRequest].value.flatMap{
         case Right(req) =>
           postAuthenticate(_req, req.email, req.password).flatMap {
