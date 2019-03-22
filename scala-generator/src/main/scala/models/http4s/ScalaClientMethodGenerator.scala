@@ -194,7 +194,7 @@ class ScalaClientMethodGenerator (
         val body = variableName.map(v => s"{\n  lazy val $v = ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(body)\n}").getOrElse("")
 
         Seq(
-          s"final case class $className(",
+          s"final case class $className${config.asyncTypeParam(Some("Sync")).map(p => s"[$p]").getOrElse("")}(",
           s"  response: ${config.responseClass},",
           s"  message: Option[String] = None" + variableName.map(v => s",\n  body: $responseDataType").getOrElse(""),
           s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$body"""
@@ -205,15 +205,8 @@ class ScalaClientMethodGenerator (
   override protected def modelErrorClasses(): Seq[String] =
     config match {
       case _ @ (_:ScalaClientMethodConfigs.Http4s017 | _:ScalaClientMethodConfigs.Http4s015) => super.modelErrorClasses()
-      case _ => Seq()
+      case _ => errorClasses()
     }
-
-  def modelErrors(): String =
-    config match {
-      case _ @ (_:ScalaClientMethodConfigs.Http4s017 | _:ScalaClientMethodConfigs.Http4s015) => ""
-      case _ => s"\n\nobject errors {\n\n${errorClasses().mkString("\n\n")}\n}"
-    }
-
 }
 
 class ScalaClientMethod(

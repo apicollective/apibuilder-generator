@@ -3075,19 +3075,6 @@ formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
 
       httpClient.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }
-
-    object errors {
-
-    final case class ErrorsResponse(
-      response: org.http4s.Response[F],
-      message: Option[String] = None,
-      body: Seq[io.apibuilder.api.v0.models.Error]
-    ) extends Exception(message.getOrElse(response.status.code + ": " + response.body)){
-      lazy val errors = Sync[F].pure(body)
-    }
-
-    final case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
-    }
   }
 
   object Client {
@@ -3861,6 +3848,21 @@ formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
   }
 
   package errors {
+
+    import io.apibuilder.api.v0.models.json._
+    import io.apibuilder.common.v0.models.json._
+    import io.apibuilder.generator.v0.models.json._
+    import io.apibuilder.spec.v0.models.json._
+
+    final case class ErrorsResponse[F[_]: Sync](
+      response: org.http4s.Response[F],
+      message: Option[String] = None,
+      body: Seq[io.apibuilder.api.v0.models.Error]
+    ) extends Exception(message.getOrElse(response.status.code + ": " + response.body)){
+      lazy val errors = Sync[F].pure(body)
+    }
+
+    final case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 
     final case class FailedRequest(responseCode: Int, message: String, requestUri: Option[_root_.java.net.URI] = None, parent: Exception = null) extends _root_.java.lang.Exception(s"HTTP $responseCode: $message", parent)
 

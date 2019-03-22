@@ -274,7 +274,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
   case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "F"
-    override def asyncTypeParam(constraint: Option[String] = None) = Some(s"F[_]${constraint.map(c => s": $c").getOrElse("")}")
+    override def asyncTypeParam(constraint: Option[String] = None) = Some(s"$asyncType[_]${constraint.map(c => s": $c").getOrElse("")}")
     override val leftType = "Left"
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
@@ -321,7 +321,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
 
   case class Http4s020(namespace: String, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "F"
-    override def asyncTypeParam(constraint: Option[String] = None) = Some(s"F[_]${constraint.map(c => s": $c").getOrElse("")}")
+    override def asyncTypeParam(constraint: Option[String] = None) = Some(s"$asyncType[_]${constraint.map(c => s": $c").getOrElse("")}")
     override val leftType = "Left"
     override val rightType = "Right"
     override val monadTransformerInvoke = "value"
