@@ -1,22 +1,21 @@
 package generator
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import org.scalatest.{Assertion, Matchers, WordSpec}
-import play.api.libs.json.Json
 import io.flow.postman.v0.models._
 import io.flow.postman.v0.models.json.jsonReadsPostmanCollection
+import org.scalatest.{Matchers, WordSpec}
+import play.api.libs.json.Json
+import testUtils.TestPostmanCollectionGenerator
 
 class PostmanTestAssertionsSpec extends WordSpec with Matchers {
 
-  import TestFixtures._
   import models.TestHelper.referenceApiService
-
 
   "Postman JS test assertions" should {
 
     "be added to GET, PUT, POST requests as simple 2xx status code check" in new TestContext {
       val invocationForm = InvocationForm(referenceApiService, importedServices = None)
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       assertResultCollection(result) { collection =>
         val folders = collection.item.collect {
@@ -42,7 +41,7 @@ class PostmanTestAssertionsSpec extends WordSpec with Matchers {
 
     "not be added to the requests with the remaining methods" in new TestContext {
       val invocationForm = InvocationForm(referenceApiService, importedServices = None)
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       assertResultCollection(result) { collection =>
         val folders = collection.item.collect {

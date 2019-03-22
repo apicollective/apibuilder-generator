@@ -1,6 +1,6 @@
 package generator
 
-import examples.{ExampleJson, Selection}
+import examples.{ExampleJson, RandomStringGenerator, ScalaRandomStringGenerator, Selection}
 import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
@@ -15,15 +15,9 @@ import Utils._
 import io.flow.postman.v0.models.{Folder, Item}
 import lib.Datatype.Primitive
 
-object PostmanCollectionGenerator extends CodeGenerator {
+class PostmanCollectionGenerator(randomStringGenerator: RandomStringGenerator) extends CodeGenerator {
 
   import scala.languageFeature.implicitConversions._
-
-  object Constants {
-    val BaseUrl = "BASE_URL"
-    val EntitiesSetup = "Entities Setup"
-    val EntitiesCleanup = "Entities Cleanup"
-  }
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     form.importedServices match {
@@ -69,7 +63,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
       )
     }
 
-    val examplesProvider: ExampleJson = ExampleJson(service, Selection.All)
+    val examplesProvider: ExampleJson = ExampleJson(service, Selection.All, randomStringGenerator)
 
     val basicAuthOpt = service.attributes
       .find(_.name.equalsIgnoreCase(AttributeName.PostmanBasicAuth.toString))
@@ -111,7 +105,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
       item = folders,
       variable = Seq(
         Utils.Variable(
-          key = Constants.BaseUrl,
+          key = PostmanGeneratorConstants.BaseUrl,
           value = baseUrl.getOrElse(""),
           `type` = Primitive.String.name
         )
@@ -157,3 +151,5 @@ object PostmanCollectionGenerator extends CodeGenerator {
     )
   }
 }
+
+object PostmanCollectionGeneratorImpl extends PostmanCollectionGenerator(ScalaRandomStringGenerator)

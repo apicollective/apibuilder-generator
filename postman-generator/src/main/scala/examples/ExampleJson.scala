@@ -13,14 +13,10 @@ import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
 
 import scala.util.Random
-import scala.util.hashing.MurmurHash3
 
-case object ExampleJson {
+object ExampleJson {
   val TrueStrings = Seq("t", "true", "y", "yes", "on", "1", "trueclass")
   val FalseStrings = Seq("f", "false", "n", "no", "off", "0", "falseclass")
-
-  def allFields(service: Service): ExampleJson = ExampleJson(service, Selection.All)
-  def requiredFieldsOnly(service: Service): ExampleJson = ExampleJson(service, Selection.RequiredFieldsOnly)
 }
 
 trait Selection
@@ -31,7 +27,10 @@ object Selection {
 
 case class UnknownType(typ: String) extends Throwable
 
-case class ExampleJson(service: Service, selection: Selection) {
+case class ExampleJson(
+  service: Service,
+  selection: Selection,
+  randomStringGenerator: RandomStringGenerator) {
 
   def sample(typ: String, subTyp: Option[String] = None): Option[JsValue] = {
     try {
@@ -365,8 +364,8 @@ case class ExampleJson(service: Service, selection: Selection) {
         .map(_.name)
         .getOrElse(Random.nextString(12))
     }
-    val hash = MurmurHash3.stringHash(seed).toString.takeRight(6)
-    s"lorem ipsum $hash"
+
+    randomStringGenerator.generate(seed)
   }
 
 }

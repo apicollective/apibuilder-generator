@@ -1,6 +1,6 @@
 package generator
 
-import examples.ExampleJson
+import examples.{ExampleJson, MurmurRandomStringGenerator, Selection}
 import generator.TestFixtures.TrivialServiceWithImportAndDependencyCtx
 import io.flow.postman.v0.models.{EventType, Folder, Header}
 import models.attributes.PostmanAttributes.ExtendedObjectReference
@@ -80,7 +80,7 @@ class SetupCleanupFolderBuilderSpec extends WordSpec with Matchers {
     lazy val objReferenceAttrToOperationTuples: Seq[(ExtendedObjectReference, DependantOperations)] =
       Seq(objectRef1AttrValue.toExtended -> defaultTargetOp)
     lazy val serviceSpecificHeaders: Seq[Header] = Seq.empty
-    lazy val exampleProvider: ExampleJson = ExampleJson.allFields(testMainService)
+    lazy val exampleProvider: ExampleJson = ExampleJson(testMainService, Selection.All, MurmurRandomStringGenerator)
 
     lazy val (setupFolderOpt, cleanupFolderOpt) =
       SetupCleanupFolderBuilder.prepareDependantEntitiesSetupAndCleanup(objReferenceAttrToOperationTuples, serviceSpecificHeaders, exampleProvider)

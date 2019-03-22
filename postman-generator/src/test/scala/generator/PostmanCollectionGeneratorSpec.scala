@@ -1,6 +1,5 @@
 package generator
 
-import generator.PostmanCollectionGenerator.Constants
 import generator.Utils.Description
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Attribute
@@ -12,6 +11,7 @@ import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGene
 import io.flow.postman.v0.models.Method
 import org.scalatest.{Assertion, Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
+import testUtils.TestPostmanCollectionGenerator
 
 import scala.util.Try
 
@@ -24,7 +24,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
     "return an error when invocation form contains a service with declared, but not provided imports" in {
       val invocationForm = InvocationForm(referenceWithImportsApiService, importedServices = None)
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       result.isLeft shouldEqual true
       result.left.get shouldEqual Seq("Service imports need to be resolved before generating Postman Collection. However, InvocationForm.importedServices is empty")
@@ -32,7 +32,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
     "return a generated Postman Collection for a trivial service" in new TrivialServiceContext {
       val invocationForm = InvocationForm(trivialService, importedServices = None)
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       result.isRight shouldEqual true
 
@@ -101,7 +101,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
     "return a generated Postman Collection for a reference service without imports" in {
       val invocationForm = InvocationForm(referenceApiService, importedServices = None)
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       assertResultCollection(result) { collection =>
         val postmanFolders = collection.item.collect {
@@ -138,7 +138,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
     "return a generated Postman Collection for a service with imports" in new TrivialServiceWithImportCtx {
       val invocationForm = InvocationForm(trivialServiceWithImport, importedServices = Some(Seq(referenceApiService)))
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       assertResultCollection(result) { collection =>
         val postmanFolders = collection.item.collect {
@@ -172,7 +172,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       )
 
       val invocationForm = InvocationForm(trivialServiceWithAuth, importedServices = Some(Seq(referenceApiService)))
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       assertResultCollection(result) { collection =>
         collection.auth.isDefined shouldEqual true
@@ -186,22 +186,22 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
     "add 'Entities Setup' and 'Entities Cleanup' folders with dependant entities if the right object-reference attributes are set" in new TrivialServiceWithImportAndDependencyCtx {
       val invocationForm = InvocationForm(trivialServiceWithImportAndDependency, importedServices = Some(Seq(updatedReferenceApiService)))
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       assertResultCollection(result) { collection =>
         val folders = collection.item.collect {
           case folder: postman.Folder => folder
         }
 
-        folders.map(_.name) should contain allElementsOf Seq(Constants.EntitiesSetup, Constants.EntitiesCleanup)
-        val entitiesSetupFolder = folders.find(_.name === Constants.EntitiesSetup).get
+        folders.map(_.name) should contain allElementsOf Seq(PostmanGeneratorConstants.EntitiesSetup, PostmanGeneratorConstants.EntitiesCleanup)
+        val entitiesSetupFolder = folders.find(_.name === PostmanGeneratorConstants.EntitiesSetup).get
         val entitiesSetupItems = entitiesSetupFolder.item
         entitiesSetupItems.foreach { item =>
           item.request.body.isDefined shouldEqual true
         }
         entitiesSetupItems.nonEmpty shouldEqual true
 
-        val entitiesCleanupFolder = folders.find(_.name === Constants.EntitiesCleanup).get
+        val entitiesCleanupFolder = folders.find(_.name === PostmanGeneratorConstants.EntitiesCleanup).get
         val entitiesCleanupItems = entitiesCleanupFolder.item
         entitiesCleanupItems.foreach { item =>
           item.request.method shouldEqual Some(Method.Delete)

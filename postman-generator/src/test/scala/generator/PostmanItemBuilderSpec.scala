@@ -123,7 +123,7 @@ class PostmanItemBuilderSpec extends WordSpec with Matchers {
     "build a POST request without example payload when Example Provider fails" in new TestContext {
       override val method = Method.Post
 
-      override val exampleProvider = new ExampleJson(null, null) {
+      override val exampleProvider = new ExampleJson(null, null, null) {
         override def sample(typ: String, subTyp: Option[String]): Option[JsValue] = {
           None
         }
@@ -146,7 +146,7 @@ class PostmanItemBuilderSpec extends WordSpec with Matchers {
     val path = "/resource/operation/all"
     val exampleJson = Json.obj("example" -> JsString("value"))
 
-    def exampleProvider: ExampleJson = new ExampleJson(null, null) {
+    def exampleProvider: ExampleJson = new ExampleJson(null, null, null) {
       override def sample(typ: String, subTyp: Option[String]): Option[JsValue] = {
         Some(exampleJson)
       }

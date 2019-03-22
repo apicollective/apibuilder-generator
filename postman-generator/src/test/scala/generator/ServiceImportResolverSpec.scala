@@ -1,6 +1,6 @@
 package generator
 
-import examples.ExampleJson
+import examples.{ExampleJson, MurmurRandomStringGenerator, Selection}
 import io.apibuilder.spec.v0.models.Service
 import org.scalatest.{Assertion, Matchers, WordSpec}
 
@@ -81,7 +81,7 @@ class ServiceImportResolverSpec extends WordSpec with Matchers {
     }
 
     "prepare models in a way, which enables ExampleJson to prepare a sample JSON for every single one of them" in new ResolvedServiceTestContext {
-      val exampleProvider = ExampleJson.allFields(resultService)
+      val exampleProvider = ExampleJson(resultService, Selection.All, MurmurRandomStringGenerator)
       resultService.models.foreach { model =>
         val exampleProvided = exampleProvider.sample(model.name).isDefined
         assert(exampleProvided, s"// it should provide an example for ${model.name}")
@@ -110,7 +110,7 @@ class ServiceImportResolverSpec extends WordSpec with Matchers {
     }
 
     "prepare unions in a way, which enables ExampleJson to prepare a sample JSON for every single one of them" in new ResolvedServiceWithUnionsTestContext {
-      val exampleProvider = ExampleJson.allFields(resultService)
+      val exampleProvider = ExampleJson(resultService, Selection.All, MurmurRandomStringGenerator)
       resultService.unions.foreach { union =>
         val exampleProvided = exampleProvider.sample(union.name).isDefined
         assert(exampleProvided, s"// it should provide an example for ${union.name}")

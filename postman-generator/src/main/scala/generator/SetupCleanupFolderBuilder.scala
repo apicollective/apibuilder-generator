@@ -2,7 +2,6 @@ package generator
 
 import akka.http.scaladsl.model.StatusCodes
 import examples.ExampleJson
-import generator.PostmanCollectionGenerator.Constants
 import io.apibuilder.spec.v0.models.{Operation, Parameter, ParameterLocation}
 import io.flow.postman.v0.models.{Folder, Item}
 import models.attributes.PostmanAttributes.ExtendedObjectReference
@@ -43,8 +42,8 @@ object SetupCleanupFolderBuilder {
     val setupSteps = setupItemToCleanupItemOpts.map(_._1)
     val cleanupSteps = setupItemToCleanupItemOpts.flatMap(_._2)
 
-    val setupFolderOpt = wrapInFolder(setupSteps, Constants.EntitiesSetup)
-    val cleanupFolderOpt = wrapInFolder(cleanupSteps, Constants.EntitiesCleanup)
+    val setupFolderOpt = wrapInFolder(setupSteps, PostmanGeneratorConstants.EntitiesSetup)
+    val cleanupFolderOpt = wrapInFolder(cleanupSteps, PostmanGeneratorConstants.EntitiesCleanup)
 
     setupFolderOpt -> cleanupFolderOpt
   }

@@ -2,7 +2,6 @@ package generator
 
 import examples.ExampleJson
 import generator.Heuristics.PathVariable
-import generator.PostmanCollectionGenerator.Constants
 import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
 import io.flow.postman.v0.{models => postman}
@@ -76,9 +75,9 @@ object PostmanItemBuilder extends Logging {
       }
 
     val postmanUrl = postman.Url(
-      raw = Some(s"{{${Constants.BaseUrl}}}" + operation.path),
+      raw = Some(s"{{${PostmanGeneratorConstants.BaseUrl}}}" + operation.path),
       protocol = None,
-      host = Some(Seq(s"{{${Constants.BaseUrl}}}")),
+      host = Some(Seq(s"{{${PostmanGeneratorConstants.BaseUrl}}}")),
       path = Some(operation.path.stripPrefix("/").split('/').toSeq),
       query = Some(queryParams),
       variable = Some(pathParams)

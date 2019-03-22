@@ -1,0 +1,6 @@
+package testUtils
+
+import examples.MurmurRandomStringGenerator
+import generator.PostmanCollectionGenerator
+
+object TestPostmanCollectionGenerator extends PostmanCollectionGenerator(MurmurRandomStringGenerator)

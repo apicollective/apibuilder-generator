@@ -405,7 +405,7 @@ object Generators {
         language = Some("json")
       ),
       status = lib.generator.Status.InDevelopment,
-      codeGenerator = Some(generator.PostmanCollectionGenerator)
+      codeGenerator = Some(generator.PostmanCollectionGeneratorImpl)
     )
   ).sortBy(_.metaData.key)
 }

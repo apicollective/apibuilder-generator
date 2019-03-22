@@ -4,6 +4,7 @@ import io.apibuilder.generator.v0.models.InvocationForm
 import models.TestHelper._
 import org.scalatest.WordSpec
 import play.api.libs.json._
+import testUtils.TestPostmanCollectionGenerator
 
 import scala.io.Source
 
@@ -21,7 +22,7 @@ class FileInputOutputGeneratorTests extends WordSpec {
       val parsedService = service(inputFile)
 
       val invocationForm = InvocationForm(parsedService, importedServices = None)
-      val result = PostmanCollectionGenerator.invoke(invocationForm)
+      val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
       val files = result.getOrElse(fail("Generator invoke failure"))
       val str = files.head.contents
