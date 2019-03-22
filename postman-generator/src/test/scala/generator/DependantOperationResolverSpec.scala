@@ -35,12 +35,6 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
     }
 
     "resolve second level dependencies (dependency has its own dependency) in the right order" in new TestCtxWithImportedService {
-      val objRef2AttrValue = ObjectReference(
-        relatedServiceNamespace = referenceApiService.namespace,
-        resourceType = "group",
-        operationMethod = Method("GET"),
-        identifierField = "members[0].age_group"
-      )
       val dependency2Target = getTargetOperation(referenceApiService, objRef2AttrValue)
       val testReferenceApiService = addAttributeToModelField(referenceApiService, "member", "role", objRef2AttrValue)
 
@@ -60,7 +54,8 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       val objRefToThirdServiceAttrValue = ObjectReference(
         relatedServiceNamespace = generatorApiServiceWithUnionWithoutDescriminator.namespace,
         resourceType = "user",
-        operationMethod = Method("POST"),
+        operationMethod = Method.Post,
+        operationPath = "/users",
         identifierField = "guid"
       )
       val dependencyToThirdServiceTarget = {
@@ -123,6 +118,36 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       ).toExtended
     }
 
+    "resolve a dependency bound to the resource path" in new TestCtxWithAttrFromResourcePath {
+      val resolvedService = ServiceImportResolver.resolveService(testMainService, Seq(referenceApiService))
+      val result = DependantOperationResolver.resolve(resolvedService)
+
+      result should === (List(objectRef1AttrValue.toExtended -> dependency1Target))
+    }
+
+    "resolve a nested dependency bound to the body of the operation referenced by the resource path attribute" in new TestCtxWithAttrFromResourcePath {
+      val dependency2Target = getTargetOperation(updatedReferenceApiService, objRef2AttrValue)
+      val testReferenceApiService = addAttributeToModelField(updatedReferenceApiService, "member", "role", objRef2AttrValue)
+
+      val resolvedService = ServiceImportResolver.resolveService(testMainService, Seq(testReferenceApiService))
+      val result = DependantOperationResolver.resolve(resolvedService)
+
+      val dep1Target = {
+        val dependantOperations = getTargetOperation(testReferenceApiService, objectRef1AttrValue)
+        val referencedOperation = dependantOperations.referencedOperation
+        val updatedBody = referencedOperation.body.get.copy(`type` = objectRef1AttrValue.relatedServiceNamespace + ".models." + referencedOperation.body.get.`type`)
+        val updatedReferencedOperation = referencedOperation.copy(body = Some(updatedBody))
+        dependantOperations.copy(referencedOperation = updatedReferencedOperation)
+      }
+
+      val expected: Seq[(ExtendedObjectReference, DependantOperations)] = Seq(
+        objRef2AttrValue -> dependency2Target,
+        objectRef1AttrValue -> dep1Target
+      ).toExtended
+
+      result should contain allElementsOf expected
+    }
+
   }
 
   implicit class SeqObjectRefOperationExtend(seq: Seq[(ObjectReference, DependantOperations)]) {
@@ -131,21 +156,6 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
         case (ref, op) => (ref.toExtended, op)
       }
     }
-  }
-
-  private def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): DependantOperations = {
-    val targetResource =
-      targetService
-        .resources.find(_.`type` === objRefAttrValue.resourceType).get
-
-    val referencedOp = targetResource
-      .operations.find(_.method === objRefAttrValue.operationMethod).get
-    val deleteOpOption = objRefAttrValue.deleteOperationPath.flatMap { deleteOpPath =>
-      targetResource
-        .operations.find(_.path === deleteOpPath)
-    }
-
-    DependantOperations(referencedOp, deleteOpOption)
   }
 
   private def addAttributeToModelField(service: Service, modelName: String, fieldName: String, attributeValue: ObjectReference): Service = {
@@ -177,6 +187,14 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
 
   trait TestDependencies extends TestFixtures.TrivialServiceWithImportAndDependencyCtx {
     val dependency1Target = getTargetOperation(referenceApiService, objectRef1AttrValue)
+
+    val objRef2AttrValue = ObjectReference(
+      relatedServiceNamespace = referenceApiService.namespace,
+      resourceType = "group",
+      operationMethod = Method.Get,
+      operationPath = "/groups/:organization",
+      identifierField = "members[0].age_group"
+    )
   }
 
   trait TestCtxWithImportedService extends TestDependencies with TestFixtures.TrivialServiceWithImportCtx {
@@ -188,6 +206,16 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
   trait TestCtxWithTwoImportedServices extends TestDependencies with TestFixtures.TrivialServiceWithTwoImportsCtx {
     val testMainServiceWithTwoImports = trivialServiceWithTwoImports.copy(
       models = Seq(modelWithDependency)
+    )
+  }
+
+  trait TestCtxWithAttrFromResourcePath extends TestDependencies {
+    val resourceWithImportedEnumAndObjRef = resourceWithImportedEnum.copy(
+      attributes = Seq(objectRef1Attribute)
+    )
+    val indexOfLastResource = trivialServiceWithImport.resources.length - 1
+    val testMainService = trivialServiceWithImport.copy(
+      resources = trivialServiceWithImport.resources.updated(indexOfLastResource, resourceWithImportedEnumAndObjRef)
     )
   }
 

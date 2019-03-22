@@ -18,7 +18,9 @@ object PostmanAttributes {
     relatedServiceNamespace: String,
     resourceType: String,
     operationMethod: io.apibuilder.spec.v0.models.Method,
+    operationPath: String,
     identifierField: String,
+    queryParams: Option[Map[String, String]],
     deleteOperationPath: Option[String],
     postmanVariableName: PostmanVariableName
   )
@@ -33,7 +35,9 @@ object PostmanAttributes {
       relatedServiceNamespace = objRef.relatedServiceNamespace,
       resourceType = objRef.resourceType,
       operationMethod = objRef.operationMethod,
+      operationPath = objRef.operationPath,
       identifierField = objRef.identifierField,
+      queryParams = objRef.queryParams,
       deleteOperationPath = objRef.deleteOperationPath,
       postmanVariableName = postmanVariableNameFrom(objRef)
     )

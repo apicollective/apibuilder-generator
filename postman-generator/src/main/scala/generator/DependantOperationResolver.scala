@@ -3,6 +3,7 @@ package generator
 import io.apibuilder.spec.v0.models._
 import io.flow.postman.generator.attributes.v0.models.json._
 import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
+import lib.Datatype.Primitive
 import models.AttributeValueReader
 import models.service.ResolvedService
 import org.scalactic.TripleEquals._
@@ -50,6 +51,15 @@ object DependantOperationResolver extends Logging {
       }
     }
 
+    val nestedAttributesFromResourceRefs = for {
+      attribute <- attributesFromResources
+      dependantOperations <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
+      updatedReferencedOp = addNamespaceToOperationBodyIfNecessary(resolvedService, dependantOperations.referencedOperation, attribute.relatedServiceNamespace)
+      body <- updatedReferencedOp.body.toSeq
+      attribute <- deepSearchModelsForAttributes(body.`type`, service)
+      extendedAttribute = attribute.toExtended
+    } yield extendedAttribute
+
     val attributesFromModel = for {
       resource <- service.resources
       operation <- resource.operations
@@ -58,13 +68,13 @@ object DependantOperationResolver extends Logging {
       extendedAttribute = attribute.toExtended
     } yield extendedAttribute
 
-    val allAttributes = attributesFromResources ++ attributesFromModel
+    val allAttributes = nestedAttributesFromResourceRefs ++ attributesFromResources ++ attributesFromModel
 
     for {
       attribute <- allAttributes
       dependantOperations <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
       updatedReferencedOp =
-        addNamespaceToOperationBodyIfNecessary(resolvedService, dependantOperations.referencedOperation, attribute.relatedServiceNamespace)
+      addNamespaceToOperationBodyIfNecessary(resolvedService, dependantOperations.referencedOperation, attribute.relatedServiceNamespace)
       updatedDeleteOp = dependantOperations.deleteOperationOpt
         .map(addNamespaceToOperationBodyIfNecessary(resolvedService, _, attribute.relatedServiceNamespace))
       updatedDependantOperations = DependantOperations(updatedReferencedOp, updatedDeleteOp)
@@ -77,7 +87,7 @@ object DependantOperationResolver extends Logging {
     AttributeValueReader.findAndReadFirst[ObjectReference](field.attributes, AttributeName.ObjectReference)
   }
 
-  private def findOperationForAttribute(objRefAttr: ExtendedObjectReference, serviceNamespaceToResources: Map[String, Seq[Resource]]) = {
+  private def findOperationForAttribute(objRefAttr: ExtendedObjectReference, serviceNamespaceToResources: Map[String, Seq[Resource]]): Option[DependantOperations] = {
     serviceNamespaceToResources
       .get(key = objRefAttr.relatedServiceNamespace) match {
       case Some(resources) =>
@@ -86,10 +96,11 @@ object DependantOperationResolver extends Logging {
             .filter(_.`type` === objRefAttr.resourceType)
             .flatMap(_.operations)
 
-        val referencedOperationOpt = operations.find(_.method === objRefAttr.operationMethod)
+        val referencedOperationOpt = findOperationThatEndsWithOrEquals(operations, objRefAttr.operationMethod, objRefAttr.operationPath)
+
         val deleteOperationOpt = for {
-          deleteOpPath <- objRefAttr.deleteOperationPath
-          deleteOp <- operations.find(o => o.method === Method.Delete && o.path === deleteOpPath)
+          deleteOpPath <- objRefAttr.deleteOperationPath.map(_.toLowerCase)
+          deleteOp <- findOperationThatEndsWithOrEquals(operations, Method.Delete, deleteOpPath)
         } yield deleteOp
 
         referencedOperationOpt.map { referencedOperation =>
@@ -101,41 +112,48 @@ object DependantOperationResolver extends Logging {
     }
   }
 
+  private def findOperationThatEndsWithOrEquals(operations: Seq[Operation], method: Method, pathSuffix: String): Option[Operation] = {
+    operations.find { o =>
+      o.method === method &&
+        (o.path.toLowerCase.endsWith(pathSuffix.toLowerCase()) || o.path.equalsIgnoreCase(pathSuffix))
+    }
+  }
+
   private def deepSearchModelsForAttributes(typ: String, service: Service): Seq[ObjectReference] = {
 
-      def recurSearch(typ: String): Seq[ObjectReference] = {
-        service.models.find(_.name === typ) match {
-          case Some(model) =>
-            model.fields.flatMap {
-              // model have fields with another models, going deeper
-              case field if service.models.exists(_.name === field.`type`) =>
-                recurSearch(field.`type`)
-              // model is a "leaf", searching for special attribute
-              case field =>
-                val objRefAttrOpt = findReferenceAttributeInModelField(field)
+    def recurSearch(typ: String): Seq[ObjectReference] = {
+      service.models.find(_.name === typ) match {
+        case Some(model) =>
+          model.fields.flatMap {
+            // model have fields with another models, going deeper
+            case field if service.models.exists(_.name === field.`type`) =>
+              recurSearch(field.`type`)
+            // model is a "leaf", searching for special attribute
+            case field =>
+              val objRefAttrOpt = findReferenceAttributeInModelField(field)
 
-                objRefAttrOpt match {
-                  case Some(objAttrRef) =>
-                    val modelToLookup =
-                      if (objAttrRef.relatedServiceNamespace != service.namespace)
-                        s"${objAttrRef.relatedServiceNamespace}.models.${objAttrRef.resourceType}"
-                      else
-                        objAttrRef.resourceType // namespace from the main service, plain model name
-                    // adding and going recursive
-                    recurSearch(modelToLookup) :+ objAttrRef
-                  case None =>
-                    Nil
-                }
-            }
-          case None if service.unions.exists(_.name === typ) =>
-            val union = service.unions.find(_.name === typ).get
-            union.types.flatMap(u => recurSearch(u.`type`))
-          case _ =>
-            Nil
-        }
+              objRefAttrOpt match {
+                case Some(objAttrRef) =>
+                  val modelToLookup =
+                    if (objAttrRef.relatedServiceNamespace != service.namespace)
+                      s"${objAttrRef.relatedServiceNamespace}.models.${objAttrRef.resourceType}"
+                    else
+                      objAttrRef.resourceType // namespace from the main service, plain model name
+                  // adding and going recursive
+                  recurSearch(modelToLookup) :+ objAttrRef
+                case None =>
+                  Nil
+              }
+          }
+        case None if service.unions.exists(_.name === typ) =>
+          val union = service.unions.find(_.name === typ).get
+          union.types.flatMap(u => recurSearch(u.`type`))
+        case _ =>
+          Nil
       }
+    }
 
-      recurSearch(typ)
+    recurSearch(typ)
   }
 
   private def findParameterInPathString(path: String): Option[Parameter] = {
@@ -149,7 +167,7 @@ object DependantOperationResolver extends Logging {
     firstParameterNameOpt.map { paramName =>
       Parameter(
         name = paramName,
-        `type` = "string",
+        `type` = Primitive.String.name,
         location = ParameterLocation.Path,
         required = true
       )

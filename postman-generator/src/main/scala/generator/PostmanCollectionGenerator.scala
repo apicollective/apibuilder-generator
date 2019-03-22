@@ -13,12 +13,11 @@ import models.service.ResolvedService
 import play.api.libs.json.Json
 import Utils._
 import io.flow.postman.v0.models.{Folder, Item}
-import org.scalactic.TripleEquals._
+import lib.Datatype.Primitive
 
 object PostmanCollectionGenerator extends CodeGenerator {
 
   import scala.languageFeature.implicitConversions._
-  import models.attributes.PostmanAttributes._
 
   object Constants {
     val BaseUrl = "BASE_URL"
@@ -85,8 +84,10 @@ object PostmanCollectionGenerator extends CodeGenerator {
         )
       }
 
+    val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
+
     val (entitiesSetupFolderOpt, entitiesCleanupFolderOpt) =
-      prepareDependantEntitiesSetupAndCleanup(resolvedService, serviceSpecificHeaders, examplesProvider)
+      SetupCleanupFolderBuilder.prepareDependantEntitiesSetupAndCleanup(objReferenceAttrToOperationTuples, serviceSpecificHeaders, examplesProvider)
 
     val postmanCollectionFolders = for {
       resource <- service.resources
@@ -112,7 +113,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
         Utils.Variable(
           key = Constants.BaseUrl,
           value = baseUrl.getOrElse(""),
-          `type` = "string"
+          `type` = Primitive.String.name
         )
       ),
       auth = basicAuthOpt,
@@ -120,7 +121,7 @@ object PostmanCollectionGenerator extends CodeGenerator {
     )
   }
 
-  def prepareHeuristicPathVar(resource: Resource): Option[PathVariable] = {
+  private def prepareHeuristicPathVar(resource: Resource): Option[PathVariable] = {
     Heuristics
       .idFieldHeuristic(resource)
       .map {
@@ -128,144 +129,16 @@ object PostmanCollectionGenerator extends CodeGenerator {
       }
   }
 
-  def prepareOperations(
+  private def prepareOperations(
     resource: Resource,
     pathVariableOpt: Option[PathVariable],
     serviceSpecificHeaders: Seq[postman.Header],
-    examplesProvider: ExampleJson) = {
+    examplesProvider: ExampleJson): Seq[Item] = {
 
     resource
       .operations
       .map(PostmanItemBuilder.build(_, serviceSpecificHeaders, examplesProvider, pathVariableOpt))
-      .map(addItemTests)
-  }
-
-  /**
-    * Prepares dependant entities setup phase.
-    *
-    * @param resolvedService Service with all imports at hand.
-    * @param serviceSpecificHeaders Service specific headers.
-    * @param examplesProvider Examples generator.
-    * @return Tuple of options of dependant entities setup and cleanup folders for Postman.
-    */
-  def prepareDependantEntitiesSetupAndCleanup(
-    resolvedService          : ResolvedService,
-    serviceSpecificHeaders   : Seq[postman.Header],
-    examplesProvider         : ExampleJson
-  ): (Option[Folder], Option[Folder]) = {
-    val objReferenceAttrToOperationTuples = DependantOperationResolver.resolve(resolvedService)
-
-    val setupItemToCleanupItemOpts = objReferenceAttrToOperationTuples.map {
-      case (objRefAttr, operation) =>
-
-        val setupItem = PostmanItemBuilder.build(operation.referencedOperation, serviceSpecificHeaders, examplesProvider, None)
-        val setupItemWithTests = addItemTests(setupItem)
-        val setupWithTestsAndVar = addDependencyItemVarSetting(objRefAttr, setupItemWithTests, None)
-
-        val deleteItemOpt = operation.deleteOperationOpt
-            .map(prepareDeleteOpWithFilledParam(objRefAttr, _, serviceSpecificHeaders, examplesProvider))
-
-        setupWithTestsAndVar -> deleteItemOpt
-    }
-
-    val setupSteps = setupItemToCleanupItemOpts.map(_._1)
-    val cleanupSteps = setupItemToCleanupItemOpts.flatMap(_._2)
-
-    val setupFolderOpt = wrapInFolderIfNotEmpty(setupSteps, Constants.EntitiesSetup)
-    val cleanupFolderOpt = wrapInFolderIfNotEmpty(cleanupSteps, Constants.EntitiesCleanup)
-
-    setupFolderOpt -> cleanupFolderOpt
-  }
-
-  private def addItemTests(item: postman.Item): postman.Item = {
-
-    val method = item.request.method.getOrElse("").toString.toUpperCase
-    if (Seq("GET", "PUT", "POST").contains(method)) {
-      val test = PredefinedCollectionItems.testEventResponseStatusOk(
-        f"$method requests should return 2xx"
-      )
-      item.copy(event = Option(item.event.toSeq.flatten :+ test))
-    } else {
-      item
-    }
-  }
-
-  private def addDependencyItemVarSetting(objRefAttr: ExtendedObjectReference, item: postman.Item, varNameOpt: Option[String]): postman.Item = {
-
-    val varName = objRefAttr.postmanVariableName.name
-
-    val scriptExecFragment = Seq(
-      """var jsonData = JSON.parse(responseBody);""",
-      s"""var id = jsonData["${objRefAttr.identifierField}"];""",
-      s"""if (id != null) pm.environment.set("$varName", id);"""
-    )
-    item.event
-      .getOrElse(Seq.empty)
-      .find(_.listen === postman.EventType.Test) match {
-      case Some(testEvent) =>
-        val updatedScript = testEvent.script.map(_.copy(
-          exec = testEvent.script.map(_.exec ++ scriptExecFragment).getOrElse(Seq.empty)
-        ))
-        val updatedTestEvent = testEvent.copy(script = updatedScript)
-        val updatedEvents =
-          item.event.getOrElse(Seq.empty)
-            .filterNot(_.listen === postman.EventType.Test) :+ updatedTestEvent
-        item.copy(event = Some(updatedEvents))
-      case None =>
-        val eventToAdd = postman.Event(
-          listen = postman.EventType.Test,
-          script = Some(postman.Script(
-            exec = scriptExecFragment
-          ))
-        )
-        item.copy(event = Some(Seq(eventToAdd)))
-    }
-  }
-
-  private def prepareDeleteOpWithFilledParam(
-    objRefAttr: ExtendedObjectReference,
-    deleteOperation: Operation,
-    serviceSpecificHeaders: Seq[postman.Header],
-    examplesProvider: ExampleJson): Item = {
-
-    val (pathParameters, otherParams) = deleteOperation.parameters.partition(_.location === ParameterLocation.Path)
-    val filledPathParameters = pathParameters match {
-      case params if pathParameters.nonEmpty =>
-        val updatedLast = params.lastOption.get.copy(example = Some(objRefAttr.postmanVariableName.reference))
-        params.init :+ updatedLast
-      case _ =>
-        val rawPathParamOpt =
-          deleteOperation
-            .path
-            .split('/')
-            .reverse
-            .find(_.startsWith(":"))
-            .map(_.stripPrefix(":"))
-
-        rawPathParamOpt.map { rawPathParam =>
-          Parameter(
-            name = rawPathParam,
-            `type` = "string",
-            location = ParameterLocation.Path,
-            example = Some(objRefAttr.postmanVariableName.reference),
-            required = true
-          )
-        }.toSeq
-    }
-    val filledDeleteOp = deleteOperation.copy(parameters = filledPathParameters ++ otherParams)
-
-    val postmanItem = PostmanItemBuilder.build(filledDeleteOp, serviceSpecificHeaders, examplesProvider, None)
-    addItemTests(postmanItem)
-  }
-
-  private def wrapInFolderIfNotEmpty(items: Seq[Item], folderName: String): Option[Folder] = {
-    if (items.nonEmpty) {
-      Some(
-        postman.Folder(
-          name = folderName,
-          item = items
-        ))
-    } else None
+      .map(PredefinedCollectionItems.addItemTests)
   }
 
   private def writePostmanCollectionToFile(service: Service, postmanCollection: postman.Collection): File = {

@@ -3,7 +3,10 @@ package generator
 import io.apibuilder.spec.v0.models._
 import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
 import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesObjectReference
+import lib.Datatype.Primitive
+import models.operation.DependantOperations
 import play.api.libs.json.{JsObject, Json}
+import org.scalactic.TripleEquals._
 
 object TestFixtures {
 
@@ -25,7 +28,7 @@ object TestFixtures {
           fields = Seq(
             Field(
               name = "value",
-              `type` = "string",
+              `type` = Primitive.String.name,
               example = Some("something"),
               required = true
             )
@@ -48,6 +51,21 @@ object TestFixtures {
       ),
       baseUrl = Some("https://some.service.com")
     )
+
+    def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): DependantOperations = {
+      val targetResource =
+        targetService
+          .resources.find(_.`type` === objRefAttrValue.resourceType).get
+
+      val referencedOp = targetResource
+        .operations.find(_.method === objRefAttrValue.operationMethod).get
+      val deleteOpOption = objRefAttrValue.deleteOperationPath.flatMap { deleteOpPath =>
+        targetResource
+          .operations.find(_.path === deleteOpPath)
+      }
+
+      DependantOperations(referencedOp, deleteOpOption)
+    }
 
   }
 
@@ -116,7 +134,7 @@ object TestFixtures {
       parameters = Seq(
         Parameter(
           name = "id",
-          `type` = "string",
+          `type` = Primitive.String.name,
           location = ParameterLocation.Path,
           required = true
         )
@@ -133,7 +151,13 @@ object TestFixtures {
       resourceType = "member",
       operationMethod = Method("POST"),
       identifierField = "guid",
+      operationPath = "/members",
       deleteOperationPath = Some(extraDeleteOpPath)
+    )
+
+    val objectRef1Attribute = Attribute(
+      name = AttributeName.ObjectReference.toString,
+      value = Json.toJson(objectRef1AttrValue).as[JsObject]
     )
 
     val modelWithDependency = Model(
@@ -142,15 +166,10 @@ object TestFixtures {
       fields = Seq(
         Field(
           name = "value",
-          `type` = "string",
+          `type` = Primitive.String.name,
           example = Some("something"),
           required = true,
-          attributes = Seq(
-            Attribute(
-              AttributeName.ObjectReference.toString,
-              Json.toJson(objectRef1AttrValue).as[JsObject]
-            )
-          )
+          attributes = Seq(objectRef1Attribute)
         )
       )
     )

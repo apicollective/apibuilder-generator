@@ -74,7 +74,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});",
-                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData[\"id\"];",
+                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData.id;",
                   "if (id != null) pm.environment.set(\"organization\", id);"
                 ]
               }
@@ -146,7 +146,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});",
-                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData[\"id\"];",
+                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData.id;",
                   "if (id != null) pm.environment.set(\"catalog#id\", id);"
                 ]
               }

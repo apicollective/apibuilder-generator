@@ -86,6 +86,7 @@
                 "related_service_namespace": "io.ecorp.api.v0",
                 "resource_type": "catalog",
                 "operation_method": "POST",
+                "operation_path": "/:organization/catalog",
                 "identifier_field": "id"
               }
             }
@@ -110,6 +111,7 @@
             "related_service_namespace": "io.ecorp.api.v0",
             "resource_type": "organization",
             "operation_method": "POST",
+            "operation_path": "/organizations",
             "identifier_field": "id",
             "delete_operation_path": "/organizations/:id"
           }

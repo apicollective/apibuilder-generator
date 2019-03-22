@@ -2,8 +2,25 @@ package generator
 
 import generator.Heuristics.PathVariable
 import io.flow.postman.v0.models._
+import io.flow.postman.v0.{models => postman}
 
 object PredefinedCollectionItems {
+
+  def addItemTests(item: postman.Item): postman.Item = {
+    import Method._
+
+    val methodsToCoverWithTests = Seq(Get, Put, Post)
+    val itemMethod = item.request.method.getOrElse(UNDEFINED)
+
+    if (methodsToCoverWithTests.contains(itemMethod)) {
+      val test = PredefinedCollectionItems.testEventResponseStatusOk(
+        f"$itemMethod requests should return 2xx"
+      )
+      item.copy(event = Option(item.event.toSeq.flatten :+ test))
+    } else {
+      item
+    }
+  }
 
   def testEventResponseStatusOk(testTitle: String): Event = {
     Event(
