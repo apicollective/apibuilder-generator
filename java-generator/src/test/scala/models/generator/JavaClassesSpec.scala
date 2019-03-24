@@ -247,7 +247,9 @@ class JavaClassesSpec extends FunSpec with Matchers with MockitoSugar {
     sourceFile.contents.size shouldBe > (0)
     val javaName = sourceFile.name.split(Pattern.quote(".")).head
     javaName.length shouldBe > (0)
-    val compilationUnit = JavaParser.parse(sourceFile.contents)
+    val parseResult = new JavaParser().parse(sourceFile.contents)
+    parseResult.isSuccessful shouldBe true
+    val compilationUnit = parseResult.getResult.get
     compilationUnit.getType(0).getNameAsString shouldBe javaName
   }
 }

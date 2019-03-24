@@ -179,8 +179,9 @@ class AwsLambdaJavaPOJOClassesSpec
     files(0).name should be("CarType.java")
     files(1).name should be("Model.java")
 
-    val carTypeCompiled = JavaParser.parse(files(0).contents)
-    val modelCompiled = JavaParser.parse(files(1).contents)
+    val javaParser = new JavaParser()
+    val carTypeCompiled = javaParser.parse(files(0).contents).getResult.get
+    val modelCompiled = javaParser.parse(files(1).contents).getResult.get
 
     val javaAnnotations = modelCompiled.findAll(classOf[NormalAnnotationExpr])
     val annotations: Set[String] = (for(i <- 0 until javaAnnotations.size()) yield javaAnnotations.get(i).getNameAsString).toSet
