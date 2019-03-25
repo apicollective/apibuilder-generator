@@ -1,7 +1,7 @@
 package generator
 
-import io.flow.postman.v0.models.Description
-import io.flow.postman.v0.{models => postman}
+import io.apibuilder.postman.collection.v21.v0.models.Description
+import io.apibuilder.postman.collection.v21.v0.{models => postman}
 
 object Utils {
 

@@ -1,8 +1,8 @@
 package generator
 
 import io.apibuilder.spec.v0.models._
-import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
-import io.flow.postman.generator.attributes.v0.models.json._
+import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
+import io.postman.generator.attributes.v0.models.json._
 import models.attributes.PostmanAttributes._
 import models.operation.DependantOperations
 import org.scalatest.{Matchers, WordSpec}

@@ -4,8 +4,8 @@ import java.util.UUID
 
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.spec.v0.models.json._
-import io.flow.postman.generator.attributes.v0.models.{AttributeName, ObjectReference, ValueSubstitute}
-import io.flow.postman.generator.attributes.v0.models.json.{jsonReadsPostmanGeneratorAttributesObjectReference, jsonReadsPostmanGeneratorAttributesValueSubstitute}
+import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference, ValueSubstitute}
+import io.postman.generator.attributes.v0.models.json.{jsonReadsPostmanGeneratorAttributesObjectReference, jsonReadsPostmanGeneratorAttributesValueSubstitute}
 import models.AttributeValueReader
 import models.attributes.PostmanAttributes.ObjectReferenceExtend
 import org.joda.time.{DateTime, LocalDate}

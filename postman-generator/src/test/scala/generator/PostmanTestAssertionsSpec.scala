@@ -1,8 +1,8 @@
 package generator
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.flow.postman.v0.models._
-import io.flow.postman.v0.models.json.jsonReadsPostmanCollection
+import io.apibuilder.postman.collection.v21.v0.models._
+import io.apibuilder.postman.collection.v21.v0.models.json.jsonReadsApiBuilderPostmanCollectionV21Collection
 import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.Json
 import testUtils.TestPostmanCollectionGenerator

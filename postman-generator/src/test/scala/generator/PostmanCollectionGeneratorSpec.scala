@@ -3,12 +3,12 @@ package generator
 import generator.Utils.Description
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Attribute
-import io.flow.postman.v0.{models => postman}
-import io.flow.postman.v0.models.json.jsonReadsPostmanCollection
-import io.flow.postman.generator.attributes.v0.models.AttributeName
-import io.flow.postman.generator.attributes.v0.models.BasicAuth
-import io.flow.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesBasicAuth
-import io.flow.postman.v0.models.Method
+import io.apibuilder.postman.collection.v21.v0.{models => postman}
+import io.apibuilder.postman.collection.v21.v0.models.json.jsonReadsApiBuilderPostmanCollectionV21Collection
+import io.postman.generator.attributes.v0.models.AttributeName
+import io.postman.generator.attributes.v0.models.BasicAuth
+import io.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesBasicAuth
+import io.apibuilder.postman.collection.v21.v0.models.Method
 import org.scalatest.{Assertion, Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
 import testUtils.TestPostmanCollectionGenerator

@@ -5,14 +5,14 @@ import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import lib.generator.CodeGenerator
-import io.flow.postman.generator.attributes.v0.models._
-import io.flow.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesBasicAuth
-import io.flow.postman.v0.{models => postman}
-import io.flow.postman.v0.models.json._
+import io.postman.generator.attributes.v0.models._
+import io.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesBasicAuth
+import io.apibuilder.postman.collection.v21.v0.{models => postman}
+import io.apibuilder.postman.collection.v21.v0.models.json._
 import models.service.ResolvedService
 import play.api.libs.json.Json
 import Utils._
-import io.flow.postman.v0.models.{Folder, Item}
+import io.apibuilder.postman.collection.v21.v0.models.{Folder, Item}
 import lib.Datatype.Primitive
 
 class PostmanCollectionGenerator(randomStringGenerator: RandomStringGenerator) extends CodeGenerator {

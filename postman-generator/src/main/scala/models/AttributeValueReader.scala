@@ -1,6 +1,6 @@
 package models
 
-import io.flow.postman.generator.attributes.v0.models.AttributeName
+import io.postman.generator.attributes.v0.models.AttributeName
 import _root_.play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import _root_.play.api.Logging
 import io.apibuilder.spec.v0.models.Attribute

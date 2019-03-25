@@ -13,8 +13,7 @@ code:
       generators:
         play_2_6_client: generated/app
         play_2_x_routes: generator/conf/routes
-  flow:
-    postman:
+    apibuilder-postman-collection-v2-1:
       version: latest
       generators:
         play_2_x_json: generated/app
@@ -22,5 +21,3 @@ code:
       version: latest
       generators:
         play_2_x_json: generated/app
-
-  

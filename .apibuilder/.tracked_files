@@ -11,10 +11,9 @@ apicollective:
     - generated/app/ApicollectiveApibuilderGeneratorV0Client.scala
     play_2_x_routes:
     - generator/conf/routes
-flow:
-  postman:
+  apibuilder-postman-collection-v2-1:
     play_2_x_json:
-    - generated/app/FlowPostmanV0Models.scala
+    - generated/app/ApicollectiveApibuilderPostmanCollectionV21V0Models.scala
   postman-generator-attributes:
     play_2_x_json:
-    - generated/app/FlowPostmanGeneratorAttributesV0Models.scala
+    - generated/app/ApicollectivePostmanGeneratorAttributesV0Models.scala

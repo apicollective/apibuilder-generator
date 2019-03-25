@@ -2,7 +2,7 @@ package generator
 
 import examples.{ExampleJson, MurmurRandomStringGenerator, Selection}
 import generator.TestFixtures.TrivialServiceWithImportAndDependencyCtx
-import io.flow.postman.v0.models.{EventType, Folder, Header}
+import io.apibuilder.postman.collection.v21.v0.models.{EventType, Folder, Header}
 import models.attributes.PostmanAttributes.ExtendedObjectReference
 import models.operation.DependantOperations
 import org.scalatest.{Assertion, Matchers, WordSpec}

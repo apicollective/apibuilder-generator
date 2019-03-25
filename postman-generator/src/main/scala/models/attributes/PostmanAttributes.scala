@@ -1,7 +1,7 @@
 package models.attributes
 
 import io.apibuilder.spec.v0.models.Parameter
-import io.flow.postman.generator.attributes.v0.models.ObjectReference
+import io.postman.generator.attributes.v0.models.ObjectReference
 
 import scala.language.implicitConversions
 

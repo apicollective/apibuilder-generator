@@ -3,7 +3,7 @@ package generator
 import examples.ExampleJson
 import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
-import io.flow.postman.v0.{models => postman}
+import io.apibuilder.postman.collection.v21.v0.{models => postman}
 import org.scalatest.{Assertion, Matchers, WordSpec}
 import play.api.libs.json.{JsString, JsValue, Json}
 

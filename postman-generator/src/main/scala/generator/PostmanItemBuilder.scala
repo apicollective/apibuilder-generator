@@ -4,7 +4,7 @@ import examples.ExampleJson
 import generator.Heuristics.PathVariable
 import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
-import io.flow.postman.v0.{models => postman}
+import io.apibuilder.postman.collection.v21.v0.{models => postman}
 import models.attributes.PostmanAttributes
 import org.scalactic.TripleEquals._
 import play.api.Logging
