@@ -35,7 +35,7 @@
     },
 
     "object_reference": {
-      "description": "Attribute instructs the generator to add a setup step with the referenced entity creation. This attribute should be attached to the field (that holds an identifier) inside model or to the resource path (that holds one path param).",
+      "description": "Attribute instructs the generator to add a setup step with the referenced entity creation. This attribute should be attached to the field (that holds an identifier) inside model or to the resource object (that holds operations and a path with an identifier param).",
       "fields": [
         {
           "name": "related_service_namespace",
