@@ -1,8 +1,6 @@
 package generator
 
-
 import io.apibuilder.spec.v0.models.Resource
-
 
 object Heuristics {
 
@@ -15,7 +13,7 @@ object Heuristics {
 
   def idFieldHeuristic(resource: Resource): Option[String] = {
     val pathsWithOperation = resource.operations.flatMap { operation =>
-      findPathParams(operation.path)
+      PathParamsFinder.find(operation.path)
         .map(param => (param, resource))
     }
     pathsWithOperation
@@ -26,11 +24,4 @@ object Heuristics {
       .headOption
   }
 
-  def findPathParams(path: String): Seq[String] = {
-    val regex = """\:(\w+)[\/]{0,1}""".r
-    regex
-      .findAllIn(path)
-      .map(str => regex.replaceAllIn(str, "$1"))
-      .toList
-  }
 }

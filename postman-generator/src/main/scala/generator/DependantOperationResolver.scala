@@ -157,12 +157,7 @@ object DependantOperationResolver extends Logging {
   }
 
   private def findParameterInPathString(path: String): Option[Parameter] = {
-    val regex = """\:(\w+)[\/]{0,1}""".r
-    val firstParameterNameOpt = regex
-      .findAllIn(path)
-      .map(str => regex.replaceAllIn(str, "$1"))
-      .toList
-      .headOption //TODO investigate few params like ":organization/order/:id" in one resource path. Is it valid/used anywhere ?
+    val firstParameterNameOpt = PathParamsFinder.find(path).headOption
 
     firstParameterNameOpt.map { paramName =>
       Parameter(

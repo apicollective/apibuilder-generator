@@ -6,10 +6,6 @@ import org.scalatest.WordSpec
 class HeuristicsSpec extends WordSpec {
 
   "Postman Generator Heuristics" should {
-    "find params in path" in {
-      assert(Heuristics.findPathParams("/:organization/attributes/:key") == List("organization", "key"))
-      assert(Heuristics.findPathParams("/:organization/attributes/:key/:abc") == List("organization", "key", "abc"))
-    }
 
     "find an identifier param in a group of paths" in {
       val op1 = Operation(Method.Get, "/:organization/attributes/:key")
