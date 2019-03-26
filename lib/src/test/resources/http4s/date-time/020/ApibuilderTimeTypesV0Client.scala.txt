@@ -280,9 +280,7 @@ formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
   object Client {
     import cats.effect._
 
-
     implicit def circeJsonDecoder[F[_]: Sync, A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[F, A]
-
 
     def parseJson[F[_]: Sync, T](
       className: String,
