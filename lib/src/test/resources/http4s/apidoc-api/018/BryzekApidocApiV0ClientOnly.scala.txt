@@ -2048,11 +2048,6 @@ formBody.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
 
   package errors {
 
-    import io.apibuilder.api.v0.models.json._
-    import io.apibuilder.common.v0.models.json._
-    import io.apibuilder.generator.v0.models.json._
-    import io.apibuilder.spec.v0.models.json._
-
     final case class ErrorsResponse[F[_]: Sync](
       response: org.http4s.Response[F],
       message: Option[String] = None,

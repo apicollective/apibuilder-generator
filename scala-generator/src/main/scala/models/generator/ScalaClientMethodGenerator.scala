@@ -76,8 +76,11 @@ class ScalaClientMethodGenerator(
       Some("package errors {"),
       modelErrorClasses() match {
         case Nil => None
-        case classes => {
-          Some(JsonImports(ssd.service).mkString("\n").indent(2) + "\n\n" + classes.mkString("\n\n").indent(2))
+        case classes => Some {
+          val jsonImports =
+            if (includeJsonImportsInErrorsPackage) JsonImports(ssd.service).mkString("\n").indent(2) + "\n\n"
+            else ""
+          jsonImports + classes.mkString("\n\n").indent(2)
         }
       },
       Some(failedRequestClass().indent(2)),
@@ -99,6 +102,8 @@ class ScalaClientMethodGenerator(
       errorTypeClass(response)
     }.distinct.sorted
   }
+
+  protected def includeJsonImportsInErrorsPackage: Boolean = true
 
   protected def errorTypeClass(response: ScalaResponse): String = {
     require(!response.isSuccess)
