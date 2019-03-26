@@ -1267,9 +1267,9 @@ import io.circe.syntax._
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
-formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
-} else body.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
+      val reqAndMaybeAuthAndBody =
+        if (formBody.nonEmpty) formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
+        else body.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
 
       httpClient.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }

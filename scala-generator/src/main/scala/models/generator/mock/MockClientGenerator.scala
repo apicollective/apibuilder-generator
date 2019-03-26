@@ -151,7 +151,7 @@ class MockClientGenerator(
       s"trait Mock${resource.plural} extends ${ssd.namespaces.base}.${resource.plural} {",
       generator.methods(resource).map { m =>
         Seq(
-          m.interface + s" = ${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess} {",
+          m.interface + s" = ${config.asyncSuccessInvoke} {",
           mockImplementation(m).indent(2),
           "}"
         ).mkString("\n")
