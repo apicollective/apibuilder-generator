@@ -396,6 +396,16 @@ object Generators {
       ),
       status = lib.generator.Status.InDevelopment,
       codeGenerator = Some(scala.models.play.Play26Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "postman_collection_2_1",
+        name = "Postman Collection v2.1",
+        description = Some("Generates Postman Collection that contains every single endpoint defined in Apibuilder spec. Requests are filled with example JSON payloads."),
+        language = Some("json")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(generator.PostmanCollectionGeneratorImpl)
     )
   ).sortBy(_.metaData.key)
 }

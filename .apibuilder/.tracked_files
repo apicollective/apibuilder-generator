@@ -3,11 +3,17 @@ apicollective:
   apibuilder-common:
     play_2_x_json:
     - generated/app/ApicollectiveApibuilderCommonV0Models.scala
+  apibuilder-spec:
+    play_2_6_client:
+    - generated/app/ApicollectiveApibuilderSpecV0Client.scala
   apibuilder-generator:
     play_2_6_client:
     - generated/app/ApicollectiveApibuilderGeneratorV0Client.scala
     play_2_x_routes:
     - generator/conf/routes
-  apibuilder-spec:
-    play_2_6_client:
-    - generated/app/ApicollectiveApibuilderSpecV0Client.scala
+  apibuilder-postman-collection-v2-1:
+    play_2_x_json:
+    - generated/app/ApicollectiveApibuilderPostmanCollectionV21V0Models.scala
+  postman-generator-attributes:
+    play_2_x_json:
+    - generated/app/ApicollectivePostmanGeneratorAttributesV0Models.scala

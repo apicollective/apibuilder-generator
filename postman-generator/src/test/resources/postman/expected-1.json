@@ -1,0 +1,581 @@
+{
+  "item": [
+    {
+      "item": [
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create Organization"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+            },
+            "url": {
+              "path": [ "organizations" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [ ],
+              "raw": "{{BASE_URL}}/organizations"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create Organization"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+                },
+                "url": {
+                  "path": [ "organizations" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [ ],
+                  "raw": "{{BASE_URL}}/organizations"
+                }
+              },
+              "code": 202,
+              "name": "Example 202 - organization",
+              "header": [ ],
+              "body": "{\n  \"id\" : \"org-324324\"\n}"
+            }
+          ],
+          "name": "POST /organizations",
+          "description": {
+            "content": "Create Organization"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});",
+                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData.id;",
+                  "if (id != null) pm.environment.set(\"organization\", id);"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }, {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create catalog."
+            },
+            "header": [ ],
+            "url": {
+              "path": [ ":organization", "catalog" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: uuid  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{organization}}",
+                  "key": "organization"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:organization/catalog"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create catalog."
+                },
+                "header": [ ],
+                "url": {
+                  "path": [ ":organization", "catalog" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: uuid  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{organization}}",
+                      "key": "organization"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:organization/catalog"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": [ ]
+            }
+          ],
+          "name": "POST /:organization/catalog",
+          "description": {
+            "content": "Create catalog."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});",
+                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData.id;",
+                  "if (id != null) pm.environment.set(\"catalog#id\", id);"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }
+      ],
+      "name": "Entities Setup",
+      "type": "folder"
+    }, {
+      "item": [
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create catalog."
+            },
+            "header": [ ],
+            "url": {
+              "path": [ ":organization", "catalog" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: uuid  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{organization}}",
+                  "key": "organization"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:organization/catalog"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create catalog."
+                },
+                "header": [ ],
+                "url": {
+                  "path": [ ":organization", "catalog" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: uuid  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{organization}}",
+                      "key": "organization"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:organization/catalog"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": [ ]
+            }
+          ],
+          "name": "POST /:organization/catalog",
+          "description": {
+            "content": "Create catalog."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }, {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create order"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"catalog_id\" : \"{{catalog#id}}\"\n}"
+            },
+            "url": {
+              "path": [ ":organization", "order" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: uuid  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{organization}}",
+                  "key": "organization"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:organization/order"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create order"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"catalog_id\" : \"{{catalog#id}}\"\n}"
+                },
+                "url": {
+                  "path": [ ":organization", "order" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: uuid  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{organization}}",
+                      "key": "organization"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:organization/order"
+                }
+              },
+              "code": 200,
+              "name": "Example 200 - unit",
+              "header": [ ]
+            }
+          ],
+          "name": "POST /:organization/order",
+          "description": {
+            "content": "Create order"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }
+      ],
+      "name": "catalogs",
+      "type": "folder"
+    }, {
+      "item": [
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create Organization"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+            },
+            "url": {
+              "path": [ "organizations" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [ ],
+              "raw": "{{BASE_URL}}/organizations"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create Organization"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"parent_id\" : \"{{ORGANIZATION-PARENT}}\"\n}"
+                },
+                "url": {
+                  "path": [ "organizations" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [ ],
+                  "raw": "{{BASE_URL}}/organizations"
+                }
+              },
+              "code": 202,
+              "name": "Example 202 - organization",
+              "header": [ ],
+              "body": "{\n  \"id\" : \"org-324324\"\n}"
+            }
+          ],
+          "name": "POST /organizations",
+          "description": {
+            "content": "Create Organization"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        },
+        {
+          "description": {
+            "content": "Delete Organization"
+          },
+          "name": "DELETE /organizations/:id",
+          "request": {
+            "description": {
+              "content": "Delete Organization"
+            },
+            "header": [
+            ],
+            "method": "DELETE",
+            "url": {
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "organizations",
+                ":id"
+              ],
+              "query": [
+              ],
+              "raw": "{{BASE_URL}}/organizations/:id",
+              "variable": [
+              ]
+            }
+          },
+          "response": [
+            {
+              "code": 204,
+              "header": [
+              ],
+              "name": "Example 204 - unit",
+              "originalRequest": {
+                "description": {
+                  "content": "Delete Organization"
+                },
+                "header": [
+                ],
+                "method": "DELETE",
+                "url": {
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "organizations",
+                    ":id"
+                  ],
+                  "query": [
+                  ],
+                  "raw": "{{BASE_URL}}/organizations/:id",
+                  "variable": [
+                  ]
+                }
+              }
+            }
+          ],
+          "type": "item"
+        }
+      ],
+      "name": "organizations",
+      "type": "folder"
+    },
+    {
+      "item": [
+        {
+          "description": {
+            "content": "Delete Organization"
+          },
+          "name": "DELETE /organizations/:id",
+          "request": {
+            "description": {
+              "content": "Delete Organization"
+            },
+            "header": [
+            ],
+            "method": "DELETE",
+            "url": {
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "organizations",
+                ":id"
+              ],
+              "query": [
+              ],
+              "raw": "{{BASE_URL}}/organizations/:id",
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "key": "id",
+                  "value": "{{organization}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "code": 204,
+              "header": [
+              ],
+              "name": "Example 204 - unit",
+              "originalRequest": {
+                "description": {
+                  "content": "Delete Organization"
+                },
+                "header": [
+                ],
+                "method": "DELETE",
+                "url": {
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "organizations",
+                    ":id"
+                  ],
+                  "query": [
+                  ],
+                  "raw": "{{BASE_URL}}/organizations/:id",
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "key": "id",
+                      "value": "{{organization}}"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "type": "item"
+        }
+      ],
+      "name": "Entities Cleanup",
+      "type": "folder"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "value": "{{MY_TOKEN}}",
+        "key": "username"
+      }, {
+        "value": "",
+        "key": "password"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.ecorp.io",
+      "key": "BASE_URL"
+    }
+  ],
+  "event": [ ],
+  "info": {
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "name": "catalog",
+    "description": {},
+    "version": "0.3.47"
+  }
+}

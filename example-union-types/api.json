@@ -15,19 +15,19 @@
     },
 
     "unions": {
-	"user": {
-	    "types": [
-		{ "type": "registered_user" },
-		{ "type": "guest_user" },
-		{ "type": "uuid" }
-	    ]
-	},
-	"foobar": {
-	    "types": [
-		{ "type": "foo" },
-		{ "type": "bar" }
-	    ]
-	}
+		"user": {
+			"types": [
+			{ "type": "registered_user" },
+			{ "type": "guest_user" },
+			{ "type": "uuid" }
+			]
+		},
+		"foobar": {
+			"types": [
+			{ "type": "foo" },
+			{ "type": "bar" }
+			]
+		}
     },
 
     "models": {

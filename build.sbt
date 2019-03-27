@@ -30,8 +30,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -112,6 +112,17 @@ lazy val kotlinGenerator = project
     )
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 95.15, ScoverageKeys.coverageFailOnMinimum := true))
+
+lazy val postmanGenerator = project
+  .in(file("postman-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++=Seq(
+      "com.lihaoyi" %% "ammonite-ops" % "1.6.3",
+      "org.scalactic" %% "scalactic" % "3.0.5"
+    )
+  )
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name ~= ("apibuilder-generator-" + _),
