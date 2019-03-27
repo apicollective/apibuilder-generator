@@ -7,6 +7,7 @@ import lib.Text._
 
 import scala.models.{ApidocComments, Config}
 import scala.generator._
+import scala.util.Random
 
 object MockClientGenerator {
 
@@ -46,6 +47,27 @@ object MockClientGenerator {
 
   }
 
+  private[mock] def calculateStringLength(limitation: ScalaField.Limitation): Int = {
+    val defaultCandidate = 24L
+
+    // TODO handle Int vs Long (really String of length Int.MaxValue + 1??!)
+    //   consider some artificial upper bound of e.g. 10,000; 100,000; 1,000,000 -- to be discussed
+
+    val withLimitationApplied = limitation match {
+      case ScalaField.Limitation(None, None) => defaultCandidate
+      case ScalaField.Limitation(Some(minimum), None) => Math.max(defaultCandidate, minimum)
+      case ScalaField.Limitation(None, Some(maximum)) => Math.min(defaultCandidate, maximum)
+      case ScalaField.Limitation(Some(minimum), Some(maximum)) =>
+        if (minimum < maximum) minimum + Random.nextInt(maximum.toInt - minimum.toInt)
+        else if (minimum == maximum) minimum
+        else 0
+    }
+
+    val withZeroAsLowerBound = Math.max(0L, withLimitationApplied)
+
+    if (!withZeroAsLowerBound.isValidInt) Int.MaxValue // TODO really?!
+    else withZeroAsLowerBound.toInt
+  }
 }
 
 class MockClientGenerator(
@@ -90,9 +112,9 @@ class MockClientGenerator(
   def factoriesCode = Seq(
     "object Factories {",
     Seq(
-      "def randomString(): String = {",
-      """  "Test " + _root_.java.util.UUID.randomUUID.toString.replaceAll("-", " ")""",
-      "}"
+      """def randomString(length: _root_.scala.Int = 24): String = {""",
+      """  _root_.scala.util.Random.alphanumeric.take(length).mkString""",
+      """}"""
     ).mkString("\n").indent(2),
     Seq(
       ssd.enums.map { makeEnum },
@@ -132,7 +154,7 @@ class MockClientGenerator(
     Seq(
       s"def make${model.name}(): ${model.qualifiedName} = ${model.qualifiedName}(",
       model.fields.map { field =>
-        s"${field.name} = ${mockValue(field.datatype)}"
+        s"${field.name} = ${mockValue(field.datatype, Some(field.limitation))}"
       }.mkString(",\n").indent(2),
       ")"
     ).mkString("\n")
@@ -171,7 +193,7 @@ class MockClientGenerator(
     }
   }
 
-  def mockValue(datatype: ScalaDatatype): String = {
+  def mockValue(datatype: ScalaDatatype, limitation: Option[ScalaField.Limitation] = None): String = {
     datatype match {
       case ScalaPrimitive.Boolean => "true"
       case ScalaPrimitive.Double => "1.0"
@@ -186,7 +208,12 @@ class MockClientGenerator(
       case ScalaPrimitive.ObjectAsCirce => "Map()"
       case ScalaPrimitive.JsonValueAsPlay => "play.api.libs.json.Json.obj().asInstanceOf[play.api.libs.json.JsValue]"
       case ScalaPrimitive.JsonValueAsCirce => "io.circe.Json.obj()"
-      case ScalaPrimitive.String => "Factories.randomString()"
+      case ScalaPrimitive.String => {
+        limitation match {
+          case None => "Factories.randomString()"
+          case Some(limitationVal) => s"Factories.randomString(${MockClientGenerator.calculateStringLength(limitationVal)})"
+        }
+      }
       case ScalaPrimitive.Unit => "// unit type"
       case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
@@ -197,5 +224,4 @@ class MockClientGenerator(
       case ScalaPrimitive.Union(ns, name) => s"${ns.mock}.Factories.make$name()"
     }
   }
-
 }
