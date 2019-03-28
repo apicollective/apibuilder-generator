@@ -246,6 +246,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
     def matchersImport: String
     def httpClient: String
+    def applicationJsonMediaType: String
   }
 
   case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -256,6 +257,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override def asyncFailure: String = "fail"
     override val matchersImport: String = "\n  import Matchers._\n"
     override val httpClient: String = "asyncHttpClient"
+    override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.`application/json`"
   }
 
   case class Http4s017(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -267,6 +269,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
     override val matchersImport: String = "\n  import Matchers._\n"
     override val httpClient: String = "asyncHttpClient"
+    override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.`application/json`"
   }
 
   case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -313,6 +316,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override val httpClient: String = "httpClient"
 
     override val asyncTypeImport: String = "import cats.effect._"
+    override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.`application/json`"
   }
 
   case class Http4s020(namespace: String, baseUrl: Option[String]) extends Http4s {
@@ -363,5 +367,7 @@ implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrEl
     override def reqAndMaybeAuthAndBody: String = """val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
                                            |formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
                                            |} else body.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)""".stripMargin
+
+    override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.application.json"
   }
 }

@@ -83,7 +83,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
 
   def service()(implicit sync: Sync[F]) = org.http4s.HttpRoutes.of[F] {
     case _req @ POST -> Root / "test" if apiVersionMatch(_req) =>
-    if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {
+    if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.application.json)) {
       _req.attemptAs[PostRequest].value.flatMap{
         case Right(req) =>
           post(_req, req.id, req.model, req.enum, req.opt, req.list, req.map).flatMap {
