@@ -40,7 +40,7 @@ object SetupCleanupFolderBuilder {
     }
 
     val setupSteps = setupItemToCleanupItemOpts.map(_._1)
-    val cleanupSteps = setupItemToCleanupItemOpts.flatMap(_._2)
+    val cleanupSteps = setupItemToCleanupItemOpts.flatMap(_._2).reverse
 
     val setupFolderOpt = wrapInFolder(setupSteps, PostmanGeneratorConstants.EntitiesSetup)
     val cleanupFolderOpt = wrapInFolder(cleanupSteps, PostmanGeneratorConstants.EntitiesCleanup)

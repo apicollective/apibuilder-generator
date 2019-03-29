@@ -46,11 +46,15 @@ case class ExampleJson(
     }
   }
 
-  private[this] def makeEnum(enum: Enum, parentUnion: Option[(Union, UnionType)]): JsValue = {
-    val value: JsValue = JsString(
+  private[this] def makeEnum(enum: Enum, parentUnion: Option[(Union, UnionType)], outerField: Option[Field]): JsValue = {
+    def randomValue: JsValue = JsString(
       Random.shuffle(enum.values)
         .headOption.map(ev => ev.value.getOrElse(ev.name)).getOrElse("undefined")
     )
+    val value = outerField
+      .flatMap(field => field.example orElse field.default)
+      .map(JsString)
+      .getOrElse(randomValue)
 
     parentUnion.fold(value) { case (union, unionType) =>
       // strip any namespace prefix from model name
@@ -75,23 +79,25 @@ case class ExampleJson(
           filter { f => selection == Selection.All || f.required }.
           map { field =>
 
-            val objRefAttrOpt = AttributeValueReader.findAndReadFirst[ObjectReference](field.attributes, AttributeName.ObjectReference)
             val valueSubstituteAttrOpt = AttributeValueReader.findAndReadFirst[ValueSubstitute](field.attributes, AttributeName.ValueSubstitute)
-
-            val postmanVariableRefOpt = objRefAttrOpt.map(_.toExtended.postmanVariableName.reference)
             val valueSubstituteOpt = valueSubstituteAttrOpt.map(_.substitute)
-            val valueFromAttributesOpt = postmanVariableRefOpt orElse valueSubstituteOpt
+            val value = valueSubstituteOpt match {
+              case Some(valueSubstitute) => JsString(valueSubstitute)
+              case None =>
+                val objRefAttrOpt = AttributeValueReader.findAndReadFirst[ObjectReference](field.attributes, AttributeName.ObjectReference)
+                val postmanVariableRefOpt = objRefAttrOpt.map(_.toExtended.postmanVariableName.reference)
 
-            val value = valueFromAttributesOpt.map { valueFromAttributes =>
-              if (field.`type`.equalsIgnoreCase("string"))
-                JsString(valueFromAttributes)
-              else if (field.`type`.equalsIgnoreCase("[string]"))
-                Json.arr(JsString(valueFromAttributes))
-              else if (field.`type`.equalsIgnoreCase("map[string]"))
-                Json.obj(valueFromAttributes -> JsString("bar"))
-              else
-                mockValue(field)
-            }.getOrElse(mockValue(field))
+                postmanVariableRefOpt.map { postmanVariableRef =>
+                  if (field.`type`.equalsIgnoreCase("string"))
+                    JsString(postmanVariableRef)
+                  else if (field.`type`.equalsIgnoreCase("[string]"))
+                    Json.arr(JsString(postmanVariableRef))
+                  else if (field.`type`.equalsIgnoreCase("map[string]"))
+                    Json.obj(postmanVariableRef -> JsString("bar"))
+                  else
+                    mockValue(field)
+                }.getOrElse(mockValue(field))
+            }
 
             field.name -> value
           }: _*
@@ -159,7 +165,7 @@ case class ExampleJson(
     Primitives(typ) match {
       case None => {
         service.enums.find(_.name == typ) match {
-          case Some(e) => makeEnum(e, parentUnion)
+          case Some(e) => makeEnum(e, parentUnion, None)
           case None => {
             service.models.find(_.name == typ) match {
               case Some(m) => makeModel(m, parentUnion)
@@ -220,7 +226,7 @@ case class ExampleJson(
     Primitives(field.`type`) match {
       case None => {
         service.enums.find(_.name == field.`type`) match {
-          case Some(e) => makeEnum(e, None)
+          case Some(e) => makeEnum(e, None, Some(field))
           case None => {
             service.models.find(_.name == field.`type`) match {
               case Some(m) => makeModel(m, None)

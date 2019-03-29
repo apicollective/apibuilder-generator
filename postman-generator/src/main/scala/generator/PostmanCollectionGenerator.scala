@@ -1,6 +1,6 @@
 package generator
 
-import examples.{ExampleJson, RandomStringGenerator, ScalaRandomStringGenerator, Selection}
+import examples.{ExampleJson, RandomStringGenerator, UuidRandomStringGenerator, Selection}
 import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
@@ -152,4 +152,4 @@ class PostmanCollectionGenerator(randomStringGenerator: RandomStringGenerator) e
   }
 }
 
-object PostmanCollectionGeneratorImpl extends PostmanCollectionGenerator(ScalaRandomStringGenerator)
+object PostmanCollectionGeneratorImpl extends PostmanCollectionGenerator(UuidRandomStringGenerator)
