@@ -1913,7 +1913,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.ApplicationForm, io.apibuilder.api.v0.models.Application]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Application]("io.apibuilder.api.v0.models.Application", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -1930,7 +1930,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.ApplicationForm, io.apibuilder.api.v0.models.Application]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Application]("io.apibuilder.api.v0.models.Application", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -1960,7 +1960,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.MoveForm, io.apibuilder.api.v0.models.Application]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Application]("io.apibuilder.api.v0.models.Application", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -1997,7 +1997,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Attribute]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Attribute]("io.apibuilder.api.v0.models.Attribute", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2012,8 +2012,8 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.AttributeForm, io.apibuilder.api.v0.models.Attribute]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Attribute]("io.apibuilder.api.v0.models.Attribute", r)
-          case r if r.status.code == 401 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 401 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 201, 401, 409"))
         }
       }
@@ -2026,8 +2026,8 @@ import io.circe.syntax._
 
         _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 204 => Sync[F].pure(())
-          case r if r.status.code == 401 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 401 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 401, 404"))
         }
       }
@@ -2069,8 +2069,8 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Code]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Code]("io.apibuilder.api.v0.models.Code", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404, 409"))
         }
       }
@@ -2088,7 +2088,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.Domain, io.apibuilder.api.v0.models.Domain]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Domain]("io.apibuilder.api.v0.models.Domain", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2118,7 +2118,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.EmailVerificationConfirmationForm, Unit]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 204 => Sync[F].pure(())
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
         }
       }
@@ -2157,7 +2157,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.GeneratorService]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.GeneratorService]("io.apibuilder.api.v0.models.GeneratorService", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2172,7 +2172,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.GeneratorServiceForm, io.apibuilder.api.v0.models.GeneratorService]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.GeneratorService]("io.apibuilder.api.v0.models.GeneratorService", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2185,8 +2185,8 @@ import io.circe.syntax._
 
         _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 204 => Sync[F].pure(())
-          case r if r.status.code == 403 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 403 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 403, 404"))
         }
       }
@@ -2229,7 +2229,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.GeneratorWithService]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.GeneratorWithService]("io.apibuilder.api.v0.models.GeneratorWithService", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2288,7 +2288,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Item]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Item]("io.apibuilder.api.v0.models.Item", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2338,7 +2338,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.MembershipRequest]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.MembershipRequest]("io.apibuilder.api.v0.models.MembershipRequest", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2351,7 +2351,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, Unit]("POST", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 204 => Sync[F].pure(())
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
         }
       }
@@ -2364,7 +2364,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, Unit]("POST", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 204 => Sync[F].pure(())
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
         }
       }
@@ -2405,7 +2405,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Membership]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Membership]("io.apibuilder.api.v0.models.Membership", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2460,7 +2460,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Organization]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Organization]("io.apibuilder.api.v0.models.Organization", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2475,7 +2475,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.OrganizationForm, io.apibuilder.api.v0.models.Organization]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Organization]("io.apibuilder.api.v0.models.Organization", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2491,7 +2491,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.OrganizationForm, io.apibuilder.api.v0.models.Organization]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Organization]("io.apibuilder.api.v0.models.Organization", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2538,7 +2538,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.AttributeValue]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.AttributeValue]("io.apibuilder.api.v0.models.AttributeValue", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2556,8 +2556,8 @@ import io.circe.syntax._
         _executeRequest[io.apibuilder.api.v0.models.AttributeValueForm, io.apibuilder.api.v0.models.AttributeValue]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.AttributeValue]("io.apibuilder.api.v0.models.AttributeValue", r)
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.AttributeValue]("io.apibuilder.api.v0.models.AttributeValue", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 201, 404, 409"))
         }
       }
@@ -2571,8 +2571,8 @@ import io.circe.syntax._
 
         _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 204 => Sync[F].pure(())
-          case r if r.status.code == 401 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 401 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 401, 404"))
         }
       }
@@ -2589,7 +2589,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.PasswordResetRequest, Unit]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 204 => Sync[F].pure(())
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
         }
       }
@@ -2606,7 +2606,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.PasswordReset, io.apibuilder.api.v0.models.PasswordResetSuccess]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.PasswordResetSuccess]("io.apibuilder.api.v0.models.PasswordResetSuccess", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2647,7 +2647,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Subscription]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Subscription]("io.apibuilder.api.v0.models.Subscription", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2662,7 +2662,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.SubscriptionForm, io.apibuilder.api.v0.models.Subscription]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Subscription]("io.apibuilder.api.v0.models.Subscription", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 201, 409"))
         }
       }
@@ -2710,7 +2710,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.CleartextToken]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.CleartextToken]("io.apibuilder.api.v0.models.CleartextToken", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2725,7 +2725,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.TokenForm, io.apibuilder.api.v0.models.Token]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Token]("io.apibuilder.api.v0.models.Token", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 201, 409"))
         }
       }
@@ -2772,7 +2772,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.User]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2792,7 +2792,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.User]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2807,7 +2807,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.UserForm, io.apibuilder.api.v0.models.User]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2823,7 +2823,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.UserUpdateForm, io.apibuilder.api.v0.models.User]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2876,7 +2876,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Version]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Version]("io.apibuilder.api.v0.models.Version", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -2893,7 +2893,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.VersionForm, io.apibuilder.api.v0.models.Version]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Version]("io.apibuilder.api.v0.models.Version", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2911,7 +2911,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.VersionForm, io.apibuilder.api.v0.models.Version]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Version]("io.apibuilder.api.v0.models.Version", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
         }
       }
@@ -2966,7 +2966,7 @@ import io.circe.syntax._
 
         _executeRequest[Unit, io.apibuilder.api.v0.models.Watch]("GET", path = urlPath, requestHeaders = requestHeaders) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Watch]("io.apibuilder.api.v0.models.Watch", r)
-          case r if r.status.code == 404 => Sync[F].raiseError(new errors.UnitResponse(r.status.code))
+          case r if r.status.code == 404 => Sync[F].raiseError(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
         }
       }
@@ -3001,7 +3001,7 @@ import io.circe.syntax._
 
         _executeRequest[io.apibuilder.api.v0.models.WatchForm, io.apibuilder.api.v0.models.Watch]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[F, io.apibuilder.api.v0.models.Watch]("io.apibuilder.api.v0.models.Watch", r)
-          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new errors.ErrorsResponse(r, None, body)))
+          case r if r.status.code == 409 => _root_.io.apibuilder.api.v0.Client.parseJson[F, Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", r).flatMap(body => Sync[F].raiseError(new io.apibuilder.api.v0.errors.ErrorsResponse(r.headers, r.status.code, None, body)))
           case r => Sync[F].raiseError(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 201, 409"))
         }
       }
@@ -3849,12 +3849,13 @@ formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
 
   package errors {
 
-    final case class ErrorsResponse[F[_]: Sync](
-      response: org.http4s.Response[F],
+    final case class ErrorsResponse(
+      headers: org.http4s.Headers,
+      status: Int,
       message: Option[String] = None,
       body: Seq[io.apibuilder.api.v0.models.Error]
-    ) extends Exception(message.getOrElse(response.status.code + ": " + response.body)){
-      lazy val errors = Sync[F].pure(body)
+    ) extends Exception(s"HTTP $status${message.fold("")(m => s": $m")}"){
+      lazy val errors = body
     }
 
     final case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
