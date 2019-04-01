@@ -85,7 +85,7 @@ class PostmanCollectionGenerator(randomStringGenerator: RandomStringGenerator) e
 
     val postmanCollectionFolders = for {
       resource <- service.resources
-      heuristicPathVariableOpt <- Seq(prepareHeuristicPathVar(resource))
+      heuristicPathVariableOpt = None
       postmanItems = prepareOperations(resource, heuristicPathVariableOpt, serviceSpecificHeaders, examplesProvider)
     } yield {
       postman.Folder(
@@ -115,13 +115,17 @@ class PostmanCollectionGenerator(randomStringGenerator: RandomStringGenerator) e
     )
   }
 
+
+  /*
+  Disabled for now
+  
   private def prepareHeuristicPathVar(resource: Resource): Option[PathVariable] = {
     Heuristics
       .idFieldHeuristic(resource)
       .map {
         pathVar => PathVariable(pathVar, s"${resource.plural}-$pathVar")
       }
-  }
+  }*/
 
   private def prepareOperations(
     resource: Resource,

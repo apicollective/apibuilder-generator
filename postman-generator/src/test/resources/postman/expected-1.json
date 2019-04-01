@@ -147,6 +147,150 @@
                 "exec": [
                   "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});",
                   "var jsonData = JSON.parse(responseBody);", "var id = jsonData.id;",
+                  "if (id != null) pm.environment.set(\"catalog\", id);"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }, {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create subcatalog."
+            },
+            "header": [ ],
+            "url": {
+              "path": [ ":organization", "subcatalog" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: uuid  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{organization}}",
+                  "key": "organization"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:organization/subcatalog"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create subcatalog."
+                },
+                "header": [ ],
+                "url": {
+                  "path": [ ":organization", "subcatalog" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: uuid  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{organization}}",
+                      "key": "organization"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:organization/subcatalog"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": [ ]
+            }
+          ],
+          "name": "POST /:organization/subcatalog",
+          "description": {
+            "content": "Create subcatalog."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});",
+                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData.id;",
+                  "if (id != null) pm.environment.set(\"subcatalog\", id);"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }, {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create catalog."
+            },
+            "header": [ ],
+            "url": {
+              "path": [ ":organization", "catalog" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: uuid  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{organization}}",
+                  "key": "organization"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:organization/catalog"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create catalog."
+                },
+                "header": [ ],
+                "url": {
+                  "path": [ ":organization", "catalog" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: uuid  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{organization}}",
+                      "key": "organization"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:organization/catalog"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": [ ]
+            }
+          ],
+          "name": "POST /:organization/catalog",
+          "description": {
+            "content": "Create catalog."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});",
+                  "var jsonData = JSON.parse(responseBody);", "var id = jsonData.id;",
                   "if (id != null) pm.environment.set(\"catalog#id\", id);"
                 ]
               }
@@ -216,6 +360,76 @@
           "name": "POST /:organization/catalog",
           "description": {
             "content": "Create catalog."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }, {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create subcatalog."
+            },
+            "header": [ ],
+            "url": {
+              "path": [ ":organization", "subcatalog" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: uuid  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{organization}}",
+                  "key": "organization"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:organization/subcatalog"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create subcatalog."
+                },
+                "header": [ ],
+                "url": {
+                  "path": [ ":organization", "subcatalog" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: uuid  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{organization}}",
+                      "key": "organization"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:organization/subcatalog"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": [ ]
+            }
+          ],
+          "name": "POST /:organization/subcatalog",
+          "description": {
+            "content": "Create subcatalog."
           },
           "event": [
             {
@@ -331,6 +545,94 @@
       "item": [
         {
           "request": {
+            "method": "GET",
+            "description": {
+              "content": "Get subcatalog"
+            },
+            "header": [ ],
+            "url": {
+              "path": [ ":catalog", ":subcatalog" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{catalog}}",
+                  "key": "catalog"
+                }, {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{subcatalog}}",
+                  "key": "subcatalog"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:catalog/:subcatalog"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "GET",
+                "description": {
+                  "content": "Get subcatalog"
+                },
+                "header": [ ],
+                "url": {
+                  "path": [ ":catalog", ":subcatalog" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{catalog}}",
+                      "key": "catalog"
+                    }, {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{subcatalog}}",
+                      "key": "subcatalog"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:catalog/:subcatalog"
+                }
+              },
+              "code": 200,
+              "name": "Example 200 - unit",
+              "header": [ ]
+            }
+          ],
+          "name": "GET /:catalog/:subcatalog",
+          "description": {
+            "content": "Get subcatalog"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [ "pm.test(\"GET requests should return 2xx\", function () {", "    pm.response.to.be.success;", "});" ]
+              }
+            }
+          ],
+          "type": "item"
+        }
+      ],
+      "name": "subcatalogs",
+      "type": "folder"
+    }, {
+      "item": [
+        {
+          "request": {
             "method": "POST",
             "description": {
               "content": "Create Organization"
@@ -406,145 +708,111 @@
             }
           ],
           "type": "item"
-        },
-        {
-          "description": {
-            "content": "Delete Organization"
-          },
-          "name": "DELETE /organizations/:id",
+        }, {
           "request": {
+            "method": "DELETE",
             "description": {
               "content": "Delete Organization"
             },
-            "header": [
-            ],
-            "method": "DELETE",
+            "header": [ ],
             "url": {
-              "host": [
-                "{{BASE_URL}}"
-              ],
-              "path": [
-                "organizations",
-                ":id"
-              ],
-              "query": [
-              ],
-              "raw": "{{BASE_URL}}/organizations/:id",
-              "variable": [
-              ]
+              "path": [ "organizations", ":id" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
+              "variable": [ ],
+              "raw": "{{BASE_URL}}/organizations/:id"
             }
           },
           "response": [
             {
-              "code": 204,
-              "header": [
-              ],
-              "name": "Example 204 - unit",
               "originalRequest": {
+                "method": "DELETE",
                 "description": {
                   "content": "Delete Organization"
                 },
-                "header": [
-                ],
-                "method": "DELETE",
+                "header": [ ],
                 "url": {
-                  "host": [
-                    "{{BASE_URL}}"
-                  ],
-                  "path": [
-                    "organizations",
-                    ":id"
-                  ],
-                  "query": [
-                  ],
-                  "raw": "{{BASE_URL}}/organizations/:id",
-                  "variable": [
-                  ]
+                  "path": [ "organizations", ":id" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
+                  "variable": [ ],
+                  "raw": "{{BASE_URL}}/organizations/:id"
                 }
-              }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": [ ]
             }
           ],
+          "name": "DELETE /organizations/:id",
+          "description": {
+            "content": "Delete Organization"
+          },
           "type": "item"
         }
       ],
       "name": "organizations",
       "type": "folder"
-    },
-    {
+    }, {
       "item": [
         {
-          "description": {
-            "content": "Delete Organization"
-          },
-          "name": "DELETE /organizations/:id",
           "request": {
+            "method": "DELETE",
             "description": {
               "content": "Delete Organization"
             },
-            "header": [
-            ],
-            "method": "DELETE",
+            "header": [ ],
             "url": {
-              "host": [
-                "{{BASE_URL}}"
-              ],
-              "path": [
-                "organizations",
-                ":id"
-              ],
-              "query": [
-              ],
-              "raw": "{{BASE_URL}}/organizations/:id",
+              "path": [ "organizations", ":id" ],
+              "query": [ ],
+              "host": [ "{{BASE_URL}}" ],
               "variable": [
                 {
                   "description": {
                     "content": "Type: string  | Required: true"
                   },
                   "disabled": false,
-                  "key": "id",
-                  "value": "{{organization}}"
+                  "value": "{{organization}}",
+                  "key": "id"
                 }
-              ]
+              ],
+              "raw": "{{BASE_URL}}/organizations/:id"
             }
           },
           "response": [
             {
-              "code": 204,
-              "header": [
-              ],
-              "name": "Example 204 - unit",
               "originalRequest": {
+                "method": "DELETE",
                 "description": {
                   "content": "Delete Organization"
                 },
-                "header": [
-                ],
-                "method": "DELETE",
+                "header": [ ],
                 "url": {
-                  "host": [
-                    "{{BASE_URL}}"
-                  ],
-                  "path": [
-                    "organizations",
-                    ":id"
-                  ],
-                  "query": [
-                  ],
-                  "raw": "{{BASE_URL}}/organizations/:id",
+                  "path": [ "organizations", ":id" ],
+                  "query": [ ],
+                  "host": [ "{{BASE_URL}}" ],
                   "variable": [
                     {
                       "description": {
                         "content": "Type: string  | Required: true"
                       },
                       "disabled": false,
-                      "key": "id",
-                      "value": "{{organization}}"
+                      "value": "{{organization}}",
+                      "key": "id"
                     }
-                  ]
+                  ],
+                  "raw": "{{BASE_URL}}/organizations/:id"
                 }
-              }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": [ ]
             }
           ],
+          "name": "DELETE /organizations/:id",
+          "description": {
+            "content": "Delete Organization"
+          },
           "type": "item"
         }
       ],

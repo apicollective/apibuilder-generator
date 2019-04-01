@@ -103,7 +103,7 @@
     {
       "type": "catalog",
       "plural": "catalogs",
-      "path": "/:organization/:subcatalog_id",
+      "path": "/:organization",
       "attributes": [
         {
           "name": "object-reference",
@@ -122,6 +122,31 @@
           "method": "POST",
           "description": "Create catalog.",
           "path": "/:organization/catalog",
+          "attributes": [ ],
+          "parameters": [
+            {
+              "name": "organization",
+              "type": "uuid",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "description": "Create subcatalog.",
+          "path": "/:organization/subcatalog",
           "attributes": [ ],
           "parameters": [
             {
@@ -173,7 +198,68 @@
           }
         }
       ]
-    }, {
+    },
+    {
+      "type": "subcatalog",
+      "plural": "subcatalogs",
+      "path": "/:catalog/:subcatalog",
+      "attributes": [
+        {
+          "name": "object-reference",
+          "value": {
+            "related_service_namespace": "io.ecorp.api.v0",
+            "resource_type": "catalog",
+            "operation_method": "POST",
+            "operation_path": "/:organization/catalog",
+            "identifier_field": "id"
+          }
+        },
+        {
+          "name": "object-reference",
+          "value": {
+            "related_service_namespace": "io.ecorp.api.v0",
+            "resource_type": "catalog",
+            "operation_method": "POST",
+            "operation_path": "/:organization/subcatalog",
+            "identifier_field": "id"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "GET",
+          "description": "Get subcatalog",
+          "path": "/:catalog/:subcatalog",
+          "attributes": [ ],
+          "parameters": [
+            {
+              "name": "catalog",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "subcatalog",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "organization",
       "plural": "organizations",
       "path": "",
