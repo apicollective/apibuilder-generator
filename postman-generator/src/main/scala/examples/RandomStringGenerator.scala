@@ -1,21 +1,19 @@
 package examples
 
-import scala.util.Random
+import java.util.UUID
+
 import scala.util.hashing.MurmurHash3
 
 trait RandomStringGenerator {
   def generate(seed: String): String
 }
 
-object ScalaRandomStringGenerator extends RandomStringGenerator {
+object UuidRandomStringGenerator extends RandomStringGenerator {
 
   override def generate(seed: String): String = {
-    val string = randomStringStream.take(6).mkString
-    s"lorem_ipsum_$string"
+    UUID.randomUUID().toString.toLowerCase.takeRight(12)
   }
 
-  private def randomStringStream: Stream[Char] =
-    Random.alphanumeric.dropWhile(_.isDigit)
 }
 
 object MurmurRandomStringGenerator extends RandomStringGenerator {

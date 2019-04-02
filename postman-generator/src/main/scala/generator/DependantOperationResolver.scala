@@ -68,7 +68,7 @@ object DependantOperationResolver extends Logging {
       extendedAttribute = attribute.toExtended
     } yield extendedAttribute
 
-    val allAttributes = nestedAttributesFromResourceRefs ++ attributesFromResources ++ attributesFromModel
+    val allAttributes = (nestedAttributesFromResourceRefs ++ attributesFromResources ++ attributesFromModel).distinct
 
     for {
       attribute <- allAttributes
