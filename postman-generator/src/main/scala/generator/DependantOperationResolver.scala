@@ -39,15 +39,16 @@ object DependantOperationResolver extends Logging {
     val attributesFromResources: Seq[ExtendedObjectReference] = {
       for {
         resource <- service.resources
-        foundedPathAttr <- resource.attributes if foundedPathAttr.name.equalsIgnoreCase(AttributeName.ObjectReference.toString)
-        pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttr.value)
+        path <- resource.path.toSeq
+        parameters = findParametersInPathString(path)
+        foundedPathAttrIdx <- resource.attributes.zipWithIndex if (
+          foundedPathAttrIdx._1.name.equalsIgnoreCase(AttributeName.ObjectReference.toString)
+          && parameters.size > 0)
+        pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttrIdx._1.value).toSeq
         extendedObjectReference = pureAttr.toExtended
-        parameterFromResourcePath = resource.path.flatMap(findParameterInPathString)
-        postmanVariableNameOpt = parameterFromResourcePath.map(postmanVariableNameFrom)
+        postmanVariableName = postmanVariableNameFrom(parameters(foundedPathAttrIdx._2))
       } yield {
-        postmanVariableNameOpt.fold(extendedObjectReference) { pathVariableName =>
-          extendedObjectReference.copy(postmanVariableName = pathVariableName)
-        }
+        extendedObjectReference.copy(postmanVariableName = postmanVariableName)
       }
     }
 
@@ -156,17 +157,17 @@ object DependantOperationResolver extends Logging {
     recurSearch(typ)
   }
 
-  private def findParameterInPathString(path: String): Option[Parameter] = {
-    val firstParameterNameOpt = PathParamsFinder.find(path).headOption
-
-    firstParameterNameOpt.map { paramName =>
-      Parameter(
-        name = paramName,
-        `type` = Primitive.String.name,
-        location = ParameterLocation.Path,
-        required = true
-      )
-    }
+  private def findParametersInPathString(path: String): Seq[Parameter] = {
+    PathParamsFinder
+      .find(path)
+      .map { paramName =>
+        Parameter(
+          name = paramName,
+          `type` = Primitive.String.name,
+          location = ParameterLocation.Path,
+          required = true
+        )
+      }
   }
 
   private def addNamespaceToOperationBodyIfNecessary(resolvedService: ResolvedService, operation: Operation, referencedServiceNamespace: String): Operation = {

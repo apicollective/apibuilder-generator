@@ -118,36 +118,6 @@ class DependantOperationResolverSpec extends WordSpec with Matchers {
       ).toExtended
     }
 
-    "resolve a dependency bound to the resource path" in new TestCtxWithAttrFromResourcePath {
-      val resolvedService = ServiceImportResolver.resolveService(testMainService, Seq(referenceApiService))
-      val result = DependantOperationResolver.resolve(resolvedService)
-
-      result should === (List(objectRef1AttrValue.toExtended -> dependency1Target))
-    }
-
-    "resolve a nested dependency bound to the body of the operation referenced by the resource path attribute" in new TestCtxWithAttrFromResourcePath {
-      val dependency2Target = getTargetOperation(updatedReferenceApiService, objRef2AttrValue)
-      val testReferenceApiService = addAttributeToModelField(updatedReferenceApiService, "member", "role", objRef2AttrValue)
-
-      val resolvedService = ServiceImportResolver.resolveService(testMainService, Seq(testReferenceApiService))
-      val result = DependantOperationResolver.resolve(resolvedService)
-
-      val dep1Target = {
-        val dependantOperations = getTargetOperation(testReferenceApiService, objectRef1AttrValue)
-        val referencedOperation = dependantOperations.referencedOperation
-        val updatedBody = referencedOperation.body.get.copy(`type` = objectRef1AttrValue.relatedServiceNamespace + ".models." + referencedOperation.body.get.`type`)
-        val updatedReferencedOperation = referencedOperation.copy(body = Some(updatedBody))
-        dependantOperations.copy(referencedOperation = updatedReferencedOperation)
-      }
-
-      val expected: Seq[(ExtendedObjectReference, DependantOperations)] = Seq(
-        objRef2AttrValue -> dependency2Target,
-        objectRef1AttrValue -> dep1Target
-      ).toExtended
-
-      result should contain allElementsOf expected
-    }
-
   }
 
   implicit class SeqObjectRefOperationExtend(seq: Seq[(ObjectReference, DependantOperations)]) {
