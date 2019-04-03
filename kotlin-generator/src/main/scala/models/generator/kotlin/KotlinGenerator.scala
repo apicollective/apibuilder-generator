@@ -103,9 +103,16 @@ class KotlinGenerator
 
     def generateUnionType(union: Union, service: Service): File = {
       val className = toClassName(union.name)
+      val undefinedClassName = className + "Undefined"
+      val modelsUnderUnion = service.models
+        .filter{ model =>
+          union.types.exists(_.`type` == model.name)
+        }
+        .map(generateModelTypeBuilder(_, Some(union), service).build())
+        .asJava
 
-      val builder = TypeSpec.interfaceBuilder(className)
-        .addModifiers(KModifier.PUBLIC)
+      val builder = TypeSpec.classBuilder(className)
+        .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
         .addKdoc(kdocClassMessage)
 
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties])
@@ -117,6 +124,7 @@ class KotlinGenerator
       if (union.discriminator.isDefined) {
         jsonAnnotationBuilder.addMember("include = com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
         jsonAnnotationBuilder.addMember("property = \"" + union.discriminator.get + "\"")
+        jsonAnnotationBuilder.addMember("defaultImpl = " + new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
       } else {
         jsonAnnotationBuilder.addMember("include", "com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT")
       }
@@ -128,21 +136,38 @@ class KotlinGenerator
         jsonSubTypesAnnotationBuilder
           .addMember("%L",
             AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-              .addMember("value = %L", dataTypeFromField(u.`type`, nameSpace, service) + "::class")
+              .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(u.`type`)) + "::class")
               .addMember("name = %S", u.discriminatorValue.getOrElse(u.`type`))
               .build()
           )
       })
 
+      jsonSubTypesAnnotationBuilder
+        .addMember("%L",
+          AnnotationSpec.builder(classOf[JsonSubTypes.Type])
+            .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
+            .build()
+        )
+
       builder.addAnnotation(jsonSubTypesAnnotationBuilder.build())
 
       union.description.map(builder.addKdoc(_))
+
+      val undefinedTypeBuilder = TypeSpec.objectBuilder(undefinedClassName)
+
+      val undefinedJsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
+      undefinedJsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
+      undefinedTypeBuilder.addAnnotation(undefinedJsonAnnotationBuilder.build())
+      undefinedTypeBuilder.superclass(new ClassName(modelsNameSpace, toClassName(className)))
+
+      /* Put the model classes inside the sealed class */
+      builder.addTypes(modelsUnderUnion)
+      builder.addType(undefinedTypeBuilder.build())
+
       makeFile(modelsNameSpace, className, builder)
     }
 
-
-
-    def generateModel(model: Model, relatedUnions: Seq[Union], service: Service): File = {
+    private def generateModelTypeBuilder(model: Model, union: Option[Union], service: Service): TypeSpec.Builder = {
       val className = toClassName(model.name)
 
       val builder = TypeSpec.classBuilder(className)
@@ -158,10 +183,10 @@ class KotlinGenerator
 
       val constructorWithParams = FunSpec.constructorBuilder()
 
-      val unionClassTypeNames = relatedUnions.map { u => new ClassName(modelsNameSpace, toClassName(u.name)) }
-      builder.addSuperinterfaces(unionClassTypeNames.asJava)
+      union.map{ relatedUnion =>
+        val unionClassTypeName = new ClassName(modelsNameSpace, toClassName(relatedUnion.name))
+        builder.superclass(unionClassTypeName)
 
-      relatedUnions.headOption.map { _ =>
         val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
         jsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
         builder.addAnnotation(jsonAnnotationBuilder.build())
@@ -197,11 +222,29 @@ class KotlinGenerator
 
       val companionBuilder = TypeSpec.companionObjectBuilder()
       val fromBuilder = FunSpec.builder("parseJson").addModifiers(KModifier.PUBLIC).addParameter("json", ClassName.bestGuess("kotlin.String"))
-      val modelType = ClassName.bestGuess(modelsNameSpace + "." + className)
+
+      val modelType =
+        union match{
+          case Some(relatedUnion) => {
+            ClassName.bestGuess(s"$modelsNameSpace.${toClassName(relatedUnion.name)}.$className")
+          }
+          case None =>{
+            ClassName.bestGuess(modelsNameSpace + "." + className)
+          }
+        }
+
       fromBuilder.returns(modelType)
       fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue( json, ${modelType.getSimpleName() + "::class.java"})")
       companionBuilder.addFunction(fromBuilder.build)
       builder.addType(companionBuilder.build())
+
+      builder
+    }
+
+    def generateModel(model: Model, union: Option[Union], service: Service): File = {
+      val className = toClassName(model.name)
+
+      val builder = generateModelTypeBuilder(model, union, service)
 
       makeFile(modelsNameSpace, className, builder)
     }
@@ -745,10 +788,7 @@ class KotlinGenerator
 
       val generatedUnionTypes = service.unions.map(union => generateUnionType(union, service))
 
-      val generatedModels = service.models.map { model =>
-        val relatedUnions = service.unions.filter(_.types.exists(_.`type` == model.name))
-        generateModel(model, relatedUnions, service)
-      }
+      val generatedModels = service.models.map (generateModel(_, None, service))
 
       val generatedObjectMapper = Seq(generateJacksonObjectMapper())
 
