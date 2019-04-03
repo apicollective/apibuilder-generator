@@ -86,7 +86,7 @@ ${headerString.indent(6)}
       ${config.reqAndMaybeAuthAndBody}
 
       ${config.httpClient}.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
-    }${methodGenerator.modelErrors().indent(4)}
+    }
   }
 
 ${Http4sScalaClientCommon(config).indent(2)}

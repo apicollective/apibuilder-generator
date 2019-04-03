@@ -270,11 +270,6 @@ formBody.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)
 
       httpClient.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }
-
-    object errors {
-
-
-    }
   }
 
   object Client {
