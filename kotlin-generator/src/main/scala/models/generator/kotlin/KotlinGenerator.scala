@@ -17,7 +17,6 @@ import org.threeten.bp.{Instant, LocalDate}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
-import scala.sys.process.ProcessBuilder.FileBuilder
 
 class KotlinGenerator
   extends CodeGenerator
@@ -102,9 +101,15 @@ class KotlinGenerator
 
     def getRetrofitResponseTypeWrapperClass(): ClassName = classToClassName(classOf[retrofit2.Response[Void]])
 
-    def generateUnionType(union: Union, service: Service, fileBuilder: FileSpec.Builder, modelsUnderUnion: Iterable[TypeSpec]): File = {
+    def generateUnionType(union: Union, service: Service): File = {
       val className = toClassName(union.name)
       val undefinedClassName = className + "Undefined"
+      val modelsUnderUnion = service.models
+        .filter{ model =>
+          union.types.exists(_.`type` == model.name)
+        }
+        .map(generateModelTypeBuilder(_, Some(union), service).build())
+        .asJava
 
       val builder = TypeSpec.classBuilder(className)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
@@ -156,20 +161,18 @@ class KotlinGenerator
       undefinedTypeBuilder.superclass(new ClassName(modelsNameSpace, toClassName(className)))
 
       /* Put the model classes inside the sealed class */
-      builder.addTypes(modelsUnderUnion.asJava)
+      builder.addTypes(modelsUnderUnion)
       builder.addType(undefinedTypeBuilder.build())
 
-      fileBuilder
-        .addType(builder.build())
-
-      makeFile(className, fileBuilder)
+      makeFile(modelsNameSpace, className, builder)
     }
 
-    private def generateModelBuilder(model: Model, union: Option[Union], service: Service): TypeSpec.Builder = {
+    private def generateModelTypeBuilder(model: Model, union: Option[Union], service: Service): TypeSpec.Builder = {
       val className = toClassName(model.name)
 
       val builder = TypeSpec.classBuilder(className)
         .addModifiers(KModifier.PUBLIC, KModifier.DATA)
+        .addKdoc(kdocClassMessage)
 
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown=true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
@@ -238,16 +241,10 @@ class KotlinGenerator
       builder
     }
 
-    def generateModelWithUnion(model: Model, union: Union, service: Service): TypeSpec.Builder = {
-      generateModelBuilder(model, Some(union), service)
-    }
-
-    def generateModelWithoutUnion(model: Model, service: Service): File = {
+    def generateModel(model: Model, union: Option[Union], service: Service): File = {
       val className = toClassName(model.name)
 
-      val builder = generateModelBuilder(model, None, service)
-
-      builder.addKdoc(kdocClassMessage)
+      val builder = generateModelTypeBuilder(model, union, service)
 
       makeFile(modelsNameSpace, className, builder)
     }
@@ -783,43 +780,15 @@ class KotlinGenerator
     }
 
     def generateSourceFiles(service: Service): Seq[File] = {
-      val modelsWithoutUnion = service.models.filter { model =>
-        !service.unions.exists(_.types.exists(_.`type` == model.name))
-      }
-
-      val modelsWithUnion = service.models.diff(modelsWithoutUnion)
-      val unionModelMap = service.unions.map{ union =>
-        val models = union.types.map{ unionType =>
-          modelsWithUnion.find(_.name == unionType.`type`).get
-        }
-        (union, models)
-      }.toMap
-
 
       val generatedErrorsHelper = Seq(generateErrorsHelper())
 
 
       val generatedEnums = generateEnums(service.enums)
 
-      val generatedUnionTypes = unionModelMap.map{
-        case (union, relatedModels) => {
-          val fileBuilder = FileSpec.builder(modelsNameSpace, toClassName(union.name))
+      val generatedUnionTypes = service.unions.map(union => generateUnionType(union, service))
 
-          val relatedModelType = relatedModels.map(generateModelWithUnion(_, union, service).build())
-
-
-          generateUnionType(union, service, fileBuilder, relatedModelType)
-        }
-      }
-
-
-      val generatedModels =
-        modelsWithoutUnion.map { model =>
-          generateModelWithoutUnion(model, service)
-        } ++
-        modelsWithUnion.map { model =>
-          generateModelWithoutUnion(model, service)
-        }
+      val generatedModels = service.models.map (generateModel(_, None, service))
 
       val generatedObjectMapper = Seq(generateJacksonObjectMapper())
 
