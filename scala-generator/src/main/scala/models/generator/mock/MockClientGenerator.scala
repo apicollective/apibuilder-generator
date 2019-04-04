@@ -112,7 +112,7 @@ class MockClientGenerator(
   def factoriesCode = Seq(
     "object Factories {",
     Seq(
-      """def randomString(length: _root_.scala.Int = 24): String = {""",
+      """def randomString(length: Int = 24): String = {""",
       """  _root_.scala.util.Random.alphanumeric.take(length).mkString""",
       """}"""
     ).mkString("\n").indent(2),
