@@ -127,14 +127,14 @@ class ScalaClientMethodGenerator (
               if (response.isSuccess) {
                 if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(Some(()))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncSuccessInvoke}(Some(()))")
                   } else {
                     val json = config.toJson("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(Some($json))")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncSuccessInvoke}(Some($json))")
                   }
 
                 } else if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncSuccess}(())")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncSuccessInvoke}(())")
 
                 } else {
                   val json = config.toJson("r", response.datatype.name)

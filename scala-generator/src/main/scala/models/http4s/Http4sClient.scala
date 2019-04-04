@@ -83,7 +83,7 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      ${config.reqAndMaybeAuthAndBody}
+${config.reqAndMaybeAuthAndBody.indent(6)}
 
       ${config.httpClient}.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }

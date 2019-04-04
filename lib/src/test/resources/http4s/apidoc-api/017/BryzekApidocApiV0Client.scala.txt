@@ -3071,9 +3071,9 @@ def closeAsyncHttpClient(): Unit = {
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
-formBody.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
-} else body.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+      val reqAndMaybeAuthAndBody =
+        if (formBody.nonEmpty) formBody.fold(fs2.Task.now(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+        else body.fold(fs2.Task.now(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
 
       asyncHttpClient.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }
