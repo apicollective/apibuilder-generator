@@ -1,0 +1,978 @@
+{
+  "item": [
+    {
+      "item": [
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create library"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\" : \"lorem_ipsum_163079\"\n}"
+            },
+            "url": {
+              "path": [
+                "libraries"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/libraries"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create library"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\" : \"lorem_ipsum_163079\"\n}"
+                },
+                "url": {
+                  "path": [
+                    "libraries"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/libraries"
+                }
+              },
+              "code": 202,
+              "name": "Example 202 - library",
+              "header": [],
+              "body": "{\n  \"id\" : \"lib-324324\"\n}"
+            }
+          ],
+          "name": "POST /libraries",
+          "description": {
+            "content": "Create library"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});",
+                  "var jsonData = JSON.parse(responseBody);",
+                  "var id = jsonData.id;",
+                  "if (id != null) pm.environment.set(\"library#id\", id);"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create a book"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"library_id\" : \"{{library#id}}\",\n  \"title\" : \"lorem_ipsum_217364\"\n}"
+            },
+            "url": {
+              "path": [
+                ":library",
+                "books"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/:library/books"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create a book"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"library_id\" : \"{{library#id}}\",\n  \"title\" : \"lorem_ipsum_217364\"\n}"
+                },
+                "url": {
+                  "path": [
+                    ":library",
+                    "books"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/:library/books"
+                }
+              },
+              "code": 202,
+              "name": "Example 202 - book",
+              "header": [],
+              "body": "{\n  \"library_id\" : \"lorem_ipsum_220950\",\n  \"title\" : \"Bible\"\n}"
+            }
+          ],
+          "name": "POST /:library/books",
+          "description": {
+            "content": "Create a book"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});",
+                  "var jsonData = JSON.parse(responseBody);",
+                  "var id = jsonData.library_id;",
+                  "if (id != null) pm.environment.set(\"book_id\", id);"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create library"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\" : \"lorem_ipsum_163079\"\n}"
+            },
+            "url": {
+              "path": [
+                "libraries"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/libraries"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create library"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\" : \"lorem_ipsum_163079\"\n}"
+                },
+                "url": {
+                  "path": [
+                    "libraries"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/libraries"
+                }
+              },
+              "code": 202,
+              "name": "Example 202 - library",
+              "header": [],
+              "body": "{\n  \"id\" : \"lib-324324\"\n}"
+            }
+          ],
+          "name": "POST /libraries",
+          "description": {
+            "content": "Create library"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});",
+                  "var jsonData = JSON.parse(responseBody);",
+                  "var id = jsonData.id;",
+                  "if (id != null) pm.environment.set(\"id\", id);"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        }
+      ],
+      "name": "Entities Setup",
+      "type": "folder"
+    },
+    {
+      "item": [
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create a book"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"library_id\" : \"{{library#id}}\",\n  \"title\" : \"lorem_ipsum_217364\"\n}"
+            },
+            "url": {
+              "path": [
+                ":library",
+                "books"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/:library/books"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create a book"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"library_id\" : \"{{library#id}}\",\n  \"title\" : \"lorem_ipsum_217364\"\n}"
+                },
+                "url": {
+                  "path": [
+                    ":library",
+                    "books"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/:library/books"
+                }
+              },
+              "code": 202,
+              "name": "Example 202 - book",
+              "header": [],
+              "body": "{\n  \"library_id\" : \"lorem_ipsum_220950\",\n  \"title\" : \"Bible\"\n}"
+            }
+          ],
+          "name": "POST /:library/books",
+          "description": {
+            "content": "Create a book"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "GET",
+            "description": {
+              "content": "Get books"
+            },
+            "header": [],
+            "url": {
+              "path": [
+                ":library",
+                "books"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/:library/books"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "GET",
+                "description": {
+                  "content": "Get books"
+                },
+                "header": [],
+                "url": {
+                  "path": [
+                    ":library",
+                    "books"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/:library/books"
+                }
+              },
+              "code": 200,
+              "name": "Example 200 - [book]",
+              "header": [],
+              "body": "[ {\n  \"library_id\" : \"lorem_ipsum_220950\",\n  \"title\" : \"Bible\"\n} ]"
+            }
+          ],
+          "name": "GET /:library/books",
+          "description": {
+            "content": "Get books"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET requests should return 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "GET",
+            "description": {
+              "content": "Get a book"
+            },
+            "header": [],
+            "url": {
+              "path": [
+                ":library",
+                "books",
+                ":book_id"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{id}}",
+                  "key": "id"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:library/books/:book_id"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "GET",
+                "description": {
+                  "content": "Get a book"
+                },
+                "header": [],
+                "url": {
+                  "path": [
+                    ":library",
+                    "books",
+                    ":book_id"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{id}}",
+                      "key": "id"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:library/books/:book_id"
+                }
+              },
+              "code": 200,
+              "name": "Example 200 - book",
+              "header": [],
+              "body": "{\n  \"library_id\" : \"lorem_ipsum_220950\",\n  \"title\" : \"Bible\"\n}"
+            }
+          ],
+          "name": "GET /:library/books/:book_id",
+          "description": {
+            "content": "Get a book"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET requests should return 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "DELETE",
+            "description": {
+              "content": "Delete a book"
+            },
+            "header": [],
+            "url": {
+              "path": [
+                ":library",
+                "books",
+                ":book_id"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/:library/books/:book_id"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "DELETE",
+                "description": {
+                  "content": "Delete a book"
+                },
+                "header": [],
+                "url": {
+                  "path": [
+                    ":library",
+                    "books",
+                    ":book_id"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/:library/books/:book_id"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": []
+            }
+          ],
+          "name": "DELETE /:library/books/:book_id",
+          "description": {
+            "content": "Delete a book"
+          },
+          "type": "item"
+        }
+      ],
+      "name": "books",
+      "type": "folder"
+    },
+    {
+      "item": [
+        {
+          "request": {
+            "method": "POST",
+            "description": {
+              "content": "Create library"
+            },
+            "header": [
+              {
+                "description": {
+                  "content": "Required to send JSON body"
+                },
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\" : \"lorem_ipsum_163079\"\n}"
+            },
+            "url": {
+              "path": [
+                "libraries"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/libraries"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "POST",
+                "description": {
+                  "content": "Create library"
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Required to send JSON body"
+                    },
+                    "value": "application/json",
+                    "key": "Content-Type"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\" : \"lorem_ipsum_163079\"\n}"
+                },
+                "url": {
+                  "path": [
+                    "libraries"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/libraries"
+                }
+              },
+              "code": 202,
+              "name": "Example 202 - library",
+              "header": [],
+              "body": "{\n  \"id\" : \"lib-324324\"\n}"
+            }
+          ],
+          "name": "POST /libraries",
+          "description": {
+            "content": "Create library"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST requests should return 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "DELETE",
+            "description": {
+              "content": "Delete library"
+            },
+            "header": [],
+            "url": {
+              "path": [
+                "libraries",
+                ":id"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [],
+              "raw": "{{BASE_URL}}/libraries/:id"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "DELETE",
+                "description": {
+                  "content": "Delete library"
+                },
+                "header": [],
+                "url": {
+                  "path": [
+                    "libraries",
+                    ":id"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [],
+                  "raw": "{{BASE_URL}}/libraries/:id"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": []
+            }
+          ],
+          "name": "DELETE /libraries/:id",
+          "description": {
+            "content": "Delete library"
+          },
+          "type": "item"
+        }
+      ],
+      "name": "libraries",
+      "type": "folder"
+    },
+    {
+      "item": [
+        {
+          "request": {
+            "method": "DELETE",
+            "description": {
+              "content": "Delete library"
+            },
+            "header": [],
+            "url": {
+              "path": [
+                "libraries",
+                ":id"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{id}}",
+                  "key": "id"
+                }
+              ],
+              "raw": "{{BASE_URL}}/libraries/:id"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "DELETE",
+                "description": {
+                  "content": "Delete library"
+                },
+                "header": [],
+                "url": {
+                  "path": [
+                    "libraries",
+                    ":id"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{id}}",
+                      "key": "id"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/libraries/:id"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": []
+            }
+          ],
+          "name": "DELETE /libraries/:id",
+          "description": {
+            "content": "Delete library"
+          },
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "DELETE",
+            "description": {
+              "content": "Delete a book"
+            },
+            "header": [],
+            "url": {
+              "path": [
+                ":library",
+                "books",
+                ":book_id"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{book_id}}",
+                  "key": "book_id"
+                }
+              ],
+              "raw": "{{BASE_URL}}/:library/books/:book_id"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "DELETE",
+                "description": {
+                  "content": "Delete a book"
+                },
+                "header": [],
+                "url": {
+                  "path": [
+                    ":library",
+                    "books",
+                    ":book_id"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{book_id}}",
+                      "key": "book_id"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/:library/books/:book_id"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": []
+            }
+          ],
+          "name": "DELETE /:library/books/:book_id",
+          "description": {
+            "content": "Delete a book"
+          },
+          "type": "item"
+        },
+        {
+          "request": {
+            "method": "DELETE",
+            "description": {
+              "content": "Delete library"
+            },
+            "header": [],
+            "url": {
+              "path": [
+                "libraries",
+                ":id"
+              ],
+              "query": [],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "Type: string  | Required: true"
+                  },
+                  "disabled": false,
+                  "value": "{{library#id}}",
+                  "key": "id"
+                }
+              ],
+              "raw": "{{BASE_URL}}/libraries/:id"
+            }
+          },
+          "response": [
+            {
+              "originalRequest": {
+                "method": "DELETE",
+                "description": {
+                  "content": "Delete library"
+                },
+                "header": [],
+                "url": {
+                  "path": [
+                    "libraries",
+                    ":id"
+                  ],
+                  "query": [],
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "Type: string  | Required: true"
+                      },
+                      "disabled": false,
+                      "value": "{{library#id}}",
+                      "key": "id"
+                    }
+                  ],
+                  "raw": "{{BASE_URL}}/libraries/:id"
+                }
+              },
+              "code": 204,
+              "name": "Example 204 - unit",
+              "header": []
+            }
+          ],
+          "name": "DELETE /libraries/:id",
+          "description": {
+            "content": "Delete library"
+          },
+          "type": "item"
+        }
+      ],
+      "name": "Entities Cleanup",
+      "type": "folder"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "value": "{{MY_TOKEN}}",
+        "key": "username"
+      },
+      {
+        "value": "",
+        "key": "password"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.ecorp.io",
+      "key": "BASE_URL"
+    }
+  ],
+  "event": [],
+  "info": {
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "name": "library",
+    "description": {},
+    "version": "0.0.1"
+  }
+}
