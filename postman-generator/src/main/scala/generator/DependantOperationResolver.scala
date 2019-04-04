@@ -5,6 +5,7 @@ import io.postman.generator.attributes.v0.models.json._
 import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
 import lib.Datatype.Primitive
 import models.AttributeValueReader
+import models.attributes.PostmanAttributes
 import models.service.ResolvedService
 import org.scalactic.TripleEquals._
 import models.attributes.PostmanAttributes._
@@ -52,8 +53,23 @@ object DependantOperationResolver extends Logging {
       }
     }
 
-    val nestedAttributesFromResourceRefs = for {
-      attribute <- attributesFromResources
+    val attributesFromOperations = for {
+      resource <- service.resources
+      operation <- resource.operations
+      operationPath = operation.path.stripPrefix(resource.path.getOrElse(""))
+      parameters = findParametersInPathString(operationPath)
+      foundedPathAttrIdx <- operation.attributes.zipWithIndex if (
+        foundedPathAttrIdx._1.name.equalsIgnoreCase(AttributeName.ObjectReference.toString)
+        && parameters.size > 0)
+      pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttrIdx._1.value).toSeq
+      extendedObjectReference = pureAttr.toExtended
+      postmanVariableName = postmanVariableNameFrom(parameters(foundedPathAttrIdx._2))
+    } yield {
+      extendedObjectReference.copy(postmanVariableName = postmanVariableName)
+    }
+
+    val nestedAttributesFromPathParams = for {
+      attribute <- attributesFromResources ++ attributesFromOperations
       dependantOperations <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
       updatedReferencedOp = addNamespaceToOperationBodyIfNecessary(resolvedService, dependantOperations.referencedOperation, attribute.relatedServiceNamespace)
       body <- updatedReferencedOp.body.toSeq
@@ -69,7 +85,7 @@ object DependantOperationResolver extends Logging {
       extendedAttribute = attribute.toExtended
     } yield extendedAttribute
 
-    val allAttributes = (nestedAttributesFromResourceRefs ++ attributesFromResources ++ attributesFromModel).distinct
+    val allAttributes = (nestedAttributesFromPathParams ++ attributesFromResources ++ attributesFromOperations ++ attributesFromModel).distinct
 
     for {
       attribute <- allAttributes
