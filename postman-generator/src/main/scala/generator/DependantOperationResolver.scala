@@ -5,7 +5,6 @@ import io.postman.generator.attributes.v0.models.json._
 import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
 import lib.Datatype.Primitive
 import models.AttributeValueReader
-import models.attributes.PostmanAttributes
 import models.service.ResolvedService
 import org.scalactic.TripleEquals._
 import models.attributes.PostmanAttributes._
@@ -37,40 +36,35 @@ object DependantOperationResolver extends Logging {
     val service: Service = resolvedService.service
     val serviceNamespaceToResources: Map[String, Seq[Resource]] = resolvedService.serviceNamespaceToResources
 
-    val attributesFromResources: Seq[ExtendedObjectReference] = {
-      for {
-        resource <- service.resources
-        path <- resource.path.toSeq
-        parameters = findParametersInPathString(path)
-        foundedPathAttrIdx <- resource
-          .attributes
+    def findObjectReferenceAttrs(
+      paramName: String,
+      attributes: Seq[Attribute],
+      parameters: Seq[Parameter]): Seq[ExtendedObjectReference] = for {
+        foundedPathAttrIdx <- attributes
           .filter(_.name.equalsIgnoreCase(AttributeName.ObjectReference.toString))
           .zipWithIndex if parameters.nonEmpty
         pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttrIdx._1.value).toSeq
         extendedObjectReference = pureAttr.toExtended
         postmanVariableName = postmanVariableNameFrom(parameters(foundedPathAttrIdx._2))
-      } yield {
-        extendedObjectReference.copy(postmanVariableName = postmanVariableName)
-      }
-    }
+        extendedObjRefWithUpdatedName = extendedObjectReference.copy(postmanVariableName = postmanVariableName)
+      } yield extendedObjRefWithUpdatedName
+
+    val attributesFromResources: Seq[ExtendedObjectReference] = for {
+      resource <- service.resources
+      path <- resource.path.toSeq
+      parameters = findParametersInPathString(path)
+      objectReference <- findObjectReferenceAttrs(path, resource.attributes, parameters)
+    } yield objectReference
 
     val attributesFromOperations = for {
       resource <- service.resources
       operation <- resource.operations
       operationPath = operation.path.stripPrefix(resource.path.getOrElse(""))
       parameters = findParametersInPathString(operationPath)
-      foundedPathAttrIdx <- operation
-        .attributes
-        .filter(_.name.equalsIgnoreCase(AttributeName.ObjectReference.toString))
-        .zipWithIndex if parameters.nonEmpty
-      pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttrIdx._1.value).toSeq
-      extendedObjectReference = pureAttr.toExtended
-      postmanVariableName = postmanVariableNameFrom(parameters(foundedPathAttrIdx._2))
-    } yield {
-      extendedObjectReference.copy(postmanVariableName = postmanVariableName)
-    }
+      objectReference <- findObjectReferenceAttrs(operationPath, operation.attributes, parameters)
+    } yield objectReference
 
-    def findNestedAttributes(attributes: Seq[ExtendedObjectReference]): Seq[ExtendedObjectReference] =
+    def findNestedObjRefAttrs(attributes: Seq[ExtendedObjectReference]): Seq[ExtendedObjectReference] =
       for {
         attribute <- attributes
         dependantOperations <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
@@ -80,8 +74,8 @@ object DependantOperationResolver extends Logging {
         extendedAttribute = attribute.toExtended
       } yield extendedAttribute
 
-    val nestedAttributesFromResources = findNestedAttributes(attributesFromResources)
-    val nestedAttributesFromOperations = findNestedAttributes(attributesFromOperations)
+    val nestedAttributesFromResources = findNestedObjRefAttrs(attributesFromResources)
+    val nestedAttributesFromOperations = findNestedObjRefAttrs(attributesFromOperations)
 
     val attributesFromModel = for {
       resource <- service.resources
