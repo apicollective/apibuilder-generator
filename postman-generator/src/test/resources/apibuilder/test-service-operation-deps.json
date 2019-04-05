@@ -207,6 +207,12 @@
           "path": "/:library/books/:book_id",
           "attributes": [
             {
+              "name": "unrelated-attribute",
+              "value": {
+                "this_attribute_is_unrelated": "should_not_break_anything"
+              }
+            },
+            {
               "name": "object-reference",
               "value": {
                 "related_service_namespace": "io.ecorp.api.v0",
