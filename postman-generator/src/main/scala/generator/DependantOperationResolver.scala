@@ -42,9 +42,10 @@ object DependantOperationResolver extends Logging {
         resource <- service.resources
         path <- resource.path.toSeq
         parameters = findParametersInPathString(path)
-        foundedPathAttrIdx <- resource.attributes.zipWithIndex if (
-          foundedPathAttrIdx._1.name.equalsIgnoreCase(AttributeName.ObjectReference.toString)
-          && parameters.size > 0)
+        foundedPathAttrIdx <- resource
+          .attributes
+          .filter(_.name.equalsIgnoreCase(AttributeName.ObjectReference.toString))
+          .zipWithIndex if parameters.nonEmpty
         pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttrIdx._1.value).toSeq
         extendedObjectReference = pureAttr.toExtended
         postmanVariableName = postmanVariableNameFrom(parameters(foundedPathAttrIdx._2))
@@ -58,9 +59,10 @@ object DependantOperationResolver extends Logging {
       operation <- resource.operations
       operationPath = operation.path.stripPrefix(resource.path.getOrElse(""))
       parameters = findParametersInPathString(operationPath)
-      foundedPathAttrIdx <- operation.attributes.zipWithIndex if (
-        foundedPathAttrIdx._1.name.equalsIgnoreCase(AttributeName.ObjectReference.toString)
-        && parameters.size > 0)
+      foundedPathAttrIdx <- operation
+        .attributes
+        .filter(_.name.equalsIgnoreCase(AttributeName.ObjectReference.toString))
+        .zipWithIndex if parameters.nonEmpty
       pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttrIdx._1.value).toSeq
       extendedObjectReference = pureAttr.toExtended
       postmanVariableName = postmanVariableNameFrom(parameters(foundedPathAttrIdx._2))
@@ -68,14 +70,18 @@ object DependantOperationResolver extends Logging {
       extendedObjectReference.copy(postmanVariableName = postmanVariableName)
     }
 
-    val nestedAttributesFromPathParams = for {
-      attribute <- attributesFromResources ++ attributesFromOperations
-      dependantOperations <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
-      updatedReferencedOp = addNamespaceToOperationBodyIfNecessary(resolvedService, dependantOperations.referencedOperation, attribute.relatedServiceNamespace)
-      body <- updatedReferencedOp.body.toSeq
-      attribute <- deepSearchModelsForAttributes(body.`type`, service)
-      extendedAttribute = attribute.toExtended
-    } yield extendedAttribute
+    def findNestedAttributes(attributes: Seq[ExtendedObjectReference]): Seq[ExtendedObjectReference] =
+      for {
+        attribute <- attributes
+        dependantOperations <- findOperationForAttribute(attribute, serviceNamespaceToResources).toSeq
+        updatedReferencedOp = addNamespaceToOperationBodyIfNecessary(resolvedService, dependantOperations.referencedOperation, attribute.relatedServiceNamespace)
+        body <- updatedReferencedOp.body.toSeq
+        attribute <- deepSearchModelsForAttributes(body.`type`, service)
+        extendedAttribute = attribute.toExtended
+      } yield extendedAttribute
+
+    val nestedAttributesFromResources = findNestedAttributes(attributesFromResources)
+    val nestedAttributesFromOperations = findNestedAttributes(attributesFromOperations)
 
     val attributesFromModel = for {
       resource <- service.resources
@@ -85,7 +91,13 @@ object DependantOperationResolver extends Logging {
       extendedAttribute = attribute.toExtended
     } yield extendedAttribute
 
-    val allAttributes = (nestedAttributesFromPathParams ++ attributesFromResources ++ attributesFromOperations ++ attributesFromModel).distinct
+    val allAttributes = (
+        nestedAttributesFromResources ++
+        attributesFromResources ++
+        nestedAttributesFromOperations ++
+        attributesFromOperations ++
+        attributesFromModel
+      ).distinct
 
     for {
       attribute <- allAttributes
@@ -188,7 +200,7 @@ object DependantOperationResolver extends Logging {
 
   private def addNamespaceToOperationBodyIfNecessary(resolvedService: ResolvedService, operation: Operation, referencedServiceNamespace: String): Operation = {
     operation.body match {
-      case Some(body) if referencedServiceNamespace === resolvedService.service.namespace =>
+      case Some(_) if referencedServiceNamespace === resolvedService.service.namespace =>
         operation
       case Some(body) if !body.`type`.startsWith(referencedServiceNamespace) =>
         val typeToLookFor = body.`type`
