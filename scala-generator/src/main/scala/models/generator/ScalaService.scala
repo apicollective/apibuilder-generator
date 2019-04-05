@@ -387,6 +387,8 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     datatype.definition(varName, default, field.deprecation)
   }
 
+  def limitation: ScalaField.Limitation = ScalaField.Limitation(field.minimum, field.maximum)
+
   /**
     * A Scala type can be modeled in one of two ways:
     *  - Wire Friendly, in which the model captures the optionality of data on the wire.
@@ -423,6 +425,10 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
   }
 
   def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.nonEmpty
+}
+
+object ScalaField {
+  final case class Limitation(minimum: Option[Long], maximum: Option[Long])
 }
 
 class ScalaParameter(ssd: ScalaService, val param: Parameter) {
