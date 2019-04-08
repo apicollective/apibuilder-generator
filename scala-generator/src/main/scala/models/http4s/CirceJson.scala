@@ -50,7 +50,7 @@ ${Seq(generateTimeSerde(),generateEnums(), generateModels(), generateUnions()).f
 
       case TimeConfig.JavaTime => s"""
         |private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
-        |  Decoder.decodeString.emapTry(str => Try(_root_.java.time.Instant.parse(str)))
+        |  Decoder.decodeString.emapTry(str => Try(_root_.java.time.ZonedDateTime.parse(str).toInstant))
         |
         |private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.java.time.Instant] =
         |  Encoder.encodeString.contramap[_root_.java.time.Instant](_.toString)
