@@ -190,7 +190,7 @@ class ScalaUtilSpec extends FunSpec with Matchers {
       }
       it("behaves for java.time") {
           ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601Java) should be {
-            """_root_.java.time.Instant.parse("2014-03-14T12:13:15Z")"""
+            """_root_.java.time.ZonedDateTime.parse("2014-03-14T12:13:15Z").toInstant"""
           }
       }
     }
