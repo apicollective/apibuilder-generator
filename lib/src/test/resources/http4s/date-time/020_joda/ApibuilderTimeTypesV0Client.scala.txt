@@ -81,19 +81,19 @@ package io.gregor.time.types.v0.models {
       Decoder.decodeString.emapTry(str => Try(_root_.java.util.UUID.fromString(str)))
 
     private[v0] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
-      Encoder.encodeString.contramap[_root_.java.util.UUID](_.toString)
+      Encoder.encodeString.contramap[_root_.java.util.UUID](uuid => uuid.toString)
 
-    private[v0] implicit val decodeInstant: Decoder[_root_.org.joda.time.DateTime] =
+    private[v0] implicit val decodeDateTime: Decoder[_root_.org.joda.time.DateTime] =
       Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)))
 
-    private[v0] implicit val encodeInstant: Encoder[_root_.org.joda.time.DateTime] =
-      Encoder.encodeString.contramap[_root_.org.joda.time.DateTime](org.joda.time.format.ISODateTimeFormat.dateTime.print)
+    private[v0] implicit val encodeDateTime: Encoder[_root_.org.joda.time.DateTime] =
+      Encoder.encodeString.contramap[_root_.org.joda.time.DateTime](_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(_))
 
     private[v0] implicit val decodeLocalDate: Decoder[_root_.org.joda.time.LocalDate] =
-      Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateParser.parseLocalDate(str)))
+      Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(str)))
 
     private[v0] implicit val encodeLocalDate: Encoder[_root_.org.joda.time.LocalDate] =
-      Encoder.encodeString.contramap[_root_.org.joda.time.LocalDate](org.joda.time.format.ISODateTimeFormat.date.print)
+      Encoder.encodeString.contramap[_root_.org.joda.time.LocalDate](_.toString)
 
     implicit def decodeTimeTypesDateTimeModel: Decoder[DateTimeModel] = Decoder.instance { c =>
      for {

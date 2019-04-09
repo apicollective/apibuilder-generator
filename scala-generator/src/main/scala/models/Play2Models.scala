@@ -3,8 +3,11 @@ package scala.models
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
+
 import scala.generator.{ScalaCaseClasses, ScalaService}
 import generator.ServiceFileNames
+
+import scala.generator.ScalaPrimitive.{DateIso8601Joda, DateTimeIso8601Joda, Uuid}
 
 object Play2Models extends Play2Models
 
@@ -91,35 +94,31 @@ $bindables
 
   def manualImplicits(ssd: ScalaService) = {
     s"""
-       |private[${ssd.namespaces.last}] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
+       |private[${ssd.namespaces.last}] implicit val jsonReadsUUID = __.read[String].map { str =>
+       |  ${Uuid.fromStringValue("str")}
+       |}
        |
-       |private[${ssd.namespaces.last}] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
-       |  def writes(x: java.util.UUID) = JsString(x.toString)
+       |private[${ssd.namespaces.last}] implicit val jsonWritesUUID = new Writes[${Uuid.fullName}] {
+       |  def writes(x: ${Uuid.fullName}) = JsString(${Uuid.asString("x")})
        |}
        |
        |private[${ssd.namespaces.last}] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
-       |  import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-       |  dateTimeParser.parseDateTime(str)
+       |  ${DateTimeIso8601Joda.fromStringValue("str")}
        |}
        |
-       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
-       |  def writes(x: org.joda.time.DateTime) = {
-       |    import org.joda.time.format.ISODateTimeFormat.dateTime
-       |    val str = dateTime.print(x)
-       |    JsString(str)
+       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaDateTime = new Writes[${DateTimeIso8601Joda.fullName}] {
+       |  def writes(x: ${DateTimeIso8601Joda.fullName}) = {
+       |    JsString(${DateTimeIso8601Joda.asString("x")})
        |  }
        |}
        |
        |private[${ssd.namespaces.last}] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
-       |  import org.joda.time.format.ISODateTimeFormat.dateParser
-       |  dateParser.parseLocalDate(str)
+       |  ${DateIso8601Joda.fromStringValue("str")}
        |}
        |
-       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
-       |  def writes(x: org.joda.time.LocalDate) = {
-       |    import org.joda.time.format.ISODateTimeFormat.date
-       |    val str = date.print(x)
-       |    JsString(str)
+       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaLocalDate = new Writes[${DateIso8601Joda.fullName}] {
+       |  def writes(x: ${DateIso8601Joda.fullName}) = {
+       |    JsString(${DateIso8601Joda.asString("x")})
        |  }
        |}""".stripMargin
   }

@@ -2,54 +2,40 @@ package scala.models
 
 import lib.Text._
 
-import scala.generator.{ScalaEnumValue, ScalaService, ScalaUtil}
+import scala.generator.ScalaPrimitive.{DateIso8601Java, DateIso8601Joda, DateTimeIso8601Java, DateTimeIso8601Joda}
+import scala.generator.{ScalaEnumValue, ScalaPrimitive, ScalaService, ScalaUtil}
 
 case class Play2Bindables(ssd: ScalaService) {
 
   def build(): String = {
+    val (dateTimeIso8601, dateIso8601) = ssd.config.timeLib match {
+      case TimeConfig.JodaTime => (DateTimeIso8601Joda, DateIso8601Joda)
+      case TimeConfig.JavaTime => (DateTimeIso8601Java, DateIso8601Java)
+    }
 
     Seq(
       "object Bindables {",
       Seq(
         "import play.api.mvc.{PathBindable, QueryStringBindable}",
         buildImports(),
-        buildObjectCore(),
+        buildObjectCore(dateTimeIso8601, dateIso8601),
         buildObjectModels().getOrElse(""),
-        apibuilderHelpers()
+        apibuilderHelpers(dateTimeIso8601, dateIso8601)
       ).filter(_.trim.nonEmpty).mkString("\n\n").indent(2),
       "}"
     ).mkString("\n\n")
   }
 
-  private def buildObjectCore(): String = {
-    ssd.config.timeLib match {
-      case TimeConfig.JodaTime => buildObjectCoreJoda()
-      case TimeConfig.JavaTime => buildObjectCoreJava()
-    }
-  }
-
-  private def buildObjectCoreJoda(): String = {
-    """
-object Core {
-  implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
-  implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.DateTime] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
-
-  implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
-  implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
-}
-""".trim
-  }
-
-  private def buildObjectCoreJava(): String = {
-    """
-object Core {
-  implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.java.time.Instant] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
-  implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.java.time.Instant] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
-
-  implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.java.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
-  implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.java.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
-}
-""".trim
+  private def buildObjectCore(dateTimeIso8601: ScalaPrimitive, dateIso8601: ScalaPrimitive): String = {
+    s"""
+       |object Core {
+       |  implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[${dateTimeIso8601.fullName}] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
+       |  implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[${dateTimeIso8601.fullName}] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
+       |
+       |  implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[${dateIso8601.fullName}] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
+       |  implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[${dateIso8601.fullName}] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
+       |}
+       |""".trim.stripMargin
   }
 
   private def buildObjectModels(): Option[String] = {
@@ -81,49 +67,23 @@ object Core {
     ).filter(_.nonEmpty).mkString("\n")
   }
 
-  private def apibuilderTypesJoda = {
-    """object ApibuilderTypes {
-      |  import org.joda.time.{format, DateTime, LocalDate}
-      |
-      |  val dateTimeIso8601: ApibuilderTypeConverter[DateTime] = new ApibuilderTypeConverter[DateTime] {
-      |    override def convert(value: String): DateTime = format.ISODateTimeFormat.dateTimeParser.parseDateTime(value)
-      |    override def convert(value: DateTime): String = format.ISODateTimeFormat.dateTime.print(value)
-      |    override def example: DateTime = DateTime.now
-      |  }
-      |
-      |  val dateIso8601: ApibuilderTypeConverter[LocalDate] = new ApibuilderTypeConverter[LocalDate] {
-      |    override def convert(value: String): LocalDate = format.ISODateTimeFormat.yearMonthDay.parseLocalDate(value)
-      |    override def convert(value: LocalDate): String = value.toString
-      |    override def example: LocalDate = LocalDate.now
-      |  }
-      |
-      |}""".stripMargin
-  }
+  private def apibuilderHelpers(dateTimeIso8601: ScalaPrimitive, dateIso8601: ScalaPrimitive): String = {
+    val apibuilderTypes =
+      s"""object ApibuilderTypes {
+         |  val dateTimeIso8601: ApibuilderTypeConverter[${dateTimeIso8601.fullName}] = new ApibuilderTypeConverter[${dateTimeIso8601.fullName}] {
+         |    override def convert(value: String): ${dateTimeIso8601.fullName} = ${dateTimeIso8601.fromStringValue("value")}
+         |    override def convert(value: ${dateTimeIso8601.fullName}): String = ${dateTimeIso8601.asString("value")}
+         |    override def example: ${dateTimeIso8601.fullName} = ${dateTimeIso8601.fullName}.now
+         |  }
+         |
+         |  val dateIso8601: ApibuilderTypeConverter[${dateIso8601.fullName}] = new ApibuilderTypeConverter[${dateIso8601.fullName}] {
+         |    override def convert(value: String): ${dateIso8601.fullName} = ${dateTimeIso8601.fromStringValue("value")}
+         |    override def convert(value: ${dateIso8601.fullName}): String = ${dateIso8601.asString("value")}
+         |    override def example: LocalDate = ${dateIso8601.fullName}.now
+         |  }
+         |
+         |}""".stripMargin
 
-  private def apibuilderTypesJava = {
-    """object ApibuilderTypes {
-      |  import java.time.{Instant, LocalDate}
-      |
-      |  val dateTimeIso8601: ApibuilderTypeConverter[Instant] = new ApibuilderTypeConverter[Instant] {
-      |    override def convert(value: String): Instant = Instant.parse(value)
-      |    override def convert(value: Instant): String = value.toString
-      |    override def example: Instant = Instant.now
-      |  }
-      |
-      |  val dateIso8601: ApibuilderTypeConverter[LocalDate] = new ApibuilderTypeConverter[LocalDate] {
-      |    override def convert(value: String): LocalDate = LocalDate.parse(value)
-      |    override def convert(value: LocalDate): String = value.toString
-      |    override def example: LocalDate = LocalDate.now
-      |  }
-      |
-      |}""".stripMargin
-  }
-
-  private def apibuilderHelpers(): String = {
-    val apibuilderTypes = ssd.config.timeLib match {
-      case TimeConfig.JodaTime => apibuilderTypesJoda
-      case TimeConfig.JavaTime => apibuilderTypesJava
-    }
 
     s"""
 trait ApibuilderTypeConverter[T] {

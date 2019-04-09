@@ -16,13 +16,13 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
 
   implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.Instant] =
-    org.http4s.QueryParamDecoder.fromUnsafeCast[java.time.Instant](p => java.time.Instant.parse(p.value))("java.time.Instant")
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.Instant](p => _root_.java.time.OffsetDateTime.parse(p.value).toInstant)("_root_.java.time.Instant")
 
   implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.LocalDate] =
-    org.http4s.QueryParamDecoder.fromUnsafeCast[java.time.LocalDate](p => java.time.LocalDate.parse(p.value))("java.time.LocalDate")
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.LocalDate](p => _root_.java.time.LocalDate.parse(p.value))("_root_.java.time.LocalDate")
 
   implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
-    org.http4s.QueryParamDecoder.fromUnsafeCast[java.util.UUID](p => java.util.UUID.fromString(p.value))("java.util.UUID")
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.util.UUID](p => _root_.java.util.UUID.fromString(p.value))("_root_.java.util.UUID")
 
 
   object ApiVersion {
@@ -37,11 +37,11 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
   }
 
   object InstantVal {
-    def unapply(s: String): Option[_root_.java.time.Instant] = scala.util.Try(java.time.Instant.parse(s)).toOption
+    def unapply(s: String): Option[_root_.java.time.Instant] = scala.util.Try(_root_.java.time.OffsetDateTime.parse(s).toInstant).toOption
   }
 
   object LocalDateVal {
-    def unapply(s: String): Option[_root_.java.time.LocalDate] = scala.util.Try(java.time.LocalDate.parse(s)).toOption
+    def unapply(s: String): Option[_root_.java.time.LocalDate] = scala.util.Try(_root_.java.time.LocalDate.parse(p.value)).toOption
   }
 
   object QueryDateLocalDateMatcher extends QueryParamDecoderMatcher[_root_.java.time.LocalDate]("query_date")

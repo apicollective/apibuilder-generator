@@ -740,7 +740,7 @@ package io.apibuilder.api.v0.models {
       Decoder.decodeString.emapTry(str => Try(_root_.java.util.UUID.fromString(str)))
 
     private[v0] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
-      Encoder.encodeString.contramap[_root_.java.util.UUID](_.toString)
+      Encoder.encodeString.contramap[_root_.java.util.UUID](uuid => uuid.toString)
 
     private[v0] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
       Decoder.decodeString.emapTry(str => Try(_root_.java.time.OffsetDateTime.parse(str).toInstant))

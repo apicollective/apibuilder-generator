@@ -29,35 +29,31 @@ package com.gilt.test.v0.models {
     import play.api.libs.functional.syntax._
     import com.gilt.test.v0.models.json._
 
-    private[v0] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
+    private[v0] implicit val jsonReadsUUID = __.read[String].map { str =>
+      _root_.java.util.UUID.fromString(str)
+    }
 
-    private[v0] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
-      def writes(x: java.util.UUID) = JsString(x.toString)
+    private[v0] implicit val jsonWritesUUID = new Writes[_root_.java.util.UUID] {
+      def writes(x: _root_.java.util.UUID) = JsString(x.toString)
     }
 
     private[v0] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
-      import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-      dateTimeParser.parseDateTime(str)
+      _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)
     }
 
-    private[v0] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
-      def writes(x: org.joda.time.DateTime) = {
-        import org.joda.time.format.ISODateTimeFormat.dateTime
-        val str = dateTime.print(x)
-        JsString(str)
+    private[v0] implicit val jsonWritesJodaDateTime = new Writes[_root_.org.joda.time.DateTime] {
+      def writes(x: _root_.org.joda.time.DateTime) = {
+        JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x))
       }
     }
 
     private[v0] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
-      import org.joda.time.format.ISODateTimeFormat.dateParser
-      dateParser.parseLocalDate(str)
+      _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(str)
     }
 
-    private[v0] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
-      def writes(x: org.joda.time.LocalDate) = {
-        import org.joda.time.format.ISODateTimeFormat.date
-        val str = date.print(x)
-        JsString(str)
+    private[v0] implicit val jsonWritesJodaLocalDate = new Writes[_root_.org.joda.time.LocalDate] {
+      def writes(x: _root_.org.joda.time.LocalDate) = {
+        JsString(x.toString)
       }
     }
 

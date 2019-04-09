@@ -151,6 +151,7 @@ package io.gregor.time.types.v0 {
       implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.java.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
     }
 
+
     trait ApibuilderTypeConverter[T] {
 
       def convert(value: String): T
@@ -171,18 +172,16 @@ package io.gregor.time.types.v0 {
     }
 
     object ApibuilderTypes {
-      import java.time.{Instant, LocalDate}
-
-      val dateTimeIso8601: ApibuilderTypeConverter[Instant] = new ApibuilderTypeConverter[Instant] {
-        override def convert(value: String): Instant = Instant.parse(value)
-        override def convert(value: Instant): String = value.toString
-        override def example: Instant = Instant.now
+      val dateTimeIso8601: ApibuilderTypeConverter[_root_.java.time.Instant] = new ApibuilderTypeConverter[_root_.java.time.Instant] {
+        override def convert(value: String): _root_.java.time.Instant = _root_.java.time.OffsetDateTime.parse(value).toInstant
+        override def convert(value: _root_.java.time.Instant): String = value.toString
+        override def example: _root_.java.time.Instant = _root_.java.time.Instant.now
       }
 
-      val dateIso8601: ApibuilderTypeConverter[LocalDate] = new ApibuilderTypeConverter[LocalDate] {
-        override def convert(value: String): LocalDate = LocalDate.parse(value)
-        override def convert(value: LocalDate): String = value.toString
-        override def example: LocalDate = LocalDate.now
+      val dateIso8601: ApibuilderTypeConverter[_root_.java.time.LocalDate] = new ApibuilderTypeConverter[_root_.java.time.LocalDate] {
+        override def convert(value: String): _root_.java.time.LocalDate = _root_.java.time.OffsetDateTime.parse(value).toInstant
+        override def convert(value: _root_.java.time.LocalDate): String = value.toString
+        override def example: LocalDate = _root_.java.time.LocalDate.now
       }
 
     }
