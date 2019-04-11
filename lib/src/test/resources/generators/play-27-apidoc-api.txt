@@ -2004,7 +2004,6 @@ package io.apibuilder.api.v0 {
       implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.org.joda.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
     }
 
-
     object Models {
       import io.apibuilder.api.v0.models._
 
@@ -2067,7 +2066,6 @@ package io.apibuilder.api.v0 {
         override def convert(value: _root_.org.joda.time.LocalDate): String = _root_.org.joda.time.format.ISODateTimeFormat.date.print(value)
         override def example: _root_.org.joda.time.LocalDate = _root_.org.joda.time.LocalDate.now
       }
-
     }
 
     final case class ApibuilderQueryStringBindable[T](

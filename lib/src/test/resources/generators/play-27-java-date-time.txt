@@ -151,7 +151,6 @@ package io.gregor.time.types.v0 {
       implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.java.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
     }
 
-
     trait ApibuilderTypeConverter[T] {
 
       def convert(value: String): T
@@ -183,7 +182,6 @@ package io.gregor.time.types.v0 {
         override def convert(value: _root_.java.time.LocalDate): String = value.toString
         override def example: _root_.java.time.LocalDate = _root_.java.time.LocalDate.now
       }
-
     }
 
     final case class ApibuilderQueryStringBindable[T](

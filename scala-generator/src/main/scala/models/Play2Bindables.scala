@@ -27,15 +27,13 @@ case class Play2Bindables(ssd: ScalaService) {
   }
 
   private def buildObjectCore(dateTimeIso8601: ScalaPrimitive, dateIso8601: ScalaPrimitive): String = {
-    s"""
-       |object Core {
+    s"""object Core {
        |  implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[${dateTimeIso8601.fullName}] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
        |  implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[${dateTimeIso8601.fullName}] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
        |
        |  implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[${dateIso8601.fullName}] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
        |  implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[${dateIso8601.fullName}] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
-       |}
-       |""".trim.stripMargin
+       |}""".stripMargin
   }
 
   private def buildObjectModels(): Option[String] = {
@@ -68,89 +66,82 @@ case class Play2Bindables(ssd: ScalaService) {
   }
 
   private def apibuilderHelpers(dateTimeIso8601: ScalaPrimitive, dateIso8601: ScalaPrimitive): String = {
-    val apibuilderTypes =
-      s"""object ApibuilderTypes {
-         |  val dateTimeIso8601: ApibuilderTypeConverter[${dateTimeIso8601.fullName}] = new ApibuilderTypeConverter[${dateTimeIso8601.fullName}] {
-         |    override def convert(value: String): ${dateTimeIso8601.fullName} = ${dateTimeIso8601.fromStringValue("value")}
-         |    override def convert(value: ${dateTimeIso8601.fullName}): String = ${dateTimeIso8601.asString("value")}
-         |    override def example: ${dateTimeIso8601.fullName} = ${dateTimeIso8601.fullName}.now
-         |  }
-         |
-         |  val dateIso8601: ApibuilderTypeConverter[${dateIso8601.fullName}] = new ApibuilderTypeConverter[${dateIso8601.fullName}] {
-         |    override def convert(value: String): ${dateIso8601.fullName} = ${dateIso8601.fromStringValue("value")}
-         |    override def convert(value: ${dateIso8601.fullName}): String = ${dateIso8601.asString("value")}
-         |    override def example: ${dateIso8601.fullName} = ${dateIso8601.fullName}.now
-         |  }
-         |
-         |}""".stripMargin
-
-
-    s"""
-trait ApibuilderTypeConverter[T] {
-
-  def convert(value: String): T
-
-  def convert(value: T): String
-
-  def example: T
-
-  def validValues: Seq[T] = Nil
-
-  def errorMessage(key: String, value: String, ex: java.lang.Exception): String = {
-    val base = s"Invalid value '$$value' for parameter '$$key'. "
-    validValues.toList match {
-      case Nil => base + "Ex: " + convert(example)
-      case values => base + ". Valid values are: " + values.mkString("'", "', '", "'")
-    }
-  }
-}
-
-$apibuilderTypes
-
-final case class ApibuilderQueryStringBindable[T](
-  converters: ApibuilderTypeConverter[T]
-) extends QueryStringBindable[T] {
-
-  override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, T]] = {
-    params.getOrElse(key, Nil).headOption.map { v =>
-      try {
-        Right(
-          converters.convert(v)
-        )
-      } catch {
-        case ex: java.lang.Exception => Left(
-          converters.errorMessage(key, v, ex)
-        )
-      }
-    }
-  }
-
-  override def unbind(key: String, value: T): String = {
-    s"$$key=$${converters.convert(value)}"
-  }
-}
-
-final case class ApibuilderPathBindable[T](
-  converters: ApibuilderTypeConverter[T]
-) extends PathBindable[T] {
-
-  override def bind(key: String, value: String): _root_.scala.Either[String, T] = {
-    try {
-      Right(
-        converters.convert(value)
-      )
-    } catch {
-      case ex: java.lang.Exception => Left(
-        converters.errorMessage(key, value, ex)
-      )
-    }
-  }
-
-  override def unbind(key: String, value: T): String = {
-    converters.convert(value)
-  }
-}
-""".trim
+    s"""trait ApibuilderTypeConverter[T] {
+       |
+       |  def convert(value: String): T
+       |
+       |  def convert(value: T): String
+       |
+       |  def example: T
+       |
+       |  def validValues: Seq[T] = Nil
+       |
+       |  def errorMessage(key: String, value: String, ex: java.lang.Exception): String = {
+       |    val base = s"Invalid value '$$value' for parameter '$$key'. "
+       |    validValues.toList match {
+       |      case Nil => base + "Ex: " + convert(example)
+       |      case values => base + ". Valid values are: " + values.mkString("'", "', '", "'")
+       |    }
+       |  }
+       |}
+       |
+       |object ApibuilderTypes {
+       |  val dateTimeIso8601: ApibuilderTypeConverter[${dateTimeIso8601.fullName}] = new ApibuilderTypeConverter[${dateTimeIso8601.fullName}] {
+       |    override def convert(value: String): ${dateTimeIso8601.fullName} = ${dateTimeIso8601.fromStringValue("value")}
+       |    override def convert(value: ${dateTimeIso8601.fullName}): String = ${dateTimeIso8601.asString("value")}
+       |    override def example: ${dateTimeIso8601.fullName} = ${dateTimeIso8601.fullName}.now
+       |  }
+       |
+       |  val dateIso8601: ApibuilderTypeConverter[${dateIso8601.fullName}] = new ApibuilderTypeConverter[${dateIso8601.fullName}] {
+       |    override def convert(value: String): ${dateIso8601.fullName} = ${dateIso8601.fromStringValue("value")}
+       |    override def convert(value: ${dateIso8601.fullName}): String = ${dateIso8601.asString("value")}
+       |    override def example: ${dateIso8601.fullName} = ${dateIso8601.fullName}.now
+       |  }
+       |}
+       |
+       |final case class ApibuilderQueryStringBindable[T](
+       |  converters: ApibuilderTypeConverter[T]
+       |) extends QueryStringBindable[T] {
+       |
+       |  override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, T]] = {
+       |    params.getOrElse(key, Nil).headOption.map { v =>
+       |      try {
+       |        Right(
+       |          converters.convert(v)
+       |        )
+       |      } catch {
+       |        case ex: java.lang.Exception => Left(
+       |          converters.errorMessage(key, v, ex)
+       |        )
+       |      }
+       |    }
+       |  }
+       |
+       |  override def unbind(key: String, value: T): String = {
+       |    s"$$key=$${converters.convert(value)}"
+       |  }
+       |}
+       |
+       |final case class ApibuilderPathBindable[T](
+       |  converters: ApibuilderTypeConverter[T]
+       |) extends PathBindable[T] {
+       |
+       |  override def bind(key: String, value: String): _root_.scala.Either[String, T] = {
+       |    try {
+       |      Right(
+       |        converters.convert(value)
+       |      )
+       |    } catch {
+       |      case ex: java.lang.Exception => Left(
+       |        converters.errorMessage(key, value, ex)
+       |      )
+       |    }
+       |  }
+       |
+       |  override def unbind(key: String, value: T): String = {
+       |    converters.convert(value)
+       |  }
+       |}""".stripMargin
   }
 
   private[models] def buildImplicit(
