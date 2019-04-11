@@ -28,7 +28,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                  |    isFlashy: Boolean = true,
                                  |    markets: Seq[String] = scala.List("USA","CAN"),
                                  |    launchedOn: _root_.java.time.LocalDate = _root_.java.time.LocalDate.parse("1986-02-01"),
-                                 |    timestamp: _root_.java.time.Instant = _root_.java.time.ZonedDateTime.parse("2018-03-21T02:20:52Z").toInstant""".stripMargin) should be(true)
+                                 |    timestamp: _root_.java.time.Instant = _root_.java.time.OffsetDateTime.parse("2018-03-21T02:20:52Z").toInstant""".stripMargin) should be(true)
 
     jsOnly.contents.contains("""    implicit def decodeAPIBuilderTestModel: Decoder[Model] = Decoder.instance { c =>
                                |     for {
@@ -55,7 +55,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |          isFlashy = isFlashy.getOrElse(true),
                                |          markets = markets.getOrElse(scala.List("USA","CAN")),
                                |          launchedOn = launchedOn.getOrElse(_root_.java.time.LocalDate.parse("1986-02-01")),
-                               |          timestamp = timestamp.getOrElse(_root_.java.time.ZonedDateTime.parse("2018-03-21T02:20:52Z").toInstant)
+                               |          timestamp = timestamp.getOrElse(_root_.java.time.OffsetDateTime.parse("2018-03-21T02:20:52Z").toInstant)
                                |        )
                                |      }
                                |    }""".stripMargin) should be(true)
@@ -82,7 +82,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |    isFlashy: Boolean = true,
                                |    markets: Seq[String] = scala.List("USA","CAN"),
                                |    launchedOn: _root_.java.time.LocalDate = _root_.java.time.LocalDate.parse("1986-02-01"),
-                               |    timestamp: _root_.java.time.Instant = _root_.java.time.ZonedDateTime.parse("2018-03-21T02:20:52Z").toInstant""".stripMargin) should be(true)
+                               |    timestamp: _root_.java.time.Instant = _root_.java.time.OffsetDateTime.parse("2018-03-21T02:20:52Z").toInstant""".stripMargin) should be(true)
 
     jsOnly.contents.contains("""for {
                                |        guid <- c.downField("guid").as[Option[_root_.java.util.UUID]]
@@ -108,7 +108,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |          isFlashy = isFlashy.getOrElse(true),
                                |          markets = markets.getOrElse(scala.List("USA","CAN")),
                                |          launchedOn = launchedOn.getOrElse(_root_.java.time.LocalDate.parse("1986-02-01")),
-                               |          timestamp = timestamp.getOrElse(_root_.java.time.ZonedDateTime.parse("2018-03-21T02:20:52Z").toInstant)
+                               |          timestamp = timestamp.getOrElse(_root_.java.time.OffsetDateTime.parse("2018-03-21T02:20:52Z").toInstant)
                                |        )
                                |      }
                                |    }""".stripMargin) should be(true)
@@ -134,7 +134,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |    isFlashy: _root_.scala.Option[Boolean] = Some(true),
                                |    markets: _root_.scala.Option[Seq[String]] = Some(scala.List("USA","CAN")),
                                |    launchedOn: _root_.scala.Option[_root_.java.time.LocalDate] = Some(_root_.java.time.LocalDate.parse("1986-02-01")),
-                               |    timestamp: _root_.scala.Option[_root_.java.time.Instant] = Some(_root_.java.time.ZonedDateTime.parse("2018-03-21T02:20:52Z").toInstant)""".stripMargin) should be(true)
+                               |    timestamp: _root_.scala.Option[_root_.java.time.Instant] = Some(_root_.java.time.OffsetDateTime.parse("2018-03-21T02:20:52Z").toInstant)""".stripMargin) should be(true)
 
     jsOnly.contents.contains("""for {
                                |        guid <- c.downField("guid").as[Option[_root_.java.util.UUID]]
@@ -160,7 +160,7 @@ class CirceDefaultsSpec extends FunSpec with Matchers {
                                |          isFlashy = isFlashy.getOrElse(Some(true)),
                                |          markets = markets.getOrElse(Some(scala.List("USA","CAN"))),
                                |          launchedOn = launchedOn.getOrElse(Some(_root_.java.time.LocalDate.parse("1986-02-01"))),
-                               |          timestamp = timestamp.getOrElse(Some(_root_.java.time.ZonedDateTime.parse("2018-03-21T02:20:52Z").toInstant))
+                               |          timestamp = timestamp.getOrElse(Some(_root_.java.time.OffsetDateTime.parse("2018-03-21T02:20:52Z").toInstant))
                                |        )
                                |      }""".stripMargin) should be(true)
   }

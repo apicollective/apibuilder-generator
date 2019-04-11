@@ -181,7 +181,7 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
     override def default(value: String): String = {
-      "_root_.java.time.ZonedDateTime.parse(" + ScalaUtil.wrapInQuotes(value) + ").toInstant"
+      "_root_.java.time.OffsetDateTime.parse(" + ScalaUtil.wrapInQuotes(value) + ").toInstant"
     }
   }
 

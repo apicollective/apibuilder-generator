@@ -58,7 +58,7 @@ private[server] object Matchers {
   object IdEnumMatcher extends QueryParamDecoderMatcher[io.apibuilder.http4s.test.models.Enum]("id")
 
   object IdInstant10To30Def19991231t235959zMatcher extends QueryParamDecoderMatcher[_root_.java.time.Instant]("id") {
-    override def unapply(params: Map[String, Seq[String]]) = super.unapply(params).orElse(Some(_root_.java.time.ZonedDateTime.parse("1999-12-31T23:59:59Z").toInstant))
+    override def unapply(params: Map[String, Seq[String]]) = super.unapply(params).orElse(Some(_root_.java.time.OffsetDateTime.parse("1999-12-31T23:59:59Z").toInstant))
   }
 
   object IdInstantMatcher extends QueryParamDecoderMatcher[_root_.java.time.Instant]("id")
