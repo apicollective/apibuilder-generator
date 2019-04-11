@@ -40,7 +40,7 @@ private[server] object Matchers {
   }
 
   object UUIDVal {
-    def unapply(s: String): Option[_root_.java.util.UUID] = scala.util.Try(_root_.java.util.UUID.fromString(p.value)).toOption
+    def unapply(s: String): Option[_root_.java.util.UUID] = scala.util.Try(_root_.java.util.UUID.fromString(s)).toOption
   }
 
   object ApplicationKeyOptStringMatcher extends OptionalQueryParamDecoderMatcher[String]("application_key")

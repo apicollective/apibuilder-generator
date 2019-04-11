@@ -61,7 +61,7 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
   }
 
   object LocalDateVal {
-    def unapply(s: String): Option[_root_.java.time.LocalDate] = scala.util.Try(_root_.java.time.LocalDate.parse(p.value)).toOption
+    def unapply(s: String): Option[_root_.java.time.LocalDate] = scala.util.Try(_root_.java.time.LocalDate.parse(s)).toOption
   }
 
   object Long10To30Val {
@@ -89,7 +89,7 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
   }
 
   object UUIDVal {
-    def unapply(s: String): Option[_root_.java.util.UUID] = scala.util.Try(_root_.java.util.UUID.fromString(p.value)).toOption
+    def unapply(s: String): Option[_root_.java.util.UUID] = scala.util.Try(_root_.java.util.UUID.fromString(s)).toOption
   }
 
 }
