@@ -154,7 +154,7 @@ package io.apibuilder.reference.api.v0.models {
 
     private[v0] implicit val jsonWritesJodaLocalDate = new Writes[_root_.org.joda.time.LocalDate] {
       def writes(x: _root_.org.joda.time.LocalDate) = {
-        JsString(x.toString)
+        JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
       }
     }
 
@@ -472,7 +472,7 @@ package io.apibuilder.reference.api.v0 {
 
       val dateIso8601: ApibuilderTypeConverter[_root_.org.joda.time.LocalDate] = new ApibuilderTypeConverter[_root_.org.joda.time.LocalDate] {
         override def convert(value: String): _root_.org.joda.time.LocalDate = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(value)
-        override def convert(value: _root_.org.joda.time.LocalDate): String = value.toString
+        override def convert(value: _root_.org.joda.time.LocalDate): String = _root_.org.joda.time.format.ISODateTimeFormat.date.print(value)
         override def example: _root_.org.joda.time.LocalDate = _root_.org.joda.time.LocalDate.now
       }
 

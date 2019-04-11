@@ -129,7 +129,7 @@ object ScalaPrimitive {
     def shortName = "LocalDate"
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
+      s"_root_.org.joda.time.format.ISODateTimeFormat.date.print($varName)"
     }
     override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate($value)"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))

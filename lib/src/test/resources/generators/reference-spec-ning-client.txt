@@ -153,7 +153,7 @@ package io.apibuilder.reference.api.v0.models {
 
     private[v0] implicit val jsonWritesJodaLocalDate = new Writes[_root_.org.joda.time.LocalDate] {
       def writes(x: _root_.org.joda.time.LocalDate) = {
-        JsString(x.toString)
+        JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
       }
     }
 

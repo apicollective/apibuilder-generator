@@ -93,7 +93,7 @@ package io.gregor.time.types.v0.models {
       Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(str)))
 
     private[v0] implicit val encodeLocalDate: Encoder[_root_.org.joda.time.LocalDate] =
-      Encoder.encodeString.contramap[_root_.org.joda.time.LocalDate](_.toString)
+      Encoder.encodeString.contramap[_root_.org.joda.time.LocalDate](_root_.org.joda.time.format.ISODateTimeFormat.date.print(_))
 
     implicit def decodeTimeTypesDateTimeModel: Decoder[DateTimeModel] = Decoder.instance { c =>
      for {
@@ -198,12 +198,12 @@ import io.circe.syntax._
         dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
         requestHeaders: Seq[(String, String)] = Nil
       ): F[io.gregor.time.types.v0.models.DateTimeModel] = {
-        val urlPath = Seq("date_time_models", pathDate.toString, _root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(pathTime))
+        val urlPath = Seq("date_time_models", _root_.org.joda.time.format.ISODateTimeFormat.date.print(pathDate), _root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(pathTime))
 
         val (payload, formPayload) = (Some(dateTimeModel), None)
 
         val queryParameters = Seq(
-          Some("query_date" -> queryDate.toString),
+          Some("query_date" -> _root_.org.joda.time.format.ISODateTimeFormat.date.print(queryDate)),
           Some("query_time" -> _root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(queryTime))
         ).flatten
 
