@@ -181,7 +181,7 @@ package io.gregor.time.types.v0 {
       val dateIso8601: ApibuilderTypeConverter[_root_.java.time.LocalDate] = new ApibuilderTypeConverter[_root_.java.time.LocalDate] {
         override def convert(value: String): _root_.java.time.LocalDate = _root_.java.time.LocalDate.parse(value)
         override def convert(value: _root_.java.time.LocalDate): String = value.toString
-        override def example: LocalDate = _root_.java.time.LocalDate.now
+        override def example: _root_.java.time.LocalDate = _root_.java.time.LocalDate.now
       }
 
     }

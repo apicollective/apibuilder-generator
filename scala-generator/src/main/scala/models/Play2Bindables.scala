@@ -79,7 +79,7 @@ case class Play2Bindables(ssd: ScalaService) {
          |  val dateIso8601: ApibuilderTypeConverter[${dateIso8601.fullName}] = new ApibuilderTypeConverter[${dateIso8601.fullName}] {
          |    override def convert(value: String): ${dateIso8601.fullName} = ${dateIso8601.fromStringValue("value")}
          |    override def convert(value: ${dateIso8601.fullName}): String = ${dateIso8601.asString("value")}
-         |    override def example: LocalDate = ${dateIso8601.fullName}.now
+         |    override def example: ${dateIso8601.fullName} = ${dateIso8601.fullName}.now
          |  }
          |
          |}""".stripMargin

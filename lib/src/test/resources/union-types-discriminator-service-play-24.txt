@@ -295,7 +295,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
       val dateIso8601: ApibuilderTypeConverter[_root_.org.joda.time.LocalDate] = new ApibuilderTypeConverter[_root_.org.joda.time.LocalDate] {
         override def convert(value: String): _root_.org.joda.time.LocalDate = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(value)
         override def convert(value: _root_.org.joda.time.LocalDate): String = value.toString
-        override def example: LocalDate = _root_.org.joda.time.LocalDate.now
+        override def example: _root_.org.joda.time.LocalDate = _root_.org.joda.time.LocalDate.now
       }
 
     }
