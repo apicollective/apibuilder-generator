@@ -300,7 +300,7 @@ package io.gregor.time.types.v0 {
           Some("query_time" -> _root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(queryTime))
         ).flatten
 
-        _executeRequest("POST", s"/date_time_models/${_root_.org.joda.time.format.ISODateTimeFormat.date.print(pathDate)}/${_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(pathTime)}", body = Some(payload), queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/date_time_models/${play.utils.UriEncoding.encodePathSegment(_root_.org.joda.time.format.ISODateTimeFormat.date.print(pathDate), "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(pathTime), "UTF-8")}", body = Some(payload), queryParameters = queryParameters, requestHeaders = requestHeaders).map {
           case r if r.status == 200 => _root_.io.gregor.time.types.v0.Client.parseJson("io.gregor.time.types.v0.models.DateTimeModel", r, _.validate[io.gregor.time.types.v0.models.DateTimeModel])
           case r => throw io.gregor.time.types.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
