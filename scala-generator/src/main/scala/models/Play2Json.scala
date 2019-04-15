@@ -435,7 +435,7 @@ case class Play2Json(
       case ScalaPrimitive.Decimal | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsNumber($varName)")
       }
-      case dt @ (ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601JavaInstant | ScalaPrimitive.Uuid) => {
+      case dt @ (ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601JavaInstant | ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime | ScalaPrimitive.Uuid) => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString(${dt.asString(varName)})")
       }
       case ScalaPrimitive.String => {
@@ -499,7 +499,7 @@ case class Play2Json(
       case ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long => {
         wrapInObject(s"play.api.libs.json.JsNumber(${varName}.value)", discriminator)
       }
-      case dt @ (ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601JavaInstant | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid) => {
+      case dt @ (ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601JavaInstant | ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid) => {
         wrapInObject(s"play.api.libs.json.JsString(${dt.asString(s"$varName.value")})", discriminator)
       }
       case ScalaPrimitive.String => {

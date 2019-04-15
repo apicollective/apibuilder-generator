@@ -18,10 +18,10 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
   implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
 
-  implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.Instant] =
+  implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[_root_.java.time.Instant] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.Instant](p => _root_.java.time.OffsetDateTime.parse(p.value).toInstant)("_root_.java.time.Instant")
 
-  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.LocalDate] =
+  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[_root_.java.time.LocalDate] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.LocalDate](p => _root_.java.time.LocalDate.parse(p.value))("_root_.java.time.LocalDate")
 
   implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
