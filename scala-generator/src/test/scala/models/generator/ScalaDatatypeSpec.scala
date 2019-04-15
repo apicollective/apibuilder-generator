@@ -50,8 +50,8 @@ class ScalaDatatypeSpec extends FunSpec with Matchers {
   }
 
   it("DateIso8601Joda sanity check") {
-    DateIso8601Joda.asString("myVar") shouldBe "myVar.toString"
-    DateIso8601Joda.default("2020-12-31") shouldBe "new _root_.org.joda.time.LocalDate(2020, 12, 31)"
+    DateIso8601Joda.asString("myVar") shouldBe "_root_.org.joda.time.format.ISODateTimeFormat.date.print(myVar)"
+    DateIso8601Joda.default("2020-12-31") shouldBe """_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate("2020-12-31")"""
     DateIso8601Joda.name shouldBe "_root_.org.joda.time.LocalDate"
   }
 

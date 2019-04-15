@@ -73,6 +73,8 @@ sealed trait ScalaPrimitive extends ScalaDatatype {
   def name: String = fullName
 
   override def toVariableName = "value"
+
+  def fromStringValue(value: String): String = s"$value.toString"
 }
 
 object ScalaPrimitive {
@@ -127,16 +129,11 @@ object ScalaPrimitive {
     def shortName = "LocalDate"
     override def asString(originalVarName: String): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
+      s"_root_.org.joda.time.format.ISODateTimeFormat.date.print($varName)"
     }
-
-    override def default(value: String): String = default(JsString(value))
-
-
-    override protected def default(json: JsValue): String = {
-      val dt = dateTimeParser.parseLocalDate(json.as[String])
-      s"new ${fullName}(${dt.getYear}, ${dt.getMonthOfYear}, ${dt.getDayOfMonth})"
-    }
+    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate($value)"
+    override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
+    override protected def default(json: JsValue): String = default(json.toString)
   }
 
   case object DateIso8601Java extends ScalaPrimitive {
@@ -147,9 +144,8 @@ object ScalaPrimitive {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
-    override def default(value: String): String = {
-      "_root_.java.time.LocalDate.parse(" + ScalaUtil.wrapInQuotes(value) + ")"
-    }
+    override def fromStringValue(value: String) = s"_root_.java.time.LocalDate.parse($value)"
+    override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
   }
 
   case object DateTimeIso8601Joda extends ScalaPrimitive {
@@ -160,16 +156,9 @@ object ScalaPrimitive {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
     }
-
-    override def default(value: String): String = {
-      "_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(" + ScalaUtil.wrapInQuotes(value) + ")"
-    }
-
-    override protected def default(json: JsValue): String = {
-      // TODO would like to use the constructor for DateTime, since that would
-      // be faster code, but things get quite tricky because of time zones :(
-      s"""_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${json})"""
-    }
+    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime($value)"
+    override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
+    override protected def default(json: JsValue): String = default(json.toString)
   }
 
   case object DateTimeIso8601Java extends ScalaPrimitive {
@@ -180,9 +169,8 @@ object ScalaPrimitive {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
-    override def default(value: String): String = {
-      "_root_.java.time.OffsetDateTime.parse(" + ScalaUtil.wrapInQuotes(value) + ").toInstant"
-    }
+    override def fromStringValue(value: String) = s"_root_.java.time.OffsetDateTime.parse($value).toInstant"
+    override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
   }
 
   case object Decimal extends ScalaPrimitive {
@@ -243,9 +231,8 @@ object ScalaPrimitive {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName"
     }
-
+    override def fromStringValue(value: String) = value
     override def default(value: String): String = ScalaUtil.wrapInQuotes(value)
-
     override protected def default(json: JsValue): String = default(json.as[String])
   }
 
@@ -265,8 +252,8 @@ object ScalaPrimitive {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
       s"$varName.toString"
     }
-
-    override def default(value: String): String = "_root_.java.util.UUID.fromString(" + ScalaUtil.wrapInQuotes(value) + ")"
+    override def fromStringValue(value: String) = s"_root_.java.util.UUID.fromString($value)"
+    override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
 
     override protected def default(json: JsValue): String = default(json.as[UUID].toString)
 

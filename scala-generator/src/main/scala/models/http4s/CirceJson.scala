@@ -2,6 +2,7 @@ package scala.models.http4s
 
 import lib.Text._
 
+import scala.generator.ScalaPrimitive.{DateIso8601Java, DateIso8601Joda, DateTimeIso8601Java, DateTimeIso8601Joda, Uuid}
 import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaUnion, ScalaUnionType}
 import scala.models.{JsonImports, TimeConfig}
 
@@ -23,44 +24,29 @@ ${JsonImports(ssd.service).mkString("\n").indent(4)}
     // Make Scala 2.11 Either monadic
     private[${ssd.namespaces.last}] implicit def eitherOps[A,B](e: Either[A,B]) = cats.implicits.catsSyntaxEither(e)
 
-    private[${ssd.namespaces.last}] implicit val decodeUUID: Decoder[_root_.java.util.UUID] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.util.UUID.fromString(str)))
+    private[${ssd.namespaces.last}] implicit val decodeUUID: Decoder[${Uuid.fullName}] =
+      Decoder.decodeString.emapTry(str => Try(${Uuid.fromStringValue("str")}))
 
-    private[${ssd.namespaces.last}] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
-      Encoder.encodeString.contramap[_root_.java.util.UUID](_.toString)
+    private[${ssd.namespaces.last}] implicit val encodeUUID: Encoder[${Uuid.fullName}] =
+      Encoder.encodeString.contramap[${Uuid.fullName}](uuid => ${Uuid.asString("uuid")})
 ${Seq(generateTimeSerde(),generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
   }
 
   def generateTimeSerde(): String = {
-    ssd.config.timeLib match {
-      case TimeConfig.JodaTime => s"""
-        |private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.org.joda.time.DateTime] =
-        |  Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)))
-        |
-        |private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.org.joda.time.DateTime] =
-        |  Encoder.encodeString.contramap[_root_.org.joda.time.DateTime](org.joda.time.format.ISODateTimeFormat.dateTime.print)
-        |
-        |private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.org.joda.time.LocalDate] =
-        |  Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateParser.parseLocalDate(str)))
-        |
-        |private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.org.joda.time.LocalDate] =
-        |  Encoder.encodeString.contramap[_root_.org.joda.time.LocalDate](org.joda.time.format.ISODateTimeFormat.date.print)""".stripMargin('|')
-
-      case TimeConfig.JavaTime => s"""
-        |private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
-        |  Decoder.decodeString.emapTry(str => Try(_root_.java.time.OffsetDateTime.parse(str).toInstant))
-        |
-        |private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.java.time.Instant] =
-        |  Encoder.encodeString.contramap[_root_.java.time.Instant](_.toString)
-        |
-        |private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.java.time.LocalDate] =
-        |  Decoder.decodeString.emapTry(str => Try(_root_.java.time.LocalDate.parse(str)))
-        |
-        |private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.java.time.LocalDate] =
-        |  Encoder.encodeString.contramap[_root_.java.time.LocalDate](_.toString)""".stripMargin('|')
+    val dts = ssd.config.timeLib match {
+      case TimeConfig.JodaTime => Seq(DateTimeIso8601Joda, DateIso8601Joda)
+      case TimeConfig.JavaTime => Seq(DateTimeIso8601Java, DateIso8601Java)
     }
+    dts.map { dt =>
+      s"""
+         |private[${ssd.namespaces.last}] implicit val decode${dt.shortName}: Decoder[${dt.fullName}] =
+         |  Decoder.decodeString.emapTry(str => Try(${dt.fromStringValue("str")}))
+         |
+         |private[${ssd.namespaces.last}] implicit val encode${dt.shortName}: Encoder[${dt.fullName}] =
+         |  Encoder.encodeString.contramap[${dt.fullName}](${dt.asString("_")})""".stripMargin('|')
+    }.mkString("\n")
   }
 
   def generateModels(): String = {

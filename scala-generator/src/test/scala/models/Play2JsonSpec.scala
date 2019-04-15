@@ -162,7 +162,7 @@ class Play2JsonSpec extends FunSpec with Matchers {
         """for {
           |  one <- (__ \ "one").readWithDefault[Seq[String]](Nil)
           |  two <- (__ \ "two").readWithDefault[Int](7)
-          |  three <- (__ \ "three").readWithDefault[_root_.org.joda.time.LocalDate](new _root_.org.joda.time.LocalDate(2008, 9, 15))
+          |  three <- (__ \ "three").readWithDefault[_root_.org.joda.time.LocalDate](_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate("2008-09-15T15:53:00"))
           |  four <- (__ \ "four").readWithDefault[Boolean](true)
           |} yield B(one, two, three, four)""".stripMargin)
     }

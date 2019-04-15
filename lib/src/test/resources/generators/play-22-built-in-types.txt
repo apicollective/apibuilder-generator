@@ -71,35 +71,31 @@ package apibuilder.models {
     import play.api.libs.functional.syntax._
     import apibuilder.models.json._
 
-    private[apibuilder] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
+    private[apibuilder] implicit val jsonReadsUUID = __.read[String].map { str =>
+      _root_.java.util.UUID.fromString(str)
+    }
 
-    private[apibuilder] implicit val jsonWritesUUID = new Writes[java.util.UUID] {
-      def writes(x: java.util.UUID) = JsString(x.toString)
+    private[apibuilder] implicit val jsonWritesUUID = new Writes[_root_.java.util.UUID] {
+      def writes(x: _root_.java.util.UUID) = JsString(x.toString)
     }
 
     private[apibuilder] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
-      import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-      dateTimeParser.parseDateTime(str)
+      _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)
     }
 
-    private[apibuilder] implicit val jsonWritesJodaDateTime = new Writes[org.joda.time.DateTime] {
-      def writes(x: org.joda.time.DateTime) = {
-        import org.joda.time.format.ISODateTimeFormat.dateTime
-        val str = dateTime.print(x)
-        JsString(str)
+    private[apibuilder] implicit val jsonWritesJodaDateTime = new Writes[_root_.org.joda.time.DateTime] {
+      def writes(x: _root_.org.joda.time.DateTime) = {
+        JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x))
       }
     }
 
     private[apibuilder] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
-      import org.joda.time.format.ISODateTimeFormat.dateParser
-      dateParser.parseLocalDate(str)
+      _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(str)
     }
 
-    private[apibuilder] implicit val jsonWritesJodaLocalDate = new Writes[org.joda.time.LocalDate] {
-      def writes(x: org.joda.time.LocalDate) = {
-        import org.joda.time.format.ISODateTimeFormat.date
-        val str = date.print(x)
-        JsString(str)
+    private[apibuilder] implicit val jsonWritesJodaLocalDate = new Writes[_root_.org.joda.time.LocalDate] {
+      def writes(x: _root_.org.joda.time.LocalDate) = {
+        JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
       }
     }
 
@@ -237,7 +233,7 @@ package apibuilder.models {
       }) ++
       (obj.dateiso8601 match {
         case None => play.api.libs.json.Json.obj()
-        case Some(x) => play.api.libs.json.Json.obj("dateiso8601" -> play.api.libs.json.JsString(x.toString))
+        case Some(x) => play.api.libs.json.Json.obj("dateiso8601" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x)))
       }) ++
       (obj.datetimeiso8601 match {
         case None => play.api.libs.json.Json.obj()
@@ -304,7 +300,7 @@ package apibuilder.models {
     def jsObjectRequired(obj: apibuilder.models.Required): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "boolean" -> play.api.libs.json.JsBoolean(obj.boolean),
-        "dateiso8601" -> play.api.libs.json.JsString(obj.dateiso8601.toString),
+        "dateiso8601" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(obj.dateiso8601)),
         "datetimeiso8601" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.datetimeiso8601)),
         "decimal" -> play.api.libs.json.JsNumber(obj.decimal),
         "double" -> play.api.libs.json.JsNumber(obj.double),
@@ -364,20 +360,17 @@ package apibuilder {
     }
 
     object ApibuilderTypes {
-      import org.joda.time.{format, DateTime, LocalDate}
-
-      val dateTimeIso8601: ApibuilderTypeConverter[DateTime] = new ApibuilderTypeConverter[DateTime] {
-        override def convert(value: String): DateTime = format.ISODateTimeFormat.dateTimeParser.parseDateTime(value)
-        override def convert(value: DateTime): String = format.ISODateTimeFormat.dateTime.print(value)
-        override def example: DateTime = DateTime.now
+      val dateTimeIso8601: ApibuilderTypeConverter[_root_.org.joda.time.DateTime] = new ApibuilderTypeConverter[_root_.org.joda.time.DateTime] {
+        override def convert(value: String): _root_.org.joda.time.DateTime = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(value)
+        override def convert(value: _root_.org.joda.time.DateTime): String = _root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(value)
+        override def example: _root_.org.joda.time.DateTime = _root_.org.joda.time.DateTime.now
       }
 
-      val dateIso8601: ApibuilderTypeConverter[LocalDate] = new ApibuilderTypeConverter[LocalDate] {
-        override def convert(value: String): LocalDate = format.ISODateTimeFormat.yearMonthDay.parseLocalDate(value)
-        override def convert(value: LocalDate): String = value.toString
-        override def example: LocalDate = LocalDate.now
+      val dateIso8601: ApibuilderTypeConverter[_root_.org.joda.time.LocalDate] = new ApibuilderTypeConverter[_root_.org.joda.time.LocalDate] {
+        override def convert(value: String): _root_.org.joda.time.LocalDate = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(value)
+        override def convert(value: _root_.org.joda.time.LocalDate): String = _root_.org.joda.time.format.ISODateTimeFormat.date.print(value)
+        override def example: _root_.org.joda.time.LocalDate = _root_.org.joda.time.LocalDate.now
       }
-
     }
 
     final case class ApibuilderQueryStringBindable[T](
