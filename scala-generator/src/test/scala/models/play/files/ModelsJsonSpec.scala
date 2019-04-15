@@ -43,8 +43,8 @@ class ModelsJsonSpec extends FunSpec with Matchers {
         | import play.api.libs.json.Writes._
         |import play.api.libs.json.Reads._
         |import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
-        |import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
         |import play.api.libs.json.JodaWrites.JodaDateTimeWrites
+        |import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
         |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites
         |
         | import x.models.json._

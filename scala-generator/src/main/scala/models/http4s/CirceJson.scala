@@ -2,9 +2,9 @@ package scala.models.http4s
 
 import lib.Text._
 
-import scala.generator.ScalaPrimitive.{DateIso8601Java, DateIso8601Joda, DateTimeIso8601Java, DateTimeIso8601Joda, Uuid}
+import scala.generator.ScalaPrimitive.Uuid
 import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaUnion, ScalaUnionType}
-import scala.models.{JsonImports, TimeConfig}
+import scala.models.JsonImports
 
 case class CirceJson(
   ssd: ScalaService
@@ -35,11 +35,7 @@ ${Seq(generateTimeSerde(),generateEnums(), generateModels(), generateUnions()).f
   }
 
   def generateTimeSerde(): String = {
-    val dts = ssd.config.timeLib match {
-      case TimeConfig.JodaTime => Seq(DateTimeIso8601Joda, DateIso8601Joda)
-      case TimeConfig.JavaTime => Seq(DateTimeIso8601Java, DateIso8601Java)
-    }
-    dts.map { dt =>
+    Seq(ssd.config.dateTimeType.dataType, ssd.config.dateType.dataType).map { dt =>
       s"""
          |private[${ssd.namespaces.last}] implicit val decode${dt.shortName}: Decoder[${dt.fullName}] =
          |  Decoder.decodeString.emapTry(str => Try(${dt.fromStringValue("str")}))
