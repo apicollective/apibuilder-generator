@@ -39,7 +39,7 @@ object DateTypeConfig {
     override val dataType = ScalaPrimitive.DateIso8601Java
   }
 
-  private val Key = "scala_generator.date_time.type"
+  private val Key = "scala_generator.date.type"
   def apply(attributes: Seq[Attribute]): Option[DateTypeConfig] = {
     attributes.find(_.name == Key).map(_.value.toLowerCase) match {
       case Some("joda.localdate") => Some(JodaLocalDate)

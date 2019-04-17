@@ -1,9 +1,10 @@
 package scala.models
 
-import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 import io.apibuilder.spec.v0.models.Method
+
 import scala.generator.{ScalaOperation, ScalaResource, ScalaService}
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.{FunSpec, Matchers}
 
 class Play2RouteGeneratorSpec extends FunSpec with Matchers {
 
@@ -170,4 +171,44 @@ class Play2RouteGeneratorSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("date and date-time types") {
+    it("uses joda time") {
+      val service = models.TestHelper.dateTimeService
+      val form = InvocationForm(service)
+      val result = Play2RouteGenerator(form).invoke()
+
+      result.isRight shouldBe true
+      val files = result.right.get
+
+      files.size shouldBe 1
+      val route = files(0).contents
+      models.TestHelper.assertEqualsFile(s"/play2/route/date-time-joda.txt", route)
+    }
+
+    it("uses java Instant") {
+      val service = models.TestHelper.dateTimeService
+      val form = InvocationForm(service, Seq(Attribute("scala_generator.date_time.type", "java.instant"), Attribute("scala_generator.date.type", "java.localdate")))
+      val result = Play2RouteGenerator(form).invoke()
+
+      result.isRight shouldBe true
+      val files = result.right.get
+
+      files.size shouldBe 1
+      val route = files(0).contents
+      models.TestHelper.assertEqualsFile(s"/play2/route/date-time-instant.txt", route)
+    }
+
+    it("uses java OffsetDateTime") {
+      val service = models.TestHelper.dateTimeService
+      val form = InvocationForm(service, Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate")))
+      val result = Play2RouteGenerator(form).invoke()
+
+      result.isRight shouldBe true
+      val files = result.right.get
+
+      files.size shouldBe 1
+      val route = files(0).contents
+      models.TestHelper.assertEqualsFile(s"/play2/route/date-time-offsetdatetime.txt", route)
+    }
+  }
 }
