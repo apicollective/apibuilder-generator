@@ -29,7 +29,7 @@ object TimeConfig {
 }
 
 sealed trait DateTypeConfig {
-  def dataType: ScalaPrimitive
+  def dataType: ScalaPrimitive.DateIso8601
 }
 object DateTypeConfig {
   case object JodaLocalDate extends DateTypeConfig {
@@ -50,7 +50,7 @@ object DateTypeConfig {
 }
 
 sealed trait DateTimeTypeConfig {
-  def dataType: ScalaPrimitive
+  def dataType: ScalaPrimitive.DateTimeIso8601
 }
 object DateTimeTypeConfig {
   case object JodaDateTime extends DateTimeTypeConfig {
@@ -74,10 +74,19 @@ object DateTimeTypeConfig {
   }
 }
 
-sealed trait JsonConfig
+sealed trait JsonConfig {
+  def jsonValueType: ScalaPrimitive.JsonValue
+  def jsonObjectType: ScalaPrimitive.JsonObject
+}
 object JsonConfig {
-  case object PlayJson extends JsonConfig
-  case object CirceJson extends JsonConfig
+  case object PlayJson extends JsonConfig {
+    override val jsonValueType = ScalaPrimitive.JsonValueAsPlay
+    override val jsonObjectType = ScalaPrimitive.ObjectAsPlay
+  }
+  case object CirceJson extends JsonConfig {
+    override val jsonValueType = ScalaPrimitive.JsonValueAsCirce
+    override val jsonObjectType = ScalaPrimitive.ObjectAsCirce
+  }
 
   private val Key = "scala_generator.json_library"
   def apply(attributes: Seq[Attribute]): Option[JsonConfig] = {

@@ -202,10 +202,10 @@ class MockClientGenerator(
       case dt: ScalaPrimitive.DateIso8601 => s"${dt.fullName}.now"
       case dt: ScalaPrimitive.DateTimeIso8601 => s"${dt.fullName}.now"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
-      case ScalaPrimitive.ObjectAsPlay => "play.api.libs.json.Json.obj()"
+      case ScalaPrimitive.ObjectAsPlay => "_root_.play.api.libs.json.Json.obj()"
       case ScalaPrimitive.ObjectAsCirce => "Map()"
-      case ScalaPrimitive.JsonValueAsPlay => "play.api.libs.json.Json.obj().asInstanceOf[play.api.libs.json.JsValue]"
-      case ScalaPrimitive.JsonValueAsCirce => "io.circe.Json.obj()"
+      case ScalaPrimitive.JsonValueAsPlay => "_root_.play.api.libs.json.Json.obj().asInstanceOf[_root_.play.api.libs.json.JsValue]"
+      case dt @ ScalaPrimitive.JsonValueAsCirce => s"${dt.fullName}.obj()"
       case ScalaPrimitive.String => {
         limitation match {
           case None => "Factories.randomString()"
@@ -213,7 +213,7 @@ class MockClientGenerator(
         }
       }
       case ScalaPrimitive.Unit => "// unit type"
-      case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"
+      case dt @ ScalaPrimitive.Uuid => s"${dt.fullName}.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
       case ScalaDatatype.Map(_) => "Map()"
       case ScalaDatatype.Option(_) => "None"

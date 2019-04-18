@@ -13,14 +13,6 @@ object Conversions {
     ScalaPrimitive.Long,
   )
 
-  private val ObjectTypes = Seq(
-    ScalaPrimitive.Decimal,
-    ScalaPrimitive.ObjectAsPlay,
-    ScalaPrimitive.JsonValueAsPlay,
-    ScalaPrimitive.String,
-    ScalaPrimitive.Uuid,
-  )
-
   private val Header = """
 package %s {
 %s
@@ -71,7 +63,7 @@ package %s {
     ssd: ScalaService,
     attributes: ParserGeneratorPlayVersionSpecificAttributes
   ): String = {
-    val coreTypes = JavaPrimitiveTypes ++ Seq(ssd.config.dateType.dataType, ssd.config.dateTimeType.dataType) ++ ObjectTypes
+    val coreTypes = JavaPrimitiveTypes ++ Seq(ssd.config.dateType.dataType, ssd.config.dateTimeType.dataType, ScalaPrimitive.Decimal, ssd.config.jsonLib.jsonObjectType, ssd.config.jsonLib.jsonValueType, ScalaPrimitive.String, ScalaPrimitive.Uuid)
 
     Seq(
       Header.format(ssd.namespaces.anormConversions, attributes.imports.map(i => s"\n  import $i").mkString),
