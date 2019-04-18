@@ -2,12 +2,12 @@ package scala.generator
 
 import io.apibuilder.spec.v0.models._
 
-import scala.models.{Config, JsonConfig, Util}
+import scala.models.{Config, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
 import play.api.libs.json.JsString
 
-import scala.generator.ScalaPrimitive.{DateIso8601Joda, DateTimeIso8601Joda, JsonValueAsCirce, JsonValueAsPlay, ObjectAsCirce, ObjectAsPlay}
+import scala.generator.ScalaPrimitive.{DateIso8601, DateTimeIso8601, JsonObject, JsonValue}
 
 object ScalaService {
   def apply(service: Service, config: Config = Config.PlayDefaultConfig) = new ScalaService(service, config)
@@ -39,19 +39,13 @@ class ScalaService(
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
     def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
-      case ObjectAsPlay => config.jsonLib match {
-        case JsonConfig.PlayJson => ObjectAsPlay
-        case JsonConfig.CirceJson => ObjectAsCirce
-      }
+      case _: JsonObject => config.jsonLib.jsonObjectType
 
-      case JsonValueAsPlay => config.jsonLib match {
-        case JsonConfig.PlayJson => JsonValueAsPlay
-        case JsonConfig.CirceJson => JsonValueAsCirce
-      }
+      case _: JsonValue => config.jsonLib.jsonValueType
 
-      case DateIso8601Joda => config.dateType.dataType
+      case _: DateIso8601 => config.dateType.dataType
 
-      case DateTimeIso8601Joda => config.dateTimeType.dataType
+      case _: DateTimeIso8601 => config.dateTimeType.dataType
 
       case ScalaDatatype.List(t) => ScalaDatatype.List(convertObjectType(t))
 

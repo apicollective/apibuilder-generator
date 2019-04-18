@@ -981,7 +981,7 @@ package io.apibuilder.api.v0.mock {
     def makeVisibility(): io.apibuilder.api.v0.models.Visibility = io.apibuilder.api.v0.models.Visibility.User
 
     def makeApplication(): io.apibuilder.api.v0.models.Application = io.apibuilder.api.v0.models.Application(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       organization = io.apibuilder.common.v0.mock.Factories.makeReference(),
       name = Factories.randomString(24),
       key = Factories.randomString(24),
@@ -998,13 +998,13 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeApplicationSummary(): io.apibuilder.api.v0.models.ApplicationSummary = io.apibuilder.api.v0.models.ApplicationSummary(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       organization = io.apibuilder.common.v0.mock.Factories.makeReference(),
       key = Factories.randomString(24)
     )
 
     def makeAttribute(): io.apibuilder.api.v0.models.Attribute = io.apibuilder.api.v0.models.Attribute(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       name = Factories.randomString(24),
       description = None,
       audit = io.apibuilder.common.v0.mock.Factories.makeAudit()
@@ -1016,12 +1016,12 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeAttributeSummary(): io.apibuilder.api.v0.models.AttributeSummary = io.apibuilder.api.v0.models.AttributeSummary(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       name = Factories.randomString(24)
     )
 
     def makeAttributeValue(): io.apibuilder.api.v0.models.AttributeValue = io.apibuilder.api.v0.models.AttributeValue(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       attribute = io.apibuilder.api.v0.mock.Factories.makeAttributeSummary(),
       value = Factories.randomString(24),
       audit = io.apibuilder.common.v0.mock.Factories.makeAudit()
@@ -1032,19 +1032,19 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeChange(): io.apibuilder.api.v0.models.Change = io.apibuilder.api.v0.models.Change(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       organization = io.apibuilder.common.v0.mock.Factories.makeReference(),
       application = io.apibuilder.common.v0.mock.Factories.makeReference(),
       fromVersion = io.apibuilder.api.v0.mock.Factories.makeChangeVersion(),
       toVersion = io.apibuilder.api.v0.mock.Factories.makeChangeVersion(),
       diff = io.apibuilder.api.v0.mock.Factories.makeDiff(),
-      changedAt = java.time.Instant.now,
+      changedAt = _root_.java.time.Instant.now,
       changedBy = io.apibuilder.api.v0.mock.Factories.makeUserSummary(),
       audit = io.apibuilder.common.v0.mock.Factories.makeAudit()
     )
 
     def makeChangeVersion(): io.apibuilder.api.v0.models.ChangeVersion = io.apibuilder.api.v0.models.ChangeVersion(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       version = Factories.randomString(24)
     )
 
@@ -1080,12 +1080,12 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeGeneratorForm(): io.apibuilder.api.v0.models.GeneratorForm = io.apibuilder.api.v0.models.GeneratorForm(
-      serviceGuid = java.util.UUID.randomUUID,
+      serviceGuid = _root_.java.util.UUID.randomUUID,
       generator = io.apibuilder.generator.v0.mock.Factories.makeGenerator()
     )
 
     def makeGeneratorService(): io.apibuilder.api.v0.models.GeneratorService = io.apibuilder.api.v0.models.GeneratorService(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       uri = Factories.randomString(24),
       audit = io.apibuilder.common.v0.mock.Factories.makeAudit()
     )
@@ -1100,14 +1100,14 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeItem(): io.apibuilder.api.v0.models.Item = io.apibuilder.api.v0.models.Item(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       detail = io.apibuilder.api.v0.mock.Factories.makeItemDetail(),
       label = Factories.randomString(24),
       description = None
     )
 
     def makeMembership(): io.apibuilder.api.v0.models.Membership = io.apibuilder.api.v0.models.Membership(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       user = io.apibuilder.api.v0.mock.Factories.makeUser(),
       organization = io.apibuilder.api.v0.mock.Factories.makeOrganization(),
       role = Factories.randomString(24),
@@ -1115,7 +1115,7 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeMembershipRequest(): io.apibuilder.api.v0.models.MembershipRequest = io.apibuilder.api.v0.models.MembershipRequest(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       user = io.apibuilder.api.v0.mock.Factories.makeUser(),
       organization = io.apibuilder.api.v0.mock.Factories.makeOrganization(),
       role = Factories.randomString(24),
@@ -1127,7 +1127,7 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeOrganization(): io.apibuilder.api.v0.models.Organization = io.apibuilder.api.v0.models.Organization(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       key = Factories.randomString(24),
       name = Factories.randomString(24),
       namespace = Factories.randomString(24),
@@ -1164,11 +1164,11 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makePasswordResetSuccess(): io.apibuilder.api.v0.models.PasswordResetSuccess = io.apibuilder.api.v0.models.PasswordResetSuccess(
-      userGuid = java.util.UUID.randomUUID
+      userGuid = _root_.java.util.UUID.randomUUID
     )
 
     def makeSubscription(): io.apibuilder.api.v0.models.Subscription = io.apibuilder.api.v0.models.Subscription(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       organization = io.apibuilder.api.v0.mock.Factories.makeOrganization(),
       user = io.apibuilder.api.v0.mock.Factories.makeUser(),
       publication = io.apibuilder.api.v0.mock.Factories.makePublication(),
@@ -1177,12 +1177,12 @@ package io.apibuilder.api.v0.mock {
 
     def makeSubscriptionForm(): io.apibuilder.api.v0.models.SubscriptionForm = io.apibuilder.api.v0.models.SubscriptionForm(
       organizationKey = Factories.randomString(24),
-      userGuid = java.util.UUID.randomUUID,
+      userGuid = _root_.java.util.UUID.randomUUID,
       publication = io.apibuilder.api.v0.mock.Factories.makePublication()
     )
 
     def makeToken(): io.apibuilder.api.v0.models.Token = io.apibuilder.api.v0.models.Token(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       user = io.apibuilder.api.v0.mock.Factories.makeUser(),
       maskedToken = Factories.randomString(24),
       description = None,
@@ -1190,12 +1190,12 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeTokenForm(): io.apibuilder.api.v0.models.TokenForm = io.apibuilder.api.v0.models.TokenForm(
-      userGuid = java.util.UUID.randomUUID,
+      userGuid = _root_.java.util.UUID.randomUUID,
       description = None
     )
 
     def makeUser(): io.apibuilder.api.v0.models.User = io.apibuilder.api.v0.models.User(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       email = Factories.randomString(24),
       nickname = Factories.randomString(24),
       name = None,
@@ -1210,7 +1210,7 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeUserSummary(): io.apibuilder.api.v0.models.UserSummary = io.apibuilder.api.v0.models.UserSummary(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       nickname = Factories.randomString(24)
     )
 
@@ -1226,7 +1226,7 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeVersion(): io.apibuilder.api.v0.models.Version = io.apibuilder.api.v0.models.Version(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       organization = io.apibuilder.common.v0.mock.Factories.makeReference(),
       application = io.apibuilder.common.v0.mock.Factories.makeReference(),
       version = Factories.randomString(24),
@@ -1241,7 +1241,7 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeWatch(): io.apibuilder.api.v0.models.Watch = io.apibuilder.api.v0.models.Watch(
-      guid = java.util.UUID.randomUUID,
+      guid = _root_.java.util.UUID.randomUUID,
       user = io.apibuilder.api.v0.mock.Factories.makeUser(),
       organization = io.apibuilder.api.v0.mock.Factories.makeOrganization(),
       application = io.apibuilder.api.v0.mock.Factories.makeApplication(),
@@ -1249,7 +1249,7 @@ package io.apibuilder.api.v0.mock {
     )
 
     def makeWatchForm(): io.apibuilder.api.v0.models.WatchForm = io.apibuilder.api.v0.models.WatchForm(
-      userGuid = java.util.UUID.randomUUID,
+      userGuid = _root_.java.util.UUID.randomUUID,
       organizationKey = Factories.randomString(24),
       applicationKey = Factories.randomString(24)
     )

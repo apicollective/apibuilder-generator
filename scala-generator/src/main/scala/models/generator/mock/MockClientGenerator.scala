@@ -199,16 +199,13 @@ class MockClientGenerator(
       case ScalaPrimitive.Double => "1.0"
       case ScalaPrimitive.Integer => "1"
       case ScalaPrimitive.Long => "1l"
-      case ScalaPrimitive.DateIso8601Joda => "new org.joda.time.LocalDate()"
-      case ScalaPrimitive.DateIso8601Java => "java.time.LocalDate.now"
-      case ScalaPrimitive.DateTimeIso8601Joda => "org.joda.time.DateTime.now"
-      case ScalaPrimitive.DateTimeIso8601JavaInstant => "java.time.Instant.now"
-      case ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime => "java.time.OffsetDateTime.now"
+      case dt: ScalaPrimitive.DateIso8601 => s"${dt.fullName}.now"
+      case dt: ScalaPrimitive.DateTimeIso8601 => s"${dt.fullName}.now"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
-      case ScalaPrimitive.ObjectAsPlay => "play.api.libs.json.Json.obj()"
+      case ScalaPrimitive.ObjectAsPlay => "_root_.play.api.libs.json.Json.obj()"
       case ScalaPrimitive.ObjectAsCirce => "Map()"
-      case ScalaPrimitive.JsonValueAsPlay => "play.api.libs.json.Json.obj().asInstanceOf[play.api.libs.json.JsValue]"
-      case ScalaPrimitive.JsonValueAsCirce => "io.circe.Json.obj()"
+      case ScalaPrimitive.JsonValueAsPlay => "_root_.play.api.libs.json.Json.obj().asInstanceOf[_root_.play.api.libs.json.JsValue]"
+      case dt @ ScalaPrimitive.JsonValueAsCirce => s"${dt.fullName}.obj()"
       case ScalaPrimitive.String => {
         limitation match {
           case None => "Factories.randomString()"
@@ -216,7 +213,7 @@ class MockClientGenerator(
         }
       }
       case ScalaPrimitive.Unit => "// unit type"
-      case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"
+      case dt @ ScalaPrimitive.Uuid => s"${dt.fullName}.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
       case ScalaDatatype.Map(_) => "Map()"
       case ScalaDatatype.Option(_) => "None"

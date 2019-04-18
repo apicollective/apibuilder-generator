@@ -24,12 +24,12 @@ ${JsonImports(ssd.service).mkString("\n").indent(4)}
     // Make Scala 2.11 Either monadic
     private[${ssd.namespaces.last}] implicit def eitherOps[A,B](e: Either[A,B]) = cats.implicits.catsSyntaxEither(e)
 
-    private[${ssd.namespaces.last}] implicit val decodeUUID: Decoder[${Uuid.fullName}] =
+    private[${ssd.namespaces.last}] implicit val decode${Uuid.shortName}: Decoder[${Uuid.fullName}] =
       Decoder.decodeString.emapTry(str => Try(${Uuid.fromStringValue("str")}))
 
-    private[${ssd.namespaces.last}] implicit val encodeUUID: Encoder[${Uuid.fullName}] =
+    private[${ssd.namespaces.last}] implicit val encode${Uuid.shortName}: Encoder[${Uuid.fullName}] =
       Encoder.encodeString.contramap[${Uuid.fullName}](uuid => ${Uuid.asString("uuid")})
-${Seq(generateTimeSerde(),generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
   }

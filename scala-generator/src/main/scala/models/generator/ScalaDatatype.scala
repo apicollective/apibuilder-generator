@@ -63,17 +63,17 @@ sealed trait ScalaDatatype {
 sealed trait ScalaPrimitive extends ScalaDatatype {
   def apidocType: String
   def shortName: String
-  override def asString(originalVarName: String): String
+  override def asString(originalVarName: String): String = s"${ScalaUtil.quoteNameIfKeyword(originalVarName)}.toString"
   def namespace: Option[String] = None
   def fullName: String = namespace match {
     case None => shortName
     case Some(ns) => s"$ns.$shortName"
   }
-  def name: String = fullName
+  override def name: String = fullName
 
   override def toVariableName = "value"
 
-  def fromStringValue(value: String): String = s"$value.toString"
+  def fromStringValue(value: String): String = s"$fullName(${ScalaUtil.quoteNameIfKeyword(value)})"
 }
 
 object ScalaPrimitive {
@@ -81,168 +81,120 @@ object ScalaPrimitive {
   case object Boolean extends ScalaPrimitive {
     def apidocType = "boolean"
     def shortName = "Boolean"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
+    override def fromStringValue(value: String) = s"${ScalaUtil.quoteNameIfKeyword(value)}.toBoolean"
     override protected def default(json: JsValue): String = json.as[scala.Boolean].toString
   }
 
   case object Double extends ScalaPrimitive {
     def apidocType = "double"
     def shortName = "Double"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
+    override def fromStringValue(value: String) = s"${ScalaUtil.quoteNameIfKeyword(value)}.toDouble"
     override protected def default(json: JsValue): String = toBigDecimal(json).toDouble.toString
   }
 
   case object Integer extends ScalaPrimitive {
     def apidocType = "integer"
     def shortName = "Int"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
+    override def fromStringValue(value: String) = s"${ScalaUtil.quoteNameIfKeyword(value)}.toInt"
     override protected def default(json: JsValue): String = toBigDecimal(json).toInt.toString
   }
 
   case object Long extends ScalaPrimitive {
     def apidocType = "long"
     def shortName = "Long"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
+    override def fromStringValue(value: String) = s"${ScalaUtil.quoteNameIfKeyword(value)}.toLong"
     override protected def default(json: JsValue): String = toBigDecimal(json).toLong.toString + 'L'
   }
 
-  case object DateIso8601Joda extends ScalaPrimitive {
+  sealed trait DateIso8601 extends ScalaPrimitive
+
+  case object DateIso8601Joda extends DateIso8601 {
     override def namespace = Some("_root_.org.joda.time")
     def apidocType = "date-iso8601"
     def shortName = "LocalDate"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"_root_.org.joda.time.format.ISODateTimeFormat.date.print($varName)"
-    }
-    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate($value)"
+    override def asString(originalVarName: String): String = s"_root_.org.joda.time.format.ISODateTimeFormat.date.print(${ScalaUtil.quoteNameIfKeyword(originalVarName)})"
+    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(${ScalaUtil.quoteNameIfKeyword(value)})"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
     override protected def default(json: JsValue): String = default(json.toString)
   }
 
-  case object DateIso8601Java extends ScalaPrimitive {
+  case object DateIso8601Java extends DateIso8601 {
     override def namespace = Some("_root_.java.time")
     def apidocType = "date-iso8601"
     def shortName = "LocalDate"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-    override def fromStringValue(value: String) = s"_root_.java.time.LocalDate.parse($value)"
+    override def fromStringValue(value: String) = s"_root_.java.time.LocalDate.parse(${ScalaUtil.quoteNameIfKeyword(value)})"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
   }
 
-  case object DateTimeIso8601Joda extends ScalaPrimitive {
+  sealed trait DateTimeIso8601 extends ScalaPrimitive
+
+  case object DateTimeIso8601Joda extends DateTimeIso8601 {
     override def namespace = Some("_root_.org.joda.time")
     def apidocType = "date-time-iso8601"
     def shortName = "DateTime"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($varName)"
-    }
-    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime($value)"
+    override def asString(originalVarName: String): String = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(${ScalaUtil.quoteNameIfKeyword(originalVarName)})"
+    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${ScalaUtil.quoteNameIfKeyword(value)})"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
     override protected def default(json: JsValue): String = default(json.toString)
   }
 
-  case object DateTimeIso8601JavaInstant extends ScalaPrimitive {
+  case object DateTimeIso8601JavaInstant extends DateTimeIso8601 {
     override def namespace = Some("_root_.java.time")
     def apidocType = "date-time-iso8601"
     def shortName = "Instant"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-    override def fromStringValue(value: String) = s"_root_.java.time.OffsetDateTime.parse($value).toInstant"
+    override def fromStringValue(value: String) = s"_root_.java.time.OffsetDateTime.parse(${ScalaUtil.quoteNameIfKeyword(value)}).toInstant"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
   }
 
-  case object DateTimeIso8601JavaOffsetDateTime extends ScalaPrimitive {
+  case object DateTimeIso8601JavaOffsetDateTime extends DateTimeIso8601 {
     override def namespace = Some("_root_.java.time")
     def apidocType = "date-time-iso8601"
     def shortName = "OffsetDateTime"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-    override def fromStringValue(value: String) = s"_root_.java.time.OffsetDateTime.parse($value)"
+    override def fromStringValue(value: String) = s"_root_.java.time.OffsetDateTime.parse(${ScalaUtil.quoteNameIfKeyword(value)})"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
   }
 
   case object Decimal extends ScalaPrimitive {
     def apidocType = "decimal"
     def shortName = "BigDecimal"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
     override protected def default(json: JsValue): String = json.as[scala.BigDecimal].toString
   }
 
-  case object ObjectAsPlay extends ScalaPrimitive {
+  sealed trait JsonObject extends ScalaPrimitive
+
+  case object ObjectAsPlay extends JsonObject {
     override def namespace = Some("_root_.play.api.libs.json")
     def apidocType = "object"
     def shortName = "JsObject"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
   }
 
-  case object ObjectAsCirce extends ScalaPrimitive {
-    override def namespace: None.type = None
+  case object ObjectAsCirce extends JsonObject {
+    override def namespace = None
     def apidocType = "object"
     def shortName = "Map[String, _root_.io.circe.Json]"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.asJson"
-    }
+    override def asString(originalVarName: String): String = s"${ScalaUtil.quoteNameIfKeyword(originalVarName)}.asJson"
   }
 
-  case object JsonValueAsPlay extends ScalaPrimitive {
+  sealed trait JsonValue extends ScalaPrimitive
+
+  case object JsonValueAsPlay extends JsonValue {
     override def namespace = Some("_root_.play.api.libs.json")
     def apidocType = "json"
     def shortName = "JsValue"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
   }
 
-  case object JsonValueAsCirce extends ScalaPrimitive {
-    override def namespace: None.type = None
+  case object JsonValueAsCirce extends JsonValue {
+    override def namespace = Some("_root_.io.circe")
     def apidocType = "json"
-    def shortName = "_root_.io.circe.Json"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.asJson"
-    }
+    def shortName = "Json"
+    override def asString(originalVarName: String): String = s"${ScalaUtil.quoteNameIfKeyword(originalVarName)}.asJson"
   }
 
   case object String extends ScalaPrimitive {
     def apidocType = "string"
     def shortName = "String"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName"
-    }
-    override def fromStringValue(value: String) = value
+    override def asString(originalVarName: String): String = ScalaUtil.quoteNameIfKeyword(originalVarName)
+    override def fromStringValue(value: String) = ScalaUtil.quoteNameIfKeyword(value)
     override def default(value: String): String = ScalaUtil.wrapInQuotes(value)
     override protected def default(json: JsValue): String = default(json.as[String])
   }
@@ -259,11 +211,7 @@ object ScalaPrimitive {
     override def namespace = Some("_root_.java.util")
     def apidocType = "uuid"
     def shortName = "UUID"
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-    override def fromStringValue(value: String) = s"_root_.java.util.UUID.fromString($value)"
+    override def fromStringValue(value: String) = s"_root_.java.util.UUID.fromString(${ScalaUtil.quoteNameIfKeyword(value)})"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
 
     override protected def default(json: JsValue): String = default(json.as[UUID].toString)
@@ -273,41 +221,20 @@ object ScalaPrimitive {
   case class Model(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(namespaces.models)
     def apidocType: String = shortName
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
     override def toVariableName: String = initLowerCase(shortName)
   }
 
   case class Enum(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(namespaces.enums)
     def apidocType: String = shortName
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
-    override def default(value: String): String = {
-      fullName + "." + ScalaUtil.toClassName(value)
-    }
-
-    override protected def default(json: JsValue): String = {
-      default(json.as[String])
-    }
-
+    override def default(value: String): String = fullName + "." + ScalaUtil.toClassName(value)
+    override protected def default(json: JsValue): String = default(json.as[String])
     override def toVariableName: String = initLowerCase(shortName)
   }
 
   case class Union(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
     override def namespace = Some(namespaces.unions)
     def apidocType: String = shortName
-    override def asString(originalVarName: String): String = {
-      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      s"$varName.toString"
-    }
-
     override def toVariableName: String = initLowerCase(shortName)
   }
 

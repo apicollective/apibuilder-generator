@@ -30,11 +30,11 @@ package io.gregor.time.types.v0.mock {
     }
 
     def makeDateTimeModel(): io.gregor.time.types.v0.models.DateTimeModel = io.gregor.time.types.v0.models.DateTimeModel(
-      dateTime = java.time.Instant.now,
-      date = java.time.LocalDate.now
+      dateTime = _root_.java.time.Instant.now,
+      date = _root_.java.time.LocalDate.now
     )
 
-    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = java.time.Instant.now
+    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = _root_.java.time.Instant.now
 
   }
 
