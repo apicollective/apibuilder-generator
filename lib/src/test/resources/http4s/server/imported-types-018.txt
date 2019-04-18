@@ -18,7 +18,7 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
   implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[_root_.java.time.LocalDate] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.LocalDate](p => _root_.java.time.LocalDate.parse(p.value))("_root_.java.time.LocalDate")
 
-  implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
+  implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[_root_.java.util.UUID] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.util.UUID](p => _root_.java.util.UUID.fromString(p.value))("_root_.java.util.UUID")
 
   implicit lazy val enumQueryParamDecoder: org.http4s.QueryParamDecoder[io.apibuilder.http4s.test.models.Enum] =

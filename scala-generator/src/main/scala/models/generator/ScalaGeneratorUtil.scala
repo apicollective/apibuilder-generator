@@ -176,9 +176,9 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
         case ScalaPrimitive.String => config.pathEncode(name)
         case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
         case ScalaPrimitive.Enum(_, _) => config.pathEncode(s"$name.toString")
-        case dt @ (ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601JavaInstant | ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime) =>
+        case dt @ (_: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601) =>
           config.pathEncode(dt.asString(name))
-        case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.JsonValueAsPlay | ScalaPrimitive.JsonValueAsCirce | ScalaPrimitive.Unit => {
+        case _ @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.Unit) => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }
         case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encounteered as path param($name)")

@@ -9,7 +9,7 @@ import lib.Text
 import lib.Text._
 import lib.VersionTag
 
-import scala.generator.ScalaPrimitive.{DateIso8601Java, DateTimeIso8601JavaInstant, DateTimeIso8601JavaOffsetDateTime, Uuid}
+import scala.generator.ScalaPrimitive.Uuid
 
 case class PathExtractor(name: String, filter: Option[String])
 case class QueryExtractor(name: String, handler: String)
@@ -139,13 +139,13 @@ case class Http4sServer(form: InvocationForm,
        |  implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
        |
-       |  implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateTimeType.dataType.fullName}] =
+       |  implicit lazy val ${Text.initLowerCase(ssd.config.dateTimeType.dataType.shortName)}QueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateTimeType.dataType.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateTimeType.dataType.fullName}](p => ${ssd.config.dateTimeType.dataType.fromStringValue("p.value")})("${ssd.config.dateTimeType.dataType.fullName}")
        |
-       |  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateType.dataType.fullName}] =
+       |  implicit lazy val ${Text.initLowerCase(ssd.config.dateType.dataType.shortName)}QueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateType.dataType.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateType.dataType.fullName}](p => ${ssd.config.dateType.dataType.fromStringValue("p.value")})("${ssd.config.dateType.dataType.fullName}")
        |
-       |  implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
+       |  implicit lazy val ${Uuid.shortName.toLowerCase}QueryParamDecoder: org.http4s.QueryParamDecoder[${Uuid.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Uuid.fullName}](p => ${Uuid.fromStringValue("p.value")})("${Uuid.fullName}")
        |${enumDecoders.indent(2)}
        |${versionCapture.indent(2)}
@@ -166,17 +166,14 @@ case class Http4sServer(form: InvocationForm,
       val filter = extractor.filter.getOrElse("")
 
       val toOption = param.datatype match {
-        case ScalaPrimitive.String => s"Some(s)$filter"
-        case ScalaPrimitive.Boolean => "scala.util.Try(s.toBoolean).toOption"
-        case ScalaPrimitive.Integer => s"scala.util.Try(s.toInt).toOption$filter"
-        case ScalaPrimitive.Long => s"scala.util.Try(s.toLong).toOption$filter"
-        case ScalaPrimitive.Double => "scala.util.Try(s.toDouble).toOption"
-        case ScalaPrimitive.Decimal => "scala.util.Try(BigDecimal(s)).toOption"
-        case ScalaPrimitive.Uuid => s"""scala.util.Try(${Uuid.fromStringValue("s")}).toOption"""
-        case ScalaPrimitive.DateIso8601Java => s"""scala.util.Try(${DateIso8601Java.fromStringValue("s")}).toOption"""
-        case ScalaPrimitive.DateTimeIso8601JavaInstant => s"""scala.util.Try(${DateTimeIso8601JavaInstant.fromStringValue("s")}).toOption"""
-        case ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime => s"""scala.util.Try(${DateTimeIso8601JavaOffsetDateTime.fromStringValue("s")}).toOption"""
-        case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
+        case sp: ScalaPrimitive =>
+          sp match {
+            case dt @ ScalaPrimitive.String => s"Some(${dt.fromStringValue("s")})$filter"
+            case dt @ (ScalaPrimitive.Integer | ScalaPrimitive.Long) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption$filter"
+            case dt @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption"
+            case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
+            case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
+          }
         case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
       }
 

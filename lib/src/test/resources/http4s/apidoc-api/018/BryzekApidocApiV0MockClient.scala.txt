@@ -996,7 +996,7 @@ package io.apibuilder.api.v0.mock {
       fromVersion = io.apibuilder.api.v0.mock.Factories.makeChangeVersion(),
       toVersion = io.apibuilder.api.v0.mock.Factories.makeChangeVersion(),
       diff = io.apibuilder.api.v0.mock.Factories.makeDiff(),
-      changedAt = java.time.Instant.now,
+      changedAt = _root_.java.time.Instant.now,
       changedBy = io.apibuilder.api.v0.mock.Factories.makeUserSummary(),
       audit = io.apibuilder.common.v0.mock.Factories.makeAudit()
     )

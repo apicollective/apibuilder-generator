@@ -117,22 +117,13 @@ private[models] case class Play2Route(
     primitive: ScalaPrimitive,
     value: String
   ): String = primitive match {
-    case ScalaPrimitive.String | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601JavaInstant | ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+    case ScalaPrimitive.String | _:ScalaPrimitive.DateIso8601 | _:ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
       value
     }
     case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal => {
       value
     }
-    case ScalaPrimitive.ObjectAsPlay => {
-      "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
-    }
-    case ScalaPrimitive.ObjectAsCirce => {
-      "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
-    }
-    case ScalaPrimitive.JsonValueAsPlay => {
-      "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
-    }
-    case ScalaPrimitive.JsonValueAsCirce => {
+    case _ @ (_: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue) => {
       "play.api.libs.json.Json.parse(%s)".format(ScalaUtil.wrapInQuotes(value))
     }
     case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.Unit => {

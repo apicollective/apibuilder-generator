@@ -32,11 +32,11 @@ package io.gregor.time.types.v0.mock {
     }
 
     def makeDateTimeModel(): io.gregor.time.types.v0.models.DateTimeModel = io.gregor.time.types.v0.models.DateTimeModel(
-      dateTime = org.joda.time.DateTime.now,
-      date = new org.joda.time.LocalDate()
+      dateTime = _root_.org.joda.time.DateTime.now,
+      date = _root_.org.joda.time.LocalDate.now
     )
 
-    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = org.joda.time.DateTime.now
+    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = _root_.org.joda.time.DateTime.now
 
   }
 
