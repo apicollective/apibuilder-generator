@@ -12,16 +12,16 @@ import io.gregor.time.types.v0.models.json._
 
 private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
 
-  implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
+  implicit lazy val queryParamDecodeBigDecimal: org.http4s.QueryParamDecoder[BigDecimal] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
 
-  implicit lazy val dateTimeQueryParamDecoder: org.http4s.QueryParamDecoder[_root_.org.joda.time.DateTime] =
+  implicit lazy val queryParamDecodeDateTime: org.http4s.QueryParamDecoder[_root_.org.joda.time.DateTime] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.org.joda.time.DateTime](p => _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(p.value))("_root_.org.joda.time.DateTime")
 
-  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[_root_.org.joda.time.LocalDate] =
+  implicit lazy val queryParamDecodeLocalDate: org.http4s.QueryParamDecoder[_root_.org.joda.time.LocalDate] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.org.joda.time.LocalDate](p => _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(p.value))("_root_.org.joda.time.LocalDate")
 
-  implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[_root_.java.util.UUID] =
+  implicit lazy val queryParamDecodeUUID: org.http4s.QueryParamDecoder[_root_.java.util.UUID] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.util.UUID](p => _root_.java.util.UUID.fromString(p.value))("_root_.java.util.UUID")
 
 

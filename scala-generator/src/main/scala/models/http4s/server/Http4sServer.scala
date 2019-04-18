@@ -9,7 +9,7 @@ import lib.Text
 import lib.Text._
 import lib.VersionTag
 
-import scala.generator.ScalaPrimitive.Uuid
+import scala.generator.ScalaPrimitive.{Uuid, Decimal}
 
 case class PathExtractor(name: String, filter: Option[String])
 case class QueryExtractor(name: String, handler: String)
@@ -136,16 +136,16 @@ case class Http4sServer(form: InvocationForm,
        |
        |private[server] ${config.matcherKind} Matchers${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.matchersExtends.getOrElse("")} {
        |
-       |  implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
+       |  implicit lazy val queryParamDecode${Decimal.shortName}: org.http4s.QueryParamDecoder[${Decimal.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Decimal.fullName}](p => ${Decimal.fromStringValue("p.value")})("${Decimal.fullName}")
        |
-       |  implicit lazy val ${Text.initLowerCase(ssd.config.dateTimeType.dataType.shortName)}QueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateTimeType.dataType.fullName}] =
+       |  implicit lazy val queryParamDecode${ssd.config.dateTimeType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.config.dateTimeType.dataType.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateTimeType.dataType.fullName}](p => ${ssd.config.dateTimeType.dataType.fromStringValue("p.value")})("${ssd.config.dateTimeType.dataType.fullName}")
        |
-       |  implicit lazy val ${Text.initLowerCase(ssd.config.dateType.dataType.shortName)}QueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateType.dataType.fullName}] =
+       |  implicit lazy val queryParamDecode${ssd.config.dateType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.config.dateType.dataType.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateType.dataType.fullName}](p => ${ssd.config.dateType.dataType.fromStringValue("p.value")})("${ssd.config.dateType.dataType.fullName}")
        |
-       |  implicit lazy val ${Uuid.shortName.toLowerCase}QueryParamDecoder: org.http4s.QueryParamDecoder[${Uuid.fullName}] =
+       |  implicit lazy val queryParamDecode${Uuid.shortName}: org.http4s.QueryParamDecoder[${Uuid.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Uuid.fullName}](p => ${Uuid.fromStringValue("p.value")})("${Uuid.fullName}")
        |${enumDecoders.indent(2)}
        |${versionCapture.indent(2)}
