@@ -1,7 +1,6 @@
 package scala.generator
 
 import java.util.UUID
-import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 
 import lib.Datatype
 import lib.Text.initLowerCase
@@ -161,7 +160,7 @@ object ScalaPrimitive {
     override protected def default(json: JsValue): String = default(json.toString)
   }
 
-  case object DateTimeIso8601Java extends ScalaPrimitive {
+  case object DateTimeIso8601JavaInstant extends ScalaPrimitive {
     override def namespace = Some("_root_.java.time")
     def apidocType = "date-time-iso8601"
     def shortName = "Instant"
@@ -170,6 +169,18 @@ object ScalaPrimitive {
       s"$varName.toString"
     }
     override def fromStringValue(value: String) = s"_root_.java.time.OffsetDateTime.parse($value).toInstant"
+    override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
+  }
+
+  case object DateTimeIso8601JavaOffsetDateTime extends ScalaPrimitive {
+    override def namespace = Some("_root_.java.time")
+    def apidocType = "date-time-iso8601"
+    def shortName = "OffsetDateTime"
+    override def asString(originalVarName: String): String = {
+      val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
+      s"$varName.toString"
+    }
+    override def fromStringValue(value: String) = s"_root_.java.time.OffsetDateTime.parse($value)"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
   }
 

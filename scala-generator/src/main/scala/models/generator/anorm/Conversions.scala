@@ -1,8 +1,8 @@
 package scala.generator.anorm
 
 import lib.Text._
+
 import scala.generator.{ScalaPrimitive, ScalaService}
-import scala.models.TimeConfig
 
 object Conversions {
 
@@ -11,16 +11,6 @@ object Conversions {
     ScalaPrimitive.Double,
     ScalaPrimitive.Integer,
     ScalaPrimitive.Long,
-  )
-
-  private val JodaTimeTypes = Seq(
-    ScalaPrimitive.DateIso8601Joda,
-    ScalaPrimitive.DateTimeIso8601Joda,
-  )
-
-  private val JavaTimeTypes = Seq(
-    ScalaPrimitive.DateIso8601Java,
-    ScalaPrimitive.DateTimeIso8601Java,
   )
 
   private val ObjectTypes = Seq(
@@ -81,11 +71,7 @@ package %s {
     ssd: ScalaService,
     attributes: ParserGeneratorPlayVersionSpecificAttributes
   ): String = {
-
-    val coreTypes = ssd.config.timeLib match {
-      case TimeConfig.JavaTime => JavaPrimitiveTypes ++ JavaTimeTypes ++ ObjectTypes
-      case TimeConfig.JodaTime => JavaPrimitiveTypes ++ JodaTimeTypes ++ ObjectTypes
-    }
+    val coreTypes = JavaPrimitiveTypes ++ Seq(ssd.config.dateType.dataType, ssd.config.dateTimeType.dataType) ++ ObjectTypes
 
     Seq(
       Header.format(ssd.namespaces.anormConversions, attributes.imports.map(i => s"\n  import $i").mkString),

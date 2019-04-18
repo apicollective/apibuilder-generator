@@ -1,0 +1,43 @@
+package io.gregor.time.types.v0.mock {
+
+  trait Client extends io.gregor.time.types.v0.interfaces.Client {
+
+    val baseUrl: String = "http://mock.localhost"
+
+    override def dateTimeModels: io.gregor.time.types.v0.DateTimeModels = MockDateTimeModelsImpl
+
+  }
+
+  object MockDateTimeModelsImpl extends MockDateTimeModels
+
+  trait MockDateTimeModels extends io.gregor.time.types.v0.DateTimeModels {
+
+    def postByPathDateAndPathTime(
+      pathDate: _root_.org.joda.time.LocalDate,
+      pathTime: _root_.org.joda.time.DateTime,
+      queryDate: _root_.org.joda.time.LocalDate,
+      queryTime: _root_.org.joda.time.DateTime,
+      dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.gregor.time.types.v0.models.DateTimeModel] = scala.concurrent.Future.successful {
+      io.gregor.time.types.v0.mock.Factories.makeDateTimeModel()
+    }
+
+  }
+
+  object Factories {
+
+    def randomString(length: Int = 24): String = {
+      _root_.scala.util.Random.alphanumeric.take(length).mkString
+    }
+
+    def makeDateTimeModel(): io.gregor.time.types.v0.models.DateTimeModel = io.gregor.time.types.v0.models.DateTimeModel(
+      dateTime = org.joda.time.DateTime.now,
+      date = new org.joda.time.LocalDate()
+    )
+
+    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = org.joda.time.DateTime.now
+
+  }
+
+}

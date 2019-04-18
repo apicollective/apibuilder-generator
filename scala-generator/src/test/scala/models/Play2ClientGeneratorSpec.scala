@@ -211,7 +211,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
   describe("Play 2.7.x generator joda  vs. java time") {
     it("generates date-time with joda") {
       val form = new InvocationForm(
-        models.TestHelper.parseFile("/examples/date-time-types.json"),
+        models.TestHelper.dateTimeService,
         Seq.empty,
         None
       )
@@ -222,9 +222,9 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
       models.TestHelper.assertEqualsFile(s"/generators/play-27-joda-date-time.txt", files(0).contents)
     }
 
-    it("generates date-time with java.time") {
+    it("generates date-time with java.time.Instant") {
       val form = new InvocationForm(
-        models.TestHelper.parseFile("/examples/date-time-types.json"),
+        models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.time_library", "java")),
         None
       )
@@ -233,7 +233,21 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
       files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
       assertValidScalaSourceCode(files(0).contents)
       assertJodaTimeNotPresent(files)
-      models.TestHelper.assertEqualsFile(s"/generators/play-27-java-date-time.txt", files(0).contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-27-java-instant.txt", files(0).contents)
+    }
+
+    it("generates date-time with java.time.OffsetDateTime") {
+      val form = new InvocationForm(
+        models.TestHelper.dateTimeService,
+        Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate")),
+        None
+      )
+      val Right(files) = Play27ClientGenerator.invoke(form)
+      files.size shouldBe 1
+      files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
+      assertValidScalaSourceCode(files(0).contents)
+      assertJodaTimeNotPresent(files)
+      models.TestHelper.assertEqualsFile(s"/generators/play-27-java-offsetdatetime.txt", files(0).contents)
     }
   }
 

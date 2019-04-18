@@ -9,7 +9,7 @@ import lib.Text
 import lib.Text._
 import lib.VersionTag
 
-import scala.generator.ScalaPrimitive.{DateIso8601Java, DateTimeIso8601Java, Uuid}
+import scala.generator.ScalaPrimitive.{DateIso8601Java, DateTimeIso8601JavaInstant, DateTimeIso8601JavaOffsetDateTime, Uuid}
 
 case class PathExtractor(name: String, filter: Option[String])
 case class QueryExtractor(name: String, handler: String)
@@ -139,11 +139,11 @@ case class Http4sServer(form: InvocationForm,
        |  implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
        |
-       |  implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.Instant] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${DateTimeIso8601Java.fullName}](p => ${DateTimeIso8601Java.fromStringValue("p.value")})("${DateTimeIso8601Java.fullName}")
+       |  implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateTimeType.dataType.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateTimeType.dataType.fullName}](p => ${ssd.config.dateTimeType.dataType.fromStringValue("p.value")})("${ssd.config.dateTimeType.dataType.fullName}")
        |
-       |  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.LocalDate] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${DateIso8601Java.fullName}](p => ${DateIso8601Java.fromStringValue("p.value")})("${DateIso8601Java.fullName}")
+       |  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[${ssd.config.dateType.dataType.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateType.dataType.fullName}](p => ${ssd.config.dateType.dataType.fromStringValue("p.value")})("${ssd.config.dateType.dataType.fullName}")
        |
        |  implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Uuid.fullName}](p => ${Uuid.fromStringValue("p.value")})("${Uuid.fullName}")
@@ -174,7 +174,8 @@ case class Http4sServer(form: InvocationForm,
         case ScalaPrimitive.Decimal => "scala.util.Try(BigDecimal(s)).toOption"
         case ScalaPrimitive.Uuid => s"""scala.util.Try(${Uuid.fromStringValue("s")}).toOption"""
         case ScalaPrimitive.DateIso8601Java => s"""scala.util.Try(${DateIso8601Java.fromStringValue("s")}).toOption"""
-        case ScalaPrimitive.DateTimeIso8601Java => s"""scala.util.Try(${DateTimeIso8601Java.fromStringValue("s")}).toOption"""
+        case ScalaPrimitive.DateTimeIso8601JavaInstant => s"""scala.util.Try(${DateTimeIso8601JavaInstant.fromStringValue("s")}).toOption"""
+        case ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime => s"""scala.util.Try(${DateTimeIso8601JavaOffsetDateTime.fromStringValue("s")}).toOption"""
         case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
         case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
       }

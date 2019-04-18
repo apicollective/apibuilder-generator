@@ -2,12 +2,12 @@ package scala.generator
 
 import io.apibuilder.spec.v0.models._
 
-import scala.models.{Config, JsonConfig, TimeConfig, Util}
+import scala.models.{Config, JsonConfig, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
 import play.api.libs.json.JsString
 
-import scala.generator.ScalaPrimitive.{DateIso8601Java, DateIso8601Joda, DateTimeIso8601Java, DateTimeIso8601Joda, JsonValueAsCirce, JsonValueAsPlay, ObjectAsCirce, ObjectAsPlay}
+import scala.generator.ScalaPrimitive.{DateIso8601Joda, DateTimeIso8601Joda, JsonValueAsCirce, JsonValueAsPlay, ObjectAsCirce, ObjectAsPlay}
 
 object ScalaService {
   def apply(service: Service, config: Config = Config.PlayDefaultConfig) = new ScalaService(service, config)
@@ -49,15 +49,9 @@ class ScalaService(
         case JsonConfig.CirceJson => JsonValueAsCirce
       }
 
-      case DateIso8601Joda => config.timeLib match {
-        case TimeConfig.JodaTime => DateIso8601Joda
-        case TimeConfig.JavaTime => DateIso8601Java
-      }
+      case DateIso8601Joda => config.dateType.dataType
 
-      case DateTimeIso8601Joda => config.timeLib match {
-        case TimeConfig.JodaTime => DateTimeIso8601Joda
-        case TimeConfig.JavaTime => DateTimeIso8601Java
-      }
+      case DateTimeIso8601Joda => config.dateTimeType.dataType
 
       case ScalaDatatype.List(t) => ScalaDatatype.List(convertObjectType(t))
 

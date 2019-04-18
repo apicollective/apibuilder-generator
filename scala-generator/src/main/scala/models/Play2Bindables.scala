@@ -2,25 +2,19 @@ package scala.models
 
 import lib.Text._
 
-import scala.generator.ScalaPrimitive.{DateIso8601Java, DateIso8601Joda, DateTimeIso8601Java, DateTimeIso8601Joda}
 import scala.generator.{ScalaEnumValue, ScalaPrimitive, ScalaService, ScalaUtil}
 
 case class Play2Bindables(ssd: ScalaService) {
 
   def build(): String = {
-    val (dateTimeIso8601, dateIso8601) = ssd.config.timeLib match {
-      case TimeConfig.JodaTime => (DateTimeIso8601Joda, DateIso8601Joda)
-      case TimeConfig.JavaTime => (DateTimeIso8601Java, DateIso8601Java)
-    }
-
     Seq(
       "object Bindables {",
       Seq(
         "import play.api.mvc.{PathBindable, QueryStringBindable}",
         buildImports(),
-        buildObjectCore(dateTimeIso8601, dateIso8601),
+        buildObjectCore(ssd.config.dateTimeType.dataType, ssd.config.dateType.dataType),
         buildObjectModels().getOrElse(""),
-        apibuilderHelpers(dateTimeIso8601, dateIso8601)
+        apibuilderHelpers(ssd.config.dateTimeType.dataType, ssd.config.dateType.dataType)
       ).filter(_.trim.nonEmpty).mkString("\n\n").indent(2),
       "}"
     ).mkString("\n\n")

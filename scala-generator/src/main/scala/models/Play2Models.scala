@@ -50,10 +50,25 @@ trait Play2Models extends CodeGenerator {
       }
     }
 
-    val serDes = ssd.config.timeLib match {
-      case TimeConfig.JavaTime => javaTimeImplicits
-      case TimeConfig.JodaTime if useBuiltInImplicits => jodaImplicits
-      case TimeConfig.JodaTime => manualImplicits(ssd)
+    val serDes = if (useBuiltInImplicits) {
+      Seq(timeImplicits) ++
+      (ssd.config.dateTimeType match {
+        case DateTimeTypeConfig.JodaDateTime => Seq(jodaDateTimeImplicits)
+        case _ => Nil
+      }) ++
+      (ssd.config.dateType match {
+        case DateTypeConfig.JodaLocalDate => Seq(jodaLocalDateImplicits)
+        case _ => Nil
+      })
+    } else {
+      (ssd.config.dateTimeType match {
+        case DateTimeTypeConfig.JodaDateTime => Seq(manualImplicits(ssd))
+        case _ => Seq(timeImplicits)
+      }) ++
+      (ssd.config.dateType match {
+        case DateTypeConfig.JodaLocalDate => Seq(manualImplicits(ssd))
+        case _ => Seq(timeImplicits)
+      })
     }
 
     val source = s"""$header$caseClasses
@@ -66,7 +81,7 @@ package ${ssd.namespaces.models} {
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
 ${JsonImports(form.service).mkString("\n").indent(4)}
-${serDes.indent(4)}
+${serDes.distinct.mkString("\n").indent(4)}
 
 ${Seq(enumJson, modelAndUnionJson).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
@@ -77,18 +92,19 @@ $bindables
     Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
   }
 
-  val javaTimeImplicits = {
+  val timeImplicits = {
     s"""import play.api.libs.json.Writes._
        |import play.api.libs.json.Reads._""".stripMargin
 
   }
 
-  val jodaImplicits = {
-    s"""import play.api.libs.json.Writes._
-       |import play.api.libs.json.Reads._
-       |import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
-       |import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
-       |import play.api.libs.json.JodaWrites.JodaDateTimeWrites
+  val jodaDateTimeImplicits = {
+    s"""import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
+       |import play.api.libs.json.JodaWrites.JodaDateTimeWrites""".stripMargin
+  }
+
+  val jodaLocalDateImplicits = {
+    s"""import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
        |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites""".stripMargin
   }
 

@@ -68,9 +68,9 @@ class ScalaDatatypeSpec extends FunSpec with Matchers {
   }
 
   it("DateTimeIso8601Java sanity check") {
-    DateTimeIso8601Java.asString("myVar") shouldBe "myVar.toString"
-    DateTimeIso8601Java.default("2020-12-31") shouldBe "_root_.java.time.OffsetDateTime.parse(\"2020-12-31\").toInstant"
-    DateTimeIso8601Java.name shouldBe "_root_.java.time.Instant"
+    DateTimeIso8601JavaInstant.asString("myVar") shouldBe "myVar.toString"
+    DateTimeIso8601JavaInstant.default("2020-12-31") shouldBe "_root_.java.time.OffsetDateTime.parse(\"2020-12-31\").toInstant"
+    DateTimeIso8601JavaInstant.name shouldBe "_root_.java.time.Instant"
   }
 }
 

@@ -1,0 +1,93 @@
+object Bindables {
+
+  import play.api.mvc.{PathBindable, QueryStringBindable}
+
+  // import models directly for backwards compatibility with prior versions of the generator
+  import Core._
+
+  object Core {
+    implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.java.time.Instant] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
+    implicit def queryStringBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.java.time.Instant] = ApibuilderQueryStringBindable(ApibuilderTypes.dateTimeIso8601)
+
+    implicit def pathBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.java.time.LocalDate] = ApibuilderPathBindable(ApibuilderTypes.dateIso8601)
+    implicit def queryStringBindableDateIso8601(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[_root_.java.time.LocalDate] = ApibuilderQueryStringBindable(ApibuilderTypes.dateIso8601)
+  }
+
+  trait ApibuilderTypeConverter[T] {
+
+    def convert(value: String): T
+
+    def convert(value: T): String
+
+    def example: T
+
+    def validValues: Seq[T] = Nil
+
+    def errorMessage(key: String, value: String, ex: java.lang.Exception): String = {
+      val base = s"Invalid value '$value' for parameter '$key'. "
+      validValues.toList match {
+        case Nil => base + "Ex: " + convert(example)
+        case values => base + ". Valid values are: " + values.mkString("'", "', '", "'")
+      }
+    }
+  }
+
+  object ApibuilderTypes {
+    val dateTimeIso8601: ApibuilderTypeConverter[_root_.java.time.Instant] = new ApibuilderTypeConverter[_root_.java.time.Instant] {
+      override def convert(value: String): _root_.java.time.Instant = _root_.java.time.OffsetDateTime.parse(value).toInstant
+      override def convert(value: _root_.java.time.Instant): String = value.toString
+      override def example: _root_.java.time.Instant = _root_.java.time.Instant.now
+    }
+
+    val dateIso8601: ApibuilderTypeConverter[_root_.java.time.LocalDate] = new ApibuilderTypeConverter[_root_.java.time.LocalDate] {
+      override def convert(value: String): _root_.java.time.LocalDate = _root_.java.time.LocalDate.parse(value)
+      override def convert(value: _root_.java.time.LocalDate): String = value.toString
+      override def example: _root_.java.time.LocalDate = _root_.java.time.LocalDate.now
+    }
+  }
+
+  final case class ApibuilderQueryStringBindable[T](
+    converters: ApibuilderTypeConverter[T]
+  ) extends QueryStringBindable[T] {
+
+    override def bind(key: String, params: Map[String, Seq[String]]): _root_.scala.Option[_root_.scala.Either[String, T]] = {
+      params.getOrElse(key, Nil).headOption.map { v =>
+        try {
+          Right(
+            converters.convert(v)
+          )
+        } catch {
+          case ex: java.lang.Exception => Left(
+            converters.errorMessage(key, v, ex)
+          )
+        }
+      }
+    }
+
+    override def unbind(key: String, value: T): String = {
+      s"$key=${converters.convert(value)}"
+    }
+  }
+
+  final case class ApibuilderPathBindable[T](
+    converters: ApibuilderTypeConverter[T]
+  ) extends PathBindable[T] {
+
+    override def bind(key: String, value: String): _root_.scala.Either[String, T] = {
+      try {
+        Right(
+          converters.convert(value)
+        )
+      } catch {
+        case ex: java.lang.Exception => Left(
+          converters.errorMessage(key, value, ex)
+        )
+      }
+    }
+
+    override def unbind(key: String, value: T): String = {
+      converters.convert(value)
+    }
+  }
+
+}

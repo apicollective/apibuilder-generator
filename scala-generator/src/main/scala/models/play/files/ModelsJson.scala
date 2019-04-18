@@ -1,16 +1,20 @@
 package scala.models.play.files
 
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.models.Play2Models
-import scala.models.{Config, TimeConfig}
+import scala.models.{Config, DateTimeTypeConfig, DateTypeConfig, Play2Models}
 
 object ModelsJson {
 
-  def implicits(ssd: scala.generator.ScalaService) = ssd.config.timeLib match {
-      case TimeConfig.JavaTime => Play2Models.javaTimeImplicits
-      case TimeConfig.JodaTime => Play2Models.jodaImplicits
-  }
+  private def implicits(ssd: scala.generator.ScalaService) = Seq(Play2Models.timeImplicits) ++
+    (ssd.config.dateTimeType match {
+      case DateTimeTypeConfig.JodaDateTime => Seq(Play2Models.jodaDateTimeImplicits)
+      case _ => Nil
+    }) ++
+    (ssd.config.dateType match {
+      case DateTypeConfig.JodaLocalDate => Seq(Play2Models.jodaLocalDateImplicits)
+      case _ => Nil
+    })
 
   def contents(form: InvocationForm): String = {
     val scalaService = scala.generator.ScalaService(form.service, Config(form.attributes, Config.PlayGen2DefaultConfig))
@@ -25,7 +29,7 @@ object ModelsJson {
         import play.api.libs.json.{__, JsString, Writes}
         import play.api.libs.functional.syntax._
 
-        ${implicits(scalaService)}
+        ${implicits(scalaService).mkString("\n")}
 
         ${imports.mkString("\n")}
 
