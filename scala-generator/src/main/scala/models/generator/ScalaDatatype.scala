@@ -169,7 +169,7 @@ object ScalaPrimitive {
   }
 
   case object ObjectAsCirce extends JsonObject {
-    override def namespace: None.type = None
+    override def namespace = None
     def apidocType = "object"
     def shortName = "Map[String, _root_.io.circe.Json]"
     override def asString(originalVarName: String): String = s"${ScalaUtil.quoteNameIfKeyword(originalVarName)}.asJson"
@@ -184,9 +184,9 @@ object ScalaPrimitive {
   }
 
   case object JsonValueAsCirce extends JsonValue {
-    override def namespace: None.type = None
+    override def namespace = Some("_root_.io.circe")
     def apidocType = "json"
-    def shortName = "_root_.io.circe.Json"
+    def shortName = "Json"
     override def asString(originalVarName: String): String = s"${ScalaUtil.quoteNameIfKeyword(originalVarName)}.asJson"
   }
 
