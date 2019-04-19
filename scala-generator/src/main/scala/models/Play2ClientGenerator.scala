@@ -125,10 +125,11 @@ object Play2ClientGenerator {
 
 case class Play2ClientGenerator(
   version: PlayFrameworkVersion,
-  form: InvocationForm
+  form: InvocationForm,
+  configDefault: Config = Config.PlayDefaultConfig
 ) {
 
-  private[this] val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+  private[this] val ssd = new ScalaService(form.service, Config(form.attributes, configDefault))
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     Right(generateCode())

@@ -17,12 +17,12 @@ object Play2RouteGenerator extends CodeGenerator {
  * Generates a Play routes file based on the service description
  * from api.json
  */
-case class Play2RouteGenerator(form: InvocationForm) {
+case class Play2RouteGenerator(form: InvocationForm, configDefault: Config = Config.PlayDefaultConfig) {
 
   private[this] val GlobalPad = 5
 
   private[this] val service = form.service
-  private[this] val scalaService = ScalaService(service, Config(form.attributes, Config.PlayDefaultConfig))
+  private[this] val scalaService = ScalaService(service, Config(form.attributes, configDefault))
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     scalaService.resources.flatMap { resource =>

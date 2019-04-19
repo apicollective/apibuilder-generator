@@ -2,6 +2,8 @@ package scala.models.play.files
 
 import io.apibuilder.generator.v0.models.InvocationForm
 
+import scala.models.Config
+
 object ModelsBodyParsers {
 
 	val BadRequest = "_root_.play.api.mvc.Results.BadRequest"
@@ -25,7 +27,7 @@ object ModelsBodyParsers {
 	"""
 
 	def contents(form: InvocationForm): String = {
-		val scalaService = scala.generator.ScalaService(form.service)
+		val scalaService = scala.generator.ScalaService(form.service, Config(form.attributes, Config.PlayGen2DefaultConfig))
 		val bodyParsers =
 			scalaService.enums.map(bodyParser) ++
 			scalaService.models.map(bodyParser) ++

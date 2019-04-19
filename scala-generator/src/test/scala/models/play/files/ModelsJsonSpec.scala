@@ -1,35 +1,15 @@
 package scala.models.play.files
 
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
-import io.apibuilder.spec.v0.models.{Apidoc, Application, Info, Organization, Service}
 import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.prop.PropertyChecks
-import scala.models.play.Helpers.compareWithoutWhiteSpaces
+
+import scala.models.play.Helpers
 
 class ModelsJsonSpec extends FunSpec with Matchers {
-  val basicService = Service(
-    apidoc = Apidoc("0"),
-    name = "name",
-    organization = Organization("foo"),
-    application = Application("bar"),
-    namespace = "x",
-    version = "1",
-    baseUrl = None,
-    description = None,
-    info = Info(),
-    headers = Nil,
-    imports = Nil,
-    enums = Nil,
-    unions = Nil,
-    models = Nil,
-    resources = Nil,
-    attributes = Nil,
-    annotations = Nil
-  )
 
   it("generates models and joda json") {
     val form = InvocationForm(
-      service = basicService,
+      service = Helpers.basicService("x"),
       attributes = Seq(Attribute("scala_generator.time_library", "joda"))
     )
     ModelsJson.contents(form).replaceAll(" +", " ").replaceAll(" +\n", "\n").trim shouldBe
@@ -57,7 +37,7 @@ class ModelsJsonSpec extends FunSpec with Matchers {
 
   it("generates models and java json") {
     val form = InvocationForm(
-      service = basicService,
+      service = Helpers.basicService("x"),
       attributes = Nil
     )
     ModelsJson.contents(form).replaceAll(" +", " ").replaceAll(" +\n", "\n").trim shouldBe
