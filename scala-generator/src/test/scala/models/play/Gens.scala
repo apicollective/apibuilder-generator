@@ -45,4 +45,13 @@ package object gens {
     safeButBad = union.copy(types = Seq.empty)
   } yield new ScalaUnion(service, safeButBad)
 
+  private val genNsPart = for {
+    c <- Gen.alphaChar
+    s <- Gen.alphaNumStr
+  } yield {
+    s"$c$s"
+  }
+
+  val genNsStr: Gen[String] = Gen.listOf(genNsPart).map (_.mkString("."))
+
 }

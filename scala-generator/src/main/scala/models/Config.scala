@@ -103,7 +103,7 @@ case class Config(dateType: DateTypeConfig, dateTimeType: DateTimeTypeConfig, js
 
 object Config {
   val PlayDefaultConfig = Config(DateTypeConfig.JodaLocalDate, DateTimeTypeConfig.JodaDateTime, JsonConfig.PlayJson)
-  val PlayGen2DefaultConfig = Config(DateTypeConfig.JavaLocalDate, DateTimeTypeConfig.JavaInstant, JsonConfig.PlayJson)
+  val PlayGen2DefaultConfig = Config(DateTypeConfig.JavaLocalDate, DateTimeTypeConfig.JavaOffsetDateTime, JsonConfig.PlayJson)
   val Http4sDefaultConfig = Config(DateTypeConfig.JavaLocalDate, DateTimeTypeConfig.JavaInstant, JsonConfig.CirceJson)
 
   def apply(attributes: Seq[Attribute], defaultConfig: Config): Config = {

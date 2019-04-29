@@ -1,15 +1,15 @@
 package scala.models.play.files
 
 import io.apibuilder.generator.v0.models.InvocationForm
+
 import scala.generator._
+import scala.models.Config
 
 object ModelsGens {
 
   val Arbitrary = "_root_.org.scalacheck.Arbitrary"
   val Gen = "_root_.org.scalacheck.Gen"
 
-  val JodaDateTime = "_root_.org.joda.time.DateTime"
-  val JodaLocalDate = "_root_.org.joda.time.LocalDate"
   val JsObject = "_root_.play.api.libs.json.JsObject"
   val JsValue = "_root_.play.api.libs.json.JsValue"
   val JsArray = "_root_.play.api.libs.json.JsArray"
@@ -18,17 +18,17 @@ object ModelsGens {
   val JsNumber = "_root_.play.api.libs.json.JsNumber"
   val JsString = "_root_.play.api.libs.json.JsString"
 
-  def jodaDateTimeGenAndArbitrary(ns: Namespaces): String = s"""
-    private[${ns.last}] ${arbitrary(ns, "JodaDateTime", JodaDateTime)}
-    private[${ns.last}] lazy val genJodaDateTime: ${Gen}[${JodaDateTime}] = ${Gen}.lzy {
-      ${Gen}.posNum[Long].map(instant => new ${JodaDateTime}(instant))
+  def dateTimeGenAndArbitrary(scalaService: ScalaService): String = s"""
+    private[${scalaService.namespaces.last}] ${arbitrary(scalaService.namespaces, scalaService.config.dateTimeType.dataType.shortName, scalaService.config.dateTimeType.dataType.fullName)}
+    private[${scalaService.namespaces.last}] lazy val gen${scalaService.config.dateTimeType.dataType.shortName}: ${Gen}[${scalaService.config.dateTimeType.dataType.fullName}] = ${Gen}.lzy {
+      ${Gen}.posNum[Long].map(instant => new ${scalaService.config.dateTimeType.dataType.fullName}(instant))
     }
   """
 
-  def jodaLocalDateGenAndArbitrary(ns: Namespaces): String = s"""
-    private[${ns.last}] ${arbitrary(ns, "JodaLocalDate", JodaLocalDate)}
-    private[${ns.last}] lazy val genJodaLocalDate: ${Gen}[${JodaLocalDate}] = ${Gen}.lzy {
-      ${Gen}.posNum[Long].map(instant => new ${JodaLocalDate}(instant))
+  def dateGenAndArbitrary(scalaService: ScalaService): String = s"""
+    private[${scalaService.namespaces.last}] ${arbitrary(scalaService.namespaces, scalaService.config.dateType.dataType.shortName, scalaService.config.dateType.dataType.fullName)}
+    private[${scalaService.namespaces.last}] lazy val gen${scalaService.config.dateType.dataType.shortName}: ${Gen}[${scalaService.config.dateType.dataType.fullName}] = ${Gen}.lzy {
+      ${Gen}.posNum[Long].map(instant => new ${scalaService.config.dateType.dataType.fullName}(instant))
     }
   """
 
@@ -71,8 +71,8 @@ object ModelsGens {
 	def arbitrary(model: ScalaModel): String = arbitrary(model.ssd.namespaces, model.name, model.qualifiedName)
 	def arbitrary(union: ScalaUnion): String = arbitrary(union.ssd.namespaces, union.name, union.qualifiedName)
   def arbitrary(ns: Namespaces, name: String, tpe: String): String = {
-    val collisionFreeName = s"""${ns.models.split('.').map(_.capitalize).mkString}${name}"""
-    s"""implicit lazy val arbitrary${collisionFreeName}: ${Arbitrary}[$tpe] = ${Arbitrary}(gen${name})"""
+//    val collisionFreeName = s"""${ns.models.split('.').map(_.capitalize).mkString}${name}"""
+    s"""implicit lazy val arbitrary${name}: ${Arbitrary}[$tpe] = ${Arbitrary}(gen${name})"""
   }
 
   def genOneOf(name: String, tpe: String, oneOf: List[String]): String = oneOf match {
@@ -120,7 +120,7 @@ object ModelsGens {
   }
 
 	def contents(form: InvocationForm): String = {
-    val scalaService = ScalaService(form.service)
+    val scalaService = ScalaService(form.service, Config(form.attributes, Config.PlayGen2DefaultConfig))
     val wrappers = PrimitiveWrapper(scalaService).wrappers
 
     val imports = scalaService.models.flatMap(this.imports)
@@ -143,8 +143,8 @@ object ModelsGens {
 
       package object gens {
 
-        ${jodaDateTimeGenAndArbitrary(scalaService.namespaces)}
-        ${jodaLocalDateGenAndArbitrary(scalaService.namespaces)}
+        ${dateTimeGenAndArbitrary(scalaService)}
+        ${dateGenAndArbitrary(scalaService)}
 
         ${playJsObjectGenAndArbitrary(scalaService.namespaces)}
         ${playJsValueGenAndArbitrary(scalaService.namespaces)}
