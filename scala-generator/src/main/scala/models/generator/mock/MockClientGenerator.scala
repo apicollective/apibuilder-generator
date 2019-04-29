@@ -7,7 +7,6 @@ import lib.Text._
 
 import scala.models.{ApidocComments, Config}
 import scala.generator._
-import scala.util.Random
 
 object MockClientGenerator {
 
@@ -58,7 +57,7 @@ object MockClientGenerator {
       case ScalaField.Limitation(Some(minimum), None) => Math.max(defaultCandidate, minimum)
       case ScalaField.Limitation(None, Some(maximum)) => Math.min(defaultCandidate, maximum)
       case ScalaField.Limitation(Some(minimum), Some(maximum)) =>
-        if (minimum < maximum) minimum + Random.nextInt(maximum.toInt - minimum.toInt)
+        if (minimum < maximum) (minimum + maximum) / 2
         else if (minimum == maximum) minimum
         else 0
     }

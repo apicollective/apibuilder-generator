@@ -29,6 +29,7 @@ class MockClientGeneratorSpec extends FunSpec with Matchers {
     calculateStringLength(Limitation(Some(3), Some(3))) should be(3)
 
     calculateStringLength(Limitation(Some(25), Some(22))) should be(0)
+    calculateStringLength(Limitation(Some(22), Some(25))) should be(23)
     calculateStringLength(Limitation(None, Some(-1))) should be(0)
 
     calculateStringLength(Limitation(Some(Int.MaxValue), None)) should be(Int.MaxValue) // TODO: really?!
