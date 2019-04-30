@@ -65,7 +65,7 @@ ${headerString.indent(6)}
         apiHeaders ++
         defaultHeaders ++
         requestHeaders
-      ).toList.map { case (k, v) => org.http4s.Header(k, v) })
+      ).groupBy(_._1).map { case (k, l) => org.http4s.Header(k, l.last._2) }.toList)
 
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
       val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
