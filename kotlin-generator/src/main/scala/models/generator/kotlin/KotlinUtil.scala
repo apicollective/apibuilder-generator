@@ -104,7 +104,10 @@ trait KotlinUtil {
   }
 
   def isModelNameWithPackage(modelName: String): Boolean = {
-    modelName.toLowerCase.equals(modelName) && modelName.contains(".")
+    modelName.contains(".") && {
+      val packageName = modelName.substring(0, modelName.lastIndexOf("."))
+      packageName.toLowerCase.equals(packageName)
+    }
   }
 
   def capitalizeModelName(modelName: String): String ={
