@@ -104,6 +104,7 @@ class KotlinUtilTest
   "isModelNameWithPackage" should "return correctly" in {
     isModelNameWithPackage("abc") should be(false)
     isModelNameWithPackage("io.apibuilder.common.v0.models.reference") should be(true)
+    isModelNameWithPackage("io.apibuilder.common.v0.models.testReference") should be (true)
   }
 
   "capitalizeModelNameWithPackage" should "capitalize last word" in {
