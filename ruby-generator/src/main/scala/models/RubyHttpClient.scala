@@ -189,7 +189,7 @@ module HttpClient
       # DEBUG curl = ['curl']
       # DEBUG if klass != Net::HTTP::Get
       # DEBUG  curl << "-X%s" % klass.name.split("::").last.upcase
-      # DEBUGend
+      # DEBUG end
 
       if @body
         # DEBUG tmpfile = "/tmp/rest_client.tmp"
