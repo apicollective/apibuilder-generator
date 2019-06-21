@@ -77,7 +77,11 @@ trait ScalaClientMethodConfig {
     * instance of the specified class.
     */
   def toJson(responseName: String, className: String): String = {
-    s"""_root_.${namespace}.Client.parseJson("$className", $responseName, _.validate[$className])"""
+    if (className == "_root_.play.api.libs.json.JsValue") {
+      s"$responseName.json" // use the built-in response.json method
+    } else {
+      s"""_root_.$namespace.Client.parseJson("$className", $responseName, _.validate[$className])"""
+    }
   }
 
   def asyncTypeParam(constraint: Option[String] = None): Option[String] = None
