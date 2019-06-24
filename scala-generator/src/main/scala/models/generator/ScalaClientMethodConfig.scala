@@ -77,11 +77,7 @@ trait ScalaClientMethodConfig {
     * instance of the specified class.
     */
   def toJson(responseName: String, className: String): String = {
-    if (className == "_root_.play.api.libs.json.JsValue") {
-      s"$responseName.json" // use the built-in response.json method
-    } else {
-      s"""_root_.$namespace.Client.parseJson("$className", $responseName, _.validate[$className])"""
-    }
+    s"""_root_.$namespace.Client.parseJson("$className", $responseName, _.validate[$className])"""
   }
 
   def asyncTypeParam(constraint: Option[String] = None): Option[String] = None
@@ -94,6 +90,13 @@ trait ScalaClientMethodConfig {
 object ScalaClientMethodConfigs {
 
   trait Play extends ScalaClientMethodConfig {
+    override def toJson(responseName: String, className: String): String = {
+      if (className == "_root_.play.api.libs.json.JsValue") {
+        s"$responseName.json" // use the built-in response.json method
+      } else {
+        super.toJson(responseName, className)
+      }
+    }
     override def pathEncode(value: String) = s"""play.utils.UriEncoding.encodePathSegment($value, "UTF-8")"""
     override val responseStatusMethod = "status"
     override val responseBodyMethod = "body"
