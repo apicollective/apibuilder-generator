@@ -103,7 +103,7 @@ lazy val kotlinGenerator = project
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.8",
       "org.threeten" % "threetenbp" % "1.3.8",
-      "com.squareup" % "kotlinpoet" % "1.2.0",
+      "com.squareup" % "kotlinpoet" % "1.3.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.3.10" % "test",
