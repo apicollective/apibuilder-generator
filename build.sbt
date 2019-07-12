@@ -107,7 +107,7 @@ lazy val kotlinGenerator = project
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
       "org.jetbrains.kotlin" % "kotlin-compiler" % "1.3.10" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.7" % "test",
+      "org.scalatest" %% "scalatest" % "3.1.0-SNAP13" % "test",
       "org.mockito" % "mockito-core" % "2.27.0" % "test"
     )
   )
