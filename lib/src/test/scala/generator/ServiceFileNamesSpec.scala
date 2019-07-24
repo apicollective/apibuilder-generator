@@ -43,6 +43,7 @@ class ServiceFileNamesSpec extends FunSpec with Matchers {
     ServiceFileNames.toLanguages("java").map(_.extension) should be(Seq("java"))
     ServiceFileNames.toLanguages("javascript").map(_.extension) should be(Seq("js"))
     ServiceFileNames.toLanguages("go").map(_.extension) should be(Seq("go"))
+    ServiceFileNames.toLanguages("kotlin").map(_.extension) should be(Seq("kt"))
   }
 
   it("getSuffix for all known languages") {
