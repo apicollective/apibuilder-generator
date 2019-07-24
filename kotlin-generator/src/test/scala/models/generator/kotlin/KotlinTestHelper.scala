@@ -24,17 +24,21 @@ object KotlinTestHelper extends Matchers {
     }
   }
 
-  def assertValidKotlinSourceCode(sourceDirectory: java.nio.file.Path): Unit = {
-    System.out.println("Kotlin: sourceDirectory=" + sourceDirectory.toString)
+  def assertValidKotlinSourceCode(kotlinSourceDirectory: java.nio.file.Path): Unit = {
+    System.out.println("kotlinSourceDirectory=" + kotlinSourceDirectory.toString)
     val freeArgList = new java.util.ArrayList[String]
-    freeArgList.add(sourceDirectory.toString)
+    freeArgList.add(kotlinSourceDirectory.toString)
     val msgCollector = new MessageCollectorImpl()
     val compiler = new K2JVMCompiler()
     val args = new K2JVMCompilerArguments()
     args.setFreeArgs(freeArgList)
-    args.setClasspath(System.getProperty("java.class.path"))
+    val classpath = System.getProperty("java.class.path")
+    args.setClasspath(classpath)
     args.setCompileJava(true)
+    args.setNoStdlib(true)
+    args.setNoReflect(true)
     val exitCode = compiler.exec(msgCollector, Services.EMPTY, args)
+    System.out.println("KotlinCompiler: exitCode=" + exitCode)
     msgCollector.hasErrors shouldBe false
   }
 

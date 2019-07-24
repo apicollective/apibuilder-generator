@@ -102,6 +102,8 @@ lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(
+    fork in Test := true,
+    baseDirectory in Test := file("."),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.8",
       "org.threeten" % "threetenbp" % "1.3.8",
