@@ -31,8 +31,8 @@ class KotlinGeneratorTest
         files.foreach(f => {
           f.contents.length shouldBe >(0)
           f.name should endWith(".kt")
-          // assertValidKotlinSourceCode(tmpDir)
         })
+        // TODO assertValidKotlinSourceCode(tmpDir.toPath)
         files.exists(
           file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
         ) shouldBe true

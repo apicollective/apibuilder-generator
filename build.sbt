@@ -96,6 +96,8 @@ lazy val androidGenerator = project
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 77.8))
 
+val kotlinLangVersion = "1.3.41"
+
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
   .dependsOn(lib, lib % "test->test")
@@ -106,7 +108,8 @@ lazy val kotlinGenerator = project
       "com.squareup" % "kotlinpoet" % "1.3.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
-      "org.jetbrains.kotlin" % "kotlin-compiler" % "1.3.41" % "test",
+      "org.jetbrains.kotlin" % "kotlin-stdlib" % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-compiler" % kotlinLangVersion % "test",
       "org.scalatest" %% "scalatest" % "3.0.7" % "test",
       "org.mockito" % "mockito-core" % "3.0.0" % "test"
     )
