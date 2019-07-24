@@ -105,7 +105,8 @@ lazy val kotlinGenerator = project
     fork in Test := true,
     baseDirectory in Test := file("."),
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.8",
+      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.9",
+      "com.fasterxml.jackson.core"   % "jackson-annotations"   % "2.9.9",
       "org.threeten" % "threetenbp" % "1.3.8",
       "com.squareup" % "kotlinpoet" % "1.3.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
