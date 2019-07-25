@@ -113,8 +113,10 @@ lazy val kotlinGenerator = project
       "com.squareup" % "kotlinpoet" % "1.3.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
-      "org.jetbrains.kotlin" % "kotlin-stdlib" % kotlinLangVersion % "test",
-      "org.jetbrains.kotlin" % "kotlin-compiler" % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-stdlib"      % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-stdlib-jdk8" % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-reflect"     % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-compiler"    % kotlinLangVersion % "test",
       "org.scalatest" %% "scalatest" % "3.0.7" % "test",
       "org.mockito" % "mockito-core" % "3.0.0" % "test"
     )
