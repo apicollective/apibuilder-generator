@@ -8,6 +8,7 @@ import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCode
 import io.apibuilder.spec.v0.models.json._
 import io.apibuilder.spec.v0.models.Service
 import io.apibuilder.generator.v0.models.File
+
 import lib.Text
 
 import org.scalatest.Matchers
@@ -55,6 +56,18 @@ object TestHelper extends Matchers {
 
   def parseFile(path: String): Service = {
     service(readFile(resolvePath(path)))
+  }
+
+  def writeFiles(dir: java.io.File, files: Seq[File]): Unit = {
+    dir.createNewFile()
+    for (f <- files) {
+      val javaFile = new java.io.File(dir.getAbsolutePath, f.name)
+      javaFile.createNewFile()
+      val writer = new java.io.FileWriter(javaFile)
+      writer.write(f.contents)
+      writer.flush()
+      writer.close()
+    }
   }
 
   /**
