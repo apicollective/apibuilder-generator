@@ -1,12 +1,7 @@
 package models.generator.kotlin
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import org.scalatest.{FunSpec, Matchers}
-import java.nio.file.Files.createTempDirectory
-
 import KotlinTestHelper._
-import io.apibuilder.spec.v0.models.Service
 
 class KotlinGeneratorTest
   extends FunSpec
@@ -30,25 +25,6 @@ class KotlinGeneratorTest
       val dir = generateSourceFiles(service)
       assertKotlinCodeCompiles(dir.toPath)
     }
-  }
-
-  private def generateSourceFiles(service: Service): java.io.File = {
-    val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
-    tmpDir.deleteOnExit()
-    val invocationForm = InvocationForm(service, Seq.empty, None)
-    val generator = new KotlinGenerator()
-    val files = generator.invoke(invocationForm).right.get
-    files.size shouldBe >(0)
-    files.foreach(f => {
-      f.contents.length shouldBe >(0)
-      f.name should endWith(".kt")
-    })
-    files.exists(
-      file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
-    ) shouldBe true
-    assertJodaTimeNotPresent(files)
-    writeFiles(tmpDir, files)
-    tmpDir
   }
 
 }
