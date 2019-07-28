@@ -24,6 +24,7 @@ object KotlinTestHelper extends Matchers {
     args.setCompileJava(true)
     args.setNoStdlib(true)
     args.setNoReflect(true)
+    args.setDestination(kotlinSourceDirectory.toAbsolutePath.toString)
     val exitCode = compiler.exec(msgCollector, Services.EMPTY, args)
     if (exitCode != ExitCode.OK) {
       System.err.println("KotlinCompiler: exitCode=" + exitCode)
