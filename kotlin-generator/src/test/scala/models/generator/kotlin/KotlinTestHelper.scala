@@ -12,7 +12,12 @@ import org.scalatest.Matchers
 object KotlinTestHelper extends Matchers {
 
   def assertValidKotlinSourceCode(kotlinSourceDirectory: java.nio.file.Path): Unit = {
-    System.out.println("kotlinSourceDirectory=" + kotlinSourceDirectory.toString)
+    val compilerOutputDir = new java.io.File(kotlinSourceDirectory.toAbsolutePath.toString + "-output");
+    compilerOutputDir.mkdirs()
+
+    // System.out.println("kotlinSourceDirectory=" + kotlinSourceDirectory.toString)
+    // System.out.println("compilerOutputDir=" + compilerOutputDir.toString)
+
     val freeArgList = new java.util.ArrayList[String]
     freeArgList.add(kotlinSourceDirectory.toString)
     val msgCollector = new MessageCollectorImpl()
@@ -24,7 +29,7 @@ object KotlinTestHelper extends Matchers {
     args.setCompileJava(true)
     args.setNoStdlib(true)
     args.setNoReflect(true)
-    args.setDestination(kotlinSourceDirectory.toAbsolutePath.toString)
+    args.setDestination(compilerOutputDir.getAbsolutePath)
     val exitCode = compiler.exec(msgCollector, Services.EMPTY, args)
     if (exitCode != ExitCode.OK) {
       System.err.println("KotlinCompiler: exitCode=" + exitCode)
