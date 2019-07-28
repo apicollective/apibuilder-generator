@@ -22,7 +22,7 @@ class KotlinGeneratorTest
         tmpDir.deleteOnExit()
         val service = models.TestHelper.apidocApiService
         service.enums.size shouldBe (3)
-        val invocationForm = new InvocationForm(service, Seq.empty, None)
+        val invocationForm = InvocationForm(service, Seq.empty, None)
         val generator = new KotlinGenerator()
         val files = generator.invoke(invocationForm).right.get
         assertJodaTimeNotPresent(files)
@@ -49,7 +49,7 @@ class KotlinGeneratorTest
       val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
       tmpDir.deleteOnExit()
       service.imports.size shouldBe (0)
-      val invocationForm = new InvocationForm(service, Seq.empty, None)
+      val invocationForm = InvocationForm(service, Seq.empty, None)
       val generator = new KotlinGenerator()
       val files = generator.invoke(invocationForm).right.get
       files.size shouldBe >(0)
