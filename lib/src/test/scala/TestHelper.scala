@@ -21,6 +21,7 @@ object TestHelper extends Matchers {
   lazy val generatorApiService: Service = parseFile(s"/examples/apidoc-generator.json")
   lazy val apidocApiService: Service = parseFile(s"/examples/apidoc-api.json")
   lazy val dateTimeService: Service = parseFile(s"/examples/date-time-types.json")
+  lazy val builtInTypesService: Service = parseFile(s"/examples/built-in-types.json")
 
   lazy val generatorApiServiceWithUnionAndDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
   lazy val generatorApiServiceWithUnionWithoutDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types.json")
