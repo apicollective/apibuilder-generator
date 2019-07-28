@@ -32,7 +32,6 @@ class KotlinGeneratorTest
           f.contents.length shouldBe >(0)
           f.name should endWith(".kt")
         })
-        // TODO assertValidKotlinSourceCode(tmpDir.toPath)
         files.exists(
           file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
         ) shouldBe true
@@ -41,6 +40,22 @@ class KotlinGeneratorTest
           enumFileExists(files, enumName) shouldBe true
         }
       }
+    }
+  }
+
+  describe("dateTimeService") {
+    val service = models.TestHelper.dateTimeService
+    it("source files should compile") {
+      val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
+      tmpDir.deleteOnExit()
+      service.imports.size shouldBe (0)
+      val invocationForm = new InvocationForm(service, Seq.empty, None)
+      val generator = new KotlinGenerator()
+      val files = generator.invoke(invocationForm).right.get
+      files.size shouldBe >(0)
+      assertJodaTimeNotPresent(files)
+      writeFiles(tmpDir, files)
+      // TODO assertValidKotlinSourceCode(tmpDir.toPath)
     }
   }
 
