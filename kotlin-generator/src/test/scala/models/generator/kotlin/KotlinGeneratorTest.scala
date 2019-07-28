@@ -6,6 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import java.nio.file.Files.createTempDirectory
 
 import KotlinTestHelper._
+import io.apibuilder.spec.v0.models.Service
 
 class KotlinGeneratorTest
   extends FunSpec
@@ -13,50 +14,33 @@ class KotlinGeneratorTest
 
   import models.TestHelper._
 
-  val serviceDefs = Seq(apidocApiService, generatorApiServiceWithUnionAndDescriminator)
+  val serviceDefs = Seq(apidocApiService, generatorApiServiceWithUnionAndDescriminator, dateTimeService)
 
   describe("invoke should output Kotlin source files") {
     for (service <- serviceDefs) {
       it(s"for service [${service.name}]") {
-        val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
-        tmpDir.deleteOnExit()
-        val service = models.TestHelper.apidocApiService
-        service.enums.size shouldBe (3)
-        val invocationForm = InvocationForm(service, Seq.empty, None)
-        val generator = new KotlinGenerator()
-        val files = generator.invoke(invocationForm).right.get
-        assertJodaTimeNotPresent(files)
-        writeFiles(tmpDir, files)
-        files.size shouldBe >(0)
-        files.foreach(f => {
-          f.contents.length shouldBe >(0)
-          f.name should endWith(".kt")
-        })
-        files.exists(
-          file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
-        ) shouldBe true
-
-        Seq("Visibility", "Publication", "OriginalType").foreach { enumName =>
-          enumFileExists(files, enumName) shouldBe true
-        }
+        generateSourceFiles(service)
       }
     }
   }
 
-  describe("dateTimeService") {
-    val service = models.TestHelper.dateTimeService
-    it("source files should compile") {
-      val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
-      tmpDir.deleteOnExit()
-      service.imports.size shouldBe (0)
-      val invocationForm = InvocationForm(service, Seq.empty, None)
-      val generator = new KotlinGenerator()
-      val files = generator.invoke(invocationForm).right.get
-      files.size shouldBe >(0)
-      assertJodaTimeNotPresent(files)
-      writeFiles(tmpDir, files)
-      // assertValidKotlinSourceCode(tmpDir.toPath)
-    }
+  private def generateSourceFiles(service: Service): java.io.File = {
+    val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
+    tmpDir.deleteOnExit()
+    val invocationForm = InvocationForm(service, Seq.empty, None)
+    val generator = new KotlinGenerator()
+    val files = generator.invoke(invocationForm).right.get
+    files.size shouldBe >(0)
+    files.foreach(f => {
+      f.contents.length shouldBe >(0)
+      f.name should endWith(".kt")
+    })
+    files.exists(
+      file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
+    ) shouldBe true
+    assertJodaTimeNotPresent(files)
+    writeFiles(tmpDir, files)
+    tmpDir
   }
 
   private def enumFileExists(files: Seq[File], enumName: String): Boolean = {
