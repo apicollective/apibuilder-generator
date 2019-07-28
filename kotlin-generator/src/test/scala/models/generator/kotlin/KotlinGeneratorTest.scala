@@ -24,6 +24,14 @@ class KotlinGeneratorTest
     }
   }
 
+  describe("built-in-types") {
+    val service = builtInTypesService
+    it(s"code compiles") {
+      val dir = generateSourceFiles(service)
+      assertValidKotlinSourceCode(dir.toPath)
+    }
+  }
+
   private def generateSourceFiles(service: Service): java.io.File = {
     val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
     tmpDir.deleteOnExit()
