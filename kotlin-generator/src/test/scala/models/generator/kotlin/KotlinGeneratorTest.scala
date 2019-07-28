@@ -55,7 +55,7 @@ class KotlinGeneratorTest
       files.size shouldBe >(0)
       assertJodaTimeNotPresent(files)
       writeFiles(tmpDir, files)
-      // TODO assertValidKotlinSourceCode(tmpDir.toPath)
+      // assertValidKotlinSourceCode(tmpDir.toPath)
     }
   }
 
