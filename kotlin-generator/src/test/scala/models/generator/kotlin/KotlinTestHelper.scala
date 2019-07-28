@@ -11,7 +11,7 @@ import org.scalatest.Matchers
 
 object KotlinTestHelper extends Matchers {
 
-  def assertValidKotlinSourceCode(kotlinSourceDirectory: java.nio.file.Path): Unit = {
+  def assertKotlinCodeCompiles(kotlinSourceDirectory: java.nio.file.Path): Unit = {
     val compilerOutputDir = new java.io.File(kotlinSourceDirectory.toAbsolutePath.toString + "-output");
     compilerOutputDir.mkdirs()
 

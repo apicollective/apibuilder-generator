@@ -28,7 +28,7 @@ class KotlinGeneratorTest
     val service = builtInTypesService
     it(s"code compiles") {
       val dir = generateSourceFiles(service)
-      assertValidKotlinSourceCode(dir.toPath)
+      assertKotlinCodeCompiles(dir.toPath)
     }
   }
 
