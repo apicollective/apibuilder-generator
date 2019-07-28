@@ -14,6 +14,7 @@ object KotlinTestHelper extends Matchers {
   def assertKotlinCodeCompiles(kotlinSourceDirectory: java.nio.file.Path): Unit = {
     val compilerOutputDir = new java.io.File(kotlinSourceDirectory.toAbsolutePath.toString + "-output");
     compilerOutputDir.mkdirs()
+    compilerOutputDir.deleteOnExit()
 
     // System.out.println("kotlinSourceDirectory=" + kotlinSourceDirectory.toString)
     // System.out.println("compilerOutputDir=" + compilerOutputDir.toString)
