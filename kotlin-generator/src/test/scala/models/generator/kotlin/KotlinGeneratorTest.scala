@@ -51,9 +51,4 @@ class KotlinGeneratorTest
     tmpDir
   }
 
-  private def enumFileExists(files: Seq[File], enumName: String): Boolean = {
-    files.exists(file => {
-      file.contents.contains(s"enum class ${enumName}")
-    })
-  }
 }
