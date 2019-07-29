@@ -35,7 +35,8 @@ object KotlinTestHelper extends Matchers {
 
   private def createTempDirectory(service: Service): java.io.File = {
     val name = service.name + System.currentTimeMillis
-    val dir = Files.createTempDirectory(name).toFile
+    val tmpdir = "/tmp"
+    val dir = new java.io.File(tmpdir + "/" + name)
     dir.mkdirs
     dir.deleteOnExit
     dir
