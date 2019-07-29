@@ -9,7 +9,7 @@ class KotlinGeneratorTest
 
   import models.TestHelper._
 
-  val serviceDefs = Seq(apidocApiService, generatorApiServiceWithUnionAndDescriminator)
+  val serviceDefs = Seq(apidocApiService)
 
   describe("invoke should output Kotlin source files") {
     for (service <- serviceDefs) {
@@ -19,7 +19,7 @@ class KotlinGeneratorTest
     }
   }
 
-  private val compileList = Seq(builtInTypesService, dateTimeService)
+  private val compileList = Seq(builtInTypesService, dateTimeService, generatorApiServiceWithUnionAndDescriminator)
 
   describe("Kotlin code compiles") {
     for (service <- compileList) {
