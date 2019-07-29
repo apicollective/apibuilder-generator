@@ -37,8 +37,8 @@ object KotlinTestHelper extends Matchers {
     val name = (service.name + System.currentTimeMillis).replace(' ', '-')
     val tmpdir = "/tmp"
     val dir = new java.io.File(tmpdir + "/" + name)
-    dir.mkdirs
-    dir.deleteOnExit
+    dir.mkdirs()
+    dir.deleteOnExit()
     dir
   }
 }
