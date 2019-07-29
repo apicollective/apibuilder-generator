@@ -19,9 +19,11 @@ class KotlinGeneratorTest
     }
   }
 
-  describe("built-in-types") {
-    val service = builtInTypesService
-    it(s"code compiles") {
+  private val compileList = Seq(builtInTypesService)
+
+  describe("Kotlin code compiles") {
+    for (service <- compileList)
+    it(s"[${service.name}]") {
       val dir = generateSourceFiles(service)
       assertKotlinCodeCompiles(dir.toPath)
     }
