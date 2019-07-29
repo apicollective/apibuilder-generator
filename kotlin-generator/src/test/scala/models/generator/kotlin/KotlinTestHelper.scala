@@ -1,6 +1,6 @@
 package models.generator.kotlin
 
-import java.nio.file.Files.createTempDirectory
+import java.nio.file.Files
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.Service
@@ -10,7 +10,7 @@ import org.scalatest.Matchers
 object KotlinTestHelper extends Matchers {
 
   def generateSourceFiles(service: Service): java.io.File = {
-    val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
+    val tmpDir = createTempDirectory(service)
     tmpDir.deleteOnExit()
     val invocationForm = InvocationForm(service, Seq.empty, None)
     val generator = new KotlinGenerator()
@@ -31,5 +31,13 @@ object KotlinTestHelper extends Matchers {
   def assertKotlinCodeCompiles(kotlinSourceDirectory: java.nio.file.Path): Unit = {
     val msgCollector = KotlinCompiler.compile(kotlinSourceDirectory)
     msgCollector.hasErrors shouldBe false
+  }
+
+  private def createTempDirectory(service: Service): java.io.File = {
+    val name = service.name + System.currentTimeMillis
+    val dir = Files.createTempDirectory(name).toFile
+    dir.mkdirs
+    dir.deleteOnExit
+    dir
   }
 }
