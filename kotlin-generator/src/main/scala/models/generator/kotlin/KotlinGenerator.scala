@@ -15,7 +15,6 @@ import lib.Datatype
 import lib.generator.CodeGenerator
 import org.threeten.bp.{Instant, LocalDate}
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 class KotlinGenerator
@@ -106,10 +105,10 @@ class KotlinGenerator
       val undefinedClassName = className + "Undefined"
       val modelsUnderUnion = service.models
         .filter{ model =>
-          union.types.exists(_.`type` == model.name)
+          union.types.exists(unionType => model.fields.exists(_.`type` == unionType.`type`))
         }
-        .map(generateModelTypeBuilder(_, Some(union), service).build())
-        .asJava
+
+      val fieldsUnderUnion = modelsUnderUnion.map(_.fields).flatten
 
       val builder = TypeSpec.classBuilder(className)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
@@ -153,16 +152,18 @@ class KotlinGenerator
 
       union.description.map(builder.addKdoc(_))
 
-      val undefinedTypeBuilder = TypeSpec.objectBuilder(undefinedClassName)
+      val unionTypeNames = fieldsUnderUnion.map(f => toClassName(f.`type`)) ++ Seq(undefinedClassName)
 
-      val undefinedJsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
-      undefinedJsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
-      undefinedTypeBuilder.addAnnotation(undefinedJsonAnnotationBuilder.build())
-      undefinedTypeBuilder.superclass(new ClassName(modelsNameSpace, toClassName(className)))
+      for (unionTypeName <- unionTypeNames) {
+        val objectBuilder = TypeSpec.objectBuilder(unionTypeName)
 
-      /* Put the model classes inside the sealed class */
-      builder.addTypes(modelsUnderUnion)
-      builder.addType(undefinedTypeBuilder.build())
+        val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
+        jsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
+        objectBuilder.addAnnotation(jsonAnnotationBuilder.build())
+        objectBuilder.superclass(new ClassName(modelsNameSpace, toClassName(className)))
+
+        builder.addType(objectBuilder.build())
+      }
 
       makeFile(modelsNameSpace, className, builder)
     }
