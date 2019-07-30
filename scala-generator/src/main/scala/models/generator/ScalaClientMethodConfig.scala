@@ -302,6 +302,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
     override def serverImports: String =
       s"""
+         |import org.http4s.circe.decodeUri
+         |import org.http4s.circe.encodeUri
          |import org.http4s.dsl.{io => _, _}
          |import cats.effect._
          |import cats.implicits._
@@ -350,6 +352,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
     override def serverImports: String =
       s"""
+         |import org.http4s.circe.decodeUri
+         |import org.http4s.circe.encodeUri
          |import org.http4s.dsl.{io => _, _}
          |import org.http4s.implicits._
          |import cats.effect._
