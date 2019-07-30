@@ -11,7 +11,6 @@ object KotlinTestHelper extends Matchers {
 
   def generateSourceFiles(service: Service): java.io.File = {
     val tmpDir = createTempDirectory(service)
-    tmpDir.deleteOnExit()
     val invocationForm = InvocationForm(service, Seq.empty, None)
     val generator = new KotlinGenerator()
     val files = generator.invoke(invocationForm).right.get
