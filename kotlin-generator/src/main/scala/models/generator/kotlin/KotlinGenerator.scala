@@ -458,13 +458,19 @@ class KotlinGenerator
 
                 val errorPayloadTypeString = errorPayloadType match {
                   case cn: ClassName => cn.getSimpleName()
-                  case pt: ParameterizedTypeName => pt.toString()
+                  case pt: ParameterizedTypeName => pt.toString
                   case _ => errorPayloadType.toString()
                 }
 
 
                 if (dataTypes.keySet.contains(errorResponse.`type`)) {
                   toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${errorPayloadTypeString + "::class.java"}))) } ?: %T(%T(" + responseCodeString + ", \"No Body\"))",
+                    callErrorEitherErrorTypeClassName,
+                    commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
+                } else if (isParameterArray(errorResponse.`type`)) {
+                  val jacksonTypeReference = buildJacksonTypeReferenceTypeSpec(errorPayloadType.asInstanceOf[ParameterizedTypeName])
+                  callObjectBuilder.addType(jacksonTypeReference)
+                  toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${jacksonTypeReference.getName} ))) } ?: %T(%T(" + responseCodeString + ", \"No Body\"))",
                     callErrorEitherErrorTypeClassName,
                     commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
                 } else {
@@ -523,6 +529,19 @@ class KotlinGenerator
     }
 
     def emptyCodeBlock(): CodeBlock = CodeBlock.builder().build()
+
+    def buildJacksonTypeReferenceTypeSpec(ptn: ParameterizedTypeName): TypeSpec = {
+      // see  https://stackoverflow.com/questions/6349421/how-to-use-jackson-to-deserialise-an-array-of-objects
+      // see  https://fasterxml.github.io/jackson-core/javadoc/2.9/com/fasterxml/jackson/core/type/TypeReference.html
+      require(ptn.getRawType.toString.equals("kotlin.collections.List"))
+      require(ptn.getTypeArguments.size == 1)
+      val firstTypeArg = ptn.getTypeArguments.get(0).asInstanceOf[ClassName]
+      val superClassName = new ClassName("com.fasterxml.jackson.core.type", "TypeReference")
+      val superClazz = ParameterizedTypeName.get(superClassName, ptn)
+      TypeSpec.objectBuilder(firstTypeArg.getSimpleName + ptn.getRawType.getSimpleName + "TypeReference")
+        .superclass(superClazz)
+        .build()
+    }
 
     def generateJacksonObjectMapper(): File = {
 
