@@ -9,13 +9,13 @@ class KotlinGeneratorTest
 
   import models.TestHelper._
 
-  private val compileList = Seq(builtInTypesService,
-                              dateTimeService,
-                              generatorApiServiceWithUnionAndDescriminator,
-                              apidocApiService)
+  private val serviceDefs = Seq(builtInTypesService,
+                                dateTimeService,
+                                generatorApiServiceWithUnionAndDescriminator,
+                                apidocApiService)
 
   describe("Kotlin code compiles") {
-    for (service <- compileList) {
+    for (service <- serviceDefs) {
       it(s"[${service.name}]") {
         val dir = generateSourceFiles(service)
         assertKotlinCodeCompiles(dir.toPath)
