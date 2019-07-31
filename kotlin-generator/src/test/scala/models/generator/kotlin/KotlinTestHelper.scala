@@ -1,10 +1,10 @@
 package models.generator.kotlin
 
-import java.nio.file.Files
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.Service
 import models.TestHelper.{assertJodaTimeNotPresent, writeFiles}
+import org.scalatest.Assertions._
 import org.scalatest.Matchers
 
 object KotlinTestHelper extends Matchers {
@@ -27,7 +27,10 @@ object KotlinTestHelper extends Matchers {
     tmpDir
   }
 
-  def assertKotlinCodeCompiles(kotlinSourceDirectory: java.nio.file.Path): Unit = {
+  def assertKotlinCodeCompiles(kotlinSourceDirectory: java.io.File): Unit = {
+    assert(kotlinSourceDirectory.exists())
+    assert(kotlinSourceDirectory.canRead())
+    assert(kotlinSourceDirectory.isDirectory())
     val msgCollector = KotlinCompiler.compile(kotlinSourceDirectory)
     msgCollector.hasErrors shouldBe false
   }

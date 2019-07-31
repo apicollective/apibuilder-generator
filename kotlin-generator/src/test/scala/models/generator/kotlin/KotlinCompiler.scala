@@ -1,7 +1,8 @@
 package models.generator.kotlin
 
-import java.nio.file.Path
+import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
+
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.messages.{CompilerMessageLocation, CompilerMessageSeverity, MessageCollector}
@@ -9,9 +10,12 @@ import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
 import org.jetbrains.kotlin.config.Services
 
 object KotlinCompiler {
-
-  def compile(kotlinSourceDirectory: Path): MessageCollector = {
-    val compilerOutputDir = new java.io.File(kotlinSourceDirectory.toAbsolutePath.toString + "-output");
+  def compile(kotlinSourceDirectory: java.io.File): MessageCollector = {
+    require(kotlinSourceDirectory.exists())
+    require(kotlinSourceDirectory.canRead())
+    require(kotlinSourceDirectory.isDirectory())
+    require(kotlinSourceDirectory.listFiles(new KotlinFileFilter()).size > 0)
+    val compilerOutputDir = new java.io.File(kotlinSourceDirectory.toPath.toAbsolutePath.toString + "-output");
     compilerOutputDir.mkdirs()
     compilerOutputDir.deleteOnExit()
 
@@ -36,6 +40,11 @@ object KotlinCompiler {
     }
     msgCollector
   }
+
+  private class KotlinFileFilter extends java.io.FileFilter {
+    override def accept(pathname: File): Boolean = pathname.isFile && pathname.getName.endsWith(".kt")
+  }
+
 
   private class MessageCollectorImpl extends MessageCollector {
     private val errorCount = new AtomicInteger(0)
