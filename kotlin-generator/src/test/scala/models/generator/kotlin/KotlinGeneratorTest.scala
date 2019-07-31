@@ -16,7 +16,7 @@ class KotlinGeneratorTest
 
   describe("Kotlin code compiles") {
     for (service <- serviceDefs) {
-      it(s"[${service.name}]") {
+      it(s"[${service.name}] imports=${(service.imports.size > 0)}") {
         val dir = generateSourceFiles(service)
         assertKotlinCodeCompiles(dir.toPath)
       }
