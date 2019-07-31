@@ -9,7 +9,7 @@ class KotlinCompilerSpec
   extends FunSpec
   with Matchers {
 
-  private val goodCode = "class HelloWorld(val name: String) { /* hello */ }"
+  private val goodCode = "class HelloWorld(val name: String?) { /* hello */ }"
 
   describe("KotlinCompiler") {
     it("happy path") {
