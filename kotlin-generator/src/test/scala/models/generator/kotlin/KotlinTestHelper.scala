@@ -31,6 +31,12 @@ object KotlinTestHelper extends Matchers {
     ) shouldBe true
   }
 
+  def assertPackageExists(packageName: String, files: Seq[File]): Unit = {
+    files.exists(
+      file => file.contents.contains(s"package ${packageName}")
+    ) shouldBe true
+  }
+
   def assertKotlinCodeCompiles(kotlinSourceDirectory: java.io.File): Unit = {
     assert(kotlinSourceDirectory.exists())
     assert(kotlinSourceDirectory.canRead())
