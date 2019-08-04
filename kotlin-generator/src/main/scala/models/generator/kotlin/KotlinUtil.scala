@@ -85,8 +85,24 @@ trait KotlinUtil {
     "while"
   )
 
+  def isReservedWord(value: String): Boolean = {
+    ReservedWords.contains(value)
+  }
+
+  def quoteNameIfReservedWord(name: String): String = {
+    if (isReservedWord(name) || needsQuoting(name)) {
+      "`" + name + "`"
+    } else {
+      name
+    }
+  }
+
+  def needsQuoting(name: String): Boolean = {
+    name.indexOf("[") >= 0
+  }
+
   def checkForReservedWord(word: String): String =
-    if (ReservedWords.contains(word)) word + "_"
+    if (isReservedWord(word)) word + "_"
     else word
 
   def textToComment(text: String): String = textToComment(Seq(text))
