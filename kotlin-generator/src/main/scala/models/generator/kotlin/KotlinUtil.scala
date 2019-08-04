@@ -257,3 +257,5 @@ trait KotlinUtil {
   }
 
 }
+
+object KotlinUtil extends KotlinUtil
