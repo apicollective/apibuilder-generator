@@ -1,7 +1,7 @@
 package models.generator.kotlin
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
 import models.TestHelper.{assertJodaTimeNotPresent, writeFiles}
 import org.scalatest.Assertions._
@@ -19,12 +19,16 @@ object KotlinTestHelper extends Matchers {
       f.contents.length shouldBe >(0)
       f.name should endWith(".kt")
     })
-    files.exists(
-      file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
-    ) shouldBe true
+    assertFileExists("JacksonObjectMapperFactory.kt", files)
     assertJodaTimeNotPresent(files)
     writeFiles(tmpDir, files)
     tmpDir
+  }
+
+  def assertFileExists(filename: String, files: Seq[File]): Unit = {
+    files.exists(
+      file => (file.name == filename && file.contents.contains(classOf[ObjectMapper].getSimpleName))
+    ) shouldBe true
   }
 
   def assertKotlinCodeCompiles(kotlinSourceDirectory: java.io.File): Unit = {
