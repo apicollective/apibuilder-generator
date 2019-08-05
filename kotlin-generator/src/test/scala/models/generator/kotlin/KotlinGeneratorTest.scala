@@ -32,10 +32,6 @@ class KotlinGeneratorTest
     it(s"[${service.name}]") {
       service.enums.size shouldBe > (0)
       service.namespace shouldBe "io.apibuilder.reference.api.v0"
-      val namespaces = Namespaces(service.namespace)
-      namespaces.models shouldBe "io.apibuilder.reference.api.v0.models"
-      namespaces.enums shouldBe "io.apibuilder.reference.api.v0.models"
-      namespaces.unions shouldBe "io.apibuilder.reference.api.v0.models"
       val invocationForm = InvocationForm(service, Seq.empty, None)
       val generator = new KotlinGenerator()
       val files = generator.invoke(invocationForm).right.get
