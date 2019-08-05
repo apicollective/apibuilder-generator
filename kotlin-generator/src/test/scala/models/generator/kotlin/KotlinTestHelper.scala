@@ -1,10 +1,8 @@
 package models.generator.kotlin
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
 import models.TestHelper.{assertJodaTimeNotPresent, writeFiles}
-import org.scalatest.Assertions._
 import org.scalatest.Matchers
 
 object KotlinTestHelper extends Matchers {
@@ -27,7 +25,7 @@ object KotlinTestHelper extends Matchers {
 
   def assertFileExists(filename: String, files: Seq[File]): Unit = {
     files.exists(
-      file => (file.name == filename && file.contents.contains(classOf[ObjectMapper].getSimpleName))
+      file => (file.name == filename)
     ) shouldBe true
   }
 
