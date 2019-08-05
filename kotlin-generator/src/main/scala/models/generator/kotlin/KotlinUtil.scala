@@ -188,6 +188,7 @@ trait KotlinUtil {
   }
 
   protected def dataTypeFromField(`type`: String, serviceNameSpace: String, allEnums: Seq[Enum]): TypeName = {
+    val namespaces = Namespaces(serviceNameSpace)
     dataTypes.get(`type`).getOrElse{
       val name = toParamName(`type`, false)
       if(isParameterArray(`type`)) {
@@ -198,15 +199,11 @@ trait KotlinUtil {
       }
       else {
         val isLocalEnum = allEnums.exists(enum => enum.name == `type`)
-        val nameSpace: String = if(isLocalEnum) toEnumsNameSpace(serviceNameSpace) else toModelsNameSpace(serviceNameSpace)
+        val nameSpace: String = if(isLocalEnum) namespaces.enums else namespaces.models
         new ClassName(nameSpace, name)
       }
     }
   }
-
-  def toModelsNameSpace(nameSpace: String): String = nameSpace + ".models"
-
-  def toEnumsNameSpace(nameSpace: String): String = nameSpace + ".enums"
 
   def toParamName(modelName: String, startingWithLowercase: Boolean): String = {
     val paramStartingWithUppercase = if (isParameterArray(modelName)){

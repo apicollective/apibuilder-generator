@@ -31,12 +31,10 @@ class KotlinGenerator
 
   class GeneratorHelper(service: Service) {
 
-    private val nameSpace = makeNameSpace(service.namespace)
+    private val namespaces = Namespaces(service.namespace)
     private val sharedNameSpace = "io.apibuilder.app"
-    private val modelsNameSpace = toModelsNameSpace(nameSpace)
-    private val enumsNameSpace = toEnumsNameSpace(nameSpace)
 
-    private val sharedJacksonSpace = modelsNameSpace
+    private val sharedJacksonSpace = namespaces.models
     private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
 
     //Errors
@@ -93,7 +91,7 @@ class KotlinGenerator
       toStringMethod.addStatement(s"return $nameField")
       builder.addFunction(toStringMethod.build)
 
-      makeFile(enumsNameSpace, className, builder)
+      makeFile(namespaces.enums, className, builder)
     }
 
     def getRetrofitSingleTypeWrapperClass(): ClassName = classToClassName(classOf[Single[Void]])
@@ -117,7 +115,7 @@ class KotlinGenerator
       if (union.discriminator.isDefined) {
         jsonAnnotationBuilder.addMember("include = com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
         jsonAnnotationBuilder.addMember("property = \"" + union.discriminator.get + "\"")
-        jsonAnnotationBuilder.addMember("defaultImpl = " + new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
+        jsonAnnotationBuilder.addMember("defaultImpl = " + new ClassName(s"${namespaces.models}.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
       } else {
         jsonAnnotationBuilder.addMember("include", "com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT")
       }
@@ -129,7 +127,7 @@ class KotlinGenerator
         jsonSubTypesAnnotationBuilder
           .addMember("%L",
             AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-              .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(u.`type`)) + "::class")
+              .addMember("value = %L", new ClassName(s"${namespaces.models}.$className", toClassName(u.`type`)) + "::class")
               .addMember("name = %S", u.discriminatorValue.getOrElse(u.`type`))
               .build()
           )
@@ -138,7 +136,7 @@ class KotlinGenerator
       jsonSubTypesAnnotationBuilder
         .addMember("%L",
           AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-            .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
+            .addMember("value = %L", new ClassName(s"${namespaces.models}.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
             .build()
         )
 
@@ -154,12 +152,12 @@ class KotlinGenerator
         val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
         jsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
         objectBuilder.addAnnotation(jsonAnnotationBuilder.build())
-        objectBuilder.superclass(new ClassName(modelsNameSpace, toClassName(className)))
+        objectBuilder.superclass(new ClassName(namespaces.models, toClassName(className)))
 
         builder.addType(objectBuilder.build())
       }
 
-      makeFile(modelsNameSpace, className, builder)
+      makeFile(namespaces.models, className, builder)
     }
 
     private def generateModelTypeBuilder(model: Model, union: Option[Union], service: Service): TypeSpec.Builder = {
@@ -179,7 +177,7 @@ class KotlinGenerator
       val constructorWithParams = FunSpec.constructorBuilder()
 
       union.map{ relatedUnion =>
-        val unionClassTypeName = new ClassName(modelsNameSpace, toClassName(relatedUnion.name))
+        val unionClassTypeName = new ClassName(namespaces.models, toClassName(relatedUnion.name))
         builder.superclass(unionClassTypeName)
 
         val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
@@ -194,7 +192,7 @@ class KotlinGenerator
         val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
-        val kotlinDataType = dataTypeFromField(field.`type`, nameSpace, service)
+        val kotlinDataType = dataTypeFromField(field.`type`, namespaces.base, service)
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
         val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
@@ -221,10 +219,10 @@ class KotlinGenerator
       val modelType =
         union match{
           case Some(relatedUnion) => {
-            ClassName.bestGuess(s"$modelsNameSpace.${toClassName(relatedUnion.name)}.$className")
+            ClassName.bestGuess(s"${namespaces.models}.${toClassName(relatedUnion.name)}.$className")
           }
           case None =>{
-            ClassName.bestGuess(modelsNameSpace + "." + className)
+            ClassName.bestGuess(namespaces.models + "." + className)
           }
         }
 
@@ -241,7 +239,7 @@ class KotlinGenerator
 
       val builder = generateModelTypeBuilder(model, union, service)
 
-      makeFile(modelsNameSpace, className, builder)
+      makeFile(namespaces.models, className, builder)
     }
 
     def generateResource(resource: Resource): File = {
@@ -326,7 +324,7 @@ class KotlinGenerator
             }
 
             maybeAnnotationClass.map(annotationClass => {
-              val parameterType: TypeName = dataTypeFromField(parameter.`type`, nameSpace, service)
+              val parameterType: TypeName = dataTypeFromField(parameter.`type`, namespaces.base, service)
               val param = ParameterSpec.builder(toParamName(parameter.name, true), parameterType.copy(!parameter.required, parameterType.getAnnotations))
 
               parametersCache += (param.build())
@@ -339,7 +337,7 @@ class KotlinGenerator
           })
 
           operation.body.map(body => {
-            val bodyType = dataTypeFromField(body.`type`, nameSpace, service)
+            val bodyType = dataTypeFromField(body.`type`, namespaces.base, service)
             val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
 
             parametersCache += (parameter.build())
@@ -375,7 +373,7 @@ class KotlinGenerator
 
 
           maybeSuccessfulResponse.map(successfulResponse => {
-            val returnType = dataTypeFromField(successfulResponse.`type`, nameSpace, service)
+            val returnType = dataTypeFromField(successfulResponse.`type`, namespaces.base, service)
             method.returns(
               ParameterizedTypeName.get(
                 getRetrofitSingleTypeWrapperClass(),
@@ -407,7 +405,7 @@ class KotlinGenerator
           })
           if (errorResponses.nonEmpty) {
 
-            val callObjectName = new ClassName(modelsNameSpace + "." + className, methodName.capitalize + "Call")
+            val callObjectName = new ClassName(namespaces.models + "." + className, methodName.capitalize + "Call")
             val callObjectBuilder = TypeSpec.objectBuilder(callObjectName)
 
             val callErrorResponseSealedClassName = new ClassName(callObjectName.getCanonicalName, errorResponsesString)
@@ -443,7 +441,7 @@ class KotlinGenerator
                   callErrorEitherErrorTypeClassName)
                 callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
               } else {
-                val errorPayloadType = dataTypeFromField(errorResponse.`type`, nameSpace, service)
+                val errorPayloadType = dataTypeFromField(errorResponse.`type`, namespaces.base, service)
 
 
                 val errorPayloadNameString = "data"
@@ -494,7 +492,7 @@ class KotlinGenerator
             //combined function
 
             val combinedFunction = FunSpec.builder("getCallAndErrorLambda")
-              .addParameter("client", new ClassName(modelsNameSpace, className))
+              .addParameter("client", new ClassName(namespaces.models, className))
 
 
             parametersCache.toList.foreach(
@@ -525,7 +523,7 @@ class KotlinGenerator
         })
       }
 
-      makeFile(modelsNameSpace, className, builder)
+      makeFile(namespaces.models, className, builder)
     }
 
     def emptyCodeBlock(): CodeBlock = CodeBlock.builder().build()
@@ -630,7 +628,7 @@ class KotlinGenerator
         .addType(deserializerLocalDateType)
         .addType(serializerLocalDateType)
         .addFunction(createFunSpec)
-      makeFile(modelsNameSpace, className, builder)
+      makeFile(namespaces.models, className, builder)
     }
 
 

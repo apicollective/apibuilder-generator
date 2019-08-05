@@ -36,7 +36,6 @@ class KotlinGeneratorTest
       val generator = new KotlinGenerator()
       val files = generator.invoke(invocationForm).right.get
       assertPackageExists("io.apibuilder.reference.api.v0.models", files)
-      assertPackageExists("io.apibuilder.reference.api.v0.enums", files)
     }
   }
 
