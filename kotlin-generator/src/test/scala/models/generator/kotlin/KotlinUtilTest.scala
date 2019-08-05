@@ -78,8 +78,8 @@ class KotlinUtilTest
   )
 
   it should "produce enums" in {
-    dataTypeFromField("enum_one", "com.foobar.example", enums).toString should be("com.foobar.example.models.EnumOne")
-    dataTypeFromField("enum_two", "com.foobar.example", enums).toString should be("com.foobar.example.models.EnumTwo")
+    dataTypeFromField("enum_one", "com.foobar.example", enums).toString should be("com.foobar.example.enums.EnumOne")
+    dataTypeFromField("enum_two", "com.foobar.example", enums).toString should be("com.foobar.example.enums.EnumTwo")
     dataTypeFromField("enum_three", "com.foobar.example", enums).toString should be("com.foobar.example.models.EnumThree")
   }
 
@@ -87,7 +87,7 @@ class KotlinUtilTest
     dataTypeFromField("[long]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.List<kotlin.Long>")
     dataTypeFromField("[string]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.List<kotlin.String>")
     dataTypeFromField("[CustomType]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.List<com.foobar.example.models.CustomType>")
-    dataTypeFromField("[enum_one]", "com.foobar.example", enums).toString should be("kotlin.collections.List<com.foobar.example.models.EnumOne>")
+    dataTypeFromField("[enum_one]", "com.foobar.example", enums).toString should be("kotlin.collections.List<com.foobar.example.enums.EnumOne>")
     dataTypeFromField("[enum_one]", "com.foobar.example", Seq.empty).toString should be("kotlin.collections.List<com.foobar.example.models.EnumOne>")
   }
 
@@ -97,7 +97,7 @@ class KotlinUtilTest
     dataTypeFromField("map[date-iso8601]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, org.threeten.bp.LocalDate>")
     dataTypeFromField("map[string]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, kotlin.String>")
     dataTypeFromField("map[CustomType]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, com.foobar.example.models.CustomType>")
-    dataTypeFromField("map[enum_one]", "com.foobar.example", enums).toString should be("kotlin.collections.Map<kotlin.String, com.foobar.example.models.EnumOne>")
+    dataTypeFromField("map[enum_one]", "com.foobar.example", enums).toString should be("kotlin.collections.Map<kotlin.String, com.foobar.example.enums.EnumOne>")
     dataTypeFromField("map[enum_one]", "com.foobar.example", Seq.empty).toString should be("kotlin.collections.Map<kotlin.String, com.foobar.example.models.EnumOne>")
   }
 

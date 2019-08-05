@@ -122,7 +122,7 @@ lazy val kotlinGenerator = project
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 92.20, ScoverageKeys.coverageFailOnMinimum := true))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 92.49, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val postmanGenerator = project
   .in(file("postman-generator"))
