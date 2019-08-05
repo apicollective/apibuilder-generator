@@ -32,7 +32,6 @@ class KotlinGenerator
   class GeneratorHelper(service: Service) {
 
     private val namespaces = Namespaces(service.namespace)
-    private val nameSpace = namespaces.base
     private val sharedNameSpace = "io.apibuilder.app"
 
     private val sharedJacksonSpace = namespaces.models
@@ -193,7 +192,7 @@ class KotlinGenerator
         val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
-        val kotlinDataType = dataTypeFromField(field.`type`, nameSpace, service)
+        val kotlinDataType = dataTypeFromField(field.`type`, namespaces.base, service)
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
         val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
@@ -325,7 +324,7 @@ class KotlinGenerator
             }
 
             maybeAnnotationClass.map(annotationClass => {
-              val parameterType: TypeName = dataTypeFromField(parameter.`type`, nameSpace, service)
+              val parameterType: TypeName = dataTypeFromField(parameter.`type`, namespaces.base, service)
               val param = ParameterSpec.builder(toParamName(parameter.name, true), parameterType.copy(!parameter.required, parameterType.getAnnotations))
 
               parametersCache += (param.build())
@@ -338,7 +337,7 @@ class KotlinGenerator
           })
 
           operation.body.map(body => {
-            val bodyType = dataTypeFromField(body.`type`, nameSpace, service)
+            val bodyType = dataTypeFromField(body.`type`, namespaces.base, service)
             val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
 
             parametersCache += (parameter.build())
@@ -374,7 +373,7 @@ class KotlinGenerator
 
 
           maybeSuccessfulResponse.map(successfulResponse => {
-            val returnType = dataTypeFromField(successfulResponse.`type`, nameSpace, service)
+            val returnType = dataTypeFromField(successfulResponse.`type`, namespaces.base, service)
             method.returns(
               ParameterizedTypeName.get(
                 getRetrofitSingleTypeWrapperClass(),
@@ -442,7 +441,7 @@ class KotlinGenerator
                   callErrorEitherErrorTypeClassName)
                 callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
               } else {
-                val errorPayloadType = dataTypeFromField(errorResponse.`type`, nameSpace, service)
+                val errorPayloadType = dataTypeFromField(errorResponse.`type`, namespaces.base, service)
 
 
                 val errorPayloadNameString = "data"
