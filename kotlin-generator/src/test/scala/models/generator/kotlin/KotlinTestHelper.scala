@@ -51,6 +51,14 @@ object KotlinTestHelper extends Matchers {
     ) shouldBe true
   }
 
+  def assertFileContainsString(s: String, file: File): Unit = {
+    file.contents.contains(s) shouldBe true
+  }
+
+  def getFile(filename: String, files: Seq[File]): File = {
+    files.filter(_.name == filename).head
+  }
+
   def assertKotlinCodeCompiles(kotlinSourceDirectory: java.io.File): Unit = {
     assert(kotlinSourceDirectory.exists())
     assert(kotlinSourceDirectory.canRead())

@@ -47,10 +47,16 @@ class KotlinGeneratorTest
       val invocationForm = InvocationForm(service, Seq.empty, None)
       val generator = new KotlinGenerator()
       val files = generator.invoke(invocationForm).right.get
-      assertFileExists("RegisteredUser.kt", files)
-      assertFileExists("GuestUser.kt", files)
-      assertFileContainsString("data class RegisteredUser(", files)
-      assertFileContainsString("data class GuestUser(", files)
+
+      val registeredUser = getFile("RegisteredUser.kt", files)
+      assertFileContainsString("data class RegisteredUser(", registeredUser)
+      assertFileContainsString("@JsonProperty(\"email\")", registeredUser)
+      assertFileContainsString("@JsonProperty(\"id\")", registeredUser)
+
+      val guestUser = getFile("GuestUser.kt", files)
+      assertFileContainsString("data class GuestUser(", guestUser)
+      assertFileContainsString("@JsonProperty(\"email\")", guestUser)
+      assertFileContainsString("@JsonProperty(\"id\")", guestUser)
     }
   }
 }
