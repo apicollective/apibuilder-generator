@@ -51,16 +51,19 @@ class KotlinGeneratorTest
       val generator = new KotlinGenerator()
       val files = generator.invoke(invocationForm).right.get
 
+      // model: registered_user
       val registeredUser = getFile("RegisteredUser.kt", files)
       assertFileContainsString("data class RegisteredUser(", registeredUser)
       assertFileContainsString("@JsonProperty(\"email\")", registeredUser)
       assertFileContainsString("@JsonProperty(\"id\")", registeredUser)
 
+      // model: guest_user
       val guestUser = getFile("GuestUser.kt", files)
       assertFileContainsString("data class GuestUser(", guestUser)
       assertFileContainsString("@JsonProperty(\"email\")", guestUser)
       assertFileContainsString("@JsonProperty(\"id\")", guestUser)
 
+      // union: user
       val user = getFile("User.kt", files)
       val Some(userDir) = user.dir
       userDir should endWith ("/models")
