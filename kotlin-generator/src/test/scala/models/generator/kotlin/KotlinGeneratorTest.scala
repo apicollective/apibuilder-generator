@@ -11,8 +11,8 @@ class KotlinGeneratorTest
   import models.TestHelper._
 
   private val serviceDefs = Seq(builtInTypesService,
-                                dateTimeService,
-                                generatorApiServiceWithUnionAndDescriminator,
+                                // dateTimeService,
+                                // generatorApiServiceWithUnionAndDescriminator,
                                 apidocApiService,
                                 collectionJsonDefaultsService,
                                 referenceApiService,
