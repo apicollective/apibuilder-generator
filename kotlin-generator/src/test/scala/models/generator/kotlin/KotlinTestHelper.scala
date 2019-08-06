@@ -33,6 +33,14 @@ object KotlinTestHelper extends Matchers {
     service.models.foreach( m => {
       val expectedFilename = Text.initCap(Text.snakeToCamelCase(m.name)) + ".kt"
       assertFileExists(expectedFilename, files)
+      val file = getFile(expectedFilename, files)
+      val Some(dir) = file.dir
+      dir should endWith ("/models")
+      m.fields.foreach( f => {
+        if (KotlinUtil.isParameterArray(f.`type`)) {
+          assertFileContainsString("import kotlin.collections.List", file)
+        }
+      })
     })
 
     assertJodaTimeNotPresent(files)
