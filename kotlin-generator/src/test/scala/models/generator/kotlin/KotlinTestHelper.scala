@@ -30,6 +30,11 @@ object KotlinTestHelper extends Matchers {
       assertFileExists(expectedFilename, files)
     })
 
+    service.models.foreach( m => {
+      val expectedFilename = Text.initCap(Text.snakeToCamelCase(m.name)) + ".kt"
+      assertFileExists(expectedFilename, files)
+    })
+
     assertJodaTimeNotPresent(files)
     writeFiles(tmpDir, files)
     tmpDir
