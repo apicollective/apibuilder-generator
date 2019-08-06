@@ -19,6 +19,7 @@ project/project/target
 project/target
 ruby-generator/target
 scala-generator/target
+kotlin-generator/target
 target
 .git
 .ivy2
