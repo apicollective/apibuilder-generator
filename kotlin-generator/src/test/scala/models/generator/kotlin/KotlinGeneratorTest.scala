@@ -40,4 +40,17 @@ class KotlinGeneratorTest
     }
   }
 
+  describe("Union") {
+    val service = generatorApiServiceWithUnionAndDescriminator
+    it(s"[${service.name}] sanity check") {
+      service.unions.size shouldBe > (0)
+      val invocationForm = InvocationForm(service, Seq.empty, None)
+      val generator = new KotlinGenerator()
+      val files = generator.invoke(invocationForm).right.get
+      assertFileExists("RegisteredUser.kt", files)
+      assertFileExists("GuestUser.kt", files)
+      assertFileContainsString("data class RegisteredUser(", files)
+      assertFileContainsString("data class GuestUser(", files)
+    }
+  }
 }
