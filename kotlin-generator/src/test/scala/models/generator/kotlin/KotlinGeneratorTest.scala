@@ -43,7 +43,9 @@ class KotlinGeneratorTest
   describe("Union") {
     val service = generatorApiServiceWithUnionAndDescriminator
     it(s"[${service.name}] sanity check") {
-      service.unions.size shouldBe > (0)
+      service.unions.map(_.name) shouldBe Seq("user")
+      val unionTypes = service.unions.flatMap(_.types)
+      unionTypes.map(_.`type`) shouldBe Seq("registered_user", "guest_user", "system_user", "string")
       val invocationForm = InvocationForm(service, Seq.empty, None)
       val generator = new KotlinGenerator()
       val files = generator.invoke(invocationForm).right.get
