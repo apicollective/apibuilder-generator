@@ -103,6 +103,12 @@ class KotlinGenerator
     def generateUnionType(union: Union, service: Service): File = {
       val className = toClassName(union.name)
       val undefinedClassName = className + "Undefined"
+      val modelsUnderUnion = service.models
+        .filter{ model =>
+          union.types.exists(unionType => model.fields.exists(_.`type` == unionType.`type`))
+        }
+
+      val fieldsUnderUnion = modelsUnderUnion.map(_.fields).flatten
 
       val builder = TypeSpec.classBuilder(className)
         .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
@@ -146,7 +152,7 @@ class KotlinGenerator
 
       union.description.map(builder.addKdoc(_))
 
-      val unionTypeNames = union.types.map(ut => toClassName(ut.`type`)) ++ Seq(undefinedClassName)
+      val unionTypeNames = fieldsUnderUnion.map(f => toClassName(f.`type`)) ++ Seq(undefinedClassName)
 
       for (unionTypeName <- unionTypeNames) {
         val objectBuilder = TypeSpec.objectBuilder(unionTypeName)
