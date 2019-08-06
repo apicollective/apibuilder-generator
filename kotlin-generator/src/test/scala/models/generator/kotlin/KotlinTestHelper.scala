@@ -2,6 +2,7 @@ package models.generator.kotlin
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
+import lib.Text
 import models.TestHelper.{assertJodaTimeNotPresent, writeFiles}
 import org.scalatest.Matchers
 
@@ -18,6 +19,17 @@ object KotlinTestHelper extends Matchers {
       f.name should endWith(".kt")
     })
     assertFileExists("JacksonObjectMapperFactory.kt", files)
+
+    service.enums.foreach( e => {
+      val expectedFilename = Text.initCap(Text.snakeToCamelCase(e.name)) + ".kt"
+      assertFileExists(expectedFilename, files)
+    })
+
+    service.unions.foreach( u => {
+      val expectedFilename = Text.initCap(Text.snakeToCamelCase(u.name)) + ".kt"
+      assertFileExists(expectedFilename, files)
+    })
+
     assertJodaTimeNotPresent(files)
     writeFiles(tmpDir, files)
     tmpDir
