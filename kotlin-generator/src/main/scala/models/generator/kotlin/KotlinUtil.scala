@@ -206,7 +206,7 @@ trait KotlinUtil {
 
   def toModelsNameSpace(nameSpace: String): String = nameSpace + ".models"
 
-  def toEnumsNameSpace(nameSpace: String): String = nameSpace + ".enums"
+  def toEnumsNameSpace(nameSpace: String): String = nameSpace + ".models"
 
   def toParamName(modelName: String, startingWithLowercase: Boolean): String = {
     val paramStartingWithUppercase = if (isParameterArray(modelName)){

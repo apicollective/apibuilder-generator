@@ -24,7 +24,7 @@ object KotlinTestHelper extends Matchers {
       val expectedFilename = KotlinUtil.capitalizeModelName(e.name) + ".kt"
       assertFileExists(expectedFilename, files)
       val file = getFile(expectedFilename, files)
-      file.dir.get should endWith ("/enums")
+      file.dir.get should endWith ("/models")
     })
 
     service.unions.foreach( u => {
