@@ -74,6 +74,7 @@ class KotlinGeneratorTest
       assertFileContainsString("@JsonProperty(\"id\")", user)
       assertFileContainsString("data class GuestUser(", user)
       assertFileContainsString("data class RegisteredUser(", user)
+      assertFileContainsString("object UserUndefined", user)
       // assertFileContainsString("data class SystemUser(", user)
     }
   }
