@@ -21,21 +21,24 @@ object KotlinTestHelper extends Matchers {
     assertFileExists("JacksonObjectMapperFactory.kt", files)
 
     service.enums.foreach( e => {
-      val expectedFilename = Text.initCap(Text.snakeToCamelCase(e.name)) + ".kt"
+      val expectedFilename = KotlinUtil.capitalizeModelName(e.name) + ".kt"
       assertFileExists(expectedFilename, files)
+      val file = getFile(expectedFilename, files)
+      file.dir.get should endWith ("/enums")
     })
 
     service.unions.foreach( u => {
-      val expectedFilename = Text.initCap(Text.snakeToCamelCase(u.name)) + ".kt"
+      val expectedFilename = KotlinUtil.capitalizeModelName(u.name) + ".kt"
       assertFileExists(expectedFilename, files)
+      val file = getFile(expectedFilename, files)
+      file.dir.get should endWith ("/models")
     })
 
     service.models.foreach( m => {
-      val expectedFilename = Text.initCap(Text.snakeToCamelCase(m.name)) + ".kt"
+      val expectedFilename = KotlinUtil.capitalizeModelName(m.name) + ".kt"
       assertFileExists(expectedFilename, files)
       val file = getFile(expectedFilename, files)
-      val Some(dir) = file.dir
-      dir should endWith ("/models")
+      file.dir.get should endWith ("/models")
       m.fields.foreach( f => {
         if (KotlinUtil.isParameterArray(f.`type`)) {
           assertFileContainsString("import kotlin.collections.List", file)
