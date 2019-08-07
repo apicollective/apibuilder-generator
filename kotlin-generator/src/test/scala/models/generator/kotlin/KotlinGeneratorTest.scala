@@ -53,20 +53,21 @@ class KotlinGeneratorTest
 
       // model: registered_user
       val registeredUser = getFile("RegisteredUser.kt", files)
+      registeredUser.dir.get should endWith ("/models")
       assertFileContainsString("data class RegisteredUser(", registeredUser)
       assertFileContainsString("@JsonProperty(\"email\")", registeredUser)
       assertFileContainsString("@JsonProperty(\"id\")", registeredUser)
 
       // model: guest_user
       val guestUser = getFile("GuestUser.kt", files)
+      guestUser.dir.get should endWith ("/models")
       assertFileContainsString("data class GuestUser(", guestUser)
       assertFileContainsString("@JsonProperty(\"email\")", guestUser)
       assertFileContainsString("@JsonProperty(\"id\")", guestUser)
 
       // union: user
       val user = getFile("User.kt", files)
-      val Some(userDir) = user.dir
-      userDir should endWith ("/models")
+      user.dir.get should endWith ("/models")
       assertFileContainsString("@JsonTypeInfo(", user)
       assertFileContainsString("@JsonSubTypes(", user)
       assertFileContainsString("JsonSubTypes.Type(", user)
@@ -75,7 +76,6 @@ class KotlinGeneratorTest
       assertFileContainsString("data class GuestUser(", user)
       assertFileContainsString("data class RegisteredUser(", user)
       assertFileContainsString("object UserUndefined", user)
-      // assertFileContainsString("data class SystemUser(", user)
     }
   }
 }
