@@ -30,8 +30,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -106,30 +106,42 @@ lazy val kotlinGenerator = project
     fork in Test := true,
     baseDirectory in Test := file("."),
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.module"   % "jackson-module-kotlin" % "2.9.9",
-      "com.fasterxml.jackson.core"     % "jackson-annotations"   % "2.9.9",
-      "com.fasterxml.jackson.core"     % "jackson-databind"   % "2.9.9",
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda"   % "2.9.9",
+      "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.9",
+      "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.9",
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9",
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.9",
       "org.threeten" % "threetenbp" % "1.3.8",
       "com.squareup" % "kotlinpoet" % "1.3.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
-      "org.jetbrains.kotlin" % "kotlin-stdlib"      % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-stdlib" % kotlinLangVersion % "test",
       "org.jetbrains.kotlin" % "kotlin-stdlib-jdk8" % kotlinLangVersion % "test",
-      "org.jetbrains.kotlin" % "kotlin-reflect"     % kotlinLangVersion % "test",
-      "org.jetbrains.kotlin" % "kotlin-compiler"    % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-reflect" % kotlinLangVersion % "test",
+      "org.jetbrains.kotlin" % "kotlin-compiler" % kotlinLangVersion % "test",
       "org.scalatest" %% "scalatest" % "3.0.7" % "test",
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 92.49, ScoverageKeys.coverageFailOnMinimum := true))
 
+lazy val csvGenerator = project
+  .in(file("csv-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(
+    fork in Test := true,
+    baseDirectory in Test := file("."),
+    libraryDependencies ++= Seq(
+      "org.apache.commons" % "commons-csv" % "1.6"
+    )
+  )
+  .settings(Seq(ScoverageKeys.coverageMinimum := 77.50, ScoverageKeys.coverageFailOnMinimum := true))
+
 lazy val postmanGenerator = project
   .in(file("postman-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++=Seq(
+    libraryDependencies ++= Seq(
       "com.lihaoyi" %% "ammonite-ops" % "1.6.3",
       "org.scalactic" %% "scalactic" % "3.0.5"
     )
@@ -149,9 +161,9 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4"
   ),
- libraryDependencies += guice,
+  libraryDependencies += guice,
   scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified"),
-  sources in (Compile,doc) := Seq.empty,
-  publishArtifact in (Compile, packageDoc) := false
+  sources in(Compile, doc) := Seq.empty,
+  publishArtifact in(Compile, packageDoc) := false
 )
 version := "0.8.47"

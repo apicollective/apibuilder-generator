@@ -271,6 +271,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "csv_client",
+        name = "CSV Generator",
+        description = Some("Information about API in useful CSV format, for example list of endpoints"),
+        language = Some("test/csv")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.csv.CsvGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "swagger_json",
         name = "Swagger JSON",
         description = Some("Generate a valid swagger 2.0 json description of a service."),
