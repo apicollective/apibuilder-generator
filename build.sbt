@@ -131,7 +131,7 @@ lazy val csvGenerator = project
     fork in Test := true,
     baseDirectory in Test := file("."),
     libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-csv" % "1.6"
+      "org.apache.commons" % "commons-csv" % "1.7"
     )
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 77.50, ScoverageKeys.coverageFailOnMinimum := true))
