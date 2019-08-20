@@ -163,6 +163,7 @@ class KotlinGenerator
       /* Put the model classes inside the sealed class */
       builder.addTypes(modelsUnderUnion)
       builder.addType(undefinedTypeBuilder.build())
+      builder.addType(generateCompanionObject(className, None))
 
       makeFile(modelsNameSpace, className, builder)
     }
@@ -220,6 +221,12 @@ class KotlinGenerator
       toJsonString.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().writeValueAsString(this)")
       builder.addFunction(toJsonString.build)
 
+      builder.addType(generateCompanionObject(className, union))
+
+      builder
+    }
+
+    private def generateCompanionObject(className: String, union: Option[Union]): TypeSpec = {
       val companionBuilder = TypeSpec.companionObjectBuilder()
       val fromBuilder = FunSpec.builder("parseJson").addModifiers(KModifier.PUBLIC).addParameter("json", ClassName.bestGuess("kotlin.String"))
 
@@ -236,9 +243,7 @@ class KotlinGenerator
       fromBuilder.returns(modelType)
       fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue( json, ${modelType.getSimpleName() + "::class.java"})")
       companionBuilder.addFunction(fromBuilder.build)
-      builder.addType(companionBuilder.build())
-
-      builder
+      companionBuilder.build()
     }
 
     def generateModel(model: Model, union: Option[Union], service: Service): File = {
