@@ -2,6 +2,7 @@ package models.generator.kotlin
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
+import io.github.sullis.kotlin.compiler.KotlinCompiler
 import lib.Text
 import models.TestHelper.{assertJodaTimeNotPresent, writeFiles}
 import org.scalatest.Matchers
@@ -79,8 +80,8 @@ object KotlinTestHelper extends Matchers {
     assert(kotlinSourceDirectory.exists())
     assert(kotlinSourceDirectory.canRead())
     assert(kotlinSourceDirectory.isDirectory())
-    val msgCollector = KotlinCompiler.compile(kotlinSourceDirectory)
-    msgCollector.hasErrors shouldBe false
+    val result = new KotlinCompiler().compileSourceDir(kotlinSourceDirectory.toPath)
+    result.isSuccess shouldBe true
   }
 
   private def createTempDirectory(service: Service): java.io.File = {
