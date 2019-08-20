@@ -118,6 +118,7 @@ lazy val kotlinGenerator = project
       "org.jetbrains.kotlin" % "kotlin-stdlib-jdk8" % kotlinLangVersion % "test",
       "org.jetbrains.kotlin" % "kotlin-reflect" % kotlinLangVersion % "test",
       "org.jetbrains.kotlin" % "kotlin-compiler" % kotlinLangVersion % "test",
+      "io.github.sullis" % "kotlin-compiler-util" % "0.0.1" % "test",
       "org.scalatest" %% "scalatest" % "3.0.7" % "test",
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
