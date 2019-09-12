@@ -36,6 +36,7 @@ class KotlinGenerator
     private val sharedNameSpace = "io.apibuilder.app"
     private val modelsNameSpace = toModelsNameSpace(nameSpace)
     private val enumsNameSpace = toEnumsNameSpace(nameSpace)
+    private val unionsNameSpace = toUnionsNameSpace(nameSpace)
 
     private val sharedJacksonSpace = modelsNameSpace
     private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
@@ -165,7 +166,7 @@ class KotlinGenerator
       builder.addType(undefinedTypeBuilder.build())
       builder.addType(generateCompanionObject(className, None))
 
-      makeFile(modelsNameSpace, className, builder)
+      makeFile(unionsNameSpace, className, builder)
     }
 
     private def generateModelTypeBuilder(model: Model, union: Option[Union], service: Service): TypeSpec.Builder = {

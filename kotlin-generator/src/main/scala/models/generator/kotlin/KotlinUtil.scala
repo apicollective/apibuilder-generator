@@ -208,6 +208,8 @@ trait KotlinUtil {
 
   def toEnumsNameSpace(nameSpace: String): String = nameSpace + ".enums"
 
+  def toUnionsNameSpace(nameSpace: String): String = nameSpace + ".unions"
+
   def toParamName(modelName: String, startingWithLowercase: Boolean): String = {
     val paramStartingWithUppercase = if (isParameterArray(modelName)){
       toClassName(modelName.tail.reverse.tail.reverse)
