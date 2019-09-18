@@ -119,7 +119,7 @@ lazy val kotlinGenerator = project
       "org.jetbrains.kotlin" % "kotlin-reflect" % kotlinLangVersion % "test",
       "org.jetbrains.kotlin" % "kotlin-compiler" % kotlinLangVersion % "test",
       "io.github.sullis" % "kotlin-compiler-util" % "0.0.2" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.7" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.8" % "test",
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
@@ -154,7 +154,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "3.0.7" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.8" % "test",
     "org.mockito" % "mockito-core" % mockitoVersion % "test",
     "com.github.javaparser" % "javaparser-core" % "3.14.14" % "test",
     "org.scalameta" %% "scalameta" % "4.2.0" % "test",
