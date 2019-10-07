@@ -96,7 +96,7 @@ lazy val androidGenerator = project
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 77.8))
 
-val kotlinLangVersion = "1.3.50"
+val kotlinLangVersion = "1.3.41"
 val mockitoVersion = "3.0.0"
 
 lazy val kotlinGenerator = project
@@ -111,7 +111,7 @@ lazy val kotlinGenerator = project
       "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.9",
       "org.threeten" % "threetenbp" % "1.3.8",
-      "com.squareup" % "kotlinpoet" % "1.4.0",
+      "com.squareup" % "kotlinpoet" % "1.3.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
       "org.jetbrains.kotlin" % "kotlin-stdlib" % kotlinLangVersion % "test",
