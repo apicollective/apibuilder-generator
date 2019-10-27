@@ -156,7 +156,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % "3.0.8" % "test",
     "org.mockito" % "mockito-core" % mockitoVersion % "test",
-    "com.github.javaparser" % "javaparser-core" % "3.14.16" % "test",
+    "com.github.javaparser" % "javaparser-core" % "3.15.3" % "test",
     "org.scalameta" %% "scalameta" % "4.2.0" % "test",
     "com.squareup" % "javapoet" % "1.11.1",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
