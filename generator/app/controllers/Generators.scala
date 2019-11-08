@@ -221,6 +221,17 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "scalacheck",
+        name = "ScalaCheck",
+        description = Some("Generate <a href='https://github.com/typelevel/scalacheck'>ScalaCheck</a> generators for models, enums, and unions."),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(scala.models.ScalaCheckGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "java_models",
         name = "Java models",
         description = Some("Generate Java models from the API description."),
