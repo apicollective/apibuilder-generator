@@ -98,6 +98,7 @@ lazy val androidGenerator = project
 
 val kotlinLangVersion = "1.3.60"
 val mockitoVersion = "3.2.0"
+val scalatestVersion = "3.0.8"
 
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
@@ -119,7 +120,7 @@ lazy val kotlinGenerator = project
       "org.jetbrains.kotlin" % "kotlin-reflect" % kotlinLangVersion % "test",
       "org.jetbrains.kotlin" % "kotlin-compiler" % kotlinLangVersion % "test",
       "io.github.sullis" % "kotlin-compiler-util" % "0.0.2" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+      "org.scalatest" %% "scalatest" % scalatestVersion % "test",
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
@@ -154,7 +155,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+    "org.scalatest" %% "scalatest" % scalatestVersion % "test",
     "org.mockito" % "mockito-core" % mockitoVersion % "test",
     "com.github.javaparser" % "javaparser-core" % "3.15.5" % "test",
     "org.scalameta" %% "scalameta" % "4.2.4" % "test",
