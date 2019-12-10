@@ -5,7 +5,7 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
 
 import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
-import scala.models.{ApidocComments, Config}
+import scala.models.{ApidocComments, Attributes}
 import scala.models.http4s.server.Http4sServer
 import generator.ServiceFileNames
 import models.http4s.mock.{Http4s018MockClientGenerator, Http4s020MockClientGenerator}
@@ -44,7 +44,7 @@ trait Generator extends CodeGenerator {
     form: InvocationForm,
     addHeader: Boolean
   ): Seq[File] = {
-    val ssd = new ScalaService(form.service, Config(form.attributes, Config.Http4sDefaultConfig))
+    val ssd = new ScalaService(form.service, Attributes.Http4sDefaultConfig.withAttributes(form.attributes))
     val config = mkConfig(Namespaces.quote(form.service.namespace), form.service.baseUrl)
 
     val header = addHeader match {

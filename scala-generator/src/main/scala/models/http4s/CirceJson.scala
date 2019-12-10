@@ -35,7 +35,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
   }
 
   def generateTimeSerde(): String = {
-    Seq(ssd.config.dateTimeType.dataType, ssd.config.dateType.dataType).map { dt =>
+    Seq(ssd.attributes.dateTimeType.dataType, ssd.attributes.dateType.dataType).map { dt =>
       s"""
          |private[${ssd.namespaces.last}] implicit val decode${dt.shortName}: Decoder[${dt.fullName}] =
          |  Decoder.decodeString.emapTry(str => Try(${dt.fromStringValue("str")}))
@@ -150,7 +150,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
   private[models] def decodersAndEncoders(model: ScalaModel): String = {
     decoders(model) ++ "\n\n" ++ encoders(model)
   }
-  
+
   private[models] def decoders(model: ScalaModel): String = {
     // backticks don't work correctly as enumerator names in for comprehensions
     def nobt(fieldName:String) = fieldName.replaceAll("`", "__")

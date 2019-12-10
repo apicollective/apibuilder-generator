@@ -44,7 +44,7 @@ case class NingClientGenerator(
   form: InvocationForm
 ) {
 
-  private[this] val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+  private[this] val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     Right(generateCode())

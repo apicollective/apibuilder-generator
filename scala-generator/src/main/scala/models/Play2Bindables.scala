@@ -12,9 +12,9 @@ case class Play2Bindables(ssd: ScalaService) {
       Seq(
         "import play.api.mvc.{PathBindable, QueryStringBindable}",
         buildImports(),
-        buildObjectCore(ssd.config.dateTimeType.dataType, ssd.config.dateType.dataType),
+        buildObjectCore(ssd.attributes.dateTimeType.dataType, ssd.attributes.dateType.dataType),
         buildObjectModels().getOrElse(""),
-        apibuilderHelpers(ssd.config.dateTimeType.dataType, ssd.config.dateType.dataType)
+        apibuilderHelpers(ssd.attributes.dateTimeType.dataType, ssd.attributes.dateType.dataType)
       ).filter(_.trim.nonEmpty).mkString("\n\n").indent(2),
       "}"
     ).mkString("\n\n")

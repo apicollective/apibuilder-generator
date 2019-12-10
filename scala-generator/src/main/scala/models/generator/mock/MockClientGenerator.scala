@@ -5,7 +5,7 @@ import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text._
 
-import scala.models.{ApidocComments, Config}
+import scala.models.{ApidocComments, Attributes}
 import scala.generator._
 
 object MockClientGenerator {
@@ -13,7 +13,7 @@ object MockClientGenerator {
   object Play24 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
     }
 
@@ -22,7 +22,7 @@ object MockClientGenerator {
   object Play25 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
     }
 
@@ -31,7 +31,7 @@ object MockClientGenerator {
   object Play26 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play26(ssd.namespaces.base, None)).invoke()
     }
 
@@ -40,7 +40,7 @@ object MockClientGenerator {
   object Ning19 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Ning19(ssd.namespaces.base, None)).invoke()
     }
 

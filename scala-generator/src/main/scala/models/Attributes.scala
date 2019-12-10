@@ -20,7 +20,7 @@ object TimeConfig {
 
   private val Key = "scala_generator.time_library"
   def apply(attributes: Seq[Attribute]): Option[TimeConfig] = {
-    attributes.find(_.name == Key).map(_.value.toLowerCase) match {
+    attributes.find(_.name == Key).map(_.value.toLowerCase.trim) match {
       case Some("joda") => Some(JodaTime)
       case Some("java") => Some(JavaTime)
       case _ => None
@@ -41,7 +41,7 @@ object DateTypeConfig {
 
   private val Key = "scala_generator.date.type"
   def apply(attributes: Seq[Attribute]): Option[DateTypeConfig] = {
-    attributes.find(_.name == Key).map(_.value.toLowerCase) match {
+    attributes.find(_.name == Key).map(_.value.toLowerCase.trim) match {
       case Some("joda.localdate") => Some(JodaLocalDate)
       case Some("java.localdate") => Some(JavaLocalDate)
       case _ => None
@@ -65,7 +65,7 @@ object DateTimeTypeConfig {
 
   private val Key = "scala_generator.date_time.type"
   def apply(attributes: Seq[Attribute]): Option[DateTimeTypeConfig] = {
-    attributes.find(_.name == Key).map(_.value.toLowerCase) match {
+    attributes.find(_.name == Key).map(_.value.toLowerCase.trim) match {
       case Some("joda.datetime") => Some(JodaDateTime)
       case Some("java.instant") => Some(JavaInstant)
       case Some("java.offsetdatetime") => Some(JavaOffsetDateTime)
@@ -90,7 +90,7 @@ object JsonConfig {
 
   private val Key = "scala_generator.json_library"
   def apply(attributes: Seq[Attribute]): Option[JsonConfig] = {
-    attributes.find(_.name == Key).map(_.value.toLowerCase) match {
+    attributes.find(_.name == Key).map(_.value.toLowerCase.trim) match {
       // Don't allow json library to be configured via attributes for now as the generators currently don't support it yet
       // case Some("play") => Some(PlayJson)
       // case Some("circe") => Some(CirceJson)
@@ -99,19 +99,43 @@ object JsonConfig {
   }
 }
 
-case class Config(dateType: DateTypeConfig, dateTimeType: DateTimeTypeConfig, jsonLib: JsonConfig)
+sealed trait ResponseConfig
+object ResponseConfig {
+  case object Envelope extends ResponseConfig { override def toString = "envelope" }
+  case object Standard extends ResponseConfig { override def toString = "standard" }
 
-object Config {
-  val PlayDefaultConfig = Config(DateTypeConfig.JodaLocalDate, DateTimeTypeConfig.JodaDateTime, JsonConfig.PlayJson)
-  val PlayGen2DefaultConfig = Config(DateTypeConfig.JavaLocalDate, DateTimeTypeConfig.JavaOffsetDateTime, JsonConfig.PlayJson)
-  val Http4sDefaultConfig = Config(DateTypeConfig.JavaLocalDate, DateTimeTypeConfig.JavaInstant, JsonConfig.CirceJson)
+  private val Key = "scala_generator.response"
 
-  def apply(attributes: Seq[Attribute], defaultConfig: Config): Config = {
-    val timeCfg = TimeConfig(attributes)
-    Config(
-      dateType = DateTypeConfig(attributes).orElse(timeCfg.map(_.dateType)).getOrElse(defaultConfig.dateType),
-      dateTimeType = DateTimeTypeConfig(attributes).orElse(timeCfg.map(_.dateTimeType)).getOrElse(defaultConfig.dateTimeType),
-      jsonLib = JsonConfig(attributes).getOrElse(defaultConfig.jsonLib),
+  def apply(attributes: Seq[Attribute]): ResponseConfig = {
+    attributes.find(_.name == Key).map(_.value.toLowerCase.trim) match {
+      case Some(value) if value == Envelope.toString => ResponseConfig.Envelope
+      case _ => ResponseConfig.Standard
+    }
+  }
+
+}
+
+case class Attributes(
+  dateType: DateTypeConfig,
+  dateTimeType: DateTimeTypeConfig,
+  jsonLib: JsonConfig,
+  response: ResponseConfig,
+) {
+
+  def withAttributes(attributes: Seq[Attribute]): Attributes = {
+    val timeConfig = TimeConfig(attributes)
+    val responseConfig = ResponseConfig(attributes)
+    Attributes(
+      dateType = DateTypeConfig(attributes).orElse(timeConfig.map(_.dateType)).getOrElse(dateType),
+      dateTimeType = DateTimeTypeConfig(attributes).orElse(timeConfig.map(_.dateTimeType)).getOrElse(dateTimeType),
+      jsonLib = JsonConfig(attributes).getOrElse(jsonLib),
+      response = responseConfig,
     )
   }
+}
+
+object Attributes {
+  val PlayDefaultConfig: Attributes = Attributes(DateTypeConfig.JodaLocalDate, DateTimeTypeConfig.JodaDateTime, JsonConfig.PlayJson, ResponseConfig.Standard)
+  val PlayGen2DefaultConfig: Attributes = Attributes(DateTypeConfig.JavaLocalDate, DateTimeTypeConfig.JavaOffsetDateTime, JsonConfig.PlayJson, ResponseConfig.Standard)
+  val Http4sDefaultConfig: Attributes = Attributes(DateTypeConfig.JavaLocalDate, DateTimeTypeConfig.JavaInstant, JsonConfig.CirceJson, ResponseConfig.Standard)
 }

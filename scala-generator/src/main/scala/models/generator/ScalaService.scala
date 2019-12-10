@@ -2,7 +2,7 @@ package scala.generator
 
 import io.apibuilder.spec.v0.models._
 
-import scala.models.{Config, Util}
+import scala.models.{Attributes, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
 import play.api.libs.json.JsString
@@ -10,14 +10,14 @@ import play.api.libs.json.JsString
 import scala.generator.ScalaPrimitive.{DateIso8601, DateTimeIso8601, JsonObject, JsonValue}
 
 object ScalaService {
-  def apply(service: Service, config: Config = Config.PlayDefaultConfig) = new ScalaService(service, config)
+  def apply(service: Service, config: Attributes = Attributes.PlayDefaultConfig) = new ScalaService(service, config)
 }
 
 class ScalaService(
   val service: Service,
-  val config: Config = Config.PlayDefaultConfig,
+  val attributes: Attributes = Attributes.PlayDefaultConfig,
 ) {
-  val namespaces = Namespaces(service.namespace)
+  val namespaces: Namespaces = Namespaces(service.namespace)
 
   private[this] val scalaTypeResolver = ScalaTypeResolver(namespaces)
 
@@ -39,13 +39,13 @@ class ScalaService(
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
     def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
-      case _: JsonObject => config.jsonLib.jsonObjectType
+      case _: JsonObject => attributes.jsonLib.jsonObjectType
 
-      case _: JsonValue => config.jsonLib.jsonValueType
+      case _: JsonValue => attributes.jsonLib.jsonValueType
 
-      case _: DateIso8601 => config.dateType.dataType
+      case _: DateIso8601 => attributes.dateType.dataType
 
-      case _: DateTimeIso8601 => config.dateTimeType.dataType
+      case _: DateTimeIso8601 => attributes.dateTimeType.dataType
 
       case ScalaDatatype.List(t) => ScalaDatatype.List(convertObjectType(t))
 

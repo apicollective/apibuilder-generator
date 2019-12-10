@@ -139,11 +139,11 @@ case class Http4sServer(form: InvocationForm,
        |  implicit lazy val queryParamDecode${Decimal.shortName}: org.http4s.QueryParamDecoder[${Decimal.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Decimal.fullName}](p => ${Decimal.fromStringValue("p.value")})("${Decimal.fullName}")
        |
-       |  implicit lazy val queryParamDecode${ssd.config.dateTimeType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.config.dateTimeType.dataType.fullName}] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateTimeType.dataType.fullName}](p => ${ssd.config.dateTimeType.dataType.fromStringValue("p.value")})("${ssd.config.dateTimeType.dataType.fullName}")
+       |  implicit lazy val queryParamDecode${ssd.attributes.dateTimeType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.attributes.dateTimeType.dataType.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.attributes.dateTimeType.dataType.fullName}](p => ${ssd.attributes.dateTimeType.dataType.fromStringValue("p.value")})("${ssd.attributes.dateTimeType.dataType.fullName}")
        |
-       |  implicit lazy val queryParamDecode${ssd.config.dateType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.config.dateType.dataType.fullName}] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.config.dateType.dataType.fullName}](p => ${ssd.config.dateType.dataType.fromStringValue("p.value")})("${ssd.config.dateType.dataType.fullName}")
+       |  implicit lazy val queryParamDecode${ssd.attributes.dateType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.attributes.dateType.dataType.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.attributes.dateType.dataType.fullName}](p => ${ssd.attributes.dateType.dataType.fromStringValue("p.value")})("${ssd.attributes.dateType.dataType.fullName}")
        |
        |  implicit lazy val queryParamDecode${Uuid.shortName}: org.http4s.QueryParamDecoder[${Uuid.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Uuid.fullName}](p => ${Uuid.fromStringValue("p.value")})("${Uuid.fullName}")
