@@ -45,7 +45,7 @@ case class ResponseHeaders(all: Map[String, Seq[String]]) {
   def get(name: String): _root_.scala.Option[String] = getAll(name).headOption
   def getAll(name: String): _root_.scala.Seq[String] = all.getOrElse(name, Nil)
 }
-""".trim  
+""".trim
   }
 
   def failedRequestUriParam(config: ScalaClientMethodConfig): String = {
