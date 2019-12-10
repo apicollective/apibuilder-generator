@@ -85,6 +85,8 @@ trait ScalaClientMethodConfig {
   def wrappedAsyncType(instance: String = ""): Option[String] = None
 
   def asyncSuccessInvoke: String = wrappedAsyncType("Sync").getOrElse(asyncType) + "." + asyncSuccess
+
+  def useResponseEnvelope: Boolean = false
 }
 
 object ScalaClientMethodConfigs {
@@ -141,6 +143,14 @@ object ScalaClientMethodConfigs {
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
+  }
+
+  case class Play26Envelope(namespace: String, baseUrl: Option[String]) extends Play {
+    override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestUriMethod: Option[String] = None
+    override val expectsInjectedWsClient = true
+    override val canSerializeUuid = true
+    override val useResponseEnvelope = true
   }
 
   case class Play27(namespace: String, baseUrl: Option[String]) extends Play {

@@ -13,7 +13,7 @@ case class PlayFrameworkVersion(
   requestHolderClass: String,
   authSchemeClass: String,
   supportsHttpPatch: Boolean,
-  useSpecificAddMethods: Boolean
+  useSpecificAddMethods: Boolean,
 )
 
 object Play22ClientGenerator extends CodeGenerator {
@@ -24,7 +24,7 @@ object Play22ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
     authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
     supportsHttpPatch = false,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -40,7 +40,7 @@ object Play23ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequestHolder",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -56,7 +56,7 @@ object Play24ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -72,7 +72,7 @@ object Play25ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -88,7 +88,23 @@ object Play26ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = true
+    useSpecificAddMethods = true,
+  )
+
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
+    Play2ClientGenerator.invoke(config(form), form)
+
+}
+
+object Play26EnvelopeClientGenerator extends CodeGenerator {
+
+  def config(form: InvocationForm) = PlayFrameworkVersion(
+    name = "2.6.x",
+    config = ScalaClientMethodConfigs.Play26Envelope(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+    requestHolderClass = "play.api.libs.ws.WSRequest",
+    authSchemeClass = "play.api.libs.ws.WSAuthScheme",
+    supportsHttpPatch = true,
+    useSpecificAddMethods = true,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -104,7 +120,7 @@ object Play27ClientGenerator extends CodeGenerator {
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = true
+    useSpecificAddMethods = true,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =

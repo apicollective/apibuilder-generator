@@ -6,7 +6,7 @@ import lib.Text._
 
 class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,
-  ssd: ScalaService
+  ssd: ScalaService,
 ) {
 
   protected val namespaces: Namespaces = Namespaces(config.namespace)
@@ -35,6 +35,14 @@ class ScalaClientMethodGenerator(
     }.mkString("\n\n")
   }
 
+  def responseType(name: String): String = {
+    if (config.useResponseEnvelope) {
+      s"TodoResponseEnvelope[$name]"
+    } else {
+      name
+    }
+  }
+
   def interfaces(): String = {
     Seq(
       "package interfaces {",
@@ -42,7 +50,10 @@ class ScalaClientMethodGenerator(
         s"trait Client${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")} {",
         "  def baseUrl: String",
         sortedResources.map { resource =>
-          s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
+          val respType = responseType(
+            s"${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
+          )
+          s"def ${methodName(resource)}: $respType"
        }.mkString("\n").indent(2),
         "}"
       ).mkString("\n").indent(2),

@@ -167,6 +167,17 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_6_envelope_client",
+        name = "Play 2.6 envelope_client",
+        description = Some("Same as Play 2.6 client except responses are returned in an envelope providing access to response headers"),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Beta,
+      codeGenerator = Some(scala.models.Play26EnvelopeClientGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "play_2_7_client",
         name = "Play 2.7 client",
         description = Some("Play Framework 2.7 client based on <a href='http://www.playframework.com/documentation/2.7.x/ScalaWS'>WS API</a>."),
