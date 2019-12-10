@@ -179,12 +179,16 @@ case class Play2ClientGenerator(
     val headerString = headers.scala.
       map { case (name, value) => s""""$name" -> ${value}""" }.
       mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders : _*)"
+    val responseEnvelopeString = version.config.responseEnvelopeClassName match {
+      case None => ""
+      case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indent + "\n\n"
+    }
 
     s"""package ${ssd.namespaces.base} {
 
 ${headers.objectConstants.indent(2)}
 
-${PlayScalaClientCommon.clientSignature(version.config).indent(2)} {
+$responseEnvelopeString${PlayScalaClientCommon.clientSignature(version.config).indent(2)} {
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")

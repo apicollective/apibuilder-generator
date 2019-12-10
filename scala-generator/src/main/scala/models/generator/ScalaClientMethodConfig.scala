@@ -77,7 +77,18 @@ trait ScalaClientMethodConfig {
     * instance of the specified class.
     */
   def toJson(responseName: String, className: String): String = {
-    s"""_root_.$namespace.Client.parseJson("$className", $responseName, _.validate[$className])"""
+    toClientMethodCall("parseJson", responseName, className)
+  }
+
+  private[this] def toClientMethodCall(methodName: String, responseName: String, className: String): String = {
+    s"""_root_.$namespace.Client.$methodName("$className", $responseName, _.validate[$className])"""
+  }
+
+  final def buildResponse(responseName: String, className: String): String = {
+    responseEnvelopeClassName match {
+      case None => toJson(responseName, className)
+      case Some(_) => toClientMethodCall("buildResponse", responseName, className)
+    }
   }
 
   def asyncTypeParam(constraint: Option[String] = None): Option[String] = None
@@ -86,7 +97,7 @@ trait ScalaClientMethodConfig {
 
   def asyncSuccessInvoke: String = wrappedAsyncType("Sync").getOrElse(asyncType) + "." + asyncSuccess
 
-  def useResponseEnvelope: Boolean = false
+  def responseEnvelopeClassName: Option[String] = None
 }
 
 object ScalaClientMethodConfigs {
@@ -150,7 +161,7 @@ object ScalaClientMethodConfigs {
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
-    override val useResponseEnvelope = true
+    override val responseEnvelopeClassName: Option[String] = Some("Response")
   }
 
   case class Play27(namespace: String, baseUrl: Option[String]) extends Play {

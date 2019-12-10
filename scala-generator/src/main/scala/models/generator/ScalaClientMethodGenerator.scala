@@ -31,15 +31,15 @@ class ScalaClientMethodGenerator(
 
   def accessors(): String = {
     sortedResources.map { resource =>
-      s"def ${methodName(resource)}: ${resource.plural}${config.wrappedAsyncType().getOrElse("")} = ${resource.plural}"
+      s"def ${methodName(resource)}: ${responseType(resource)} = ${resource.plural}"
     }.mkString("\n\n")
   }
 
-  def responseType(name: String): String = {
-    if (config.useResponseEnvelope) {
-      s"TodoResponseEnvelope[$name]"
-    } else {
-      name
+  def responseType(resource: ScalaResource): String = {
+    val name = s"${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
+    config.responseEnvelopeClassName match {
+      case None => name
+      case Some(envelopeName) => s"${namespaces.base}.$envelopeName[$name]"
     }
   }
 
@@ -50,10 +50,7 @@ class ScalaClientMethodGenerator(
         s"trait Client${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")} {",
         "  def baseUrl: String",
         sortedResources.map { resource =>
-          val respType = responseType(
-            s"${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
-          )
-          s"def ${methodName(resource)}: $respType"
+          s"def ${methodName(resource)}: ${responseType(resource)}"
        }.mkString("\n").indent(2),
         "}"
       ).mkString("\n").indent(2),
@@ -234,16 +231,16 @@ class ScalaClientMethodGenerator(
                   if (response.isUnit) {
                     Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some(())")
                   } else {
-                    val json = config.toJson("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($json)")
+                    val result = config.buildResponse("r", response.datatype.name)
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($result)")
                   }
 
                 } else if (response.isUnit) {
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ()")
 
                 } else {
-                  val json = config.toJson("r", response.datatype.name)
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json")
+                  val result = config.buildResponse("r", response.datatype.name)
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $result")
                 }
 
               } else if (featureMigration.hasImplicit404s && response.isNotFound && response.isOption) {
@@ -269,18 +266,26 @@ class ScalaClientMethodGenerator(
 
       new ScalaClientMethod(
         operation = op,
-        returnType = hasOptionResult match {
-          case None => s"${config.asyncType}[${op.resultType}]"
-          case Some(_) => s"${config.asyncType}[_root_.scala.Option[${op.resultType}]]"
-        },
+        returnType = s"${config.asyncType}[${withEnvelope(op.resultType, isOption = hasOptionResult.isDefined)}]",
         methodCall = methodCall,
         response = matchResponse,
-        implicitArgs = config.implicitArgs
+        implicitArgs = config.implicitArgs,
+        responseEnvelopeName = config.responseEnvelopeClassName,
       )
-
     }
   }
 
+  private[this] def withEnvelope(resultType: String, isOption: Boolean): String = {
+    val finalType = config.responseEnvelopeClassName match {
+      case None => resultType
+      case Some(envName) => s"$envName[$resultType]"
+    }
+    if (isOption) {
+      s"_root_.scala.Option[$finalType]"
+    } else {
+      finalType
+    }
+  }
 
 }
 
@@ -289,7 +294,8 @@ class ScalaClientMethod(
   returnType: String,
   methodCall: String,
   response: String,
-  implicitArgs: Option[String]
+  implicitArgs: Option[String],
+  responseEnvelopeName: Option[String],
 ) {
 
   val name: String = operation.name
