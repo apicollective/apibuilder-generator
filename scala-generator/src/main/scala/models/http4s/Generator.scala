@@ -11,22 +11,22 @@ import generator.ServiceFileNames
 import models.http4s.mock.{Http4s018MockClientGenerator, Http4s020MockClientGenerator}
 
 object Http4s015Generator extends Generator {
-  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s015(namespace, baseUrl)
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s015(namespace, Attributes.Http4sDefaultConfig, baseUrl)
 }
 
 object Http4s017Generator extends Generator {
-  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s017(namespace, baseUrl)
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s017(namespace, Attributes.Http4sDefaultConfig, baseUrl)
 }
 
 object Http4s018Generator extends Generator {
-  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s018(namespace, baseUrl)
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s018(namespace, Attributes.Http4sDefaultConfig, baseUrl)
 
   override def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new Http4s018MockClientGenerator(ssd, userAgent, config).generateCode()
 }
 
 object Http4s020Generator extends Generator {
-  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s020(namespace, baseUrl)
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s020(namespace, Attributes.Http4sDefaultConfig, baseUrl)
 
   override def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new Http4s020MockClientGenerator(ssd, userAgent, config).generateCode()

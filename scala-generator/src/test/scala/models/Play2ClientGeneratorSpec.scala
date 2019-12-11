@@ -10,7 +10,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 class Play2ClientGeneratorSpec extends FunSpec with Matchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", None)
+  val clientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", Attributes.PlayDefaultConfig, None)
 
   it("errorTypeClass") {
     val service = models.TestHelper.generatorApiService
@@ -130,9 +130,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
 
   describe("Play 2.6.x generator basic output") {
     val service = models.TestHelper.generatorApiService
-    val ssd = new ScalaService(service)
     val invocationForm = InvocationForm(service, Seq.empty, None)
-    val play26Config = ScalaClientMethodConfigs.Play26("whatever", None)
     val output = Play26ClientGenerator.invoke(invocationForm).right.get
 
     it("is valid scala code") {
@@ -170,9 +168,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
 
   describe("Play 2.7.x generator basic output") {
     val service = models.TestHelper.generatorApiService
-    val ssd = new ScalaService(service)
     val invocationForm = InvocationForm(service, Seq.empty, None)
-    val play27Config = ScalaClientMethodConfigs.Play27("whatever", None)
     val output = Play27ClientGenerator.invoke(invocationForm).right.get
 
     it("is valid scala code") {
@@ -223,7 +219,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("generates date-time with java.time.Instant") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.time_library", "java")),
         None
