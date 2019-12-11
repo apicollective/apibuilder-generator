@@ -62,7 +62,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * An application has a name and multiple versions of its API.
-   * 
+   *
    * @param guid Internal unique identifier for this application.
    * @param name The unique name for this application.
    * @param key Used as a unique key in the URL path. Key is automatically derived from the
@@ -101,7 +101,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Attributes are globally unique key which allow users to specify additional
    * content to pass in to the code generators.
-   * 
+   *
    * @param guid Internal unique identifier for this attribute.
    * @param name The name of the attribute. Globally unique and an 'identifier' (lower case, url
    *        safe, etc.)
@@ -134,7 +134,7 @@ package io.apibuilder.api.v0.models {
    * Attribute values can be set at different levels. Initially we support setting
    * organization wide attributes, but in the future plan to support setting
    * attribute values with each version of the application.
-   * 
+   *
    * @param guid Internal unique identifier for this attribute value.
    */
   final case class AttributeValue(
@@ -150,7 +150,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * Represents a single change from one version of a service to another
-   * 
+   *
    * @param changedAt Records the timestamp of when the actual change occurred (vs. when we created
    *        the changed record)
    * @param changedBy Records who made the actual change
@@ -178,7 +178,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * Separate resource used only for the few actions that require the full token.
-   * 
+   *
    * @param token The actual token. Guaranteed to be globally unique.
    */
   final case class CleartextToken(
@@ -187,7 +187,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * Generated source code.
-   * 
+   *
    * @param source The actual source code.
    * @param files A collection of source files
    */
@@ -220,7 +220,7 @@ package io.apibuilder.api.v0.models {
    * account with an email address of foo@bryzek.com, we will automatically create a
    * membership request on your behalf to join the organization with domain
    * bryzek.com.
-   * 
+   *
    * @param name The domain name
    */
   final case class Domain(
@@ -275,7 +275,7 @@ package io.apibuilder.api.v0.models {
    * When searching for content, the results of the search will be a list of items.
    * Each item will have enough information to render for the user, including a type
    * and item_guid to enable creating the appropriate link.
-   * 
+   *
    * @param guid Unique identifer for this item. By using a UUID, you can combine with the type
    *        to figure out the URI for the resource
    */
@@ -290,7 +290,7 @@ package io.apibuilder.api.v0.models {
    * A membership represents a user in a specific role to an organization.
    * Memberships cannot be created directly. Instead you first create a membership
    * request, then that request is either accepted or declined.
-   * 
+   *
    * @param guid Internal unique identifier for this membership.
    * @param role The role this user plays for this organization. Typically member or admin.
    */
@@ -307,7 +307,7 @@ package io.apibuilder.api.v0.models {
    * specific role (e.g. as a member or an admin). Membership requests can be
    * reviewed by any current admin of the organization who can either accept or
    * decline the request.
-   * 
+   *
    * @param guid Internal unique identifier for this membership request.
    * @param role The requested role for membership to this organization. Typically member or
    *        admin.
@@ -329,7 +329,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * An organization is used to group a set of applications together.
-   * 
+   *
    * @param guid Internal unique identifier for this organization.
    * @param key Used as a unique key in the URL path. Key is automatically derived from the
    *        organization name.
@@ -378,7 +378,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * Allows a user to change their password with authentication from a token.
-   * 
+   *
    * @param token Unique one time use token to change a password
    */
   final case class PasswordReset(
@@ -389,7 +389,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Create a password reset request - e.g. an email containing a one time URL to
    * change a password
-   * 
+   *
    * @param email The email address for which we generate the password reset.
    */
   final case class PasswordResetRequest(
@@ -405,7 +405,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * Represents a user that is currently subscribed to a publication
-   * 
+   *
    * @param guid Internal unique identifier for this subscription record
    */
   final case class Subscription(
@@ -424,7 +424,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * A token gives a user access to the API.
-   * 
+   *
    * @param guid Internal unique identifier for this token.
    * @param user The user to which this token belongs.
    * @param maskedToken The masked from of the token.
@@ -448,7 +448,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * A user is a top level person interacting with the api doc server.
-   * 
+   *
    * @param guid Internal unique identifier for this user.
    * @param nickname Public unique identifier for this user.
    */
@@ -487,7 +487,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Used only to validate json files - used as a resource where http status code
    * defines success
-   * 
+   *
    * @param valid If true, the json schema is valid. If false, there is at least one validation
    *        error.
    * @param errors Contains any validation errors that result from parsing the json document. If
@@ -500,7 +500,7 @@ package io.apibuilder.api.v0.models {
 
   /**
    * Represents a unique version of the application.
-   * 
+   *
    * @param guid Internal unique identifier for this version.
    * @param version The tag for this version. Can be anything, but if semver style version number is
    *        used, we automatically correctly sort by version number to find latest.
@@ -529,7 +529,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Users can watch individual applications which enables features like receiving an
    * email notification when there is a new version of an application.
-   * 
+   *
    * @param guid Internal unique identifier for this watch
    */
   final case class Watch(
@@ -550,7 +550,7 @@ package io.apibuilder.api.v0.models {
    * Provides future compatibility in clients - in the future, when a type is added
    * to the union Diff, it will need to be handled in the client code. This
    * implementation will deserialize these future types as an instance of this class.
-   * 
+   *
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
@@ -562,7 +562,7 @@ package io.apibuilder.api.v0.models {
    * Provides future compatibility in clients - in the future, when a type is added
    * to the union ItemDetail, it will need to be handled in the client code. This
    * implementation will deserialize these future types as an instance of this class.
-   * 
+   *
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
@@ -3129,7 +3129,7 @@ import scala.language.higherKinds
   trait Applications[F[_]] {
     /**
      * Search all applications. Results are always paginated.
-     * 
+     *
      * @param orgKey The organization key for which to search applications
      * @param name The name of an application. Case in-sensitive. Exact match
      * @param guid The guid of an application. Exact match
@@ -3192,7 +3192,7 @@ import scala.language.higherKinds
   trait Attributes[F[_]] {
     /**
      * Search all attributes. Results are always paginated.
-     * 
+     *
      * @param guid Find the watch with this guid.
      * @param name Find attributes with this name. Case in-sensitive. Exact match
      * @param limit The number of records to return
@@ -3251,7 +3251,7 @@ import scala.language.higherKinds
   trait Code[F[_]] {
     /**
      * Generate code for a specific version of an application.
-     * 
+     *
      * @param orgKey The organization key for which to generate code
      * @param applicationKey The application key for which to generate code
      * @param version The version of this application. Can be 'latest'
@@ -3299,7 +3299,7 @@ import scala.language.higherKinds
   trait GeneratorServices[F[_]] {
     /**
      * List all generator services
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -3334,7 +3334,7 @@ import scala.language.higherKinds
   trait GeneratorWithServices[F[_]] {
     /**
      * List all available generators
-     * 
+     *
      * @param guid Filter to generator with this guid
      * @param serviceGuid Filter to generator from this service
      * @param serviceUri Filter to generator from this service URI
@@ -3392,7 +3392,7 @@ import scala.language.higherKinds
   trait MembershipRequests[F[_]] {
     /**
      * Search all membership requests. Results are always paginated.
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -3438,7 +3438,7 @@ import scala.language.higherKinds
   trait Memberships[F[_]] {
     /**
      * Search all memberships. Results are always paginated.
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -3466,7 +3466,7 @@ import scala.language.higherKinds
   trait Organizations[F[_]] {
     /**
      * Search all organizations. Results are always paginated.
-     * 
+     *
      * @param guid Finds the organization with this guid, if any
      * @param userGuid If specified, restricts to organizations that this user is specifically a member
      *        of (e.g. will exclude public organizations with which the user does not have a
@@ -3524,7 +3524,7 @@ import scala.language.higherKinds
     /**
      * Returns all attribute values for this organization. Results are always
      * paginated.
-     * 
+     *
      * @param name Find the values for the attribute with this name.
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
@@ -3593,7 +3593,7 @@ import scala.language.higherKinds
   trait Subscriptions[F[_]] {
     /**
      * Search subscriptions. Always paginated.
-     * 
+     *
      * @param guid Find the subscription with this guid.
      * @param organizationKey Find subscriptions for this organization.
      * @param userGuid Find subscriptions for this user.
@@ -3672,7 +3672,7 @@ import scala.language.higherKinds
     /**
      * Search for a specific user. You must specify at least 1 parameter - either a
      * guid, email or token - and will receive back either 0 or 1 users.
-     * 
+     *
      * @param guid Find user with this guid. Exact match
      * @param email Find user with this email address. Case in-sensitive. Exact match
      * @param token Find the user with this API token. Exact match
@@ -3731,7 +3731,7 @@ import scala.language.higherKinds
   trait Versions[F[_]] {
     /**
      * Search all versions of this application. Results are always paginated.
-     * 
+     *
      * @param orgKey The organization key for which to search versions
      * @param applicationKey The application key for which to search versions
      * @param limit The number of records to return
@@ -3747,7 +3747,7 @@ import scala.language.higherKinds
 
     /**
      * Retrieve a specific version of an application.
-     * 
+     *
      * @param version The version of tthis application to download, or the keyword latest to get the
      *        latest version
      */
@@ -3793,7 +3793,7 @@ import scala.language.higherKinds
   trait Watches[F[_]] {
     /**
      * Search attributes. Always paginated.
-     * 
+     *
      * @param guid Find the watch with this guid.
      * @param userGuid Find attributes for this user.
      * @param organizationKey Find attributes for this organization.
@@ -3821,7 +3821,7 @@ import scala.language.higherKinds
 
     /**
      * Quick check if a user is watching a specific application.
-     * 
+     *
      * @param userGuid The user for which we are checking. API returns false if the user guid is not
      *        provided
      */

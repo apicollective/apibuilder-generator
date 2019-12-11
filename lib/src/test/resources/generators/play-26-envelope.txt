@@ -37,7 +37,7 @@ package io.gregor.time.types.v0.models {
    * Provides future compatibility in clients - in the future, when a type is added
    * to the union DateTimeUnion, it will need to be handled in the client code. This
    * implementation will deserialize these future types as an instance of this class.
-   * 
+   *
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
@@ -309,7 +309,7 @@ package io.gregor.time.types.v0 {
         queryTime: _root_.org.joda.time.DateTime,
         dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
         requestHeaders: Seq[(String, String)] = Nil
-      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Response[io.gregor.time.types.v0.models.DateTimeModel]] = {
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.gregor.time.types.v0.Response[io.gregor.time.types.v0.models.DateTimeModel]] = {
         val payload = play.api.libs.json.Json.toJson(dateTimeModel)
 
         val queryParameters = Seq(
@@ -411,7 +411,7 @@ package io.gregor.time.types.v0 {
       ResponseImpl(
         body = parseJson(className, r, f),
         status = r.status,
-        headers = r.headers,
+        headers = ResponseHeaders(r.headers),
       )
     }
 
@@ -439,7 +439,7 @@ package io.gregor.time.types.v0 {
 
     trait Client {
       def baseUrl: String
-      def dateTimeModels: io.gregor.time.types.v0.Response[io.gregor.time.types.v0.DateTimeModels]
+      def dateTimeModels: io.gregor.time.types.v0.DateTimeModels
     }
 
   }
@@ -452,7 +452,7 @@ package io.gregor.time.types.v0 {
       queryTime: _root_.org.joda.time.DateTime,
       dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
       requestHeaders: Seq[(String, String)] = Nil
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Response[io.gregor.time.types.v0.models.DateTimeModel]]
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.gregor.time.types.v0.Response[io.gregor.time.types.v0.models.DateTimeModel]]
   }
 
   package errors {
