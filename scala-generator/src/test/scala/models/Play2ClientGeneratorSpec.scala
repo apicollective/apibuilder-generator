@@ -5,12 +5,12 @@ import io.apibuilder.spec.v0.models.Method
 import models.TestHelper
 import models.TestHelper.{assertJodaTimeNotPresent, assertValidScalaSourceCode}
 
-import scala.generator.{ScalaClientMethodConfigs, ScalaClientMethodGenerator, ScalaService}
+import scala.generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs, ScalaClientMethodGenerator, ScalaService}
 import org.scalatest.{FunSpec, Matchers}
 
 class Play2ClientGeneratorSpec extends FunSpec with Matchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", Attributes.PlayDefaultConfig, None)
+  private[this] val clientMethodConfig: ScalaClientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", Attributes.PlayDefaultConfig, None)
 
   it("errorTypeClass") {
     val service = models.TestHelper.generatorApiService
