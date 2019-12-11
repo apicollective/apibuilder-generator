@@ -12,7 +12,7 @@ class Play26EnvelopeGeneratorSpec extends FunSpec with Matchers with PropertyChe
   it("generates response envelope") {
     val form = InvocationForm(
       models.TestHelper.dateTimeService,
-      Seq(Attribute("scala_generator.response", "envelope")),
+      Seq(Attribute("response", "envelope")),
       None
     )
     val Right(files) = Play26EnvelopeClientGenerator.invoke(form)
