@@ -299,7 +299,7 @@ package io.gregor.time.types.v0 {
 
     logger.info(s"Initializing io.gregor.time.types.v0.Client for url $baseUrl")
 
-    def dateTimeModels: io.gregor.time.types.v0.Response[io.gregor.time.types.v0.DateTimeModels] = DateTimeModels
+    def dateTimeModels: DateTimeModels = DateTimeModels
 
     object DateTimeModels extends DateTimeModels {
       override def postByPathDateAndPathTime(
@@ -419,7 +419,7 @@ package io.gregor.time.types.v0 {
       className: String,
       r: play.api.libs.ws.WSResponse,
       f: (play.api.libs.json.JsValue => play.api.libs.json.JsResult[T])
-  ): T = {
+    ): T = {
       f(play.api.libs.json.Json.parse(r.body)) match {
         case play.api.libs.json.JsSuccess(x, _) => x
         case play.api.libs.json.JsError(errors) => {
