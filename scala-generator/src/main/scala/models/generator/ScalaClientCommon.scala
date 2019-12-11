@@ -90,7 +90,7 @@ object Client {
 $extraMethods
 $buildResponse  def parseJson[T](
 $parseJsonSignature
-): T = {
+  ): T = {
     f(play.api.libs.json.Json.parse(r.${config.responseBodyMethod})) match {
       case play.api.libs.json.JsSuccess(x, _) => x
       case play.api.libs.json.JsError(errors) => {
