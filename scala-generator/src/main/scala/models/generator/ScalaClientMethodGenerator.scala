@@ -31,7 +31,7 @@ class ScalaClientMethodGenerator(
 
   def accessors(): String = {
     sortedResources.map { resource =>
-      s"def ${methodName(resource)}: ${responseType(resource)} = ${resource.plural}"
+      s"def ${methodName(resource)}: ${resource.plural}${config.wrappedAsyncType().getOrElse("")} = ${resource.plural}"
     }.mkString("\n\n")
   }
 
