@@ -2,12 +2,13 @@ package scala.generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models._
-import models.TestHelper
-import org.scalatest.{ Matchers, FunSpec }
+import org.scalatest.{FunSpec, Matchers}
+
+import scala.models.Attributes
 
 class ScalaPrimitiveObjectSpec extends FunSpec with Matchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", None)
+  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", Attributes.PlayDefaultConfig, None)
 
   describe("for a field with an object field") {
 

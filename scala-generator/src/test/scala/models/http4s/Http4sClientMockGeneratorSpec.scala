@@ -14,7 +14,7 @@ class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
     val ssd = new ScalaService(service)
 
     it("Http4s 0.20 mock generator produces valid Scala source code") {
-      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
       val sourceCode = Http4s020Generator.generateMockClientCode(None, ssd, config)
 
@@ -25,7 +25,7 @@ class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("Http4s 0.18 mock generator produces valid Scala source code") {
-      val config = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
       val sourceCode = Http4s018Generator.generateMockClientCode(None, ssd, config)
 
@@ -36,7 +36,7 @@ class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("Http4s 0.17 mock generator produces valid Scala source code") {
-      val config = new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
       val sourceCode = Http4s017Generator.generateMockClientCode(None, ssd, config)
 
@@ -52,7 +52,7 @@ class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.dateTimeService
       val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JodaLocalDate, dateTimeType = DateTimeTypeConfig.JodaDateTime))
 
-      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
       val sourceCode = Http4s020Generator.generateMockClientCode(None, ssd, config)
 
@@ -64,7 +64,7 @@ class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.dateTimeService
       val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaInstant))
 
-      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
       val sourceCode = Http4s020Generator.generateMockClientCode(None, ssd, config)
 
@@ -76,7 +76,7 @@ class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.dateTimeService
       val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaOffsetDateTime))
 
-      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
       val sourceCode = Http4s020Generator.generateMockClientCode(None, ssd, config)
 
