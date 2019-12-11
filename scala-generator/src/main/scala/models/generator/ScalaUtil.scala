@@ -28,14 +28,14 @@ object ScalaUtil {
   }
 
   def textToComment(text: Seq[String]): String = {
-    "/**\n * " + text.mkString("\n * ") + "\n */"
+    "/**\n * " + text.map { t => s" * $t".trim }.mkString("\n") + "\n */"
   }
 
   def textToComment(text: String): String = {
     if (text.trim.isEmpty) {
       ""
     } else {
-      textToComment(text.split("\n").flatMap(s => GeneratorUtil.splitIntoLines(s)))
+      textToComment(text.split("\n").flatMap(s => GeneratorUtil.splitIntoLines(s).map(_.trim)))
     }
   }
 
