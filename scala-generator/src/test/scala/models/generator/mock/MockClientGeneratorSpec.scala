@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import scala.generator.{ScalaClientMethodConfigs, ScalaService}
 import scala.generator.mock.MockClientGenerator._
 import scala.generator.ScalaField.Limitation
-import scala.models.{Config, DateTimeTypeConfig, DateTypeConfig}
+import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig}
 
 class MockClientGeneratorSpec extends FunSpec with Matchers {
   it("should generate the right desired length for string given a field limitation") {
@@ -39,9 +39,9 @@ class MockClientGeneratorSpec extends FunSpec with Matchers {
   describe("date and date-time types") {
     it("uses joda time") {
       val service = models.TestHelper.dateTimeService
-      val ssd = new ScalaService(service, Config.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JodaLocalDate, dateTimeType = DateTimeTypeConfig.JodaDateTime))
+      val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JodaLocalDate, dateTimeType = DateTimeTypeConfig.JodaDateTime))
 
-      val config = new ScalaClientMethodConfigs.Play27(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Play27(namespace = "whatever", attributes = Attributes.PlayDefaultConfig, baseUrl = None)
 
       val sourceCode = new MockClientGenerator(ssd, None, config).generateCode()
 
@@ -51,9 +51,9 @@ class MockClientGeneratorSpec extends FunSpec with Matchers {
 
     it("uses java time with Instant") {
       val service = models.TestHelper.dateTimeService
-      val ssd = new ScalaService(service, Config.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaInstant))
+      val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaInstant))
 
-      val config = new ScalaClientMethodConfigs.Play27(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Play27(namespace = "whatever", attributes = Attributes.PlayDefaultConfig, baseUrl = None)
 
       val sourceCode = new MockClientGenerator(ssd, None, config).generateCode()
 
@@ -63,9 +63,9 @@ class MockClientGeneratorSpec extends FunSpec with Matchers {
 
     it("uses java time with OffsetDateTime") {
       val service = models.TestHelper.dateTimeService
-      val ssd = new ScalaService(service, Config.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaOffsetDateTime))
+      val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaOffsetDateTime))
 
-      val config = new ScalaClientMethodConfigs.Play27(namespace = "whatever", baseUrl = None)
+      val config = new ScalaClientMethodConfigs.Play27(namespace = "whatever", attributes = Attributes.PlayDefaultConfig, baseUrl = None)
 
       val sourceCode = new MockClientGenerator(ssd, None, config).generateCode()
 

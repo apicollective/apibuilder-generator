@@ -25,10 +25,9 @@ trait Play2Models extends CodeGenerator {
     addHeader: Boolean,
     useBuiltInImplicits: Boolean,
   ): Seq[File] = {
-    val ssd = ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+    val ssd = ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
     val caseClasses = ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
-    val prefix = underscoreAndDashToInitCap(ssd.name)
     val play2json = Play2Json(ssd)
     val enumJson: String = play2json.generateEnums()
     val modelAndUnionJson: String = play2json.generateModelsAndUnions()
@@ -52,20 +51,20 @@ trait Play2Models extends CodeGenerator {
 
     val serDes = if (useBuiltInImplicits) {
       Seq(timeImplicits) ++
-      (ssd.config.dateTimeType match {
+      (ssd.attributes.dateTimeType match {
         case DateTimeTypeConfig.JodaDateTime => Seq(jodaDateTimeImplicits)
         case _ => Nil
       }) ++
-      (ssd.config.dateType match {
+      (ssd.attributes.dateType match {
         case DateTypeConfig.JodaLocalDate => Seq(jodaLocalDateImplicits)
         case _ => Nil
       })
     } else {
-      (ssd.config.dateTimeType match {
+      (ssd.attributes.dateTimeType match {
         case DateTimeTypeConfig.JodaDateTime => Seq(manualImplicits(ssd))
         case _ => Seq(timeImplicits)
       }) ++
-      (ssd.config.dateType match {
+      (ssd.attributes.dateType match {
         case DateTypeConfig.JodaLocalDate => Seq(manualImplicits(ssd))
         case _ => Seq(timeImplicits)
       })

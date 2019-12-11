@@ -13,18 +13,18 @@ case class PlayFrameworkVersion(
   requestHolderClass: String,
   authSchemeClass: String,
   supportsHttpPatch: Boolean,
-  useSpecificAddMethods: Boolean
+  useSpecificAddMethods: Boolean,
 )
 
 object Play22ClientGenerator extends CodeGenerator {
 
   def config(form: InvocationForm) = PlayFrameworkVersion(
     name = "2.2.x",
-    config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+    config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
     authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
     supportsHttpPatch = false,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -36,11 +36,11 @@ object Play23ClientGenerator extends CodeGenerator {
 
   def config(form: InvocationForm) = PlayFrameworkVersion(
     name = "2.3.x",
-    config = ScalaClientMethodConfigs.Play23(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+    config = ScalaClientMethodConfigs.Play23(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequestHolder",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -52,11 +52,11 @@ object Play24ClientGenerator extends CodeGenerator {
 
   def config(form: InvocationForm) = PlayFrameworkVersion(
     name = "2.4.x",
-    config = ScalaClientMethodConfigs.Play24(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+    config = ScalaClientMethodConfigs.Play24(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes),form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -68,11 +68,11 @@ object Play25ClientGenerator extends CodeGenerator {
 
   def config(form: InvocationForm) = PlayFrameworkVersion(
     name = "2.5.x",
-    config = ScalaClientMethodConfigs.Play25(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+    config = ScalaClientMethodConfigs.Play25(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = false
+    useSpecificAddMethods = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -84,11 +84,27 @@ object Play26ClientGenerator extends CodeGenerator {
 
   def config(form: InvocationForm) = PlayFrameworkVersion(
     name = "2.6.x",
-    config = ScalaClientMethodConfigs.Play26(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+    config = ScalaClientMethodConfigs.Play26(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = true
+    useSpecificAddMethods = true,
+  )
+
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
+    Play2ClientGenerator.invoke(config(form), form)
+
+}
+
+object Play26EnvelopeClientGenerator extends CodeGenerator {
+
+  def config(form: InvocationForm) = PlayFrameworkVersion(
+    name = "2.6.x",
+    config = ScalaClientMethodConfigs.Play26Envelope(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
+    requestHolderClass = "play.api.libs.ws.WSRequest",
+    authSchemeClass = "play.api.libs.ws.WSAuthScheme",
+    supportsHttpPatch = true,
+    useSpecificAddMethods = true,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -100,11 +116,11 @@ object Play27ClientGenerator extends CodeGenerator {
 
   def config(form: InvocationForm) = PlayFrameworkVersion(
     name = "2.7.x",
-    config = ScalaClientMethodConfigs.Play27(Namespaces.quote(form.service.namespace), form.service.baseUrl),
+    config = ScalaClientMethodConfigs.Play27(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
-    useSpecificAddMethods = true
+    useSpecificAddMethods = true,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -126,10 +142,11 @@ object Play2ClientGenerator {
 case class Play2ClientGenerator(
   version: PlayFrameworkVersion,
   form: InvocationForm,
-  configDefault: Config = Config.PlayDefaultConfig
+  defaultAttributes: Attributes = Attributes.PlayDefaultConfig
 ) {
 
-  private[this] val ssd = new ScalaService(form.service, Config(form.attributes, configDefault))
+  private[this] val attributes = defaultAttributes.withAttributes(form.attributes)
+  private[this] val ssd = new ScalaService(form.service, attributes)
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     Right(generateCode())
@@ -163,12 +180,16 @@ case class Play2ClientGenerator(
     val headerString = headers.scala.
       map { case (name, value) => s""""$name" -> ${value}""" }.
       mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders : _*)"
+    val responseEnvelopeString = version.config.responseEnvelopeClassName match {
+      case None => ""
+      case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indent + "\n\n"
+    }
 
     s"""package ${ssd.namespaces.base} {
 
 ${headers.objectConstants.indent(2)}
 
-${PlayScalaClientCommon.clientSignature(version.config).indent(2)} {
+$responseEnvelopeString${PlayScalaClientCommon.clientSignature(version.config).indent(2)} {
 ${JsonImports(form.service).mkString("\n").indent(4)}
 
     private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")

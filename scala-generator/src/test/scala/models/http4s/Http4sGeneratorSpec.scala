@@ -19,7 +19,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     )
 
     it("http4s 0.15") {
-      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s015Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
@@ -30,7 +30,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.17") {
-      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s017Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
@@ -41,7 +41,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.18") {
-      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s018Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
@@ -52,7 +52,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.20") {
-      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Http4s020Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
@@ -75,7 +75,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     )
 
     it("http4s 0.20 java instant") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq.empty,
         None
@@ -93,7 +93,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.20 java offsetdatetime") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate")),
         None
@@ -111,7 +111,7 @@ class Http4sGeneratorSpec extends FunSpec with Matchers {
     }
 
     it("http4s 0.20 joda datetime") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.time_library", "joda")),
         None

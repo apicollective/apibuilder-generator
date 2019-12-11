@@ -4,7 +4,9 @@ package scala.models.http4s
 import models.TestHelper.assertValidScalaSourceCode
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.{FunSpec, Matchers}
+
 import scala.generator.ScalaClientMethodConfigs
+import scala.models.Attributes
 
 class Http4sClientGeneratorSpec extends FunSpec with Matchers {
 
@@ -12,8 +14,8 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
     it("Http4s 0.15 generator produces valid Scala source code") {
       val service = models.TestHelper.generatorApiService
       val ssd = new ScalaService(service)
-      val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s015(namespace = "whatever", baseUrl = None)
+      val invocationForm = InvocationForm(service, Seq.empty, None)
+      val clientMethodConfig = ScalaClientMethodConfigs.Http4s015(namespace = "whatever", attributes = Attributes.Http4sDefaultConfig, baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
@@ -34,7 +36,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.generatorApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", attributes = Attributes.Http4sDefaultConfig, baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
@@ -55,7 +57,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.generatorApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", attributes = Attributes.Http4sDefaultConfig, baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
@@ -79,7 +81,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.generatorApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", attributes = Attributes.Http4sDefaultConfig, baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
@@ -123,7 +125,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.referenceApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", attributes = Attributes.Http4sDefaultConfig, baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)
@@ -135,7 +137,7 @@ class Http4sClientGeneratorSpec extends FunSpec with Matchers {
       val service = models.TestHelper.referenceApiService
       val ssd = new ScalaService(service)
       val invocationForm = new InvocationForm(service, Seq.empty, None)
-      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", baseUrl = None)
+      val clientMethodConfig = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", attributes = Attributes.Http4sDefaultConfig, baseUrl = None)
       val client = Http4sClient(invocationForm, ssd, clientMethodConfig)
       val scalaSourceCode = client.generate()
       assertValidScalaSourceCode(scalaSourceCode)

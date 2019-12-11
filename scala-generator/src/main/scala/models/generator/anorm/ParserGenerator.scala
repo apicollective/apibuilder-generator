@@ -1,7 +1,7 @@
 package scala.generator.anorm
 
 import scala.generator._
-import scala.models.{ApidocComments, Config, DateTimeTypeConfig, DateTypeConfig}
+import scala.models.{ApidocComments, Attributes, DateTimeTypeConfig, DateTypeConfig}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -20,13 +20,13 @@ object ParserGenerator24 extends ParserGenerator {
 
 object ParserGenerator26 extends ParserGenerator {
   override def attributes(ssd: ScalaService) = {
-    val dateImports = ssd.config.dateType match {
+    val dateImports = ssd.attributes.dateType match {
       case DateTypeConfig.JodaLocalDate => Seq(
         "play.api.libs.json.JodaReads._",
       )
       case _ => Nil
     }
-    val dateTimeImports = ssd.config.dateTimeType match {
+    val dateTimeImports = ssd.attributes.dateTimeType match {
       case DateTimeTypeConfig.JodaDateTime => Seq(
         "play.api.libs.json.JodaReads._",
       )
@@ -51,7 +51,7 @@ trait ParserGenerator extends CodeGenerator {
   def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = new ScalaService(form.service, Config(form.attributes, Config.PlayDefaultConfig))
+    val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
     val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
 

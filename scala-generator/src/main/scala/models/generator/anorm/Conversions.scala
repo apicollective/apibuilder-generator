@@ -63,7 +63,7 @@ package %s {
     ssd: ScalaService,
     attributes: ParserGeneratorPlayVersionSpecificAttributes
   ): String = {
-    val coreTypes = JavaPrimitiveTypes ++ Seq(ssd.config.dateType.dataType, ssd.config.dateTimeType.dataType, ScalaPrimitive.Decimal, ssd.config.jsonLib.jsonObjectType, ssd.config.jsonLib.jsonValueType, ScalaPrimitive.String, ScalaPrimitive.Uuid)
+    val coreTypes = JavaPrimitiveTypes ++ Seq(ssd.attributes.dateType.dataType, ssd.attributes.dateTimeType.dataType, ScalaPrimitive.Decimal, ssd.attributes.jsonLib.jsonObjectType, ssd.attributes.jsonLib.jsonValueType, ScalaPrimitive.String, ScalaPrimitive.Uuid)
 
     Seq(
       Header.format(ssd.namespaces.anormConversions, attributes.imports.map(i => s"\n  import $i").mkString),

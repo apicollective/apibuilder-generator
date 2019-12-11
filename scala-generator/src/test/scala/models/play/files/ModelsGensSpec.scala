@@ -7,7 +7,7 @@ import org.scalatest.prop.PropertyChecks
 import scala.models.play.gens._
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
 import scala.generator.{ScalaEnum, ScalaModel, ScalaService, ScalaUnion}
-import scala.models.Config
+import scala.models.Attributes
 import scala.models.play.Helpers
 
 class ModelsGensSpec extends FunSpec with Matchers with PropertyChecks {
@@ -49,7 +49,7 @@ class ModelsGensSpec extends FunSpec with Matchers with PropertyChecks {
   it("generates java OffsetDateTime generator") {
     forAll(genNsStr) { (str: String) =>
       val ns = scala.generator.Namespaces(str)
-      val scalaService = ScalaService(service = Helpers.basicService(str), Config.PlayGen2DefaultConfig)
+      val scalaService = ScalaService(service = Helpers.basicService(str), Attributes.PlayGen2DefaultConfig)
       val expected = s"""
         private[${ns.last}] implicit lazy val arbitraryOffsetDateTime: _root_.org.scalacheck.Arbitrary[_root_.java.time.OffsetDateTime] = _root_.org.scalacheck.Arbitrary(genOffsetDateTime)
         private[${ns.last}] lazy val genOffsetDateTime: _root_.org.scalacheck.Gen[_root_.java.time.OffsetDateTime] = _root_.org.scalacheck.Gen.lzy {
@@ -65,7 +65,7 @@ class ModelsGensSpec extends FunSpec with Matchers with PropertyChecks {
   it("generates java LocalDate generator") {
     forAll(genNsStr) { (str: String) =>
       val ns = scala.generator.Namespaces(str)
-      val scalaService = ScalaService(service = Helpers.basicService(str), Config.PlayGen2DefaultConfig)
+      val scalaService = ScalaService(service = Helpers.basicService(str), Attributes.PlayGen2DefaultConfig)
       val expected = s"""
         private[${ns.last}] implicit lazy val arbitraryLocalDate: _root_.org.scalacheck.Arbitrary[_root_.java.time.LocalDate] = _root_.org.scalacheck.Arbitrary(genLocalDate)
         private[${ns.last}] lazy val genLocalDate: _root_.org.scalacheck.Gen[_root_.java.time.LocalDate] = _root_.org.scalacheck.Gen.lzy {

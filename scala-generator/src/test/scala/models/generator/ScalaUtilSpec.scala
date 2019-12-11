@@ -84,6 +84,23 @@ class ScalaUtilSpec extends FunSpec with Matchers {
            | */""".stripMargin)
     }
 
+    it("avoids empty lines") {
+      ScalaUtil.textToComment(
+        Seq(
+          "description",
+          " ",
+          "foo",
+        )
+      ) should be(
+        """
+          |/**
+          | * description
+          | *
+          | * foo
+          | */
+          | """.stripMargin.trim
+      )
+    }
   }
 
   describe("scalaDefault") {
