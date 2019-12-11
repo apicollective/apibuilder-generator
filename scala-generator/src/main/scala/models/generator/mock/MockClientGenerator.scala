@@ -96,7 +96,7 @@ class MockClientGenerator(
     )
   }
 
-  def clientCode =
+  def clientCode: String =
     Seq(
       s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
@@ -109,7 +109,7 @@ class MockClientGenerator(
       }.mkString("\n\n")
     ).mkString("\n\n")
 
-  def factoriesCode = Seq(
+  def factoriesCode: String = Seq(
     "object Factories {",
     Seq(
       """def randomString(length: Int = 24): String = {""",
@@ -188,10 +188,21 @@ class MockClientGenerator(
         "// No-op as there is no successful response defined"
       }
       case Some(r) => {
-        val resultType = mockValue(ssd.scalaDatatype(r.`type`))
+        val unitType = config.responseEnvelopeClassName.map { _ => "()" }.getOrElse("// unit type")
+        val resultType = mockValue(ssd.scalaDatatype(r.`type`), unitType = unitType)
         config.responseEnvelopeClassName match {
           case None => resultType
-          case Some(envelopeName) => s"${ssd.namespaces.base}.${envelopeName}Impl(body = resultType, status = ${getStatus(r)}, headers = Map.empty)"
+          case Some(envelopeName) => {
+            Seq(
+              s"${ssd.namespaces.base}.${envelopeName}Impl(",
+              Seq(
+                s"body = $resultType,",
+                s"status = ${getStatus(r)},",
+                s"headers = ${ssd.namespaces.base}.ResponseHeaders(Map.empty)",
+              ).mkString("\n").indent(2),
+              ")"
+            ).mkString("\n")
+          }
         }
       }
     }
@@ -206,7 +217,11 @@ class MockClientGenerator(
     }
   }
 
-  def mockValue(datatype: ScalaDatatype, limitation: Option[ScalaField.Limitation] = None): String = {
+  def mockValue(
+    datatype: ScalaDatatype,
+    limitation: Option[ScalaField.Limitation] = None,
+    unitType: String = "// unit type",
+  ): String = {
     datatype match {
       case ScalaPrimitive.Boolean => "true"
       case ScalaPrimitive.Double => "1.0"
@@ -225,7 +240,7 @@ class MockClientGenerator(
           case Some(limitationVal) => s"Factories.randomString(${MockClientGenerator.calculateStringLength(limitationVal)})"
         }
       }
-      case ScalaPrimitive.Unit => "// unit type"
+      case ScalaPrimitive.Unit => unitType
       case dt @ ScalaPrimitive.Uuid => s"${dt.fullName}.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
       case ScalaDatatype.Map(_) => "Map()"

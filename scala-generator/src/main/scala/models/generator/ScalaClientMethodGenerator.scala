@@ -35,8 +35,12 @@ class ScalaClientMethodGenerator(
     }.mkString("\n\n")
   }
 
-  def responseType(resource: ScalaResource): String = {
-    val name = s"${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
+  private[this] def responseType(resource: ScalaResource): String = {
+    s"${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
+  }
+
+  private[this] def responseTypeWithEnvelope(resource: ScalaResource): String = {
+    val name = responseType(resource)
     config.responseEnvelopeClassName match {
       case None => name
       case Some(envelopeName) => s"${namespaces.base}.$envelopeName[$name]"
@@ -278,14 +282,14 @@ class ScalaClientMethodGenerator(
   private[this] def unitResponse: String = {
     config.responseEnvelopeClassName match {
       case None => "()"
-      case Some(envelopeName) => s"${envelopeName}Impl(body = (), status = r.status, headers = ResponseHeaders(r.headers))"
+      case Some(envelopeName) => s"${envelopeName}Impl" + "(body = (), status = r.status, headers = ResponseHeaders(r.headers))"
     }
   }
 
   private[this] def withEnvelope(resultType: String, isOption: Boolean): String = {
     val finalType = config.responseEnvelopeClassName match {
       case None => resultType
-      case Some(envName) => s"$envName[$resultType]"
+      case Some(envName) => s"${ssd.namespaces.base}.$envName[$resultType]"
     }
     if (isOption) {
       s"_root_.scala.Option[$finalType]"
