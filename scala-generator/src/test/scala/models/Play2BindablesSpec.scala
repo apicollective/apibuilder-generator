@@ -26,7 +26,7 @@ class Play2BindablesSpec extends FunSpec with Matchers {
 
   it("generates bindable for joda time") {
     val service = models.TestHelper.dateTimeService
-    val ssd = new ScalaService(service, Attributes(Nil, Attributes.PlayDefaultConfig))
+    val ssd = new ScalaService(service, Attributes.PlayDefaultConfig)
     models.TestHelper.assertEqualsFile(
       "/generators/play-2-bindable-joda-date-time.txt",
       Play2Bindables(ssd).build()
@@ -35,7 +35,7 @@ class Play2BindablesSpec extends FunSpec with Matchers {
 
   it("generates bindable for java time Instant") {
     val service = models.TestHelper.dateTimeService
-    val ssd = new ScalaService(service, Attributes(Seq(Attribute("scala_generator.date_time.type", "java.instant"), Attribute("scala_generator.date.type", "java.localdate")), Attributes.PlayDefaultConfig))
+    val ssd = new ScalaService(service, Attributes.PlayDefaultConfig.withAttributes(Seq(Attribute("scala_generator.date_time.type", "java.instant"), Attribute("scala_generator.date.type", "java.localdate"))))
     models.TestHelper.assertEqualsFile(
       "/generators/play-2-bindable-java-instant.txt",
       Play2Bindables(ssd).build()
@@ -44,7 +44,7 @@ class Play2BindablesSpec extends FunSpec with Matchers {
 
   it("generates bindable for java time OffsetDateTime") {
     val service = models.TestHelper.dateTimeService
-    val ssd = new ScalaService(service, Attributes(Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate")), Attributes.PlayDefaultConfig))
+    val ssd = new ScalaService(service, Attributes.PlayDefaultConfig.withAttributes(Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate"))))
     models.TestHelper.assertEqualsFile(
       "/generators/play-2-bindable-java-offsetdatetime.txt",
       Play2Bindables(ssd).build()

@@ -6,7 +6,7 @@ import org.scalatest.{Matchers, FunSpec}
 
 class ScalaNestedUnionSpec extends FunSpec with Matchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", None)
+  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", Attributes.PlayDefaultConfig, None)
 
   val json = models.TestHelper.buildJson("""
       "imports": [],
