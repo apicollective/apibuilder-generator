@@ -275,6 +275,13 @@ class ScalaClientMethodGenerator(
     }
   }
 
+  private[this] def unitResponse: String = {
+    config.responseEnvelopeClassName match {
+      case None => "()"
+      case Some(envelopeName) => s"${envelopeName}Impl(body = (), status = r.status, headers = ResponseHeaders(r.headers))"
+    }
+  }
+
   private[this] def withEnvelope(resultType: String, isOption: Boolean): String = {
     val finalType = config.responseEnvelopeClassName match {
       case None => resultType
