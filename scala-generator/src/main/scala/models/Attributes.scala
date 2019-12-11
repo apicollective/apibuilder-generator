@@ -104,7 +104,7 @@ object ResponseConfig {
   case object Envelope extends ResponseConfig { override def toString = "envelope" }
   case object Standard extends ResponseConfig { override def toString = "standard" }
 
-  private val Key = "scala_generator.response"
+  private val Key = "response"
 
   def apply(attributes: Seq[Attribute]): ResponseConfig = {
     attributes.find(_.name == Key).map(_.value.toLowerCase.trim) match {
