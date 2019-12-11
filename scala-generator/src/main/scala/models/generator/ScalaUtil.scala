@@ -28,7 +28,7 @@ object ScalaUtil {
   }
 
   def textToComment(text: Seq[String]): String = {
-    "/**\n * " + text.map { t => s" * $t".trim }.mkString("\n") + "\n */"
+    "/**\n * " + text.map { t => s"  * $t".trim }.mkString("\n") + "\n */"
   }
 
   def textToComment(text: String): String = {
