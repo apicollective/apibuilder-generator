@@ -229,14 +229,14 @@ class ScalaClientMethodGenerator(
               if (response.isSuccess) {
                 if (featureMigration.hasImplicit404s && response.isOption) {
                   if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some(())")
+                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($unitResponse")
                   } else {
                     val result = config.buildResponse("r", response.datatype.name)
                     Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($result)")
                   }
 
                 } else if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ()")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $unitResponse")
 
                 } else {
                   val result = config.buildResponse("r", response.datatype.name)
@@ -272,6 +272,13 @@ class ScalaClientMethodGenerator(
         implicitArgs = config.implicitArgs,
         responseEnvelopeName = config.responseEnvelopeClassName,
       )
+    }
+  }
+
+  private[this] def unitResponse: String = {
+    config.responseEnvelopeClassName match {
+      case None => "()"
+      case Some(envelopeName) => s"${envelopeName}Impl(body = (), status = r.status, headers = ResponseHeaders(r.headers))"
     }
   }
 

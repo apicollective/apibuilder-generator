@@ -191,7 +191,7 @@ class MockClientGenerator(
         val resultType = mockValue(ssd.scalaDatatype(r.`type`))
         config.responseEnvelopeClassName match {
           case None => resultType
-          case Some(envelopeName) => s"${envelopeName}Impl(body = resultType, status = ${getStatus(r)}, headers = Map.empty)"
+          case Some(envelopeName) => s"${ssd.namespaces.base}.${envelopeName}Impl(body = resultType, status = ${getStatus(r)}, headers = Map.empty)"
         }
       }
     }
