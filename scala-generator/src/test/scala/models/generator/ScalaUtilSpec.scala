@@ -89,12 +89,14 @@ class ScalaUtilSpec extends FunSpec with Matchers {
         Seq(
           "description",
           " ",
+          "foo",
         )
       ) should be(
         """
           |/**
           | * description
           | *
+          | * foo
           | */
           | """.stripMargin.trim
       )

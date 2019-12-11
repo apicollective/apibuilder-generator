@@ -27,8 +27,12 @@ object ScalaUtil {
     }
   }
 
+  def trimTrailingWhitespace(text: String): String = {
+    text.reverse.dropWhile(_ == ' ').reverse
+  }
+
   def textToComment(text: Seq[String]): String = {
-    "/**\n * " + text.mkString("\n * ") + "\n */"
+    "/**\n" + text.map { t => trimTrailingWhitespace(s" * $t") }.mkString("\n") + "\n */"
   }
 
   def textToComment(text: String): String = {

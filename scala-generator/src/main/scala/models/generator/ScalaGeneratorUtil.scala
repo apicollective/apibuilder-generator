@@ -23,9 +23,14 @@ object ScalaGeneratorUtil {
 
     val prefix = s"@param "
     val paramDesc: Seq[String] = params.flatMap { case (name, optionalDescription) =>
-      optionalDescription.map(_.trim).filter(_.nonEmpty).map { desc =>
+      optionalDescription.map(_.trim).filter(_.nonEmpty).flatMap { desc =>
         val lines = GeneratorUtil.splitIntoLines(desc).map { _.indent(prefix.length) }
-        s"$prefix$name " + lines.mkString("\n").trim
+        val paramDocs = lines.mkString("\n").trim
+        if (paramDocs.isEmpty) {
+          None
+        } else {
+          Some(s"$prefix$name " + lines.mkString("\n").trim)
+        }
       }
     }
 
