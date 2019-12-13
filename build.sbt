@@ -16,7 +16,7 @@ lazy val generated = project
   .settings(
     libraryDependencies ++= Seq(
       ws,
-      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
+      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test
     )
   )
 
