@@ -96,8 +96,9 @@ lazy val androidGenerator = project
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 77.8))
 
-val kotlinLangVersion = "1.3.60"
-val mockitoVersion = "3.1.0"
+val kotlinLangVersion = "1.3.61"
+val mockitoVersion = "3.2.0"
+val scalatestVersion = "3.0.8"
 
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
@@ -119,7 +120,7 @@ lazy val kotlinGenerator = project
       "org.jetbrains.kotlin" % "kotlin-reflect" % kotlinLangVersion % "test",
       "org.jetbrains.kotlin" % "kotlin-compiler" % kotlinLangVersion % "test",
       "io.github.sullis" % "kotlin-compiler-util" % "0.0.2" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+      "org.scalatest" %% "scalatest" % scalatestVersion % "test",
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
@@ -154,10 +155,10 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+    "org.scalatest" %% "scalatest" % scalatestVersion % "test",
     "org.mockito" % "mockito-core" % mockitoVersion % "test",
-    "com.github.javaparser" % "javaparser-core" % "3.15.5" % "test",
-    "org.scalameta" %% "scalameta" % "4.2.4" % "test",
+    "com.github.javaparser" % "javaparser-core" % "3.15.6" % "test",
+    "org.scalameta" %% "scalameta" % "4.3.0" % "test",
     "com.squareup" % "javapoet" % "1.11.1",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4"
@@ -167,4 +168,4 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   sources in(Compile, doc) := Seq.empty,
   publishArtifact in(Compile, packageDoc) := false
 )
-version := "0.8.47"
+version := "0.8.57"

@@ -2,12 +2,12 @@ package scala.models.play.files
 
 import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.models.Config
+import scala.models.Attributes
 
 object ModelsBindables {
 
   def contents(form: InvocationForm): String = {
-    val scalaService = scala.generator.ScalaService(form.service, Config(form.attributes, Config.PlayGen2DefaultConfig))
+    val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
     val bindables = scala.models.Play2Bindables(scalaService)
       .build
       .split("\n")

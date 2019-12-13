@@ -222,7 +222,7 @@ class ScalaClientMethod(
   response: String,
   implicitArgs: Option[String],
   typeParam: Option[String]
-) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs) {
+) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs, responseEnvelopeName = None) {
   import lib.Text._
 
   override val interface: String = {

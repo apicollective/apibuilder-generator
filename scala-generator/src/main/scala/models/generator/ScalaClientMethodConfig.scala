@@ -1,11 +1,18 @@
 package scala.generator
 
+import scala.models.{Attributes, ResponseConfig}
+
 trait ScalaClientMethodConfig {
 
   /**
     * Namespace in which the client is defined
     */
   def namespace: String
+
+  /**
+   * Configuration related to all generator attributes
+   */
+  def attributes: Attributes
 
   /**
     * Base URL for the service if provided
@@ -77,7 +84,18 @@ trait ScalaClientMethodConfig {
     * instance of the specified class.
     */
   def toJson(responseName: String, className: String): String = {
-    s"""_root_.$namespace.Client.parseJson("$className", $responseName, _.validate[$className])"""
+    toClientMethodCall("parseJson", responseName, className)
+  }
+
+  private[this] def toClientMethodCall(methodName: String, responseName: String, className: String): String = {
+    s"""_root_.$namespace.Client.$methodName("$className", $responseName, _.validate[$className])"""
+  }
+
+  final def buildResponse(responseName: String, className: String): String = {
+    responseEnvelopeClassName match {
+      case None => toJson(responseName, className)
+      case Some(_) => toClientMethodCall("buildResponse", responseName, className)
+    }
   }
 
   def asyncTypeParam(constraint: Option[String] = None): Option[String] = None
@@ -85,6 +103,11 @@ trait ScalaClientMethodConfig {
   def wrappedAsyncType(instance: String = ""): Option[String] = None
 
   def asyncSuccessInvoke: String = wrappedAsyncType("Sync").getOrElse(asyncType) + "." + asyncSuccess
+
+  final def responseEnvelopeClassName: Option[String] = attributes.response match {
+    case ResponseConfig.Envelope => Some("Response")
+    case ResponseConfig.Standard => None
+  }
 }
 
 object ScalaClientMethodConfigs {
@@ -108,42 +131,49 @@ object ScalaClientMethodConfigs {
     override val asyncSuccess: String = "successful"
   }
 
-  case class Play22(namespace: String, baseUrl: Option[String]) extends Play {
+  case class Play22(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.Response"
     override val requestUriMethod = Some("ahcResponse.getUri")
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = false
   }
 
-  case class Play23(namespace: String, baseUrl: Option[String]) extends Play {
+  case class Play23(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = true
   }
 
-  case class Play24(namespace: String, baseUrl: Option[String]) extends Play {
+  case class Play24(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = false
     override val canSerializeUuid = true
   }
 
-  case class Play25(namespace: String, baseUrl: Option[String]) extends Play {
+  case class Play25(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
   }
 
-  case class Play26(namespace: String, baseUrl: Option[String]) extends Play {
+  case class Play26(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
     override val canSerializeUuid = true
   }
 
-  case class Play27(namespace: String, baseUrl: Option[String]) extends Play {
+  case class Play26Envelope(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Play {
+    override val responseClass = "play.api.libs.ws.WSResponse"
+    override val requestUriMethod: Option[String] = None
+    override val expectsInjectedWsClient = true
+    override val canSerializeUuid = true
+  }
+
+  case class Play27(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Play {
     override val responseClass = "play.api.libs.ws.WSResponse"
     override val requestUriMethod: Option[String] = None
     override val expectsInjectedWsClient = true
@@ -181,14 +211,14 @@ private lazy val defaultAsyncHttpClient = {
           |  .setPassword($password)""".stripMargin
   }
 
-  case class Ning18(namespace: String, baseUrl: Option[String]) extends Ning {
+  case class Ning18(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Ning {
     override def addQueryParamMethod: String = "addQueryParameter"
     override val requestUriMethod = Some("getUri")
   }
 
-  case class Ning19(namespace: String, baseUrl: Option[String]) extends Ning
+  case class Ning19(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Ning
 
-  case class AsyncHttpClient(namespace: String, baseUrl: Option[String]) extends Ning {
+  case class AsyncHttpClient(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Ning {
     override def ningPackage: String = "org.asynchttpclient"
     override val responseBodyMethod = """getResponseBody(java.nio.charset.Charset.forName("UTF-8"))"""
     override val responseClass = "_root_.org.asynchttpclient.Response"
@@ -257,7 +287,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def applicationJsonMediaType: String
   }
 
-  case class Http4s015(namespace: String, baseUrl: Option[String]) extends Http4s {
+  case class Http4s015(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "scalaz.concurrent.Task"
     override val leftType = "scalaz.-\\/"
     override val rightType = "scalaz.\\/-"
@@ -268,7 +298,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.`application/json`"
   }
 
-  case class Http4s017(namespace: String, baseUrl: Option[String]) extends Http4s {
+  case class Http4s017(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "fs2.Task"
     override val leftType = "Left"
     override val rightType = "Right"
@@ -280,7 +310,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.`application/json`"
   }
 
-  case class Http4s018(namespace: String, baseUrl: Option[String]) extends Http4s {
+  case class Http4s018(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "F"
     override def asyncTypeParam(constraint: Option[String] = None) = Some(s"$asyncType[_]${constraint.map(c => s": $c").getOrElse("")}")
     override val leftType = "Left"
@@ -329,7 +359,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.`application/json`"
   }
 
-  case class Http4s020(namespace: String, baseUrl: Option[String]) extends Http4s {
+  case class Http4s020(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s {
     override val asyncType = "F"
     override def asyncTypeParam(constraint: Option[String] = None) = Some(s"$asyncType[_]${constraint.map(c => s": $c").getOrElse("")}")
     override val leftType = "Left"

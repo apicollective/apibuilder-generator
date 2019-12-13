@@ -1327,7 +1327,7 @@ import scala.language.higherKinds
   trait Applications[F[_]] {
     /**
      * Search all applications. Results are always paginated.
-     * 
+     *
      * @param orgKey The organization key for which to search applications
      * @param name The name of an application. Case in-sensitive. Exact match
      * @param guid The guid of an application. Exact match
@@ -1390,7 +1390,7 @@ import scala.language.higherKinds
   trait Attributes[F[_]] {
     /**
      * Search all attributes. Results are always paginated.
-     * 
+     *
      * @param guid Find the watch with this guid.
      * @param name Find attributes with this name. Case in-sensitive. Exact match
      * @param limit The number of records to return
@@ -1449,7 +1449,7 @@ import scala.language.higherKinds
   trait Code[F[_]] {
     /**
      * Generate code for a specific version of an application.
-     * 
+     *
      * @param orgKey The organization key for which to generate code
      * @param applicationKey The application key for which to generate code
      * @param version The version of this application. Can be 'latest'
@@ -1497,7 +1497,7 @@ import scala.language.higherKinds
   trait GeneratorServices[F[_]] {
     /**
      * List all generator services
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -1532,7 +1532,7 @@ import scala.language.higherKinds
   trait GeneratorWithServices[F[_]] {
     /**
      * List all available generators
-     * 
+     *
      * @param guid Filter to generator with this guid
      * @param serviceGuid Filter to generator from this service
      * @param serviceUri Filter to generator from this service URI
@@ -1590,7 +1590,7 @@ import scala.language.higherKinds
   trait MembershipRequests[F[_]] {
     /**
      * Search all membership requests. Results are always paginated.
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -1636,7 +1636,7 @@ import scala.language.higherKinds
   trait Memberships[F[_]] {
     /**
      * Search all memberships. Results are always paginated.
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -1664,7 +1664,7 @@ import scala.language.higherKinds
   trait Organizations[F[_]] {
     /**
      * Search all organizations. Results are always paginated.
-     * 
+     *
      * @param guid Finds the organization with this guid, if any
      * @param userGuid If specified, restricts to organizations that this user is specifically a member
      *        of (e.g. will exclude public organizations with which the user does not have a
@@ -1722,7 +1722,7 @@ import scala.language.higherKinds
     /**
      * Returns all attribute values for this organization. Results are always
      * paginated.
-     * 
+     *
      * @param name Find the values for the attribute with this name.
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
@@ -1791,7 +1791,7 @@ import scala.language.higherKinds
   trait Subscriptions[F[_]] {
     /**
      * Search subscriptions. Always paginated.
-     * 
+     *
      * @param guid Find the subscription with this guid.
      * @param organizationKey Find subscriptions for this organization.
      * @param userGuid Find subscriptions for this user.
@@ -1870,7 +1870,7 @@ import scala.language.higherKinds
     /**
      * Search for a specific user. You must specify at least 1 parameter - either a
      * guid, email or token - and will receive back either 0 or 1 users.
-     * 
+     *
      * @param guid Find user with this guid. Exact match
      * @param email Find user with this email address. Case in-sensitive. Exact match
      * @param token Find the user with this API token. Exact match
@@ -1929,7 +1929,7 @@ import scala.language.higherKinds
   trait Versions[F[_]] {
     /**
      * Search all versions of this application. Results are always paginated.
-     * 
+     *
      * @param orgKey The organization key for which to search versions
      * @param applicationKey The application key for which to search versions
      * @param limit The number of records to return
@@ -1945,7 +1945,7 @@ import scala.language.higherKinds
 
     /**
      * Retrieve a specific version of an application.
-     * 
+     *
      * @param version The version of tthis application to download, or the keyword latest to get the
      *        latest version
      */
@@ -1991,7 +1991,7 @@ import scala.language.higherKinds
   trait Watches[F[_]] {
     /**
      * Search attributes. Always paginated.
-     * 
+     *
      * @param guid Find the watch with this guid.
      * @param userGuid Find attributes for this user.
      * @param organizationKey Find attributes for this organization.
@@ -2019,7 +2019,7 @@ import scala.language.higherKinds
 
     /**
      * Quick check if a user is watching a specific application.
-     * 
+     *
      * @param userGuid The user for which we are checking. API returns false if the user guid is not
      *        provided
      */

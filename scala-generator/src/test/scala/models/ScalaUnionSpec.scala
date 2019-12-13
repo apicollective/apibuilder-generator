@@ -6,7 +6,7 @@ import org.scalatest.{Matchers, FunSpec}
 
 class ScalaUnionSpec extends FunSpec with Matchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", None)
+  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", Attributes.PlayDefaultConfig, None)
 
   describe("models") {
 

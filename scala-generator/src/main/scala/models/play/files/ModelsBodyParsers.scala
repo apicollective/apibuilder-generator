@@ -2,7 +2,7 @@ package scala.models.play.files
 
 import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.models.Config
+import scala.models.Attributes
 
 object ModelsBodyParsers {
 
@@ -27,7 +27,7 @@ object ModelsBodyParsers {
 	"""
 
 	def contents(form: InvocationForm): String = {
-		val scalaService = scala.generator.ScalaService(form.service, Config(form.attributes, Config.PlayGen2DefaultConfig))
+		val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
 		val bodyParsers =
 			scalaService.enums.map(bodyParser) ++
 			scalaService.models.map(bodyParser) ++

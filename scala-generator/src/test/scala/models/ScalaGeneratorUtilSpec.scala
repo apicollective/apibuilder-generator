@@ -1,6 +1,5 @@
 package scala.models
 
-import lib.Datatype
 import io.apibuilder.spec.v0.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
 import scala.generator._
 import org.scalatest.{ Matchers, FunSpec }
@@ -11,7 +10,7 @@ class ScalaGeneratorUtilSpec extends FunSpec with Matchers {
   private lazy val ssd = new ScalaService(service)
 
   private[this] val play2Util = new ScalaGeneratorUtil(
-    ScalaClientMethodConfigs.Play22("test.apidoc", None)
+    ScalaClientMethodConfigs.Play22("test.apidoc", Attributes.PlayDefaultConfig, None)
   )
 
   describe("params") {

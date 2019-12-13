@@ -1331,7 +1331,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Applications {
     /**
      * Search all applications. Results are always paginated.
-     * 
+     *
      * @param orgKey The organization key for which to search applications
      * @param name The name of an application. Case in-sensitive. Exact match
      * @param guid The guid of an application. Exact match
@@ -1394,7 +1394,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Attributes {
     /**
      * Search all attributes. Results are always paginated.
-     * 
+     *
      * @param guid Find the watch with this guid.
      * @param name Find attributes with this name. Case in-sensitive. Exact match
      * @param limit The number of records to return
@@ -1453,7 +1453,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Code {
     /**
      * Generate code for a specific version of an application.
-     * 
+     *
      * @param orgKey The organization key for which to generate code
      * @param applicationKey The application key for which to generate code
      * @param version The version of this application. Can be 'latest'
@@ -1501,7 +1501,7 @@ def closeAsyncHttpClient(): Unit = {
   trait GeneratorServices {
     /**
      * List all generator services
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -1536,7 +1536,7 @@ def closeAsyncHttpClient(): Unit = {
   trait GeneratorWithServices {
     /**
      * List all available generators
-     * 
+     *
      * @param guid Filter to generator with this guid
      * @param serviceGuid Filter to generator from this service
      * @param serviceUri Filter to generator from this service URI
@@ -1594,7 +1594,7 @@ def closeAsyncHttpClient(): Unit = {
   trait MembershipRequests {
     /**
      * Search all membership requests. Results are always paginated.
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -1640,7 +1640,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Memberships {
     /**
      * Search all memberships. Results are always paginated.
-     * 
+     *
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
      */
@@ -1668,7 +1668,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Organizations {
     /**
      * Search all organizations. Results are always paginated.
-     * 
+     *
      * @param guid Finds the organization with this guid, if any
      * @param userGuid If specified, restricts to organizations that this user is specifically a member
      *        of (e.g. will exclude public organizations with which the user does not have a
@@ -1726,7 +1726,7 @@ def closeAsyncHttpClient(): Unit = {
     /**
      * Returns all attribute values for this organization. Results are always
      * paginated.
-     * 
+     *
      * @param name Find the values for the attribute with this name.
      * @param limit The number of records to return
      * @param offset Used to paginate. First page of results is 0.
@@ -1795,7 +1795,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Subscriptions {
     /**
      * Search subscriptions. Always paginated.
-     * 
+     *
      * @param guid Find the subscription with this guid.
      * @param organizationKey Find subscriptions for this organization.
      * @param userGuid Find subscriptions for this user.
@@ -1874,7 +1874,7 @@ def closeAsyncHttpClient(): Unit = {
     /**
      * Search for a specific user. You must specify at least 1 parameter - either a
      * guid, email or token - and will receive back either 0 or 1 users.
-     * 
+     *
      * @param guid Find user with this guid. Exact match
      * @param email Find user with this email address. Case in-sensitive. Exact match
      * @param token Find the user with this API token. Exact match
@@ -1933,7 +1933,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Versions {
     /**
      * Search all versions of this application. Results are always paginated.
-     * 
+     *
      * @param orgKey The organization key for which to search versions
      * @param applicationKey The application key for which to search versions
      * @param limit The number of records to return
@@ -1949,7 +1949,7 @@ def closeAsyncHttpClient(): Unit = {
 
     /**
      * Retrieve a specific version of an application.
-     * 
+     *
      * @param version The version of tthis application to download, or the keyword latest to get the
      *        latest version
      */
@@ -1995,7 +1995,7 @@ def closeAsyncHttpClient(): Unit = {
   trait Watches {
     /**
      * Search attributes. Always paginated.
-     * 
+     *
      * @param guid Find the watch with this guid.
      * @param userGuid Find attributes for this user.
      * @param organizationKey Find attributes for this organization.
@@ -2023,7 +2023,7 @@ def closeAsyncHttpClient(): Unit = {
 
     /**
      * Quick check if a user is watching a specific application.
-     * 
+     *
      * @param userGuid The user for which we are checking. API returns false if the user guid is not
      *        provided
      */

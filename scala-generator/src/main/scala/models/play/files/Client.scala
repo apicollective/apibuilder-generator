@@ -2,7 +2,7 @@ package scala.models.play.files
 
 import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.models.Config
+import scala.models.Attributes
 
 object Client {
 
@@ -10,7 +10,7 @@ object Client {
     scala.models.Play2ClientGenerator(
         scala.models.Play26ClientGenerator.config(form),
         form,
-        Config.PlayGen2DefaultConfig
+        Attributes.PlayGen2DefaultConfig
       )
       .client
 
