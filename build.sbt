@@ -67,7 +67,7 @@ lazy val scalaGenerator = project
     scalacOptions += "-Ypartial-unification",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "1.5.0",
-      "com.geirsson" %% "scalafmt-core" % "1.5.1"
+      "org.scalameta" %% "scalafmt-core" % "2.3.2"
     )
   )
 
