@@ -9,7 +9,7 @@ object Play2StandaloneModelsJson extends CodeGenerator {
   override def invoke(
     form: InvocationForm
   ): Either[Seq[String], Seq[File]] = {
-    Right(Play2Models.generateCode(form = form, addBindables = false, addHeader = true))
+    Right(Play2Models.generateCode(form = form, addBindables = false, addHeader = true, useBuiltInImplicits = false))
   }
 
 }

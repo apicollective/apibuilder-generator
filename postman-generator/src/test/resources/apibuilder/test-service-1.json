@@ -1,0 +1,321 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "organization": {
+    "key": "ecorp"
+  },
+  "application": {
+    "key": "apidoc-reference-api"
+  },
+  "namespace": "io.ecorp.api.v0",
+  "version": "0.3.47",
+  "info": {},
+  "name": "catalog",
+  "base_url": "https://api.ecorp.io",
+  "headers": [ ],
+  "imports": [ ],
+  "enums": [ ],
+  "unions": [ ],
+  "models": [
+    {
+      "name": "catalog",
+      "plural": "catalogs",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "attributes": [ ],
+          "example": "cat-14123213"
+        }
+      ],
+      "attributes": [ ],
+      "description": "A model"
+    },
+    {
+      "name": "organization",
+      "plural": "catalogs",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "attributes": [ ],
+          "example": "org-324324"
+        }
+      ],
+      "attributes": [ ],
+      "description": "A model"
+    },
+    {
+      "name": "organization_form",
+      "plural": "organization_form",
+      "fields": [
+        {
+          "name": "parent_id",
+          "type": "string",
+          "required": true,
+          "attributes": [
+            {
+              "name": "value-substitute",
+              "value": {
+                "substitute": "{{ORGANIZATION-PARENT}}"
+              }
+            }
+          ],
+          "annotations": [ ],
+          "description": "Corresponds with the parent organization id."
+        }
+      ],
+      "attributes": [ ],
+      "description": "Represents a form to create a sandbox organization."
+    },
+    {
+      "name": "order_form",
+      "plural": "order_form",
+      "fields": [
+        {
+          "name": "catalog_id",
+          "type": "string",
+          "required": true,
+          "attributes": [
+            {
+              "name": "object-reference",
+              "value": {
+                "related_service_namespace": "io.ecorp.api.v0",
+                "resource_type": "catalog",
+                "operation_method": "POST",
+                "operation_path": "/:organization/catalog",
+                "identifier_field": "id"
+              }
+            }
+          ],
+          "annotations": [ ],
+          "description": "Corresponds with the price book key to which this price book item belongs."
+        }
+      ],
+      "attributes": [ ],
+      "description": "Represents the form to create an item in a pricebook."
+    }
+  ],
+  "resources": [
+    {
+      "type": "catalog",
+      "plural": "catalogs",
+      "path": "/:organization",
+      "attributes": [
+        {
+          "name": "object-reference",
+          "value": {
+            "related_service_namespace": "io.ecorp.api.v0",
+            "resource_type": "organization",
+            "operation_method": "POST",
+            "operation_path": "/organizations",
+            "identifier_field": "id",
+            "delete_operation_path": "/organizations/:id"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "POST",
+          "description": "Create catalog.",
+          "path": "/:organization/catalog",
+          "attributes": [ ],
+          "parameters": [
+            {
+              "name": "organization",
+              "type": "uuid",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "description": "Create subcatalog.",
+          "path": "/:organization/subcatalog",
+          "attributes": [ ],
+          "parameters": [
+            {
+              "name": "organization",
+              "type": "uuid",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "description": "Create order",
+          "path": "/:organization/order",
+          "attributes": [ ],
+          "parameters": [
+            {
+              "name": "organization",
+              "type": "uuid",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ],
+          "body": {
+            "type": "order_form",
+            "attributes": [ ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "subcatalog",
+      "plural": "subcatalogs",
+      "path": "/:catalog/:subcatalog",
+      "attributes": [
+        {
+          "name": "object-reference",
+          "value": {
+            "related_service_namespace": "io.ecorp.api.v0",
+            "resource_type": "catalog",
+            "operation_method": "POST",
+            "operation_path": "/:organization/catalog",
+            "identifier_field": "id"
+          }
+        },
+        {
+          "name": "object-reference",
+          "value": {
+            "related_service_namespace": "io.ecorp.api.v0",
+            "resource_type": "catalog",
+            "operation_method": "POST",
+            "operation_path": "/:organization/subcatalog",
+            "identifier_field": "id"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "GET",
+          "description": "Get subcatalog",
+          "path": "/:catalog/:subcatalog",
+          "attributes": [ ],
+          "parameters": [
+            {
+              "name": "catalog",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "subcatalog",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "organization",
+      "plural": "organizations",
+      "path": "",
+      "parameters": [ ],
+      "attributes": [ ],
+      "operations": [
+        {
+          "method": "POST",
+          "description": "Create Organization",
+          "path": "/organizations",
+          "attributes": [ ],
+          "parameters": [ ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 202
+                }
+              },
+              "type": "organization"
+            }
+          ],
+          "body": {
+            "type": "organization_form",
+            "attributes": [ ]
+          }
+        },
+        {
+          "method": "DELETE",
+          "description": "Delete Organization",
+          "path": "/organizations/:id",
+          "attributes": [ ],
+          "parameters": [ ],
+          "responses": [
+            {
+              "headers": [ ],
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "postman-basic-auth",
+      "value": {
+        "username": "{{MY_TOKEN}}",
+        "password": ""
+      }
+    }
+  ]
+}

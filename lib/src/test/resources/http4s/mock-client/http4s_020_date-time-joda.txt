@@ -1,0 +1,41 @@
+package io.gregor.time.types.v0.mock {
+
+  class Client[F[_]: cats.Applicative] extends io.gregor.time.types.v0.interfaces.Client[F] {
+
+    val baseUrl: org.http4s.Uri = org.http4s.Uri.unsafeFromString("http://mock.localhost")
+
+    override def dateTimeModels: io.gregor.time.types.v0.DateTimeModels[F] = new MockDateTimeModels[F]
+
+  }
+
+  class MockDateTimeModels[F[_]: cats.Applicative] extends io.gregor.time.types.v0.DateTimeModels[F] {
+
+    def postByPathDateAndPathTime(
+      pathDate: _root_.org.joda.time.LocalDate,
+      pathTime: _root_.org.joda.time.DateTime,
+      queryDate: _root_.org.joda.time.LocalDate,
+      queryTime: _root_.org.joda.time.DateTime,
+      dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
+      requestHeaders: Seq[(String, String)] = Nil
+    ): F[io.gregor.time.types.v0.models.DateTimeModel] = cats.Applicative[F].pure {
+      io.gregor.time.types.v0.mock.Factories.makeDateTimeModel()
+    }
+
+  }
+
+  object Factories {
+
+    def randomString(length: Int = 24): String = {
+      _root_.scala.util.Random.alphanumeric.take(length).mkString
+    }
+
+    def makeDateTimeModel(): io.gregor.time.types.v0.models.DateTimeModel = io.gregor.time.types.v0.models.DateTimeModel(
+      dateTime = _root_.org.joda.time.DateTime.now,
+      date = _root_.org.joda.time.LocalDate.now
+    )
+
+    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = _root_.org.joda.time.DateTime.now
+
+  }
+
+}

@@ -1,0 +1,170 @@
+package io.apibuilder.http4s.test.server
+
+import org.http4s.circe.decodeUri
+import org.http4s.circe.encodeUri
+import org.http4s.dsl.{io => _, _}
+import org.http4s.implicits._
+import cats.effect._
+import cats.implicits._
+import io.apibuilder.http4s.test.models.json._
+
+private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
+
+  implicit lazy val queryParamDecodeBigDecimal: org.http4s.QueryParamDecoder[BigDecimal] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
+
+  implicit lazy val queryParamDecodeInstant: org.http4s.QueryParamDecoder[_root_.java.time.Instant] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.Instant](p => _root_.java.time.OffsetDateTime.parse(p.value).toInstant)("_root_.java.time.Instant")
+
+  implicit lazy val queryParamDecodeLocalDate: org.http4s.QueryParamDecoder[_root_.java.time.LocalDate] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.LocalDate](p => _root_.java.time.LocalDate.parse(p.value))("_root_.java.time.LocalDate")
+
+  implicit lazy val queryParamDecodeUUID: org.http4s.QueryParamDecoder[_root_.java.util.UUID] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.util.UUID](p => _root_.java.util.UUID.fromString(p.value))("_root_.java.util.UUID")
+
+
+  object ApiVersion {
+    val ApiVersionMajor = {
+      "X-Apidoc-Version-Major".ci
+    }
+
+    def apply(req: org.http4s.Message[F]): Boolean = req.headers.get(ApiVersionMajor) match {
+      case Some(v) if v.value == "0" => true
+      case _ => false
+    }
+  }
+
+
+}
+
+trait ModelRoutes[F[_]] extends Matchers[F] {
+
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
+
+  sealed trait GetStringResponse
+
+  object GetStringResponse {
+    case class HTTP200(value: String, headers: Seq[org.http4s.Header] = Nil) extends GetStringResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetStringResponse
+  }
+
+  def getString(
+    _req: org.http4s.Request[F]
+  ): F[GetStringResponse]
+
+  sealed trait GetEnumResponse
+
+  object GetEnumResponse {
+    case class HTTP200(value: io.apibuilder.http4s.test.models.Enum, headers: Seq[org.http4s.Header] = Nil) extends GetEnumResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetEnumResponse
+  }
+
+  def getEnum(
+    _req: org.http4s.Request[F]
+  ): F[GetEnumResponse]
+
+  sealed trait GetModelResponse
+
+  object GetModelResponse {
+    case class HTTP200(value: io.apibuilder.http4s.test.models.Model, headers: Seq[org.http4s.Header] = Nil) extends GetModelResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetModelResponse
+  }
+
+  def getModel(
+    _req: org.http4s.Request[F]
+  ): F[GetModelResponse]
+
+  sealed trait GetListResponse
+
+  object GetListResponse {
+    case class HTTP200(value: Seq[Int], headers: Seq[org.http4s.Header] = Nil) extends GetListResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetListResponse
+  }
+
+  def getList(
+    _req: org.http4s.Request[F]
+  ): F[GetListResponse]
+
+  sealed trait GetMapResponse
+
+  object GetMapResponse {
+    case class HTTP200(value: Map[String, _root_.java.util.UUID], headers: Seq[org.http4s.Header] = Nil) extends GetMapResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetMapResponse
+  }
+
+  def getMap(
+    _req: org.http4s.Request[F]
+  ): F[GetMapResponse]
+
+  sealed trait GetMultipleResponse
+
+  object GetMultipleResponse {
+    case class HTTP200(value: io.apibuilder.http4s.test.models.Model, headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
+    case class HTTP201(value: io.apibuilder.http4s.test.models.Enum, headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
+    case class HTTP202(value: String, headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
+    case class HTTP204(headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
+    case class HTTP206(value: Seq[io.apibuilder.http4s.test.models.Model], headers: Seq[org.http4s.Header] = Nil) extends GetMultipleResponse
+    case class UndocumentedResponse(response: F[org.http4s.Response[F]]) extends GetMultipleResponse
+  }
+
+  def getMultiple(
+    _req: org.http4s.Request[F]
+  ): F[GetMultipleResponse]
+
+  def apiVersionMatch(req: org.http4s.Message[F]): Boolean = ApiVersion(req)
+
+  def service()(implicit sync: Sync[F]) = org.http4s.HttpRoutes.of[F] {
+    case _req @ GET -> Root / "string" if apiVersionMatch(_req) =>
+      getString(_req).flatMap {
+        case GetStringResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetStringResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "string" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "enum" if apiVersionMatch(_req) =>
+      getEnum(_req).flatMap {
+        case GetEnumResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetEnumResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "enum" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "model" if apiVersionMatch(_req) =>
+      getModel(_req).flatMap {
+        case GetModelResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetModelResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "model" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "list" if apiVersionMatch(_req) =>
+      getList(_req).flatMap {
+        case GetListResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetListResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "list" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "map" if apiVersionMatch(_req) =>
+      getMap(_req).flatMap {
+        case GetMapResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetMapResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "map" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "multiple" if apiVersionMatch(_req) =>
+      getMultiple(_req).flatMap {
+        case GetMultipleResponse.HTTP200(value, headers) => Ok(value, headers: _*)
+        case GetMultipleResponse.HTTP201(value, headers) => Created(value, headers: _*)
+        case GetMultipleResponse.HTTP202(value, headers) => Accepted(value, headers: _*)
+        case GetMultipleResponse.HTTP204(headers) => NoContent(headers: _*)
+        case GetMultipleResponse.HTTP206(value, headers) => PartialContent(value, headers: _*)
+        case GetMultipleResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "multiple" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+  }
+}

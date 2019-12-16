@@ -41,7 +41,7 @@ ${headerString.indent(6)}
 
     def apiHeaders: Seq[(String, String)] = defaultApiHeaders
 
-    def modifyRequest(request: ${config.asyncType}[${config.requestClass}]): ${config.asyncType}[${config.requestClass}] = request
+    def modifyRequest(request: ${config.requestType}): ${config.requestType} = request
 
     implicit def circeJsonEncoder[${config.asyncTypeParam(Some("Sync")).map(p => p + ", ").getOrElse("")}A](implicit encoder: io.circe.Encoder[A]) = ${config.generateCirceJsonEncoderOf("A")}
 
@@ -65,7 +65,7 @@ ${headerString.indent(6)}
         apiHeaders ++
         defaultHeaders ++
         requestHeaders
-      ).toList.map { case (k, v) => org.http4s.Header(k, v) })
+      ).groupBy(_._1).map { case (k, l) => org.http4s.Header(k, l.last._2) }.toList)
 
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
       val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
@@ -83,12 +83,10 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-      val reqAndMaybeAuthAndBody = if (formBody.nonEmpty) {
-        formBody.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
-      } else body.fold(Sync[F].pure(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+${config.reqAndMaybeAuthAndBody.indent(6)}
 
       ${config.httpClient}.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
-    }${methodGenerator.modelErrors().indent(4)}
+    }
   }
 
 ${Http4sScalaClientCommon(config).indent(2)}

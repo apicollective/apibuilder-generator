@@ -15,7 +15,7 @@ import generator.ServiceFileNames
 object Ning18ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val config = ScalaClientMethodConfigs.Ning18(Namespaces.quote(form.service.namespace), form.service.baseUrl)
+    val config = ScalaClientMethodConfigs.Ning18(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig, form.service.baseUrl)
     NingClientGenerator(config, form).invoke()
   }
 
@@ -24,7 +24,7 @@ object Ning18ClientGenerator extends CodeGenerator {
 object Ning19ClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val config = ScalaClientMethodConfigs.Ning19(Namespaces.quote(form.service.namespace), form.service.baseUrl)
+    val config = ScalaClientMethodConfigs.Ning19(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig, form.service.baseUrl)
     NingClientGenerator(config, form).invoke()
   }
 
@@ -33,7 +33,7 @@ object Ning19ClientGenerator extends CodeGenerator {
 object AsyncHttpClientGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val config = ScalaClientMethodConfigs.AsyncHttpClient(Namespaces.quote(form.service.namespace), form.service.baseUrl)
+    val config = ScalaClientMethodConfigs.AsyncHttpClient(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig, form.service.baseUrl)
     NingClientGenerator(config, form).invoke()
   }
 
@@ -44,7 +44,7 @@ case class NingClientGenerator(
   form: InvocationForm
 ) {
 
-  private[this] val ssd = new ScalaService(form.service)
+  private[this] val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     Right(generateCode())
@@ -53,7 +53,7 @@ case class NingClientGenerator(
   private def generateCode(): Seq[File] = {
     val source = ApidocComments(form.service.version, form.userAgent).toJavaString + "\n" +
       Seq(
-        Play2Models.generateCode(form, addBindables = false, addHeader = false).map(_.contents).mkString("\n\n"),
+        Play2Models.generateCode(form, addBindables = false, addHeader = false, useBuiltInImplicits = false).map(_.contents).mkString("\n\n"),
         client()
       ).mkString("\n\n")
 

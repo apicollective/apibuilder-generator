@@ -10,9 +10,9 @@ trait StatusCode {
   def responseParams(config: ScalaClientMethodConfigs.Http4s): String = (params(config).map { case (name, typ) => s"$name: $typ" } ++ Seq("headers: Seq[org.http4s.Header] = Nil")).mkString(", ")
   def responseExtractor(config: ScalaClientMethodConfigs.Http4s): String = (params(config).map(_._1) ++ Seq("headers")).mkString(", ")
   def applyArgs(config: ScalaClientMethodConfigs.Http4s): String = config match {
-    case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
+    case _: ScalaClientMethodConfigs.Http4s015 | _: ScalaClientMethodConfigs.Http4s017 =>
       params(config).map(_._1).mkString(", ") + ").putHeaders(headers: _*"
-    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+    case _: ScalaClientMethodConfigs.Http4s018 | _: ScalaClientMethodConfigs.Http4s020 =>
       (params(config).map(_._1) ++ Seq("headers: _*")).mkString(", ")
   }
   protected def params(config: ScalaClientMethodConfigs.Http4s): Seq[(String, String)] = bodyType.toSeq.map(typ => "value" -> typ)
@@ -31,15 +31,15 @@ case class LocationStatusCode(code: Int, name: String) extends StatusCode {
 case class WWWAuthenticateStatusCode(code: Int, name: String, override val bodyType: Option[String] = None) extends StatusCode {
   override def withBodyType(typ: String) = this.copy(bodyType = Some(typ))
   override def params(config: ScalaClientMethodConfigs.Http4s) = super.params(config) ++ (config match {
-    case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
+    case _: ScalaClientMethodConfigs.Http4s015 | _: ScalaClientMethodConfigs.Http4s017 =>
       Seq("challenge" -> "org.http4s.Challenge", "challenges" -> "Seq[org.http4s.Challenge] = Nil")
-    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+    case _: ScalaClientMethodConfigs.Http4s018 | _: ScalaClientMethodConfigs.Http4s020 =>
       Seq("authenticate" -> "org.http4s.headers.`WWW-Authenticate`")
   })
   override def applyArgs(config: ScalaClientMethodConfigs.Http4s) = config match {
-    case ScalaClientMethodConfigs.Http4s015(_, _) | ScalaClientMethodConfigs.Http4s017(_, _) =>
+    case _: ScalaClientMethodConfigs.Http4s015 | _: ScalaClientMethodConfigs.Http4s017 =>
       "challenge, challenges: _*).putHeaders(headers: _*"
-    case ScalaClientMethodConfigs.Http4s018(_, _) =>
+    case _: ScalaClientMethodConfigs.Http4s018 | _: ScalaClientMethodConfigs.Http4s020 =>
       bodyType.fold(
         "authenticate, headers: _*"
       )(_ =>

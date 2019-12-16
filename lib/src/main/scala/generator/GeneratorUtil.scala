@@ -99,7 +99,7 @@ object GeneratorUtil {
 
   /**
    * Turns a URL path to a camelcased method name.
-   * 
+   *
    * @param resourcePath The path to the resource itself, if known
    * @param resourceOperationPaths The full set of paths to all operations. This is
    *        used to compute a resource path (longest common string) if resource path
@@ -172,16 +172,16 @@ object GeneratorUtil {
     var currentWord = new StringBuilder()
     comment.split(" ").map(_.trim).foreach { word =>
       if (word.length + currentWord.length >= maxLength) {
-        if (!currentWord.isEmpty) {
+        if (currentWord.nonEmpty) {
           sb.append(currentWord.toString)
         }
         currentWord = new StringBuilder()
-      } else if (!currentWord.isEmpty) {
+      } else if (currentWord.nonEmpty) {
         currentWord.append(" ")
       }
       currentWord.append(word)
     }
-    if (!currentWord.isEmpty) {
+    if (currentWord.nonEmpty) {
       sb.append(currentWord.toString)
     }
     sb.toList

@@ -8,7 +8,7 @@ import play.api.mvc._
 
 class Invocations extends InjectedController {
 
-  def postByKey(key: String) = Action(parse.json(maxLength = 1024 * 1024)) { request: Request[JsValue] =>
+  def postByKey(key: String) = Action(parse.json(maxLength = 10 * 1024 * 1024)) { request: Request[JsValue] =>
     Generators.findGenerator(key) match {
       case Some((target, generator)) =>
         request.body.validate[InvocationForm] match {

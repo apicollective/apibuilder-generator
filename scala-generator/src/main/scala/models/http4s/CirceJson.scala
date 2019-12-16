@@ -1,6 +1,8 @@
 package scala.models.http4s
 
 import lib.Text._
+
+import scala.generator.ScalaPrimitive.Uuid
 import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaUnion, ScalaUnionType}
 import scala.models.JsonImports
 
@@ -13,6 +15,7 @@ case class CirceJson(
   package object json {
     import io.circe.Decoder._
     import io.circe.Encoder._
+    import scala.language.implicitConversions // See below - Make Scala 2.11 Either monadic
     import scala.util.Try
     import io.circe.{Json, JsonObject, Encoder, Decoder, DecodingFailure}
     import io.circe.syntax._
@@ -21,27 +24,25 @@ ${JsonImports(ssd.service).mkString("\n").indent(4)}
     // Make Scala 2.11 Either monadic
     private[${ssd.namespaces.last}] implicit def eitherOps[A,B](e: Either[A,B]) = cats.implicits.catsSyntaxEither(e)
 
-    private[${ssd.namespaces.last}] implicit val decodeUUID: Decoder[_root_.java.util.UUID] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.util.UUID.fromString(str)))
+    private[${ssd.namespaces.last}] implicit val decode${Uuid.shortName}: Decoder[${Uuid.fullName}] =
+      Decoder.decodeString.emapTry(str => Try(${Uuid.fromStringValue("str")}))
 
-    private[${ssd.namespaces.last}] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
-      Encoder.encodeString.contramap[_root_.java.util.UUID](_.toString)
-
-    private[${ssd.namespaces.last}] implicit val decodeInstant: Decoder[_root_.java.time.Instant] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.time.Instant.parse(str)))
-
-    private[${ssd.namespaces.last}] implicit val encodeInstant: Encoder[_root_.java.time.Instant] =
-      Encoder.encodeString.contramap[_root_.java.time.Instant](_.toString)
-
-    private[${ssd.namespaces.last}] implicit val decodeLocalDate: Decoder[_root_.java.time.LocalDate] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.time.LocalDate.parse(str)))
-
-    private[${ssd.namespaces.last}] implicit val encodeLocalDate: Encoder[_root_.java.time.LocalDate] =
-      Encoder.encodeString.contramap[_root_.java.time.LocalDate](_.toString)
-
-${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+    private[${ssd.namespaces.last}] implicit val encode${Uuid.shortName}: Encoder[${Uuid.fullName}] =
+      Encoder.encodeString.contramap[${Uuid.fullName}](uuid => ${Uuid.asString("uuid")})
+${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
   }
 }"""
+  }
+
+  def generateTimeSerde(): String = {
+    Seq(ssd.attributes.dateTimeType.dataType, ssd.attributes.dateType.dataType).map { dt =>
+      s"""
+         |private[${ssd.namespaces.last}] implicit val decode${dt.shortName}: Decoder[${dt.fullName}] =
+         |  Decoder.decodeString.emapTry(str => Try(${dt.fromStringValue("str")}))
+         |
+         |private[${ssd.namespaces.last}] implicit val encode${dt.shortName}: Encoder[${dt.fullName}] =
+         |  Encoder.encodeString.contramap[${dt.fullName}](${dt.asString("_")})""".stripMargin('|')
+    }.mkString("\n")
   }
 
   def generateModels(): String = {
@@ -149,7 +150,7 @@ ${Seq(generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mk
   private[models] def decodersAndEncoders(model: ScalaModel): String = {
     decoders(model) ++ "\n\n" ++ encoders(model)
   }
-  
+
   private[models] def decoders(model: ScalaModel): String = {
     // backticks don't work correctly as enumerator names in for comprehensions
     def nobt(fieldName:String) = fieldName.replaceAll("`", "__")

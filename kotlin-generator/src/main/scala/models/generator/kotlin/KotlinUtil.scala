@@ -1,7 +1,8 @@
 package models.generator.kotlin
 
-import lib.Text
 import com.squareup.kotlinpoet._
+import io.apibuilder.spec.v0.models.{Enum, Service}
+import lib.Text
 
 trait KotlinUtil {
   val undefinedEnumName = "UNDEFINED"
@@ -84,8 +85,24 @@ trait KotlinUtil {
     "while"
   )
 
+  def isReservedWord(value: String): Boolean = {
+    ReservedWords.contains(value)
+  }
+
+  def quoteNameIfReservedWord(name: String): String = {
+    if (isReservedWord(name) || needsQuoting(name)) {
+      "`" + name + "`"
+    } else {
+      name
+    }
+  }
+
+  def needsQuoting(name: String): Boolean = {
+    name.indexOf("[") >= 0
+  }
+
   def checkForReservedWord(word: String): String =
-    if (ReservedWords.contains(word)) word + "_"
+    if (isReservedWord(word)) word + "_"
     else word
 
   def textToComment(text: String): String = textToComment(Seq(text))
@@ -103,7 +120,10 @@ trait KotlinUtil {
   }
 
   def isModelNameWithPackage(modelName: String): Boolean = {
-    modelName.toLowerCase.equals(modelName) && modelName.contains(".")
+    modelName.contains(".") && {
+      val packageName = modelName.substring(0, modelName.lastIndexOf("."))
+      packageName.toLowerCase.equals(packageName)
+    }
   }
 
   def capitalizeModelName(modelName: String): String ={
@@ -161,20 +181,32 @@ trait KotlinUtil {
     "uuid" -> new ClassName("java.util","UUID")
   )
 
-  def dataTypeFromField(`type`: String, modelsNameSpace: String): TypeName = {
+
+
+  def dataTypeFromField(`type`: String, serviceNameSpace: String, service: Service): TypeName = {
+    dataTypeFromField(`type`, serviceNameSpace, service.enums)
+  }
+
+  protected def dataTypeFromField(`type`: String, serviceNameSpace: String, allEnums: Seq[Enum]): TypeName = {
     dataTypes.get(`type`).getOrElse{
       val name = toParamName(`type`, false)
       if(isParameterArray(`type`)) {
-        ParameterizedTypeName.get(new ClassName("kotlin.collections", "List"), dataTypeFromField(getArrayType(`type`), modelsNameSpace))
+        ParameterizedTypeName.get(new ClassName("kotlin.collections", "List"), dataTypeFromField(getArrayType(`type`), serviceNameSpace, allEnums))
       }
       else if (isParameterMap(`type`)) {
-        ParameterizedTypeName.get(new ClassName("kotlin.collections", "Map"), new ClassName("kotlin", "String"), dataTypeFromField(getMapType(`type`), modelsNameSpace))
+        ParameterizedTypeName.get(new ClassName("kotlin.collections", "Map"), new ClassName("kotlin", "String"), dataTypeFromField(getMapType(`type`), serviceNameSpace, allEnums))
       }
       else {
-        new ClassName(modelsNameSpace, name)
+        val isLocalEnum = allEnums.exists(enum => enum.name == `type`)
+        val nameSpace: String = if(isLocalEnum) toEnumsNameSpace(serviceNameSpace) else toModelsNameSpace(serviceNameSpace)
+        new ClassName(nameSpace, name)
       }
     }
   }
+
+  def toModelsNameSpace(nameSpace: String): String = nameSpace + ".models"
+
+  def toEnumsNameSpace(nameSpace: String): String = nameSpace + ".enums"
 
   def toParamName(modelName: String, startingWithLowercase: Boolean): String = {
     val paramStartingWithUppercase = if (isParameterArray(modelName)){
@@ -208,4 +240,22 @@ trait KotlinUtil {
     namespace.split("\\.").map { checkForReservedWord }.mkString(".")
   }
 
+  def getThrowableClassName() : ClassName = {
+    new ClassName("kotlin", "Throwable")
+  }
+
+  def getKotlinIntClassName() : ClassName = {
+    new ClassName("kotlin", "Int")
+  }
+
+  def getKotlinStringClassName() : ClassName = {
+    new ClassName("kotlin", "String")
+  }
+
+  def getKotlinPairClassName(): ClassName = {
+    new ClassName("kotlin", "Pair")
+  }
+
 }
+
+object KotlinUtil extends KotlinUtil

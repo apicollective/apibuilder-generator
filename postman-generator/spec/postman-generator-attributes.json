@@ -1,0 +1,91 @@
+{
+  "name": "Postman Generator Attributes",
+  "description": "Specification contains various ApiBuilder attributes, which are recognized by Postman Collection Generator",
+
+  "imports": [
+    { "uri": "https://app.apibuilder.io/apicollective/apibuilder-spec/latest/service.json" }
+  ],
+
+  "enums": {
+    "attribute_name": {
+      "description": "A set of attribute names, that are recognized by Postman Generator",
+      "values": [
+        { "name": "postman-basic-auth" },
+        { "name": "object-reference" },
+        { "name": "value-substitute"}
+      ]
+    }
+  },
+
+  "models": {
+    "basic_auth": {
+      "description": "Attribute instructs the generator to add Basic Auth info to the whole Postman collection. Attribute should be defined on the root level of the ApiBuilder specification",
+      "fields": [
+        {
+          "name": "username",
+          "type": "string",
+          "description": "Specifies the username to be used in Postman Collection auth definition. It may be also a variable reference."
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "description": "Specified the password to be used in Postman Collection auth definition. It may be also a variable reference. Leave this string empty, when only a username is needed."
+        }
+      ]
+    },
+
+    "object_reference": {
+      "description": "Attribute instructs the generator to add a setup step with the referenced entity creation. This attribute should be attached to the field (that holds an identifier) inside model or to the resource object (that holds operations and a path with an identifier param).",
+      "fields": [
+        {
+          "name": "related_service_namespace",
+          "type": "string",
+          "description": "ApiBuilder service's namespace, in which a target operation is specified."
+        },
+        {
+          "name": "resource_type",
+          "type": "string",
+          "description": "Resource type, that holds a referenced operation."
+        },
+        {
+          "name": "operation_method",
+          "type": "io.apibuilder.spec.v0.enums.method",
+          "description": "Referenced operation method."
+        },
+        {
+          "name": "operation_path",
+          "type": "string",
+          "description": "Operation path corresponding with the selected {{operation_method}}."
+        },
+        {
+          "name": "identifier_field",
+          "type": "string",
+          "description": "A field name. When the referenced operation is called, identifier_field is used to extract the corresponding field from the response JSON. If the response JSON is an array, then a value is extracted from the first object."
+        },
+        {
+          "name": "query_params",
+          "type": "map[string]",
+          "description": "Optionally, the specified query params will be used to execute a referenced operation.",
+          "required": false
+        },
+        {
+          "name": "delete_operation_path",
+          "type": "string",
+          "description": "Optionally, the referenced entity's DELETE operation path can be put here. If specified, the generator will add a cleanup step for the referenced object.",
+          "required": false
+        }
+      ]
+    },
+
+    "value_substitute": {
+      "description": "Attribute instructs the generator to substitute a field value (when generating examples) with specified value or variable reference. Attribute should be attached to a field inside model.",
+      "fields": [
+        {
+          "name": "substitute",
+          "type": "string",
+          "description": "Value, which will be put into the field marked by this attribute. It may be also a variable reference."
+        }
+      ]
+    }
+  }
+}

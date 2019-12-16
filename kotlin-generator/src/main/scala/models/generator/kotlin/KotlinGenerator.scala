@@ -6,14 +6,17 @@ import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, Version}
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
 import com.squareup.kotlinpoet._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import io.reactivex.Single
+import lib.Datatype
 import lib.generator.CodeGenerator
 import org.threeten.bp.{Instant, LocalDate}
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 
 class KotlinGenerator
   extends CodeGenerator
@@ -30,11 +33,32 @@ class KotlinGenerator
   class GeneratorHelper(service: Service) {
 
     private val nameSpace = makeNameSpace(service.namespace)
-    private val modelsNameSpace = nameSpace + ".models"
-    private val modelsDirectoryPath = createDirectoryPath(modelsNameSpace)
+    private val sharedNameSpace = "io.apibuilder.app"
+    private val modelsNameSpace = toModelsNameSpace(nameSpace)
+    private val enumsNameSpace = toEnumsNameSpace(nameSpace)
 
     private val sharedJacksonSpace = modelsNameSpace
     private val sharedObjectMapperClassName = "JacksonObjectMapperFactory"
+
+    //Errors
+    private val errorsHelperClassName = "ErrorsHelper"
+
+    val commonNetworkErrorsClassName = new ClassName(sharedNameSpace, "CommonNetworkErrors")
+    val eitherErrorTypeClassName = new ClassName(sharedNameSpace, "EitherCallOrCommonNetworkError")
+    val callErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CallError")
+    val commonErrorEitherErrorTypeClassName = new ClassName(eitherErrorTypeClassName.getCanonicalName, "CommonNetworkError")
+
+    val apiNetworkCallResponseTypeClassName = new ClassName(sharedNameSpace, "ApiNetworkCallResponse")
+    val errorResponsesString = "ErrorResponses"
+    private val processCommonNetworkErrorString = "processCommonNetworkError"
+
+
+    private val commonNetworkHttpErrorsList = Seq(
+      ("in 500..599", "ServerError"),
+    )
+    private val serverTimeOutErrorClassName = "ServerTimeOut"
+    private val serverUnknownErrorClassName = "UnknownNetworkError"
+
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -47,12 +71,14 @@ class KotlinGenerator
 
       enum.description.map(builder.addKdoc(_))
 
-      val allEnumValues = enum.values ++ Seq(io.apibuilder.spec.v0.models.EnumValue(undefinedEnumName, Some(undefinedEnumName)))
-
-      allEnumValues.foreach(value => {
+      enum.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
-        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("\"" + value.name + "\"").addAnnotation(annotation.build()).build())
+        builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder().addSuperclassConstructorParameter("%S", value.name).addAnnotation(annotation.build()).build())
       })
+
+      val annotationJsonEnumDefaultValue = AnnotationSpec.builder(classOf[JsonEnumDefaultValue]).build()
+      val annotationJsonProperty = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + undefinedEnumName + "\"").build()
+      builder.addEnumConstant(toEnumName(undefinedEnumName), TypeSpec.anonymousClassBuilder().addSuperclassConstructorParameter("%S", undefinedEnumName).addAnnotation(annotationJsonEnumDefaultValue).addAnnotation(annotationJsonProperty).build())
 
       val nameField = "jsonProperty"
       val nameFieldType = ClassName.bestGuess("kotlin.String")
@@ -68,16 +94,25 @@ class KotlinGenerator
       toStringMethod.addStatement(s"return $nameField")
       builder.addFunction(toStringMethod.build)
 
-      makeFile(className, builder)
+      makeFile(enumsNameSpace, className, builder)
     }
 
-    def getRetrofitReturnTypeWrapperClass(): ClassName = classToClassName(classOf[Single[Void]])
+    def getRetrofitSingleTypeWrapperClass(): ClassName = classToClassName(classOf[Single[Void]])
 
-    def generateUnionType(union: Union): File = {
+    def getRetrofitResponseTypeWrapperClass(): ClassName = classToClassName(classOf[retrofit2.Response[Void]])
+
+    def generateUnionType(union: Union, service: Service): File = {
       val className = toClassName(union.name)
+      val undefinedClassName = className + "Undefined"
+      val modelsUnderUnion = service.models
+        .filter{ model =>
+          union.types.exists(_.`type` == model.name)
+        }
+        .map(generateModelTypeBuilder(_, Some(union), service).build())
+        .asJava
 
-      val builder = TypeSpec.interfaceBuilder(className)
-        .addModifiers(KModifier.PUBLIC)
+      val builder = TypeSpec.classBuilder(className)
+        .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
         .addKdoc(kdocClassMessage)
 
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties])
@@ -89,6 +124,7 @@ class KotlinGenerator
       if (union.discriminator.isDefined) {
         jsonAnnotationBuilder.addMember("include = com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY")
         jsonAnnotationBuilder.addMember("property = \"" + union.discriminator.get + "\"")
+        jsonAnnotationBuilder.addMember("defaultImpl = " + new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
       } else {
         jsonAnnotationBuilder.addMember("include", "com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT")
       }
@@ -100,19 +136,39 @@ class KotlinGenerator
         jsonSubTypesAnnotationBuilder
           .addMember("%L",
             AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-            .addMember("value = %L", dataTypeFromField(u.`type`, modelsNameSpace) + "::class")
-            .addMember("name = %S", u.`type`)
-            .build()
+              .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(u.`type`)) + "::class")
+              .addMember("name = %S", u.discriminatorValue.getOrElse(u.`type`))
+              .build()
           )
       })
+
+      jsonSubTypesAnnotationBuilder
+        .addMember("%L",
+          AnnotationSpec.builder(classOf[JsonSubTypes.Type])
+            .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
+            .build()
+        )
 
       builder.addAnnotation(jsonSubTypesAnnotationBuilder.build())
 
       union.description.map(builder.addKdoc(_))
-      makeFile(className, builder)
+
+      val undefinedTypeBuilder = TypeSpec.objectBuilder(undefinedClassName)
+
+      val undefinedJsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
+      undefinedJsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
+      undefinedTypeBuilder.addAnnotation(undefinedJsonAnnotationBuilder.build())
+      undefinedTypeBuilder.superclass(new ClassName(modelsNameSpace, toClassName(className)))
+
+      /* Put the model classes inside the sealed class */
+      builder.addTypes(modelsUnderUnion)
+      builder.addType(undefinedTypeBuilder.build())
+      builder.addType(generateCompanionObject(className, None))
+
+      makeFile(modelsNameSpace, className, builder)
     }
 
-    def generateModel(model: Model, relatedUnions: Seq[Union]): File = {
+    private def generateModelTypeBuilder(model: Model, union: Option[Union], service: Service): TypeSpec.Builder = {
       val className = toClassName(model.name)
 
       val builder = TypeSpec.classBuilder(className)
@@ -128,10 +184,10 @@ class KotlinGenerator
 
       val constructorWithParams = FunSpec.constructorBuilder()
 
-      val unionClassTypeNames = relatedUnions.map { u => new ClassName(modelsNameSpace, toClassName(u.name)) }
-      builder.addSuperinterfaces(unionClassTypeNames.asJava)
+      union.map{ relatedUnion =>
+        val unionClassTypeName = new ClassName(modelsNameSpace, toClassName(relatedUnion.name))
+        builder.superclass(unionClassTypeName)
 
-      relatedUnions.headOption.map { _ =>
         val jsonAnnotationBuilder = AnnotationSpec.builder(classOf[JsonTypeInfo])
         jsonAnnotationBuilder.addMember("use = com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NONE")
         builder.addAnnotation(jsonAnnotationBuilder.build())
@@ -144,14 +200,14 @@ class KotlinGenerator
         val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
-        val kotlinDataType = dataTypeFromField(field.`type`, modelsNameSpace)
+        val kotlinDataType = dataTypeFromField(field.`type`, nameSpace, service)
 
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"")
         val getterAnnotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + field.name + "\"").useSiteTarget(AnnotationSpec.UseSiteTarget.GET)
-        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
+        val constructorParameter = ParameterSpec.builder(fieldCamelCaseName, kotlinDataType.copy(!field.required, kotlinDataType.getAnnotations))
         constructorWithParams.addParameter(constructorParameter.build)
         propSpecs.add(
-          PropertySpec.builder(fieldCamelCaseName, if (field.required) kotlinDataType.asNonNullable() else kotlinDataType.asNullable())
+          PropertySpec.builder(fieldCamelCaseName, kotlinDataType.copy(!field.required, kotlinDataType.getAnnotations))
             .initializer(fieldCamelCaseName)
             .addAnnotation(annotation.build())
             .addAnnotation(getterAnnotation.build())
@@ -165,16 +221,37 @@ class KotlinGenerator
       toJsonString.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().writeValueAsString(this)")
       builder.addFunction(toJsonString.build)
 
+      builder.addType(generateCompanionObject(className, union))
+
+      builder
+    }
+
+    private def generateCompanionObject(className: String, union: Option[Union]): TypeSpec = {
       val companionBuilder = TypeSpec.companionObjectBuilder()
       val fromBuilder = FunSpec.builder("parseJson").addModifiers(KModifier.PUBLIC).addParameter("json", ClassName.bestGuess("kotlin.String"))
-      val modelType = ClassName.bestGuess(modelsNameSpace + "." + className)
+
+      val modelType =
+        union match{
+          case Some(relatedUnion) => {
+            ClassName.bestGuess(s"$modelsNameSpace.${toClassName(relatedUnion.name)}.$className")
+          }
+          case None =>{
+            ClassName.bestGuess(modelsNameSpace + "." + className)
+          }
+        }
+
       fromBuilder.returns(modelType)
-      fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue( json, ${modelType.simpleName() + "::class.java"})")
+      fromBuilder.addStatement(s"return ${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue( json, ${modelType.getSimpleName() + "::class.java"})")
       companionBuilder.addFunction(fromBuilder.build)
-      builder.companionObject(companionBuilder.build())
+      companionBuilder.build()
+    }
 
+    def generateModel(model: Model, union: Option[Union], service: Service): File = {
+      val className = toClassName(model.name)
 
-      makeFile(className, builder)
+      val builder = generateModelTypeBuilder(model, union, service)
+
+      makeFile(modelsNameSpace, className, builder)
     }
 
     def generateResource(resource: Resource): File = {
@@ -206,7 +283,20 @@ class KotlinGenerator
 
         maybeAnnotationClass.map(annotationClass => {
 
-          val methodAnnotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + retrofitPath + "\"").build()
+          val deleteWithBody = annotationClass == classOf[retrofit2.http.DELETE] && operation.body.isDefined
+
+          val methodAnnotation =
+          //Retrofit does not like DELETE method with body, so we have to define it differently
+            if (deleteWithBody) {
+              AnnotationSpec.builder(classOf[retrofit2.http.HTTP])
+                .addMember("path=\"" + retrofitPath + "\"")
+                .addMember("method = \"DELETE\"")
+                .addMember("hasBody = true")
+                .build()
+            } else {
+              AnnotationSpec.builder(annotationClass).addMember("value=\"" + retrofitPath + "\"").build()
+            }
+
           val methodName =
             if (operation.path == "/")
               toMethodName(operation.method.toString.toLowerCase)
@@ -219,6 +309,10 @@ class KotlinGenerator
             method.addKdoc(description)
           })
 
+          if (deleteWithBody) {
+            method.addKdoc(" Note: Retrofit does not like @DELETE with body, so it's defined as @HTTP instead")
+          }
+
           operation.deprecation.map(deprecation => {
             val deprecationAnnotation = AnnotationSpec.builder(classOf[Deprecated]).build
             method.addAnnotation(deprecationAnnotation)
@@ -229,14 +323,7 @@ class KotlinGenerator
 
           method.addAnnotation(methodAnnotation)
 
-          operation.body.map(body => {
-            val bodyType = dataTypeFromField(body.`type`, modelsNameSpace)
-
-            val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
-            val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
-            parameter.addAnnotation(annotation)
-            method.addParameter(parameter.build())
-          })
+          val parametersCache = ListBuffer[ParameterSpec]()
 
           operation.parameters.foreach(parameter => {
 
@@ -249,12 +336,27 @@ class KotlinGenerator
             }
 
             maybeAnnotationClass.map(annotationClass => {
-              val parameterType: TypeName = dataTypeFromField(parameter.`type`, modelsNameSpace)
-              val param = ParameterSpec.builder(toParamName(parameter.name, true), if (parameter.required) parameterType.asNonNullable() else parameterType.asNullable())
+              val parameterType: TypeName = dataTypeFromField(parameter.`type`, nameSpace, service)
+              val param = ParameterSpec.builder(toParamName(parameter.name, true), parameterType.copy(!parameter.required, parameterType.getAnnotations))
+
+              parametersCache += (param.build())
+
               val annotation = AnnotationSpec.builder(annotationClass).addMember("value=\"" + parameter.name + "\"").build
               param.addAnnotation(annotation)
               method.addParameter(param.build)
+
             })
+          })
+
+          operation.body.map(body => {
+            val bodyType = dataTypeFromField(body.`type`, nameSpace, service)
+            val parameter = ParameterSpec.builder(toParamName(body.`type`, true), bodyType)
+
+            parametersCache += (parameter.build())
+
+            val annotation = AnnotationSpec.builder(classOf[retrofit2.http.Body]).build
+            parameter.addAnnotation(annotation)
+            method.addParameter(parameter.build())
           })
 
           /*
@@ -281,19 +383,175 @@ class KotlinGenerator
               response.code.asInstanceOf[ResponseCodeInt].value < 299
           })
 
+
           maybeSuccessfulResponse.map(successfulResponse => {
-            val returnType = dataTypeFromField(successfulResponse.`type`, modelsNameSpace)
-            val retrofitWrappedClassname = getRetrofitReturnTypeWrapperClass()
-            method.returns(ParameterizedTypeName.get(retrofitWrappedClassname, returnType))
+            val returnType = dataTypeFromField(successfulResponse.`type`, nameSpace, service)
+            method.returns(
+              ParameterizedTypeName.get(
+                getRetrofitSingleTypeWrapperClass(),
+                ParameterizedTypeName.get(
+                  getRetrofitResponseTypeWrapperClass,
+                  returnType)))
           })
+
+          val isUnitResponse = maybeSuccessfulResponse.map(successfulResponse =>
+            successfulResponse.`type` == Datatype.Primitive.Unit.name
+          ).getOrElse(false)
+
           builder.addFunction(method.build)
+
+
+          /* ----- Error responses --------
+          Since we want to keep Rx's success/error format, and we can't make retrofit return something custom,
+          we create for each resource that has non 200 error responses defined
+          - a sealed class that has all the error types
+          - a lambda that converts retrofit's exception into above sealed class
+          - a convenience method getCallAndErrors to return both the rx single, and the lambda.
+          the client of this generated code is responsible for calling the lambda to get all the error responses
+          */
+
+
+          val errorResponses = operation.responses.filter(response => {
+            response.code.isInstanceOf[ResponseCodeInt] &&
+              response.code.asInstanceOf[ResponseCodeInt].value >= 300
+          })
+          if (errorResponses.nonEmpty) {
+
+            val callObjectName = new ClassName(modelsNameSpace + "." + className, methodName.capitalize + "Call")
+            val callObjectBuilder = TypeSpec.objectBuilder(callObjectName)
+
+            val callErrorResponseSealedClassName = new ClassName(callObjectName.getCanonicalName, errorResponsesString)
+            val callErrorResopnseSealedClassBuilder = TypeSpec.classBuilder(callErrorResponseSealedClassName)
+              .addModifiers(KModifier.SEALED)
+
+            operation.description.map(description => {
+              callErrorResopnseSealedClassBuilder.addKdoc("Error Responses for " + methodName + " - " + description)
+            })
+
+            val companionObject = TypeSpec.companionObjectBuilder()
+            val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
+            val throwableToErrorTypesLambda = LambdaTypeName.get(null, Array(throwableTypeName), ParameterizedTypeName.get(eitherErrorTypeClassName, callErrorResponseSealedClassName))
+            val toErrorCodeBlockBuilder = CodeBlock.builder()
+            toErrorCodeBlockBuilder.add("{\n" +
+              "t ->\n" +
+              "                when (t) {\n" + "" +
+              "                    is %T -> {\n" +
+              "                        val body: String? = t.response().errorBody()?.string()\n" +
+              "                            when (t.code()) {\n"
+
+              , classOf[HttpException])
+
+
+            val commonUnknownNetworkErrorType = new ClassName(commonNetworkErrorsClassName.getCanonicalName, serverUnknownErrorClassName)
+
+            errorResponses.map(errorResponse => {
+              val responseCodeString = errorResponse.code.asInstanceOf[ResponseCodeInt].value.toString
+              val errorTypeNameString = "Error" + responseCodeString
+
+              if (errorResponse.`type` == Datatype.Primitive.Unit.name) {
+                toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> %T<" + errorResponsesString + "> (" + errorResponsesString + "." + errorTypeNameString + ")",
+                  callErrorEitherErrorTypeClassName)
+                callErrorResopnseSealedClassBuilder.addType(TypeSpec.objectBuilder(errorTypeNameString).superclass(callErrorResponseSealedClassName).build())
+              } else {
+                val errorPayloadType = dataTypeFromField(errorResponse.`type`, nameSpace, service)
+
+
+                val errorPayloadNameString = "data"
+                val errorResponseDataClass = TypeSpec.classBuilder(errorTypeNameString)
+                  .addModifiers(KModifier.DATA)
+                  .primaryConstructor(FunSpec.constructorBuilder().addParameter(errorPayloadNameString, errorPayloadType).build())
+                  .addProperty(PropertySpec.builder(errorPayloadNameString, errorPayloadType)
+                    .initializer(errorPayloadNameString)
+                    .build())
+                  .superclass(callErrorResponseSealedClassName)
+                  .build()
+
+                val errorPayloadTypeString = errorPayloadType match {
+                  case cn: ClassName => cn.getSimpleName()
+                  case pt: ParameterizedTypeName => pt.toString
+                  case _ => errorPayloadType.toString()
+                }
+
+
+                if (dataTypes.keySet.contains(errorResponse.`type`)) {
+                  toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${errorPayloadTypeString + "::class.java"}))) } ?: %T(%T(" + responseCodeString + ", \"No Body\"))",
+                    callErrorEitherErrorTypeClassName,
+                    commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
+                } else if (isParameterArray(errorResponse.`type`)) {
+                  val jacksonTypeReference = buildJacksonTypeReferenceTypeSpec(errorPayloadType.asInstanceOf[ParameterizedTypeName])
+                  callObjectBuilder.addType(jacksonTypeReference)
+                  toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + s"${sharedJacksonSpace}.${sharedObjectMapperClassName}.create().readValue(body, ${jacksonTypeReference.getName} ))) } ?: %T(%T(" + responseCodeString + ", \"No Body\"))",
+                    callErrorEitherErrorTypeClassName,
+                    commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
+                } else {
+                  toErrorCodeBlockBuilder.addStatement("                            " + responseCodeString + " -> body?.let { %T<" + errorResponsesString + ">(" + errorResponsesString + "." + errorTypeNameString + "(" + errorPayloadTypeString + s".parseJson(body))) } ?: %T(%T(" + responseCodeString + ", \"No Body\"))",
+                    callErrorEitherErrorTypeClassName,
+                    commonErrorEitherErrorTypeClassName, commonUnknownNetworkErrorType)
+                }
+                callErrorResopnseSealedClassBuilder.addType(errorResponseDataClass)
+              }
+            })
+            toErrorCodeBlockBuilder.add("                        else -> %T(%T." + processCommonNetworkErrorString + "(t))\n", commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
+            toErrorCodeBlockBuilder.add("                        }\n" +
+              "                    }\n" +
+              "                    else -> %T(%T." + processCommonNetworkErrorString + "(t))\n" +
+              "                }\n" +
+              "            }\n"
+              , commonErrorEitherErrorTypeClassName, commonNetworkErrorsClassName)
+
+            callObjectBuilder.addProperty(PropertySpec.builder("toError", throwableToErrorTypesLambda).initializer(toErrorCodeBlockBuilder.build()).build())
+
+            //combined function
+
+            val combinedFunction = FunSpec.builder("getCallAndErrorLambda")
+              .addParameter("client", new ClassName(modelsNameSpace, className))
+
+
+            parametersCache.toList.foreach(
+              param => {
+                combinedFunction.addParameter(param)
+              }
+            )
+
+            val succesParseString = if (isUnitResponse) { "           Pair(Unit, response.code())\n" } else { "           response.body()?.let { body -> Pair(body, response.code())}\n" }
+            combinedFunction.addStatement("return %T(\n" +
+              "   client." + methodName + "(" + parametersCache.map({
+              _.getName
+              }).mkString(",") + ")\n"
+              + "     .map{ response -> \n"
+              + "         if(response.isSuccessful)\n"
+              + succesParseString
+              + "         else\n"
+              + "           throw HttpException(response)}\n"
+              + "     .map{it}\n"
+              + ", toError)", apiNetworkCallResponseTypeClassName)
+
+
+
+            callObjectBuilder.addFunction(combinedFunction.build())
+            callObjectBuilder.addType(callErrorResopnseSealedClassBuilder.build())
+            builder.addType(callObjectBuilder.build())
+          }
         })
       }
 
-      makeFile(className, builder)
+      makeFile(modelsNameSpace, className, builder)
     }
 
     def emptyCodeBlock(): CodeBlock = CodeBlock.builder().build()
+
+    def buildJacksonTypeReferenceTypeSpec(ptn: ParameterizedTypeName): TypeSpec = {
+      // see  https://stackoverflow.com/questions/6349421/how-to-use-jackson-to-deserialise-an-array-of-objects
+      // see  https://fasterxml.github.io/jackson-core/javadoc/2.9/com/fasterxml/jackson/core/type/TypeReference.html
+      require(ptn.getRawType.toString.equals("kotlin.collections.List"))
+      require(ptn.getTypeArguments.size == 1)
+      val firstTypeArg = ptn.getTypeArguments.get(0).asInstanceOf[ClassName]
+      val superClassName = new ClassName("com.fasterxml.jackson.core.type", "TypeReference")
+      val superClazz = ParameterizedTypeName.get(superClassName, ptn)
+      TypeSpec.objectBuilder(firstTypeArg.getSimpleName + ptn.getRawType.getSimpleName + "TypeReference")
+        .superclass(superClazz)
+        .build()
+    }
 
     def generateJacksonObjectMapper(): File = {
 
@@ -360,7 +618,7 @@ class KotlinGenerator
         .addStatement("mapper.registerModule(com.fasterxml.jackson.module.kotlin.KotlinModule())")
         .addStatement("mapper.registerModule(com.fasterxml.jackson.datatype.joda.JodaModule())")
         .addStatement(s"mapper.configure(${deserializationFeatureClassName}.FAIL_ON_UNKNOWN_PROPERTIES, false)")
-        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)")
+        .addStatement(s"mapper.configure(${deserializationFeatureClassName}.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, true)")
         .addStatement("module.addDeserializer(Instant::class.java, InstantDeserializer)")
         .addStatement("module.addSerializer(Instant::class.java, InstantSerializer)")
         .addStatement("module.addDeserializer(LocalDate::class.java, LocalDateDeserializer)")
@@ -382,22 +640,179 @@ class KotlinGenerator
         .addType(deserializerLocalDateType)
         .addType(serializerLocalDateType)
         .addFunction(createFunSpec)
-      makeFile(className, builder)
+      makeFile(modelsNameSpace, className, builder)
     }
+
+
+    def generateErrorsHelper(): File = {
+
+      val fileName = errorsHelperClassName
+
+      //sealed class CommonNetworkErrors
+      val commonNetworkErrorsBuilder = TypeSpec.classBuilder(commonNetworkErrorsClassName)
+        .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
+        .addKdoc(s"Common generic errors that are expected to happen are not defined in apibuilder.json\n" + kdocClassMessage)
+
+      commonNetworkHttpErrorsList.map({
+        e => commonNetworkErrorsBuilder.addType(TypeSpec.classBuilder(e._2).addModifiers(KModifier.DATA).superclass(commonNetworkErrorsClassName)
+          .primaryConstructor(FunSpec.constructorBuilder()
+            .addParameter("httpCode", getKotlinIntClassName())
+            .addParameter("responseDump", getKotlinStringClassName())
+            .build())
+          .addProperty(PropertySpec.builder("httpCode", getKotlinIntClassName())
+            .initializer("httpCode")
+            .build())
+          .addProperty(PropertySpec.builder("responseDump", getKotlinStringClassName())
+            .initializer("responseDump")
+            .build())
+          .build())
+      })
+
+      commonNetworkErrorsBuilder.addType(TypeSpec.classBuilder(serverTimeOutErrorClassName).addModifiers(KModifier.DATA).superclass(commonNetworkErrorsClassName)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("responseDump", getKotlinStringClassName())
+          .build())
+        .addProperty(PropertySpec.builder("responseDump", getKotlinStringClassName())
+          .initializer("responseDump")
+          .build())
+        .build())
+
+      commonNetworkErrorsBuilder.addType(TypeSpec.classBuilder(serverUnknownErrorClassName).addModifiers(KModifier.DATA).superclass(commonNetworkErrorsClassName)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("httpCode", getKotlinIntClassName())
+          .addParameter("responseDump", getKotlinStringClassName())
+          .build())
+        .addProperty(PropertySpec.builder("httpCode", getKotlinIntClassName())
+          .initializer("httpCode")
+          .build())
+        .addProperty(PropertySpec.builder("responseDump", getKotlinStringClassName())
+          .initializer("responseDump")
+          .build())
+        .build())
+
+      val processCommonFuncBody = CodeBlock.builder()
+        .beginControlFlow("return when (t)")
+
+        .add(
+          "    is %T -> {\n" +
+            "        val body: String? = t.response().errorBody()?.string()\n" +
+            "        when (t.code()) {\n" +
+            commonNetworkHttpErrorsList.map(e => "            " + e._1 + " -> " + e._2 + "(t.code(), t.message())").mkString("\n") + "\n" + //                        in 500..599 -> ServerError(t.code(), t.message())
+            "            else -> " + serverUnknownErrorClassName + "(t.code(), t.message())" + "\n" +
+            "        }\n" +
+            "    }\n"
+          , classOf[com.jakewharton.retrofit2.adapter.rxjava2.HttpException])
+        .addStatement(
+          "    is %T -> " + serverTimeOutErrorClassName + "(\nt.message?: \"Server Timeout Error, t.message() was null\"\n)" //                is SocketTimeoutException -> ServerTimeOut(t.message?: "Server Timeout Error, t.message() was null")
+          , classOf[java.net.SocketTimeoutException]
+        )
+        .addStatement(
+          "    else -> " + serverUnknownErrorClassName + "(\n-1, t.message?: \"Unknown Network Error, t.message() was null\"\n)" //                else -> UnknownNetworkError(-1, t.message?: "Unknown Network Error, t.message() was null")
+        )
+
+        .endControlFlow()
+        .build()
+
+      commonNetworkErrorsBuilder.addType(TypeSpec.companionObjectBuilder()
+        .addFunction(FunSpec.builder(processCommonNetworkErrorString)
+          .addParameter(ParameterSpec.builder("t", getThrowableClassName()).build())
+          .addCode(processCommonFuncBody)
+          .returns(commonNetworkErrorsClassName)
+          .build())
+
+        build())
+
+
+      //sealed class for Either Type
+      val c = TypeVariableName.get("C", KModifier.OUT)
+      val nothing = TypeVariableName.get("Nothing")
+
+
+      val callErrorEitherType = TypeSpec.classBuilder(callErrorEitherErrorTypeClassName)
+        .addModifiers(KModifier.DATA)
+        .addTypeVariable(c)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("error", c).build())
+        .addProperty(PropertySpec.builder("error", c)
+          .initializer("error")
+          .build())
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, c))
+        .build()
+
+      val commonErrorEitherType = TypeSpec.classBuilder(commonErrorEitherErrorTypeClassName)
+        .addModifiers(KModifier.DATA)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("error", commonNetworkErrorsClassName).build())
+        .addProperty(PropertySpec.builder("error", commonNetworkErrorsClassName)
+          .initializer("error")
+          .build())
+        .superclass(ParameterizedTypeName.get(eitherErrorTypeClassName, nothing))
+        .build()
+
+      val eitherErrorBuilder = TypeSpec.classBuilder(eitherErrorTypeClassName)
+        .addTypeVariable(c)
+        .addModifiers(KModifier.SEALED)
+        .addType(callErrorEitherType)
+        .addType(commonErrorEitherType)
+        .addKdoc(s"Either type that combines CommonNetworkErrors with network errors for a specific call (as defined in apibuilder.json)\n" + kdocClassMessage)
+
+
+      //data class for ApiNetworkCallResponse Type
+      val n = TypeVariableName.get("N")
+      val e = TypeVariableName.get("E")
+
+      val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
+
+      val singleParameterized =
+        ParameterizedTypeName.get(
+          getRetrofitSingleTypeWrapperClass,
+          ParameterizedTypeName.get(
+            getKotlinPairClassName(),
+            n,
+            getKotlinIntClassName())
+        )
+
+      val throwableToELambda = LambdaTypeName.get(null, Array(throwableTypeName), e)
+      val apiNetworkCallResponseBuilder = TypeSpec.classBuilder(apiNetworkCallResponseTypeClassName)
+        .addModifiers(KModifier.PUBLIC, KModifier.DATA)
+        .addTypeVariable(n)
+        .addTypeVariable(e)
+        .primaryConstructor(FunSpec.constructorBuilder()
+          .addParameter("networkSingle", singleParameterized)
+          .addParameter("toError", throwableToELambda)
+          .build())
+        .addProperty(PropertySpec.builder("networkSingle", singleParameterized)
+          .initializer("networkSingle")
+          .build())
+        .addProperty(PropertySpec.builder("toError", throwableToELambda)
+          .initializer("toError")
+          .build())
+        .addKdoc(s"Utility data class to combine a call with its response code and its error responses\n" + kdocClassMessage)
+
+
+      //output file
+      val fileBuilder = FileSpec.builder(sharedNameSpace, fileName)
+        .addType(apiNetworkCallResponseBuilder.build())
+        .addType(eitherErrorBuilder.build())
+        .addType(commonNetworkErrorsBuilder.build())
+      makeFile(fileName, fileBuilder)
+    }
+
 
     def generateEnums(enums: Seq[Enum]): Seq[File] = {
       enums.map(generateEnum(_))
     }
 
     def generateSourceFiles(service: Service): Seq[File] = {
+
+      val generatedErrorsHelper = Seq(generateErrorsHelper())
+
+
       val generatedEnums = generateEnums(service.enums)
 
-      val generatedUnionTypes = service.unions.map(generateUnionType(_))
+      val generatedUnionTypes = service.unions.map(union => generateUnionType(union, service))
 
-      val generatedModels = service.models.map { model =>
-        val relatedUnions = service.unions.filter(_.types.exists(_.`type` == model.name))
-        generateModel(model, relatedUnions)
-      }
+      val generatedModels = service.models.map (generateModel(_, None, service))
 
       val generatedObjectMapper = Seq(generateJacksonObjectMapper())
 
@@ -407,16 +822,31 @@ class KotlinGenerator
         generatedUnionTypes ++
         generatedModels ++
         generatedObjectMapper ++
+        generatedErrorsHelper ++
         generatedResources
     }
 
-    def makeFile(name: String, typeSpecBuilder: TypeSpec.Builder): File = {
+    //write one file with a single class
+    def makeFile(packageName: String, name: String, typeSpecBuilder: TypeSpec.Builder): File = {
       val typeSpec = typeSpecBuilder.build
-      val kFile = FileSpec.get(modelsNameSpace, typeSpec)
+      val kFile = FileSpec.get(packageName, typeSpec)
       val sw = new StringWriter(1024)
       try {
         kFile.writeTo(sw)
-        File(s"${name}.kt", Some(modelsDirectoryPath), sw.toString)
+        File(s"${name}.kt", Some(createDirectoryPath(packageName)), sw.toString)
+      } finally {
+        sw.close()
+      }
+    }
+
+    //write one file with multiple classes
+    def makeFile(name: String, fileBuilder: FileSpec.Builder): File = {
+      val sw = new StringWriter(1024)
+      val fileSpec = fileBuilder.build()
+      val packageName = fileSpec.getPackageName()
+      try {
+        fileSpec.writeTo(sw)
+        File(s"${name}.kt", Some(createDirectoryPath(packageName)), sw.toString)
       } finally {
         sw.close()
       }

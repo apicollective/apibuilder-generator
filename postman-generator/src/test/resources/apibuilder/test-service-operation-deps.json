@@ -1,0 +1,313 @@
+{
+  "apidoc": {
+    "version": "1.0.0"
+  },
+  "organization": {
+    "key": "ecorp"
+  },
+  "application": {
+    "key": "service-with-operation-deps"
+  },
+  "namespace": "io.ecorp.api.v0",
+  "version": "0.0.1",
+  "info": {},
+  "name": "library",
+  "base_url": "https://api.ecorp.io",
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [],
+  "models": [
+    {
+      "name": "book",
+      "plural": "books",
+      "fields": [
+        {
+          "name": "library_id",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "example": "Bible"
+        }
+      ],
+      "attributes": [],
+      "description": "A book model"
+    },
+    {
+      "name": "library",
+      "plural": "libraries",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "example": "lib-324324"
+        }
+      ],
+      "attributes": [],
+      "description": "A library model"
+    },
+    {
+      "name": "library_form",
+      "plural": "library_forms",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "New library's id."
+        }
+      ],
+      "attributes": [],
+      "description": "Represents a form to create a library."
+    },
+    {
+      "name": "book_form",
+      "plural": "book_forms",
+      "fields": [
+        {
+          "name": "library_id",
+          "type": "string",
+          "required": true,
+          "attributes": [
+            {
+              "name": "object-reference",
+              "value": {
+                "related_service_namespace": "io.ecorp.api.v0",
+                "resource_type": "library",
+                "operation_method": "POST",
+                "operation_path": "/libraries",
+                "identifier_field": "id",
+                "delete_operation_path": "/libraries/:id"
+              }
+            }
+          ],
+          "annotations": [],
+          "description": "Corresponds with the library id to which this book belongs"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "description": "Book title"
+        }
+      ],
+      "attributes": [],
+      "description": "Represents the form to create an item in a pricebook."
+    }
+  ],
+  "resources": [
+    {
+      "type": "book",
+      "plural": "books",
+      "path": "/:library/books",
+      "attributes": [
+        {
+          "name": "object-reference",
+          "value": {
+            "related_service_namespace": "io.ecorp.api.v0",
+            "resource_type": "libraries",
+            "operation_method": "POST",
+            "operation_path": "/libraries",
+            "identifier_field": "id",
+            "delete_operation_path": "/libraries/:id"
+          }
+        }
+      ],
+      "operations": [
+        {
+          "method": "POST",
+          "description": "Create a book",
+          "path": "/:library/books",
+          "attributes": [],
+          "parameters": [],
+          "body": {
+            "type": "book_form",
+            "attributes": []
+          },
+          "responses": [
+            {
+              "headers": [],
+              "code": {
+                "integer": {
+                  "value": 202
+                }
+              },
+              "type": "book"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "description": "Get books",
+          "path": "/:library/books",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "headers": [],
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[book]"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "description": "Get a book",
+          "path": "/:library/books/:book_id",
+          "attributes": [
+            {
+              "name": "object-reference",
+              "value": {
+                "related_service_namespace": "io.ecorp.api.v0",
+                "resource_type": "book",
+                "operation_method": "POST",
+                "operation_path": "/:library/books",
+                "identifier_field": "library_id",
+                "delete_operation_path": "/:library/books/:book_id"
+              }
+            }
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [],
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "book"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "description": "Delete a book",
+          "path": "/:library/books/:book_id",
+          "attributes": [
+            {
+              "name": "unrelated-attribute",
+              "value": {
+                "this_attribute_is_unrelated": "should_not_break_anything"
+              }
+            },
+            {
+              "name": "object-reference",
+              "value": {
+                "related_service_namespace": "io.ecorp.api.v0",
+                "resource_type": "book",
+                "operation_method": "POST",
+                "operation_path": "/:library/books",
+                "identifier_field": "library_id",
+                "delete_operation_path": "/:library/books/:book_id"
+              }
+            }
+          ],
+          "parameters": [],
+          "responses": [
+            {
+              "headers": [],
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "plural": "libraries",
+      "path": "/libraries",
+      "parameters": [],
+      "attributes": [],
+      "operations": [
+        {
+          "method": "POST",
+          "description": "Create library",
+          "path": "/libraries",
+          "attributes": [],
+          "parameters": [],
+          "responses": [
+            {
+              "headers": [],
+              "code": {
+                "integer": {
+                  "value": 202
+                }
+              },
+              "type": "library"
+            }
+          ],
+          "body": {
+            "type": "library_form",
+            "attributes": []
+          }
+        },
+        {
+          "method": "DELETE",
+          "description": "Delete library",
+          "path": "/libraries/:id",
+          "attributes": [
+            {
+              "name": "object-reference",
+              "value": {
+                "related_service_namespace": "io.ecorp.api.v0",
+                "resource_type": "library",
+                "operation_method": "POST",
+                "operation_path": "/libraries",
+                "identifier_field": "id",
+                "delete_operation_path": "/libraries/:id"
+              }
+            }
+          ],
+          "parameters": [],
+          "responses": [
+            {
+              "headers": [],
+              "code": {
+                "integer": {
+                  "value": 204
+                }
+              },
+              "type": "unit"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "postman-basic-auth",
+      "value": {
+        "username": "{{MY_TOKEN}}",
+        "password": ""
+      }
+    }
+  ]
+}

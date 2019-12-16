@@ -76,6 +76,12 @@ object ServiceFileNames {
 
       new Language {
         override def isCamelCased = true
+        override def name = "kotlin"
+        override def extension = "kt"
+      },
+
+      new Language {
+        override def isCamelCased = true
         override def name = "swift"
         override def extension = "swift"
       },
@@ -84,6 +90,12 @@ object ServiceFileNames {
         override def isCamelCased = false
         override def name = "text"
         override def extension = "txt"
+      },
+
+      new Language {
+        override def isCamelCased = false
+        override def name = "json"
+        override def extension = "json"
       }
     )
 

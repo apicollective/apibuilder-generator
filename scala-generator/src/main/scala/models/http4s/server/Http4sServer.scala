@@ -9,6 +9,8 @@ import lib.Text
 import lib.Text._
 import lib.VersionTag
 
+import scala.generator.ScalaPrimitive.{Uuid, Decimal}
+
 case class PathExtractor(name: String, filter: Option[String])
 case class QueryExtractor(name: String, handler: String)
 
@@ -134,17 +136,17 @@ case class Http4sServer(form: InvocationForm,
        |
        |private[server] ${config.matcherKind} Matchers${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.matchersExtends.getOrElse("")} {
        |
-       |  implicit lazy val bigDecimalDateQueryParamDecoder: org.http4s.QueryParamDecoder[BigDecimal] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
+       |  implicit lazy val queryParamDecode${Decimal.shortName}: org.http4s.QueryParamDecoder[${Decimal.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Decimal.fullName}](p => ${Decimal.fromStringValue("p.value")})("${Decimal.fullName}")
        |
-       |  implicit lazy val instantQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.Instant] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[java.time.Instant](p => java.time.Instant.parse(p.value))("java.time.Instant")
+       |  implicit lazy val queryParamDecode${ssd.attributes.dateTimeType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.attributes.dateTimeType.dataType.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.attributes.dateTimeType.dataType.fullName}](p => ${ssd.attributes.dateTimeType.dataType.fromStringValue("p.value")})("${ssd.attributes.dateTimeType.dataType.fullName}")
        |
-       |  implicit lazy val localDateQueryParamDecoder: org.http4s.QueryParamDecoder[java.time.LocalDate] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[java.time.LocalDate](p => java.time.LocalDate.parse(p.value))("java.time.LocalDate")
+       |  implicit lazy val queryParamDecode${ssd.attributes.dateType.dataType.shortName}: org.http4s.QueryParamDecoder[${ssd.attributes.dateType.dataType.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${ssd.attributes.dateType.dataType.fullName}](p => ${ssd.attributes.dateType.dataType.fromStringValue("p.value")})("${ssd.attributes.dateType.dataType.fullName}")
        |
-       |  implicit lazy val uuidQueryParamDecoder: org.http4s.QueryParamDecoder[java.util.UUID] =
-       |    org.http4s.QueryParamDecoder.fromUnsafeCast[java.util.UUID](p => java.util.UUID.fromString(p.value))("java.util.UUID")
+       |  implicit lazy val queryParamDecode${Uuid.shortName}: org.http4s.QueryParamDecoder[${Uuid.fullName}] =
+       |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Uuid.fullName}](p => ${Uuid.fromStringValue("p.value")})("${Uuid.fullName}")
        |${enumDecoders.indent(2)}
        |${versionCapture.indent(2)}
        |${path.mkString("\n").indent(2)}
@@ -164,16 +166,14 @@ case class Http4sServer(form: InvocationForm,
       val filter = extractor.filter.getOrElse("")
 
       val toOption = param.datatype match {
-        case ScalaPrimitive.String => s"Some(s)$filter"
-        case ScalaPrimitive.Boolean => "scala.util.Try(s.toBoolean).toOption"
-        case ScalaPrimitive.Integer => s"scala.util.Try(s.toInt).toOption$filter"
-        case ScalaPrimitive.Long => s"scala.util.Try(s.toLong).toOption$filter"
-        case ScalaPrimitive.Double => "scala.util.Try(s.toDouble).toOption"
-        case ScalaPrimitive.Decimal => "scala.util.Try(BigDecimal(s)).toOption"
-        case ScalaPrimitive.Uuid => "scala.util.Try(java.util.UUID.fromString(s)).toOption"
-        case ScalaPrimitive.DateIso8601Java => "scala.util.Try(java.time.LocalDate.parse(s)).toOption"
-        case ScalaPrimitive.DateTimeIso8601Java => "scala.util.Try(java.time.Instant.parse(s)).toOption"
-        case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
+        case sp: ScalaPrimitive =>
+          sp match {
+            case dt @ ScalaPrimitive.String => s"Some(${dt.fromStringValue("s")})$filter"
+            case dt @ (ScalaPrimitive.Integer | ScalaPrimitive.Long) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption$filter"
+            case dt @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption"
+            case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
+            case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
+          }
         case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
       }
 
