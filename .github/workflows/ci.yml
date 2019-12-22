@@ -23,5 +23,5 @@ jobs:
         java-version: ${{ matrix.java }}
     - name: print Java version
       run: java -version
-    - name: Build with Maven
-      run: sbt  ${{ matrix.scala }} clean coverage test coverageReport
+    - name: Build
+      run: sbt ++${{ matrix.scala }} clean coverage test coverageReport
