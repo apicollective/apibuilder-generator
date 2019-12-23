@@ -27,7 +27,6 @@ class ScalaCheckGeneratorSpec extends FunSpec with Matchers {
 
   def arbitraryCount(service: Service): Int = count("def arbitrary".r, service)
   def genCount(service: Service): Int = count("def gen".r, service)
-  def importCount(service: Service): Int = count("import ".r, service)
 
   describe("for all services") {
     List(
@@ -54,10 +53,6 @@ class ScalaCheckGeneratorSpec extends FunSpec with Matchers {
 
         it("generates all gens") {
           assert(genCount(service) == elementCount)
-        }
-
-        it("generates all imports") {
-          assert(importCount(service) == service.imports.size + 1)
         }
       }
     }

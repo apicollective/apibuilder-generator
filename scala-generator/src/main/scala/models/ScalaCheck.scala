@@ -7,11 +7,21 @@ import scala.generator._
 
 object ScalaCheckGenerator extends CodeGenerator {
 
+  def fileName(str: String): String = s"${objectName(str)}.scala"
+  def packageName(str: String): String = s"${str}.models.scalacheck"
+  def objectName(str: String): String = s"${str}ScalaCheck"
+  def traitName(str: String): String = objectName(str)
+
   def header(form: InvocationForm) = ApidocComments(form.service.version, form.userAgent).toJavaString()
 
-  def `import`(`import`: Import): String = s"""
-    |import ${`import`.namespace}.models.scalacheck.${`import`.application.key.capitalize}Check._
-  """.stripMargin.trim
+  def extendsWith(imports: Seq[Import]): String = {
+    val traits = imports.map(i => s"${packageName(i.namespace)}.${traitName(i.application.key.capitalize)}").toList
+    traits match {
+      case Nil => ""
+      case one :: Nil => s"extends ${one}"
+      case more => more.mkString("extends ", " with ", "")
+    }
+  }
 
   def model(namespace: String, model: ScalaModel): String = {
     def field(field: ScalaField): String = s"""
@@ -54,38 +64,39 @@ object ScalaCheckGenerator extends CodeGenerator {
     """.stripMargin.trim
   }
 
-  def jodaDateTime(): String = s"""
-    |implicit def arbitraryJodaDateTime: Arbitrary[_root_.org.joda.time.DateTime] = Arbitrary(genJodaDateTime)
-    |def genJodaDateTime: Gen[_root_.org.joda.time.DateTime] = Gen.posNum[Long].map(instant => new _root_.org.joda.time.DateTime(instant))
-  """.stripMargin.trim
-
-  def contents(form: InvocationForm): String = {
-    val ssd = ScalaService(form.service)
+  def jodaDateTime(imports: Seq[Import]): String = {
+    val alreadyDefined = if(imports.isEmpty) { "" } else { "override" }
     s"""
-    |${header(form)}
-    |package ${ssd.namespaces.models}.scalacheck
-    |
-    |${form.service.imports.map(`import`).mkString("\n")}
-    |import org.scalacheck.{Arbitrary, Gen}
-    |
-    |object ${ssd.name}Check extends ${ssd.name}Check
-    |trait ${ssd.name}Check {
-    |
-    |  ${jodaDateTime}
-    |
-    |  ${ssd.models.map(model(ssd.namespaces.models, _)).mkString("\n\n")}
-    |
-    |  ${ssd.enums.map(enum(ssd.namespaces.models,_)).mkString("\n\n")}
-    |
-    |  ${ssd.unions.map(union(ssd.namespaces.models, _)).mkString("\n\n")}
-    |
-    |}
-  """.stripMargin.trim
+      |implicit ${alreadyDefined} def arbitraryJodaDateTime: Arbitrary[_root_.org.joda.time.DateTime] = Arbitrary(genJodaDateTime)
+      |${alreadyDefined} def genJodaDateTime: Gen[_root_.org.joda.time.DateTime] = Gen.posNum[Long].map(instant => new _root_.org.joda.time.DateTime(instant))
+    """.stripMargin.trim
   }
 
+  def contents(form: InvocationForm, ssd: ScalaService): String =
+    s"""
+      |${header(form)}
+      |package ${packageName(ssd.namespaces.base)}
+      |
+      |import org.scalacheck.{Arbitrary, Gen}
+      |
+      |object ${objectName(ssd.name)} extends ${traitName(ssd.name)}
+      |trait ${traitName(ssd.name)} ${extendsWith(form.service.imports)} {
+      |
+      |  ${jodaDateTime(form.service.imports)}
+      |
+      |  ${ssd.models.map(model(ssd.namespaces.models, _)).mkString("\n\n")}
+      |
+      |  ${ssd.enums.map(enum(ssd.namespaces.models,_)).mkString("\n\n")}
+      |
+      |  ${ssd.unions.map(union(ssd.namespaces.models, _)).mkString("\n\n")}
+      |
+      |}
+    """.stripMargin.trim
+
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+    val ssd = ScalaService(form.service)
     Right(Seq(
-        File("", None, contents(form), None)
+        File(fileName(ssd.name), None, contents(form, ssd), None)
     ))
   }
 }
