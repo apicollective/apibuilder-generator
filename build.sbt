@@ -168,4 +168,4 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   sources in(Compile, doc) := Seq.empty,
   publishArtifact in(Compile, packageDoc) := false
 )
-version := "0.8.60"
+version := "0.8.61"
