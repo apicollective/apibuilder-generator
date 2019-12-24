@@ -72,6 +72,14 @@ object ScalaCheckGenerator extends CodeGenerator {
     """.stripMargin.trim
   }
 
+  def playJsObject(imports: Seq[Import]): String = {
+    val alreadyDefined = if(imports.isEmpty) { "" } else { "override" }
+    s"""
+      |implicit ${alreadyDefined} def arbitraryPlayJsObject: Arbitrary[_root_.play.api.libs.json.JsObject] = Arbitrary(genPlayJsObject)
+      |${alreadyDefined} def genPlayJsObject: Gen[_root_.play.api.libs.json.JsObject] = Gen.const(_root_.play.api.libs.json.JsObject.empty)
+    """.stripMargin.trim
+  }
+
   def contents(form: InvocationForm, ssd: ScalaService): String =
     s"""
       |${header(form)}
@@ -83,6 +91,7 @@ object ScalaCheckGenerator extends CodeGenerator {
       |trait ${traitName(ssd.name)} ${extendsWith(form.service.imports)} {
       |
       |  ${jodaDateTime(form.service.imports)}
+      |  ${playJsObject(form.service.imports)}
       |
       |  ${ssd.models.map(model(ssd.namespaces.models, _)).mkString("\n\n")}
       |

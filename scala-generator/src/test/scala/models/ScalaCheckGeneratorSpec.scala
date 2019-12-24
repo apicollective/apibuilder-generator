@@ -45,7 +45,7 @@ class ScalaCheckGeneratorSpec extends FunSpec with Matchers {
         val elementCount = service.enums.size +
           service.models.size +
           service.unions.size +
-          1 // org.joda.time.DateTime
+          2 // org.joda.time.DateTime + play.api.libs.json.JsObject
 
         it("generates all arbitraries") {
           assert(arbitraryCount(service) == elementCount)
