@@ -2,11 +2,11 @@ package scala.generator.mock
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
+import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import lib.generator.CodeGenerator
 import lib.Text._
-import models.http4s.mock.Http4s018MockClientGenerator
 
-import scala.models.ApidocComments
+import scala.models.{ApidocComments, Attributes}
 import scala.generator._
 
 object MockClientGenerator {
@@ -14,8 +14,8 @@ object MockClientGenerator {
   object Play24 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service)
-      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, None)).invoke()
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
     }
 
   }
@@ -23,8 +23,8 @@ object MockClientGenerator {
   object Play25 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service)
-      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, None)).invoke()
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
     }
 
   }
@@ -32,8 +32,8 @@ object MockClientGenerator {
   object Play26 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service)
-      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play26(ssd.namespaces.base, None)).invoke()
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play26(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
     }
 
   }
@@ -41,12 +41,33 @@ object MockClientGenerator {
   object Ning19 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service)
-      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Ning19(ssd.namespaces.base, None)).invoke()
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Ning19(ssd.namespaces.base, Attributes.PlayDefaultConfig, None)).invoke()
     }
 
   }
 
+  private[mock] def calculateStringLength(limitation: ScalaField.Limitation): Int = {
+    val defaultCandidate = 24L
+
+    // TODO handle Int vs Long (really String of length Int.MaxValue + 1??!)
+    //   consider some artificial upper bound of e.g. 10,000; 100,000; 1,000,000 -- to be discussed
+
+    val withLimitationApplied = limitation match {
+      case ScalaField.Limitation(None, None) => defaultCandidate
+      case ScalaField.Limitation(Some(minimum), None) => Math.max(defaultCandidate, minimum)
+      case ScalaField.Limitation(None, Some(maximum)) => Math.min(defaultCandidate, maximum)
+      case ScalaField.Limitation(Some(minimum), Some(maximum)) =>
+        if (minimum < maximum) (minimum + maximum) / 2
+        else if (minimum == maximum) minimum
+        else 0
+    }
+
+    val withZeroAsLowerBound = Math.max(0L, withLimitationApplied)
+
+    if (!withZeroAsLowerBound.isValidInt) Int.MaxValue // TODO really?!
+    else withZeroAsLowerBound.toInt
+  }
 }
 
 class MockClientGenerator(
@@ -75,7 +96,7 @@ class MockClientGenerator(
     )
   }
 
-  def clientCode =
+  def clientCode: String =
     Seq(
       s"trait Client extends ${ssd.namespaces.interfaces}.Client {",
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
@@ -88,12 +109,12 @@ class MockClientGenerator(
       }.mkString("\n\n")
     ).mkString("\n\n")
 
-  def factoriesCode = Seq(
+  def factoriesCode: String = Seq(
     "object Factories {",
     Seq(
-      "def randomString(): String = {",
-      """  "Test " + _root_.java.util.UUID.randomUUID.toString.replaceAll("-", " ")""",
-      "}"
+      """def randomString(length: Int = 24): String = {""",
+      """  _root_.scala.util.Random.alphanumeric.take(length).mkString""",
+      """}"""
     ).mkString("\n").indent(2),
     Seq(
       ssd.enums.map { makeEnum },
@@ -133,7 +154,7 @@ class MockClientGenerator(
     Seq(
       s"def make${model.name}(): ${model.qualifiedName} = ${model.qualifiedName}(",
       model.fields.map { field =>
-        s"${field.name} = ${mockValue(field.datatype)}"
+        s"${field.name} = ${mockValue(field.datatype, Some(field.limitation))}"
       }.mkString(",\n").indent(2),
       ")"
     ).mkString("\n")
@@ -152,7 +173,7 @@ class MockClientGenerator(
       s"trait Mock${resource.plural} extends ${ssd.namespaces.base}.${resource.plural} {",
       generator.methods(resource).map { m =>
         Seq(
-          m.interface + s" = ${config.wrappedAsyncType("Sync").getOrElse(config.asyncType)}.${config.asyncSuccess} {",
+          m.interface + s" = ${config.asyncSuccessInvoke} {",
           mockImplementation(m).indent(2),
           "}"
         ).mkString("\n")
@@ -167,29 +188,60 @@ class MockClientGenerator(
         "// No-op as there is no successful response defined"
       }
       case Some(r) => {
-        mockValue(ssd.scalaDatatype(r.`type`))
+        val unitType = config.responseEnvelopeClassName.map { _ => "()" }.getOrElse("// unit type")
+        val resultType = mockValue(ssd.scalaDatatype(r.`type`), unitType = unitType)
+        config.responseEnvelopeClassName match {
+          case None => resultType
+          case Some(envelopeName) => {
+            Seq(
+              s"${ssd.namespaces.base}.${envelopeName}Impl(",
+              Seq(
+                s"body = $resultType,",
+                s"status = ${getStatus(r)},",
+                s"headers = ${ssd.namespaces.base}.ResponseHeaders(Map.empty)",
+              ).mkString("\n").indent(2),
+              ")"
+            ).mkString("\n")
+          }
+        }
       }
     }
   }
 
-  def mockValue(datatype: ScalaDatatype): String = {
+  private[this] def getStatus(r: ScalaResponse): Int = {
+    r.code match {
+      case ResponseCodeInt(value) => value
+      case ResponseCodeOption.Default => 200
+      case ResponseCodeOption.UNDEFINED(_) => 417
+      case ResponseCodeUndefinedType(_) => 500
+    }
+  }
+
+  def mockValue(
+    datatype: ScalaDatatype,
+    limitation: Option[ScalaField.Limitation] = None,
+    unitType: String = "// unit type",
+  ): String = {
     datatype match {
       case ScalaPrimitive.Boolean => "true"
       case ScalaPrimitive.Double => "1.0"
       case ScalaPrimitive.Integer => "1"
       case ScalaPrimitive.Long => "1l"
-      case ScalaPrimitive.DateIso8601Joda => "new org.joda.time.LocalDate()"
-      case ScalaPrimitive.DateIso8601Java => "java.time.LocalDate.now"
-      case ScalaPrimitive.DateTimeIso8601Joda => "org.joda.time.DateTime.now"
-      case ScalaPrimitive.DateTimeIso8601Java => "java.time.Instant.now"
+      case dt: ScalaPrimitive.DateIso8601 => s"${dt.fullName}.now"
+      case dt: ScalaPrimitive.DateTimeIso8601 => s"${dt.fullName}.now"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
-      case ScalaPrimitive.ObjectAsPlay => "play.api.libs.json.Json.obj()"
+      case ScalaPrimitive.ObjectAsPlay => "_root_.play.api.libs.json.Json.obj()"
       case ScalaPrimitive.ObjectAsCirce => "Map()"
-      case ScalaPrimitive.JsonValueAsPlay => "play.api.libs.json.Json.obj().asInstanceOf[play.api.libs.json.JsValue]"
-      case ScalaPrimitive.JsonValueAsCirce => "io.circe.Json.obj()"
-      case ScalaPrimitive.String => "Factories.randomString()"
-      case ScalaPrimitive.Unit => "// unit type"
-      case ScalaPrimitive.Uuid => "java.util.UUID.randomUUID"
+      case ScalaPrimitive.JsonValueAsPlay => "_root_.play.api.libs.json.Json.obj().asInstanceOf[_root_.play.api.libs.json.JsValue]"
+      case dt @ ScalaPrimitive.JsonValueAsCirce => s"${dt.fullName}.obj()"
+      case ScalaPrimitive.String => {
+        limitation match {
+          case None => "Factories.randomString()"
+          case Some(limitationVal) => s"Factories.randomString(${MockClientGenerator.calculateStringLength(limitationVal)})"
+        }
+      }
+      case ScalaPrimitive.Unit => unitType
+      case dt @ ScalaPrimitive.Uuid => s"${dt.fullName}.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
       case ScalaDatatype.Map(_) => "Map()"
       case ScalaDatatype.Option(_) => "None"
@@ -198,5 +250,4 @@ class MockClientGenerator(
       case ScalaPrimitive.Union(ns, name) => s"${ns.mock}.Factories.make$name()"
     }
   }
-
 }

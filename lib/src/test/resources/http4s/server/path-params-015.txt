@@ -1,0 +1,605 @@
+package io.apibuilder.http4s.test.server
+
+import org.http4s.dsl._
+
+import io.apibuilder.http4s.test.models.json._
+
+private[server] object Matchers {
+
+  implicit lazy val queryParamDecodeBigDecimal: org.http4s.QueryParamDecoder[BigDecimal] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
+
+  implicit lazy val queryParamDecodeInstant: org.http4s.QueryParamDecoder[_root_.java.time.Instant] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.Instant](p => _root_.java.time.OffsetDateTime.parse(p.value).toInstant)("_root_.java.time.Instant")
+
+  implicit lazy val queryParamDecodeLocalDate: org.http4s.QueryParamDecoder[_root_.java.time.LocalDate] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.time.LocalDate](p => _root_.java.time.LocalDate.parse(p.value))("_root_.java.time.LocalDate")
+
+  implicit lazy val queryParamDecodeUUID: org.http4s.QueryParamDecoder[_root_.java.util.UUID] =
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.java.util.UUID](p => _root_.java.util.UUID.fromString(p.value))("_root_.java.util.UUID")
+
+
+  object ApiVersion {
+    val ApiVersionMajor = {
+      "X-Apidoc-Version-Major".ci
+    }
+
+    def apply(req: org.http4s.Message): Boolean = req.headers.get(ApiVersionMajor) match {
+      case Some(v) if v.value == "0" => true
+      case _ => false
+    }
+  }
+
+  object BigDecimalVal {
+    def unapply(s: String): Option[BigDecimal] = scala.util.Try(BigDecimal(s)).toOption
+  }
+
+  object BooleanVal {
+    def unapply(s: String): Option[Boolean] = scala.util.Try(s.toBoolean).toOption
+  }
+
+  object DoubleVal {
+    def unapply(s: String): Option[Double] = scala.util.Try(s.toDouble).toOption
+  }
+
+  object EnumVal {
+    def unapply(s: String): Option[io.apibuilder.http4s.test.models.Enum] = io.apibuilder.http4s.test.models.Enum.fromString(s)
+  }
+
+  object InstantVal {
+    def unapply(s: String): Option[_root_.java.time.Instant] = scala.util.Try(_root_.java.time.OffsetDateTime.parse(s).toInstant).toOption
+  }
+
+  object Int10To30Val {
+    def unapply(s: String): Option[Int] = scala.util.Try(s.toInt).toOption.filter(v => v >= 10 && v <= 30)
+  }
+
+  object IntVal {
+    def unapply(s: String): Option[Int] = scala.util.Try(s.toInt).toOption
+  }
+
+  object LocalDateVal {
+    def unapply(s: String): Option[_root_.java.time.LocalDate] = scala.util.Try(_root_.java.time.LocalDate.parse(s)).toOption
+  }
+
+  object Long10To30Val {
+    def unapply(s: String): Option[Long] = scala.util.Try(s.toLong).toOption.filter(v => v >= 10 && v <= 30)
+  }
+
+  object LongVal {
+    def unapply(s: String): Option[Long] = scala.util.Try(s.toLong).toOption
+  }
+
+  object ModelVal {
+    def unapply(s: String): Option[io.apibuilder.http4s.test.models.Model] = None // Type io.apibuilder.http4s.test.models.Model is not supported as a capture value
+  }
+
+  object String10To30Val {
+    def unapply(s: String): Option[String] = Some(s).filter(s => s.length >= 10 && s.length <= 30)
+  }
+
+  object String10Val {
+    def unapply(s: String): Option[String] = Some(s).filter(_.length >= 10)
+  }
+
+  object StringTo10Val {
+    def unapply(s: String): Option[String] = Some(s).filter(_.length <= 10)
+  }
+
+  object UUIDVal {
+    def unapply(s: String): Option[_root_.java.util.UUID] = scala.util.Try(_root_.java.util.UUID.fromString(s)).toOption
+  }
+
+}
+
+trait ModelRoutes {
+
+  import Matchers._
+
+  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]) = org.http4s.circe.jsonOf[A]
+  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]) = org.http4s.circe.jsonEncoderOf[A]
+
+  sealed trait GetStringByIdResponse
+
+  object GetStringByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetStringByIdResponse
+  }
+
+  def getStringById(
+    _req: org.http4s.Request,
+    id: String
+  ): scalaz.concurrent.Task[GetStringByIdResponse]
+
+  sealed trait GetNamedStringByNamedIdResponse
+
+  object GetNamedStringByNamedIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetNamedStringByNamedIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetNamedStringByNamedIdResponse
+  }
+
+  def getNamedStringByNamedId(
+    _req: org.http4s.Request,
+    namedId: String
+  ): scalaz.concurrent.Task[GetNamedStringByNamedIdResponse]
+
+  sealed trait GetStringWithMinByIdResponse
+
+  object GetStringWithMinByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringWithMinByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetStringWithMinByIdResponse
+  }
+
+  def getStringWithMinById(
+    _req: org.http4s.Request,
+    id: String
+  ): scalaz.concurrent.Task[GetStringWithMinByIdResponse]
+
+  sealed trait GetStringWithMaxByIdResponse
+
+  object GetStringWithMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringWithMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetStringWithMaxByIdResponse
+  }
+
+  def getStringWithMaxById(
+    _req: org.http4s.Request,
+    id: String
+  ): scalaz.concurrent.Task[GetStringWithMaxByIdResponse]
+
+  sealed trait GetStringWithMinAndMaxByIdResponse
+
+  object GetStringWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetStringWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetStringWithMinAndMaxByIdResponse
+  }
+
+  def getStringWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: String
+  ): scalaz.concurrent.Task[GetStringWithMinAndMaxByIdResponse]
+
+  sealed trait GetIntByIdResponse
+
+  object GetIntByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetIntByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetIntByIdResponse
+  }
+
+  def getIntById(
+    _req: org.http4s.Request,
+    id: Int
+  ): scalaz.concurrent.Task[GetIntByIdResponse]
+
+  sealed trait GetIntWithMinAndMaxByIdResponse
+
+  object GetIntWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetIntWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetIntWithMinAndMaxByIdResponse
+  }
+
+  def getIntWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: Int
+  ): scalaz.concurrent.Task[GetIntWithMinAndMaxByIdResponse]
+
+  sealed trait GetLongByIdResponse
+
+  object GetLongByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetLongByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetLongByIdResponse
+  }
+
+  def getLongById(
+    _req: org.http4s.Request,
+    id: Long
+  ): scalaz.concurrent.Task[GetLongByIdResponse]
+
+  sealed trait GetLongWithMinAndMaxByIdResponse
+
+  object GetLongWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetLongWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetLongWithMinAndMaxByIdResponse
+  }
+
+  def getLongWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: Long
+  ): scalaz.concurrent.Task[GetLongWithMinAndMaxByIdResponse]
+
+  sealed trait GetBooleanByIdResponse
+
+  object GetBooleanByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetBooleanByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetBooleanByIdResponse
+  }
+
+  def getBooleanById(
+    _req: org.http4s.Request,
+    id: Boolean
+  ): scalaz.concurrent.Task[GetBooleanByIdResponse]
+
+  sealed trait GetBooleanWithMinAndMaxByIdResponse
+
+  object GetBooleanWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetBooleanWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetBooleanWithMinAndMaxByIdResponse
+  }
+
+  def getBooleanWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: Boolean
+  ): scalaz.concurrent.Task[GetBooleanWithMinAndMaxByIdResponse]
+
+  sealed trait GetDoubleByIdResponse
+
+  object GetDoubleByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDoubleByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDoubleByIdResponse
+  }
+
+  def getDoubleById(
+    _req: org.http4s.Request,
+    id: Double
+  ): scalaz.concurrent.Task[GetDoubleByIdResponse]
+
+  sealed trait GetDoubleWithMinAndMaxByIdResponse
+
+  object GetDoubleWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDoubleWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDoubleWithMinAndMaxByIdResponse
+  }
+
+  def getDoubleWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: Double
+  ): scalaz.concurrent.Task[GetDoubleWithMinAndMaxByIdResponse]
+
+  sealed trait GetDecimalByIdResponse
+
+  object GetDecimalByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDecimalByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDecimalByIdResponse
+  }
+
+  def getDecimalById(
+    _req: org.http4s.Request,
+    id: BigDecimal
+  ): scalaz.concurrent.Task[GetDecimalByIdResponse]
+
+  sealed trait GetDecimalWithMinAndMaxByIdResponse
+
+  object GetDecimalWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDecimalWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDecimalWithMinAndMaxByIdResponse
+  }
+
+  def getDecimalWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: BigDecimal
+  ): scalaz.concurrent.Task[GetDecimalWithMinAndMaxByIdResponse]
+
+  sealed trait GetDateByIdResponse
+
+  object GetDateByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDateByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDateByIdResponse
+  }
+
+  def getDateById(
+    _req: org.http4s.Request,
+    id: _root_.java.time.LocalDate
+  ): scalaz.concurrent.Task[GetDateByIdResponse]
+
+  sealed trait GetDateWithMinAndMaxByIdResponse
+
+  object GetDateWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDateWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDateWithMinAndMaxByIdResponse
+  }
+
+  def getDateWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: _root_.java.time.LocalDate
+  ): scalaz.concurrent.Task[GetDateWithMinAndMaxByIdResponse]
+
+  sealed trait GetDatetimeByIdResponse
+
+  object GetDatetimeByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDatetimeByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDatetimeByIdResponse
+  }
+
+  def getDatetimeById(
+    _req: org.http4s.Request,
+    id: _root_.java.time.Instant
+  ): scalaz.concurrent.Task[GetDatetimeByIdResponse]
+
+  sealed trait GetDatetimeWithMinAndMaxByIdResponse
+
+  object GetDatetimeWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetDatetimeWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetDatetimeWithMinAndMaxByIdResponse
+  }
+
+  def getDatetimeWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: _root_.java.time.Instant
+  ): scalaz.concurrent.Task[GetDatetimeWithMinAndMaxByIdResponse]
+
+  sealed trait GetUuidByIdResponse
+
+  object GetUuidByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetUuidByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetUuidByIdResponse
+  }
+
+  def getUuidById(
+    _req: org.http4s.Request,
+    id: _root_.java.util.UUID
+  ): scalaz.concurrent.Task[GetUuidByIdResponse]
+
+  sealed trait GetUuidWithMinAndMaxByIdResponse
+
+  object GetUuidWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetUuidWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetUuidWithMinAndMaxByIdResponse
+  }
+
+  def getUuidWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: _root_.java.util.UUID
+  ): scalaz.concurrent.Task[GetUuidWithMinAndMaxByIdResponse]
+
+  sealed trait GetEnumByIdResponse
+
+  object GetEnumByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetEnumByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetEnumByIdResponse
+  }
+
+  def getEnumById(
+    _req: org.http4s.Request,
+    id: io.apibuilder.http4s.test.models.Enum
+  ): scalaz.concurrent.Task[GetEnumByIdResponse]
+
+  sealed trait GetNamedEnumByNamedIdResponse
+
+  object GetNamedEnumByNamedIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetNamedEnumByNamedIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetNamedEnumByNamedIdResponse
+  }
+
+  def getNamedEnumByNamedId(
+    _req: org.http4s.Request,
+    namedId: io.apibuilder.http4s.test.models.Enum
+  ): scalaz.concurrent.Task[GetNamedEnumByNamedIdResponse]
+
+  sealed trait GetEnumWithMinAndMaxByIdResponse
+
+  object GetEnumWithMinAndMaxByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetEnumWithMinAndMaxByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetEnumWithMinAndMaxByIdResponse
+  }
+
+  def getEnumWithMinAndMaxById(
+    _req: org.http4s.Request,
+    id: io.apibuilder.http4s.test.models.Enum
+  ): scalaz.concurrent.Task[GetEnumWithMinAndMaxByIdResponse]
+
+  sealed trait GetInvalidByIdResponse
+
+  object GetInvalidByIdResponse {
+    case class HTTP200(headers: Seq[org.http4s.Header] = Nil) extends GetInvalidByIdResponse
+    case class UndocumentedResponse(response: scalaz.concurrent.Task[org.http4s.Response]) extends GetInvalidByIdResponse
+  }
+
+  def getInvalidById(
+    _req: org.http4s.Request,
+    id: io.apibuilder.http4s.test.models.Model
+  ): scalaz.concurrent.Task[GetInvalidByIdResponse]
+
+  def apiVersionMatch(req: org.http4s.Message): Boolean = ApiVersion(req)
+
+  def service() = org.http4s.HttpService {
+    case _req @ GET -> Root / "string" / id if apiVersionMatch(_req) =>
+      getStringById(_req, id).flatMap {
+        case GetStringByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "string" / id if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "named_string" / namedId if apiVersionMatch(_req) =>
+      getNamedStringByNamedId(_req, namedId).flatMap {
+        case GetNamedStringByNamedIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetNamedStringByNamedIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "named_string" / namedId if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "string_with_min" / String10Val(id) if apiVersionMatch(_req) =>
+      getStringWithMinById(_req, id).flatMap {
+        case GetStringWithMinByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMinByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "string_with_min" / String10Val(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "string_with_max" / StringTo10Val(id) if apiVersionMatch(_req) =>
+      getStringWithMaxById(_req, id).flatMap {
+        case GetStringWithMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "string_with_max" / StringTo10Val(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "string_with_min_and_max" / String10To30Val(id) if apiVersionMatch(_req) =>
+      getStringWithMinAndMaxById(_req, id).flatMap {
+        case GetStringWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetStringWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "string_with_min_and_max" / String10To30Val(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "int" / IntVal(id) if apiVersionMatch(_req) =>
+      getIntById(_req, id).flatMap {
+        case GetIntByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetIntByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "int" / IntVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "int_with_min_and_max" / Int10To30Val(id) if apiVersionMatch(_req) =>
+      getIntWithMinAndMaxById(_req, id).flatMap {
+        case GetIntWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetIntWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "int_with_min_and_max" / Int10To30Val(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "long" / LongVal(id) if apiVersionMatch(_req) =>
+      getLongById(_req, id).flatMap {
+        case GetLongByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetLongByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "long" / LongVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "long_with_min_and_max" / Long10To30Val(id) if apiVersionMatch(_req) =>
+      getLongWithMinAndMaxById(_req, id).flatMap {
+        case GetLongWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetLongWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "long_with_min_and_max" / Long10To30Val(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "boolean" / BooleanVal(id) if apiVersionMatch(_req) =>
+      getBooleanById(_req, id).flatMap {
+        case GetBooleanByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetBooleanByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "boolean" / BooleanVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "boolean_with_min_and_max" / BooleanVal(id) if apiVersionMatch(_req) =>
+      getBooleanWithMinAndMaxById(_req, id).flatMap {
+        case GetBooleanWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetBooleanWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "boolean_with_min_and_max" / BooleanVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "double" / DoubleVal(id) if apiVersionMatch(_req) =>
+      getDoubleById(_req, id).flatMap {
+        case GetDoubleByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDoubleByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "double" / DoubleVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "double_with_min_and_max" / DoubleVal(id) if apiVersionMatch(_req) =>
+      getDoubleWithMinAndMaxById(_req, id).flatMap {
+        case GetDoubleWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDoubleWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "double_with_min_and_max" / DoubleVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "decimal" / BigDecimalVal(id) if apiVersionMatch(_req) =>
+      getDecimalById(_req, id).flatMap {
+        case GetDecimalByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDecimalByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "decimal" / BigDecimalVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "decimal_with_min_and_max" / BigDecimalVal(id) if apiVersionMatch(_req) =>
+      getDecimalWithMinAndMaxById(_req, id).flatMap {
+        case GetDecimalWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDecimalWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "decimal_with_min_and_max" / BigDecimalVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "date" / LocalDateVal(id) if apiVersionMatch(_req) =>
+      getDateById(_req, id).flatMap {
+        case GetDateByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDateByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "date" / LocalDateVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "date_with_min_and_max" / LocalDateVal(id) if apiVersionMatch(_req) =>
+      getDateWithMinAndMaxById(_req, id).flatMap {
+        case GetDateWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDateWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "date_with_min_and_max" / LocalDateVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "datetime" / InstantVal(id) if apiVersionMatch(_req) =>
+      getDatetimeById(_req, id).flatMap {
+        case GetDatetimeByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDatetimeByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "datetime" / InstantVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "datetime_with_min_and_max" / InstantVal(id) if apiVersionMatch(_req) =>
+      getDatetimeWithMinAndMaxById(_req, id).flatMap {
+        case GetDatetimeWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetDatetimeWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "datetime_with_min_and_max" / InstantVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "uuid" / UUIDVal(id) if apiVersionMatch(_req) =>
+      getUuidById(_req, id).flatMap {
+        case GetUuidByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetUuidByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "uuid" / UUIDVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "uuid_with_min_and_max" / UUIDVal(id) if apiVersionMatch(_req) =>
+      getUuidWithMinAndMaxById(_req, id).flatMap {
+        case GetUuidWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetUuidWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "uuid_with_min_and_max" / UUIDVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "enum" / EnumVal(id) if apiVersionMatch(_req) =>
+      getEnumById(_req, id).flatMap {
+        case GetEnumByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetEnumByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "enum" / EnumVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "named_enum" / EnumVal(namedId) if apiVersionMatch(_req) =>
+      getNamedEnumByNamedId(_req, namedId).flatMap {
+        case GetNamedEnumByNamedIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetNamedEnumByNamedIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "named_enum" / EnumVal(namedId) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "enum_with_min_and_max" / EnumVal(id) if apiVersionMatch(_req) =>
+      getEnumWithMinAndMaxById(_req, id).flatMap {
+        case GetEnumWithMinAndMaxByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetEnumWithMinAndMaxByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "enum_with_min_and_max" / EnumVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "invalid" / ModelVal(id) if apiVersionMatch(_req) =>
+      getInvalidById(_req, id).flatMap {
+        case GetInvalidByIdResponse.HTTP200(headers) => Ok().putHeaders(headers: _*)
+        case GetInvalidByIdResponse.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "invalid" / ModelVal(id) if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+  }
+}

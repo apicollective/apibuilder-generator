@@ -361,21 +361,31 @@ case class RubyClientGenerator(form: InvocationForm) {
       case Nil => None
       case single :: Nil => Some(single)
       case multiple => {
-        Logger.warn("Ruby client does not support multiple inheritance. Multiple union types: ${types}. Using first type")
+        Logger.warn(s"Ruby client does not support multiple inheritance. Multiple union types: ${multiple.map(_.name).mkString(", ")}. Using first type: ${multiple.head.name}")
         Some(multiple.head)
       }
     }
   }
 
-  private def unionsFor(model: Model): Seq[Union] = {
-    service.unions.filter { u =>
-      u.types.map(_.`type`).contains(model.name)
+  private def unionFor(model: Model): Option[Union] = {
+    service.unions.filter(u => u.types.map(_.`type`).contains(model.name)).toList match {
+      case Nil => None
+      case one :: Nil => Some(one)
+      case multiple => {
+        Logger.warn(s"Model ${model.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
+        multiple.headOption
+      }
     }
   }
 
-  private def unionsFor(enum: Enum): Seq[Union] = {
-    service.unions.filter { u =>
-      u.types.map(_.`type`).contains(enum.name)
+  private def unionFor(enum: Enum): Option[Union] = {
+    service.unions.filter { u => u.types.map(_.`type`).contains(enum.name) }.toList match {
+      case Nil => None
+      case one :: Nil => Some(one)
+      case multiple => {
+        Logger.warn(s"Enum ${enum.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
+        multiple.headOption
+      }
     }
   }
 
@@ -405,8 +415,8 @@ case class RubyClientGenerator(form: InvocationForm) {
           "module Models",
           Seq(
             service.unions.map { generateUnion },
-            service.enums.map { e => RubyClientGenerator.generateEnum(e, singleUnion(unionsFor(e))) },
-            service.models.map { m => generateModel(m, singleUnion(unionsFor(m))) },
+            service.enums.map { e => RubyClientGenerator.generateEnum(e, unionFor(e)) },
+            service.models.map { m => generateModel(m, unionFor(m)) },
             primitiveWrapper.wrappers().map { w => generateModel(w.model, Some(w.union)) }
           ).filter(_.nonEmpty).flatten.mkString("\n\n").indent(2),
           "end"
@@ -1049,10 +1059,10 @@ ${headers.rubyModuleConstants.indent(2)}
   // TODO should be encapsulated in the RubyDatatype model
   private def asHash(varName: String, dt: Datatype): String = {
     dt match {
-      case _: Datatype.Primitive => varName
-      case Datatype.Container.List(_: Datatype.Primitive) => varName
-      case Datatype.Container.Map(_: Datatype.Primitive) => varName
-      case Datatype.Container.Option(_: Datatype.Primitive) => varName
+      case p: Datatype.Primitive => primitiveAsHash(varName, p)
+      case Datatype.Container.List(p: Datatype.Primitive) => primitiveAsHash(varName, p)
+      case Datatype.Container.Map(p: Datatype.Primitive) => primitiveAsHash(varName, p)
+      case Datatype.Container.Option(p: Datatype.Primitive) => primitiveAsHash(varName, p)
 
       case Datatype.Container.List(inner) =>
         s"$varName.map { |o| ${asHash("o", inner)} }"
@@ -1066,6 +1076,12 @@ ${headers.rubyModuleConstants.indent(2)}
       case Datatype.UserDefined.Enum(_) => s"$varName.value"
 
       case _: Datatype.UserDefined => s"$varName.to_hash"
+    }
+  }
+  private[this] def primitiveAsHash(varName: String, p: Datatype.Primitive): String = {
+    p.name match {
+      case "decimal" => s"${varName}.to_f.to_s"
+      case _ => varName
     }
   }
 

@@ -1,20 +1,23 @@
 package scala.generator
 
 import io.apibuilder.spec.v0.models._
+
+import scala.models.{Attributes, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
 import lib.generator.GeneratorUtil
 import play.api.libs.json.JsString
 
-import scala.models.Util
+import scala.generator.ScalaPrimitive.{DateIso8601, DateTimeIso8601, JsonObject, JsonValue}
 
 object ScalaService {
-  def apply(service: Service) = new ScalaService(service)
+  def apply(service: Service, config: Attributes = Attributes.PlayDefaultConfig) = new ScalaService(service, config)
 }
 
 class ScalaService(
-  val service: Service
+  val service: Service,
+  val attributes: Attributes = Attributes.PlayDefaultConfig,
 ) {
-  val namespaces = Namespaces(service.namespace)
+  val namespaces: Namespaces = Namespaces(service.namespace)
 
   private[this] val scalaTypeResolver = ScalaTypeResolver(namespaces)
 
@@ -35,7 +38,25 @@ class ScalaService(
   val resources: Seq[ScalaResource] = service.resources.map { r => new ScalaResource(this, r) }
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
-    scalaTypeResolver.scalaDatatype(t)
+    def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
+      case _: JsonObject => attributes.jsonLib.jsonObjectType
+
+      case _: JsonValue => attributes.jsonLib.jsonValueType
+
+      case _: DateIso8601 => attributes.dateType.dataType
+
+      case _: DateTimeIso8601 => attributes.dateTimeType.dataType
+
+      case ScalaDatatype.List(t) => ScalaDatatype.List(convertObjectType(t))
+
+      case ScalaDatatype.Map(t) => ScalaDatatype.Map(convertObjectType(t))
+
+      case ScalaDatatype.Option(t) => ScalaDatatype.Option(convertObjectType(t))
+
+      case o => o
+    }
+
+    convertObjectType(scalaTypeResolver.scalaDatatype(t))
   }
 
   def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
@@ -354,6 +375,8 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     datatype.definition(varName, default, field.deprecation)
   }
 
+  def limitation: ScalaField.Limitation = ScalaField.Limitation(field.minimum, field.maximum)
+
   /**
     * A Scala type can be modeled in one of two ways:
     *  - Wire Friendly, in which the model captures the optionality of data on the wire.
@@ -390,6 +413,10 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
   }
 
   def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.nonEmpty
+}
+
+object ScalaField {
+  final case class Limitation(minimum: Option[Long], maximum: Option[Long])
 }
 
 class ScalaParameter(ssd: ScalaService, val param: Parameter) {

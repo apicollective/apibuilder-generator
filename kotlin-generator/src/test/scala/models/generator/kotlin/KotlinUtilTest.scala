@@ -1,6 +1,7 @@
 package models.generator.kotlin
 
 import org.scalatest.{FlatSpec, Matchers}
+import io.apibuilder.spec.v0.models.{Enum, EnumValue}
 
 class KotlinUtilTest
   extends FlatSpec
@@ -59,34 +60,55 @@ class KotlinUtilTest
   }
 
   "dataTypeFromField" should "produce simple types" in {
-    dataTypeFromField("boolean", "com.foobar.example").toString should be ("kotlin.Boolean")
-    dataTypeFromField("long", "com.foobar.example").toString should be ("kotlin.Long")
-    dataTypeFromField("uuid", "com.foobar.example").toString should be ("java.util.UUID")
-    dataTypeFromField("date-iso8601", "com.foobar.example").toString should be ("org.threeten.bp.LocalDate")
-    dataTypeFromField("date-time-iso8601", "com.foobar.example").toString should be ("org.threeten.bp.Instant")
+    dataTypeFromField("boolean", "com.foobar.example", Seq.empty).toString should be ("kotlin.Boolean")
+    dataTypeFromField("long", "com.foobar.example", Seq.empty).toString should be ("kotlin.Long")
+    dataTypeFromField("uuid", "com.foobar.example", Seq.empty).toString should be ("java.util.UUID")
+    dataTypeFromField("date-iso8601", "com.foobar.example", Seq.empty).toString should be ("org.threeten.bp.LocalDate")
+    dataTypeFromField("date-time-iso8601", "com.foobar.example", Seq.empty).toString should be ("org.threeten.bp.Instant")
+  }
+
+  it should "produce models" in {
+    dataTypeFromField("custom_type_one", "com.foobar.example", Seq.empty).toString should be("com.foobar.example.models.CustomTypeOne")
+    dataTypeFromField("custom_type_two", "com.foobar.example", Seq.empty).toString should be("com.foobar.example.models.CustomTypeTwo")
+  }
+
+  val enums = Seq(
+    Enum(name = "enum_one", plural = "enum_ones", values = Seq(EnumValue("value_one"))),
+    Enum(name = "enum_two", plural = "enum_twos", values = Seq(EnumValue("value_two")))
+  )
+
+  it should "produce enums" in {
+    dataTypeFromField("enum_one", "com.foobar.example", enums).toString should be("com.foobar.example.enums.EnumOne")
+    dataTypeFromField("enum_two", "com.foobar.example", enums).toString should be("com.foobar.example.enums.EnumTwo")
+    dataTypeFromField("enum_three", "com.foobar.example", enums).toString should be("com.foobar.example.models.EnumThree")
+  }
+
+  it should "handle arrays" in {
+    dataTypeFromField("[long]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.List<kotlin.Long>")
+    dataTypeFromField("[string]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.List<kotlin.String>")
+    dataTypeFromField("[CustomType]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.List<com.foobar.example.models.CustomType>")
+    dataTypeFromField("[enum_one]", "com.foobar.example", enums).toString should be("kotlin.collections.List<com.foobar.example.enums.EnumOne>")
+    dataTypeFromField("[enum_one]", "com.foobar.example", Seq.empty).toString should be("kotlin.collections.List<com.foobar.example.models.EnumOne>")
+  }
+
+  it should "handle maps" in {
+    dataTypeFromField("map[long]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, kotlin.Long>")
+    dataTypeFromField("map[date-time-iso8601]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, org.threeten.bp.Instant>")
+    dataTypeFromField("map[date-iso8601]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, org.threeten.bp.LocalDate>")
+    dataTypeFromField("map[string]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, kotlin.String>")
+    dataTypeFromField("map[CustomType]", "com.foobar.example", Seq.empty).toString should be ("kotlin.collections.Map<kotlin.String, com.foobar.example.models.CustomType>")
+    dataTypeFromField("map[enum_one]", "com.foobar.example", enums).toString should be("kotlin.collections.Map<kotlin.String, com.foobar.example.enums.EnumOne>")
+    dataTypeFromField("map[enum_one]", "com.foobar.example", Seq.empty).toString should be("kotlin.collections.Map<kotlin.String, com.foobar.example.models.EnumOne>")
   }
 
   "isModelNameWithPackage" should "return correctly" in {
     isModelNameWithPackage("abc") should be(false)
     isModelNameWithPackage("io.apibuilder.common.v0.models.reference") should be(true)
+    isModelNameWithPackage("io.apibuilder.common.v0.models.testReference") should be (true)
   }
 
   "capitalizeModelNameWithPackage" should "capitalize last word" in {
     capitalizeModelNameWithPackage("io.apibuilder.common.v0.models.reference") should be("io.apibuilder.common.v0.models.Reference")
-  }
-
-  it should "handle arrays" in {
-    dataTypeFromField("[long]", "com.foobar.example").toString should be ("kotlin.collections.List<kotlin.Long>")
-    dataTypeFromField("[string]", "com.foobar.example").toString should be ("kotlin.collections.List<kotlin.String>")
-    dataTypeFromField("[CustomType]", "com.foobar.example").toString should be ("kotlin.collections.List<com.foobar.example.CustomType>")
-  }
-
-  it should "handle maps" in {
-    dataTypeFromField("map[long]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, kotlin.Long>")
-    dataTypeFromField("map[date-time-iso8601]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, org.threeten.bp.Instant>")
-    dataTypeFromField("map[date-iso8601]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, org.threeten.bp.LocalDate>")
-    dataTypeFromField("map[string]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, kotlin.String>")
-    dataTypeFromField("map[CustomType]", "com.foobar.example").toString should be ("kotlin.collections.Map<kotlin.String, com.foobar.example.CustomType>")
   }
 
   "textToComment" should "accept String" in {

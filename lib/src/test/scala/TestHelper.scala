@@ -8,6 +8,7 @@ import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCode
 import io.apibuilder.spec.v0.models.json._
 import io.apibuilder.spec.v0.models.Service
 import io.apibuilder.generator.v0.models.File
+
 import lib.Text
 
 import org.scalatest.Matchers
@@ -19,6 +20,8 @@ object TestHelper extends Matchers {
   lazy val referenceWithImportsApiService: Service = parseFile(s"/examples/reference-with-imports.json")
   lazy val generatorApiService: Service = parseFile(s"/examples/apidoc-generator.json")
   lazy val apidocApiService: Service = parseFile(s"/examples/apidoc-api.json")
+  lazy val dateTimeService: Service = parseFile(s"/examples/date-time-types.json")
+  lazy val builtInTypesService: Service = parseFile(s"/examples/built-in-types.json")
 
   lazy val generatorApiServiceWithUnionAndDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
   lazy val generatorApiServiceWithUnionWithoutDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types.json")
@@ -56,6 +59,18 @@ object TestHelper extends Matchers {
     service(readFile(resolvePath(path)))
   }
 
+  def writeFiles(dir: java.io.File, files: Seq[File]): Unit = {
+    dir.createNewFile()
+    for (f <- files) {
+      val javaFile = new java.io.File(dir.getAbsolutePath, f.name)
+      javaFile.createNewFile()
+      val writer = new java.io.FileWriter(javaFile)
+      writer.write(f.contents)
+      writer.flush()
+      writer.close()
+    }
+  }
+
   /**
     * Finds the actual source file for the resource with this name. We
     * need this to easily overwrite the resource when updating our
@@ -69,11 +84,19 @@ object TestHelper extends Matchers {
     }
     val cmd = s"find . -type f -name ${targetPath.getName}"
 
-    cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).toList match {
+    cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).filter(_.endsWith(filename)).toList match {
       case Nil => sys.error(s"Could not find source file named[$filename]")
       case one :: Nil => one
       case multiple => sys.error(s"Multiple source files named[$filename]: " + multiple.mkString(", "))
     }
+  }
+
+  def assertJodaTimeNotPresent(files: Seq[File]): Unit = {
+    files.foreach(assertJodaTimeNotPresent(_))
+  }
+
+  def assertJodaTimeNotPresent(file: File): Unit = {
+    file.contents shouldNot include("org.joda.time")
   }
 
   def assertValidScalaSourceFiles(files: Seq[File]): Unit = {
@@ -83,26 +106,17 @@ object TestHelper extends Matchers {
 
   def assertValidScalaSourceFile(file: File): Unit = {
     file.name.length shouldBe > (0)
-    assertValidScalaSourceCode(file.contents)
+    assertValidScalaSourceCode(file.contents, Some(file.name))
   }
 
-  def assertValidScalaSourceCode(scalaSourceCode: String): Unit = {
-    import scala.tools.nsc.Global
-    import scala.tools.nsc.Settings
-    import scala.tools.nsc.reporters.StoreReporter
+  def assertValidScalaSourceCode(scalaSourceCode: String, filename: Option[String] = None): Unit = {
+    import scala.meta._
 
-    val settings = new Settings
-    settings.embeddedDefaults(getClass.getClassLoader)
-    settings.usejavacp.value = true
-    val reporter = new StoreReporter
-    val global = Global(settings, reporter)
-    val run = new global.Run
-    global.phase = run.parserPhase
-    run.cancel
-    val parser = global.newUnitParser(scalaSourceCode)
-    parser.parse()
-    withClue(reporter.infos.toString) {
-      reporter.errorCount shouldBe 0
+    val virtualFile = Input.VirtualFile(filename.getOrElse("filename.scala"), scalaSourceCode)
+    val parseResult = virtualFile.parse[Source]
+    parseResult.toEither match {
+      case Left(parseError) => fail(s"Not valid Scala source. ${parseError.toString()}")
+      case Right(sourceTree) => { /* cool, we have valid source code */ }
     }
   }
 
@@ -115,7 +129,7 @@ object TestHelper extends Matchers {
       val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
       TestHelper.writeToFile(expectedPath, contents.trim)
       // TestHelper.writeToFile(actualPath, contents.trim)
-      
+
       val cmd = s"diff $expectedPath $actualPath"
       println(cmd)
       cmd.!

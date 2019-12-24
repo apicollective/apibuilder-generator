@@ -1,7 +1,7 @@
 package scala.generator.anorm
 
 import scala.generator._
-import scala.models.ApidocComments
+import scala.models.{ApidocComments, Attributes, DateTimeTypeConfig, DateTypeConfig}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -9,7 +9,7 @@ import lib.Text
 import lib.Text._
 
 object ParserGenerator24 extends ParserGenerator {
-  override val attributes = ParserGeneratorPlayVersionSpecificAttributes(
+  override def attributes(ssd: ScalaService) = ParserGeneratorPlayVersionSpecificAttributes(
     imports = Seq(
       "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
       "play.api.libs.json.{JsArray, JsObject, JsValue}",
@@ -19,14 +19,27 @@ object ParserGenerator24 extends ParserGenerator {
 }
 
 object ParserGenerator26 extends ParserGenerator {
-  override val attributes = ParserGeneratorPlayVersionSpecificAttributes(
-    imports = Seq(
-      "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
-      "play.api.libs.json.{JsArray, JsObject, JsValue}",
-      "scala.util.{Failure, Success, Try}",
-      "play.api.libs.json.JodaReads._"
+  override def attributes(ssd: ScalaService) = {
+    val dateImports = ssd.attributes.dateType match {
+      case DateTypeConfig.JodaLocalDate => Seq(
+        "play.api.libs.json.JodaReads._",
+      )
+      case _ => Nil
+    }
+    val dateTimeImports = ssd.attributes.dateTimeType match {
+      case DateTimeTypeConfig.JodaDateTime => Seq(
+        "play.api.libs.json.JodaReads._",
+      )
+      case _ => Nil
+    }
+    ParserGeneratorPlayVersionSpecificAttributes(
+      imports = Seq(
+        "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
+        "play.api.libs.json.{JsArray, JsObject, JsValue}",
+        "scala.util.{Failure, Success, Try}",
+      ) ++ (dateImports ++ dateTimeImports).distinct
     )
-  )
+  }
 }
 
 case class ParserGeneratorPlayVersionSpecificAttributes(
@@ -35,10 +48,10 @@ case class ParserGeneratorPlayVersionSpecificAttributes(
 
 trait ParserGenerator extends CodeGenerator {
 
-  val attributes: ParserGeneratorPlayVersionSpecificAttributes
+  def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = new ScalaService(form.service)
+    val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
     val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
 
@@ -55,7 +68,7 @@ trait ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Conversions",
-              header ++ Conversions.code(ssd, attributes),
+              header ++ Conversions.code(ssd, attributes(ssd)),
               Some("Scala")
             ),
             ServiceFileNames.toFile(
@@ -144,7 +157,7 @@ trait ParserGenerator extends CodeGenerator {
     @scala.annotation.tailrec
     private[this] def parserFieldName(name: String, datatype: ScalaDatatype): String = {
       datatype match {
-        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.JsonValueAsPlay | ScalaPrimitive.JsonValueAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) => {
+        case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | _: ScalaPrimitive.Enum) => {
           ScalaUtil.toVariable(name)
         }
         case ScalaPrimitive.Model(_, _) => {
@@ -168,7 +181,7 @@ trait ParserGenerator extends CodeGenerator {
     @scala.annotation.tailrec
     private[this] def parserFieldDeclaration(name: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
-        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.JsonValueAsPlay | ScalaPrimitive.JsonValueAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | ScalaPrimitive.Enum(_, _) | ScalaDatatype.List(_) | ScalaDatatype.Map(_) => {
+        case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | _: ScalaPrimitive.Enum | _: ScalaDatatype.List | _: ScalaDatatype.Map) => {
           s"""$name: String = "$originalName""""
         }
         case ScalaPrimitive.Model(namespaces, name) => {
@@ -199,7 +212,7 @@ trait ParserGenerator extends CodeGenerator {
       */
     private[this] def addImports(datatype: ScalaDatatype): Unit = {
       datatype match {
-        case ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Joda | ScalaPrimitive.DateTimeIso8601Java | ScalaPrimitive.Decimal | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.JsonValueAsPlay | ScalaPrimitive.JsonValueAsCirce | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid => {
+        case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
           // no-op
         }
         case f @ ScalaDatatype.List(inner) => {
@@ -229,15 +242,11 @@ trait ParserGenerator extends CodeGenerator {
         case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.Integer => s"SqlParser.int($fieldName)"
         case f @ ScalaPrimitive.Long => s"SqlParser.long($fieldName)"
-        case f @ ScalaPrimitive.DateIso8601Joda => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.DateIso8601Java => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.DateTimeIso8601Joda => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.DateTimeIso8601Java => generatePrimitiveRowParser(fieldName, f)
+        case f : ScalaPrimitive.DateIso8601 => generatePrimitiveRowParser(fieldName, f)
+        case f : ScalaPrimitive.DateTimeIso8601 => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.ObjectAsPlay => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.ObjectAsCirce => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.JsonValueAsPlay => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.JsonValueAsCirce => generatePrimitiveRowParser(fieldName, f)
+        case f : ScalaPrimitive.JsonObject => generatePrimitiveRowParser(fieldName, f)
+        case f : ScalaPrimitive.JsonValue => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.String => s"SqlParser.str($fieldName)"
         case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(fieldName, f)

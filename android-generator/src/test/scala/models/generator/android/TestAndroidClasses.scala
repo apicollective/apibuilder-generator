@@ -135,7 +135,10 @@ class TestAndroidClasses
     files(1).name should be("Model.java")
     files(2).name should be("ApiBuilderObjectMapper.java")
     files(3).name should be("ModelsClient.java")
-    files.foreach { file => JavaParser.parse(file.contents) }
+    val javaParser = new JavaParser()
+    files.foreach { file =>
+      javaParser.parse(file.contents).isSuccessful shouldBe true
+    }
   }
 
 }

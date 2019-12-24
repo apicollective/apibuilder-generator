@@ -84,6 +84,23 @@ class ScalaUtilSpec extends FunSpec with Matchers {
            | */""".stripMargin)
     }
 
+    it("avoids empty lines") {
+      ScalaUtil.textToComment(
+        Seq(
+          "description",
+          " ",
+          "foo",
+        )
+      ) should be(
+        """
+          |/**
+          | * description
+          | *
+          | * foo
+          | */
+          | """.stripMargin.trim
+      )
+    }
   }
 
   describe("scalaDefault") {
@@ -175,7 +192,7 @@ class ScalaUtilSpec extends FunSpec with Matchers {
 
     describe ("default: 2014-03-14, datatype: date-iso8601") {
       it("behaves for Joda-Time") {
-        ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601Joda) should be("new _root_.org.joda.time.LocalDate(2014, 3, 14)")
+        ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601Joda) should be("""_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate("2014-03-14")""")
       }
       it("behaves for java.time") {
         ScalaUtil.scalaDefault("2014-03-14", ScalaPrimitive.DateIso8601Java) should be("""_root_.java.time.LocalDate.parse("2014-03-14")""")
@@ -189,8 +206,8 @@ class ScalaUtilSpec extends FunSpec with Matchers {
         }
       }
       it("behaves for java.time") {
-          ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601Java) should be {
-            """_root_.java.time.Instant.parse("2014-03-14T12:13:15Z")"""
+          ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601JavaInstant) should be {
+            """_root_.java.time.OffsetDateTime.parse("2014-03-14T12:13:15Z").toInstant"""
           }
       }
     }

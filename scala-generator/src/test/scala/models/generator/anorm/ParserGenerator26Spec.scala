@@ -1,6 +1,6 @@
 package models.generator.anorm
 
-import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.generator.anorm.ParserGenerator26
@@ -16,6 +16,18 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
       "attributes": [],
       "fields": [
         { "name": "guid", "type": "uuid", "required": true, "attributes": [] }
+      ]
+    }
+  """
+
+  val dateTimeModel = """
+    {
+      "name": "reference",
+      "plural": "references",
+      "attributes": [],
+      "fields": [
+        { "name": "date", "type": "date-iso8601", "required": true, "attributes": [] },
+        { "name": "time", "type": "date-time-iso8601", "required": true, "attributes": [] }
       ]
     }
   """
@@ -295,6 +307,34 @@ class ParserGenerator26Spec extends FunSpec with Matchers {
         files.map(_.name) should be(fileNames)
         models.TestHelper.assertEqualsFile("/generator/anorm/location-conversions-26.txt", files.head.contents)
         models.TestHelper.assertEqualsFile("/generator/anorm/location-parsers.txt", files.last.contents)
+      }
+    }
+  }
+
+  it("anorm bindings for joda time types") {
+    val form = ServiceBuilder(models = Seq(dateTimeModel)).form
+    ParserGenerator26.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(fileNames)
+        models.TestHelper.assertEqualsFile("/generator/anorm/datetime-conversions-joda.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/datetime-joda.txt", files.last.contents)
+      }
+    }
+  }
+
+  it("anorm bindings for java time types") {
+    val form = ServiceBuilder(models = Seq(dateTimeModel)).form.copy(attributes = Seq(Attribute("scala_generator.time_library", "java")))
+    ParserGenerator26.invoke(form) match {
+      case Left(errors) => {
+        fail(errors.mkString(", "))
+      }
+      case Right(files) => {
+        files.map(_.name) should be(fileNames)
+        models.TestHelper.assertEqualsFile("/generator/anorm/datetime-conversions-java.txt", files.head.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/datetime-java.txt", files.last.contents)
       }
     }
   }

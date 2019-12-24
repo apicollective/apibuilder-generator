@@ -1,22 +1,16 @@
 package scala.generator.anorm
 
 import lib.Text._
-import scala.generator.{Namespaces, ScalaPrimitive, ScalaService}
+
+import scala.generator.{ScalaPrimitive, ScalaService}
 
 object Conversions {
 
-  private val Types = Seq(
+  private val JavaPrimitiveTypes = Seq(
     ScalaPrimitive.Boolean,
     ScalaPrimitive.Double,
     ScalaPrimitive.Integer,
     ScalaPrimitive.Long,
-    ScalaPrimitive.DateIso8601Joda,
-    ScalaPrimitive.DateTimeIso8601Joda,
-    ScalaPrimitive.Decimal,
-    ScalaPrimitive.ObjectAsPlay,
-    ScalaPrimitive.JsonValueAsPlay,
-    ScalaPrimitive.String,
-    ScalaPrimitive.Uuid
   )
 
   private val Header = """
@@ -69,6 +63,8 @@ package %s {
     ssd: ScalaService,
     attributes: ParserGeneratorPlayVersionSpecificAttributes
   ): String = {
+    val coreTypes = JavaPrimitiveTypes ++ Seq(ssd.attributes.dateType.dataType, ssd.attributes.dateTimeType.dataType, ScalaPrimitive.Decimal, ssd.attributes.jsonLib.jsonObjectType, ssd.attributes.jsonLib.jsonValueType, ScalaPrimitive.String, ScalaPrimitive.Uuid)
+
     Seq(
       Header.format(ssd.namespaces.anormConversions, attributes.imports.map(i => s"\n  import $i").mkString),
       Seq(
@@ -78,20 +74,22 @@ package %s {
       ).flatten.mkString("\n").indent(2),
       Seq(
         "object Standard {",
-        coreTypes().indent(2),
+        standard(coreTypes).indent(2),
         "}"
       ).mkString("\n").indent(2),
       "}"
     ).mkString("\n\n")
   }
 
-  def coreTypes(): String = {
+  private def standard(
+    types: Seq[ScalaPrimitive],
+  ): String = {
     (
       Seq(
         Seq(
           s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }"
         )
-      ) ++ Types.map { t =>
+      ) ++ types.map { t =>
         Seq(
           s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }",
           s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }"

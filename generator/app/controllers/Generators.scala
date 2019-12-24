@@ -167,6 +167,17 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_7_client",
+        name = "Play 2.7 client",
+        description = Some("Play Framework 2.7 client based on <a href='http://www.playframework.com/documentation/2.7.x/ScalaWS'>WS API</a>."),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.Play27ClientGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "play_2_x_json",
         name = "Play 2.x json",
         description = Some("Generate play 2.x case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
@@ -240,6 +251,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "java_aws_lambda_pojo_client",
+        name = "Java AWS Lambda POJO Client",
+        description = Some("Generate Java POJO models for use with AWS Lambdas."),
+        language = Some("Java")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.javaAwsLambdaPojos.JavaAwsLambdaPOJOClasses)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "android_kotlin_rx2_client",
         name = "Android Kotlin RxJava2 Client",
         description = Some("Generate Kotlin models and Retrofit 2 + RxJava2 client for Android from the API description."),
@@ -247,6 +268,16 @@ object Generators {
       ),
       status = lib.generator.Status.InDevelopment,
       codeGenerator = Some(models.generator.kotlin.KotlinRxClasses)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "csv_client",
+        name = "CSV Generator",
+        description = Some("Information about API in useful CSV format, for example list of endpoints"),
+        language = Some("test/csv")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(models.generator.csv.CsvGenerator)
     ),
     CodeGenTarget(
       metaData = Generator(
@@ -354,6 +385,37 @@ object Generators {
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s018Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "http4s_0_20",
+        name = "Http4s 0.20",
+        description = Some(
+          """Http4s 0.20 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.20/client/'>http4s client</a>.
+            |Note: http4s 0.19 has been withdrawn by the authors due to issues with versioning. 0.20 is the supported http4s version.""".stripMargin),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.http4s.Http4s020Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "play_2_6",
+        name = "Play 2.6 (Gen. V2)"
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(scala.models.play.Play26Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "postman_collection_2_1",
+        name = "Postman Collection v2.1",
+        description = Some("Generates Postman Collection that contains every single endpoint defined in Apibuilder spec. Requests are filled with example JSON payloads."),
+        language = Some("json")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(generator.PostmanCollectionGeneratorImpl)
     )
   ).sortBy(_.metaData.key)
 }

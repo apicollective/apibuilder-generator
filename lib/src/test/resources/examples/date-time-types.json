@@ -1,0 +1,119 @@
+{
+  "apidoc": {
+    "version": "0.14.52"
+  },
+  "name": "time-types",
+  "organization": {
+    "key": "apibuilder"
+  },
+  "application": {
+    "key": "time-types"
+  },
+  "namespace": "io.gregor.time.types.v0",
+  "version": "0.0.1-dev",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [
+    {
+      "name": "date_time_union",
+      "plural": "date_time_unions",
+      "types": [
+        {
+          "type": "date-time-iso8601",
+          "attributes": [],
+          "discriminator_value": "date-time-iso8601"
+        },
+        {
+          "type": "date-iso8601",
+          "attributes": [],
+          "discriminator_value": "date-iso8601"
+        }
+      ],
+      "attributes": [],
+      "discriminator": "type"
+    }
+  ],
+  "models": [
+    {
+      "name": "date_time_model",
+      "plural": "date_time_models",
+      "fields": [
+        {
+          "name": "date-time",
+          "type": "date-time-iso8601",
+          "required": true,
+          "attributes": [],
+          "annotations": []
+        },
+        {
+          "name": "date",
+          "type": "date-iso8601",
+          "required": true,
+          "attributes": [],
+          "annotations": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "date_time_model",
+      "plural": "date_time_models",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/date_time_models/:path_date/:path_time",
+          "parameters": [
+            {
+              "name": "path_date",
+              "type": "date-iso8601",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "path_time",
+              "type": "date-time-iso8601",
+              "location": "Path",
+              "required": true
+            },
+            {
+              "name": "query_date",
+              "type": "date-iso8601",
+              "location": "Query",
+              "required": true
+            },
+            {
+              "name": "query_time",
+              "type": "date-time-iso8601",
+              "location": "Query",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "date_time_model",
+              "attributes": []
+            }
+          ],
+          "attributes": [],
+          "body": {
+            "type": "date_time_model",
+            "attributes": []
+          }
+        }
+      ],
+      "attributes": [],
+      "path": "/date_time_models"
+    }
+  ],
+  "attributes": [],
+  "annotations": []
+}

@@ -1,11 +1,8 @@
 package models.generator.kotlin
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import org.scalatest.{FunSpec, Matchers}
-import java.nio.file.Files.createTempDirectory
-
 import KotlinTestHelper._
+import io.apibuilder.generator.v0.models.InvocationForm
 
 class KotlinGeneratorTest
   extends FunSpec
@@ -13,39 +10,72 @@ class KotlinGeneratorTest
 
   import models.TestHelper._
 
-  val serviceDefs = Seq(apidocApiService, generatorApiServiceWithUnionAndDescriminator)
+  private val serviceDefs = Seq(builtInTypesService,
+                                // dateTimeService,
+                                // generatorApiServiceWithUnionAndDescriminator,
+                                apidocApiService,
+                                collectionJsonDefaultsService,
+                                referenceApiService,
+                                referenceWithImportsApiService)
 
-  describe("invoke should output Kotlin source files") {
+  describe("Kotlin code compiles") {
     for (service <- serviceDefs) {
-      it(s"for service [${service.name}]") {
-        val tmpDir = createTempDirectory(getClass().getSimpleName).toFile
-        tmpDir.deleteOnExit()
-        val service = models.TestHelper.apidocApiService
-        service.enums.size shouldBe (3)
-        val invocationForm = new InvocationForm(service, Seq.empty, None)
-        val generator = new KotlinGenerator()
-        val files = generator.invoke(invocationForm).right.get
-        writeFiles(tmpDir, files)
-        files.size shouldBe >(0)
-        files.foreach(f => {
-          f.contents.length shouldBe >(0)
-          f.name should endWith(".kt")
-          // assertValidKotlinSourceCode(tmpDir)
-        })
-        files.exists(
-          file => (file.name == "JacksonObjectMapperFactory.kt" && file.contents.contains(classOf[ObjectMapper].getSimpleName))
-        ) shouldBe true
-
-        Seq("Visibility", "Publication", "OriginalType").foreach { enumName =>
-          enumFileExists(files, enumName) shouldBe true
-        }
+      it(s"[${service.name}] imports=${(service.imports.size > 0)}") {
+        val dir = generateSourceFiles(service)
+        assertKotlinCodeCompiles(dir)
       }
     }
   }
 
-  private def enumFileExists(files: Seq[File], enumName: String): Boolean = {
-    files.exists(file => {
-      file.contents.contains(s"enum class ${enumName}") && file.contents.contains("UNDEFINED")
-    })
+  describe("Package names") {
+    val service = referenceApiService
+    it(s"[${service.name}]") {
+      service.enums.size shouldBe > (0)
+      service.namespace shouldBe "io.apibuilder.reference.api.v0"
+      val invocationForm = InvocationForm(service, Seq.empty, None)
+      val generator = new KotlinGenerator()
+      val files = generator.invoke(invocationForm).right.get
+      assertPackageExists("io.apibuilder.reference.api.v0.models", files)
+      assertPackageExists("io.apibuilder.reference.api.v0.enums", files)
+    }
+  }
+
+  describe("Union") {
+    val service = generatorApiServiceWithUnionAndDescriminator
+    it(s"[${service.name}] sanity check") {
+      service.models.map(_.name) shouldBe Seq("guest_user", "registered_user")
+      service.unions.map(_.name) shouldBe Seq("user")
+      val unionTypes = service.unions.flatMap(_.types)
+      unionTypes.map(_.`type`) shouldBe Seq("registered_user", "guest_user", "system_user", "string")
+      val invocationForm = InvocationForm(service, Seq.empty, None)
+      val generator = new KotlinGenerator()
+      val files = generator.invoke(invocationForm).right.get
+
+      // model: registered_user
+      val registeredUser = getFile("RegisteredUser.kt", files)
+      registeredUser.dir.get should endWith ("/models")
+      assertFileContainsString("data class RegisteredUser(", registeredUser)
+      assertFileContainsString("@JsonProperty(\"email\")", registeredUser)
+      assertFileContainsString("@JsonProperty(\"id\")", registeredUser)
+
+      // model: guest_user
+      val guestUser = getFile("GuestUser.kt", files)
+      guestUser.dir.get should endWith ("/models")
+      assertFileContainsString("data class GuestUser(", guestUser)
+      assertFileContainsString("@JsonProperty(\"email\")", guestUser)
+      assertFileContainsString("@JsonProperty(\"id\")", guestUser)
+
+      // union: user
+      val user = getFile("User.kt", files)
+      user.dir.get should endWith ("/models")
+      assertFileContainsString("@JsonTypeInfo(", user)
+      assertFileContainsString("@JsonSubTypes(", user)
+      assertFileContainsString("JsonSubTypes.Type(", user)
+      assertFileContainsString("@JsonProperty(\"email\")", user)
+      assertFileContainsString("@JsonProperty(\"id\")", user)
+      assertFileContainsString("data class GuestUser(", user)
+      assertFileContainsString("data class RegisteredUser(", user)
+      assertFileContainsString("object UserUndefined", user)
+    }
   }
 }

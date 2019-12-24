@@ -1,47 +1,95 @@
 package models.generator.kotlin
 
-import java.io.FileWriter
-import java.util.concurrent.atomic.AtomicInteger
-
-import io.apibuilder.generator.v0.models.{File => ApiBuilderFile}
-import org.jetbrains.kotlin.cli.common.messages.{CompilerMessageLocation, CompilerMessageSeverity, MessageCollector}
-import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
-import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
-import org.jetbrains.kotlin.config.Services
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models.Service
+import io.github.sullis.kotlin.compiler.KotlinCompiler
+import lib.Text
+import models.TestHelper.{assertJodaTimeNotPresent, writeFiles}
 import org.scalatest.Matchers
 
 object KotlinTestHelper extends Matchers {
 
-  def writeFiles(dir: java.io.File, files: Seq[ApiBuilderFile]): Unit = {
-    dir.createNewFile()
-    for (f <- files) {
-      val javaFile = new java.io.File(dir.getAbsolutePath, f.name)
-      javaFile.createNewFile()
-      val writer = new FileWriter(javaFile)
-      writer.write(f.contents)
-      writer.flush()
-      writer.close()
-    }
+  def generateSourceFiles(service: Service): java.io.File = {
+    val tmpDir = createTempDirectory(service)
+    val invocationForm = InvocationForm(service, Seq.empty, None)
+    val generator = new KotlinGenerator()
+    val files = generator.invoke(invocationForm).right.get
+    files.size shouldBe >(0)
+    files.foreach(f => {
+      f.contents.length shouldBe >(0)
+      f.name should endWith(".kt")
+    })
+    assertFileExists("JacksonObjectMapperFactory.kt", files)
+
+    service.enums.foreach( e => {
+      val expectedFilename = KotlinUtil.capitalizeModelName(e.name) + ".kt"
+      assertFileExists(expectedFilename, files)
+      val file = getFile(expectedFilename, files)
+      file.dir.get should endWith ("/enums")
+    })
+
+    service.unions.foreach( u => {
+      val expectedFilename = KotlinUtil.capitalizeModelName(u.name) + ".kt"
+      assertFileExists(expectedFilename, files)
+      val file = getFile(expectedFilename, files)
+      file.dir.get should endWith ("/models")
+    })
+
+    service.models.foreach( m => {
+      val expectedFilename = KotlinUtil.capitalizeModelName(m.name) + ".kt"
+      assertFileExists(expectedFilename, files)
+      val file = getFile(expectedFilename, files)
+      file.dir.get should endWith ("/models")
+      m.fields.foreach( f => {
+        if (KotlinUtil.isParameterArray(f.`type`)) {
+          assertFileContainsString("import kotlin.collections.List", file)
+        }
+      })
+    })
+
+    assertJodaTimeNotPresent(files)
+    writeFiles(tmpDir, files)
+    tmpDir
   }
 
-  def assertValidKotlinSourceCode(sourceCode: String): Unit = {
-    val msgCollector = new MessageCollectorImpl()
-    val compiler = new K2JVMCompiler()
-    val args = new K2JVMCompilerArguments()
-    val exitCode = compiler.exec(msgCollector, Services.EMPTY, args)
-    msgCollector.hasErrors shouldBe false
+  def assertFileExists(filename: String, files: Seq[File]): Unit = {
+    files.exists(
+      file => (file.name == filename)
+    ) shouldBe true
   }
 
-  class MessageCollectorImpl extends MessageCollector {
-    private val errorCount = new AtomicInteger(0)
-    override def hasErrors: Boolean = { errorCount.get > 0 }
-    override def clear(): Unit = ???
-    override def report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageLocation): Unit = {
-      if (severity.isError) {
-        errorCount.incrementAndGet()
-        System.err.println("KotlinTestHelper ERROR: " + message)
-      }
-    }
+  def assertPackageExists(packageName: String, files: Seq[File]): Unit = {
+    assertFileContainsString(s"package ${packageName}", files)
+  }
 
+  def assertFileContainsString(s: String, files: Seq[File]): Unit = {
+    files.exists(
+      file => file.contents.contains(s)
+    ) shouldBe true
+  }
+
+  def assertFileContainsString(s: String, file: File): Unit = {
+    file.contents.contains(s) shouldBe true
+  }
+
+  def getFile(filename: String, files: Seq[File]): File = {
+    files.filter(_.name == filename).head
+  }
+
+  def assertKotlinCodeCompiles(kotlinSourceDirectory: java.io.File): Unit = {
+    assert(kotlinSourceDirectory.exists())
+    assert(kotlinSourceDirectory.canRead())
+    assert(kotlinSourceDirectory.isDirectory())
+    val result = new KotlinCompiler().compileSourceDir(kotlinSourceDirectory.toPath)
+    result.isSuccess shouldBe true
+  }
+
+  private def createTempDirectory(service: Service): java.io.File = {
+    val name = (service.name + System.currentTimeMillis).replace(' ', '-')
+    val tmpdir = "/tmp"
+    val dir = new java.io.File(tmpdir + "/" + name)
+    dir.mkdirs()
+    dir.deleteOnExit()
+    dir
   }
 }

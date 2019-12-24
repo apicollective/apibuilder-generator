@@ -23,9 +23,14 @@ object ScalaGeneratorUtil {
 
     val prefix = s"@param "
     val paramDesc: Seq[String] = params.flatMap { case (name, optionalDescription) =>
-      optionalDescription.map(_.trim).filter(_.nonEmpty).map { desc =>
+      optionalDescription.map(_.trim).filter(_.nonEmpty).flatMap { desc =>
         val lines = GeneratorUtil.splitIntoLines(desc).map { _.indent(prefix.length) }
-        s"$prefix$name " + lines.mkString("\n").trim
+        val paramDocs = lines.mkString("\n").trim
+        if (paramDocs.isEmpty) {
+          None
+        } else {
+          Some(s"$prefix$name " + lines.mkString("\n").trim)
+        }
       }
     }
 
@@ -176,9 +181,9 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
         case ScalaPrimitive.String => config.pathEncode(name)
         case ScalaPrimitive.Integer | ScalaPrimitive.Double | ScalaPrimitive.Long | ScalaPrimitive.Boolean | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid => name
         case ScalaPrimitive.Enum(_, _) => config.pathEncode(s"$name.toString")
-        case ScalaPrimitive.DateIso8601Joda | ScalaPrimitive.DateIso8601Java | ScalaPrimitive.DateTimeIso8601Java => s"$name.toString"
-        case ScalaPrimitive.DateTimeIso8601Joda => config.pathEncode(s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print($name)")
-        case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | ScalaPrimitive.ObjectAsPlay | ScalaPrimitive.ObjectAsCirce | ScalaPrimitive.JsonValueAsPlay | ScalaPrimitive.JsonValueAsCirce | ScalaPrimitive.Unit => {
+        case dt @ (_: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601) =>
+          config.pathEncode(dt.asString(name))
+        case _ @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.Unit) => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }
         case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encounteered as path param($name)")
