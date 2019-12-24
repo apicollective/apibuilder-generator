@@ -64,21 +64,10 @@ object ScalaCheckGenerator extends CodeGenerator {
     """.stripMargin.trim
   }
 
-  def jodaDateTime(imports: Seq[Import]): String = {
-    val alreadyDefined = if(imports.isEmpty) { "" } else { "override" }
-    s"""
-      |implicit ${alreadyDefined} def arbitraryJodaDateTime: Arbitrary[_root_.org.joda.time.DateTime] = Arbitrary(genJodaDateTime)
-      |${alreadyDefined} def genJodaDateTime: Gen[_root_.org.joda.time.DateTime] = Gen.posNum[Long].map(instant => new _root_.org.joda.time.DateTime(instant))
-    """.stripMargin.trim
-  }
-
-  def playJsObject(imports: Seq[Import]): String = {
-    val alreadyDefined = if(imports.isEmpty) { "" } else { "override" }
-    s"""
-      |implicit ${alreadyDefined} def arbitraryPlayJsObject: Arbitrary[_root_.play.api.libs.json.JsObject] = Arbitrary(genPlayJsObject)
-      |${alreadyDefined} def genPlayJsObject: Gen[_root_.play.api.libs.json.JsObject] = Gen.const(_root_.play.api.libs.json.JsObject.empty)
-    """.stripMargin.trim
-  }
+  def abstractArbitrary(): String = s"""
+    |implicit def arbitraryJodaDateTime: Arbitrary[_root_.org.joda.time.DateTime]
+    |implicit def arbitraryPlayJsObject: Arbitrary[_root_.play.api.libs.json.JsObject]
+  """.stripMargin.trim
 
   def contents(form: InvocationForm, ssd: ScalaService): String =
     s"""
@@ -90,8 +79,7 @@ object ScalaCheckGenerator extends CodeGenerator {
       |object ${objectName(ssd.name)} extends ${traitName(ssd.name)}
       |trait ${traitName(ssd.name)} ${extendsWith(form.service.imports)} {
       |
-      |  ${jodaDateTime(form.service.imports)}
-      |  ${playJsObject(form.service.imports)}
+      |  ${abstractArbitrary}
       |
       |  ${ssd.models.map(model(ssd.namespaces.models, _)).mkString("\n\n")}
       |
