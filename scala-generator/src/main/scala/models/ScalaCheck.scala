@@ -69,6 +69,14 @@ object ScalaCheckGenerator extends CodeGenerator {
     |implicit def arbitraryPlayJsObject: Arbitrary[_root_.play.api.libs.json.JsObject]
   """.stripMargin.trim
 
+  def abstractArbitraryImplementation(): String = s"""
+    |implicit def arbitraryJodaDateTime: Arbitrary[_root_.org.joda.time.DateTime] = Arbitrary(genJodaDateTime)
+    |def genJodaDateTime: Gen[_root_.org.joda.time.DateTime] = Gen.posNum[Long].map(instant => new _root_.org.joda.time.DateTime(instant))
+    |
+    |implicit def arbitraryPlayJsObject: Arbitrary[_root_.play.api.libs.json.JsObject] = Arbitrary(genPlayJsObject)
+    |def genPlayJsObject: Gen[_root_.play.api.libs.json.JsObject] = Gen.const(_root_.play.api.libs.json.JsObject.empty)
+  """.stripMargin.trim
+
   def contents(form: InvocationForm, ssd: ScalaService): String =
     s"""
       |${header(form)}
@@ -76,7 +84,10 @@ object ScalaCheckGenerator extends CodeGenerator {
       |
       |import org.scalacheck.{Arbitrary, Gen}
       |
-      |object ${objectName(ssd.name)} extends ${traitName(ssd.name)}
+      |object ${objectName(ssd.name)} extends ${traitName(ssd.name)} {
+      | ${abstractArbitraryImplementation}
+      |}
+      |
       |trait ${traitName(ssd.name)} ${extendsWith(form.service.imports)} {
       |
       |  ${abstractArbitrary}
