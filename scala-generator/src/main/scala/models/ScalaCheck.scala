@@ -9,13 +9,13 @@ object ScalaCheckGenerator extends CodeGenerator {
 
   def fileName(str: String): String = s"${objectName(str)}.scala"
   def packageName(str: String): String = s"${str}.models.scalacheck"
-  def objectName(str: String): String = s"${str}ScalaCheck"
+  def objectName(str: String): String = s"${str.split('-').map(_.capitalize).mkString}ScalaCheck"
   def traitName(str: String): String = objectName(str)
 
   def header(form: InvocationForm) = ApidocComments(form.service.version, form.userAgent).toJavaString()
 
   def extendsWith(imports: Seq[Import]): String = {
-    val traits = imports.map(i => s"${packageName(i.namespace)}.${traitName(i.application.key.capitalize)}").toList
+    val traits = imports.map(i => s"${packageName(i.namespace)}.${traitName(i.application.key)}").toList
     traits match {
       case Nil => ""
       case one :: Nil => s"extends ${one}"
