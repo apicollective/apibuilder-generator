@@ -26,6 +26,18 @@ object TestHelper extends Matchers {
   lazy val generatorApiServiceWithUnionAndDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
   lazy val generatorApiServiceWithUnionWithoutDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types.json")
 
+  lazy val emptyService: Service = service(buildJson("""
+      "imports": [],
+      "headers": [],
+      "info": [],
+      "models": [],
+      "enums": [],
+      "unions": [],
+      "models": [],
+      "resources": [],
+      "attributes": []
+    """))
+
   def buildJson(json: String): String = {
     val specVersion = io.apibuilder.spec.v0.Constants.Version
     val body = s"""

@@ -804,7 +804,7 @@ package io.apibuilder.reference.api.v0 {
       }
     }
 
-    def _logRequest(method: String, req: play.api.libs.ws.WSRequestHolder)(implicit ec: scala.concurrent.ExecutionContext): play.api.libs.ws.WSRequestHolder = {
+    def _logRequest(method: String, req: play.api.libs.ws.WSRequestHolder): play.api.libs.ws.WSRequestHolder = {
       val queryComponents = for {
         (name, values) <- req.queryString
         value <- values
@@ -823,7 +823,7 @@ package io.apibuilder.reference.api.v0 {
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None,
       requestModifier: play.api.libs.ws.WSRequestHolder => play.api.libs.ws.WSRequestHolder = identity
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
+    ): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
       method.toUpperCase match {
         case "GET" => {
           val request = requestModifier(_requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*))

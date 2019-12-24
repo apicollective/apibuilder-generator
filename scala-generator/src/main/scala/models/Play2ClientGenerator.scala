@@ -206,7 +206,7 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
       }
     }
 
-    def _logRequest(method: String, req: ${version.config.requestBuilderClass})(implicit ec: scala.concurrent.ExecutionContext): ${version.config.requestBuilderClass} = {
+    def _logRequest(method: String, req: ${version.config.requestBuilderClass}): ${version.config.requestBuilderClass} = {
       val queryComponents = for {
         (name, values) <- req.queryString
         value <- values
@@ -225,7 +225,7 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None,
       requestModifier: ${version.config.requestBuilderClass} => ${version.config.requestBuilderClass} = identity
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[${version.config.responseClass}] = {
+    ): scala.concurrent.Future[${version.config.responseClass}] = {
       method.toUpperCase match {
         case "GET" => {
           val request = requestModifier(_requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*))

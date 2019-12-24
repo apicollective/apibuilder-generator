@@ -323,7 +323,7 @@ package io.gregor.time.types.v0 {
       }
     }
 
-    def _logRequest(method: String, req: play.api.libs.ws.WSRequest)(implicit ec: scala.concurrent.ExecutionContext): play.api.libs.ws.WSRequest = {
+    def _logRequest(method: String, req: play.api.libs.ws.WSRequest): play.api.libs.ws.WSRequest = {
       val queryComponents = for {
         (name, values) <- req.queryString
         value <- values
@@ -342,7 +342,7 @@ package io.gregor.time.types.v0 {
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None,
       requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
-    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
+    ): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
       method.toUpperCase match {
         case "GET" => {
           val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
