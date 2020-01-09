@@ -1,5 +1,6 @@
 package scala.models
 
+import cats.implicits._
 import lib.generator.CodeGenerator
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Import
@@ -77,7 +78,7 @@ object ScalaCheckGenerator extends CodeGenerator {
     |def genPlayJsObject: Gen[_root_.play.api.libs.json.JsObject] = Gen.const(_root_.play.api.libs.json.JsObject.empty)
   """.stripMargin.trim
 
-  def contents(form: InvocationForm, ssd: ScalaService): String =
+  def fileContents(form: InvocationForm, ssd: ScalaService): String =
     s"""
       |${header(form)}
       |package ${packageName(ssd.namespaces.base)}
@@ -103,8 +104,11 @@ object ScalaCheckGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val ssd = ScalaService(form.service)
-    Right(Seq(
-        File(fileName(ssd.name), None, contents(form, ssd), None)
-    ))
+    val name = fileName(ssd.name)
+    val contents = fileContents(form, ssd)
+
+    utils.ScalaFormatter.format(contents)
+      .map(contents => Seq(File(name, None, contents, None)))
+      .leftMap(t => Seq(t.getMessage))
   }
 }

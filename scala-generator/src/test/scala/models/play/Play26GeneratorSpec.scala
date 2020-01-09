@@ -33,20 +33,6 @@ class Play26GeneratorSpec extends FunSpec with Matchers with PropertyChecks {
     }
   }
 
-  ignore("formatScala should format valid scala code") {
-    val contents = "case class Foo(bar: String)"
-    val result = Play26Generator.formatScala(contents)
-
-    result should be('right)
-  }
-
-  ignore("formatScala should fail to format invalid scala code") {
-    val contents = "Foo Bar"
-    val result = Play26Generator.formatScala(contents)
-
-    result should be('left)
-  }
-
   it("formatRoutes should format routes") {
     forAll { (lines: List[String], spacesCount: Byte) =>
       val spaces = " " * spacesCount
