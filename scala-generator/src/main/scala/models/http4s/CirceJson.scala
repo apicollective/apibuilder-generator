@@ -19,7 +19,7 @@ case class CirceJson(
     import scala.util.Try
     import io.circe.{Json, JsonObject, Encoder, Decoder, DecodingFailure}
     import io.circe.syntax._
-${JsonImports(ssd.service).mkString("\n").indent(4)}
+${JsonImports(ssd.service).mkString("\n").indentString(4)}
 
     // Make Scala 2.11 Either monadic
     private[${ssd.namespaces.last}] implicit def eitherOps[A,B](e: Either[A,B]) = cats.implicits.catsSyntaxEither(e)
@@ -29,7 +29,7 @@ ${JsonImports(ssd.service).mkString("\n").indent(4)}
 
     private[${ssd.namespaces.last}] implicit val encode${Uuid.shortName}: Encoder[${Uuid.fullName}] =
       Encoder.encodeString.contramap[${Uuid.fullName}](uuid => ${Uuid.asString("uuid")})
-${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indentString(4)}
   }
 }"""
   }
@@ -90,7 +90,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
       s"${implicitDecoderDef(union.name)} = Decoder.instance { c =>",
       unionTypesWithNames(union).map { case (t, typeName) =>
         s"""c.get[$typeName]("${t.discriminatorName}") orElse"""
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       s"  Right(${union.undefinedType.fullName}(c.value.toString))",
       s"}"
     ).mkString("\n")
@@ -108,7 +108,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
       s"""  c.get[Option[String]]("$discriminator") match {""",
       typesWithNames.map { case (t, typeName) =>
         s"""  case Right(Some(s)) if s == "${t.discriminatorName}" => c.as[$typeName]"""
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       s"""    case Right(Some(s)) => Right(${union.undefinedType.fullName}(s))""",
       s"""    case _ => $defaultClause""",
       s"""  }""",
@@ -130,7 +130,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
       s"${implicitEncoderDef(union.name)} = Encoder.instance {",
       unionTypesWithNames(union).map { case (t, typeName) =>
         s"""case t: ${typeName} => Json.fromJsonObject(JsonObject.singleton("${t.discriminatorName}", t.asJson))"""
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       s"""  case other => sys.error(s"The type[$${other.getClass.getName}] has no JSON encoder")""",
       "}"
     ).mkString("\n")
@@ -141,7 +141,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
       s"${implicitEncoderDef(union.name)} = Encoder.instance {",
       unionTypesWithNames(union).map { case (t, typeName) =>
         s"""case t: ${typeName} => t.asJson.mapObject(obj => ("$discriminator", Json.fromString("${t.discriminatorName}")) +: obj)"""
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       s"""  case other => sys.error(s"The type[$${other.getClass.getName}] has no JSON encoder")""",
       "}"
     ).mkString("\n")
@@ -169,7 +169,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
             s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[${datatype.name}]"""
           }
         }
-      }.mkString("\n").indent(4),
+      }.mkString("\n").indentString(4),
       s"  } yield {",
       s"    ${model.name}(",
 
@@ -181,7 +181,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
           } else {
             s"""${field.name} = ${nobt(field.name)}"""
           }
-      }.mkString(",\n").indent(6),
+      }.mkString(",\n").indentString(6),
       s"    )",
       s"  }",
       s"}"
@@ -198,7 +198,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
         } else {
           s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""
         }
-      }.mkString(",\n").indent(4),
+      }.mkString(",\n").indentString(4),
       s"  ).flatten)",
       "}"
     ).mkString("\n")

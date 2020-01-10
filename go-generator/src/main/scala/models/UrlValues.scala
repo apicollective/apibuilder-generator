@@ -36,7 +36,7 @@ case class UrlValues(
           case None => {
             Seq(
               "if " + goType.notNil(varName) + " {",
-              build(param.name, varName, goType).indent(1),
+              build(param.name, varName, goType).indentString(1),
               "}"
             ).mkString("\n")
           }
@@ -45,14 +45,14 @@ case class UrlValues(
               "if " + goType.nil(varName) + " {",
               GoType.isNumeric(datatype) match {
                 case true => {
-                  build(param.name, default, goType).indent(1)
+                  build(param.name, default, goType).indentString(1)
                 }
                 case false => {
-                  build(param.name, GoUtil.wrapInQuotes(default), goType).indent(1)
+                  build(param.name, GoUtil.wrapInQuotes(default), goType).indentString(1)
                 }
               },
               "} else {",
-              build(param.name, varName, goType).indent(1),
+              build(param.name, varName, goType).indentString(1),
               "}"
             ).mkString("\n")
           }
@@ -61,7 +61,7 @@ case class UrlValues(
       case Datatype.Container.List(inner) => {
         Seq(
           s"for _, value := range $varName {",
-          build(param.name, "value", goType).indent(1),
+          build(param.name, "value", goType).indentString(1),
           "}"
         ).mkString("\n")
       }
@@ -76,7 +76,7 @@ case class UrlValues(
         Seq(
           s"$privateName, err := ${importBuilder.ensureImport("encoding/json")}.Marshal($varName)",
           "if (err != nil) {",
-          "panic(err)".indent(1),
+          "panic(err)".indentString(1),
           "}",
           "urlValues.Add(" + GoUtil.wrapInQuotes(param.name) + s", string($privateName))"
         ).mkString("\n")

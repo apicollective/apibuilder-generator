@@ -187,7 +187,7 @@ object JavaDatatypes {
     override def valueFromJson(json: JsValue) = {
       import Text._
       val initBlockStatements = json.as[scala.collection.immutable.Map[String, JsValue]].map {
-        case (key, value) => s"""put("$key", ${inner.valueFromJson(value)});""".indent(4)
+        case (key, value) => s"""put("$key", ${inner.valueFromJson(value)});""".indentString(4)
       }
 
       val initBlock =

@@ -65,12 +65,12 @@ case class ResponseBuilder(
               s"var all ${goType.klass.localName}",
               s"for _, el := range tmp {",
               generate("el", inner, ResponseBuilder.FromMap) match {
-                case None => "// no-op as type is nil".indent(1)
-                case Some(code) => s"all = append(all, $code)".indent(1)
+                case None => "// no-op as type is nil".indentString(1)
+                case Some(code) => s"all = append(all, $code)".indentString(1)
               },
               "}",
               "return all"
-            ).mkString("\n").indent(1),
+            ).mkString("\n").indentString(1),
             "}()"
           ).mkString("\n")
         )
@@ -87,12 +87,12 @@ case class ResponseBuilder(
               s"var all ${goType.klass.localName}",
               s"for key, el := range tmp {",
               generate("el", inner, ResponseBuilder.FromMap) match {
-                case None => "// no-op as type is nil".indent(1)
-                case Some(code) => s"all[key] = $code".indent(1)
+                case None => "// no-op as type is nil".indentString(1)
+                case Some(code) => s"all[key] = $code".indentString(1)
               },
               "}",
               "return all"
-            ).mkString("\n").indent(1),
+            ).mkString("\n").indentString(1),
             "}()"
           ).mkString("\n")
         )

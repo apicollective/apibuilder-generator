@@ -126,7 +126,7 @@ private[models] case class ImportBuilder(importMappings: Option[String]) {
           } else {
             s"${imp.alias} ${GoUtil.wrapInQuotes(imp.url)}"
           }
-        }.mkString("\n").indent(1),
+        }.mkString("\n").indentString(1),
         ")"
       ).mkString("\n")
     }

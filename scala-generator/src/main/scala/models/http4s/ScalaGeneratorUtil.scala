@@ -58,7 +58,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
         Seq(
           "val payload = None",
           "val formPayload = Some(org.http4s.UrlForm(",
-          params.indent,
+          params.indentString(),
           "))"
         ).mkString("\n")
       )

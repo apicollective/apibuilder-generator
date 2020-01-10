@@ -31,7 +31,7 @@ case class Headers(
         } else {
           s"$name = ${RubyUtil.wrapInQuotes(pair._2)} unless defined?(Constants::$name)"
         }
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       "end"
     ).mkString("\n\n")
   }

@@ -32,7 +32,7 @@ case class Headers(
         } else {
           s"val ${pair._1} = ${ScalaUtil.wrapInQuotes(pair._2.trim)}"
         }
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }

@@ -92,11 +92,11 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
       s"sealed trait $responseTrait",
       s"",
       s"object ${op.name.capitalize}Response {",
-      s"${responses.mkString("\n").indent(2)}",
+      s"${responses.mkString("\n").indentString(2)}",
       s"}",
       s"",
       s"def ${op.name}(",
-      params.flatten.mkString(",\n").indent(2),
+      params.flatten.mkString(",\n").indentString(2),
       s"): ${config.asyncType}[$responseTrait]"
     )
   }
@@ -168,20 +168,20 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
               case _ => s"""$name <- Some(req.get("$originalName").flatMap(f => _root_.io.circe.parser.decode[${inner.name}](f).toOption))"""
             }
         }
-      }.map(_.indent(10))
+      }.map(_.indentString(10))
     }
 
     val decoding = if(op.formParameters.nonEmpty) {
       Seq(s"if (_req.contentType.exists(_.mediaType == ${config.applicationJsonMediaType})) {",
           s"  _req.attemptAs[$requestCaseClassName].value.flatMap{",
-          s"    case Right(req) =>") ++ route("req.").map(_.indent(4)) ++
+          s"    case Right(req) =>") ++ route("req.").map(_.indentString(4)) ++
       Seq(s"    case Left(_) => BadRequest()",
           s"  }",
           s"} else {",
           s"    _req.decode[_root_.org.http4s.UrlForm] {",
           s"      req =>",
           s"        val responseOpt = for {") ++ decodingParameters ++
-        Seq(s"        } yield {") ++ route("").map(_.indent(10)) ++
+        Seq(s"        } yield {") ++ route("").map(_.indentString(10)) ++
         Seq(s"          }",
           s"        responseOpt.getOrElse(BadRequest())",
           s"  }",

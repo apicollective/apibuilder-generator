@@ -43,7 +43,7 @@ trait Play2Models extends CodeGenerator {
         "\n" +
         Seq(
           s"package ${ssd.namespaces.base} {",
-          Play2Bindables(ssd).build().indent(2),
+          Play2Bindables(ssd).build().indentString(2),
           "}"
         ).mkString("\n\n")
       }
@@ -79,10 +79,10 @@ package ${ssd.namespaces.models} {
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
-${JsonImports(form.service).mkString("\n").indent(4)}
-${serDes.distinct.mkString("\n").indent(4)}
+${JsonImports(form.service).mkString("\n").indentString(4)}
+${serDes.distinct.mkString("\n").indentString(4)}
 
-${Seq(enumJson, modelAndUnionJson).filter(!_.isEmpty).mkString("\n\n").indent(4)}
+${Seq(enumJson, modelAndUnionJson).filter(!_.isEmpty).mkString("\n\n").indentString(4)}
   }
 }
 $bindables

@@ -182,23 +182,23 @@ case class Play2ClientGenerator(
       mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders : _*)"
     val responseEnvelopeString = version.config.responseEnvelopeClassName match {
       case None => ""
-      case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indent + "\n\n"
+      case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indentString() + "\n\n"
     }
 
     s"""package ${ssd.namespaces.base} {
 
-${headers.objectConstants.indent(2)}
+${headers.objectConstants.indentString(2)}
 
-$responseEnvelopeString${PlayScalaClientCommon.clientSignature(version.config).indent(2)} {
-${JsonImports(form.service).mkString("\n").indent(4)}
+$responseEnvelopeString${PlayScalaClientCommon.clientSignature(version.config).indentString(2)} {
+${JsonImports(form.service).mkString("\n").indentString(4)}
 
     private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
     logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$baseUrl")
 
-${methodGenerator.accessors().indent(4)}
+${methodGenerator.accessors().indentString(4)}
 
-${methodGenerator.objects().indent(4)}
+${methodGenerator.objects().indentString(4)}
 
     def _requestHolder(path: String): ${version.requestHolderClass} = {
 ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Play.current\n"}
@@ -272,9 +272,9 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
 
   }
 
-${PlayScalaClientCommon(version.config).indent(2)}
+${PlayScalaClientCommon(version.config).indentString(2)}
 
-${methodGenerator.traitsAndErrors().indent(2)}
+${methodGenerator.traitsAndErrors().indentString(2)}
 
 }"""
   }

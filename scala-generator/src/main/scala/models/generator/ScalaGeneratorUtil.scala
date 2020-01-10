@@ -24,7 +24,7 @@ object ScalaGeneratorUtil {
     val prefix = s"@param "
     val paramDesc: Seq[String] = params.flatMap { case (name, optionalDescription) =>
       optionalDescription.map(_.trim).filter(_.nonEmpty).flatMap { desc =>
-        val lines = GeneratorUtil.splitIntoLines(desc).map { _.indent(prefix.length) }
+        val lines = GeneratorUtil.splitIntoLines(desc).map { _.indentString(prefix.length) }
         val paramDocs = lines.mkString("\n").trim
         if (paramDocs.isEmpty) {
           None
@@ -165,7 +165,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
       Some(
         Seq(
           "val payload = play.api.libs.json.Json.obj(",
-          params.indent,
+          params.indentString(),
           ")"
         ).mkString("\n")
       )
