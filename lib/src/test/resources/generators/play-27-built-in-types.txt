@@ -455,9 +455,10 @@ package apibuilder {
 
     object Arrays extends Arrays {
       override def get(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Array] = {
-        _executeRequest("GET", s"/arrays", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/arrays", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.apibuilder.Client.parseJson("apibuilder.models.Array", r, _.validate[apibuilder.models.Array])
           case r => throw apibuilder.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -466,9 +467,10 @@ package apibuilder {
 
     object Optarrays extends Optarrays {
       override def get(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Optarray] = {
-        _executeRequest("GET", s"/optarrays", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/optarrays", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.apibuilder.Client.parseJson("apibuilder.models.Optarray", r, _.validate[apibuilder.models.Optarray])
           case r => throw apibuilder.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -477,9 +479,10 @@ package apibuilder {
 
     object Optionals extends Optionals {
       override def get(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Optional] = {
-        _executeRequest("GET", s"/optionals", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/optionals", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.apibuilder.Client.parseJson("apibuilder.models.Optional", r, _.validate[apibuilder.models.Optional])
           case r => throw apibuilder.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -488,9 +491,10 @@ package apibuilder {
 
     object Requireds extends Requireds {
       override def get(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Required] = {
-        _executeRequest("GET", s"/requireds", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/requireds", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.apibuilder.Client.parseJson("apibuilder.models.Required", r, _.validate[apibuilder.models.Required])
           case r => throw apibuilder.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -529,32 +533,41 @@ package apibuilder {
       path: String,
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
-      body: Option[play.api.libs.json.JsValue] = None
+      body: Option[play.api.libs.json.JsValue] = None,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     ): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
       method.toUpperCase match {
         case "GET" => {
-          _logRequest("GET", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).get()
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("GET", request).get()
         }
         case "POST" => {
-          _logRequest("POST", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("POST", request).post(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PUT" => {
-          _logRequest("PUT", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("PUT", request).put(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PATCH" => {
-          _logRequest("PATCH", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("PATCH", request).patch(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "DELETE" => {
-          _logRequest("DELETE", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).delete()
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("DELETE", request).delete()
         }
-         case "HEAD" => {
-          _logRequest("HEAD", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).head()
+        case "HEAD" => {
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("HEAD", request).head()
         }
-         case "OPTIONS" => {
-          _logRequest("OPTIONS", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).options()
+        case "OPTIONS" => {
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("OPTIONS", request).options()
         }
         case _ => {
-          _logRequest(method, _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest(method, request)
           sys.error("Unsupported method[%s]".format(method))
         }
       }
@@ -609,25 +622,29 @@ package apibuilder {
 
   trait Arrays {
     def get(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Array]
   }
 
   trait Optarrays {
     def get(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Optarray]
   }
 
   trait Optionals {
     def get(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Optional]
   }
 
   trait Requireds {
     def get(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[apibuilder.models.Required]
   }
 

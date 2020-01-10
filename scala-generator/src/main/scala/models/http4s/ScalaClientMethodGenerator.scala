@@ -63,6 +63,8 @@ class ScalaClientMethodGenerator (
         args.append("requestHeaders = (requestHeaders ++ headerParameters)")
       }
 
+      args.append("requestModifier = requestModifier")
+
       val reqType = op.body.fold("Unit")(b => b.datatype.name)
 
       val hasOptionResult = featureMigration.hasImplicit404s match {
@@ -165,11 +167,14 @@ class ScalaClientMethodGenerator (
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
 
+      val extraArgs = Seq(s"requestModifier: ${config.requestBuilderClass} => ${config.requestBuilderClass} = identity")
+
       new ScalaClientMethod(
         operation = op,
         returnType = s"${config.asyncType}[$resType]",
         methodCall = methodCall,
         response = matchResponse,
+        extraArgs = extraArgs,
         implicitArgs = config.implicitArgs,
         typeParam = config.asyncTypeParam()
       )
@@ -220,9 +225,10 @@ class ScalaClientMethod(
   returnType: String,
   methodCall: String,
   response: String,
+  extraArgs: Seq[String],
   implicitArgs: Option[String],
   typeParam: Option[String]
-) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs, responseEnvelopeName = None) {
+) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, extraArgs, implicitArgs, responseEnvelopeName = None) {
   import lib.Text._
 
   override val interface: String = {

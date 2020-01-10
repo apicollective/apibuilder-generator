@@ -54,7 +54,8 @@ package io.apibuilder.api.v0.mock {
       hasVersion: _root_.scala.Option[Boolean] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Application]] = cats.Applicative[F].pure {
       Nil
     }
@@ -65,7 +66,8 @@ package io.apibuilder.api.v0.mock {
     def post(
       orgKey: String,
       applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Application] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeApplication()
     }
@@ -77,7 +79,8 @@ package io.apibuilder.api.v0.mock {
       orgKey: String,
       applicationKey: String,
       applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Application] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeApplication()
     }
@@ -88,7 +91,8 @@ package io.apibuilder.api.v0.mock {
     def deleteByApplicationKey(
       orgKey: String,
       applicationKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -100,7 +104,8 @@ package io.apibuilder.api.v0.mock {
       orgKey: String,
       applicationKey: String,
       moveForm: io.apibuilder.api.v0.models.MoveForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Application] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeApplication()
     }
@@ -122,7 +127,8 @@ package io.apibuilder.api.v0.mock {
       name: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Attribute]] = cats.Applicative[F].pure {
       Nil
     }
@@ -132,7 +138,8 @@ package io.apibuilder.api.v0.mock {
      */
     def getByName(
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Attribute] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeAttribute()
     }
@@ -142,7 +149,8 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       attributeForm: io.apibuilder.api.v0.models.AttributeForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Attribute] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeAttribute()
     }
@@ -153,7 +161,8 @@ package io.apibuilder.api.v0.mock {
      */
     def deleteByName(
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -173,7 +182,8 @@ package io.apibuilder.api.v0.mock {
       applicationKey: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Change]] = cats.Applicative[F].pure {
       Nil
     }
@@ -195,7 +205,8 @@ package io.apibuilder.api.v0.mock {
       applicationKey: String,
       version: String,
       generatorKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Code] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeCode()
     }
@@ -205,13 +216,15 @@ package io.apibuilder.api.v0.mock {
   class MockHealthchecks[F[_]: cats.Applicative] extends io.apibuilder.api.v0.Healthchecks[F] {
 
     def getHealthcheck(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.generator.v0.models.Healthcheck] = cats.Applicative[F].pure {
       io.apibuilder.generator.v0.mock.Factories.makeHealthcheck()
     }
 
     def getMigrate(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Map[String, String]] = cats.Applicative[F].pure {
       Map()
     }
@@ -226,7 +239,8 @@ package io.apibuilder.api.v0.mock {
     def post(
       orgKey: String,
       domain: io.apibuilder.api.v0.models.Domain,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Domain] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeDomain()
     }
@@ -237,7 +251,8 @@ package io.apibuilder.api.v0.mock {
     def deleteByName(
       orgKey: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -251,7 +266,8 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       emailVerificationConfirmationForm: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -272,21 +288,24 @@ package io.apibuilder.api.v0.mock {
       generatorKey: _root_.scala.Option[String] = None,
       limit: Long = 100L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.GeneratorService]] = cats.Applicative[F].pure {
       Nil
     }
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.GeneratorService] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeGeneratorService()
     }
 
     def post(
       generatorServiceForm: io.apibuilder.api.v0.models.GeneratorServiceForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.GeneratorService] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeGeneratorService()
     }
@@ -296,7 +315,8 @@ package io.apibuilder.api.v0.mock {
      */
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -324,14 +344,16 @@ package io.apibuilder.api.v0.mock {
       key: _root_.scala.Option[String] = None,
       limit: Long = 100L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.GeneratorWithService]] = cats.Applicative[F].pure {
       Nil
     }
 
     def getByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.GeneratorWithService] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeGeneratorWithService()
     }
@@ -349,14 +371,16 @@ package io.apibuilder.api.v0.mock {
       q: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Item]] = cats.Applicative[F].pure {
       Nil
     }
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Item] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeItem()
     }
@@ -378,21 +402,24 @@ package io.apibuilder.api.v0.mock {
       role: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Membership]] = cats.Applicative[F].pure {
       Nil
     }
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Membership] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeMembership()
     }
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -414,7 +441,8 @@ package io.apibuilder.api.v0.mock {
       role: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.MembershipRequest]] = cats.Applicative[F].pure {
       Nil
     }
@@ -426,7 +454,8 @@ package io.apibuilder.api.v0.mock {
       orgGuid: _root_.java.util.UUID,
       userGuid: _root_.java.util.UUID,
       role: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.MembershipRequest] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeMembershipRequest()
     }
@@ -437,7 +466,8 @@ package io.apibuilder.api.v0.mock {
      */
     def postAcceptByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -448,7 +478,8 @@ package io.apibuilder.api.v0.mock {
      */
     def postDeclineByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -478,7 +509,8 @@ package io.apibuilder.api.v0.mock {
       namespace: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Organization]] = cats.Applicative[F].pure {
       Nil
     }
@@ -488,7 +520,8 @@ package io.apibuilder.api.v0.mock {
      */
     def getByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Organization] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeOrganization()
     }
@@ -498,7 +531,8 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Organization] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeOrganization()
     }
@@ -509,7 +543,8 @@ package io.apibuilder.api.v0.mock {
     def putByKey(
       key: String,
       organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Organization] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeOrganization()
     }
@@ -519,7 +554,8 @@ package io.apibuilder.api.v0.mock {
      */
     def deleteByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -537,7 +573,8 @@ package io.apibuilder.api.v0.mock {
       name: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.AttributeValue]] = cats.Applicative[F].pure {
       Nil
     }
@@ -548,7 +585,8 @@ package io.apibuilder.api.v0.mock {
     def getAttributesByKeyAndName(
       key: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.AttributeValue] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeAttributeValue()
     }
@@ -560,7 +598,8 @@ package io.apibuilder.api.v0.mock {
       key: String,
       name: String,
       attributeValueForm: io.apibuilder.api.v0.models.AttributeValueForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.AttributeValue] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeAttributeValue()
     }
@@ -572,7 +611,8 @@ package io.apibuilder.api.v0.mock {
     def deleteAttributesByKeyAndName(
       key: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -588,7 +628,8 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       passwordReset: io.apibuilder.api.v0.models.PasswordReset,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.PasswordResetSuccess] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makePasswordResetSuccess()
     }
@@ -603,7 +644,8 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       passwordResetRequest: io.apibuilder.api.v0.models.PasswordResetRequest,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -629,7 +671,8 @@ package io.apibuilder.api.v0.mock {
       publication: _root_.scala.Option[io.apibuilder.api.v0.models.Publication] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Subscription]] = cats.Applicative[F].pure {
       Nil
     }
@@ -639,7 +682,8 @@ package io.apibuilder.api.v0.mock {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Subscription] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeSubscription()
     }
@@ -649,14 +693,16 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       subscriptionForm: io.apibuilder.api.v0.models.SubscriptionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Subscription] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeSubscription()
     }
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -674,7 +720,8 @@ package io.apibuilder.api.v0.mock {
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Token]] = cats.Applicative[F].pure {
       Nil
     }
@@ -684,7 +731,8 @@ package io.apibuilder.api.v0.mock {
      */
     def getCleartextByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.CleartextToken] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeCleartextToken()
     }
@@ -694,14 +742,16 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       tokenForm: io.apibuilder.api.v0.models.TokenForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Token] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeToken()
     }
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -722,7 +772,8 @@ package io.apibuilder.api.v0.mock {
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       email: _root_.scala.Option[String] = None,
       token: _root_.scala.Option[String] = None,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.User]] = cats.Applicative[F].pure {
       Nil
     }
@@ -732,7 +783,8 @@ package io.apibuilder.api.v0.mock {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.User] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeUser()
     }
@@ -745,7 +797,8 @@ package io.apibuilder.api.v0.mock {
     def postAuthenticate(
       email: String,
       password: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.User] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeUser()
     }
@@ -755,7 +808,8 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       userForm: io.apibuilder.api.v0.models.UserForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.User] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeUser()
     }
@@ -766,7 +820,8 @@ package io.apibuilder.api.v0.mock {
     def putByGuid(
       guid: _root_.java.util.UUID,
       userUpdateForm: io.apibuilder.api.v0.models.UserUpdateForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.User] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeUser()
     }
@@ -777,7 +832,8 @@ package io.apibuilder.api.v0.mock {
 
     def post(
       value: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Validation] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeValidation()
     }
@@ -799,7 +855,8 @@ package io.apibuilder.api.v0.mock {
       applicationKey: String,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Version]] = cats.Applicative[F].pure {
       Nil
     }
@@ -814,7 +871,8 @@ package io.apibuilder.api.v0.mock {
       orgKey: String,
       applicationKey: String,
       version: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Version] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeVersion()
     }
@@ -826,7 +884,8 @@ package io.apibuilder.api.v0.mock {
       orgKey: String,
       version: String,
       versionForm: io.apibuilder.api.v0.models.VersionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Version] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeVersion()
     }
@@ -839,7 +898,8 @@ package io.apibuilder.api.v0.mock {
       applicationKey: String,
       version: String,
       versionForm: io.apibuilder.api.v0.models.VersionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Version] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeVersion()
     }
@@ -851,7 +911,8 @@ package io.apibuilder.api.v0.mock {
       orgKey: String,
       applicationKey: String,
       version: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }
@@ -877,7 +938,8 @@ package io.apibuilder.api.v0.mock {
       applicationKey: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Seq[io.apibuilder.api.v0.models.Watch]] = cats.Applicative[F].pure {
       Nil
     }
@@ -887,7 +949,8 @@ package io.apibuilder.api.v0.mock {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Watch] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeWatch()
     }
@@ -902,7 +965,8 @@ package io.apibuilder.api.v0.mock {
       userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
       organizationKey: String,
       applicationKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Boolean] = cats.Applicative[F].pure {
       true
     }
@@ -912,14 +976,16 @@ package io.apibuilder.api.v0.mock {
      */
     def post(
       watchForm: io.apibuilder.api.v0.models.WatchForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.apibuilder.api.v0.models.Watch] = cats.Applicative[F].pure {
       io.apibuilder.api.v0.mock.Factories.makeWatch()
     }
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[Unit] = cats.Applicative[F].pure {
       // unit type
     }

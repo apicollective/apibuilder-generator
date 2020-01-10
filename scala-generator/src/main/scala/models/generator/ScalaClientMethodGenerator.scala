@@ -183,6 +183,8 @@ class ScalaClientMethodGenerator(
         args.append("requestHeaders = (requestHeaders ++ headerParameters)")
       }
 
+      args.append("requestModifier = requestModifier")
+
       val methodCall = code.toList match {
         case Nil => s"""_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
         case v => s"""${v.mkString("\n\n")}\n\n_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
@@ -268,11 +270,14 @@ class ScalaClientMethodGenerator(
         }.mkString("\n")
       } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
 
+      val extraArgs = Seq(s"requestModifier: ${config.requestBuilderClass} => ${config.requestBuilderClass} = identity")
+
       new ScalaClientMethod(
         operation = op,
         returnType = s"${config.asyncType}[${withEnvelope(op.resultType, isOption = hasOptionResult.isDefined)}]",
         methodCall = methodCall,
         response = matchResponse,
+        extraArgs = extraArgs,
         implicitArgs = config.implicitArgs,
         responseEnvelopeName = config.responseEnvelopeClassName,
       )
@@ -305,15 +310,16 @@ class ScalaClientMethod(
   returnType: String,
   methodCall: String,
   response: String,
+  extraArgs: Seq[String],
   implicitArgs: Option[String],
   responseEnvelopeName: Option[String],
 ) {
 
-  val name: String = operation.name
+  protected val name: String = operation.name
 
-  val argList: Option[String] = operation.parameters.find(_.name.toLowerCase == "requestheaders") match {
-    case Some(_) => operation.argList()
-    case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil"))
+  protected val argList: Option[String] = operation.parameters.find(_.name.toLowerCase == "requestheaders") match {
+    case Some(_) => operation.argList(extraArgs)
+    case None => operation.argList(Seq("requestHeaders: Seq[(String, String)] = Nil") ++ extraArgs)
   }
 
   protected[this] val commentString: Option[String] = toOption(

@@ -18,7 +18,8 @@ package io.gregor.time.types.v0.mock {
       queryDate: _root_.java.time.LocalDate,
       queryTime: _root_.java.time.Instant,
       dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.gregor.time.types.v0.models.DateTimeModel] = scala.concurrent.Future.successful {
       io.gregor.time.types.v0.mock.Factories.makeDateTimeModel()
     }

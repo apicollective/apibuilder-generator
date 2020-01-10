@@ -2195,7 +2195,8 @@ package io.apibuilder.api.v0 {
         hasVersion: _root_.scala.Option[Boolean] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Application]] = {
         val queryParameters = Seq(
           name.map("name" -> _),
@@ -2206,7 +2207,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Application]", r, _.validate[Seq[io.apibuilder.api.v0.models.Application]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2215,11 +2216,12 @@ package io.apibuilder.api.v0 {
       override def post(
         orgKey: String,
         applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Application] = {
         val payload = play.api.libs.json.Json.toJson(applicationForm)
 
-        _executeRequest("POST", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Application", r, _.validate[io.apibuilder.api.v0.models.Application])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2230,11 +2232,12 @@ package io.apibuilder.api.v0 {
         orgKey: String,
         applicationKey: String,
         applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Application] = {
         val payload = play.api.libs.json.Json.toJson(applicationForm)
 
-        _executeRequest("PUT", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("PUT", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Application", r, _.validate[io.apibuilder.api.v0.models.Application])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2244,9 +2247,10 @@ package io.apibuilder.api.v0 {
       override def deleteByApplicationKey(
         orgKey: String,
         applicationKey: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -2256,11 +2260,12 @@ package io.apibuilder.api.v0 {
         orgKey: String,
         applicationKey: String,
         moveForm: io.apibuilder.api.v0.models.MoveForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Application] = {
         val payload = play.api.libs.json.Json.toJson(moveForm)
 
-        _executeRequest("POST", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/move", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/move", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Application", r, _.validate[io.apibuilder.api.v0.models.Application])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2274,7 +2279,8 @@ package io.apibuilder.api.v0 {
         name: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Attribute]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -2283,7 +2289,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/attributes", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/attributes", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Attribute]", r, _.validate[Seq[io.apibuilder.api.v0.models.Attribute]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2291,9 +2297,10 @@ package io.apibuilder.api.v0 {
 
       override def getByName(
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Attribute] = {
-        _executeRequest("GET", s"/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Attribute", r, _.validate[io.apibuilder.api.v0.models.Attribute])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2302,11 +2309,12 @@ package io.apibuilder.api.v0 {
 
       override def post(
         attributeForm: io.apibuilder.api.v0.models.AttributeForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Attribute] = {
         val payload = play.api.libs.json.Json.toJson(attributeForm)
 
-        _executeRequest("POST", s"/attributes", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/attributes", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 201 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Attribute", r, _.validate[io.apibuilder.api.v0.models.Attribute])
           case r if r.status == 401 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
@@ -2316,9 +2324,10 @@ package io.apibuilder.api.v0 {
 
       override def deleteByName(
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r if r.status == 401 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
@@ -2333,7 +2342,8 @@ package io.apibuilder.api.v0 {
         applicationKey: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Change]] = {
         val queryParameters = Seq(
           orgKey.map("org_key" -> _),
@@ -2342,7 +2352,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/changes", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/changes", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Change]", r, _.validate[Seq[io.apibuilder.api.v0.models.Change]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2355,9 +2365,10 @@ package io.apibuilder.api.v0 {
         applicationKey: String,
         version: String,
         generatorKey: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Code] = {
-        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(generatorKey, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(generatorKey, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Code", r, _.validate[io.apibuilder.api.v0.models.Code])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
@@ -2370,11 +2381,12 @@ package io.apibuilder.api.v0 {
       override def post(
         orgKey: String,
         domain: io.apibuilder.api.v0.models.Domain,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Domain] = {
         val payload = play.api.libs.json.Json.toJson(domain)
 
-        _executeRequest("POST", s"/domains/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/domains/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Domain", r, _.validate[io.apibuilder.api.v0.models.Domain])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2384,9 +2396,10 @@ package io.apibuilder.api.v0 {
       override def deleteByName(
         orgKey: String,
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/domains/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/domains/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -2396,11 +2409,12 @@ package io.apibuilder.api.v0 {
     object EmailVerificationConfirmationForms extends EmailVerificationConfirmationForms {
       override def post(
         emailVerificationConfirmationForm: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val payload = play.api.libs.json.Json.toJson(emailVerificationConfirmationForm)
 
-        _executeRequest("POST", s"/email_verification_confirmations", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/email_verification_confirmations", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204, 409")
@@ -2415,7 +2429,8 @@ package io.apibuilder.api.v0 {
         generatorKey: _root_.scala.Option[String] = None,
         limit: Long = 100L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.GeneratorService]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -2425,7 +2440,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/generator_services", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/generator_services", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.GeneratorService]", r, _.validate[Seq[io.apibuilder.api.v0.models.GeneratorService]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2433,9 +2448,10 @@ package io.apibuilder.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.GeneratorService] = {
-        _executeRequest("GET", s"/generator_services/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/generator_services/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.GeneratorService", r, _.validate[io.apibuilder.api.v0.models.GeneratorService])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2444,11 +2460,12 @@ package io.apibuilder.api.v0 {
 
       override def post(
         generatorServiceForm: io.apibuilder.api.v0.models.GeneratorServiceForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.GeneratorService] = {
         val payload = play.api.libs.json.Json.toJson(generatorServiceForm)
 
-        _executeRequest("POST", s"/generator_services", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/generator_services", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.GeneratorService", r, _.validate[io.apibuilder.api.v0.models.GeneratorService])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2457,9 +2474,10 @@ package io.apibuilder.api.v0 {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/generator_services/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/generator_services/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r if r.status == 403 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
@@ -2477,7 +2495,8 @@ package io.apibuilder.api.v0 {
         key: _root_.scala.Option[String] = None,
         limit: Long = 100L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.GeneratorWithService]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -2489,7 +2508,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/generators", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/generators", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.GeneratorWithService]", r, _.validate[Seq[io.apibuilder.api.v0.models.GeneratorWithService]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2497,9 +2516,10 @@ package io.apibuilder.api.v0 {
 
       override def getByKey(
         key: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.GeneratorWithService] = {
-        _executeRequest("GET", s"/generators/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/generators/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.GeneratorWithService", r, _.validate[io.apibuilder.api.v0.models.GeneratorWithService])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2509,18 +2529,20 @@ package io.apibuilder.api.v0 {
 
     object Healthchecks extends Healthchecks {
       override def getHealthcheck(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.generator.v0.models.Healthcheck] = {
-        _executeRequest("GET", s"/_internal_/healthcheck", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/_internal_/healthcheck", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.generator.v0.models.Healthcheck", r, _.validate[io.apibuilder.generator.v0.models.Healthcheck])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
       }
 
       override def getMigrate(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, String]] = {
-        _executeRequest("GET", s"/_internal_/migrate", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/_internal_/migrate", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Map[String, String]", r, _.validate[Map[String, String]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2532,7 +2554,8 @@ package io.apibuilder.api.v0 {
         q: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Item]] = {
         val queryParameters = Seq(
           q.map("q" -> _),
@@ -2540,7 +2563,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/items", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/items", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Item]", r, _.validate[Seq[io.apibuilder.api.v0.models.Item]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2548,9 +2571,10 @@ package io.apibuilder.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Item] = {
-        _executeRequest("GET", s"/items/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/items/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Item", r, _.validate[io.apibuilder.api.v0.models.Item])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2566,7 +2590,8 @@ package io.apibuilder.api.v0 {
         role: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.MembershipRequest]] = {
         val queryParameters = Seq(
           orgGuid.map("org_guid" -> _.toString),
@@ -2577,7 +2602,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/membership_requests", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/membership_requests", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.MembershipRequest]", r, _.validate[Seq[io.apibuilder.api.v0.models.MembershipRequest]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2587,7 +2612,8 @@ package io.apibuilder.api.v0 {
         orgGuid: _root_.java.util.UUID,
         userGuid: _root_.java.util.UUID,
         role: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.MembershipRequest] = {
         val payload = play.api.libs.json.Json.obj(
           "org_guid" -> play.api.libs.json.Json.toJson(orgGuid),
@@ -2595,7 +2621,7 @@ package io.apibuilder.api.v0 {
           "role" -> play.api.libs.json.Json.toJson(role)
         )
 
-        _executeRequest("POST", s"/membership_requests", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/membership_requests", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.MembershipRequest", r, _.validate[io.apibuilder.api.v0.models.MembershipRequest])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2604,9 +2630,10 @@ package io.apibuilder.api.v0 {
 
       override def postAcceptByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("POST", s"/membership_requests/${guid}/accept", requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/membership_requests/${guid}/accept", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204, 409")
@@ -2615,9 +2642,10 @@ package io.apibuilder.api.v0 {
 
       override def postDeclineByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("POST", s"/membership_requests/${guid}/decline", requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/membership_requests/${guid}/decline", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204, 409")
@@ -2633,7 +2661,8 @@ package io.apibuilder.api.v0 {
         role: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Membership]] = {
         val queryParameters = Seq(
           orgGuid.map("org_guid" -> _.toString),
@@ -2644,7 +2673,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/memberships", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/memberships", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Membership]", r, _.validate[Seq[io.apibuilder.api.v0.models.Membership]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2652,9 +2681,10 @@ package io.apibuilder.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Membership] = {
-        _executeRequest("GET", s"/memberships/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/memberships/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Membership", r, _.validate[io.apibuilder.api.v0.models.Membership])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2663,9 +2693,10 @@ package io.apibuilder.api.v0 {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/memberships/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/memberships/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -2681,7 +2712,8 @@ package io.apibuilder.api.v0 {
         namespace: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Organization]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -2693,7 +2725,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/organizations", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/organizations", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Organization]", r, _.validate[Seq[io.apibuilder.api.v0.models.Organization]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2701,9 +2733,10 @@ package io.apibuilder.api.v0 {
 
       override def getByKey(
         key: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Organization] = {
-        _executeRequest("GET", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Organization", r, _.validate[io.apibuilder.api.v0.models.Organization])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2712,11 +2745,12 @@ package io.apibuilder.api.v0 {
 
       override def post(
         organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Organization] = {
         val payload = play.api.libs.json.Json.toJson(organizationForm)
 
-        _executeRequest("POST", s"/organizations", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/organizations", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Organization", r, _.validate[io.apibuilder.api.v0.models.Organization])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2726,11 +2760,12 @@ package io.apibuilder.api.v0 {
       override def putByKey(
         key: String,
         organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Organization] = {
         val payload = play.api.libs.json.Json.toJson(organizationForm)
 
-        _executeRequest("PUT", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("PUT", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Organization", r, _.validate[io.apibuilder.api.v0.models.Organization])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2739,9 +2774,10 @@ package io.apibuilder.api.v0 {
 
       override def deleteByKey(
         key: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -2752,7 +2788,8 @@ package io.apibuilder.api.v0 {
         name: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.AttributeValue]] = {
         val queryParameters = Seq(
           name.map("name" -> _),
@@ -2760,7 +2797,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.AttributeValue]", r, _.validate[Seq[io.apibuilder.api.v0.models.AttributeValue]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2769,9 +2806,10 @@ package io.apibuilder.api.v0 {
       override def getAttributesByKeyAndName(
         key: String,
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.AttributeValue] = {
-        _executeRequest("GET", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.AttributeValue", r, _.validate[io.apibuilder.api.v0.models.AttributeValue])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2782,11 +2820,12 @@ package io.apibuilder.api.v0 {
         key: String,
         name: String,
         attributeValueForm: io.apibuilder.api.v0.models.AttributeValueForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.AttributeValue] = {
         val payload = play.api.libs.json.Json.toJson(attributeValueForm)
 
-        _executeRequest("PUT", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("PUT", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.AttributeValue", r, _.validate[io.apibuilder.api.v0.models.AttributeValue])
           case r if r.status == 201 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.AttributeValue", r, _.validate[io.apibuilder.api.v0.models.AttributeValue])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
@@ -2798,9 +2837,10 @@ package io.apibuilder.api.v0 {
       override def deleteAttributesByKeyAndName(
         key: String,
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/organizations/${play.utils.UriEncoding.encodePathSegment(key, "UTF-8")}/attributes/${play.utils.UriEncoding.encodePathSegment(name, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r if r.status == 401 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
@@ -2812,11 +2852,12 @@ package io.apibuilder.api.v0 {
     object PasswordResetRequests extends PasswordResetRequests {
       override def post(
         passwordResetRequest: io.apibuilder.api.v0.models.PasswordResetRequest,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val payload = play.api.libs.json.Json.toJson(passwordResetRequest)
 
-        _executeRequest("POST", s"/password_reset_requests", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/password_reset_requests", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204, 409")
@@ -2827,11 +2868,12 @@ package io.apibuilder.api.v0 {
     object PasswordResets extends PasswordResets {
       override def post(
         passwordReset: io.apibuilder.api.v0.models.PasswordReset,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.PasswordResetSuccess] = {
         val payload = play.api.libs.json.Json.toJson(passwordReset)
 
-        _executeRequest("POST", s"/password_resets", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/password_resets", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.PasswordResetSuccess", r, _.validate[io.apibuilder.api.v0.models.PasswordResetSuccess])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -2847,7 +2889,8 @@ package io.apibuilder.api.v0 {
         publication: _root_.scala.Option[io.apibuilder.api.v0.models.Publication] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Subscription]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -2858,7 +2901,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/subscriptions", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/subscriptions", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Subscription]", r, _.validate[Seq[io.apibuilder.api.v0.models.Subscription]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2866,9 +2909,10 @@ package io.apibuilder.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Subscription] = {
-        _executeRequest("GET", s"/subscriptions/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/subscriptions/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Subscription", r, _.validate[io.apibuilder.api.v0.models.Subscription])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2877,11 +2921,12 @@ package io.apibuilder.api.v0 {
 
       override def post(
         subscriptionForm: io.apibuilder.api.v0.models.SubscriptionForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Subscription] = {
         val payload = play.api.libs.json.Json.toJson(subscriptionForm)
 
-        _executeRequest("POST", s"/subscriptions", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/subscriptions", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 201 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Subscription", r, _.validate[io.apibuilder.api.v0.models.Subscription])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201, 409")
@@ -2890,9 +2935,10 @@ package io.apibuilder.api.v0 {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/subscriptions/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/subscriptions/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -2905,7 +2951,8 @@ package io.apibuilder.api.v0 {
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Token]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -2913,7 +2960,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/tokens/users/${userGuid}", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/tokens/users/${userGuid}", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Token]", r, _.validate[Seq[io.apibuilder.api.v0.models.Token]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2921,9 +2968,10 @@ package io.apibuilder.api.v0 {
 
       override def getCleartextByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.CleartextToken] = {
-        _executeRequest("GET", s"/tokens/${guid}/cleartext", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/tokens/${guid}/cleartext", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.CleartextToken", r, _.validate[io.apibuilder.api.v0.models.CleartextToken])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2932,11 +2980,12 @@ package io.apibuilder.api.v0 {
 
       override def post(
         tokenForm: io.apibuilder.api.v0.models.TokenForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Token] = {
         val payload = play.api.libs.json.Json.toJson(tokenForm)
 
-        _executeRequest("POST", s"/tokens", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/tokens", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 201 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Token", r, _.validate[io.apibuilder.api.v0.models.Token])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201, 409")
@@ -2945,9 +2994,10 @@ package io.apibuilder.api.v0 {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/tokens/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/tokens/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -2959,7 +3009,8 @@ package io.apibuilder.api.v0 {
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
         email: _root_.scala.Option[String] = None,
         token: _root_.scala.Option[String] = None,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.User]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -2967,7 +3018,7 @@ package io.apibuilder.api.v0 {
           token.map("token" -> _)
         ).flatten
 
-        _executeRequest("GET", s"/users", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/users", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.User]", r, _.validate[Seq[io.apibuilder.api.v0.models.User]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -2975,9 +3026,10 @@ package io.apibuilder.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User] = {
-        _executeRequest("GET", s"/users/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/users/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.User", r, _.validate[io.apibuilder.api.v0.models.User])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -2987,14 +3039,15 @@ package io.apibuilder.api.v0 {
       override def postAuthenticate(
         email: String,
         password: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User] = {
         val payload = play.api.libs.json.Json.obj(
           "email" -> play.api.libs.json.Json.toJson(email),
           "password" -> play.api.libs.json.Json.toJson(password)
         )
 
-        _executeRequest("POST", s"/users/authenticate", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/users/authenticate", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.User", r, _.validate[io.apibuilder.api.v0.models.User])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -3003,11 +3056,12 @@ package io.apibuilder.api.v0 {
 
       override def post(
         userForm: io.apibuilder.api.v0.models.UserForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User] = {
         val payload = play.api.libs.json.Json.toJson(userForm)
 
-        _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.User", r, _.validate[io.apibuilder.api.v0.models.User])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -3017,11 +3071,12 @@ package io.apibuilder.api.v0 {
       override def putByGuid(
         guid: _root_.java.util.UUID,
         userUpdateForm: io.apibuilder.api.v0.models.UserUpdateForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User] = {
         val payload = play.api.libs.json.Json.toJson(userUpdateForm)
 
-        _executeRequest("PUT", s"/users/${guid}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("PUT", s"/users/${guid}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.User", r, _.validate[io.apibuilder.api.v0.models.User])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -3032,11 +3087,12 @@ package io.apibuilder.api.v0 {
     object Validations extends Validations {
       override def post(
         value: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Validation] = {
         val payload = play.api.libs.json.Json.toJson(value)
 
-        _executeRequest("POST", s"/validations", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/validations", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Validation", r, _.validate[io.apibuilder.api.v0.models.Validation])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -3049,14 +3105,15 @@ package io.apibuilder.api.v0 {
         applicationKey: String,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Version]] = {
         val queryParameters = Seq(
           Some("limit" -> limit.toString),
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Version]", r, _.validate[Seq[io.apibuilder.api.v0.models.Version]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -3066,9 +3123,10 @@ package io.apibuilder.api.v0 {
         orgKey: String,
         applicationKey: String,
         version: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Version] = {
-        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Version", r, _.validate[io.apibuilder.api.v0.models.Version])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -3079,11 +3137,12 @@ package io.apibuilder.api.v0 {
         orgKey: String,
         version: String,
         versionForm: io.apibuilder.api.v0.models.VersionForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Version] = {
         val payload = play.api.libs.json.Json.toJson(versionForm)
 
-        _executeRequest("POST", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Version", r, _.validate[io.apibuilder.api.v0.models.Version])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -3095,11 +3154,12 @@ package io.apibuilder.api.v0 {
         applicationKey: String,
         version: String,
         versionForm: io.apibuilder.api.v0.models.VersionForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Version] = {
         val payload = play.api.libs.json.Json.toJson(versionForm)
 
-        _executeRequest("PUT", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("PUT", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Version", r, _.validate[io.apibuilder.api.v0.models.Version])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 409")
@@ -3110,9 +3170,10 @@ package io.apibuilder.api.v0 {
         orgKey: String,
         applicationKey: String,
         version: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/${play.utils.UriEncoding.encodePathSegment(orgKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(applicationKey, "UTF-8")}/${play.utils.UriEncoding.encodePathSegment(version, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -3127,7 +3188,8 @@ package io.apibuilder.api.v0 {
         applicationKey: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Watch]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -3138,7 +3200,7 @@ package io.apibuilder.api.v0 {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest("GET", s"/watches", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/watches", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Seq[io.apibuilder.api.v0.models.Watch]", r, _.validate[Seq[io.apibuilder.api.v0.models.Watch]])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -3146,9 +3208,10 @@ package io.apibuilder.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Watch] = {
-        _executeRequest("GET", s"/watches/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/watches/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Watch", r, _.validate[io.apibuilder.api.v0.models.Watch])
           case r if r.status == 404 => throw io.apibuilder.api.v0.errors.UnitResponse(r.status)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 404")
@@ -3159,7 +3222,8 @@ package io.apibuilder.api.v0 {
         userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
         organizationKey: String,
         applicationKey: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Boolean] = {
         val queryParameters = Seq(
           userGuid.map("user_guid" -> _.toString),
@@ -3167,7 +3231,7 @@ package io.apibuilder.api.v0 {
           Some("application_key" -> applicationKey)
         ).flatten
 
-        _executeRequest("GET", s"/watches/check", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/watches/check", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 200 => _root_.io.apibuilder.api.v0.Client.parseJson("Boolean", r, _.validate[Boolean])
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
@@ -3175,11 +3239,12 @@ package io.apibuilder.api.v0 {
 
       override def post(
         watchForm: io.apibuilder.api.v0.models.WatchForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Watch] = {
         val payload = play.api.libs.json.Json.toJson(watchForm)
 
-        _executeRequest("POST", s"/watches", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/watches", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 201 => _root_.io.apibuilder.api.v0.Client.parseJson("io.apibuilder.api.v0.models.Watch", r, _.validate[io.apibuilder.api.v0.models.Watch])
           case r if r.status == 409 => throw io.apibuilder.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201, 409")
@@ -3188,9 +3253,10 @@ package io.apibuilder.api.v0 {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("DELETE", s"/watches/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("DELETE", s"/watches/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.status == 204 => ()
           case r => throw io.apibuilder.api.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 204")
         }
@@ -3229,32 +3295,41 @@ package io.apibuilder.api.v0 {
       path: String,
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
-      body: Option[play.api.libs.json.JsValue] = None
+      body: Option[play.api.libs.json.JsValue] = None,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     ): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
       method.toUpperCase match {
         case "GET" => {
-          _logRequest("GET", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).get()
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("GET", request).get()
         }
         case "POST" => {
-          _logRequest("POST", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("POST", request).post(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PUT" => {
-          _logRequest("PUT", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("PUT", request).put(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PATCH" => {
-          _logRequest("PATCH", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("PATCH", request).patch(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "DELETE" => {
-          _logRequest("DELETE", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).delete()
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("DELETE", request).delete()
         }
-         case "HEAD" => {
-          _logRequest("HEAD", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).head()
+        case "HEAD" => {
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("HEAD", request).head()
         }
-         case "OPTIONS" => {
-          _logRequest("OPTIONS", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).options()
+        case "OPTIONS" => {
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest("OPTIONS", request).options()
         }
         case _ => {
-          _logRequest(method, _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          val request = requestModifier(_requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest(method, request)
           sys.error("Unsupported method[%s]".format(method))
         }
       }
@@ -3345,7 +3420,8 @@ package io.apibuilder.api.v0 {
       hasVersion: _root_.scala.Option[Boolean] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Application]]
 
     /**
@@ -3354,7 +3430,8 @@ package io.apibuilder.api.v0 {
     def post(
       orgKey: String,
       applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Application]
 
     /**
@@ -3364,7 +3441,8 @@ package io.apibuilder.api.v0 {
       orgKey: String,
       applicationKey: String,
       applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Application]
 
     /**
@@ -3373,7 +3451,8 @@ package io.apibuilder.api.v0 {
     def deleteByApplicationKey(
       orgKey: String,
       applicationKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
 
     /**
@@ -3383,7 +3462,8 @@ package io.apibuilder.api.v0 {
       orgKey: String,
       applicationKey: String,
       moveForm: io.apibuilder.api.v0.models.MoveForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Application]
   }
 
@@ -3401,7 +3481,8 @@ package io.apibuilder.api.v0 {
       name: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Attribute]]
 
     /**
@@ -3409,7 +3490,8 @@ package io.apibuilder.api.v0 {
      */
     def getByName(
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Attribute]
 
     /**
@@ -3417,7 +3499,8 @@ package io.apibuilder.api.v0 {
      */
     def post(
       attributeForm: io.apibuilder.api.v0.models.AttributeForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Attribute]
 
     /**
@@ -3426,7 +3509,8 @@ package io.apibuilder.api.v0 {
      */
     def deleteByName(
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3442,7 +3526,8 @@ package io.apibuilder.api.v0 {
       applicationKey: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Change]]
   }
 
@@ -3460,7 +3545,8 @@ package io.apibuilder.api.v0 {
       applicationKey: String,
       version: String,
       generatorKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Code]
   }
 
@@ -3471,7 +3557,8 @@ package io.apibuilder.api.v0 {
     def post(
       orgKey: String,
       domain: io.apibuilder.api.v0.models.Domain,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Domain]
 
     /**
@@ -3480,7 +3567,8 @@ package io.apibuilder.api.v0 {
     def deleteByName(
       orgKey: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3490,7 +3578,8 @@ package io.apibuilder.api.v0 {
      */
     def post(
       emailVerificationConfirmationForm: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3507,17 +3596,20 @@ package io.apibuilder.api.v0 {
       generatorKey: _root_.scala.Option[String] = None,
       limit: Long = 100L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.GeneratorService]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.GeneratorService]
 
     def post(
       generatorServiceForm: io.apibuilder.api.v0.models.GeneratorServiceForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.GeneratorService]
 
     /**
@@ -3525,7 +3617,8 @@ package io.apibuilder.api.v0 {
      */
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3549,22 +3642,26 @@ package io.apibuilder.api.v0 {
       key: _root_.scala.Option[String] = None,
       limit: Long = 100L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.GeneratorWithService]]
 
     def getByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.GeneratorWithService]
   }
 
   trait Healthchecks {
     def getHealthcheck(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.generator.v0.models.Healthcheck]
 
     def getMigrate(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, String]]
   }
 
@@ -3578,12 +3675,14 @@ package io.apibuilder.api.v0 {
       q: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Item]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Item]
   }
 
@@ -3601,7 +3700,8 @@ package io.apibuilder.api.v0 {
       role: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.MembershipRequest]]
 
     /**
@@ -3611,7 +3711,8 @@ package io.apibuilder.api.v0 {
       orgGuid: _root_.java.util.UUID,
       userGuid: _root_.java.util.UUID,
       role: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.MembershipRequest]
 
     /**
@@ -3620,7 +3721,8 @@ package io.apibuilder.api.v0 {
      */
     def postAcceptByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
 
     /**
@@ -3629,7 +3731,8 @@ package io.apibuilder.api.v0 {
      */
     def postDeclineByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3647,17 +3750,20 @@ package io.apibuilder.api.v0 {
       role: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Membership]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Membership]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3683,7 +3789,8 @@ package io.apibuilder.api.v0 {
       namespace: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Organization]]
 
     /**
@@ -3691,7 +3798,8 @@ package io.apibuilder.api.v0 {
      */
     def getByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Organization]
 
     /**
@@ -3699,7 +3807,8 @@ package io.apibuilder.api.v0 {
      */
     def post(
       organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Organization]
 
     /**
@@ -3708,7 +3817,8 @@ package io.apibuilder.api.v0 {
     def putByKey(
       key: String,
       organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Organization]
 
     /**
@@ -3716,7 +3826,8 @@ package io.apibuilder.api.v0 {
      */
     def deleteByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
 
     /**
@@ -3732,7 +3843,8 @@ package io.apibuilder.api.v0 {
       name: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.AttributeValue]]
 
     /**
@@ -3741,7 +3853,8 @@ package io.apibuilder.api.v0 {
     def getAttributesByKeyAndName(
       key: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.AttributeValue]
 
     /**
@@ -3751,7 +3864,8 @@ package io.apibuilder.api.v0 {
       key: String,
       name: String,
       attributeValueForm: io.apibuilder.api.v0.models.AttributeValueForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.AttributeValue]
 
     /**
@@ -3761,7 +3875,8 @@ package io.apibuilder.api.v0 {
     def deleteAttributesByKeyAndName(
       key: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3772,7 +3887,8 @@ package io.apibuilder.api.v0 {
      */
     def post(
       passwordResetRequest: io.apibuilder.api.v0.models.PasswordResetRequest,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3784,7 +3900,8 @@ package io.apibuilder.api.v0 {
      */
     def post(
       passwordReset: io.apibuilder.api.v0.models.PasswordReset,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.PasswordResetSuccess]
   }
 
@@ -3806,7 +3923,8 @@ package io.apibuilder.api.v0 {
       publication: _root_.scala.Option[io.apibuilder.api.v0.models.Publication] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Subscription]]
 
     /**
@@ -3814,7 +3932,8 @@ package io.apibuilder.api.v0 {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Subscription]
 
     /**
@@ -3822,12 +3941,14 @@ package io.apibuilder.api.v0 {
      */
     def post(
       subscriptionForm: io.apibuilder.api.v0.models.SubscriptionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Subscription]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3841,7 +3962,8 @@ package io.apibuilder.api.v0 {
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Token]]
 
     /**
@@ -3849,7 +3971,8 @@ package io.apibuilder.api.v0 {
      */
     def getCleartextByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.CleartextToken]
 
     /**
@@ -3857,12 +3980,14 @@ package io.apibuilder.api.v0 {
      */
     def post(
       tokenForm: io.apibuilder.api.v0.models.TokenForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Token]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -3879,7 +4004,8 @@ package io.apibuilder.api.v0 {
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       email: _root_.scala.Option[String] = None,
       token: _root_.scala.Option[String] = None,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.User]]
 
     /**
@@ -3887,7 +4013,8 @@ package io.apibuilder.api.v0 {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User]
 
     /**
@@ -3898,7 +4025,8 @@ package io.apibuilder.api.v0 {
     def postAuthenticate(
       email: String,
       password: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User]
 
     /**
@@ -3906,7 +4034,8 @@ package io.apibuilder.api.v0 {
      */
     def post(
       userForm: io.apibuilder.api.v0.models.UserForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User]
 
     /**
@@ -3915,14 +4044,16 @@ package io.apibuilder.api.v0 {
     def putByGuid(
       guid: _root_.java.util.UUID,
       userUpdateForm: io.apibuilder.api.v0.models.UserUpdateForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.User]
   }
 
   trait Validations {
     def post(
       value: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Validation]
   }
 
@@ -3940,7 +4071,8 @@ package io.apibuilder.api.v0 {
       applicationKey: String,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Version]]
 
     /**
@@ -3953,7 +4085,8 @@ package io.apibuilder.api.v0 {
       orgKey: String,
       applicationKey: String,
       version: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Version]
 
     /**
@@ -3963,7 +4096,8 @@ package io.apibuilder.api.v0 {
       orgKey: String,
       version: String,
       versionForm: io.apibuilder.api.v0.models.VersionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Version]
 
     /**
@@ -3974,7 +4108,8 @@ package io.apibuilder.api.v0 {
       applicationKey: String,
       version: String,
       versionForm: io.apibuilder.api.v0.models.VersionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Version]
 
     /**
@@ -3984,7 +4119,8 @@ package io.apibuilder.api.v0 {
       orgKey: String,
       applicationKey: String,
       version: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
@@ -4006,7 +4142,8 @@ package io.apibuilder.api.v0 {
       applicationKey: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.api.v0.models.Watch]]
 
     /**
@@ -4014,7 +4151,8 @@ package io.apibuilder.api.v0 {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Watch]
 
     /**
@@ -4027,7 +4165,8 @@ package io.apibuilder.api.v0 {
       userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
       organizationKey: String,
       applicationKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Boolean]
 
     /**
@@ -4035,12 +4174,14 @@ package io.apibuilder.api.v0 {
      */
     def post(
       watchForm: io.apibuilder.api.v0.models.WatchForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.api.v0.models.Watch]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: play.api.libs.ws.WSRequest => play.api.libs.ws.WSRequest = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 

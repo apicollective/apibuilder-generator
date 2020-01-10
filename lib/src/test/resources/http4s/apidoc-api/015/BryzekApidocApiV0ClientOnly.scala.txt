@@ -83,7 +83,8 @@ def closeAsyncHttpClient(): Unit = {
         hasVersion: _root_.scala.Option[Boolean] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Application]] = {
         val urlPath = Seq(orgKey)
 
@@ -96,7 +97,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Application]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Application]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Application]]("Seq[io.apibuilder.api.v0.models.Application]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -105,13 +106,14 @@ def closeAsyncHttpClient(): Unit = {
       override def post(
         orgKey: String,
         applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Application] = {
         val urlPath = Seq(orgKey)
 
         val (payload, formPayload) = (Some(applicationForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.ApplicationForm, io.apibuilder.api.v0.models.Application]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.ApplicationForm, io.apibuilder.api.v0.models.Application]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Application]("io.apibuilder.api.v0.models.Application", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -122,13 +124,14 @@ def closeAsyncHttpClient(): Unit = {
         orgKey: String,
         applicationKey: String,
         applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Application] = {
         val urlPath = Seq(orgKey, applicationKey)
 
         val (payload, formPayload) = (Some(applicationForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.ApplicationForm, io.apibuilder.api.v0.models.Application]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.ApplicationForm, io.apibuilder.api.v0.models.Application]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Application]("io.apibuilder.api.v0.models.Application", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -138,11 +141,12 @@ def closeAsyncHttpClient(): Unit = {
       override def deleteByApplicationKey(
         orgKey: String,
         applicationKey: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq(orgKey, applicationKey)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -152,13 +156,14 @@ def closeAsyncHttpClient(): Unit = {
         orgKey: String,
         applicationKey: String,
         moveForm: io.apibuilder.api.v0.models.MoveForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Application] = {
         val urlPath = Seq(orgKey, applicationKey, "move")
 
         val (payload, formPayload) = (Some(moveForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.MoveForm, io.apibuilder.api.v0.models.Application]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.MoveForm, io.apibuilder.api.v0.models.Application]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Application]("io.apibuilder.api.v0.models.Application", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -172,7 +177,8 @@ def closeAsyncHttpClient(): Unit = {
         name: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Attribute]] = {
         val urlPath = Seq("attributes")
 
@@ -183,7 +189,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Attribute]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Attribute]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Attribute]]("Seq[io.apibuilder.api.v0.models.Attribute]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -191,11 +197,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByName(
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Attribute] = {
         val urlPath = Seq("attributes", name)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Attribute]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Attribute]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Attribute]("io.apibuilder.api.v0.models.Attribute", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -204,13 +211,14 @@ def closeAsyncHttpClient(): Unit = {
 
       override def post(
         attributeForm: io.apibuilder.api.v0.models.AttributeForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Attribute] = {
         val urlPath = Seq("attributes")
 
         val (payload, formPayload) = (Some(attributeForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.AttributeForm, io.apibuilder.api.v0.models.Attribute]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.AttributeForm, io.apibuilder.api.v0.models.Attribute]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Attribute]("io.apibuilder.api.v0.models.Attribute", r)
           case r if r.status.code == 401 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
@@ -220,11 +228,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def deleteByName(
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("attributes", name)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r if r.status.code == 401 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
@@ -239,7 +248,8 @@ def closeAsyncHttpClient(): Unit = {
         applicationKey: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Change]] = {
         val urlPath = Seq("changes")
 
@@ -250,7 +260,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Change]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Change]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Change]]("Seq[io.apibuilder.api.v0.models.Change]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -263,11 +273,12 @@ def closeAsyncHttpClient(): Unit = {
         applicationKey: String,
         version: String,
         generatorKey: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Code] = {
         val urlPath = Seq(orgKey, applicationKey, version, generatorKey)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Code]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Code]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Code]("io.apibuilder.api.v0.models.Code", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
@@ -280,13 +291,14 @@ def closeAsyncHttpClient(): Unit = {
       override def post(
         orgKey: String,
         domain: io.apibuilder.api.v0.models.Domain,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Domain] = {
         val urlPath = Seq("domains", orgKey)
 
         val (payload, formPayload) = (Some(domain), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.Domain, io.apibuilder.api.v0.models.Domain]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.Domain, io.apibuilder.api.v0.models.Domain]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Domain]("io.apibuilder.api.v0.models.Domain", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -296,11 +308,12 @@ def closeAsyncHttpClient(): Unit = {
       override def deleteByName(
         orgKey: String,
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("domains", orgKey, name)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -310,13 +323,14 @@ def closeAsyncHttpClient(): Unit = {
     object EmailVerificationConfirmationForms extends EmailVerificationConfirmationForms {
       override def post(
         emailVerificationConfirmationForm: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("email_verification_confirmations")
 
         val (payload, formPayload) = (Some(emailVerificationConfirmationForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.EmailVerificationConfirmationForm, Unit]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.EmailVerificationConfirmationForm, Unit]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
@@ -331,7 +345,8 @@ def closeAsyncHttpClient(): Unit = {
         generatorKey: _root_.scala.Option[String] = None,
         limit: Long = 100L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.GeneratorService]] = {
         val urlPath = Seq("generator_services")
 
@@ -343,7 +358,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.GeneratorService]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.GeneratorService]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.GeneratorService]]("Seq[io.apibuilder.api.v0.models.GeneratorService]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -351,11 +366,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.GeneratorService] = {
         val urlPath = Seq("generator_services", guid.toString)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.GeneratorService]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.GeneratorService]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.GeneratorService]("io.apibuilder.api.v0.models.GeneratorService", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -364,13 +380,14 @@ def closeAsyncHttpClient(): Unit = {
 
       override def post(
         generatorServiceForm: io.apibuilder.api.v0.models.GeneratorServiceForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.GeneratorService] = {
         val urlPath = Seq("generator_services")
 
         val (payload, formPayload) = (Some(generatorServiceForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.GeneratorServiceForm, io.apibuilder.api.v0.models.GeneratorService]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.GeneratorServiceForm, io.apibuilder.api.v0.models.GeneratorService]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.GeneratorService]("io.apibuilder.api.v0.models.GeneratorService", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -379,11 +396,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("generator_services", guid.toString)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r if r.status.code == 403 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
@@ -401,7 +419,8 @@ def closeAsyncHttpClient(): Unit = {
         key: _root_.scala.Option[String] = None,
         limit: Long = 100L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.GeneratorWithService]] = {
         val urlPath = Seq("generators")
 
@@ -415,7 +434,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.GeneratorWithService]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.GeneratorWithService]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.GeneratorWithService]]("Seq[io.apibuilder.api.v0.models.GeneratorWithService]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -423,11 +442,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByKey(
         key: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.GeneratorWithService] = {
         val urlPath = Seq("generators", key)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.GeneratorWithService]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.GeneratorWithService]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.GeneratorWithService]("io.apibuilder.api.v0.models.GeneratorWithService", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -437,22 +457,24 @@ def closeAsyncHttpClient(): Unit = {
 
     object Healthchecks extends Healthchecks {
       override def getHealthcheck(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.generator.v0.models.Healthcheck] = {
         val urlPath = Seq("_internal_", "healthcheck")
 
-        _executeRequest[Unit, io.apibuilder.generator.v0.models.Healthcheck]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.generator.v0.models.Healthcheck]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.generator.v0.models.Healthcheck]("io.apibuilder.generator.v0.models.Healthcheck", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
       }
 
       override def getMigrate(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Map[String, String]] = {
         val urlPath = Seq("_internal_", "migrate")
 
-        _executeRequest[Unit, Map[String, String]]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Map[String, String]]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Map[String, String]]("Map[String, String]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -464,7 +486,8 @@ def closeAsyncHttpClient(): Unit = {
         q: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Item]] = {
         val urlPath = Seq("items")
 
@@ -474,7 +497,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Item]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Item]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Item]]("Seq[io.apibuilder.api.v0.models.Item]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -482,11 +505,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Item] = {
         val urlPath = Seq("items", guid.toString)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Item]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Item]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Item]("io.apibuilder.api.v0.models.Item", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -502,7 +526,8 @@ def closeAsyncHttpClient(): Unit = {
         role: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.MembershipRequest]] = {
         val urlPath = Seq("membership_requests")
 
@@ -515,7 +540,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.MembershipRequest]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.MembershipRequest]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.MembershipRequest]]("Seq[io.apibuilder.api.v0.models.MembershipRequest]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -525,7 +550,8 @@ def closeAsyncHttpClient(): Unit = {
         orgGuid: _root_.java.util.UUID,
         userGuid: _root_.java.util.UUID,
         role: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.MembershipRequest] = {
         val urlPath = Seq("membership_requests")
 
@@ -536,7 +562,7 @@ def closeAsyncHttpClient(): Unit = {
           "role" -> role
         ))
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.MembershipRequest]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.MembershipRequest]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.MembershipRequest]("io.apibuilder.api.v0.models.MembershipRequest", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -545,11 +571,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def postAcceptByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("membership_requests", guid.toString, "accept")
 
-        _executeRequest[Unit, Unit]("POST", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("POST", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
@@ -558,11 +585,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def postDeclineByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("membership_requests", guid.toString, "decline")
 
-        _executeRequest[Unit, Unit]("POST", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("POST", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
@@ -578,7 +606,8 @@ def closeAsyncHttpClient(): Unit = {
         role: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Membership]] = {
         val urlPath = Seq("memberships")
 
@@ -591,7 +620,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Membership]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Membership]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Membership]]("Seq[io.apibuilder.api.v0.models.Membership]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -599,11 +628,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Membership] = {
         val urlPath = Seq("memberships", guid.toString)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Membership]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Membership]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Membership]("io.apibuilder.api.v0.models.Membership", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -612,11 +642,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("memberships", guid.toString)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -632,7 +663,8 @@ def closeAsyncHttpClient(): Unit = {
         namespace: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Organization]] = {
         val urlPath = Seq("organizations")
 
@@ -646,7 +678,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Organization]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Organization]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Organization]]("Seq[io.apibuilder.api.v0.models.Organization]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -654,11 +686,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByKey(
         key: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Organization] = {
         val urlPath = Seq("organizations", key)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Organization]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Organization]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Organization]("io.apibuilder.api.v0.models.Organization", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -667,13 +700,14 @@ def closeAsyncHttpClient(): Unit = {
 
       override def post(
         organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Organization] = {
         val urlPath = Seq("organizations")
 
         val (payload, formPayload) = (Some(organizationForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.OrganizationForm, io.apibuilder.api.v0.models.Organization]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.OrganizationForm, io.apibuilder.api.v0.models.Organization]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Organization]("io.apibuilder.api.v0.models.Organization", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -683,13 +717,14 @@ def closeAsyncHttpClient(): Unit = {
       override def putByKey(
         key: String,
         organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Organization] = {
         val urlPath = Seq("organizations", key)
 
         val (payload, formPayload) = (Some(organizationForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.OrganizationForm, io.apibuilder.api.v0.models.Organization]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.OrganizationForm, io.apibuilder.api.v0.models.Organization]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Organization]("io.apibuilder.api.v0.models.Organization", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -698,11 +733,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def deleteByKey(
         key: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("organizations", key)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -713,7 +749,8 @@ def closeAsyncHttpClient(): Unit = {
         name: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.AttributeValue]] = {
         val urlPath = Seq("organizations", key, "attributes")
 
@@ -723,7 +760,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.AttributeValue]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.AttributeValue]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.AttributeValue]]("Seq[io.apibuilder.api.v0.models.AttributeValue]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -732,11 +769,12 @@ def closeAsyncHttpClient(): Unit = {
       override def getAttributesByKeyAndName(
         key: String,
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.AttributeValue] = {
         val urlPath = Seq("organizations", key, "attributes", name)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.AttributeValue]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.AttributeValue]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.AttributeValue]("io.apibuilder.api.v0.models.AttributeValue", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -747,13 +785,14 @@ def closeAsyncHttpClient(): Unit = {
         key: String,
         name: String,
         attributeValueForm: io.apibuilder.api.v0.models.AttributeValueForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.AttributeValue] = {
         val urlPath = Seq("organizations", key, "attributes", name)
 
         val (payload, formPayload) = (Some(attributeValueForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.AttributeValueForm, io.apibuilder.api.v0.models.AttributeValue]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.AttributeValueForm, io.apibuilder.api.v0.models.AttributeValue]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.AttributeValue]("io.apibuilder.api.v0.models.AttributeValue", r)
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.AttributeValue]("io.apibuilder.api.v0.models.AttributeValue", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
@@ -765,11 +804,12 @@ def closeAsyncHttpClient(): Unit = {
       override def deleteAttributesByKeyAndName(
         key: String,
         name: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("organizations", key, "attributes", name)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r if r.status.code == 401 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
@@ -781,13 +821,14 @@ def closeAsyncHttpClient(): Unit = {
     object PasswordResetRequests extends PasswordResetRequests {
       override def post(
         passwordResetRequest: io.apibuilder.api.v0.models.PasswordResetRequest,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("password_reset_requests")
 
         val (payload, formPayload) = (Some(passwordResetRequest), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.PasswordResetRequest, Unit]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.PasswordResetRequest, Unit]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204, 409"))
@@ -798,13 +839,14 @@ def closeAsyncHttpClient(): Unit = {
     object PasswordResets extends PasswordResets {
       override def post(
         passwordReset: io.apibuilder.api.v0.models.PasswordReset,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.PasswordResetSuccess] = {
         val urlPath = Seq("password_resets")
 
         val (payload, formPayload) = (Some(passwordReset), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.PasswordReset, io.apibuilder.api.v0.models.PasswordResetSuccess]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.PasswordReset, io.apibuilder.api.v0.models.PasswordResetSuccess]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.PasswordResetSuccess]("io.apibuilder.api.v0.models.PasswordResetSuccess", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -820,7 +862,8 @@ def closeAsyncHttpClient(): Unit = {
         publication: _root_.scala.Option[io.apibuilder.api.v0.models.Publication] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Subscription]] = {
         val urlPath = Seq("subscriptions")
 
@@ -833,7 +876,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Subscription]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Subscription]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Subscription]]("Seq[io.apibuilder.api.v0.models.Subscription]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -841,11 +884,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Subscription] = {
         val urlPath = Seq("subscriptions", guid.toString)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Subscription]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Subscription]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Subscription]("io.apibuilder.api.v0.models.Subscription", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -854,13 +898,14 @@ def closeAsyncHttpClient(): Unit = {
 
       override def post(
         subscriptionForm: io.apibuilder.api.v0.models.SubscriptionForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Subscription] = {
         val urlPath = Seq("subscriptions")
 
         val (payload, formPayload) = (Some(subscriptionForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.SubscriptionForm, io.apibuilder.api.v0.models.Subscription]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.SubscriptionForm, io.apibuilder.api.v0.models.Subscription]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Subscription]("io.apibuilder.api.v0.models.Subscription", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 201, 409"))
@@ -869,11 +914,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("subscriptions", guid.toString)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -886,7 +932,8 @@ def closeAsyncHttpClient(): Unit = {
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Token]] = {
         val urlPath = Seq("tokens", "users", userGuid.toString)
 
@@ -896,7 +943,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Token]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Token]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Token]]("Seq[io.apibuilder.api.v0.models.Token]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -904,11 +951,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getCleartextByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.CleartextToken] = {
         val urlPath = Seq("tokens", guid.toString, "cleartext")
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.CleartextToken]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.CleartextToken]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.CleartextToken]("io.apibuilder.api.v0.models.CleartextToken", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -917,13 +965,14 @@ def closeAsyncHttpClient(): Unit = {
 
       override def post(
         tokenForm: io.apibuilder.api.v0.models.TokenForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Token] = {
         val urlPath = Seq("tokens")
 
         val (payload, formPayload) = (Some(tokenForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.TokenForm, io.apibuilder.api.v0.models.Token]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.TokenForm, io.apibuilder.api.v0.models.Token]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Token]("io.apibuilder.api.v0.models.Token", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 201, 409"))
@@ -932,11 +981,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("tokens", guid.toString)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -948,7 +998,8 @@ def closeAsyncHttpClient(): Unit = {
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
         email: _root_.scala.Option[String] = None,
         token: _root_.scala.Option[String] = None,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.User]] = {
         val urlPath = Seq("users")
 
@@ -958,7 +1009,7 @@ def closeAsyncHttpClient(): Unit = {
           token.map("token" -> _)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.User]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.User]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.User]]("Seq[io.apibuilder.api.v0.models.User]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -966,11 +1017,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User] = {
         val urlPath = Seq("users", guid.toString)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.User]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.User]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -980,7 +1032,8 @@ def closeAsyncHttpClient(): Unit = {
       override def postAuthenticate(
         email: String,
         password: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User] = {
         val urlPath = Seq("users", "authenticate")
 
@@ -990,7 +1043,7 @@ def closeAsyncHttpClient(): Unit = {
           "password" -> password
         ))
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.User]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.User]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -999,13 +1052,14 @@ def closeAsyncHttpClient(): Unit = {
 
       override def post(
         userForm: io.apibuilder.api.v0.models.UserForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User] = {
         val urlPath = Seq("users")
 
         val (payload, formPayload) = (Some(userForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.UserForm, io.apibuilder.api.v0.models.User]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.UserForm, io.apibuilder.api.v0.models.User]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -1015,13 +1069,14 @@ def closeAsyncHttpClient(): Unit = {
       override def putByGuid(
         guid: _root_.java.util.UUID,
         userUpdateForm: io.apibuilder.api.v0.models.UserUpdateForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User] = {
         val urlPath = Seq("users", guid.toString)
 
         val (payload, formPayload) = (Some(userUpdateForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.UserUpdateForm, io.apibuilder.api.v0.models.User]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.UserUpdateForm, io.apibuilder.api.v0.models.User]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.User]("io.apibuilder.api.v0.models.User", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -1032,13 +1087,14 @@ def closeAsyncHttpClient(): Unit = {
     object Validations extends Validations {
       override def post(
         value: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Validation] = {
         val urlPath = Seq("validations")
 
         val (payload, formPayload) = (Some(value), None)
 
-        _executeRequest[String, io.apibuilder.api.v0.models.Validation]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[String, io.apibuilder.api.v0.models.Validation]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Validation]("io.apibuilder.api.v0.models.Validation", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -1051,7 +1107,8 @@ def closeAsyncHttpClient(): Unit = {
         applicationKey: String,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Version]] = {
         val urlPath = Seq(orgKey, applicationKey)
 
@@ -1060,7 +1117,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Version]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Version]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Version]]("Seq[io.apibuilder.api.v0.models.Version]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -1070,11 +1127,12 @@ def closeAsyncHttpClient(): Unit = {
         orgKey: String,
         applicationKey: String,
         version: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Version] = {
         val urlPath = Seq(orgKey, applicationKey, version)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Version]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Version]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Version]("io.apibuilder.api.v0.models.Version", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -1085,13 +1143,14 @@ def closeAsyncHttpClient(): Unit = {
         orgKey: String,
         version: String,
         versionForm: io.apibuilder.api.v0.models.VersionForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Version] = {
         val urlPath = Seq(orgKey, version)
 
         val (payload, formPayload) = (Some(versionForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.VersionForm, io.apibuilder.api.v0.models.Version]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.VersionForm, io.apibuilder.api.v0.models.Version]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Version]("io.apibuilder.api.v0.models.Version", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -1103,13 +1162,14 @@ def closeAsyncHttpClient(): Unit = {
         applicationKey: String,
         version: String,
         versionForm: io.apibuilder.api.v0.models.VersionForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Version] = {
         val urlPath = Seq(orgKey, applicationKey, version)
 
         val (payload, formPayload) = (Some(versionForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.VersionForm, io.apibuilder.api.v0.models.Version]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.VersionForm, io.apibuilder.api.v0.models.Version]("PUT", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Version]("io.apibuilder.api.v0.models.Version", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 409"))
@@ -1120,11 +1180,12 @@ def closeAsyncHttpClient(): Unit = {
         orgKey: String,
         applicationKey: String,
         version: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq(orgKey, applicationKey, version)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -1139,7 +1200,8 @@ def closeAsyncHttpClient(): Unit = {
         applicationKey: _root_.scala.Option[String] = None,
         limit: Long = 25L,
         offset: Long = 0L,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Watch]] = {
         val urlPath = Seq("watches")
 
@@ -1152,7 +1214,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("offset" -> offset.toString)
         ).flatten
 
-        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Watch]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Seq[io.apibuilder.api.v0.models.Watch]]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Watch]]("Seq[io.apibuilder.api.v0.models.Watch]", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -1160,11 +1222,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Watch] = {
         val urlPath = Seq("watches", guid.toString)
 
-        _executeRequest[Unit, io.apibuilder.api.v0.models.Watch]("GET", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, io.apibuilder.api.v0.models.Watch]("GET", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Watch]("io.apibuilder.api.v0.models.Watch", r)
           case r if r.status.code == 404 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.UnitResponse(r.status.code))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200, 404"))
@@ -1175,7 +1238,8 @@ def closeAsyncHttpClient(): Unit = {
         userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
         organizationKey: String,
         applicationKey: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Boolean] = {
         val urlPath = Seq("watches", "check")
 
@@ -1185,7 +1249,7 @@ def closeAsyncHttpClient(): Unit = {
           Some("application_key" -> applicationKey)
         ).flatten
 
-        _executeRequest[Unit, Boolean]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Boolean]("GET", path = urlPath, queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 200 => _root_.io.apibuilder.api.v0.Client.parseJson[Boolean]("Boolean", r)
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 200"))
         }
@@ -1193,13 +1257,14 @@ def closeAsyncHttpClient(): Unit = {
 
       override def post(
         watchForm: io.apibuilder.api.v0.models.WatchForm,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Watch] = {
         val urlPath = Seq("watches")
 
         val (payload, formPayload) = (Some(watchForm), None)
 
-        _executeRequest[io.apibuilder.api.v0.models.WatchForm, io.apibuilder.api.v0.models.Watch]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders) {
+        _executeRequest[io.apibuilder.api.v0.models.WatchForm, io.apibuilder.api.v0.models.Watch]("POST", path = urlPath, body = payload, formBody = formPayload, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 201 => _root_.io.apibuilder.api.v0.Client.parseJson[io.apibuilder.api.v0.models.Watch]("io.apibuilder.api.v0.models.Watch", r)
           case r if r.status.code == 409 => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.ErrorsResponse(r))
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 201, 409"))
@@ -1208,11 +1273,12 @@ def closeAsyncHttpClient(): Unit = {
 
       override def deleteByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: org.http4s.Request => org.http4s.Request = identity
       ): scalaz.concurrent.Task[Unit] = {
         val urlPath = Seq("watches", guid.toString)
 
-        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders) {
+        _executeRequest[Unit, Unit]("DELETE", path = urlPath, requestHeaders = requestHeaders, requestModifier = requestModifier) {
           case r if r.status.code == 204 => scalaz.concurrent.Task.now(())
           case r => scalaz.concurrent.Task.fail(new io.apibuilder.api.v0.errors.FailedRequest(r.status.code, s"Unsupported response code[${r.status.code}]. Expected: 204"))
         }
@@ -1237,7 +1303,8 @@ def closeAsyncHttpClient(): Unit = {
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[T] = None,
-      formBody : Option[org.http4s.UrlForm] = None
+      formBody: Option[org.http4s.UrlForm] = None,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     )(handler: org.http4s.Response => scalaz.concurrent.Task[U]
     )(implicit encoder: io.circe.Encoder[T]): scalaz.concurrent.Task[U] = {
       import org.http4s.QueryParamEncoder._
@@ -1256,9 +1323,7 @@ def closeAsyncHttpClient(): Unit = {
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
       val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
 
-      val request = org.http4s.Request(method = m,
-                                       uri = uri,
-                                       headers = headers)
+      val request = org.http4s.Request(method = m, uri = uri, headers = headers)
 
       val reqAndMaybeAuth = auth.fold(request) {
         case Authorization.Basic(username, passwordOpt) => {
@@ -1269,9 +1334,10 @@ def closeAsyncHttpClient(): Unit = {
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
+      val decoratedRequest = requestModifier(reqAndMaybeAuth)
       val reqAndMaybeAuthAndBody =
-        if (formBody.nonEmpty) formBody.fold(scalaz.concurrent.Task.now(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
-        else body.fold(scalaz.concurrent.Task.now(reqAndMaybeAuth))(reqAndMaybeAuth.withBody)
+        if (formBody.nonEmpty) formBody.fold(scalaz.concurrent.Task.now(decoratedRequest))(decoratedRequest.withBody)
+        else body.fold(scalaz.concurrent.Task.now(decoratedRequest))(decoratedRequest.withBody)
 
       asyncHttpClient.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }
@@ -1349,7 +1415,8 @@ def closeAsyncHttpClient(): Unit = {
       hasVersion: _root_.scala.Option[Boolean] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Application]]
 
     /**
@@ -1358,7 +1425,8 @@ def closeAsyncHttpClient(): Unit = {
     def post(
       orgKey: String,
       applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Application]
 
     /**
@@ -1368,7 +1436,8 @@ def closeAsyncHttpClient(): Unit = {
       orgKey: String,
       applicationKey: String,
       applicationForm: io.apibuilder.api.v0.models.ApplicationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Application]
 
     /**
@@ -1377,7 +1446,8 @@ def closeAsyncHttpClient(): Unit = {
     def deleteByApplicationKey(
       orgKey: String,
       applicationKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
 
     /**
@@ -1387,7 +1457,8 @@ def closeAsyncHttpClient(): Unit = {
       orgKey: String,
       applicationKey: String,
       moveForm: io.apibuilder.api.v0.models.MoveForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Application]
   }
 
@@ -1405,7 +1476,8 @@ def closeAsyncHttpClient(): Unit = {
       name: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Attribute]]
 
     /**
@@ -1413,7 +1485,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def getByName(
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Attribute]
 
     /**
@@ -1421,7 +1494,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       attributeForm: io.apibuilder.api.v0.models.AttributeForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Attribute]
 
     /**
@@ -1430,7 +1504,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def deleteByName(
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1446,7 +1521,8 @@ def closeAsyncHttpClient(): Unit = {
       applicationKey: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Change]]
   }
 
@@ -1464,7 +1540,8 @@ def closeAsyncHttpClient(): Unit = {
       applicationKey: String,
       version: String,
       generatorKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Code]
   }
 
@@ -1475,7 +1552,8 @@ def closeAsyncHttpClient(): Unit = {
     def post(
       orgKey: String,
       domain: io.apibuilder.api.v0.models.Domain,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Domain]
 
     /**
@@ -1484,7 +1562,8 @@ def closeAsyncHttpClient(): Unit = {
     def deleteByName(
       orgKey: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1494,7 +1573,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       emailVerificationConfirmationForm: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1511,17 +1591,20 @@ def closeAsyncHttpClient(): Unit = {
       generatorKey: _root_.scala.Option[String] = None,
       limit: Long = 100L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.GeneratorService]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.GeneratorService]
 
     def post(
       generatorServiceForm: io.apibuilder.api.v0.models.GeneratorServiceForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.GeneratorService]
 
     /**
@@ -1529,7 +1612,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1553,22 +1637,26 @@ def closeAsyncHttpClient(): Unit = {
       key: _root_.scala.Option[String] = None,
       limit: Long = 100L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.GeneratorWithService]]
 
     def getByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.GeneratorWithService]
   }
 
   trait Healthchecks {
     def getHealthcheck(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.generator.v0.models.Healthcheck]
 
     def getMigrate(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Map[String, String]]
   }
 
@@ -1582,12 +1670,14 @@ def closeAsyncHttpClient(): Unit = {
       q: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Item]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Item]
   }
 
@@ -1605,7 +1695,8 @@ def closeAsyncHttpClient(): Unit = {
       role: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.MembershipRequest]]
 
     /**
@@ -1615,7 +1706,8 @@ def closeAsyncHttpClient(): Unit = {
       orgGuid: _root_.java.util.UUID,
       userGuid: _root_.java.util.UUID,
       role: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.MembershipRequest]
 
     /**
@@ -1624,7 +1716,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def postAcceptByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
 
     /**
@@ -1633,7 +1726,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def postDeclineByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1651,17 +1745,20 @@ def closeAsyncHttpClient(): Unit = {
       role: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Membership]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Membership]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1687,7 +1784,8 @@ def closeAsyncHttpClient(): Unit = {
       namespace: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Organization]]
 
     /**
@@ -1695,7 +1793,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def getByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Organization]
 
     /**
@@ -1703,7 +1802,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Organization]
 
     /**
@@ -1712,7 +1812,8 @@ def closeAsyncHttpClient(): Unit = {
     def putByKey(
       key: String,
       organizationForm: io.apibuilder.api.v0.models.OrganizationForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Organization]
 
     /**
@@ -1720,7 +1821,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def deleteByKey(
       key: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
 
     /**
@@ -1736,7 +1838,8 @@ def closeAsyncHttpClient(): Unit = {
       name: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.AttributeValue]]
 
     /**
@@ -1745,7 +1848,8 @@ def closeAsyncHttpClient(): Unit = {
     def getAttributesByKeyAndName(
       key: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.AttributeValue]
 
     /**
@@ -1755,7 +1859,8 @@ def closeAsyncHttpClient(): Unit = {
       key: String,
       name: String,
       attributeValueForm: io.apibuilder.api.v0.models.AttributeValueForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.AttributeValue]
 
     /**
@@ -1765,7 +1870,8 @@ def closeAsyncHttpClient(): Unit = {
     def deleteAttributesByKeyAndName(
       key: String,
       name: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1776,7 +1882,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       passwordResetRequest: io.apibuilder.api.v0.models.PasswordResetRequest,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1788,7 +1895,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       passwordReset: io.apibuilder.api.v0.models.PasswordReset,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.PasswordResetSuccess]
   }
 
@@ -1810,7 +1918,8 @@ def closeAsyncHttpClient(): Unit = {
       publication: _root_.scala.Option[io.apibuilder.api.v0.models.Publication] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Subscription]]
 
     /**
@@ -1818,7 +1927,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Subscription]
 
     /**
@@ -1826,12 +1936,14 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       subscriptionForm: io.apibuilder.api.v0.models.SubscriptionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Subscription]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1845,7 +1957,8 @@ def closeAsyncHttpClient(): Unit = {
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Token]]
 
     /**
@@ -1853,7 +1966,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def getCleartextByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.CleartextToken]
 
     /**
@@ -1861,12 +1975,14 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       tokenForm: io.apibuilder.api.v0.models.TokenForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Token]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -1883,7 +1999,8 @@ def closeAsyncHttpClient(): Unit = {
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       email: _root_.scala.Option[String] = None,
       token: _root_.scala.Option[String] = None,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.User]]
 
     /**
@@ -1891,7 +2008,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User]
 
     /**
@@ -1902,7 +2020,8 @@ def closeAsyncHttpClient(): Unit = {
     def postAuthenticate(
       email: String,
       password: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User]
 
     /**
@@ -1910,7 +2029,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       userForm: io.apibuilder.api.v0.models.UserForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User]
 
     /**
@@ -1919,14 +2039,16 @@ def closeAsyncHttpClient(): Unit = {
     def putByGuid(
       guid: _root_.java.util.UUID,
       userUpdateForm: io.apibuilder.api.v0.models.UserUpdateForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.User]
   }
 
   trait Validations {
     def post(
       value: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Validation]
   }
 
@@ -1944,7 +2066,8 @@ def closeAsyncHttpClient(): Unit = {
       applicationKey: String,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Version]]
 
     /**
@@ -1957,7 +2080,8 @@ def closeAsyncHttpClient(): Unit = {
       orgKey: String,
       applicationKey: String,
       version: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Version]
 
     /**
@@ -1967,7 +2091,8 @@ def closeAsyncHttpClient(): Unit = {
       orgKey: String,
       version: String,
       versionForm: io.apibuilder.api.v0.models.VersionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Version]
 
     /**
@@ -1978,7 +2103,8 @@ def closeAsyncHttpClient(): Unit = {
       applicationKey: String,
       version: String,
       versionForm: io.apibuilder.api.v0.models.VersionForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Version]
 
     /**
@@ -1988,7 +2114,8 @@ def closeAsyncHttpClient(): Unit = {
       orgKey: String,
       applicationKey: String,
       version: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 
@@ -2010,7 +2137,8 @@ def closeAsyncHttpClient(): Unit = {
       applicationKey: _root_.scala.Option[String] = None,
       limit: Long = 25L,
       offset: Long = 0L,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Seq[io.apibuilder.api.v0.models.Watch]]
 
     /**
@@ -2018,7 +2146,8 @@ def closeAsyncHttpClient(): Unit = {
      */
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Watch]
 
     /**
@@ -2031,7 +2160,8 @@ def closeAsyncHttpClient(): Unit = {
       userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
       organizationKey: String,
       applicationKey: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Boolean]
 
     /**
@@ -2039,12 +2169,14 @@ def closeAsyncHttpClient(): Unit = {
      */
     def post(
       watchForm: io.apibuilder.api.v0.models.WatchForm,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[io.apibuilder.api.v0.models.Watch]
 
     def deleteByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request => org.http4s.Request = identity
     ): scalaz.concurrent.Task[Unit]
   }
 

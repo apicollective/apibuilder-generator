@@ -16,7 +16,8 @@ package io.gregor.time.types.v0.mock {
       queryDate: _root_.java.time.LocalDate,
       queryTime: _root_.java.time.Instant,
       dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: org.http4s.Request[F] => org.http4s.Request[F] = identity
     ): F[io.gregor.time.types.v0.models.DateTimeModel] = cats.Applicative[F].pure {
       io.gregor.time.types.v0.mock.Factories.makeDateTimeModel()
     }

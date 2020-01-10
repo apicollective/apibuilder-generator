@@ -64,7 +64,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     )
 
     val params =
-      Seq(Some(s"_req: ${config.requestClass}")) ++
+      Seq(Some(s"_req: ${config.requestBuilderClass}")) ++
       nonHeaderParameters ++
       Seq(op.body.map(body => s"body: => ${config.generateDecodeResult(body.datatype.name)}"))
 

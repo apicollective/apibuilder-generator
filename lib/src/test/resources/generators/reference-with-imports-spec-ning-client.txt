@@ -458,7 +458,8 @@ package io.apibuilder.reference.api.v0 {
         foo: _root_.scala.Option[String] = None,
         optionalMessages: _root_.scala.Option[Seq[String]] = None,
         requiredMessages: Seq[String],
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val queryParameters = Seq(
           foo.map("foo" -> _)
@@ -466,7 +467,7 @@ package io.apibuilder.reference.api.v0 {
           optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
           requiredMessages.map("required_messages" -> _)
 
-        _executeRequest("GET", s"/echoes", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/echoes", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 204 => ()
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
@@ -475,12 +476,13 @@ package io.apibuilder.reference.api.v0 {
       override def getArraysOnly(
         optionalMessages: _root_.scala.Option[Seq[String]] = None,
         requiredMessages: Seq[String],
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
         val queryParameters = optionalMessages.getOrElse(Nil).map("optional_messages" -> _) ++
           requiredMessages.map("required_messages" -> _)
 
-        _executeRequest("GET", s"/echoes/arrays-only", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/echoes/arrays-only", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 204 => ()
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 204", requestUri = Some(r.getUri))
         }
@@ -490,9 +492,10 @@ package io.apibuilder.reference.api.v0 {
     object Groups extends Groups {
       override def getByOrganization(
         organization: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]] = {
-        _executeRequest("GET", s"/groups/${organization}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/groups/${organization}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]", r, _.validate[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -505,7 +508,8 @@ package io.apibuilder.reference.api.v0 {
         organization: _root_.java.util.UUID,
         user: _root_.java.util.UUID,
         role: String,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Member] = {
         val payload = play.api.libs.json.Json.obj(
           "guid" -> play.api.libs.json.Json.toJson(guid),
@@ -514,7 +518,7 @@ package io.apibuilder.reference.api.v0 {
           "role" -> play.api.libs.json.Json.toJson(role)
         )
 
-        _executeRequest("POST", s"/members", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/members", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 201 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.Member", r, _.validate[io.apibuilder.reference.api.v0.models.Member])
           case r if r.getStatusCode == 409 => throw io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
@@ -526,7 +530,8 @@ package io.apibuilder.reference.api.v0 {
         organizationGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
         userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
         role: _root_.scala.Option[String] = None,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -535,7 +540,7 @@ package io.apibuilder.reference.api.v0 {
           role.map("role" -> _)
         ).flatten
 
-        _executeRequest("GET", s"/members", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/members", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -543,9 +548,10 @@ package io.apibuilder.reference.api.v0 {
 
       override def getByOrganization(
         organization: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]] = {
-        _executeRequest("GET", s"/members/${organization}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/members/${organization}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -554,11 +560,12 @@ package io.apibuilder.reference.api.v0 {
       override def postMembersBulkByOrganization(
         organization: _root_.java.util.UUID,
         members: Seq[io.apibuilder.reference.api.v0.models.Member],
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]] = {
         val payload = play.api.libs.json.Json.toJson(members)
 
-        _executeRequest("POST", s"/members/${organization}/members_bulk", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/members/${organization}/members_bulk", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Member]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Member]])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -568,13 +575,14 @@ package io.apibuilder.reference.api.v0 {
     object Organizations extends Organizations {
       override def postOrganizations(
         organization: io.apibuilder.reference.api.v0.models.Organization,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Organization] = {
         val payload = play.api.libs.json.Json.obj(
           "organization" -> play.api.libs.json.Json.toJson(organization)
         )
 
-        _executeRequest("POST", s"/organizations", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/organizations", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 201 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.Organization", r, _.validate[io.apibuilder.reference.api.v0.models.Organization])
           case r if r.getStatusCode == 409 => throw io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
@@ -584,14 +592,15 @@ package io.apibuilder.reference.api.v0 {
       override def getOrganizations(
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
         name: _root_.scala.Option[String] = None,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Organization]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
           name.map("name" -> _)
         ).flatten
 
-        _executeRequest("GET", s"/organizations", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/organizations", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Organization]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.Organization]])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -599,9 +608,10 @@ package io.apibuilder.reference.api.v0 {
 
       override def getByGuid(
         guid: _root_.java.util.UUID,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Organization] = {
-        _executeRequest("GET", s"/${guid}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/${guid}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.Organization", r, _.validate[io.apibuilder.reference.api.v0.models.Organization])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -613,7 +623,8 @@ package io.apibuilder.reference.api.v0 {
         guid: _root_.java.util.UUID,
         email: String,
         active: Boolean,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.User] = {
         val payload = play.api.libs.json.Json.obj(
           "guid" -> play.api.libs.json.Json.toJson(guid),
@@ -621,7 +632,7 @@ package io.apibuilder.reference.api.v0 {
           "active" -> play.api.libs.json.Json.toJson(active)
         )
 
-        _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/users", body = Some(payload), requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 201 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("io.apibuilder.reference.api.v0.models.User", r, _.validate[io.apibuilder.reference.api.v0.models.User])
           case r if r.getStatusCode == 409 => throw io.apibuilder.reference.api.v0.errors.ErrorsResponse(r)
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 201, 409", requestUri = Some(r.getUri))
@@ -634,7 +645,8 @@ package io.apibuilder.reference.api.v0 {
         ageGroup: _root_.scala.Option[io.apibuilder.reference.api.v0.models.AgeGroup] = None,
         email: _root_.scala.Option[String] = None,
         active: Boolean = true,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
@@ -644,7 +656,7 @@ package io.apibuilder.reference.api.v0 {
         ).flatten ++
           organizationGuids.getOrElse(Nil).map("organization_guids" -> _.toString)
 
-        _executeRequest("GET", s"/users", queryParameters = queryParameters, requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/users", queryParameters = queryParameters, requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.User]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.User]])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -652,18 +664,20 @@ package io.apibuilder.reference.api.v0 {
 
       override def getByAgeGroup(
         ageGroup: io.apibuilder.reference.api.v0.models.AgeGroup,
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]] = {
-        _executeRequest("GET", s"/users/${_root_.io.apibuilder.reference.api.v0.PathSegment.encode(ageGroup.toString, "UTF-8")}", requestHeaders = requestHeaders).map {
+        _executeRequest("GET", s"/users/${_root_.io.apibuilder.reference.api.v0.PathSegment.encode(ageGroup.toString, "UTF-8")}", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.User]", r, _.validate[Seq[io.apibuilder.reference.api.v0.models.User]])
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
       }
 
       override def postNoop(
-        requestHeaders: Seq[(String, String)] = Nil
+        requestHeaders: Seq[(String, String)] = Nil,
+        requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit] = {
-        _executeRequest("POST", s"/users/noop", requestHeaders = requestHeaders).map {
+        _executeRequest("POST", s"/users/noop", requestHeaders = requestHeaders, requestModifier = requestModifier).map {
           case r if r.getStatusCode == 200 => ()
           case r => throw io.apibuilder.reference.api.v0.errors.FailedRequest(r.getStatusCode, s"Unsupported response code[${r.getStatusCode}]. Expected: 200", requestUri = Some(r.getUri))
         }
@@ -682,8 +696,8 @@ package io.apibuilder.reference.api.v0 {
       }
     }
 
-    def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): RequestBuilder = {
-      val builder = new RequestBuilder(method)
+    def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): _root_.com.ning.http.client.RequestBuilder = {
+      val builder = new _root_.com.ning.http.client.RequestBuilder(method)
         .setUrl(baseUrl + path)
         .addHeader("User-Agent", Constants.UserAgent)
         .addHeader("X-Apidoc-Version", Constants.Version)
@@ -712,7 +726,8 @@ package io.apibuilder.reference.api.v0 {
       path: String,
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
-      body: Option[play.api.libs.json.JsValue] = None
+      body: Option[play.api.libs.json.JsValue] = None,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.ning.http.client.Response] = {
       val allHeaders = body match {
         case None => requestHeaders
@@ -730,7 +745,7 @@ package io.apibuilder.reference.api.v0 {
         request.setBody(serialized)
       }
 
-      val finalRequest = requestWithParamsAndBody.build()
+      val finalRequest = requestModifier(requestWithParamsAndBody).build()
       _logRequest(finalRequest)
 
       val result = scala.concurrent.Promise[com.ning.http.client.Response]()
@@ -807,20 +822,23 @@ package io.apibuilder.reference.api.v0 {
       foo: _root_.scala.Option[String] = None,
       optionalMessages: _root_.scala.Option[Seq[String]] = None,
       requiredMessages: Seq[String],
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
 
     def getArraysOnly(
       optionalMessages: _root_.scala.Option[Seq[String]] = None,
       requiredMessages: Seq[String],
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
   trait Groups {
     def getByOrganization(
       organization: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Map[String, Seq[io.apibuilder.reference.api.v0.models.User]]]
   }
 
@@ -830,7 +848,8 @@ package io.apibuilder.reference.api.v0 {
       organization: _root_.java.util.UUID,
       user: _root_.java.util.UUID,
       role: String,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Member]
 
     def get(
@@ -838,36 +857,42 @@ package io.apibuilder.reference.api.v0 {
       organizationGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
       userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
       role: _root_.scala.Option[String] = None,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
 
     def getByOrganization(
       organization: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
 
     def postMembersBulkByOrganization(
       organization: _root_.java.util.UUID,
       members: Seq[io.apibuilder.reference.api.v0.models.Member],
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Member]]
   }
 
   trait Organizations {
     def postOrganizations(
       organization: io.apibuilder.reference.api.v0.models.Organization,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Organization]
 
     def getOrganizations(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
       name: _root_.scala.Option[String] = None,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.Organization]]
 
     def getByGuid(
       guid: _root_.java.util.UUID,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.Organization]
   }
 
@@ -876,7 +901,8 @@ package io.apibuilder.reference.api.v0 {
       guid: _root_.java.util.UUID,
       email: String,
       active: Boolean,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.apibuilder.reference.api.v0.models.User]
 
     /**
@@ -889,16 +915,19 @@ package io.apibuilder.reference.api.v0 {
       ageGroup: _root_.scala.Option[io.apibuilder.reference.api.v0.models.AgeGroup] = None,
       email: _root_.scala.Option[String] = None,
       active: Boolean = true,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]]
 
     def getByAgeGroup(
       ageGroup: io.apibuilder.reference.api.v0.models.AgeGroup,
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.apibuilder.reference.api.v0.models.User]]
 
     def postNoop(
-      requestHeaders: Seq[(String, String)] = Nil
+      requestHeaders: Seq[(String, String)] = Nil,
+      requestModifier: _root_.com.ning.http.client.RequestBuilder => _root_.com.ning.http.client.RequestBuilder = identity
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Unit]
   }
 
