@@ -179,7 +179,15 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
       ) ++ (obj.email match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.JsString(x))
-      })
+      }) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Writes[GuestUser] = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.discriminator.v0.models.GuestUser] {
+        def writes(obj: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser) = {
+          jsObjectGuestUser(obj)
+        }
+      }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
@@ -193,7 +201,15 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
       play.api.libs.json.Json.obj(
         "id" -> play.api.libs.json.JsString(obj.id),
         "email" -> play.api.libs.json.JsString(obj.email)
-      )
+      ) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser] {
+        def writes(obj: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser) = {
+          jsObjectRegisteredUser(obj)
+        }
+      }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Reads[UserString] = {
@@ -214,8 +230,8 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
     def jsObjectUser(obj: io.apibuilder.example.union.types.discriminator.v0.models.User): play.api.libs.json.JsObject = {
       obj match {
-        case x: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser => jsObjectRegisteredUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
-        case x: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser => jsObjectGuestUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
+        case x: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser => jsObjectRegisteredUser(x)
+        case x: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser => jsObjectGuestUser(x)
         case x: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser => play.api.libs.json.Json.obj("discriminator" -> "system_user", "value" -> play.api.libs.json.JsString(x.toString))
         case x: io.apibuilder.example.union.types.discriminator.v0.models.UserString => play.api.libs.json.Json.obj("discriminator" -> "string", "value" -> play.api.libs.json.JsString(x.value))
         case other => {

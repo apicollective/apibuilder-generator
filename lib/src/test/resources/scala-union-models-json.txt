@@ -18,6 +18,14 @@ def jsObjectGuestUser(obj: test.apidoc.apidoctest.v0.models.GuestUser): play.api
   })
 }
 
+implicit def jsonWritesAPIBuilderTestGuestUser: play.api.libs.json.Writes[GuestUser] = {
+  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.GuestUser] {
+    def writes(obj: test.apidoc.apidoctest.v0.models.GuestUser) = {
+      jsObjectGuestUser(obj)
+    }
+  }
+}
+
 implicit def jsonReadsAPIBuilderTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
   for {
     id <- (__ \ "id").read[Long]
@@ -36,6 +44,14 @@ def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser)
     case None => play.api.libs.json.Json.obj()
     case Some(x) => play.api.libs.json.Json.obj("name" -> play.api.libs.json.JsString(x))
   })
+}
+
+implicit def jsonWritesAPIBuilderTestRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
+  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.RegisteredUser] {
+    def writes(obj: test.apidoc.apidoctest.v0.models.RegisteredUser) = {
+      jsObjectRegisteredUser(obj)
+    }
+  }
 }
 
 implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[User] = {

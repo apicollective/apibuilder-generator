@@ -59,9 +59,12 @@ class ScalaService(
     convertObjectType(scalaTypeResolver.scalaDatatype(t))
   }
 
-  def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
-    unions.filter { u =>
-      u.types.flatMap(_.model.map(_.fullName)).contains(model.qualifiedName)
+  def unionsForModel(model: ScalaModel): Seq[ScalaUnion] =
+    unionAndTypesForModel(model).map { case (u, _) => u }
+
+  def unionAndTypesForModel(model: ScalaModel): Seq[(ScalaUnion, ScalaUnionType)] = {
+    unions.flatMap { u =>
+      u.types.find(_.model.map(_.fullName).contains(model.qualifiedName)).map(u -> _)
     }
   }
 

@@ -349,6 +349,8 @@ case class Play2Json(
 
     val (optionalFields, requiredFields) = model.fields.partition { f => isOption(f.datatype) }
 
+    val discriminatorOpt = getDiscriminator(model)
+
     val base = Seq(
       Seq(
         s"def $method(obj: ${model.qualifiedName}): play.api.libs.json.JsObject = {",
@@ -367,24 +369,36 @@ case class Play2Json(
             fields.map { field =>
               getJsonObject(field.originalName, field.datatype, s"obj.${field.name}").obj
             }.mkString("(", ") ++\n(", ")")
-          }
+          },
+          discriminatorOpt.map(createJsonObject)
         ).flatten.mkString(" ++ ").indent(2),
         "}"
       ).mkString("\n")
     ).mkString("\n\n")
 
-    ssd.unionsForModel(model) match {
-      case Nil => {
-        Seq(
-          base,
-          play2JsonCommon.implicitWriter(model.name, model.qualifiedName, method)
-        ).mkString("\n\n")
-      }
-      case _ => {
-        // Let the implicit for the associated union handle the serialization
-        base
-      }
-    }
+    Seq(
+      base,
+      play2JsonCommon.implicitWriter(model.name, model.qualifiedName, method)
+    ).mkString("\n\n")
+  }
+
+  private[this] def getDiscriminator(model: ScalaModel): Option[Discriminator] =
+    getDiscriminator(model, ssd.unionAndTypesForModel(model))
+
+  private[this] def getDiscriminator(
+    model: ScalaModel,
+    unionAndTypes: Seq[(ScalaUnion, ScalaUnionType)]
+  ): Option[Discriminator] = {
+    val discriminatorNameValues =
+      unionAndTypes
+      .map { case (union, unionType) => (union.discriminator, unionType.discriminatorName) }
+      .distinct
+
+    if (discriminatorNameValues.size > 1) {
+      val nvs = discriminatorNameValues.map { case (n, v) => (n.getOrElse("''"), v) }.mkString(", ")
+      sys.error(s"Model ${model.qualifiedName} must have a unique discriminator name and values. Found: $nvs")
+    } else
+      discriminatorNameValues.headOption.flatMap { case (name, v) => name.map(Discriminator(_, v)) }
   }
 
   private[this] def nilToOption[T](values: Seq[T]): Option[Seq[T]] = {
@@ -471,9 +485,11 @@ case class Play2Json(
     )
   }
 
-  private[this] def createJsonObject(name: String, value: String): String = {
+  private[this] def createJsonObject(discriminator: Discriminator): String =
+    createJsonObject(discriminator.name, s""""${discriminator.value}"""")
+
+  private[this] def createJsonObject(name: String, value: String): String =
     s"""play.api.libs.json.Json.obj("$name" -> $value)"""
-  }
 
   /**
    * Assumes all primitives are wrapped in primitive wrappers
@@ -513,13 +529,13 @@ case class Play2Json(
         }
       }
       case ScalaPrimitive.Model(ns, name) => {
-        mergeDiscriminator(play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)", discriminator)
+        play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
       }
       case ScalaPrimitive.Union(ns, name) => {
-        mergeDiscriminator(play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)", discriminator)
+        play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
       }
       case ScalaDatatype.List(_) | ScalaDatatype.Map(_) | ScalaDatatype.Option(_) | ScalaPrimitive.Unit => {
-        mergeDiscriminator(s"play.api.libs.json.Json.toJson($varName)", discriminator)
+        s"play.api.libs.json.Json.toJson($varName)"
       }
     }
   }
@@ -534,20 +550,6 @@ case class Play2Json(
       }
       case Some(disc) => {
         s"""play.api.libs.json.Json.obj("${disc.name}" -> "${disc.value}", "${PrimitiveWrapper.FieldName}" -> $value)"""
-      }
-    }
-  }
-
-  private[this] def mergeDiscriminator(
-    value: String,
-    discriminator: Option[Discriminator]
-  ): String = {
-    discriminator match {
-      case None => {
-        value
-      }
-      case Some(disc) => {
-        s"$value ++ " + createJsonObject(disc.name, s""""${disc.value}"""")
       }
     }
   }
