@@ -24,12 +24,6 @@ object Play26Generator extends CodeGenerator {
       extension
     )
 
-  def formatScala(contents: String): Either[Throwable, String] = {
-    val config = org.scalafmt.config.ScalafmtConfig.default120
-    org.scalafmt.Scalafmt.format(contents, config)
-      .toEither
-  }
-
   def scalaFiles(form: InvocationForm): Either[Seq[String], List[File]] =
     List(
       ("Client", files.Client.contents(form)),
@@ -41,7 +35,7 @@ object Play26Generator extends CodeGenerator {
       ("ModelsJson", files.ModelsJson.contents(form)),
     )
     .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString)) }
-    .traverse { case (suffix, contents) => formatScala(contents).map((suffix, _)) }
+    .traverse { case (suffix, contents) => utils.ScalaFormatter.format(contents).map((suffix, _)) }
     .map(_.map { case (suffix, contents) => file(form, suffix, contents, Some("scala")) })
     .leftMap { t => Seq(t.toString) }
 
