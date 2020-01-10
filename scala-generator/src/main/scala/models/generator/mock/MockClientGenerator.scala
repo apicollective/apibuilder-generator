@@ -102,7 +102,7 @@ class MockClientGenerator(
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
       ssd.resources.map { resource =>
         s"override def ${generator.methodName(resource)}: ${ssd.namespaces.base}.${resource.plural} = Mock${resource.plural}Impl"
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       "}",
       ssd.resources.map { resource =>
         generateMockResource(resource)
@@ -115,12 +115,12 @@ class MockClientGenerator(
       """def randomString(length: Int = 24): String = {""",
       """  _root_.scala.util.Random.alphanumeric.take(length).mkString""",
       """}"""
-    ).mkString("\n").indent(2),
+    ).mkString("\n").indentString(2),
     Seq(
       ssd.enums.map { makeEnum },
       ssd.models.map { makeModel },
       ssd.unions.map { makeUnion }
-    ).flatten.mkString("\n\n").indent(2),
+    ).flatten.mkString("\n\n").indentString(2),
     "}"
   ).mkString("\n\n")
 
@@ -133,7 +133,7 @@ class MockClientGenerator(
           case _ => Some(clientCode)
         },
         Some(factoriesCode)
-      ).flatten.mkString("\n\n").indent(2),
+      ).flatten.mkString("\n\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }
@@ -155,7 +155,7 @@ class MockClientGenerator(
       s"def make${model.name}(): ${model.qualifiedName} = ${model.qualifiedName}(",
       model.fields.map { field =>
         s"${field.name} = ${mockValue(field.datatype, Some(field.limitation))}"
-      }.mkString(",\n").indent(2),
+      }.mkString(",\n").indentString(2),
       ")"
     ).mkString("\n")
   }
@@ -174,10 +174,10 @@ class MockClientGenerator(
       generator.methods(resource).map { m =>
         Seq(
           m.interface + s" = ${config.asyncSuccessInvoke} {",
-          mockImplementation(m).indent(2),
+          mockImplementation(m).indentString(2),
           "}"
         ).mkString("\n")
-      }.mkString("\n\n").indent(2),
+      }.mkString("\n\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }
@@ -199,7 +199,7 @@ class MockClientGenerator(
                 s"body = $resultType,",
                 s"status = ${getStatus(r)},",
                 s"headers = ${ssd.namespaces.base}.ResponseHeaders(Map.empty)",
-              ).mkString("\n").indent(2),
+              ).mkString("\n").indentString(2),
               ")"
             ).mkString("\n")
           }

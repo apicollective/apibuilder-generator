@@ -185,8 +185,7 @@ object Text {
   }
 
   implicit class Indentable(s: String) {
-    def indent: String = indent(2)
-    def indent(width: Int): String = {
+    def indentString(width: Int = 2): String = {
       s.split("\n").map { value =>
         if (value.trim == "") {
           ""

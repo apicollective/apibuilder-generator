@@ -108,12 +108,12 @@ case class Http4sServer(form: InvocationForm,
          |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonOf("A")}
          |  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonEncoderOf("A")}
          |
-         |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indent(2)}
+         |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indentString(2)}
          |
          |  def apiVersionMatch(req: ${config.messageClass}): Boolean = ApiVersion(req)
          |
          |  def service()${config.asyncTypeParam().map(p => s"(implicit sync: Sync[F])").getOrElse("")} = ${config.httpServiceClass} {
-         |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indent(4)}
+         |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indentString(4)}
          |  }
          |}
          |""".stripMargin
@@ -147,10 +147,10 @@ case class Http4sServer(form: InvocationForm,
        |
        |  implicit lazy val queryParamDecode${Uuid.shortName}: org.http4s.QueryParamDecoder[${Uuid.fullName}] =
        |    org.http4s.QueryParamDecoder.fromUnsafeCast[${Uuid.fullName}](p => ${Uuid.fromStringValue("p.value")})("${Uuid.fullName}")
-       |${enumDecoders.indent(2)}
-       |${versionCapture.indent(2)}
-       |${path.mkString("\n").indent(2)}
-       |${query.mkString("\n").indent(2)}
+       |${enumDecoders.indentString(2)}
+       |${versionCapture.indentString(2)}
+       |${path.mkString("\n").indentString(2)}
+       |${query.mkString("\n").indentString(2)}
        |}
        |
        |$resources

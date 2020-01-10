@@ -69,14 +69,14 @@ package %s {
       Header.format(ssd.namespaces.anormConversions, attributes.imports.map(i => s"\n  import $i").mkString),
       Seq(
         Some("object Types {"),
-        buildCollectionConversions(ssd).map(_.indent(2)),
+        buildCollectionConversions(ssd).map(_.indentString(2)),
         Some("}")
-      ).flatten.mkString("\n").indent(2),
+      ).flatten.mkString("\n").indentString(2),
       Seq(
         "object Standard {",
-        standard(coreTypes).indent(2),
+        standard(coreTypes).indentString(2),
         "}"
-      ).mkString("\n").indent(2),
+      ).mkString("\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }

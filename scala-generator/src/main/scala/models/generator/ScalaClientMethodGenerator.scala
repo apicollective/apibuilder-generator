@@ -55,9 +55,9 @@ class ScalaClientMethodGenerator(
         "  def baseUrl: String",
         sortedResources.map { resource =>
           s"def ${methodName(resource)}: ${responseType(resource)}"
-       }.mkString("\n").indent(2),
+       }.mkString("\n").indentString(2),
         "}"
-      ).mkString("\n").indent(2),
+      ).mkString("\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }
@@ -65,7 +65,7 @@ class ScalaClientMethodGenerator(
   def traits(): String = {
     sortedResources.map { resource =>
       s"trait ${resource.plural}${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")} {\n" +
-      methods(resource).map(_.interface).mkString("\n\n").indent(2) +
+      methods(resource).map(_.interface).mkString("\n\n").indentString(2) +
       "\n}"
     }.mkString("\n\n")
   }
@@ -76,7 +76,7 @@ class ScalaClientMethodGenerator(
         Some(ScalaUtil.deprecationString(resource.deprecation).trim).filter(_.nonEmpty),
         Some(
           s"object ${resource.plural} extends ${resource.plural}${config.wrappedAsyncType().getOrElse("")} {\n" +
-            methods(resource).map(_.code).mkString("\n\n").indent(2) +
+            methods(resource).map(_.code).mkString("\n\n").indentString(2) +
             "\n}"
         )
       ).flatten.mkString("\n")
@@ -90,12 +90,12 @@ class ScalaClientMethodGenerator(
         case Nil => None
         case classes => Some {
           val jsonImports =
-            if (includeJsonImportsInErrorsPackage) JsonImports(ssd.service).mkString("\n").indent(2) + "\n\n"
+            if (includeJsonImportsInErrorsPackage) JsonImports(ssd.service).mkString("\n").indentString(2) + "\n\n"
             else ""
-          jsonImports + classes.mkString("\n\n").indent(2)
+          jsonImports + classes.mkString("\n\n").indentString(2)
         }
       },
-      Some(failedRequestClass().indent(2)),
+      Some(failedRequestClass().indentString(2)),
       Some("}")
     ).flatten.mkString("\n\n")
   }
@@ -127,7 +127,7 @@ class ScalaClientMethodGenerator(
         response.errorClassName,
         response.errorVariableName.map { name =>
           val json = config.toJson("response", response.datatype.name)
-          s"lazy val $name = ${json.indent(2).trim}"
+          s"lazy val $name = ${json.indentString(2).trim}"
         }
       )
     }
@@ -139,7 +139,7 @@ class ScalaClientMethodGenerator(
   ): String = {
     val bodyString = body match {
       case None => ""
-      case Some(b) => "{\n" + b.indent(2) + "\n}"
+      case Some(b) => "{\n" + b.indentString(2) + "\n}"
     }
 
     Seq(
@@ -335,8 +335,8 @@ class ScalaClientMethod(
     Seq(
       toOption(ScalaUtil.deprecationString(operation.deprecation)),
       Some(s"""override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
-${methodCall.indent}.map {
-${response.indent(4)}
+${methodCall.indentString()}.map {
+${response.indentString(4)}
   }
 }""")
     ).flatten.mkString("\n")

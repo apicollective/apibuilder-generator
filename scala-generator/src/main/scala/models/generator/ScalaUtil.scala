@@ -47,7 +47,7 @@ object ScalaUtil {
     if (fields.isEmpty) {
       None
     } else {
-      Some(fields.map(_.indent).mkString("\n", ",\n", "\n"))
+      Some(fields.map(_.indentString()).mkString("\n", ",\n", "\n"))
     }
   }
 

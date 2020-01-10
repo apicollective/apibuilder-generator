@@ -88,7 +88,7 @@ case class Code(form: InvocationForm) {
           } ++ Seq(
             s"""${enumName}UNDEFINED = "UNDEFINED""""
           )
-        ).mkString("\n").table().indent(1),
+        ).mkString("\n").table().indentString(1),
         ")"
       ).mkString("\n"),
 
@@ -100,11 +100,11 @@ case class Code(form: InvocationForm) {
             enum.values.map { value =>
               val name = enumName + importBuilder.publicName(value.name)
               val key = GoUtil.wrapInQuotes(value.name.trim.toLowerCase)
-              s"case $key:\n" + s"return $name".indent(1)
-            } ++ Seq("default:\n" + s"return ${enumName}UNDEFINED".indent(1))
+              s"case $key:\n" + s"return $name".indentString(1)
+            } ++ Seq("default:\n" + s"return ${enumName}UNDEFINED".indentString(1))
           ).mkString("\n"),
           "}"
-        ).mkString("\n").indent(1),
+        ).mkString("\n").indentString(1),
         "}"
       ).mkString("\n")
 
@@ -152,7 +152,7 @@ case class Code(form: InvocationForm) {
           Some(GoType(importBuilder, datatype(f.`type`, f.required || f.default.isDefined)).klass.localName),
           json
         ).flatten.mkString(" ")
-      }.mkString("\n").table().indent(1),
+      }.mkString("\n").table().indentString(1),
       "}",
 
       "",
@@ -161,11 +161,11 @@ case class Code(form: InvocationForm) {
 	        Seq(
           "b, err := json.Marshal(data)",
 	        "if err == nil {",
-          s"return ${publicName}FromJson(${bytes}.NewReader(b))".indent(1),
+          s"return ${publicName}FromJson(${bytes}.NewReader(b))".indentString(1),
           "} else {",
-          "panic(err)".indent(1),
+          "panic(err)".indentString(1),
           "}"
-        ).mkString("\n").indent(1),
+        ).mkString("\n").indentString(1),
         "}"
       ).mkString("\n"),
       "",
@@ -178,7 +178,7 @@ case class Code(form: InvocationForm) {
         Seq(
           s"${json}.NewDecoder(bytes).Decode(&$privateName)",
           s"return $privateName"
-        )).mkString("\n").indent(1),
+        )).mkString("\n").indentString(1),
         "}"
       ).mkString("\n")
 
@@ -204,7 +204,7 @@ case class Code(form: InvocationForm) {
           } ++ Seq(
             s"Undefined string"
           )
-        ).mkString("\n").table().indent(1),
+        ).mkString("\n").table().indentString(1),
         "}"
       ).mkString("\n"),
 
@@ -213,11 +213,11 @@ case class Code(form: InvocationForm) {
 	Seq(
           "b, err := json.Marshal(data)",
 	  "if err == nil {",
-          s"return ${unionName}FromJson(${bytes}.NewReader(b))".indent(1),
+          s"return ${unionName}FromJson(${bytes}.NewReader(b))".indentString(1),
           "} else {",
-          "panic(err)".indent(1),
+          "panic(err)".indentString(1),
           "}"
-        ).mkString("\n").indent(1),
+        ).mkString("\n").indentString(1),
         "}"
       ).mkString("\n"),
 
@@ -272,16 +272,16 @@ case class Code(form: InvocationForm) {
                           }
                         }
                       }
-                    ).indent(1)
+                    ).indentString(1)
 
                   ).mkString("\n")
                 } ++ Seq(
-                  "default:\n" + s"""return $unionName{Undefined: el["$discriminator"].(string)}""".indent(1)
+                  "default:\n" + s"""return $unionName{Undefined: el["$discriminator"].(string)}""".indentString(1)
                 )
               ).mkString("\n"),
 
               "}"
-            ).mkString("\n").indent(1)
+            ).mkString("\n").indentString(1)
           }
         },
 
@@ -396,7 +396,7 @@ case class Code(form: InvocationForm) {
               "",
               "encodedValues := urlValues.Encode()",
               """if encodedValues != "" {""",
-              s"""requestUrl += "?" + encodedValues""".indent(1),
+              s"""requestUrl += "?" + encodedValues""".indentString(1),
               "}"
             ).mkString("\n")
           )
@@ -409,7 +409,7 @@ case class Code(form: InvocationForm) {
           typ.params.map { param =>
             val goType = GoType(importBuilder, datatype(param.`type`, true))
             importBuilder.publicName(param.name) + " " + goType.klass.localName
-          }.mkString("\n").table().indent(1),
+          }.mkString("\n").table().indentString(1),
           "}",
           ""
         ).mkString("\n")
@@ -439,7 +439,7 @@ case class Code(form: InvocationForm) {
                     Some(
                       Seq(
                         s"case $value:",
-                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp$responseCode}".indent(1)
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp$responseCode}".indentString(1)
                       ).mkString("\n")
                     )
                   }
@@ -448,7 +448,7 @@ case class Code(form: InvocationForm) {
                     Some(
                       Seq(
                         s"case $value:",
-                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}".indent(1)
+                        s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp}".indentString(1)
                       ).mkString("\n")
                     )
                   }
@@ -458,7 +458,7 @@ case class Code(form: InvocationForm) {
                 Some(
                   Seq(
                     s"case resp.StatusCode >= 200 && resp.StatusCode < 300:",
-                    s"// TODO".indent(1)
+                    s"// TODO".indentString(1)
                   ).mkString("\n")
                 )
               }
@@ -469,12 +469,12 @@ case class Code(form: InvocationForm) {
           } ++ Seq(
             Seq(
               "default:",
-              s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: ${errors}.New(resp.Status)}".indent(1)
+              s"return ${resultsType.name}{StatusCode: resp.StatusCode, Response: resp, Error: ${errors}.New(resp.Status)}".indentString(1)
             ).mkString("\n")
           )
         ).mkString("\n\n"),
         "}"
-      ).mkString("\n").indent(1)
+      ).mkString("\n").indentString(1)
 
       val responseTypeCode = if (responseTypes.isEmpty) {
         ""
@@ -488,7 +488,7 @@ case class Code(form: InvocationForm) {
   	      s"Response   *${http}.Response",
 	      "Error      error"
             ) ++ responseTypes.filter(!_.goType.isUnit()).map { t => s"${t.name} ${t.goType.klass.localName}" }.distinct.sorted
-          ).mkString("\n").table().indent(1),
+          ).mkString("\n").table().indentString(1),
           "}"
         ).mkString("\n") + "\n\n"
       }
@@ -521,22 +521,22 @@ case class Code(form: InvocationForm) {
           queryString,
           formString,
           queryToUrl
-        ).flatten.mkString("\n").indent(1),
+        ).flatten.mkString("\n").indentString(1),
 
         Seq(
           s"""request, err := buildRequest(client, "${op.method}", requestUrl$bodyParam)""",
           s"if err != nil {",
-          s"return ${resultsType.name}{Error: err}".indent(1),
+          s"return ${resultsType.name}{Error: err}".indentString(1),
           s"}"
-        ).mkString("\n").indent(1),
+        ).mkString("\n").indentString(1),
 
         Seq(
           s"resp, err := client.HttpClient.Do(request)",
           s"if err != nil {",
-          s"return ${resultsType.name}{Error: err}".indent(1),
+          s"return ${resultsType.name}{Error: err}".indentString(1),
           s"}",
           "defer resp.Body.Close()"
-        ).mkString("\n").indent(1),
+        ).mkString("\n").indentString(1),
 
         processResponses,
 
@@ -571,7 +571,7 @@ case class Code(form: InvocationForm) {
 
                     Seq(
                       "if " + fieldGoType.nil(fullName) + " {",
-                      s"$fullName = ${fieldGoType.declaration(field.default.get)}".indent(1),
+                      s"$fullName = ${fieldGoType.declaration(field.default.get)}".indentString(1),
                       "}"
                     ).mkString("\n")
                   }.mkString("\n\n").trim
@@ -592,7 +592,7 @@ case class Code(form: InvocationForm) {
       Some(
         Seq(
           "if err != nil {",
-	  s"return ${responseType.name}{Error: err}".indent(1),
+	  s"return ${responseType.name}{Error: err}".indentString(1),
           "}"
         ).mkString("\n")
       ),
@@ -658,7 +658,7 @@ type ClientRequestBody struct {
                 Seq(
                   s"request, err := http.NewRequest(method, urlStr, $bodyNewRequestArg)",
 	          "if err != nil {",
-                  "return nil, err".indent(1),
+                  "return nil, err".indentString(1),
                   "}"
                 ).mkString("\n")
               ),
@@ -667,7 +667,7 @@ type ClientRequestBody struct {
                 Seq(
                   "request.Header = map[string][]string{",
                   headers.all.map {
-                    case (name, value) => s""""$name": {$value},""".indent(1)
+                    case (name, value) => s""""$name": {$value},""".indentString(1)
                   }.mkString("\n").table(),
                   "}"
                 ).mkString("\n")
@@ -678,7 +678,7 @@ type ClientRequestBody struct {
                 case true => Some(
 	          Seq(
                     """if body.contentType != "" {""",
-                    """request.Header["Content-type"] = []string{body.contentType}""".indent(1),
+                    """request.Header["Content-type"] = []string{body.contentType}""".indentString(1),
                     "}"
                   ).mkString("\n")
                 )
@@ -687,13 +687,13 @@ type ClientRequestBody struct {
               Some(
                 Seq(
                   """if client.Username != "" {""",
-                  "request.SetBasicAuth(client.Username, client.Password)".indent(1),
+                  "request.SetBasicAuth(client.Username, client.Password)".indentString(1),
                   "}"
                 ).mkString("\n")
               ),
 
               Some("return request, nil")
-            ).flatten.mkString("\n\n").indent(1),
+            ).flatten.mkString("\n\n").indentString(1),
 
             "}"
 

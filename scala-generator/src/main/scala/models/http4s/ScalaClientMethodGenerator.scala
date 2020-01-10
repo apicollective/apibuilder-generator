@@ -24,9 +24,9 @@ class ScalaClientMethodGenerator (
         "  def baseUrl: org.http4s.Uri",
         sortedResources.map { resource =>
           s"def ${methodName(resource)}: ${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
-        }.mkString("\n").indent(2),
+        }.mkString("\n").indentString(2),
         "}"
-      ).mkString("\n").indent(2),
+      ).mkString("\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }
@@ -235,8 +235,8 @@ class ScalaClientMethod(
 
   override val code: String = {
     s"""${ScalaUtil.deprecationString(operation.deprecation)}override def $name(${argList.getOrElse("")})${implicitArgs.getOrElse("")}: $returnType = {
-${methodCall.indent} {
-${response.indent(4)}
+${methodCall.indentString()} {
+${response.indentString(4)}
   }
 }"""
   }

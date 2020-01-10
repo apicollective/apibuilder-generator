@@ -95,15 +95,15 @@ case class Play2Json(
               Seq(
                 s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
                 "case err: play.api.libs.json.JsError => err"
-              ).mkString("\n").indent(2),
+              ).mkString("\n").indentString(2),
               "}"
-            ).mkString("\n").indent(2),
+            ).mkString("\n").indentString(2),
             "}"
-          ).mkString("\n").indent(2),
+          ).mkString("\n").indentString(2),
           "}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indentString(2),
         "}"
-      ).mkString("\n").indent(2),
+      ).mkString("\n").indentString(2),
       "}",
       "",
       s"def $jsValueWriterMethod(obj: ${enum.qualifiedName}) = {",
@@ -135,7 +135,7 @@ case class Play2Json(
       s"  (",
       union.types.map { scalaUnionType =>
         s"""(__ \\ "${scalaUnionType.discriminatorName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
-      }.mkString("\norElse\n").indent(4),
+      }.mkString("\norElse\n").indentString(4),
       s"    orElse",
       s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
       s"  )",
@@ -157,12 +157,12 @@ case class Play2Json(
         Seq(s"""(js \\ "$discriminator").asOpt[String].getOrElse$defaultDiscriminatorClause match {""",
           unionTypesWithNames(union).map { case (t, typeName) =>
             s"""case "${t.discriminatorName}" => js.validate[$typeName]"""
-          }.mkString("\n").indent(2),
-          s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indent(2),
+          }.mkString("\n").indentString(2),
+          s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indentString(2),
           "}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indentString(2),
         "}"
-      ).mkString("\n").indent(2),
+      ).mkString("\n").indentString(2),
       "}"
     ).mkString("\n")
   }
@@ -188,7 +188,7 @@ case class Play2Json(
       unionTypesWithNames(union).map { case (t, typeName) =>
         val json = getJsonValueForUnion(t.datatype, "x")
         s"""case x: ${typeName} => play.api.libs.json.Json.obj("${t.discriminatorName}" -> $json)"""
-      }.mkString("\n").indent(4),
+      }.mkString("\n").indentString(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
       "}"
@@ -210,9 +210,9 @@ case class Play2Json(
           s"case other => {",
           """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""",
           "}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indentString(2),
         "}"
-      ).mkString("\n").indent(2),
+      ).mkString("\n").indentString(2),
       "}"
     ).mkString("\n")
   }
@@ -253,7 +253,7 @@ case class Play2Json(
   private[models] def readers(model: ScalaModel): String = {
     Seq(
       s"${play2JsonCommon.implicitReaderDef(model.name)} = {",
-      fieldReaders(model).indent(2),
+      fieldReaders(model).indentString(2),
       s"}"
     ).mkString("\n")
   }
@@ -335,7 +335,7 @@ case class Play2Json(
         val constructorCall = s"${model.name}(${fields.map(_.name).mkString(", ")})"
 
         val forComprehensions = (fields zip serializations).map { case (field, reader) =>
-          s"${field.name} <- $reader".indent(2)
+          s"${field.name} <- $reader".indentString(2)
         }
 
         s"""for {
@@ -359,7 +359,7 @@ case class Play2Json(
               fields.map { field =>
                 val js = getJsonObject(field.originalName, field.datatype, s"obj.${field.name}").value
                   s""""${field.originalName}" -> $js"""
-              }.mkString(",\n").indent(2),
+              }.mkString(",\n").indentString(2),
               ")"
             ).mkString("\n")
           },
@@ -368,7 +368,7 @@ case class Play2Json(
               getJsonObject(field.originalName, field.datatype, s"obj.${field.name}").obj
             }.mkString("(", ") ++\n(", ")")
           }
-        ).flatten.mkString(" ++ ").indent(2),
+        ).flatten.mkString(" ++ ").indentString(2),
         "}"
       ).mkString("\n")
     ).mkString("\n\n")

@@ -16,7 +16,7 @@ class Http4s018MockClientGenerator(
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
       ssd.resources.map { resource =>
         s"override def ${generator.methodName(resource)}: ${ssd.namespaces.base}.${resource.plural}[F] = new Mock${resource.plural}[F]"
-      }.mkString("\n").indent(2),
+      }.mkString("\n").indentString(2),
       "}",
       ssd.resources.map { resource =>
         generateMockResource(resource)
@@ -30,10 +30,10 @@ class Http4s018MockClientGenerator(
       generator.methods(resource).map { m =>
         Seq(
           m.interface + s" = cats.Applicative[F].pure {",
-          mockImplementation(m).indent(2),
+          mockImplementation(m).indentString(2),
           "}"
         ).mkString("\n")
-      }.mkString("\n\n").indent(2),
+      }.mkString("\n\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }

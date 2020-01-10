@@ -25,7 +25,7 @@ case class ScalaUnionDiscriminator(
         Some(
           Seq(
             s"object $className {",
-            buildTypes().indent(2),
+            buildTypes().indentString(2),
             s"}"
           ).mkString("\n\n")
         )
