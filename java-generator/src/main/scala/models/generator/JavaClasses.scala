@@ -84,7 +84,7 @@ object JavaClasses extends CodeGenerator {
 
         commentFromOpt(enum.description) +
           s"public enum $className {\n" +
-          enum.values.map { generateEnumValue }.mkString(",\n").indent(4) + "\n" +
+          enum.values.map { generateEnumValue }.mkString(",\n").indentString(4) + "\n" +
           "}"
       }
 
@@ -184,7 +184,7 @@ object JavaClasses extends CodeGenerator {
           (
             model.fields.map { generateClassMember }.mkString("\n\n") + "\n\n" +
               noArgsConstructor
-          ).indent(4) + "\n" +
+          ).indentString(4) + "\n" +
           "}"
       }
 

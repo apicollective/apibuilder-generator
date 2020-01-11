@@ -41,7 +41,7 @@ object Formatter {
       }
     }
 
-    def indent(numberTabs: Int): String = {
+    def indentString(numberTabs: Int): String = {
       s.split("\n").map { value =>
         if (value.trim == "") {
           ""

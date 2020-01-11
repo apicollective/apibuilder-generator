@@ -8,7 +8,7 @@ object Http4sScalaClientCommon extends ScalaClientCommon {
     config: ScalaClientMethodConfig
   ): String = {
     val extraMethods = config.extraClientObjectMethods match {
-      case Some(methods) => methods.indent(2) + "\n"
+      case Some(methods) => methods.indentString(2) + "\n"
       case _ => ""
     }
 

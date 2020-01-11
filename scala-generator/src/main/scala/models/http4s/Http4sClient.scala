@@ -24,19 +24,19 @@ case class Http4sClient(
     s"""package ${ssd.namespaces.base} {
 ${config.clientImports}
 
-${headers.objectConstants.indent(2)}
+${headers.objectConstants.indentString(2)}
 
-${Http4sScalaClientCommon.clientSignature(config).indent(2)} {
+${Http4sScalaClientCommon.clientSignature(config).indentString(2)} {
     import org.http4s.Response
-${JsonImports(form.service).mkString("\n").indent(4)}
+${JsonImports(form.service).mkString("\n").indentString(4)}
 ${config.closeClient.getOrElse("")}
 
-${methodGenerator.accessors().indent(4)}
+${methodGenerator.accessors().indentString(4)}
 
-${methodGenerator.objects().indent(4)}
+${methodGenerator.objects().indentString(4)}
 
     private lazy val defaultApiHeaders = Seq(
-${headerString.indent(6)}
+${headerString.indentString(6)}
     )
 
     def apiHeaders: Seq[(String, String)] = defaultApiHeaders
@@ -83,15 +83,15 @@ ${headerString.indent(6)}
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
 
-${config.reqAndMaybeAuthAndBody.indent(6)}
+${config.reqAndMaybeAuthAndBody.indentString(6)}
 
       ${config.httpClient}.fetch(modifyRequest(reqAndMaybeAuthAndBody))(handler)
     }
   }
 
-${Http4sScalaClientCommon(config).indent(2)}
+${Http4sScalaClientCommon(config).indentString(2)}
 
-${methodGenerator.traitsAndErrors().indent(2)}
+${methodGenerator.traitsAndErrors().indentString(2)}
 }"""
   }
 

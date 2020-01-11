@@ -108,9 +108,9 @@ trait ParserGenerator extends CodeGenerator {
             Seq(
               "import anorm._",
               s"package ${ssd.namespaces.anormParsers} {",
-              s"import ${ssd.namespaces.anormConversions}.Standard._".indent(2),
-              requiredImports.toSeq.sorted.mkString("\n").indent(2),
-              clauses.flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n").indent(2),
+              s"import ${ssd.namespaces.anormConversions}.Standard._".indentString(2),
+              requiredImports.toSeq.sorted.mkString("\n").indentString(2),
+              clauses.flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n").indentString(2),
               "}"
             ).mkString("\n\n")
           )
@@ -121,7 +121,7 @@ trait ParserGenerator extends CodeGenerator {
     private[this] def generateModel(model: ScalaModel): String = {
       Seq(
         s"object ${model.name} {",
-        generateModelParser(model).indent(2),
+        generateModelParser(model).indentString(2),
         "}\n"
       ).mkString("\n\n")
     }
@@ -133,7 +133,7 @@ trait ParserGenerator extends CodeGenerator {
         s"def parser(",
         (model.fields.map { f =>
           parserFieldDeclaration(f.name, f.datatype, f.originalName)
-        } ++ List("prefixOpt: Option[String] = None")).mkString(",\n").indent(2),
+        } ++ List("prefixOpt: Option[String] = None")).mkString(",\n").indentString(2),
         s"): RowParser[${model.qualifiedName}] = {",
         Seq(
           model.fields.map { f => generateRowParser("""prefixOpt.getOrElse("") + """ + f.name, f.datatype, f.originalName) }.mkString(" ~\n") + " map {",
@@ -143,13 +143,13 @@ trait ParserGenerator extends CodeGenerator {
               s"${model.qualifiedName}(",
               model.fields.map { f =>
                 s"${f.name} = ${parserName(f)}"
-              }.mkString(",\n").indent(2),
+              }.mkString(",\n").indentString(2),
               ")"
-            ).mkString("\n").indent(2),
+            ).mkString("\n").indentString(2),
             "}"
-          ).mkString("\n").indent(2),
+          ).mkString("\n").indentString(2),
           "}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indentString(2),
         "}"
       ).mkString("\n")
     }
@@ -295,7 +295,7 @@ trait ParserGenerator extends CodeGenerator {
             s"  }",
             s"}"
           ).mkString("\n")
-        ).mkString("\n\n").indent(2),
+        ).mkString("\n\n").indentString(2),
         "}"
       ).mkString("\n\n")
     }
@@ -324,9 +324,9 @@ trait ParserGenerator extends CodeGenerator {
               case p: ScalaPrimitive if isBasicType(p) => generateRowParser("""s"$prefix${sep}""" + s"""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.models}.${className(union, p)}.apply)"""
               case _ => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))"""
             }
-          }.mkString(" |\n").indent(2),
+          }.mkString(" |\n").indentString(2),
           "}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indentString(2),
 
         Seq(
           "def parser() = {",
@@ -336,9 +336,9 @@ trait ParserGenerator extends CodeGenerator {
               case p: ScalaPrimitive if isBasicType(p) => generateRowParser(s""""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.models}.${className(union, p)}.apply)"""
               case _ => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser()"""
             }
-          }.mkString(" |\n").indent(2),
+          }.mkString(" |\n").indentString(2),
           "}"
-        ).mkString("\n").indent(2),
+        ).mkString("\n").indentString(2),
 
         "}\n"
       ).mkString("\n\n")

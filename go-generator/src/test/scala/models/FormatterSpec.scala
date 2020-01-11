@@ -67,9 +67,9 @@ apple bat cat
   }
 
   it("indent") {
-    "foo"indent(0) should be("foo")
-    "foo"indent(1) should be("\tfoo")
-    "foo"indent(2) should be("\t\tfoo")
+    "foo".indentString(0) should be("foo")
+    "foo".indentString(1) should be("\tfoo")
+    "foo".indentString(2) should be("\t\tfoo")
   }
 
 }

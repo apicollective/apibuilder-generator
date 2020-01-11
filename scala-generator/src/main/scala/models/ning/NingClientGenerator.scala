@@ -71,11 +71,11 @@ case class NingClientGenerator(
     s"""package ${ssd.namespaces.base} {
   import ${config.ningPackage}.{AsyncCompletionHandler, AsyncHttpClient, Realm, Request, RequestBuilder, Response${config.additionalImports}}
 
-${headers.objectConstants.indent(2)}
+${headers.objectConstants.indentString(2)}
 
-${PlayScalaClientCommon.clientSignature(config).indent(2)} {
+${PlayScalaClientCommon.clientSignature(config).indentString(2)} {
     import org.slf4j.{Logger, LoggerFactory}
-${JsonImports(form.service).mkString("\n").indent(4)}
+${JsonImports(form.service).mkString("\n").indentString(4)}
 
     def closeAsyncHttpClient(): Unit = {
       asyncHttpClient.close()
@@ -83,9 +83,9 @@ ${JsonImports(form.service).mkString("\n").indent(4)}
 
     val logger = LoggerFactory.getLogger(getClass)
 
-${methodGenerator.accessors().indent(4)}
+${methodGenerator.accessors().indentString(4)}
 
-${methodGenerator.objects().indent(4)}
+${methodGenerator.objects().indentString(4)}
 
     def _logRequest(request: Request): Unit = {
       if (logger.isInfoEnabled) {
@@ -102,7 +102,7 @@ ${methodGenerator.objects().indent(4)}
     def _requestBuilder(method: String, path: String, requestHeaders: Seq[(String, String)]): RequestBuilder = {
       val builder = new RequestBuilder(method)
         .setUrl(baseUrl + path)
-${headerString.indent(8)}
+${headerString.indentString(8)}
 
       defaultHeaders.foreach { h => builder.addHeader(h._1, h._2) }
       requestHeaders.foreach { h => builder.addHeader(h._1, h._2) }
@@ -110,7 +110,7 @@ ${headerString.indent(8)}
       auth.fold(builder) {
         case Authorization.Basic(username, passwordOpt) => {
           builder.setRealm(
-${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indent(12)}
+${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indentString(12)}
               .setUsePreemptiveAuth(true)
               .setScheme(Realm.AuthScheme.BASIC)
               .build()
@@ -172,11 +172,11 @@ ${config.realmBuilder("username", """passwordOpt.getOrElse("")""").indent(12)}
 
   }
 
-${PlayScalaClientCommon(config).indent(2)}
+${PlayScalaClientCommon(config).indentString(2)}
 
-${methodGenerator.traitsAndErrors().indent(2)}
+${methodGenerator.traitsAndErrors().indentString(2)}
 
-${PathSegment.definition.indent(2)}
+${PathSegment.definition.indentString(2)}
 }"""
   }
 

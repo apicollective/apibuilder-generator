@@ -35,14 +35,14 @@ trait ScalaCaseClasses extends CodeGenerator {
     val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
       case Nil => ""
       case models => {
-        models.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
+        models.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indentString(2) + "\n"
       }
     }
 
     val wrappers = PrimitiveWrapper(ssd).wrappers match {
       case Nil => ""
       case primitives => {
-        primitives.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indent(2) + "\n"
+        primitives.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indentString(2) + "\n"
       }
     }
 
@@ -53,12 +53,12 @@ trait ScalaCaseClasses extends CodeGenerator {
 
     val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
-      additionalImports.mkString("\n").indent(2),
-      ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(u, ssd.unionsForUnion(u)) }.mkString("\n\n").indent(2),
+      additionalImports.mkString("\n").indentString(2),
+      ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(u, ssd.unionsForUnion(u)) }.mkString("\n\n").indentString(2),
       "",
-      ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indent(2),
+      ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indentString(2),
       generatedClasses,
-      ssd.enums.map { generateEnum(ssd, _) }.mkString("\n\n").indent(2)
+      ssd.enums.map { generateEnum(ssd, _) }.mkString("\n\n").indentString(2)
     ).mkString("\n").trim +
     s"\n\n}"
 

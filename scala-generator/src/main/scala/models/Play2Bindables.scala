@@ -15,7 +15,7 @@ case class Play2Bindables(ssd: ScalaService) {
         buildObjectCore(ssd.attributes.dateTimeType.dataType, ssd.attributes.dateType.dataType),
         buildObjectModels().getOrElse(""),
         apibuilderHelpers(ssd.attributes.dateTimeType.dataType, ssd.attributes.dateType.dataType)
-      ).filter(_.trim.nonEmpty).mkString("\n\n").indent(2),
+      ).filter(_.trim.nonEmpty).mkString("\n\n").indentString(2),
       "}"
     ).mkString("\n\n")
   }
@@ -40,7 +40,7 @@ case class Play2Bindables(ssd: ScalaService) {
           Seq(
             ssd.namespaces.importStatements(ssd.service).sorted.mkString("\n"),
             ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n")
-          ).filter(_.nonEmpty).mkString("\n\n").indent(2),
+          ).filter(_.nonEmpty).mkString("\n\n").indentString(2),
           "}"
         ).mkString("\n")
       )

@@ -59,7 +59,7 @@ case class ResponseHeaders(all: Map[String, Seq[String]]) {
     config: ScalaClientMethodConfig
   ): String = {
     val extraMethods = config.extraClientObjectMethods match {
-      case Some(methods) => methods.indent(2) + "\n"
+      case Some(methods) => methods.indentString(2) + "\n"
       case _ => ""
     }
 
@@ -67,7 +67,7 @@ case class ResponseHeaders(all: Map[String, Seq[String]]) {
       "className: String,",
       s"r: ${config.responseClass},",
       "f: (play.api.libs.json.JsValue => play.api.libs.json.JsResult[T])"
-    ).mkString("\n").indent(4)
+    ).mkString("\n").indentString(4)
 
     val buildResponse = config.responseEnvelopeClassName match {
       case None => ""
@@ -82,7 +82,7 @@ case class ResponseHeaders(all: Map[String, Seq[String]]) {
            |    headers = ResponseHeaders(r.headers),
            |  )
            |}
-           |""".stripMargin.indent(2) + "\n\n"
+           |""".stripMargin.indentString(2) + "\n\n"
     }
 
     s"""

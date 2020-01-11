@@ -301,7 +301,7 @@ object RubyClientGenerator extends CodeGenerator {
     enum.values.foreach { value =>
       val varName = enumName(value.name)
       value.description.foreach { desc =>
-        lines.append(GeneratorUtil.formatComment(desc).indent(2))
+        lines.append(GeneratorUtil.formatComment(desc).indentString(2))
       }
       lines.append(s"  def $className.$varName")
       lines.append(s"    @@_$varName ||= $className.new('${enumValueString(value)}')")
@@ -402,14 +402,14 @@ case class RubyClientGenerator(form: InvocationForm) {
       RubyHttpClient.require,
       Seq(
         service.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
-          module.parts.zipWithIndex.map { case (name, i) => s"module $name".indent(spacerSize * i) }.mkString("\n"),
-        generateClient().indent(moduleIndent),
+          module.parts.zipWithIndex.map { case (name, i) => s"module $name".indentString(spacerSize * i) }.mkString("\n"),
+        generateClient().indentString(moduleIndent),
         "",
         Seq(
           "module Clients",
-          service.resources.map { generateClientForResource }.mkString("\n\n").indent(2),
+          service.resources.map { generateClientForResource }.mkString("\n\n").indentString(2),
           "end"
-        ).mkString("\n\n").indent(moduleIndent),
+        ).mkString("\n\n").indentString(moduleIndent),
         "",
         Seq(
           "module Models",
@@ -418,13 +418,13 @@ case class RubyClientGenerator(form: InvocationForm) {
             service.enums.map { e => RubyClientGenerator.generateEnum(e, unionFor(e)) },
             service.models.map { m => generateModel(m, unionFor(m)) },
             primitiveWrapper.wrappers().map { w => generateModel(w.model, Some(w.union)) }
-          ).filter(_.nonEmpty).flatten.mkString("\n\n").indent(2),
+          ).filter(_.nonEmpty).flatten.mkString("\n\n").indentString(2),
           "end"
-        ).mkString("\n\n").indent(moduleIndent),
+        ).mkString("\n\n").indentString(moduleIndent),
         "",
-        "# ===== END OF SERVICE DEFINITION =====".indent(moduleIndent),
-        RubyHttpClient.contents.indent(moduleIndent),
-        module.parts.zipWithIndex.reverse.map { case (_, i) => "end".indent(spacerSize * i) }.mkString("\n")
+        "# ===== END OF SERVICE DEFINITION =====".indentString(moduleIndent),
+        RubyHttpClient.contents.indentString(moduleIndent),
+        module.parts.zipWithIndex.reverse.map { case (_, i) => "end".indentString(spacerSize * i) }.mkString("\n")
       ).mkString("\n")
     ).mkString("\n\n")
 
@@ -446,15 +446,15 @@ case class RubyClientGenerator(form: InvocationForm) {
         "",
         "# Creates an instance of the client using the base url specified in the API spec.",
         "def Client.at_base_url(opts={})",
-        "Client.new(Constants::BASE_URL, opts)".indent(2),
+        "Client.new(Constants::BASE_URL, opts)".indentString(2),
         "end"
-      ).mkString("\n").indent(2)
+      ).mkString("\n").indentString(2)
     }
 
     sb.append(s"""
 class Client
 
-${headers.rubyModuleConstants.indent(2)}
+${headers.rubyModuleConstants.indentString(2)}
 
   attr_reader :url
 
@@ -678,7 +678,7 @@ ${headers.rubyModuleConstants.indent(2)}
         union.types.map { ut =>
           ut.description.map { desc => GeneratorUtil.formatComment(desc) + "\n" }.getOrElse("") +
           s"${RubyUtil.toUnionConstant(union, ut.`type`)} = ${RubyUtil.wrapInQuotes(unionTypeDiscriminatorValue(ut))} unless defined?(${RubyUtil.toUnionConstant(union, ut.`type`)})"
-        }.mkString("\n").indent(2),
+        }.mkString("\n").indentString(2),
         "end"
       ).mkString("\n"),
 
@@ -703,7 +703,7 @@ ${headers.rubyModuleConstants.indent(2)}
 
       generateUnionClassFromJson(union)
 
-    ).mkString("\n\n").indent(2) +
+    ).mkString("\n\n").indentString(2) +
     "\n\nend"
   }
 
@@ -754,7 +754,7 @@ ${headers.rubyModuleConstants.indent(2)}
               case Failure(_) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(data)"
               case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(data)"
             }
-          }.mkString("\n").indent(6),
+          }.mkString("\n").indentString(6),
           s"      else ${undefinedTypeClassName(union)}.new(:${RubyUtil.DefaultDiscriminatorName} => union_type_name)",
           s"    end",
           s"  end.first",
@@ -775,7 +775,7 @@ ${headers.rubyModuleConstants.indent(2)}
               case Failure(_) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyUtil.toClassName(ut.`type`)}.new(hash)"
               case Success(p) => s"when Types::${RubyUtil.toUnionConstant(union, ut.`type`)}; ${RubyPrimitiveWrapper.className(union, p)}.new(hash)"
             }
-          }.mkString("\n").indent(4),
+          }.mkString("\n").indentString(4),
           s"    else ${undefinedTypeClassName(union)}.new(:$disc => discriminator)",
           s"  end",
           s"end"
@@ -818,7 +818,7 @@ ${headers.rubyModuleConstants.indent(2)}
           "end"
         ).mkString("\n")
 
-      ).mkString("\n\n").indent(2),
+      ).mkString("\n\n").indentString(2),
 
       "end"
     ).mkString("\n\n")
@@ -878,7 +878,7 @@ ${headers.rubyModuleConstants.indent(2)}
         val varName = RubyUtil.quoteNameIfKeyword(field.name)
         val value = asHash(varName, datatype)
         s":${field.name} => $value"
-      }.mkString(",\n").indent(6)
+      }.mkString(",\n").indentString(6)
     )
     sb.append("    }")
     sb.append("  end\n")
