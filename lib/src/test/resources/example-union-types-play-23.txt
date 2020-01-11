@@ -195,7 +195,11 @@ package io.apibuilder.example.union.types.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Bar(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "bar").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Bar(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -225,7 +229,11 @@ package io.apibuilder.example.union.types.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Foo(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "foo").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Foo(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }

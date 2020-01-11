@@ -766,7 +766,11 @@ package io.apibuilder.api.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.OriginalType(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "original_type").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.OriginalType(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -796,7 +800,11 @@ package io.apibuilder.api.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Publication(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "publication").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Publication(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -826,7 +834,11 @@ package io.apibuilder.api.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Visibility(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "visibility").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Visibility(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }

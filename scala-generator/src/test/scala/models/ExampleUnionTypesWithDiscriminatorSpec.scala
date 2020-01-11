@@ -17,4 +17,14 @@ class ExampleUnionTypesWithDiscriminatorSpec extends FunSpec with Matchers {
     }
   }
 
+  it("generates expected code for play 2.7 client") {
+    Play27ClientGenerator.invoke(InvocationForm(service = service)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/union-types-discriminator-service-play-27.txt", sourceFiles.head.contents)
+      }
+    }
+  }
+
 }

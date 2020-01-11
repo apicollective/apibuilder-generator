@@ -77,9 +77,19 @@ case class Play2Json(
   }
 
   private[models] def enumReadersAndWriters(enum: ScalaEnum): String = {
-    val jsObjectWriterMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
     val jsValueWriterMethod = play2JsonCommon.implicitWriterName(enum.name)
-    val implicitWriter = play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethod)
+    val jsObjectWriterMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
+
+    val discriminator = getDiscriminator(enum)
+    val jsObjectBody = wrapInObject("play.api.libs.json.JsString(obj.toString)", discriminator)
+
+    // if there is a discriminator, writes using the object version, otherwise use the value
+    val implicitWriter = discriminator match {
+      case Some(_) =>
+        play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsObjectWriterMethod)
+      case None =>
+        play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethod)
+    }
 
     Seq(
       s"implicit val jsonReads${ssd.name}${enum.name} = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
@@ -94,7 +104,15 @@ case class Play2Json(
               """(js \ "value").validate[String] match {""",
               Seq(
                 s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
-                "case err: play.api.libs.json.JsError => err"
+                "case err: play.api.libs.json.JsError =>",
+                Seq(
+                  s"""(js \\ "${enum.originalName}").validate[String] match {""",
+                  Seq(
+                    s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
+                    "case err: play.api.libs.json.JsError => err",
+                  ).mkString("\n").indent(2),
+                  "}"
+                ).mkString("\n").indent(2),
               ).mkString("\n").indent(2),
               "}"
             ).mkString("\n").indent(2),
@@ -111,7 +129,7 @@ case class Play2Json(
       s"}",
       "",
       s"def $jsObjectWriterMethod(obj: ${enum.qualifiedName}) = {",
-      s"""  play.api.libs.json.Json.obj("${PrimitiveWrapper.FieldName}" -> play.api.libs.json.JsString(obj.toString))""",
+      s"""  $jsObjectBody""",
       s"}",
       "",
       implicitWriter
@@ -383,10 +401,14 @@ case class Play2Json(
   }
 
   private[this] def getDiscriminator(model: ScalaModel): Option[Discriminator] =
-    getDiscriminator(model, ssd.unionAndTypesForModel(model))
+    getDiscriminator("Model", model.qualifiedName, ssd.unionAndTypesForModel(model))
+
+  private[this] def getDiscriminator(enum: ScalaEnum): Option[Discriminator] =
+    getDiscriminator("Enum", enum.qualifiedName, ssd.unionsAndTypesForEnum(enum))
 
   private[this] def getDiscriminator(
-    model: ScalaModel,
+    name: String,
+    modelType: String,
     unionAndTypes: Seq[(ScalaUnion, ScalaUnionType)]
   ): Option[Discriminator] = {
     val discriminatorNameValues =
@@ -396,7 +418,7 @@ case class Play2Json(
 
     if (discriminatorNameValues.size > 1) {
       val nvs = discriminatorNameValues.map { case (n, v) => (n.getOrElse("''"), v) }.mkString(", ")
-      sys.error(s"Model ${model.qualifiedName} must have a unique discriminator name and values. Found: $nvs")
+      sys.error(s"$modelType ${name} must have a unique discriminator name and values. Found: $nvs")
     } else
       discriminatorNameValues.headOption.flatMap { case (name, v) => name.map(Discriminator(_, v)) }
   }
@@ -518,14 +540,12 @@ case class Play2Json(
       case _: ScalaPrimitive.JsonValue => {
         wrapInObject(s"${varName}.value)", discriminator)
       }
-      case ScalaPrimitive.Enum(_, _) => {
+      case ScalaPrimitive.Enum(ns, name) => {
         discriminator match {
-          case None => {
+          case None =>
             s"play.api.libs.json.JsString(${varName}.toString)"
-          }
-          case Some(_) => {
-            wrapInObject(s"play.api.libs.json.JsString(${varName}.toString)", discriminator)
-          }
+          case Some(_) =>
+            play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
         }
       }
       case ScalaPrimitive.Model(ns, name) => {
