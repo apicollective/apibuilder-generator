@@ -38,6 +38,15 @@ object MockClientGenerator {
 
   }
 
+  object Play28 extends CodeGenerator {
+
+    override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play28(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
+    }
+
+  }
+
   object Ning19 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
