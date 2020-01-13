@@ -377,6 +377,17 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_8_mock_client",
+        name = "Play 2.8 Mock Client",
+        description = Some("Provides a mock client with non functional, but compiling stubs, that can serve as a baseline for testing"),
+        language = Some("Java, Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play28)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "http4s_0_15",
         name = "Http4s 0.15 / 0.16",
         description = Some("Http4s 0.15 and 0.16 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.15/client/'>http4s client</a>"),
