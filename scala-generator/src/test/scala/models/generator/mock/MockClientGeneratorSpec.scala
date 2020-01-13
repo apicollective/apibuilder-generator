@@ -36,7 +36,7 @@ class MockClientGeneratorSpec extends FunSpec with Matchers {
     calculateStringLength(Limitation(Some(Long.MaxValue), None)) should be(Int.MaxValue) // TODO: really?!
   }
 
-  describe("date and date-time types") {
+  describe("Play 2.7 - date and date-time types") {
     it("uses joda time") {
       val service = models.TestHelper.dateTimeService
       val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JodaLocalDate, dateTimeType = DateTimeTypeConfig.JodaDateTime))
@@ -73,4 +73,43 @@ class MockClientGeneratorSpec extends FunSpec with Matchers {
       models.TestHelper.assertEqualsFile(s"/play2/mock-client/play27_date-time-offsetdatetime.txt", sourceCode)
     }
   }
+
+  describe("Play 2.8 - date and date-time types") {
+    it("uses joda time") {
+      val service = models.TestHelper.dateTimeService
+      val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JodaLocalDate, dateTimeType = DateTimeTypeConfig.JodaDateTime))
+
+      val config = new ScalaClientMethodConfigs.Play28(namespace = "whatever", attributes = Attributes.PlayDefaultConfig, baseUrl = None)
+
+      val sourceCode = new MockClientGenerator(ssd, None, config).generateCode()
+
+      assertValidScalaSourceCode(sourceCode)
+      models.TestHelper.assertEqualsFile(s"/play2/mock-client/play28_date-time-joda.txt", sourceCode)
+    }
+
+    it("uses java time with Instant") {
+      val service = models.TestHelper.dateTimeService
+      val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaInstant))
+
+      val config = new ScalaClientMethodConfigs.Play28(namespace = "whatever", attributes = Attributes.PlayDefaultConfig, baseUrl = None)
+
+      val sourceCode = new MockClientGenerator(ssd, None, config).generateCode()
+
+      assertValidScalaSourceCode(sourceCode)
+      models.TestHelper.assertEqualsFile(s"/play2/mock-client/play28_date-time-instant.txt", sourceCode)
+    }
+
+    it("uses java time with OffsetDateTime") {
+      val service = models.TestHelper.dateTimeService
+      val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig.copy(dateType = DateTypeConfig.JavaLocalDate, dateTimeType = DateTimeTypeConfig.JavaOffsetDateTime))
+
+      val config = new ScalaClientMethodConfigs.Play28(namespace = "whatever", attributes = Attributes.PlayDefaultConfig, baseUrl = None)
+
+      val sourceCode = new MockClientGenerator(ssd, None, config).generateCode()
+
+      assertValidScalaSourceCode(sourceCode)
+      models.TestHelper.assertEqualsFile(s"/play2/mock-client/play28_date-time-offsetdatetime.txt", sourceCode)
+    }
+  }
+
 }
