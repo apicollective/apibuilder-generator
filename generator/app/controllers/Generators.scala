@@ -178,6 +178,17 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_8_client",
+        name = "Play 2.8 client",
+        description = Some("Play Framework 2.8 client based on <a href='http://www.playframework.com/documentation/2.8.x/ScalaWS'>WS API</a>."),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.Play28ClientGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "play_2_x_json",
         name = "Play 2.x json",
         description = Some("Generate play 2.x case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
