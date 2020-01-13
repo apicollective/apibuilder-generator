@@ -195,7 +195,11 @@ package io.apibuilder.example.union.types.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Bar(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "bar").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Bar(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -225,7 +229,11 @@ package io.apibuilder.example.union.types.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Foo(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "foo").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Foo(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -259,7 +267,15 @@ package io.apibuilder.example.union.types.v0.models {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email)
-      )
+      ) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesGuestUser: play.api.libs.json.Writes[GuestUser] = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.GuestUser] {
+        def writes(obj: io.apibuilder.example.union.types.v0.models.GuestUser) = {
+          jsObjectGuestUser(obj)
+        }
+      }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
@@ -275,7 +291,15 @@ package io.apibuilder.example.union.types.v0.models {
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email),
         "preference" -> jsObjectFoobar(obj.preference)
-      )
+      ) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
+    }
+
+    implicit def jsonWritesApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
+      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.RegisteredUser] {
+        def writes(obj: io.apibuilder.example.union.types.v0.models.RegisteredUser) = {
+          jsObjectRegisteredUser(obj)
+        }
+      }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesUserUuid: play.api.libs.json.Reads[UserUuid] = {
@@ -321,8 +345,8 @@ package io.apibuilder.example.union.types.v0.models {
 
     def jsObjectUser(obj: io.apibuilder.example.union.types.v0.models.User): play.api.libs.json.JsObject = {
       obj match {
-        case x: io.apibuilder.example.union.types.v0.models.RegisteredUser => jsObjectRegisteredUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
-        case x: io.apibuilder.example.union.types.v0.models.GuestUser => jsObjectGuestUser(x) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
+        case x: io.apibuilder.example.union.types.v0.models.RegisteredUser => jsObjectRegisteredUser(x)
+        case x: io.apibuilder.example.union.types.v0.models.GuestUser => jsObjectGuestUser(x)
         case x: io.apibuilder.example.union.types.v0.models.UserUuid => play.api.libs.json.Json.obj("discriminator" -> "uuid", "value" -> play.api.libs.json.JsString(x.value.toString))
         case other => {
           sys.error(s"The type[${other.getClass.getName}] has no JSON writer")

@@ -766,7 +766,11 @@ package io.apibuilder.api.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.OriginalType(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "original_type").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.OriginalType(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -796,7 +800,11 @@ package io.apibuilder.api.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Publication(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "publication").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Publication(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -826,7 +834,11 @@ package io.apibuilder.api.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Visibility(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "visibility").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Visibility(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -927,7 +939,15 @@ package io.apibuilder.api.v0.models {
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "organization" -> io.apibuilder.common.v0.models.json.jsObjectReference(obj.organization),
         "key" -> play.api.libs.json.JsString(obj.key)
-      )
+      ) ++ play.api.libs.json.Json.obj("type" -> "application_summary")
+    }
+
+    implicit def jsonWritesApidocApiApplicationSummary: play.api.libs.json.Writes[ApplicationSummary] = {
+      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.ApplicationSummary] {
+        def writes(obj: io.apibuilder.api.v0.models.ApplicationSummary) = {
+          jsObjectApplicationSummary(obj)
+        }
+      }
     }
 
     implicit def jsonReadsApidocApiAttribute: play.api.libs.json.Reads[Attribute] = {
@@ -1155,7 +1175,15 @@ package io.apibuilder.api.v0.models {
     def jsObjectDiffBreaking(obj: io.apibuilder.api.v0.models.DiffBreaking): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "description" -> play.api.libs.json.JsString(obj.description)
-      )
+      ) ++ play.api.libs.json.Json.obj("type" -> "diff_breaking")
+    }
+
+    implicit def jsonWritesApidocApiDiffBreaking: play.api.libs.json.Writes[DiffBreaking] = {
+      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.DiffBreaking] {
+        def writes(obj: io.apibuilder.api.v0.models.DiffBreaking) = {
+          jsObjectDiffBreaking(obj)
+        }
+      }
     }
 
     implicit def jsonReadsApidocApiDiffNonBreaking: play.api.libs.json.Reads[DiffNonBreaking] = {
@@ -1165,7 +1193,15 @@ package io.apibuilder.api.v0.models {
     def jsObjectDiffNonBreaking(obj: io.apibuilder.api.v0.models.DiffNonBreaking): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "description" -> play.api.libs.json.JsString(obj.description)
-      )
+      ) ++ play.api.libs.json.Json.obj("type" -> "diff_non_breaking")
+    }
+
+    implicit def jsonWritesApidocApiDiffNonBreaking: play.api.libs.json.Writes[DiffNonBreaking] = {
+      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.DiffNonBreaking] {
+        def writes(obj: io.apibuilder.api.v0.models.DiffNonBreaking) = {
+          jsObjectDiffNonBreaking(obj)
+        }
+      }
     }
 
     implicit def jsonReadsApidocApiDomain: play.api.libs.json.Reads[Domain] = {
@@ -1942,8 +1978,8 @@ package io.apibuilder.api.v0.models {
 
     def jsObjectDiff(obj: io.apibuilder.api.v0.models.Diff): play.api.libs.json.JsObject = {
       obj match {
-        case x: io.apibuilder.api.v0.models.DiffBreaking => jsObjectDiffBreaking(x) ++ play.api.libs.json.Json.obj("type" -> "diff_breaking")
-        case x: io.apibuilder.api.v0.models.DiffNonBreaking => jsObjectDiffNonBreaking(x) ++ play.api.libs.json.Json.obj("type" -> "diff_non_breaking")
+        case x: io.apibuilder.api.v0.models.DiffBreaking => jsObjectDiffBreaking(x)
+        case x: io.apibuilder.api.v0.models.DiffNonBreaking => jsObjectDiffNonBreaking(x)
         case other => {
           sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
         }
@@ -1969,7 +2005,7 @@ package io.apibuilder.api.v0.models {
 
     def jsObjectItemDetail(obj: io.apibuilder.api.v0.models.ItemDetail): play.api.libs.json.JsObject = {
       obj match {
-        case x: io.apibuilder.api.v0.models.ApplicationSummary => jsObjectApplicationSummary(x) ++ play.api.libs.json.Json.obj("type" -> "application_summary")
+        case x: io.apibuilder.api.v0.models.ApplicationSummary => jsObjectApplicationSummary(x)
         case other => {
           sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
         }

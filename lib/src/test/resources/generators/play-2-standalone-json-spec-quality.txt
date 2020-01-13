@@ -595,7 +595,11 @@ package com.gilt.quality.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.ExternalServiceName(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "external_service_name").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.ExternalServiceName(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -625,7 +629,11 @@ package com.gilt.quality.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Publication(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "publication").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Publication(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -655,7 +663,11 @@ package com.gilt.quality.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Response(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "response").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Response(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -685,7 +697,11 @@ package com.gilt.quality.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Severity(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "severity").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Severity(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }
@@ -715,7 +731,11 @@ package com.gilt.quality.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Task(v))
-              case err: play.api.libs.json.JsError => err
+              case err: play.api.libs.json.JsError =>
+                (js \ "task").validate[String] match {
+                  case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Task(v))
+                  case err: play.api.libs.json.JsError => err
+                }
             }
           }
         }

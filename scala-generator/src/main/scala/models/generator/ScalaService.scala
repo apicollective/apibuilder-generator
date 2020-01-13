@@ -59,17 +59,21 @@ class ScalaService(
     convertObjectType(scalaTypeResolver.scalaDatatype(t))
   }
 
-  def unionsForModel(model: ScalaModel): Seq[ScalaUnion] = {
-    unions.filter { u =>
-      u.types.flatMap(_.model.map(_.fullName)).contains(model.qualifiedName)
-    }
-  }
+  def unionsForModel(model: ScalaModel): Seq[ScalaUnion] =
+    unionAndTypesForModel(model).map { case (u, _) => u }
 
-  def unionsForEnum(enum: ScalaEnum): Seq[ScalaUnion] = {
-    unions.filter { u =>
-      u.types.flatMap(_.enum.map(_.fullName)).contains(enum.qualifiedName)
+  def unionAndTypesForModel(model: ScalaModel): Seq[(ScalaUnion, ScalaUnionType)] =
+    unions.flatMap { u =>
+      u.types.find(_.model.map(_.fullName).contains(model.qualifiedName)).map(u -> _)
     }
-  }
+
+  def unionsForEnum(enum: ScalaEnum): Seq[ScalaUnion] =
+    unionsAndTypesForEnum(enum).map { case (u, _) => u }
+
+  def unionsAndTypesForEnum(enum: ScalaEnum): Seq[(ScalaUnion, ScalaUnionType)] =
+    unions.flatMap { u =>
+      u.types.find(_.enum.map(_.fullName).contains(enum.qualifiedName)).map(u -> _)
+    }
 
   def unionsForUnion(union: ScalaUnion): Seq[ScalaUnion] = {
     unions.filter { u =>
