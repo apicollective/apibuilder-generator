@@ -12,6 +12,12 @@ object Play2Controllers extends CodeGenerator {
   def importJson(`import`: Import) =
     s"import ${`import`.namespace}.models.json._"
 
+  def imports(ssd: ScalaService) =
+    s"""
+      import ${ssd.namespaces.json}._
+      ${ssd.service.imports.map(importJson).mkString("\n")}
+    """
+
   def responseObjectCode(response: ScalaResponse) = response.code match {
     case ResponseCodeInt(code) => Some(code)
     case _ => None
@@ -34,6 +40,12 @@ object Play2Controllers extends CodeGenerator {
       }
     """
 
+  def responses(resources: Seq[ScalaResource]) =
+    resources
+      .flatMap(r => r.operations.map((r, _)))
+      .map { case (r, o) => responsesTraitAndObject(r, o) }
+      .mkString("\n\n")
+
   def serviceName(resource: ScalaResource) = s"${resource.plural}Service"
   def serviceMethod(resource: ScalaResource, operation: ScalaOperation) = {
     val parameters =
@@ -50,6 +62,8 @@ object Play2Controllers extends CodeGenerator {
         ${resource.operations.map(serviceMethod(resource, _)).mkString("\n")}
       }
     """
+
+  def services(resources: Seq[ScalaResource]) = resources.map(service).mkString("\n\n")
 
   def controllerMethodResponse(resource: ScalaResource, operation: ScalaOperation, response: ScalaResponse) =
     (responseObjectName(response), responseObjectCode(response), response.isUnit) match {
@@ -89,6 +103,8 @@ object Play2Controllers extends CodeGenerator {
       }
     """
 
+  def controllers(resources: Seq[ScalaResource]) = resources.map(controller).mkString("\n\n")
+
   def fileContents(form: InvocationForm, ssd: ScalaService): String =
     s"""
       ${ApidocComments(form.service.version, form.userAgent).toJavaString()}
@@ -97,11 +113,11 @@ object Play2Controllers extends CodeGenerator {
       import ${ssd.namespaces.json}._
       ${ssd.service.imports.map(importJson).mkString("\n")}
 
-      ${ssd.resources.flatMap(r => r.operations.map((r, _))).map { case (r, o) => responsesTraitAndObject(r, o) }.mkString("\n")}
+      ${responses(ssd.resources)}
 
-      ${ssd.resources.map(service).mkString("\n")}
+      ${services(ssd.resources)}
 
-      ${ssd.resources.map(controller).mkString("\n")}
+      ${controllers(ssd.resources)}
     """
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
