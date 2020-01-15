@@ -9,6 +9,27 @@ import scala.generator._
 
 object Play2Controllers extends CodeGenerator {
 
+  def moduleBindExample(resource: ScalaResource) =
+    s"bind(classOf[controllers.${serviceName(resource)}]).to(classOf[controllers.${serviceName(resource)}Impl])"
+
+  def moduleExample(resources: Seq[ScalaResource]) =
+  s"""
+    /*
+     * Play Framework - dependency injection example
+     *
+     * class Module extends com.google.inject.AbstractModule {
+     *   override def configure() = {
+     *     ${resources.map(moduleBindExample).mkString("\n *     ")}
+     *
+     *     ()
+     *   }
+     * }
+     *
+     *
+     * For more information: https://www.playframework.com/documentation/2.0.x/ScalaDependencyInjection
+     */
+  """
+
   def importJson(`import`: Import) =
     s"import ${`import`.namespace}.models.json._"
 
@@ -110,8 +131,9 @@ object Play2Controllers extends CodeGenerator {
       ${ApidocComments(form.service.version, form.userAgent).toJavaString()}
       package controllers
 
-      import ${ssd.namespaces.json}._
-      ${ssd.service.imports.map(importJson).mkString("\n")}
+      ${moduleExample(ssd.resources)}
+
+      ${imports(ssd)}
 
       ${responses(ssd.resources)}
 
