@@ -7,7 +7,7 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import scala.generator._
 
-object Play2Controllers extends CodeGenerator {
+object Play26Controllers extends CodeGenerator {
 
   def importJson(`import`: Import) =
     s"import ${`import`.namespace}.models.json._"

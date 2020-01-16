@@ -221,13 +221,13 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
-        key = "play_2_x_controllers",
-        name = "Play 2.x controllers",
+        key = "play_2_6_controllers",
+        name = "Play 2.6 controllers",
         description = Some("""Generate Play Controllers for the resources."""),
         language = Some("Scala")
       ),
       status = lib.generator.Status.InDevelopment,
-      codeGenerator = Some(scala.models.Play2Controllers)
+      codeGenerator = Some(scala.models.Play26Controllers)
     ),
     CodeGenTarget(
       metaData = Generator(

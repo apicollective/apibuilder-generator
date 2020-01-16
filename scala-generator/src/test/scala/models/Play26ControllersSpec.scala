@@ -6,10 +6,10 @@ import models.TestHelper._
 import org.scalatest.{FunSpec, Matchers}
 import scala.util.matching.Regex
 
-class Play2ControllersSpec extends FunSpec with Matchers {
+class Play26ControllersSpec extends FunSpec with Matchers {
 
   def fileContent(service: Service): File =
-    Play2Controllers.invoke(InvocationForm(service))
+    Play26Controllers.invoke(InvocationForm(service))
       .fold(
         { msgs => Left(new Throwable(s"Generated errors: ${msgs.mkString("\n  - ", "\n  - ", "")}")) },
         {
