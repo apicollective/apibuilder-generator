@@ -38,6 +38,7 @@ object Play26Controllers extends CodeGenerator {
       sealed trait ${responseEnumName(operation)} extends Product with Serializable
       object ${responseEnumName(operation)} {
         ${operation.responses.flatMap(responseObject(operation, _)).mkString("\n")}
+        case class Undocumented(result: play.api.mvc.Result) extends ${responseEnumName(operation)}
       }
     """
 
@@ -69,6 +70,7 @@ object Play26Controllers extends CodeGenerator {
         ${operation.name}(${parameterNames.mkString(", ")})
           .map {
             ${operation.responses.flatMap(responseToPlay(operation, _)).mkString("\n")}
+            case ${responseEnumName(operation)}.Undocumented(result) => result
           }(defaultExecutionContext)
       }
     """
