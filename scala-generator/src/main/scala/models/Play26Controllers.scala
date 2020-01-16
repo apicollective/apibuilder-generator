@@ -77,7 +77,7 @@ object Play26Controllers extends CodeGenerator {
   def controller(resource: ScalaResource) =
     s"""
       trait ${resource.plural}Controller extends play.api.mvc.BaseController {
-        ${resource.operations.map(controllerMethod).mkString("\n")}
+        ${resource.operations.map(controllerMethod).mkString("\n\n")}
       }
     """
 
