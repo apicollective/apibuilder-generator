@@ -46,7 +46,17 @@ case class ResponseBuilder(
       }
 
       case Datatype.Primitive.String => {
-        Some(s"$readerName.(string)")
+        val ioutil = importBuilder.ensureImport("io/ioutil")
+        Some(
+          Seq(
+            s"func() ${goType.klass.localName} {",
+            Seq(
+              s"body, _ := ${ioutil}.ReadAll($readerName)",
+              "return string(body)"
+            ).mkString("\n").indentString(1),
+            "}()"
+          ).mkString("\n")
+        )
       }
 
       case t: Datatype.Primitive => {
