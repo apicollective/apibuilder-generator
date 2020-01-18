@@ -35,7 +35,7 @@ object ImportPath {
             val p = pkg.replace(s"${domain}.", "")  // Ex: carrier.account
             val url = mappings(domain) + "/" + p.split("\\.").mkString("/")
             val alias = Text.snakeToCamelCase(p)
-            ImportPath(url, alias)
+            ImportPath(url, GoUtil.quoteNameIfKeyword(alias))
           }
         }
       }
@@ -52,7 +52,7 @@ object ImportPath {
     * default alias is 'http'.
     */
   def defaultAlias(name: String): String = {
-    name.split("/").last
+    GoUtil.quoteNameIfKeyword(name.split("/").last)
   }
 
 }

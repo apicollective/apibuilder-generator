@@ -155,5 +155,11 @@ import (
 )
 """.trim)
   }
+
+  it("handles keywords") {
+    val builder = ImportBuilder(None)
+
+    builder.ensureImport("io.flow.error.v0.models.error") should be("error_")
+  }
   
 }

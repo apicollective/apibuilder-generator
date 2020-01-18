@@ -230,8 +230,8 @@ case class Code(form: InvocationForm) {
           }
           case Some(discriminator) => {
             Seq(
-	      s"var el map[string]interface{}",
-	      s"${json}.Unmarshallbytes).Decode(&el)",
+              s"var el map[string]interface{}",
+              s"${json}.NewDecoder(bytes).Decode(&el)",
               s"""switch el["$discriminator"] {""",
 
               (
