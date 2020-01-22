@@ -29,7 +29,7 @@ class Play26ControllersSpec extends FunSpec with Matchers {
   def controllerCount(service: Service): Int = count("play\\.api\\.mvc\\.BaseController".r, service)
   def responseCount(service: Service): Int = count("sealed trait [^ ]+".r, service)
   def responseImplementationCount(service: Service): Int = count("case (class|object) HTTP[0-9]+".r, service)
-  def methodFinalCount(service: Service): Int = count("play\\.api\\.mvc\\.Handler".r, service)
+  def methodFinalCount(service: Service): Int = count("play\\.api\\.mvc\\.Action".r, service)
   def methodAbstractCount(service: Service): Int = count("scala\\.concurrent\\.Future".r, service)
 
   describe("for all services") {
