@@ -62,6 +62,17 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "anorm_2_8_parsers",
+        name = "Anorm 2.8 parsers",
+        description = Some("Generates anorm parsers. Depends on apidoc_0_x_libs generators. See https://playframework.github.io/anorm/"),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.generator.anorm.ParserGenerator28)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "ruby_client",
         name = "Ruby client",
         description = Some("A pure ruby library to consume api.json web services. The ruby client has minimal dependencies and does not require any additional gems."),

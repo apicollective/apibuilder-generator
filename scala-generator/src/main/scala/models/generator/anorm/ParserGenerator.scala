@@ -42,6 +42,11 @@ object ParserGenerator26 extends ParserGenerator {
   }
 }
 
+object ParserGenerator28 extends ParserGenerator {
+  override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes =
+    ParserGenerator26.attributes(ssd)
+}
+
 case class ParserGeneratorPlayVersionSpecificAttributes(
                                                          imports: Seq[String]
                                                        )
