@@ -50,6 +50,7 @@ object Play26Controllers extends CodeGenerator {
     }
 
   def controllerMethod(operation: ScalaOperation) = {
+    val bodyType = operation.body.fold("play.api.mvc.AnyContent")(_.datatype.name)
     val bodyParser = operation.body.fold("")(body => s"(parse.json[${body.datatype.name}])")
 
     val parameterNames =
@@ -58,7 +59,7 @@ object Play26Controllers extends CodeGenerator {
       operation.body.map(_ => "request.body").toList
 
     val parameterNameAndTypes =
-      List(s"""request: play.api.mvc.Request[${operation.body.fold("play.api.mvc.AnyContent")(_.datatype.name)}]""") ++
+      List(s"""request: play.api.mvc.Request[${bodyType}]""") ++
       operation.parameters.map(p => s"${p.name}: ${p.datatype.name}") ++
       operation.body.map(body => s"body: ${body.datatype.name}").toList
 
@@ -66,7 +67,7 @@ object Play26Controllers extends CodeGenerator {
       ${responses(operation)}
 
       def ${operation.name}(${parameterNameAndTypes.mkString(", ")}): scala.concurrent.Future[${responseEnumName(operation)}]
-      final def ${operation.name}(${operation.parameters.map(p => s"${p.name}: ${p.datatype.name}").mkString(", ")}): play.api.mvc.Handler = Action.async${bodyParser} { request =>
+      final def ${operation.name}(${operation.parameters.map(p => s"${p.name}: ${p.datatype.name}").mkString(", ")}): play.api.mvc.Action[${bodyType}] = Action.async${bodyParser} { request =>
         ${operation.name}(${parameterNames.mkString(", ")})
           .map {
             ${operation.responses.flatMap(responseToPlay(operation, _)).mkString("\n")}
