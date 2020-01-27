@@ -1,0 +1,96 @@
+{
+  "apidoc": {
+    "version": "0.9.6"
+  },
+  "name": "apidoc response with scala reserved word type",
+  "organization": {
+    "key": "bryzek"
+  },
+  "application": {
+    "key": "apidoc-response-with-reserved-scala-keyword"
+  },
+  "namespace": "io.apibuilder.test",
+  "version": "0.0.1-dev",
+  "headers": [],
+  "info": [],
+  "imports": [],
+  "enums": [
+    {
+      "name": "user_type",
+      "plural": "user_types",
+      "values": [
+        {
+          "name": "Youth",
+          "attributes": [],
+          "description": "under 18"
+        },
+        {
+          "name": "Adult",
+          "attributes": [],
+          "description": "18 and over"
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "unions": [],
+  "attributes": [],
+
+  "models": [
+    {
+      "name": "user",
+      "plural": "users",
+      "fields": [
+        {
+          "name": "guid",
+          "type": "uuid",
+          "description": "Internal unique identifier for this user.",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "type",
+          "type": "user_type",
+          "description": "The type of user",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "user",
+      "plural": "users",
+      "path": "/users",
+      "attributes": [],
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/users/:type",
+          "parameters": [
+            {
+              "name": "type",
+              "type": "user_type",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            {
+              "headers": [],
+              "code": {
+                "integer": {
+                  "value": 200
+                }
+              },
+              "type": "[user]"
+            }
+          ],
+          "attributes": []
+        }
+      ]
+    }
+  ]
+}
