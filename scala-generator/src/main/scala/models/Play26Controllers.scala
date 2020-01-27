@@ -54,19 +54,19 @@ object Play26Controllers extends CodeGenerator {
 
     val parameterNames =
       List("request") ++
-      operation.parameters.map(_.name) ++
+      operation.parameters.map(p => ScalaUtil.quoteNameIfKeyword(p.name)) ++
       operation.body.map(_ => "request.body").toList
 
     val parameterNameAndTypes =
       List(s"""request: play.api.mvc.Request[${operation.body.fold("play.api.mvc.AnyContent")(_.datatype.name)}]""") ++
-      operation.parameters.map(p => s"${p.name}: ${p.datatype.name}") ++
+      operation.parameters.map(p => s"${ScalaUtil.quoteNameIfKeyword(p.name)}: ${p.datatype.name}") ++
       operation.body.map(body => s"body: ${body.datatype.name}").toList
 
     s"""
       ${responses(operation)}
 
       def ${operation.name}(${parameterNameAndTypes.mkString(", ")}): scala.concurrent.Future[${responseEnumName(operation)}]
-      final def ${operation.name}(${operation.parameters.map(p => s"${p.name}: ${p.datatype.name}").mkString(", ")}): play.api.mvc.Handler = Action.async${bodyParser} { request =>
+      final def ${operation.name}(${operation.parameters.map(p => s"${ScalaUtil.quoteNameIfKeyword(p.name)}: ${p.datatype.name}").mkString(", ")}): play.api.mvc.Handler = Action.async${bodyParser} { request =>
         ${operation.name}(${parameterNames.mkString(", ")})
           .map {
             ${operation.responses.flatMap(responseToPlay(operation, _)).mkString("\n")}

@@ -41,6 +41,7 @@ class Play26ControllersSpec extends FunSpec with Matchers {
       apidocApiService,
       dateTimeService,
       builtInTypesService,
+      scalaKeywordsService,
       generatorApiServiceWithUnionAndDescriminator,
       generatorApiServiceWithUnionWithoutDescriminator,
       emptyService,
