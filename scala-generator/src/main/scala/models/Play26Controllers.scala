@@ -42,6 +42,21 @@ object Play26Controllers extends CodeGenerator {
       }
     """
 
+  def responsesName(resource: ScalaResource) = s"${resource.plural}Responses"
+  def responses(resource: ScalaResource): String =
+    s"""
+      trait ${responsesName(resource)} {
+        ${resource.operations.map(responses).mkString("\n\n")}
+      }
+    """
+
+  def executionContext(resource: ScalaResource) =
+    s"""
+      @javax.inject.Singleton
+      class ${resource.plural}ExecutionContext @javax.inject.Inject()(system: akka.actor.ActorSystem)
+        extends play.api.libs.concurrent.CustomExecutionContext(system, "${resource.namespaces.controllers}.${controllerName(resource)}")
+    """
+
   def responseToPlay(operation: ScalaOperation, response: ScalaResponse) =
     (responseObjectName(response), responseObjectCode(response), response.isUnit) match {
       case (Some(name), Some(code), true) => Some(s"case ${responseEnumName(operation)}.${name} => Status(${code})(play.api.mvc.Results.EmptyContent())")
@@ -64,8 +79,6 @@ object Play26Controllers extends CodeGenerator {
       operation.body.map(body => s"body: ${body.datatype.name}").toList
 
     s"""
-      ${responses(operation)}
-
       def ${operation.name}(${parameterNameAndTypes.mkString(", ")}): scala.concurrent.Future[${responseEnumName(operation)}]
       final def ${operation.name}(${operation.parameters.map(p => s"${p.name}: ${p.datatype.name}").mkString(", ")}): play.api.mvc.Action[${bodyType}] = Action.async${bodyParser} { request =>
         ${operation.name}(${parameterNames.mkString(", ")})
@@ -77,9 +90,14 @@ object Play26Controllers extends CodeGenerator {
     """
   }
 
+  def controllerName(resource: ScalaResource) = s"${resource.plural}Controller"
   def controller(resource: ScalaResource) =
     s"""
-      trait ${resource.plural}Controller extends play.api.mvc.BaseController {
+      ${executionContext(resource)}
+
+      ${responses(resource)}
+
+      trait ${controllerName(resource)} extends ${responsesName(resource)} with play.api.mvc.BaseController {
         ${resource.operations.map(controllerMethod).mkString("\n\n")}
       }
     """
@@ -89,7 +107,7 @@ object Play26Controllers extends CodeGenerator {
   def fileContents(form: InvocationForm, ssd: ScalaService): String =
     s"""
       ${ApidocComments(form.service.version, form.userAgent).toJavaString()}
-      package ${ssd.namespaces.base}.controllers
+      package ${ssd.namespaces.controllers}
 
       ${imports(ssd)}
 

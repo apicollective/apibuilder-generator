@@ -27,6 +27,7 @@ case class Namespaces(original: String) {
   val anorm: String = Seq(base, "anorm").mkString(".")
   val anormParsers: String = Seq(anorm, Namespaces.Parsers).mkString(".")
   val anormConversions: String = Seq(anorm, Namespaces.Conversions).mkString(".")
+  val controllers: String = Seq(base, "controllers").mkString(".")
   val errors: String = Seq(base, "errors").mkString(".")
 
   val mock: String = Seq(base, "mock").mkString(".")
