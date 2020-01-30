@@ -50,11 +50,12 @@ object Play26Controllers extends CodeGenerator {
       }
     """
 
+  def executionContextName(resource: ScalaResource) = s"${resource.plural}ExecutionContext"
   def executionContext(resource: ScalaResource) =
     s"""
       @javax.inject.Singleton
-      class ${resource.plural}ExecutionContext @javax.inject.Inject()(system: akka.actor.ActorSystem)
-        extends play.api.libs.concurrent.CustomExecutionContext(system, "${resource.namespaces.controllers}.${controllerName(resource)}")
+      class ${executionContextName(resource)} @javax.inject.Inject()(system: akka.actor.ActorSystem)
+        extends play.api.libs.concurrent.CustomExecutionContext(system, "${resource.namespaces.controllers}.${executionContextName(resource)}")
     """
 
   def responseToPlay(operation: ScalaOperation, response: ScalaResponse) =
@@ -90,14 +91,13 @@ object Play26Controllers extends CodeGenerator {
     """
   }
 
-  def controllerName(resource: ScalaResource) = s"${resource.plural}Controller"
   def controller(resource: ScalaResource) =
     s"""
       ${executionContext(resource)}
 
       ${responses(resource)}
 
-      trait ${controllerName(resource)} extends ${responsesName(resource)} with play.api.mvc.BaseController {
+      trait ${resource.plural}Controller extends ${responsesName(resource)} with play.api.mvc.BaseController {
         ${resource.operations.map(controllerMethod).mkString("\n\n")}
       }
     """
