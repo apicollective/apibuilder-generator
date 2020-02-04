@@ -235,7 +235,7 @@ class MockClientGenerator(
       case ScalaPrimitive.Boolean => "true"
       case ScalaPrimitive.Double => "1.0"
       case ScalaPrimitive.Integer => "1"
-      case ScalaPrimitive.Long => "1l"
+      case ScalaPrimitive.Long => "1L"
       case dt: ScalaPrimitive.DateIso8601 => s"${dt.fullName}.now"
       case dt: ScalaPrimitive.DateTimeIso8601 => s"${dt.fullName}.now"
       case ScalaPrimitive.Decimal => """BigDecimal("1")"""
