@@ -5,7 +5,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-val scalaVer = "2.12.10"
+val scalaVer = "2.13.1"
 
 scalaVersion in ThisBuild := scalaVer
 
@@ -40,7 +40,7 @@ lazy val generator = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % "test"
+      "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
     )
   )
 
@@ -66,7 +66,7 @@ lazy val scalaGenerator = project
     Seq(ScoverageKeys.coverageMinimum := 84.0),
     scalacOptions += "-Ypartial-unification",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "1.5.0",
+      "org.typelevel" %% "cats-core" % "2.1.0",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
     )
   )
@@ -144,8 +144,8 @@ lazy val postmanGenerator = project
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "ammonite-ops" % "1.6.3",
-      "org.scalactic" %% "scalactic" % "3.0.5"
+      "com.lihaoyi" %% "ammonite-ops" % "2.0.4",
+      "org.scalactic" %% "scalactic" % "3.1.0"
     )
   )
 
