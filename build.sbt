@@ -64,7 +64,6 @@ lazy val scalaGenerator = project
   .settings(commonSettings: _*)
   .settings(
     Seq(ScoverageKeys.coverageMinimum := 84.0),
-    scalacOptions += "-Ypartial-unification",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "2.1.0",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
@@ -98,7 +97,7 @@ lazy val androidGenerator = project
 
 val kotlinLangVersion = "1.3.61"
 val mockitoVersion = "3.2.0"
-val scalatestVersion = "3.0.8"
+val scalatestVersion = "3.1.0"
 
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
