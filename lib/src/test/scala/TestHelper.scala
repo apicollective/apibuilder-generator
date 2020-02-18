@@ -134,6 +134,9 @@ object TestHelper extends Matchers {
   }
 
   def assertEqualsFile(filename: String, contents: String): Unit = {
+    println("*****************************FILENAME HERRE*****************************")
+    println(filename)
+    println("*****************************FILENAME ABOVE*****************************")
     val actualPath = resolvePath(filename)
     val current = readFile(actualPath).trim
     if (current != contents.trim) {

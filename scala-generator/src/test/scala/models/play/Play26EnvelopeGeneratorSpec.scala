@@ -2,8 +2,8 @@ package models.play
 
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 import models.TestHelper.assertValidScalaSourceCode
-import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.models.Play26EnvelopeClientGenerator
 
