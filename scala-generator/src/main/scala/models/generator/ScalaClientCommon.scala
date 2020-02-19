@@ -79,7 +79,7 @@ case class ResponseHeaders(all: Map[String, Seq[String]]) {
            |  ResponseImpl(
            |    body = parseJson(className, r, f),
            |    status = r.status,
-           |    headers = ResponseHeaders(r.headers),
+           |    headers = ResponseHeaders(r.headers.map { case (k, v) => k -> v.toSeq }),
            |  )
            |}
            |""".stripMargin.indentString(2) + "\n\n"
