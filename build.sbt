@@ -93,7 +93,7 @@ lazy val androidGenerator = project
   .settings(
     commonSettings: _*
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 76.91))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 76.90))
 
 val kotlinLangVersion = "1.3.61"
 val mockitoVersion = "3.3.0"
@@ -135,7 +135,7 @@ lazy val csvGenerator = project
       "org.apache.commons" % "commons-csv" % "1.7"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 75.68, ScoverageKeys.coverageFailOnMinimum := true))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 75.67, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val postmanGenerator = project
   .in(file("postman-generator"))
