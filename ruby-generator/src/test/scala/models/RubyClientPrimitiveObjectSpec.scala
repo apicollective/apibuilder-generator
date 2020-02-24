@@ -2,9 +2,10 @@ package ruby.models
 
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class RubyClientPrimitiveObjectSpec extends FunSpec with Matchers {
+class RubyClientPrimitiveObjectSpec extends AnyFunSpec with Matchers {
 
   describe("for a field with an object field") {
 

@@ -5,11 +5,12 @@ import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference
 import io.postman.generator.attributes.v0.models.json._
 import models.attributes.PostmanAttributes._
 import models.operation.DependantOperations
-import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.{JsObject, Json}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 
-class DependantOperationResolverSpec extends WordSpec with Matchers {
+class DependantOperationResolverSpec extends AnyWordSpec with Matchers {
 
   import models.TestHelper.{referenceApiService, generatorApiServiceWithUnionWithoutDescriminator}
 

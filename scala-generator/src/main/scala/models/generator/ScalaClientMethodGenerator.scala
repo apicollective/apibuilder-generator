@@ -1,5 +1,7 @@
 package scala.generator
 
+import com.github.ghik.silencer.silent
+
 import scala.models.{FeatureMigration, JsonImports}
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import lib.Text._
@@ -37,14 +39,6 @@ class ScalaClientMethodGenerator(
 
   private[this] def responseType(resource: ScalaResource): String = {
     s"${namespaces.base}.${resource.plural}${config.wrappedAsyncType().getOrElse("")}"
-  }
-
-  private[this] def responseTypeWithEnvelope(resource: ScalaResource): String = {
-    val name = responseType(resource)
-    config.responseEnvelopeClassName match {
-      case None => name
-      case Some(envelopeName) => s"${namespaces.base}.$envelopeName[$name]"
-    }
   }
 
   def interfaces(): String = {
@@ -306,7 +300,7 @@ class ScalaClientMethod(
   methodCall: String,
   response: String,
   implicitArgs: Option[String],
-  responseEnvelopeName: Option[String],
+  @silent responseEnvelopeName: Option[String],
 ) {
 
   val name: String = operation.name

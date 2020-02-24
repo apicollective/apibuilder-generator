@@ -1,7 +1,6 @@
 package scala.models
 
 import lib.VersionTag
-import io.apibuilder.spec.v0.models.Service
 
 case class FeatureMigration(serviceVersion: String) {
 

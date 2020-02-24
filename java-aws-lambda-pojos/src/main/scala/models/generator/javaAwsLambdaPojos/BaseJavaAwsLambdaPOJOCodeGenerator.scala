@@ -1,21 +1,18 @@
 package models.generator.javaAwsLambdaPojos
 
-import java.io.IOException
-
-import javax.lang.model.element.Modifier
+import com.amazonaws.services.dynamodbv2.datamodeling.{DynamoDBTypeConvertedEnum, _}
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.squareup.javapoet.AnnotationSpec.Builder
 import com.squareup.javapoet._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models.{Enum, Method, Model, ParameterLocation, Resource, ResponseCodeInt, Service, Union}
+import io.apibuilder.spec.v0.models.{Enum, Model, Service, Union}
+import javax.lang.model.element.Modifier
 import lib.Text
 import lib.generator.CodeGenerator
-import com.amazonaws.services.dynamodbv2.datamodeling._
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import me.geso.tinyvalidator.constraints._
 import lombok.Data
+import me.geso.tinyvalidator.constraints._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambdaPOJOUtil {
@@ -29,7 +26,7 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
   def invoke(form: InvocationForm, addHeader: Boolean = false): Either[Seq[String], Seq[File]] = Right(generateCode(form, addHeader))
 
 
-  private def generateCode(form: InvocationForm, addHeader: Boolean = true): Seq[File] = {
+  private def generateCode(form: InvocationForm, addHeader: Boolean): Seq[File] = {
     val header =
       if (addHeader) Some(new ApidocComments(form.service.version, form.userAgent).forClassFile)
       else None
@@ -49,8 +46,6 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
       val s = JAVADOC_CLASS_MESSAGE + "\n"
       header.fold(s)(_ + "\n" + s)
     }
-
-    val T = "$T" //this is a hack for substituting types, as "$" is used by scala to do string substitution, and $T is used by javapoet to handle types
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -99,8 +94,6 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
       enum.values.foreach(value => {
         builder.addEnumConstant(toEnumName(value.name))
       })
-
-      val nameFieldType = classOf[String]
 
       val constructorWithParams = MethodSpec.constructorBuilder()
       builder.addMethod(constructorWithParams.build())
@@ -173,7 +166,6 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
       model.fields.foreach(field => {
 
         val fieldSnakeCaseName = field.name
-        val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
         val javaDataType = dataTypeFromField(field.`type`, modelsNameSpace)
@@ -202,8 +194,8 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
             case "size"=> {
               val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[Size])
               //What follows is some very strange behavior required to placate Scala's type system.
-              jsonAnnotationBuilder.addMember("min","$L",new Integer((attribute.value \ "min").as[Int]))
-              jsonAnnotationBuilder.addMember("max","$L",new Integer((attribute.value \ "max").as[Int]))
+              jsonAnnotationBuilder.addMember("min","$L",Integer.valueOf((attribute.value \ "min").as[Int]))
+              jsonAnnotationBuilder.addMember("max","$L",Integer.valueOf((attribute.value \ "max").as[Int]))
               fieldBuilder.addAnnotation(jsonAnnotationBuilder.build)
             }
             case "pattern"=> {
@@ -251,17 +243,6 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
 
     }
 
-
-    private def toMap(cc: AnyRef): Map[String, Any] =
-      (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
-        f.setAccessible(true)
-        a + (f.getName -> f.get(cc))
-      }
-
-
-    private def commentFromOpt(opt: Option[String]) = {
-      opt.fold("") { s => textToComment(s) + "\n" }
-    }
 
     def camelToUnderscores(name: String): String = "[A-Z\\d]".r.replaceAllIn(name, { m =>
       "_" + m.group(0).toLowerCase()

@@ -1,8 +1,9 @@
 package scala.generator
 
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class NamespacesSpec extends FunSpec with Matchers {
+class NamespacesSpec extends AnyFunSpec with Matchers {
 
   it("quotes keywords") {
     val ns = Namespaces("io.apibuilder.example.union.type.v0")

@@ -25,7 +25,7 @@ object UrlKey {
     val key = if (suffix <= 0) { value } else { s"$value-1" }
     validate(key) match {
       case Nil => key
-      case errors => generate(key, suffix + 1)
+      case _ => generate(key, suffix + 1)
     }
   }
 
@@ -34,11 +34,11 @@ object UrlKey {
       RegexpLeadingSpaces.replaceAllIn(
         Regexp3.replaceAllIn(
           Regexp2.replaceAllIn(
-            Regexp1.replaceAllIn(value.toLowerCase.trim, m => "-"),
-            m => "-"
-          ), m => "_"
-        ), m => ""),
-      m => ""
+            Regexp1.replaceAllIn(value.toLowerCase.trim, _ => "-"),
+            _ => "-"
+          ), _ => "_"
+        ), _ => ""),
+      _ => ""
     )
   }
 

@@ -36,7 +36,7 @@ class Play26GeneratorSpec extends AnyFunSpec with Matchers with ScalaCheckProper
 
   it("formatRoutes should format routes") {
     forAll { (lines: List[String], spacesCount: Byte) =>
-      val spaces = " " * spacesCount
+      val spaces = " " * spacesCount.toInt
       val contents = lines.mkString(spaces, s"${spaces}\n${spaces}", spaces)
       val expected = lines.mkString("\n").trim
       val result = Play26Generator.formatRoutes(contents)

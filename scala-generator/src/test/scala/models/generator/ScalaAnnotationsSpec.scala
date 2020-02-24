@@ -1,11 +1,12 @@
 package models.generator
 
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.generator.{ScalaEnums, ScalaService}
 import scala.models.Play2Json
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaAnnotationsSpec extends FunSpec with Matchers {
+class ScalaAnnotationsSpec extends AnyFunSpec with Matchers {
 
   describe("for a model with 2 enum fields") {
 

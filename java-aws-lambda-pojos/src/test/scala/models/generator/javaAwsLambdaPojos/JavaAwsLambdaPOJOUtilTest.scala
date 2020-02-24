@@ -1,9 +1,10 @@
 package models.generator.javaAwsLambdaPojos
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class JavaAwsLambdaPOJOUtilTest
-  extends FlatSpec
+  extends AnyFlatSpec
   with Matchers
   with JavaAwsLambdaPOJOUtil{
 

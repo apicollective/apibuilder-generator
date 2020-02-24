@@ -1,7 +1,5 @@
 package lib
 
-import scala.collection.immutable.StringOps
-
 object Text {
 
   /**
@@ -66,7 +64,7 @@ object Text {
     ellipsis: Option[String] = Some(Ellipsis)
   ): String = {
     val suffix = ellipsis.getOrElse("")
-    require(maxLength >= suffix.length, "maxLength must be greater than the length of the suffix[${suffix.length}]")
+    require(maxLength >= suffix.length, s"maxLength must be greater than the length of the suffix[${suffix.length}]")
 
     if (value.length <= maxLength) {
       value
@@ -144,7 +142,7 @@ object Text {
   private[this] val WordDelimiterRx = "_|\\-|\\.|:|/| ".r
 
   def splitIntoWords(value: String): Seq[String] = {
-    WordDelimiterRx.split(lib.Text.camelCaseToUnderscore(value)).map(_.trim).filter(!_.isEmpty)
+    WordDelimiterRx.split(lib.Text.camelCaseToUnderscore(value)).toSeq.map(_.trim).filter(!_.isEmpty)
   }
 
   def snakeToCamelCase(value: String): String = {

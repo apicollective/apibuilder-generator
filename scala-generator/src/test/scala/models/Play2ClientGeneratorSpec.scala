@@ -6,9 +6,10 @@ import models.TestHelper
 import models.TestHelper.{assertJodaTimeNotPresent, assertValidScalaSourceCode}
 
 import scala.generator.{ScalaClientMethodConfig, ScalaClientMethodConfigs, ScalaClientMethodGenerator, ScalaService}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class Play2ClientGeneratorSpec extends FunSpec with Matchers {
+class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
 
   private[this] val clientMethodConfig: ScalaClientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", Attributes.PlayDefaultConfig, None)
 
@@ -131,7 +132,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
   describe("Play 2.6.x generator basic output") {
     val service = models.TestHelper.generatorApiService
     val invocationForm = InvocationForm(service, Seq.empty, None)
-    val output = Play26ClientGenerator.invoke(invocationForm).right.get
+    val output = Play26ClientGenerator.invoke(invocationForm).getOrElse(sys.error("got Left"))
 
     it("is valid scala code") {
       TestHelper.assertValidScalaSourceFiles(output)
@@ -169,7 +170,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
   describe("Play 2.7.x generator basic output") {
     val service = models.TestHelper.generatorApiService
     val invocationForm = InvocationForm(service, Seq.empty, None)
-    val output = Play27ClientGenerator.invoke(invocationForm).right.get
+    val output = Play27ClientGenerator.invoke(invocationForm).getOrElse(sys.error("got Left"))
 
     it("is valid scala code") {
       TestHelper.assertValidScalaSourceFiles(output)
@@ -250,7 +251,7 @@ class Play2ClientGeneratorSpec extends FunSpec with Matchers {
   describe("Play 2.8.x generator basic output") {
     val service = models.TestHelper.generatorApiService
     val invocationForm = InvocationForm(service, Seq.empty, None)
-    val output = Play28ClientGenerator.invoke(invocationForm).right.get
+    val output = Play28ClientGenerator.invoke(invocationForm).getOrElse(sys.error("got Left"))
 
     it("is valid scala code") {
       TestHelper.assertValidScalaSourceFiles(output)

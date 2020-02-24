@@ -4,9 +4,10 @@ import io.apibuilder.generator.v0.models.InvocationForm
 
 import scala.models.Play23ClientGenerator
 import scala.models.ning.{Ning18ClientGenerator, Ning19ClientGenerator, AsyncHttpClientGenerator}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ReferenceSpec extends FunSpec with Matchers {
+class ReferenceSpec extends AnyFunSpec with Matchers {
 
   lazy val ssd = new ScalaService(models.TestHelper.referenceApiService)
 

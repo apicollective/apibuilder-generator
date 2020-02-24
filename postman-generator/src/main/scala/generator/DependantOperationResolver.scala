@@ -16,8 +16,6 @@ import scala.reflect.{ClassTag, classTag}
 
 object DependantOperationResolver extends Logging {
 
-  import scala.languageFeature.implicitConversions
-
   /**
     * 1. Searches for special postman attributes [[ObjectReference]] in whole Service and it's imports.
     * 2. Recursively resolves a dependant operations for each specified attributes.
@@ -37,15 +35,14 @@ object DependantOperationResolver extends Logging {
     val serviceNamespaceToResources: Map[String, Seq[Resource]] = resolvedService.serviceNamespaceToResources
 
     def findObjectReferenceAttrs(
-      paramName: String,
       attributes: Seq[Attribute],
       parameters: Seq[Parameter]): Seq[ExtendedObjectReference] = for {
-        foundedPathAttrIdx <- attributes
+        (foundedPathAttr, index) <- attributes
           .filter(_.name.equalsIgnoreCase(AttributeName.ObjectReference.toString))
           .zipWithIndex if parameters.nonEmpty
-        pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttrIdx._1.value).toSeq
+        pureAttr <- tryAttributeReadsWithLogging[ObjectReference](foundedPathAttr.value).toSeq
         extendedObjectReference = pureAttr.toExtended
-        postmanVariableName = postmanVariableNameFrom(parameters(foundedPathAttrIdx._2))
+        postmanVariableName = postmanVariableNameFrom(parameters(index))
         extendedObjRefWithUpdatedName = extendedObjectReference.copy(postmanVariableName = postmanVariableName)
       } yield extendedObjRefWithUpdatedName
 
@@ -53,7 +50,7 @@ object DependantOperationResolver extends Logging {
       resource <- service.resources
       path <- resource.path.toSeq
       parameters = findParametersInPathString(path)
-      objectReference <- findObjectReferenceAttrs(path, resource.attributes, parameters)
+      objectReference <- findObjectReferenceAttrs(resource.attributes, parameters)
     } yield objectReference
 
     val attributesFromOperations = for {
@@ -61,7 +58,7 @@ object DependantOperationResolver extends Logging {
       operation <- resource.operations
       operationPath = operation.path.stripPrefix(resource.path.getOrElse(""))
       parameters = findParametersInPathString(operationPath)
-      objectReference <- findObjectReferenceAttrs(operationPath, operation.attributes, parameters)
+      objectReference <- findObjectReferenceAttrs(operation.attributes, parameters)
     } yield objectReference
 
     def findNestedObjRefAttrs(attributes: Seq[ExtendedObjectReference]): Seq[ExtendedObjectReference] =

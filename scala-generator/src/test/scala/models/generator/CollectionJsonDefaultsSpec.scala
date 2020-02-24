@@ -1,13 +1,13 @@
 package scala.generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.models.Play23ClientGenerator
 import scala.models.ning.{AsyncHttpClientGenerator, Ning18ClientGenerator}
-import models.TestHelper
-import org.scalatest.{FunSpec, Matchers}
 
-class CollectionJsonDefaultsSpec extends FunSpec with Matchers {
+class CollectionJsonDefaultsSpec extends AnyFunSpec with Matchers {
 
   lazy val ssd = new ScalaService(models.TestHelper.collectionJsonDefaultsService)
 

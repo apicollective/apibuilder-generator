@@ -1,7 +1,6 @@
 package scala.generator
 
 import lib.generator.GeneratorUtil
-import io.apibuilder.spec.v0.models.Service
 
 object Namespaces {
 
@@ -42,7 +41,7 @@ case class Namespaces(original: String) {
     }
   }
 
-  def importStatements(service: Service): Seq[String] = {
+  def importStatements(): Seq[String] = {
     Seq(s"import $models._")
   }
 

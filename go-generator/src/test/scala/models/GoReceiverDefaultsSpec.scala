@@ -2,11 +2,10 @@ package models
 
 import go.models.GoClientGenerator
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-import scala.io.Source
-
-class GoReceiverDefaultsSpec extends FunSpec with Matchers {
+class GoReceiverDefaultsSpec extends AnyFunSpec with Matchers {
   it("Should produce models with defaults") {
     val json = models.TestHelper.buildJson(
       """

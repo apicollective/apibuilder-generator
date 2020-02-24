@@ -2,9 +2,10 @@ package models.generator.csv
 
 import io.apibuilder.generator.v0.models.File
 import io.apibuilder.spec.v0.models._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class CSvGeneratorTest extends FunSpec with Matchers {
+class CsvGeneratorTest extends AnyFunSpec with Matchers {
 
   val NEWLINE = "\r\n"
   val QUOTE = "\""

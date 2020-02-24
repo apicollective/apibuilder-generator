@@ -2,13 +2,14 @@ package generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import models.TestHelper._
-import org.scalatest.{Assertion, WordSpec}
+import org.scalatest.Assertion
 import play.api.libs.json._
 import testUtils.TestPostmanCollectionGenerator
 
 import scala.io.Source
+import org.scalatest.wordspec.AnyWordSpec
 
-class FileInputOutputGeneratorTests extends WordSpec {
+class FileInputOutputGeneratorTests extends AnyWordSpec {
 
   "Postman Generator" should {
     "successfully generate a postman collection from test-service-1.json" in {

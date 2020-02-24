@@ -1,10 +1,10 @@
 package scala.generator
 
-import models.TestHelper
 import io.apibuilder.spec.v0.models._
-import org.scalatest._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaOperationSpec extends FunSpec with Matchers {
+class ScalaOperationSpec extends AnyFunSpec with Matchers {
 
   private lazy val service = models.TestHelper.referenceApiService
   private lazy val ssd = new ScalaService(service)

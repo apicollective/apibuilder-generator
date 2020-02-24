@@ -1,8 +1,9 @@
 package ruby.models
 
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class FeatureMigrationSpec extends FunSpec with Matchers {
+class FeatureMigrationSpec extends AnyFunSpec with Matchers {
 
   it("hasImplicit404s") {
     FeatureMigration("0.0.1").hasImplicit404s should be(true)

@@ -1,8 +1,8 @@
 package go.models
 
+import go.models.Formatter._
+
 import scala.collection.mutable
-import lib.Text
-import Formatter._
 
 object ImportBuilder {
 
@@ -10,7 +10,7 @@ object ImportBuilder {
     * Parses the value of the go_import_mappings attribute and returns
     *a map */
   def parseMappings(importMappings: Option[String]): Map[String, String] = {
-    var map = scala.collection.mutable.Map[String, String]()
+    val map = scala.collection.mutable.Map[String, String]()
 
     importMappings.map { mappings =>
       mappings.trim.split("\\s").foreach { el =>
@@ -96,7 +96,7 @@ private[models] case class ImportBuilder(importMappings: Option[String]) {
       case 0 => path.alias
       case 1 => {
         path.url.split("/").toList match {
-          case host :: org :: app :: rest => {
+          case _ :: org :: _ :: _ => {
             // Ex: Turn github.com/flowcommerce/common into
             // flowcommerceCommon alias
             GoUtil.privateName(s"${org}_${path.alias}")

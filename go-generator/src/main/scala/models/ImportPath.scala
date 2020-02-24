@@ -21,7 +21,7 @@ object ImportPath {
 
   def apply(value: String, mappings: Map[String, String]): ImportPath = {
     value match {
-      case ApibuilderUrlPattern(pkg, app) => {
+      case ApibuilderUrlPattern(pkg, _) => {
 
         mappings.keys.toSeq.sortBy(_.length).reverse.find { key =>
           pkg.startsWith(s"${key}.")

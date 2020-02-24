@@ -1,7 +1,7 @@
 package scala.models.play
 
 import io.apibuilder.spec.v0.models.{Apidoc, Application, Info, Organization, Service}
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 
 object Helpers extends Matchers {
   def removeAllExtraWhiteSpaces(a: String): String = a.replaceAll("\\s+", " ").trim

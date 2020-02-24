@@ -1,9 +1,10 @@
 package models.generator.android
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class AndroidJavaUtilTest
-  extends FlatSpec
+  extends AnyFlatSpec
   with Matchers
   with AndroidJavaUtil{
 

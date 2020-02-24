@@ -105,14 +105,14 @@ case class Http4sServer(form: InvocationForm,
 
       s"""${config.routeKind} $name${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.routeExtends.getOrElse("")} {
          |${config.matchersImport}
-         |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonOf("A")}
-         |  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]${config.asyncTypeParam().map(p => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonEncoderOf("A")}
+         |  implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A]${config.asyncTypeParam().map(_ => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonOf("A")}
+         |  implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A]${config.asyncTypeParam().map(_ => s", sync: Sync[F]").getOrElse("")}) = ${config.generateCirceJsonEncoderOf("A")}
          |
          |${routes.map(_.operation().mkString("\n")).mkString("\n\n").indentString(2)}
          |
          |  def apiVersionMatch(req: ${config.messageClass}): Boolean = ApiVersion(req)
          |
-         |  def service()${config.asyncTypeParam().map(p => s"(implicit sync: Sync[F])").getOrElse("")} = ${config.httpServiceClass} {
+         |  def service()${config.asyncTypeParam().map(_ => s"(implicit sync: Sync[F])").getOrElse("")} = ${config.httpServiceClass} {
          |${routes.map(_.route(version).mkString("\n")).mkString("\n\n").indentString(4)}
          |  }
          |}
@@ -239,6 +239,8 @@ case class Http4sServer(form: InvocationForm,
           } else {
             s"""object $extractorName extends QueryParamDecoderMatcher[${sp.name}]("${param.originalName}")"""
           }
+        case dt =>
+          sys.error(s"Unhandled param $dt")
       }
     }.map("\n" + _)
   }

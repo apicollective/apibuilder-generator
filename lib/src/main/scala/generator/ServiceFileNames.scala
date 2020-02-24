@@ -110,7 +110,7 @@ object ServiceFileNames {
   }
 
   private[generator] def toLanguages(languages: String): Seq[Language] = {
-    languages.split(",").map(_.trim).flatMap(Language(_))
+    languages.split(",").toSeq.map(_.trim).flatMap(Language(_))
   }
 
 }

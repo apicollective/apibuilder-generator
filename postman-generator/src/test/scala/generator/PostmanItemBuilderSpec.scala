@@ -4,10 +4,12 @@ import examples.ExampleJson
 import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.postman.collection.v21.v0.{models => postman}
-import org.scalatest.{Assertion, Matchers, WordSpec}
+import org.scalatest.Assertion
 import play.api.libs.json.{JsString, JsValue, Json}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class PostmanItemBuilderSpec extends WordSpec with Matchers {
+class PostmanItemBuilderSpec extends AnyWordSpec with Matchers {
 
   "PostmanItemBuilder" should {
 

@@ -8,3 +8,5 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releas
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.0")
 
 addSbtPlugin("org.scoverage"    %% "sbt-scoverage"  % "1.6.1")
+
+addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.1.11")

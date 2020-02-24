@@ -3,10 +3,11 @@ package scala.models
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
 import models.TestHelper._
-import org.scalatest.{FunSpec, Matchers}
 import scala.util.matching.Regex
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaCheckGeneratorSpec extends FunSpec with Matchers {
+class ScalaCheckGeneratorSpec extends AnyFunSpec with Matchers {
 
   def fileContent(service: Service): File =
     ScalaCheckGenerator.invoke(InvocationForm(service))

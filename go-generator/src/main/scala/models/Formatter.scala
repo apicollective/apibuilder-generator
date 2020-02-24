@@ -36,7 +36,7 @@ object Formatter {
     private[this] def splitLine(line: String): Seq[String] = {
       line.split("\\=").toList match {
         case Nil => Nil
-        case one :: Nil => one.split("\\s+")
+        case one :: Nil => one.split("\\s+").toSeq
         case one :: rest => Seq(one) ++ Seq("=") ++ splitLine(rest.mkString("=").trim)
       }
     }

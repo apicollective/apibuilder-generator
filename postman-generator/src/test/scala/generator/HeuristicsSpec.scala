@@ -1,9 +1,9 @@
 package generator
 
 import io.apibuilder.spec.v0.models.{Method, Operation, Resource}
-import org.scalatest.WordSpec
+import org.scalatest.wordspec.AnyWordSpec
 
-class HeuristicsSpec extends WordSpec {
+class HeuristicsSpec extends AnyWordSpec {
 
   "Postman Generator Heuristics" should {
 

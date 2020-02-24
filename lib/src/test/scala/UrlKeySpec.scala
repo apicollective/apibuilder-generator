@@ -1,8 +1,8 @@
 package lib
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class UrlKeySpec extends FlatSpec {
+class UrlKeySpec extends AnyFlatSpec {
 
   behavior of "Url Key Generator"
 

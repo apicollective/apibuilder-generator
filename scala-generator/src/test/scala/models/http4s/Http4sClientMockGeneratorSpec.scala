@@ -1,13 +1,14 @@
 package models.http4s
 
 import models.TestHelper.assertValidScalaSourceCode
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.generator.ScalaClientMethodConfigs
 import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig}
 import scala.models.http4s.{Http4s017Generator, Http4s018Generator, Http4s020Generator, ScalaService}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class Http4sClientMockGeneratorSpec extends FunSpec with Matchers {
+class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
 
   describe("generate mock") {
     val service = models.TestHelper.generatorApiService

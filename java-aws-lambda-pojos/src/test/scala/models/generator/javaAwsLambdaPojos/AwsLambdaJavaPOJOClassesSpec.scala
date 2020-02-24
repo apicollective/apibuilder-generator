@@ -1,17 +1,18 @@
 package models.generator.javaAwsLambdaPojos
 
-import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{FunSpec, Matchers}
 import com.github.javaparser.JavaParser
-import com.github.javaparser.ast.{CompilationUnit, NodeList}
-import com.github.javaparser.ast.body.{AnnotationDeclaration, FieldDeclaration, MethodDeclaration}
+import com.github.javaparser.ast.NodeList
+import com.github.javaparser.ast.body.{FieldDeclaration, MethodDeclaration}
 import com.github.javaparser.ast.expr.{AnnotationExpr, MemberValuePair, NormalAnnotationExpr}
+import io.apibuilder.generator.v0.models.InvocationForm
 import models.TestHelper.assertJodaTimeNotPresent
-import scala.collection.JavaConverters._
-import scala.compat.java8.OptionConverters._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
+
+import scala.jdk.CollectionConverters._
 
 class AwsLambdaJavaPOJOClassesSpec
-  extends FunSpec
+  extends AnyFunSpec
     with Matchers {
 
   def memberValuePairsToSimpleMap(pairs: java.util.List[MemberValuePair]): Map[String,String] = {
@@ -173,14 +174,13 @@ class AwsLambdaJavaPOJOClassesSpec
     val result = JavaAwsLambdaPOJOClasses.invoke(InvocationForm(models.TestHelper.service(json.format())))
 
     result.isRight should be(true)
-    val files = result.right.get
+    val files = result.getOrElse(sys.error("got Left"))
     files.size should be(2)
     assertJodaTimeNotPresent(files)
     files(0).name should be("CarType.java")
     files(1).name should be("Model.java")
 
     val javaParser = new JavaParser()
-    val carTypeCompiled = javaParser.parse(files(0).contents).getResult.get
     val modelCompiled = javaParser.parse(files(1).contents).getResult.get
 
     val javaAnnotations = modelCompiled.findAll(classOf[NormalAnnotationExpr])

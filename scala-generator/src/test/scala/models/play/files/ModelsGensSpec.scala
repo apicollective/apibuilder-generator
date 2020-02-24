@@ -1,17 +1,15 @@
 package scala.models.play.files
 
 import org.scalacheck.Gen
-import org.scalatest.enablers.InspectorAsserting
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import scala.generator.{ScalaEnum, ScalaModel, ScalaService, ScalaUnion}
 import scala.models.Attributes
 import scala.models.play.Helpers
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
 import scala.models.play.gens._
-import org.scalacheck.Prop.forAll
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class ModelsGensSpec extends AnyFunSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
@@ -181,7 +179,7 @@ class ModelsGensSpec extends AnyFunSpec with Matchers with ScalaCheckDrivenPrope
     forAll { (name: String, tpe: String, properties: List[(String, String)]) =>
       val expected = properties match {
         case Nil => ""
-        case arguments => s"""
+        case _ => s"""
         lazy val gen${name}: _root_.org.scalacheck.Gen[${tpe}] = _root_.org.scalacheck.Gen.lzy {
           for {
             ${properties.map { case (name, tpe) => s"${name} <- _root_.org.scalacheck.Arbitrary.arbitrary[${tpe}]" }.mkString("\n")}

@@ -37,10 +37,10 @@ object ScalaGeneratorUtil {
     (modelDesc, paramDesc) match {
       case (None, Nil) => None
       case (Some(m), Nil) => Some(ScalaUtil.textToComment(m))
-      case (None, p) => Some(ScalaUtil.textToComment(p.mkString("\n").split("\n")))
+      case (None, p) => Some(ScalaUtil.textToComment(p.mkString("\n").split("\n").toSeq))
       case (Some(m), p) => Some(
         ScalaUtil.textToComment(
-          (GeneratorUtil.splitIntoLines(m).mkString("\n") + "\n\n" + p.mkString("\n")).split("\n")
+          (GeneratorUtil.splitIntoLines(m).mkString("\n") + "\n\n" + p.mkString("\n")).split("\n").toSeq
         )
       )
     }

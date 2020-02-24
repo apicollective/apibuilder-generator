@@ -48,7 +48,7 @@ object SetupCleanupFolderBuilder {
     setupFolderOpt -> cleanupFolderOpt
   }
 
-  private def addDependencyItemVarSetting(objRefAttr: ExtendedObjectReference, item: postman.Item, varNameOpt: Option[String]): postman.Item = {
+  private def addDependencyItemVarSetting(objRefAttr: ExtendedObjectReference, item: postman.Item): postman.Item = {
 
     val varName = objRefAttr.postmanVariableName.name
 
@@ -102,7 +102,7 @@ object SetupCleanupFolderBuilder {
 
     val setupItem = PostmanItemBuilder.build(filledReferencedOperation, serviceSpecificHeaders, examplesProvider, None)
     val setupItemWithTests = PredefinedCollectionItems.addItemTests(setupItem)
-    val setupWithTestsAndVar = addDependencyItemVarSetting(objRefAttr, setupItemWithTests, None)
+    val setupWithTestsAndVar = addDependencyItemVarSetting(objRefAttr, setupItemWithTests)
 
     setupWithTestsAndVar
   }

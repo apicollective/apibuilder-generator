@@ -9,13 +9,15 @@ import io.postman.generator.attributes.v0.models.AttributeName
 import io.postman.generator.attributes.v0.models.BasicAuth
 import io.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesBasicAuth
 import io.apibuilder.postman.collection.v21.v0.models.Method
-import org.scalatest.{Assertion, Matchers, WordSpec}
+import org.scalatest.Assertion
 import play.api.libs.json.{JsObject, Json}
 import testUtils.TestPostmanCollectionGenerator
 
 import scala.util.Try
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
+class PostmanCollectionGeneratorSpec extends AnyWordSpec with Matchers {
 
   import TestFixtures._
   import models.TestHelper._
@@ -26,8 +28,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
       val invocationForm = InvocationForm(referenceWithImportsApiService, importedServices = None)
       val result = TestPostmanCollectionGenerator.invoke(invocationForm)
 
-      result.isLeft shouldEqual true
-      result.left.get shouldEqual Seq("Service imports need to be resolved before generating Postman Collection. However, InvocationForm.importedServices is empty")
+      result shouldEqual Left(Seq("Service imports need to be resolved before generating Postman Collection. However, InvocationForm.importedServices is empty"))
     }
 
     "return a generated Postman Collection for a trivial service" in new TrivialServiceContext {
@@ -36,7 +37,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
       result.isRight shouldEqual true
 
-      val generatedCollectionJson = Json.parse(result.right.get.head.contents)
+      val generatedCollectionJson = Json.parse(result.getOrElse(sys.error("got Left")).head.contents)
       generatedCollectionJson shouldEqual Json.parse(
         """
           |{
@@ -219,7 +220,7 @@ class PostmanCollectionGeneratorSpec extends WordSpec with Matchers {
 
   private def assertResultCollection(result: Either[Seq[String], Seq[File]])(collectionAssertion: postman.Collection => Assertion): Assertion = {
     result.isRight shouldEqual true
-    val resultFile = result.right.get.head
+    val resultFile = result.getOrElse(sys.error("got Left")).head
     resultFile.name.endsWith("postman_collection.json") shouldEqual true
     val postmanCollection = Json.parse(resultFile.contents).as[postman.Collection]
 

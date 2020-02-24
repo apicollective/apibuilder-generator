@@ -1,10 +1,10 @@
 package scala.models
 
 import cats.implicits._
-import lib.Datatype
-import lib.generator.CodeGenerator
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
+import lib.generator.CodeGenerator
+
 import scala.generator._
 
 object Play26Controllers extends CodeGenerator {

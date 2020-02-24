@@ -1,11 +1,12 @@
 package lib
 
 import scala.util.{Failure, Success, Try}
-import org.scalatest.{FunSpec, Matchers}
 import models.TestHelper
 import org.scalatest.exceptions.TestFailedException
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class TestHelperSpec extends FunSpec with Matchers {
+class TestHelperSpec extends AnyFunSpec with Matchers {
 
   it("All services are valid") {
     val errors = Seq(

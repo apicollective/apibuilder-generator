@@ -90,7 +90,7 @@ case class GoType(
 
   private[this] def classVariableName(datatype: Datatype): String = {
     datatype match {
-      case p: Datatype.Primitive => "value"
+      case _: Datatype.Primitive => "value"
       case Datatype.UserDefined.Model(name) => importBuilder.privateName(name)
       case Datatype.UserDefined.Union(name) => importBuilder.privateName(name)
       case Datatype.UserDefined.Enum(name) => importBuilder.privateName(name)
@@ -140,7 +140,7 @@ case class GoType(
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
         sys.error("User defined type cannot be converted to escaped string")
       }
-      case Datatype.UserDefined.Enum(name) => {
+      case Datatype.UserDefined.Enum(_) => {
         s"string($varName)"
       }
       case Datatype.Container.Option(inner) => toString(varName, inner)

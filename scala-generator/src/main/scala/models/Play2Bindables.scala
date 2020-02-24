@@ -38,7 +38,7 @@ case class Play2Bindables(ssd: ScalaService) {
         Seq(
           s"object Models {",
           Seq(
-            ssd.namespaces.importStatements(ssd.service).sorted.mkString("\n"),
+            ssd.namespaces.importStatements().sorted.mkString("\n"),
             ssd.enums.map { e => buildImplicit(e.name) }.mkString("\n\n")
           ).filter(_.nonEmpty).mkString("\n\n").indentString(2),
           "}"

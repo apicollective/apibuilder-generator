@@ -17,8 +17,6 @@ import lib.Datatype.Primitive
 
 class PostmanCollectionGenerator(randomStringGenerator: RandomStringGenerator) extends CodeGenerator {
 
-  import scala.languageFeature.implicitConversions._
-
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     form.importedServices match {
       case None if form.service.imports.nonEmpty =>
@@ -96,8 +94,8 @@ class PostmanCollectionGenerator(randomStringGenerator: RandomStringGenerator) e
     }
 
     val folders: Seq[Folder] =
-      (entitiesSetupFolderOpt ++:
-        postmanCollectionFolders ++:
+      (entitiesSetupFolderOpt ++
+        postmanCollectionFolders ++
         entitiesCleanupFolderOpt).toSeq
 
     postman.Collection(

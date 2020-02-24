@@ -2,11 +2,12 @@ package models.http4s
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import models.FieldDefaultHelper._
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.models.http4s.Http4s018Generator
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class CirceDefaultsSpec extends FunSpec with Matchers {
+class CirceDefaultsSpec extends AnyFunSpec with Matchers {
   it("Should produce models with defaults") {
     val json = models.TestHelper.buildJson(requiredFalseWithDefaultsNoHints)
 

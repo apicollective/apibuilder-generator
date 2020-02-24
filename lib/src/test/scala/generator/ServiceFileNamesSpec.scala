@@ -1,9 +1,10 @@
 package generator
 
 import io.apibuilder.generator.v0.models.File
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ServiceFileNamesSpec extends FunSpec with Matchers {
+class ServiceFileNamesSpec extends AnyFunSpec with Matchers {
 
   describe("ServiceFileNames.toFile") {
 

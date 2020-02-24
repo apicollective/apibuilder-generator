@@ -1,12 +1,14 @@
 package lib
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class VersionTagSpec extends FunSpec with Matchers {
+class VersionTagSpec extends AnyFunSpec with Matchers {
 
-  def assertSorted(versions: Seq[String], target: String) {
+  def assertSorted(versions: Seq[String], target: String): Unit = {
     val versionObjects = versions.map( VersionTag(_) )
     versionObjects.sorted.map(_.version).mkString(" ") should be(target)
+    ()
   }
 
   it("sorts developer tags before release tags (latest release tag should be last)") {

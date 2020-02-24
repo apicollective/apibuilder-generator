@@ -1,8 +1,9 @@
 package ruby.models
 
-import org.scalatest.{ FunSpec, Matchers }
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class RubyUtilSpec extends FunSpec with Matchers {
+class RubyUtilSpec extends AnyFunSpec with Matchers {
 
   it("RubyUtil.Module") {
     RubyUtil.Module("foobar").fullName should be("::Foobar")

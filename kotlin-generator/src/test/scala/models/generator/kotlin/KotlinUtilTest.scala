@@ -1,10 +1,11 @@
 package models.generator.kotlin
 
-import org.scalatest.{FlatSpec, Matchers}
 import io.apibuilder.spec.v0.models.{Enum, EnumValue}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class KotlinUtilTest
-  extends FlatSpec
+  extends AnyFlatSpec
     with Matchers
     with KotlinUtil {
 

@@ -1,10 +1,11 @@
 package models
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{FunSpec, Matchers}
 import ruby.models.RubyClientGenerator
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class RubyReceiverDefaultsSpec extends FunSpec with Matchers {
+class RubyReceiverDefaultsSpec extends AnyFunSpec with Matchers {
   it("should produce models with defaults") {
     val json = models.TestHelper.buildJson(
       """

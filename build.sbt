@@ -17,7 +17,8 @@ lazy val generated = project
     libraryDependencies ++= Seq(
       ws,
       "org.scalacheck" %% "scalacheck" % "1.14.3" % Test
-    )
+    ),
+    scalacOptions += "-P:silencer:pathFilters=.*",
   )
 
 // TODO: lib will eventually be published as a jar if it turns out
@@ -41,7 +42,8 @@ lazy val generator = project
     libraryDependencies ++= Seq(
       ws,
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
-    )
+    ),
+    scalacOptions += "-P:silencer:pathFilters=target/.*"
   )
 
 lazy val javaAwsLambdaPojos = project
@@ -154,19 +156,22 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "org.scalatest" %% "scalatest" % scalatestVersion % "test",
-    "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
-    "org.mockito" % "mockito-core" % mockitoVersion % "test",
-    "com.github.javaparser" % "javaparser-core" % "3.15.7" % "test",
-    "org.scalameta" %% "scalameta" % "4.3.0" % "test",
     "com.squareup" % "javapoet" % "1.11.1",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
+    "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
+    "org.scalatest" %% "scalatest" % scalatestVersion % Test,
+    "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
+    "org.mockito" % "mockito-core" % mockitoVersion % Test,
+    "com.github.javaparser" % "javaparser-core" % "3.15.7" % Test,
+    "org.scalameta" %% "scalameta" % "4.3.0" % Test,
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full,
   ),
   libraryDependencies += guice,
   scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified"),
+  scalacOptions += s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPath}",
   sources in(Compile, doc) := Seq.empty,
-  publishArtifact in(Compile, packageDoc) := false
+  publishArtifact in(Compile, packageDoc) := false,
 )
 version := "0.8.78"

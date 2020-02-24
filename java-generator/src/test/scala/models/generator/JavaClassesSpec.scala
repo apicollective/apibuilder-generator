@@ -251,5 +251,6 @@ class JavaClassesSpec extends AnyFunSpec with Matchers {
     parseResult.isSuccessful shouldBe true
     val compilationUnit = parseResult.getResult.get
     compilationUnit.getType(0).getNameAsString shouldBe javaName
+    ()
   }
 }
