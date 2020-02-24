@@ -282,7 +282,7 @@ class ScalaClientMethodGenerator(
   private[this] def unitResponse: String = {
     config.responseEnvelopeClassName match {
       case None => "()"
-      case Some(envelopeName) => s"${envelopeName}Impl" + "(body = (), status = r.status, headers = ResponseHeaders(r.headers))"
+      case Some(envelopeName) => s"${envelopeName}Impl" + "(body = (), status = r.status, headers = ResponseHeaders(r.headers.map { case (k, v) => k -> v.toSeq }))"
     }
   }
 

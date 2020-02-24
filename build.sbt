@@ -96,7 +96,7 @@ lazy val androidGenerator = project
   .settings(Seq(ScoverageKeys.coverageMinimum := 77.8))
 
 val kotlinLangVersion = "1.3.61"
-val mockitoVersion = "3.2.0"
+val mockitoVersion = "3.3.0"
 val scalatestVersion = "3.1.0"
 
 lazy val kotlinGenerator = project
@@ -169,4 +169,4 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   sources in(Compile, doc) := Seq.empty,
   publishArtifact in(Compile, packageDoc) := false
 )
-version := "0.8.77"
+version := "0.8.78"

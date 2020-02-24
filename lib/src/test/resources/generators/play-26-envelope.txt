@@ -411,7 +411,7 @@ package io.gregor.time.types.v0 {
       ResponseImpl(
         body = parseJson(className, r, f),
         status = r.status,
-        headers = ResponseHeaders(r.headers),
+        headers = ResponseHeaders(r.headers.map { case (k, v) => k -> v.toSeq }),
       )
     }
 
