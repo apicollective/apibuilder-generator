@@ -7,11 +7,11 @@ code:
     apibuilder-spec:
       version: latest
       generators:
-        play_2_8_client: generated/app
+        play_2_6_client: generated/app
     apibuilder-generator:
       version: latest
       generators:
-        play_2_8_client: generated/app
+        play_2_6_client: generated/app
         play_2_x_routes: generator/conf/routes
     apibuilder-postman-collection-v2-1:
       version: latest

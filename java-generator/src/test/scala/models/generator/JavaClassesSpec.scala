@@ -2,14 +2,14 @@ package models.generator
 
 import java.util.regex.Pattern
 
+import io.apibuilder.spec.v0.models.{Apidoc, Application, Enum, EnumValue, Field, Info, Model, Organization, Service, Union, UnionType}
+import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.mock.MockitoSugar
 import com.github.javaparser.JavaParser
 import io.apibuilder.generator.v0.models.InvocationForm
-import io.apibuilder.spec.v0.models._
 import models.generator.JavaClasses.Generator
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
 
-class JavaClassesSpec extends AnyFunSpec with Matchers {
+class JavaClassesSpec extends FunSpec with Matchers with MockitoSugar {
 
   val testHeader = """/** Test Header */"""
   val userDefinedModel = Model("user_defined", "", None, None, Seq.empty[Field])

@@ -1,15 +1,14 @@
 
 package scala.models.http4s
 
-import io.apibuilder.generator.v0.models.InvocationForm
 import models.TestHelper.assertValidScalaSourceCode
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
+import io.apibuilder.generator.v0.models.InvocationForm
+import org.scalatest.{FunSpec, Matchers}
 
 import scala.generator.ScalaClientMethodConfigs
 import scala.models.Attributes
 
-class Http4sClientGeneratorSpec extends AnyFunSpec with Matchers {
+class Http4sClientGeneratorSpec extends FunSpec with Matchers {
 
   describe("generate") {
     it("Http4s 0.15 generator produces valid Scala source code") {

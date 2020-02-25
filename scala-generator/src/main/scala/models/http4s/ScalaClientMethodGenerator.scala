@@ -14,7 +14,7 @@ class ScalaClientMethodGenerator (
     case cfg: ScalaClientMethodConfigs.Http4s => cfg
   }
 
-  override protected val generatorUtil = new scala.models.http4s.ScalaGeneratorUtil(config)
+  override protected val generatorUtil = new ScalaGeneratorUtil(config)
 
   override def interfaces(): String = {
     Seq(

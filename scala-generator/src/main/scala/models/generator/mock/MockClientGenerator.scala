@@ -242,7 +242,7 @@ class MockClientGenerator(
       case ScalaPrimitive.ObjectAsPlay => "_root_.play.api.libs.json.Json.obj()"
       case ScalaPrimitive.ObjectAsCirce => "Map()"
       case ScalaPrimitive.JsonValueAsPlay => "_root_.play.api.libs.json.Json.obj().asInstanceOf[_root_.play.api.libs.json.JsValue]"
-      case dt @ ScalaPrimitive.JsonValueAsCirce => s"${dt.asInstanceOf[ScalaPrimitive].fullName}.obj()"
+      case dt @ ScalaPrimitive.JsonValueAsCirce => s"${dt.fullName}.obj()"
       case ScalaPrimitive.String => {
         limitation match {
           case None => "Factories.randomString()"
@@ -250,7 +250,7 @@ class MockClientGenerator(
         }
       }
       case ScalaPrimitive.Unit => unitType
-      case dt @ ScalaPrimitive.Uuid => s"${dt.asInstanceOf[ScalaPrimitive].fullName}.randomUUID"
+      case dt @ ScalaPrimitive.Uuid => s"${dt.fullName}.randomUUID"
       case ScalaDatatype.List(_) => "Nil"
       case ScalaDatatype.Map(_) => "Map()"
       case ScalaDatatype.Option(_) => "None"
