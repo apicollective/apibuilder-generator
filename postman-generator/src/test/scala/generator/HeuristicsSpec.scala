@@ -7,9 +7,7 @@ class HeuristicsSpec extends WordSpec {
 
   "Postman Generator Heuristics" should {
 
-    // Heuristics.idFieldHeuristic is not used anywhere, and I'm not sure this test is correct
-    // both :organization and :key show up the same number of times, so how is it supposed to know which one is the id?
-    "find an identifier param in a group of paths" ignore {
+    "find an identifier param in a group of paths" in {
       val op1 = Operation(Method.Get, "/:organization/attributes/:key")
       val op2 = op1.copy(path = "/:organization/attributes/:key/path/some")
       val op3 = op2.copy(path = "/:organization/attributes/:key/path/some/other/path")

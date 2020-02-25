@@ -42,7 +42,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generato
       val params = op.formParameters.map { param =>
         val value = encodeValue(param.asScalaVal, param.datatype)
 
-        //TODO : This is unfinished, just enough to cover known use cases.  Not sure what it means, for example, to send json, or some object as form parameter.  Also for dates we should probably do .toJson then strip the quotes.
+        //TODO: This is unfinished, just enough to cover known use cases.  Not sure what it means, for example, to send json, or some object as form parameter.  Also for dates we should probably do .toJson then strip the quotes.
 
         if (param.`type`.isInstanceOf[lib.Datatype.UserDefined.Enum]){
           s""""${param.originalName}" -> ${value}.toString"""

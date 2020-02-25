@@ -2,12 +2,11 @@ package models.http4s
 
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 import models.TestHelper.{assertJodaTimeNotPresent, assertValidScalaSourceCode}
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.{FunSpec, Matchers}
 
 import scala.models.http4s.{Http4s015Generator, Http4s017Generator, Http4s018Generator, Http4s020Generator}
 
-class Http4sGeneratorSpec extends AnyFunSpec with Matchers {
+class Http4sGeneratorSpec extends FunSpec with Matchers {
   describe("apidoc-api") {
     val fileNames = Seq(
       "BryzekApidocApiV0Client.scala",

@@ -11,7 +11,7 @@ import io.apibuilder.generator.v0.models.File
 
 import lib.Text
 
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.Matchers
 
 object TestHelper extends Matchers {
 

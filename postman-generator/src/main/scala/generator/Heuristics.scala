@@ -17,11 +17,10 @@ object Heuristics {
         .map(param => (param, resource))
     }
     pathsWithOperation
-      .groupBy { case (param, _) => param }
-      .view
+      .groupBy{case (param, _) => param}
       .mapValues(_.size)
       .filter(_._2 >= IdFieldHeuristicThreshold)
-      .keys
+      .map(_._1)
       .headOption
   }
 

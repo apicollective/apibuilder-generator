@@ -719,7 +719,8 @@ class KotlinGenerator
           .addCode(processCommonFuncBody)
           .returns(commonNetworkErrorsClassName)
           .build())
-        .build())
+
+        build())
 
 
       //sealed class for Either Type
