@@ -5,7 +5,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-val scalaVer = "2.12.10"
+val scalaVer = "2.13.1"
 
 scalaVersion in ThisBuild := scalaVer
 
@@ -40,7 +40,7 @@ lazy val generator = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % "test"
+      "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
     )
   )
 
@@ -64,9 +64,8 @@ lazy val scalaGenerator = project
   .settings(commonSettings: _*)
   .settings(
     Seq(ScoverageKeys.coverageMinimum := 84.0),
-    scalacOptions += "-Ypartial-unification",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "1.5.0",
+      "org.typelevel" %% "cats-core" % "2.1.0",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
     )
   )
@@ -94,11 +93,11 @@ lazy val androidGenerator = project
   .settings(
     commonSettings: _*
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 77.8))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 76.90))
 
 val kotlinLangVersion = "1.3.61"
 val mockitoVersion = "3.3.0"
-val scalatestVersion = "3.0.8"
+val scalatestVersion = "3.1.0"
 
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
@@ -136,7 +135,7 @@ lazy val csvGenerator = project
       "org.apache.commons" % "commons-csv" % "1.7"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 77.50, ScoverageKeys.coverageFailOnMinimum := true))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 75.67, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val postmanGenerator = project
   .in(file("postman-generator"))
@@ -144,8 +143,8 @@ lazy val postmanGenerator = project
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "ammonite-ops" % "1.6.3",
-      "org.scalactic" %% "scalactic" % "3.0.5"
+      "com.lihaoyi" %% "ammonite-ops" % "2.0.4",
+      "org.scalactic" %% "scalactic" % "3.1.0"
     )
   )
 
@@ -156,12 +155,14 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "org.scalatest" %% "scalatest" % scalatestVersion % "test",
+    "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
     "org.mockito" % "mockito-core" % mockitoVersion % "test",
     "com.github.javaparser" % "javaparser-core" % "3.15.7" % "test",
     "org.scalameta" %% "scalameta" % "4.3.0" % "test",
     "com.squareup" % "javapoet" % "1.11.1",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
-    "io.reactivex.rxjava2" % "rxjava" % "2.2.4"
+    "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
+    "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
   ),
   libraryDependencies += guice,
   scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified"),

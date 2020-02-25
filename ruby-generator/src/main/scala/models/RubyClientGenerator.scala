@@ -1,6 +1,7 @@
 package ruby.models
 
 import java.util.UUID
+
 import scala.util.Failure
 import scala.util.Success
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
@@ -10,7 +11,7 @@ import lib.Text._
 import lib.generator.{CodeGenerator, GeneratorUtil}
 
 import scala.collection.mutable.ListBuffer
-import play.api.Logger
+import play.api.{Logging}
 import play.api.libs.json._
 import generator.ServiceFileNames
 
@@ -239,7 +240,7 @@ object RubyUtil {
 //    field names. Currently this is done in several places.
 //    This approach is brittle, because when working with fields
 //    in a new place, one must remember to use that method.
-object RubyClientGenerator extends CodeGenerator {
+object RubyClientGenerator extends CodeGenerator with Logging {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     new RubyClientGenerator(form).invoke()
@@ -343,7 +344,7 @@ object RubyClientGenerator extends CodeGenerator {
  * Generates a Ruby Client file based on the service description
  * from api.json
  */
-case class RubyClientGenerator(form: InvocationForm) {
+case class RubyClientGenerator(form: InvocationForm) extends Logging {
   private[this] val service = form.service
 
   private[this] val module = RubyUtil.Module(service.namespace)
@@ -361,7 +362,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       case Nil => None
       case single :: Nil => Some(single)
       case multiple => {
-        Logger.warn(s"Ruby client does not support multiple inheritance. Multiple union types: ${multiple.map(_.name).mkString(", ")}. Using first type: ${multiple.head.name}")
+        logger.warn(s"Ruby client does not support multiple inheritance. Multiple union types: ${multiple.map(_.name).mkString(", ")}. Using first type: ${multiple.head.name}")
         Some(multiple.head)
       }
     }
@@ -372,7 +373,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       case Nil => None
       case one :: Nil => Some(one)
       case multiple => {
-        Logger.warn(s"Model ${model.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
+        logger.warn(s"Model ${model.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
         multiple.headOption
       }
     }
@@ -383,7 +384,7 @@ case class RubyClientGenerator(form: InvocationForm) {
       case Nil => None
       case one :: Nil => Some(one)
       case multiple => {
-        Logger.warn(s"Enum ${enum.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
+        logger.warn(s"Enum ${enum.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
         multiple.headOption
       }
     }

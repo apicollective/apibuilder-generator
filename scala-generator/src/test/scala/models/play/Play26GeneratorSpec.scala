@@ -1,13 +1,14 @@
 package scala.models.play
 
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.generator.v0.models.gens._
-import io.apibuilder.spec.v0.models.{Application, Organization, Service}
-import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
 
-class Play26GeneratorSpec extends FunSpec with Matchers with PropertyChecks {
+class Play26GeneratorSpec extends AnyFunSpec with Matchers with ScalaCheckPropertyChecks {
 
   implicit val scalacheckConfig = generatorDrivenConfig.copy(sizeRange = 10)
 

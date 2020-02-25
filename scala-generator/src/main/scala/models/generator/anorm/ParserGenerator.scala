@@ -244,17 +244,17 @@ trait ParserGenerator extends CodeGenerator {
     private[this] def generateRowParser(fieldName: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
         case f @ ScalaPrimitive.Boolean => s"SqlParser.bool($fieldName)"
-        case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f.asInstanceOf[ScalaPrimitive])
         case f @ ScalaPrimitive.Integer => s"SqlParser.int($fieldName)"
         case f @ ScalaPrimitive.Long => s"SqlParser.long($fieldName)"
         case f : ScalaPrimitive.DateIso8601 => generatePrimitiveRowParser(fieldName, f)
         case f : ScalaPrimitive.DateTimeIso8601 => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.Decimal => generatePrimitiveRowParser(fieldName, f.asInstanceOf[ScalaPrimitive])
         case f : ScalaPrimitive.JsonObject => generatePrimitiveRowParser(fieldName, f)
         case f : ScalaPrimitive.JsonValue => generatePrimitiveRowParser(fieldName, f)
         case f @ ScalaPrimitive.String => s"SqlParser.str($fieldName)"
-        case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(fieldName, f)
-        case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(fieldName, f)
+        case f @ ScalaPrimitive.Unit => generatePrimitiveRowParser(fieldName, f.asInstanceOf[ScalaPrimitive])
+        case f @ ScalaPrimitive.Uuid => generatePrimitiveRowParser(fieldName, f.asInstanceOf[ScalaPrimitive])
         case f @ ScalaDatatype.List(inner) => {
           addImports(inner)
           s"SqlParser.get[Seq[${inner.name}]]($fieldName)"
