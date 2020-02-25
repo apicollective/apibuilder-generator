@@ -1,13 +1,13 @@
 package models.play
 
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
-import models.TestHelper.{assertJodaTimeNotPresent, assertValidScalaSourceCode}
-import org.scalatest.prop.PropertyChecks
-import org.scalatest.{FunSpec, Matchers}
+import models.TestHelper.assertValidScalaSourceCode
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.funspec.AnyFunSpec
 
-import scala.models.{Play26EnvelopeClientGenerator, Play27ClientGenerator}
+import scala.models.Play26EnvelopeClientGenerator
 
-class Play26EnvelopeGeneratorSpec extends FunSpec with Matchers with PropertyChecks {
+class Play26EnvelopeGeneratorSpec extends AnyFunSpec with Matchers {
 
   it("generates response envelope") {
     val form = InvocationForm(

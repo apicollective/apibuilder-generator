@@ -1,16 +1,19 @@
 package scala.models.play.files
 
 import org.scalacheck.Gen
-import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.enablers.InspectorAsserting
 
-import scala.models.play.gens._
-import scala.models.play.Helpers.compareWithoutWhiteSpaces
 import scala.generator.{ScalaEnum, ScalaModel, ScalaService, ScalaUnion}
 import scala.models.Attributes
 import scala.models.play.Helpers
+import scala.models.play.Helpers.compareWithoutWhiteSpaces
+import scala.models.play.gens._
+import org.scalacheck.Prop.forAll
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class ModelsGensSpec extends FunSpec with Matchers with PropertyChecks {
+class ModelsGensSpec extends AnyFunSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   implicit val scalacheckConfig = generatorDrivenConfig.copy(sizeRange = 10)
 
