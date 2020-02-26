@@ -6,7 +6,6 @@ import io.apibuilder.postman.collection.v21.v0.models.{EventType, Folder, Header
 import models.attributes.PostmanAttributes.ExtendedObjectReference
 import models.operation.DependantOperations
 import org.scalatest.{Assertion, Matchers, WordSpec}
-import org.scalactic.TripleEquals._
 
 class SetupCleanupFolderBuilderSpec extends WordSpec with Matchers {
 
@@ -38,7 +37,7 @@ class SetupCleanupFolderBuilderSpec extends WordSpec with Matchers {
     "fill variable setting script in 'Test' section of Setup phase items" in new TestContext {
       setupFolder.item.foreach { item =>
         item.event.isDefined shouldEqual true
-        val testEvents = item.event.get.filter(_.listen === EventType.Test)
+        val testEvents = item.event.get.filter(_.listen == EventType.Test)
         testEvents.size shouldEqual 1
         val scriptLines = testEvents.head.script.get.exec.mkString("\n")
         scriptLines should include("pm.environment.set")

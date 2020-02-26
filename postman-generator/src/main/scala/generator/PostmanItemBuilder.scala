@@ -6,7 +6,6 @@ import generator.Utils.Description
 import io.apibuilder.spec.v0.models._
 import io.apibuilder.postman.collection.v21.v0.{models => postman}
 import models.attributes.PostmanAttributes
-import org.scalactic.TripleEquals._
 import play.api.Logging
 import play.api.libs.json.Json
 
@@ -75,7 +74,7 @@ object PostmanItemBuilder extends Logging {
         postman.Variable(
           key = Some(p.name),
           value = Some {
-            if (pathVariableOpt.exists(_.name === p.name))
+            if (pathVariableOpt.exists(_.name == p.name))
               pathVariableOpt.get.postmanVarRef
             else
               generatePathParamValue(p)
