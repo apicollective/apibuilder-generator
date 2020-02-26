@@ -91,7 +91,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
 
       def formatter: FieldSpec.Builder = {
         FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-          .initializer("$T.dateTimeParser()", classOf[ISODateTimeFormat]): @silent("possible missing interpolator")
+          .initializer(s"$$T.dateTimeParser()", classOf[ISODateTimeFormat])
       }
 
       def deserializer: TypeSpec.Builder = {

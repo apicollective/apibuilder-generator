@@ -552,7 +552,6 @@ case class Code(form: InvocationForm) {
         service.models.find(_.name == name) match {
           case None => {
             // TODO: How do we set defaults for imported models?
-            println(s"WARNING: Could not find model named[$name]")
             None
           }
           case Some(m) => {
