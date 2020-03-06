@@ -144,7 +144,6 @@ lazy val postmanGenerator = project
   .settings(
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "ammonite-ops" % "2.0.4",
-      "org.scalactic" %% "scalactic" % "3.1.0"
     )
   )
 
