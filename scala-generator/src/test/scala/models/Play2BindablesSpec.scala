@@ -3,9 +3,10 @@ package scala.models
 import io.apibuilder.generator.v0.models.Attribute
 
 import scala.generator.ScalaService
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class Play2BindablesSpec extends FunSpec with Matchers {
+class Play2BindablesSpec extends AnyFunSpec with Matchers {
 
   lazy val service = models.TestHelper.referenceApiService
   lazy val ssd = new ScalaService(service)

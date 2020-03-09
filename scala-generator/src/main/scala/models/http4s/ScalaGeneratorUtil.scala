@@ -1,8 +1,9 @@
 package scala.models.http4s
 
-import scala.generator.{ScalaClientMethodConfig, ScalaDatatype, ScalaOperation, ScalaPrimitive, ScalaUtil}
 import io.apibuilder.spec.v0.models.ParameterLocation
 import lib.Text._
+
+import scala.generator.{ScalaClientMethodConfig, ScalaDatatype, ScalaOperation, ScalaPrimitive}
 
 class ScalaGeneratorUtil(config: ScalaClientMethodConfig) extends scala.generator.ScalaGeneratorUtil(config) {
   override def pathParams(op: ScalaOperation): String = {

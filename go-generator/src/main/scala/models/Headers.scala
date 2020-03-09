@@ -2,7 +2,6 @@ package go.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import lib.VersionTag
-import lib.Text._
 
 case class Headers(
   importBuilder: ImportBuilder,
@@ -11,14 +10,13 @@ case class Headers(
 
   private[this] val versionMajor: Option[Int] = VersionTag(form.service.version).major
 
-  private[this] val PackageName = "Package"
   private[this] val VersionMajorName = "VersionMajor"
   private[this] val VersionMajorHeaderName = "X-Apidoc-Version-Major"
 
   private[this] val constants = Seq(
     form.service.baseUrl.map { url => ("BaseUrl" -> url) },
-    Some("UserAgent", form.userAgent.getOrElse("apibuilder-go_1_5_client-unknown")),
-    Some("Version", form.service.version),
+    Some(("UserAgent", form.userAgent.getOrElse("apibuilder-go_1_5_client-unknown"))),
+    Some(("Version", form.service.version)),
     versionMajor.map { major => (VersionMajorName, major.toString) }
   ).flatten
 

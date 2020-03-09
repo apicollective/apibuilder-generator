@@ -3,11 +3,12 @@ package generator
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.postman.collection.v21.v0.models._
 import io.apibuilder.postman.collection.v21.v0.models.json.jsonReadsApiBuilderPostmanCollectionV21Collection
-import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.Json
 import testUtils.TestPostmanCollectionGenerator
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class PostmanTestAssertionsSpec extends WordSpec with Matchers {
+class PostmanTestAssertionsSpec extends AnyWordSpec with Matchers {
 
   import models.TestHelper.referenceApiService
 
@@ -67,7 +68,7 @@ class PostmanTestAssertionsSpec extends WordSpec with Matchers {
 
     def assertResultCollection(result: Either[Seq[String], Seq[File]])(collectionAssertion: Collection => Unit): Unit = {
       result.isRight shouldEqual true
-      val resultFile = result.right.get.head
+      val resultFile = result.getOrElse(sys.error("got Left")).head
       val postmanCollection = Json.parse(resultFile.contents).as[Collection]
 
       collectionAssertion(postmanCollection)

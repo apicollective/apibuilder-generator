@@ -1,8 +1,9 @@
 package generator
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class PathParamsFinderSpec extends WordSpec with Matchers {
+class PathParamsFinderSpec extends AnyWordSpec with Matchers {
 
   "PathParamsFinder" should {
 

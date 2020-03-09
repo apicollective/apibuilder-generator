@@ -1,12 +1,13 @@
 package models.generator.android
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{FunSpec, Matchers}
 import com.github.javaparser.JavaParser
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 
 class TestAndroidClasses
-  extends FunSpec
+  extends AnyFunSpec
     with Matchers {
 
   describe("for a model with 2 enum fields") {
@@ -129,7 +130,7 @@ class TestAndroidClasses
     val result = AndroidClasses.invoke(InvocationForm(models.TestHelper.service(json.format())))
 
     result.isRight should be(true)
-    val files = result.right.get
+    val files = result.getOrElse(sys.error("got Left"))
     files.size should be(4)
     files(0).name should be("CarType.java")
     files(1).name should be("Model.java")

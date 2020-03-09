@@ -59,7 +59,7 @@ case class ResponseBuilder(
         )
       }
 
-      case t: Datatype.Primitive => {
+      case _: Datatype.Primitive => {
         // TODO: need to handle all the primitive types here
         Some(s"string($readerName)")
       }

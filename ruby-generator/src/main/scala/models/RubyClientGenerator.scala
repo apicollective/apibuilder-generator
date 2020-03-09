@@ -353,21 +353,6 @@ case class RubyClientGenerator(form: InvocationForm) extends Logging {
 
   private[this] val primitiveWrapper = RubyPrimitiveWrapper(service)
 
-  /**
-    * Ruby does not support multiple inheritance. This method
-    * standardizes how we select the single union type.
-    */
-  private def singleUnion(unions: Seq[Union]): Option[Union] = {
-    unions.toList match {
-      case Nil => None
-      case single :: Nil => Some(single)
-      case multiple => {
-        logger.warn(s"Ruby client does not support multiple inheritance. Multiple union types: ${multiple.map(_.name).mkString(", ")}. Using first type: ${multiple.head.name}")
-        Some(multiple.head)
-      }
-    }
-  }
-
   private def unionFor(model: Model): Option[Union] = {
     service.unions.filter(u => u.types.map(_.`type`).contains(model.name)).toList match {
       case Nil => None

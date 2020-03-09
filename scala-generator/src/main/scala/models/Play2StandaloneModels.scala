@@ -1,7 +1,6 @@
 package scala.models
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import scala.generator.ScalaCaseClasses
 import lib.generator.CodeGenerator
 
 object Play2StandaloneModelsJson extends CodeGenerator {

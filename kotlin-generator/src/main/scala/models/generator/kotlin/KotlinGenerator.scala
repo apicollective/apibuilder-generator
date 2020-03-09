@@ -15,8 +15,8 @@ import lib.Datatype
 import lib.generator.CodeGenerator
 import org.threeten.bp.{Instant, LocalDate}
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters._
 
 class KotlinGenerator
   extends CodeGenerator
@@ -136,7 +136,7 @@ class KotlinGenerator
         jsonSubTypesAnnotationBuilder
           .addMember("%L",
             AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-              .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(u.`type`)) + "::class")
+              .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(u.`type`)).toString + "::class")
               .addMember("name = %S", u.discriminatorValue.getOrElse(u.`type`))
               .build()
           )
@@ -145,7 +145,7 @@ class KotlinGenerator
       jsonSubTypesAnnotationBuilder
         .addMember("%L",
           AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-            .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)) + "::class")
+            .addMember("value = %L", new ClassName(s"$modelsNameSpace.$className", toClassName(UnionType(undefinedClassName).`type`)).toString + "::class")
             .build()
         )
 
@@ -197,7 +197,6 @@ class KotlinGenerator
       model.fields.foreach(field => {
 
         val fieldSnakeCaseName = field.name
-        val arrayParameter = isParameterArray(field.`type`)
         val fieldCamelCaseName = toParamName(fieldSnakeCaseName, true)
 
         val kotlinDataType = dataTypeFromField(field.`type`, nameSpace, service)
@@ -428,7 +427,6 @@ class KotlinGenerator
               callErrorResopnseSealedClassBuilder.addKdoc("Error Responses for " + methodName + " - " + description)
             })
 
-            val companionObject = TypeSpec.companionObjectBuilder()
             val throwableTypeName = getThrowableClassName().asInstanceOf[TypeName]
             val throwableToErrorTypesLambda = LambdaTypeName.get(null, Array(throwableTypeName), ParameterizedTypeName.get(eitherErrorTypeClassName, callErrorResponseSealedClassName))
             val toErrorCodeBlockBuilder = CodeBlock.builder()

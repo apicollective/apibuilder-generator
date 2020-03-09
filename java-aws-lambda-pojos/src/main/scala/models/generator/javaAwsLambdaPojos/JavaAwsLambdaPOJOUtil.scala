@@ -116,7 +116,7 @@ trait JavaAwsLambdaPOJOUtil {
       toClassName(modelName)
     }
     if(startingWithLowercase){
-      checkForReservedWord(paramStartingWithUppercase.head.toLower + paramStartingWithUppercase.tail)
+      checkForReservedWord(s"${paramStartingWithUppercase.head.toLower}${paramStartingWithUppercase.tail}")
     } else {
       checkForReservedWord(paramStartingWithUppercase)
     }
@@ -124,10 +124,10 @@ trait JavaAwsLambdaPOJOUtil {
 
   def toMethodName(modelName: String): String = {
     val methodName = {
-      val methoNameStartingWithUpperCase = Text.splitIntoWords(modelName).map {
+      val methodNameStartingWithUpperCase = Text.splitIntoWords(modelName).map {
         _.toLowerCase.capitalize
       }.mkString
-      Text.safeName(methoNameStartingWithUpperCase.head.toLower + methoNameStartingWithUpperCase.tail)
+      Text.safeName(s"${methodNameStartingWithUpperCase.head.toLower}${methodNameStartingWithUpperCase.tail}")
     }
     checkForReservedWord(methodName)
   }

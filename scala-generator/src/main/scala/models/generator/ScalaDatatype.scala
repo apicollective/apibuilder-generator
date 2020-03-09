@@ -2,11 +2,12 @@ package scala.generator
 
 import java.util.UUID
 
+import com.github.ghik.silencer.silent
 import lib.Datatype
 import lib.Text.initLowerCase
 import play.api.libs.json._
-
 import io.apibuilder.spec.v0.models.Deprecation
+
 import scala.util.{Failure, Success, Try}
 
 sealed trait ScalaDatatype {
@@ -39,7 +40,7 @@ sealed trait ScalaDatatype {
     }
   }
 
-  protected def default(json: JsValue): String = {
+  protected def default(@silent json: JsValue): String = {
     throw new UnsupportedOperationException(s"default for type ${name}")
   }
 

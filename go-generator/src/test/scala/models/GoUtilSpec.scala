@@ -1,8 +1,9 @@
 package go.models
 
-import org.scalatest.{ FunSpec, Matchers }
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class GoUtilSpec extends FunSpec with Matchers {
+class GoUtilSpec extends AnyFunSpec with Matchers {
 
   it("quoteNameIfKeyword") {
     GoUtil.quoteNameIfKeyword("foo") should be("foo")

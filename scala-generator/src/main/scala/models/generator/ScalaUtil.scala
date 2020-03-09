@@ -39,7 +39,7 @@ object ScalaUtil {
     if (text.trim.isEmpty) {
       ""
     } else {
-      textToComment(text.split("\n").flatMap(s => GeneratorUtil.splitIntoLines(s).map(_.trim)))
+      textToComment(text.split("\n").toSeq.flatMap(s => GeneratorUtil.splitIntoLines(s).map(_.trim)))
     }
   }
 

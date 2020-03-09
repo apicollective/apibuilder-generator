@@ -1,11 +1,11 @@
 package scala.models
 
+import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
-import scala.generator.{Namespaces, ScalaClientMethodGenerator, ScalaService, PlayScalaClientCommon}
-import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
-import generator.ServiceFileNames
+
+import scala.generator._
 
 case class PlayFrameworkVersion(
   name: String,

@@ -1,9 +1,10 @@
 package ruby.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class BuiltInTypesSpec extends FunSpec with Matchers {
+class BuiltInTypesSpec extends AnyFunSpec with Matchers {
 
   private lazy val service = models.TestHelper.parseFile(s"/examples/built-in-types.json")
 

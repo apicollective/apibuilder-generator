@@ -120,7 +120,7 @@ case class Code(form: InvocationForm) {
 
     val defaults = model.fields.flatMap { f =>
       (f.default, f.required) match {
-        case (Some(d), false) => {
+        case (Some(_), false) => {
           val publicFieldName = importBuilder.publicName(f.name)
           Defaults.mkGolangDefault(f.default, datatype(f.`type`, true), service, importBuilder).map(d=> s"$privateName.$publicFieldName = $d")
         }
@@ -325,12 +325,10 @@ case class Code(form: InvocationForm) {
         name = importBuilder.publicName(s"${functionName}Response")
       )
 
-      var methodParameters = mutable.ListBuffer[String]()
+      val methodParameters = mutable.ListBuffer[String]()
       methodParameters += "client Client"
 
-      var queryParameters = mutable.ListBuffer[String]()
-
-      var pathArgs = mutable.ListBuffer[String]()
+      val pathArgs = mutable.ListBuffer[String]()
       pathArgs += "client.BaseUrl"
 
       var path = op.path
@@ -360,7 +358,7 @@ case class Code(form: InvocationForm) {
       val fmt = importBuilder.ensureImport("fmt")
       val errors = importBuilder.ensureImport("errors")
 
-      var responseTypes = mutable.ListBuffer[ResponseType]()
+      val responseTypes = mutable.ListBuffer[ResponseType]()
 
       val queryString = urlValues.generate("params", op.parameters.filter(_.location == ParameterLocation.Query))
 
@@ -554,7 +552,6 @@ case class Code(form: InvocationForm) {
         service.models.find(_.name == name) match {
           case None => {
             // TODO: How do we set defaults for imported models?
-            println("WARNING: Could not find model named[$name]")
             None
           }
           case Some(m) => {

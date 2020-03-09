@@ -1,9 +1,9 @@
 package scala.generator
 
-import models.TestHelper
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class TargetSpec extends FunSpec with Matchers {
+class TargetSpec extends AnyFunSpec with Matchers {
 
   private lazy val service = models.TestHelper.generatorApiService
 

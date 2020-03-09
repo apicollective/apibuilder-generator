@@ -1,14 +1,15 @@
 package scala.generator.mock
 
 import models.TestHelper.assertValidScalaSourceCode
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.generator.{ScalaClientMethodConfigs, ScalaService}
 import scala.generator.mock.MockClientGenerator._
 import scala.generator.ScalaField.Limitation
 import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class MockClientGeneratorSpec extends FunSpec with Matchers {
+class MockClientGeneratorSpec extends AnyFunSpec with Matchers {
   it("should generate the right desired length for string given a field limitation") {
     calculateStringLength(Limitation(None, None)) should be(24)
     calculateStringLength(Limitation(Some(6), None)) should be(24) // TODO or [6, 24] ??? -> mostly for very small min vals e.g. min=3

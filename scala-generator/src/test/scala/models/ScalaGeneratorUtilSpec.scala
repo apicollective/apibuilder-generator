@@ -2,9 +2,10 @@ package scala.models
 
 import io.apibuilder.spec.v0.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
 import scala.generator._
-import org.scalatest.{ Matchers, FunSpec }
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaGeneratorUtilSpec extends FunSpec with Matchers {
+class ScalaGeneratorUtilSpec extends AnyFunSpec with Matchers {
 
   private lazy val service = models.TestHelper.referenceApiService
   private lazy val ssd = new ScalaService(service)
@@ -31,7 +32,6 @@ class ScalaGeneratorUtilSpec extends FunSpec with Matchers {
     val resource = new Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
 
     it("should handle required and non-required params") {
-      val scalaModel = new ScalaModel(ssd, model)
       val code = play2Util.queryParameters(
         "queryParameters",
         new ScalaOperation(

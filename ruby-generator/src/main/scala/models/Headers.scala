@@ -15,9 +15,9 @@ case class Headers(
 
   private[this] val constants = Seq(
     form.service.baseUrl.map { url => ("BaseUrl", url) },
-    Some("Namespace", form.service.namespace),
-    Some("UserAgent", form.userAgent.getOrElse("apibuilder-play_2x_client-unknown")),
-    Some("Version", form.service.version),
+    Some(("Namespace", form.service.namespace)),
+    Some(("UserAgent", form.userAgent.getOrElse("apibuilder-play_2x_client-unknown"))),
+    Some(("Version", form.service.version)),
     versionMajor.map { major => (VersionMajorName, major.toString) }
   ).flatten
 
@@ -39,7 +39,7 @@ case class Headers(
   val ruby: Seq[(String, String)] = Seq(
     Some("User-Agent" -> s"Constants::USER_AGENT"),
     Some("X-Apidoc-Version" -> s"Constants::VERSION"),
-    versionMajor.map { major => VersionMajorHeaderName -> s"Constants::VERSION_MAJOR" }
+    versionMajor.map { _ => VersionMajorHeaderName -> s"Constants::VERSION_MAJOR" }
   ).flatten ++ form.service.headers.filter(_.default.isDefined).map { h =>
     h.name -> RubyUtil.wrapInQuotes(h.default.get)
   }

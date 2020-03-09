@@ -1,8 +1,9 @@
 package scala.generator
 
-import org.scalatest.{ Matchers, FunSpec }
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaUtilSpec extends FunSpec with Matchers {
+class ScalaUtilSpec extends AnyFunSpec with Matchers {
 
   it("extendsClause") {
     ScalaUtil.extendsClause(Nil) should be(None)

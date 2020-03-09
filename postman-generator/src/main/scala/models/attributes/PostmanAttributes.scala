@@ -3,8 +3,6 @@ package models.attributes
 import io.apibuilder.spec.v0.models.Parameter
 import io.postman.generator.attributes.v0.models.ObjectReference
 
-import scala.language.implicitConversions
-
 object PostmanAttributes {
 
   /**

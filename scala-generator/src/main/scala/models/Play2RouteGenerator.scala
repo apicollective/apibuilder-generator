@@ -87,7 +87,7 @@ private[models] case class Play2Route(
         param.datatype match {
           case (_: ScalaPrimitive) | ScalaDatatype.List(_) => true
           case ScalaDatatype.Map(_) => false
-          case ScalaDatatype.Option(inner) => true
+          case ScalaDatatype.Option(_) => true
         }
       }
   )
@@ -103,9 +103,9 @@ private[models] case class Play2Route(
         Some(definition(param)),
         param.default.flatMap( d =>
           param.datatype match {
-            case ScalaDatatype.List(v) => Some("?= Nil")
+            case ScalaDatatype.List(_) => Some("?= Nil")
             case ScalaDatatype.Map(_) => Some("?= Map()")
-            case ScalaDatatype.Option(inner) => None
+            case ScalaDatatype.Option(_) => None
             case p: ScalaPrimitive => Some("?= " + defaultForPrimitive(p, d))
           }
         )

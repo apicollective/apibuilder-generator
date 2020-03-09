@@ -1,11 +1,12 @@
 package scala.models.play.files
 
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.models.play.Helpers
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ModelsJsonSpec extends FunSpec with Matchers {
+class ModelsJsonSpec extends AnyFunSpec with Matchers {
 
   it("generates models and joda json") {
     val form = InvocationForm(

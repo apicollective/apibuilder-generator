@@ -1,9 +1,8 @@
 package lib.generator
 
-import io.apibuilder.spec.v0.models.{Method, ParameterLocation, Service}
-import lib.{Datatype, DatatypeResolver}
-import lib.Text
-import lib.Text._
+import com.github.ghik.silencer.silent
+import io.apibuilder.spec.v0.models.{Method, Service}
+import lib.DatatypeResolver
 
 object GeneratorUtil {
 
@@ -30,7 +29,7 @@ object GeneratorUtil {
     */
   def fullyQualifiedInternalName(
     namespace: String,
-    objectType: ObjectType
+    @silent objectType: ObjectType
   ): String = {
     // API accepts object type parameter, but currently not used as we
     // place all internal names into the models namespace for
@@ -152,15 +151,6 @@ object GeneratorUtil {
     } else {
       method.toString.toLowerCase + notNamed.mkString("And") + "By" + named.mkString("And")
     }
-  }
-
-  /**
-    * Creates a canonical form for the specified name. Eg
-    * MembershipRequest and membership-request both end up as
-    * membership_request
-    */
-  private def formatName(name: String): String = {
-    Text.splitIntoWords(Text.camelCaseToUnderscore(name)).mkString("_")
   }
 
   /**

@@ -114,7 +114,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   // union type.
   val undefinedType = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
 
-  val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, union, _) }
+  val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
 
   val deprecation: Option[Deprecation] = union.deprecation
 
@@ -153,7 +153,7 @@ case class ScalaUnionType(
 
 object ScalaUnionType {
 
-  def apply(ssd: ScalaService, union: Union, t: UnionType): ScalaUnionType = {
+  def apply(ssd: ScalaService, t: UnionType): ScalaUnionType = {
     val `type` = ssd.datatypeResolver.parse(t.`type`).getOrElse {
       sys.error(ssd.errorParsingType(t.`type`, s"union type[$t]"))
     }

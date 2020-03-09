@@ -62,6 +62,7 @@ object TestHelper extends Matchers {
     val outputPath = Paths.get(path)
     val bytes = contents.getBytes(StandardCharsets.UTF_8)
     Files.write(outputPath, bytes)
+    ()
   }
 
   def readFile(path: String): String = {
@@ -110,6 +111,7 @@ object TestHelper extends Matchers {
 
   def assertJodaTimeNotPresent(file: File): Unit = {
     file.contents shouldNot include("org.joda.time")
+    ()
   }
 
   def assertValidScalaSourceFiles(files: Seq[File]): Unit = {
@@ -129,7 +131,7 @@ object TestHelper extends Matchers {
     val parseResult = virtualFile.parse[Source]
     parseResult.toEither match {
       case Left(parseError) => fail(s"Not valid Scala source. ${parseError.toString()}")
-      case Right(sourceTree) => { /* cool, we have valid source code */ }
+      case Right(_) => { /* cool, we have valid source code */ }
     }
   }
 

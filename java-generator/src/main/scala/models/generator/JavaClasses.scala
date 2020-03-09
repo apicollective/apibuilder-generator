@@ -6,8 +6,6 @@ import lib.Text
 import lib.generator.{CodeGenerator, GeneratorUtil}
 import models.generator.JavaDatatypes.NativeDatatype
 
-import scala.util.{Success, Try}
-
 /**
  *
  * Author: jkenny
@@ -22,7 +20,7 @@ object JavaClasses extends CodeGenerator {
 
   def invoke(form: InvocationForm, addHeader: Boolean = false): Either[Seq[String], Seq[File]] = Right(generateCode(form, addHeader))
 
-  private def generateCode(form: InvocationForm, addHeader: Boolean = true): Seq[File] = {
+  private def generateCode(form: InvocationForm, addHeader: Boolean): Seq[File] = {
     val header =
       if (addHeader) Some(new ApidocComments(form.service.version, form.userAgent).forClassFile)
       else None

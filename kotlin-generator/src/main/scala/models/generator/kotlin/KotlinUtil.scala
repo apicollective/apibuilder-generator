@@ -215,7 +215,7 @@ trait KotlinUtil {
       toClassName(modelName)
     }
     if(startingWithLowercase){
-      checkForReservedWord(paramStartingWithUppercase.head.toLower + paramStartingWithUppercase.tail)
+      checkForReservedWord(s"${paramStartingWithUppercase.head.toLower}${paramStartingWithUppercase.tail}")
     } else {
       checkForReservedWord(paramStartingWithUppercase)
     }

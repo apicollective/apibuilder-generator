@@ -1,11 +1,12 @@
 package models.generator
 import io.apibuilder.generator.v0.models.InvocationForm
 import models.FieldDefaultHelper._
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.models.Play2StandaloneModelsJson
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaDefaultsSpec extends FunSpec with Matchers {
+class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
   it("Should produce models with defaults and scala_generator.model_hint missing") {
     val json = models.TestHelper.buildJson(requiredFalseWithDefaultsNoHints)
 

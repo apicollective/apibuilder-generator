@@ -5,9 +5,10 @@ import scala.models.Play23ClientGenerator
 import scala.models.ning.Ning18ClientGenerator
 
 import models.TestHelper
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ReferenceWithImportsSpec extends FunSpec with Matchers {
+class ReferenceWithImportsSpec extends AnyFunSpec with Matchers {
 
   lazy val ssd = new ScalaService(models.TestHelper.referenceWithImportsApiService)
 

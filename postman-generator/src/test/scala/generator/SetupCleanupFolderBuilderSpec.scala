@@ -5,9 +5,11 @@ import generator.TestFixtures.TrivialServiceWithImportAndDependencyCtx
 import io.apibuilder.postman.collection.v21.v0.models.{EventType, Folder, Header}
 import models.attributes.PostmanAttributes.ExtendedObjectReference
 import models.operation.DependantOperations
-import org.scalatest.{Assertion, Matchers, WordSpec}
+import org.scalatest.Assertion
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class SetupCleanupFolderBuilderSpec extends WordSpec with Matchers {
+class SetupCleanupFolderBuilderSpec extends AnyWordSpec with Matchers {
 
   import models.attributes.PostmanAttributes.ObjectReferenceExtend
 

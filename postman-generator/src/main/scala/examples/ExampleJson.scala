@@ -3,13 +3,12 @@ package examples
 import java.util.UUID
 
 import io.apibuilder.spec.v0.models._
-import io.apibuilder.spec.v0.models.json._
-import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference, ValueSubstitute}
 import io.postman.generator.attributes.v0.models.json.{jsonReadsPostmanGeneratorAttributesObjectReference, jsonReadsPostmanGeneratorAttributesValueSubstitute}
+import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference, ValueSubstitute}
 import models.AttributeValueReader
 import models.attributes.PostmanAttributes.ObjectReferenceExtend
-import org.joda.time.{DateTime, LocalDate}
 import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json._
 
 import scala.util.Random
@@ -155,7 +154,7 @@ case class ExampleJson(
     types.toList match {
       case Nil => JsNull
       case TextDatatype.Singleton(one) :: Nil => singleton(one, parentUnion)
-      case TextDatatype.Singleton(one) :: _ => sys.error("Singleton must be leaf")
+      case TextDatatype.Singleton(_) :: _ => sys.error("Singleton must be leaf")
       case TextDatatype.List :: rest => Json.toJson(Seq(mockValue(rest, None)))
       case TextDatatype.Map :: rest => Json.obj("foo" -> mockValue(rest, None))
     }
@@ -189,7 +188,7 @@ case class ExampleJson(
     val types = TextDatatype.parse(field.`type`)
     types.toList match {
       case Nil => JsNull
-      case TextDatatype.Singleton(one) :: Nil => singleton(field)
+      case TextDatatype.Singleton(_) :: Nil => singleton(field)
       case TextDatatype.Singleton(_) :: _ => sys.error("Singleton must be leaf")
       case TextDatatype.List :: rest => {
         field.default match {
@@ -364,7 +363,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def randomString(fieldOpt: Option[Field] = None): String = {
+  private[this] def randomString(fieldOpt: Option[Field]): String = {
     val seed = {
       fieldOpt
         .map(_.name)
@@ -432,8 +431,9 @@ object TextDatatype {
   }
 }
 
-import scala.util.Random
 import java.security.SecureRandom
+
+import scala.util.Random
 
 object TokenGenerator {
 
@@ -441,7 +441,7 @@ object TokenGenerator {
   private[this] val Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
   def generate(n: Int = 80): String = {
-    Stream.continually(random.nextInt(Alphabet.size)).map(Alphabet).take(n).mkString
+    LazyList.continually(random.nextInt(Alphabet.size)).map(Alphabet).take(n).mkString
   }
 
 }

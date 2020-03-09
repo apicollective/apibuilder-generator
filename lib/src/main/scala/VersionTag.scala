@@ -46,7 +46,7 @@ case class VersionTag(version: String) extends Ordered[VersionTag] {
   val qualifier: Option[String] = {
     trimmedVersion.split(VersionTag.Dash).toList match {
       case Nil => None
-      case one :: Nil => None
+      case _ :: Nil => None
       case multiple => multiple.lastOption
     }
   }
@@ -85,7 +85,7 @@ case class VersionTag(version: String) extends Ordered[VersionTag] {
         pieces = pieces ++ Seq("0")
       }
     }
-    pieces
+    pieces.toSeq
   }
 
 }

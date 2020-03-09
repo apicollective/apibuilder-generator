@@ -58,7 +58,7 @@ case class UrlValues(
           }
         }
       }
-      case Datatype.Container.List(inner) => {
+      case Datatype.Container.List(_) => {
         Seq(
           s"for _, value := range $varName {",
           build(param.name, "value", goType).indentString(1),
@@ -71,7 +71,6 @@ case class UrlValues(
       }
 
       case Datatype.UserDefined.Model(name) => {
-        val publicName = importBuilder.publicName(name)
         val privateName = GoUtil.privateName(name)
         Seq(
           s"$privateName, err := ${importBuilder.ensureImport("encoding/json")}.Marshal($varName)",
@@ -82,11 +81,11 @@ case class UrlValues(
         ).mkString("\n")
       }
 
-      case Datatype.UserDefined.Union(name) => {
+      case Datatype.UserDefined.Union(_) => {
         sys.error("TODO")
       }
 
-      case Datatype.Container.Map(inner) => {
+      case Datatype.Container.Map(_) => {
         sys.error("TODO")
       }
 
@@ -106,13 +105,13 @@ case class UrlValues(
     goType: GoType
   ): String = {
     goType.datatype match {
-      case v: Datatype.Primitive => {
+      case _: Datatype.Primitive => {
         goType.toString(varName)
       }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
         sys.error("Cannot serialize model, union or map to parameter")
       }
-      case Datatype.UserDefined.Enum(name) => {
+      case Datatype.UserDefined.Enum(_) => {
         goType.toString(varName)
       }
       case Datatype.Container.Option(inner) => {

@@ -171,7 +171,7 @@ class MockClientGenerator(
 
   def makeUnion(union: ScalaUnion): String = {
     val typ = union.types.headOption.getOrElse {
-      sys.error("Union type[${union.qualifiedName}] does not have any times")
+      sys.error(s"Union type[${union.qualifiedName}] does not have any times")
     }
     s"def make${union.name}(): ${union.qualifiedName} = ${mockValue(typ.datatype)}"
   }

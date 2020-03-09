@@ -2,9 +2,10 @@ package scala.models
 
 import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaNestedUnionSpec extends FunSpec with Matchers {
+class ScalaNestedUnionSpec extends AnyFunSpec with Matchers {
 
   val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", Attributes.PlayDefaultConfig, None)
 

@@ -1,8 +1,9 @@
 package scala.models
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class JsonImportsSpec extends FunSpec with Matchers {
+class JsonImportsSpec extends AnyFunSpec with Matchers {
 
   it("basic service") {
     JsonImports(models.TestHelper.referenceApiService) should be(

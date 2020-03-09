@@ -1,10 +1,11 @@
 package models.generator.android
 
-import org.scalatest.{Matchers, FlatSpec}
 import RetrofitUtil._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class RetrofitUtilTest
-  extends FlatSpec
+  extends AnyFlatSpec
   with Matchers {
 
   "toRetrofitPath" should "convert correctly" in {

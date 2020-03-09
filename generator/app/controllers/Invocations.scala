@@ -10,7 +10,7 @@ class Invocations extends InjectedController {
 
   def postByKey(key: String) = Action(parse.json(maxLength = 10 * 1024 * 1024)) { request: Request[JsValue] =>
     Generators.findGenerator(key) match {
-      case Some((target, generator)) =>
+      case Some((_, generator)) =>
         request.body.validate[InvocationForm] match {
           case e: JsError => Conflict(Json.toJson(Validation.invalidJson(e)))
           case s: JsSuccess[InvocationForm] => {

@@ -1,9 +1,10 @@
 package go.models
 
 import io.apibuilder.spec.v0.models.{Application, Import, Organization}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ImportBuilderSpec extends FunSpec with Matchers {
+class ImportBuilderSpec extends AnyFunSpec with Matchers {
 
   def buildImports(
     namespace: String,

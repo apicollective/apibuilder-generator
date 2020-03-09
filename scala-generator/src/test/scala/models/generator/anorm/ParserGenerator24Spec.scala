@@ -1,9 +1,10 @@
 package scala.generator.anorm
 
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import org.scalatest.{Matchers, FunSpec}
+import io.apibuilder.generator.v0.models.InvocationForm
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ParserGenerator24Spec extends FunSpec with Matchers {
+class ParserGenerator24Spec extends AnyFunSpec with Matchers {
 
   val fileNames = Seq("TestApidocTestV1Conversions.scala", "TestApidocTestV1Parsers.scala")
 
@@ -81,7 +82,7 @@ class ParserGenerator24Spec extends FunSpec with Matchers {
   it("service with no models") {
     val form = ServiceBuilder().form
     ParserGenerator24.invoke(form) match {
-      case Left(errors) => {
+      case Left(_) => {
         // Success
       }
       case Right(files) => {

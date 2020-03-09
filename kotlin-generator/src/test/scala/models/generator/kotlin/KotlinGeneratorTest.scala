@@ -1,11 +1,12 @@
 package models.generator.kotlin
 
-import org.scalatest.{FunSpec, Matchers}
-import KotlinTestHelper._
 import io.apibuilder.generator.v0.models.InvocationForm
+import models.generator.kotlin.KotlinTestHelper._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 class KotlinGeneratorTest
-  extends FunSpec
+  extends AnyFunSpec
     with Matchers {
 
   import models.TestHelper._
@@ -34,7 +35,7 @@ class KotlinGeneratorTest
       service.namespace shouldBe "io.apibuilder.reference.api.v0"
       val invocationForm = InvocationForm(service, Seq.empty, None)
       val generator = new KotlinGenerator()
-      val files = generator.invoke(invocationForm).right.get
+      val files = generator.invoke(invocationForm).getOrElse(sys.error("got Left"))
       assertPackageExists("io.apibuilder.reference.api.v0.models", files)
       assertPackageExists("io.apibuilder.reference.api.v0.enums", files)
     }
@@ -49,7 +50,7 @@ class KotlinGeneratorTest
       unionTypes.map(_.`type`) shouldBe Seq("registered_user", "guest_user", "system_user", "string")
       val invocationForm = InvocationForm(service, Seq.empty, None)
       val generator = new KotlinGenerator()
-      val files = generator.invoke(invocationForm).right.get
+      val files = generator.invoke(invocationForm).getOrElse(sys.error("got Left"))
 
       // model: registered_user
       val registeredUser = getFile("RegisteredUser.kt", files)

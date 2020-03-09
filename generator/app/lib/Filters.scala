@@ -10,4 +10,4 @@ class Filters @Inject() (
    defaultFilters: EnabledFilters,
    gzip: GzipFilter,
    log: LoggingFilter)
-  extends DefaultHttpFilters
+  extends DefaultHttpFilters(defaultFilters.filters :+ gzip :+ log: _*)

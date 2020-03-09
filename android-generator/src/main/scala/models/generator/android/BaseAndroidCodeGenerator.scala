@@ -15,8 +15,9 @@ import lib.Text
 import lib.generator.CodeGenerator
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
+import com.github.ghik.silencer.silent
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
@@ -31,7 +32,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
   def invoke(form: InvocationForm, addHeader: Boolean = false): Either[Seq[String], Seq[File]] = Right(generateCode(form, addHeader))
 
 
-  private def generateCode(form: InvocationForm, addHeader: Boolean = true): Seq[File] = {
+  private def generateCode(form: InvocationForm, addHeader: Boolean): Seq[File] = {
     val header =
       if (addHeader) Some(new ApidocComments(form.service.version, form.userAgent).forClassFile)
       else None
@@ -54,8 +55,6 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
       val s = JAVADOC_CLASS_MESSAGE + "\n"
       header.fold(s)(_ + "\n" + s)
     }
-
-    val T = "$T" //this is a hack for substituting types, as "$" is used by scala to do string substitution, and $T is sued by javapoet to handle types
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
@@ -92,7 +91,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
 
       def formatter: FieldSpec.Builder = {
         FieldSpec.builder(classOf[DateTimeFormatter], "formatter", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-          .initializer("$T.dateTimeParser()", classOf[ISODateTimeFormat])
+          .initializer(s"$$T.dateTimeParser()", classOf[ISODateTimeFormat])
       }
 
       def deserializer: TypeSpec.Builder = {
@@ -143,7 +142,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
         .addStatement("MAPPER.configure($T.FAIL_ON_UNKNOWN_PROPERTIES, false)", classOf[DeserializationFeature])
         .addStatement("MAPPER.configure($T.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)", classOf[DeserializationFeature])
         .addStatement("MAPPER.registerModule(module)")
-        .build)
+        .build: @silent("possible missing interpolator"))
 
       val getterBuilder = MethodSpec.methodBuilder("getInstance").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC)
       getterBuilder.returns(classOf[ObjectMapper])
@@ -215,7 +214,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
       union.types.foreach(u => {
         jsonSubTypesAnnotationBuilder
           .addMember("value", "$L", AnnotationSpec.builder(classOf[JsonSubTypes.Type])
-            .addMember("value", "$L", dataTypeFromField(u.`type`, modelsNameSpace) + ".class")
+            .addMember("value", "$L", dataTypeFromField(u.`type`, modelsNameSpace).toString + ".class")
             .addMember("name", "$S", u.`type`)
             .build())
       })
@@ -287,7 +286,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
         constructorWithParams.addStatement("this.$N = $N", fieldCamelCaseName, fieldCamelCaseName)
 
         if (arrayParameter) {
-          equals.addStatement(s"if (!${T}.equals(${fieldCamelCaseName}, that.${fieldCamelCaseName})) return false", classOf[java.util.Arrays])
+          equals.addStatement(s"if (!$$T.equals(${fieldCamelCaseName}, that.${fieldCamelCaseName})) return false", classOf[java.util.Arrays])
         } else {
           equals.addStatement(s"if (${fieldCamelCaseName} != null ? !${fieldCamelCaseName}.equals(that.${fieldCamelCaseName}) : that.${fieldCamelCaseName} != null) return false")
         }
@@ -446,16 +445,6 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
       makeFile(className, builder)
     }
 
-    private def toMap(cc: AnyRef): Map[String, Any] =
-      (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
-        f.setAccessible(true)
-        a + (f.getName -> f.get(cc))
-      }
-
-
-    private def commentFromOpt(opt: Option[String]) = {
-      opt.fold("") { s => textToComment(s) + "\n" }
-    }
 
     def camelToUnderscores(name: String): String = "[A-Z\\d]".r.replaceAllIn(name, { m =>
       "_" + m.group(0).toLowerCase()

@@ -5,9 +5,10 @@ import scala.annotation.tailrec
 import ScalaPrimitive._
 import ScalaDatatype._
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ScalaDatatypeSpec extends FunSpec with Matchers {
+class ScalaDatatypeSpec extends AnyFunSpec with Matchers {
 
   it("should generate the right variable name when nested") {
     val model = new Model(Namespaces("org.example"), "User")

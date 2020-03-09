@@ -2,10 +2,10 @@ package ruby.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.{Enum, EnumValue}
-import org.scalatest.{FunSpec, Matchers}
-import play.api.libs.json.JsString
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class RubyClientGeneratorSpec extends FunSpec with Matchers {
+class RubyClientGeneratorSpec extends AnyFunSpec with Matchers {
 
   it("enumName") {
     RubyClientGenerator.enumName("CANCEL_REQUEST") should be("cancel_request")

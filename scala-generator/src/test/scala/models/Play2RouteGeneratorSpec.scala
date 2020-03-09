@@ -4,9 +4,10 @@ import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 import io.apibuilder.spec.v0.models.Method
 
 import scala.generator.{ScalaOperation, ScalaResource, ScalaService}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class Play2RouteGeneratorSpec extends FunSpec with Matchers {
+class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
 
   def getScalaResource(ssd: ScalaService, plural: String): ScalaResource = {
     ssd.resources.find(_.plural == plural).getOrElse {
@@ -41,7 +42,7 @@ class Play2RouteGeneratorSpec extends FunSpec with Matchers {
       case Left(errors) => errors.mkString(", ") should be(
         s"Service[${service.organization.key}/${service.application.key}] does not have any resource operations - cannot generate play routes"
       )
-      case Right(code) => fail("expected error when generating routes for a service with no operations")
+      case Right(_) => fail("expected error when generating routes for a service with no operations")
     }
   }
 
@@ -178,7 +179,7 @@ class Play2RouteGeneratorSpec extends FunSpec with Matchers {
       val result = Play2RouteGenerator(form).invoke()
 
       result.isRight shouldBe true
-      val files = result.right.get
+      val files = result.getOrElse(sys.error("got Left"))
 
       files.size shouldBe 1
       val route = files(0).contents
@@ -191,7 +192,7 @@ class Play2RouteGeneratorSpec extends FunSpec with Matchers {
       val result = Play2RouteGenerator(form).invoke()
 
       result.isRight shouldBe true
-      val files = result.right.get
+      val files = result.getOrElse(sys.error("got Left"))
 
       files.size shouldBe 1
       val route = files(0).contents
@@ -204,7 +205,7 @@ class Play2RouteGeneratorSpec extends FunSpec with Matchers {
       val result = Play2RouteGenerator(form).invoke()
 
       result.isRight shouldBe true
-      val files = result.right.get
+      val files = result.getOrElse(sys.error("got Left"))
 
       files.size shouldBe 1
       val route = files(0).contents

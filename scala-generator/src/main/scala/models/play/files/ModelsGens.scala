@@ -1,5 +1,6 @@
 package scala.models.play.files
 
+import com.github.ghik.silencer.silent
 import io.apibuilder.generator.v0.models.InvocationForm
 
 import scala.generator._
@@ -70,7 +71,7 @@ object ModelsGens {
 	def arbitrary(enum: ScalaEnum): String = arbitrary(enum.ssd.namespaces, enum.name, enum.qualifiedName)
 	def arbitrary(model: ScalaModel): String = arbitrary(model.ssd.namespaces, model.name, model.qualifiedName)
 	def arbitrary(union: ScalaUnion): String = arbitrary(union.ssd.namespaces, union.name, union.qualifiedName)
-  def arbitrary(ns: Namespaces, name: String, tpe: String): String = {
+  def arbitrary(@silent ns: Namespaces, name: String, tpe: String): String = {
 //    val collisionFreeName = s"""${ns.models.split('.').map(_.capitalize).mkString}${name}"""
     s"""implicit lazy val arbitrary${name}: ${Arbitrary}[$tpe] = ${Arbitrary}(gen${name})"""
   }

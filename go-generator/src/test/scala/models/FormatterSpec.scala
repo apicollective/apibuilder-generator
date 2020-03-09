@@ -1,9 +1,10 @@
 package go.models
 
-import org.scalatest.{FunSpec, Matchers}
 import Formatter._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class FormatterSpec extends FunSpec with Matchers {
+class FormatterSpec extends AnyFunSpec with Matchers {
 
   it("assignment") {
     """

@@ -1,9 +1,10 @@
 package ruby.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ResponsesWithUnitTypeSpec extends FunSpec with Matchers {
+class ResponsesWithUnitTypeSpec extends AnyFunSpec with Matchers {
 
   private lazy val service = models.TestHelper.parseFile(s"/examples/response-with-unit-type.json")
 

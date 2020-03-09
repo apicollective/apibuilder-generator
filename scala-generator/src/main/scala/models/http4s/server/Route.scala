@@ -1,10 +1,9 @@
 package scala.models.http4s.server
 
-import io.apibuilder.spec.v0.models.{Method, ResponseCodeInt}
-
-import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaOperation, ScalaParameter, ScalaPrimitive, ScalaResource, ScalaUtil}
+import io.apibuilder.spec.v0.models.ResponseCodeInt
 import lib.Text._
 
+import scala.generator._
 import scala.models.http4s.ScalaService
 
 sealed trait PathSegment

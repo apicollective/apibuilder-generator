@@ -67,7 +67,7 @@ class ScalaClientMethodGenerator (
 
       val hasOptionResult = featureMigration.hasImplicit404s match {
         case true => {
-          op.responses.filter(_.isSuccess).find(_.isOption).map { r =>
+          op.responses.filter(_.isSuccess).find(_.isOption).map { _ =>
             s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
           }
         }
@@ -171,7 +171,6 @@ class ScalaClientMethodGenerator (
         methodCall = methodCall,
         response = matchResponse,
         implicitArgs = config.implicitArgs,
-        typeParam = config.asyncTypeParam()
       )
     }
   }
@@ -221,7 +220,6 @@ class ScalaClientMethod(
   methodCall: String,
   response: String,
   implicitArgs: Option[String],
-  typeParam: Option[String]
 ) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs, responseEnvelopeName = None) {
   import lib.Text._
 

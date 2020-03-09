@@ -1,11 +1,12 @@
 package models.generator.anorm
 
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
-import org.scalatest.{FunSpec, Matchers}
 
 import scala.generator.anorm.ParserGenerator28
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class ParserGenerator28Spec extends FunSpec with Matchers {
+class ParserGenerator28Spec extends AnyFunSpec with Matchers {
 
   val fileNames = Seq("TestApidocTestV1Conversions.scala", "TestApidocTestV1Parsers.scala")
 
@@ -107,7 +108,7 @@ class ParserGenerator28Spec extends FunSpec with Matchers {
   it("service with no models") {
     val form = ServiceBuilder().form
     ParserGenerator28.invoke(form) match {
-      case Left(errors) => {
+      case Left(_) => {
         // Success
       }
       case Right(files) => {

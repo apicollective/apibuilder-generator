@@ -3,9 +3,8 @@ package models.generator.kotlin
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
 import io.github.sullis.kotlin.compiler.KotlinCompiler
-import lib.Text
 import models.TestHelper.{assertJodaTimeNotPresent, writeFiles}
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 
 object KotlinTestHelper extends Matchers {
 
@@ -13,7 +12,7 @@ object KotlinTestHelper extends Matchers {
     val tmpDir = createTempDirectory(service)
     val invocationForm = InvocationForm(service, Seq.empty, None)
     val generator = new KotlinGenerator()
-    val files = generator.invoke(invocationForm).right.get
+    val files = generator.invoke(invocationForm).getOrElse(sys.error("got Left"))
     files.size shouldBe >(0)
     files.foreach(f => {
       f.contents.length shouldBe >(0)
@@ -56,6 +55,7 @@ object KotlinTestHelper extends Matchers {
     files.exists(
       file => (file.name == filename)
     ) shouldBe true
+    ()
   }
 
   def assertPackageExists(packageName: String, files: Seq[File]): Unit = {
@@ -66,10 +66,12 @@ object KotlinTestHelper extends Matchers {
     files.exists(
       file => file.contents.contains(s)
     ) shouldBe true
+    ()
   }
 
   def assertFileContainsString(s: String, file: File): Unit = {
     file.contents.contains(s) shouldBe true
+    ()
   }
 
   def getFile(filename: String, files: Seq[File]): File = {
@@ -82,6 +84,7 @@ object KotlinTestHelper extends Matchers {
     assert(kotlinSourceDirectory.isDirectory())
     val result = new KotlinCompiler().compileSourceDir(kotlinSourceDirectory.toPath)
     result.isSuccess shouldBe true
+    ()
   }
 
   private def createTempDirectory(service: Service): java.io.File = {

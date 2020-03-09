@@ -2,9 +2,11 @@ package generator
 
 import examples.{ExampleJson, MurmurRandomStringGenerator, Selection}
 import io.apibuilder.spec.v0.models.Service
-import org.scalatest.{Assertion, Matchers, WordSpec}
+import org.scalatest.Assertion
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ServiceImportResolverSpec extends WordSpec with Matchers {
+class ServiceImportResolverSpec extends AnyWordSpec with Matchers {
 
   import TestFixtures._
   import scala.language.reflectiveCalls

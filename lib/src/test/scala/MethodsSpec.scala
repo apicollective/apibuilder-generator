@@ -1,8 +1,9 @@
 package lib
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class MethodsSpec extends FunSpec with Matchers {
+class MethodsSpec extends AnyFunSpec with Matchers {
 
   it("isJsonDocumentMethod") {
     Methods.isJsonDocumentMethod("GET") should be(false)

@@ -1,5 +1,6 @@
 package scala.models
 
+import com.github.ghik.silencer.silent
 import lib.Text._
 
 import scala.generator.ScalaPrimitive.{Model, Union}
@@ -226,7 +227,7 @@ case class Play2Json(
             s"case x: ${typeName} => $json"
           }.mkString("\n"),
           s"case other => {",
-          """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""",
+          """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""": @silent("possible missing interpolator"),
           "}"
         ).mkString("\n").indentString(2),
         "}"
@@ -237,12 +238,12 @@ case class Play2Json(
 
   private def reader(union: ScalaUnion, ut: ScalaUnionType): String = {
     ut.model match {
-      case Some(model) => {
+      case Some(_) => {
         play2JsonCommon.implicitReaderName(ut.name)
       }
       case None => {
         ut.enum match {
-          case Some(enum) => {
+          case Some(_) => {
             play2JsonCommon.implicitReaderName(ut.name)
           }
           case None => {
@@ -456,7 +457,7 @@ case class Play2Json(
    */
   private[this] def getJsonObject(originalName: String, datatype: ScalaDatatype, varName: String): JsObjectResult = {
     datatype match {
-      case ScalaPrimitive.Enum(ns, name) => {
+      case ScalaPrimitive.Enum(_, _) => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString(${varName}.toString)")
       }
       case ScalaPrimitive.Model(ns, name) => {
