@@ -146,7 +146,6 @@ lazy val postmanGenerator = project
   .settings(
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "ammonite-ops" % "2.0.4",
-      "org.scalactic" %% "scalactic" % "3.1.0"
     )
   )
 
@@ -156,7 +155,6 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ScoverageKeys.coverageFailOnMinimum := true,
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
-    "com.squareup" % "javapoet" % "1.11.1",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
     "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
@@ -165,6 +163,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.mockito" % "mockito-core" % mockitoVersion % Test,
     "com.github.javaparser" % "javaparser-core" % "3.15.7" % Test,
     "org.scalameta" %% "scalameta" % "4.3.0" % Test,
+    "com.squareup" % "javapoet" % "1.12.1",
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full,
   ),
@@ -174,4 +173,4 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   sources in(Compile, doc) := Seq.empty,
   publishArtifact in(Compile, packageDoc) := false,
 )
-version := "0.8.81"
+version := "0.8.82"

@@ -8,7 +8,6 @@ import models.attributes.PostmanAttributes.ExtendedObjectReference
 import io.apibuilder.postman.collection.v21.v0.{models => postman}
 import lib.Datatype.Primitive
 import models.operation.DependantOperations
-import org.scalactic.TripleEquals._
 
 object SetupCleanupFolderBuilder {
 
@@ -68,14 +67,14 @@ object SetupCleanupFolderBuilder {
     val events = item.event.getOrElse(Seq.empty)
 
     events
-      .find(_.listen === postman.EventType.Test) match {
+      .find(_.listen == postman.EventType.Test) match {
       case Some(testEvent) =>
         val updatedScript = testEvent.script.map(_.copy(
           exec = testEvent.script.map(_.exec ++ scriptExecFragment).getOrElse(Seq.empty)
         ))
         val updatedTestEvent = testEvent.copy(script = updatedScript)
         val updatedEvents =
-          events.filterNot(_.listen === postman.EventType.Test) :+ updatedTestEvent
+          events.filterNot(_.listen == postman.EventType.Test) :+ updatedTestEvent
         item.copy(event = Some(updatedEvents))
       case None =>
         val eventToAdd = postman.Event(
@@ -111,7 +110,7 @@ object SetupCleanupFolderBuilder {
     val (queryParameters, otherParams) =
       operation
         .parameters
-        .partition(_.location === ParameterLocation.Query)
+        .partition(_.location == ParameterLocation.Query)
 
     val filledQueryParams = rawQueryParamMap.map {
       case (key, value) =>
@@ -142,7 +141,7 @@ object SetupCleanupFolderBuilder {
     serviceSpecificHeaders: Seq[postman.Header],
     examplesProvider: ExampleJson): Item = {
 
-    val (pathParameters, otherParams) = deleteOperation.parameters.partition(_.location === ParameterLocation.Path)
+    val (pathParameters, otherParams) = deleteOperation.parameters.partition(_.location == ParameterLocation.Path)
     val filledPathParameters = pathParameters match {
       case params if pathParameters.nonEmpty =>
         val updatedLast = params.lastOption.get.copy(example = Some(objRefAttr.postmanVariableName.reference))

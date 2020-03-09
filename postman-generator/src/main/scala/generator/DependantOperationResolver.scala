@@ -6,7 +6,6 @@ import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference
 import lib.Datatype.Primitive
 import models.AttributeValueReader
 import models.service.ResolvedService
-import org.scalactic.TripleEquals._
 import models.attributes.PostmanAttributes._
 import models.operation.DependantOperations
 import play.api.Logging
@@ -113,7 +112,7 @@ object DependantOperationResolver extends Logging {
       case Some(resources) =>
         val operations =
           resources
-            .filter(_.`type` === objRefAttr.resourceType)
+            .filter(_.`type` == objRefAttr.resourceType)
             .flatMap(_.operations)
 
         val referencedOperationOpt = findOperationThatEndsWithOrEquals(operations, objRefAttr.operationMethod, objRefAttr.operationPath)
@@ -134,7 +133,7 @@ object DependantOperationResolver extends Logging {
 
   private def findOperationThatEndsWithOrEquals(operations: Seq[Operation], method: Method, pathSuffix: String): Option[Operation] = {
     operations.find { o =>
-      o.method === method &&
+      o.method == method &&
         (o.path.toLowerCase.endsWith(pathSuffix.toLowerCase()) || o.path.equalsIgnoreCase(pathSuffix))
     }
   }
@@ -142,11 +141,11 @@ object DependantOperationResolver extends Logging {
   private def deepSearchModelsForAttributes(typ: String, service: Service): Seq[ObjectReference] = {
 
     def recurSearch(typ: String): Seq[ObjectReference] = {
-      service.models.find(_.name === typ) match {
+      service.models.find(_.name == typ) match {
         case Some(model) =>
           model.fields.flatMap {
             // model have fields with another models, going deeper
-            case field if service.models.exists(_.name === field.`type`) =>
+            case field if service.models.exists(_.name == field.`type`) =>
               recurSearch(field.`type`)
             // model is a "leaf", searching for special attribute
             case field =>
@@ -165,8 +164,8 @@ object DependantOperationResolver extends Logging {
                   Nil
               }
           }
-        case None if service.unions.exists(_.name === typ) =>
-          val union = service.unions.find(_.name === typ).get
+        case None if service.unions.exists(_.name == typ) =>
+          val union = service.unions.find(_.name == typ).get
           union.types.flatMap(u => recurSearch(u.`type`))
         case _ =>
           Nil
@@ -191,7 +190,7 @@ object DependantOperationResolver extends Logging {
 
   private def addNamespaceToOperationBodyIfNecessary(resolvedService: ResolvedService, operation: Operation, referencedServiceNamespace: String): Operation = {
     operation.body match {
-      case Some(_) if referencedServiceNamespace === resolvedService.service.namespace =>
+      case Some(_) if referencedServiceNamespace == resolvedService.service.namespace =>
         operation
       case Some(body) if !body.`type`.startsWith(referencedServiceNamespace) =>
         val typeToLookFor = body.`type`

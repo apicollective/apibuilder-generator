@@ -6,7 +6,6 @@ import io.postman.generator.attributes.v0.models.json.jsonWritesPostmanGenerator
 import lib.Datatype.Primitive
 import models.operation.DependantOperations
 import play.api.libs.json.{JsObject, Json}
-import org.scalactic.TripleEquals._
 
 object TestFixtures {
 
@@ -55,13 +54,13 @@ object TestFixtures {
     def getTargetOperation(targetService: Service, objRefAttrValue: ObjectReference): DependantOperations = {
       val targetResource =
         targetService
-          .resources.find(_.`type` === objRefAttrValue.resourceType).get
+          .resources.find(_.`type` == objRefAttrValue.resourceType).get
 
       val referencedOp = targetResource
-        .operations.find(_.method === objRefAttrValue.operationMethod).get
+        .operations.find(_.method == objRefAttrValue.operationMethod).get
       val deleteOpOption = objRefAttrValue.deleteOperationPath.flatMap { deleteOpPath =>
         targetResource
-          .operations.find(_.path === deleteOpPath)
+          .operations.find(_.path == deleteOpPath)
       }
 
       DependantOperations(referencedOp, deleteOpOption)
