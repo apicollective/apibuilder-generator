@@ -99,7 +99,7 @@ lazy val androidGenerator = project
 
 val kotlinLangVersion = "1.3.61"
 val mockitoVersion = "3.3.3"
-val scalatestVersion = "3.1.0"
+val scalatestVersion = "3.1.1"
 
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
