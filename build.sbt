@@ -67,7 +67,7 @@ lazy val scalaGenerator = project
   .settings(
     Seq(ScoverageKeys.coverageMinimum := 84.0),
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.1.0",
+      "org.typelevel" %% "cats-core" % "2.1.1",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
     )
   )
