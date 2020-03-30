@@ -41,9 +41,9 @@ case class ${name}Impl[T](
   override val headers: ResponseHeaders,
 ) extends $name[T]
 
-case class ResponseHeaders(all: Map[String, Seq[String]]) {
+case class ResponseHeaders(all: Map[String, scala.collection.Seq[String]]) {
   def get(name: String): _root_.scala.Option[String] = getAll(name).headOption
-  def getAll(name: String): _root_.scala.Seq[String] = all.getOrElse(name, Nil)
+  def getAll(name: String): _root_.scala.collection.Seq[String] = all.getOrElse(name, Nil)
 }
 """.trim
   }
@@ -79,7 +79,7 @@ case class ResponseHeaders(all: Map[String, Seq[String]]) {
            |  ResponseImpl(
            |    body = parseJson(className, r, f),
            |    status = r.status,
-           |    headers = ResponseHeaders(r.headers.map { case (k, v) => k -> v.toSeq }),
+           |    headers = ResponseHeaders(r.headers),
            |  )
            |}
            |""".stripMargin.indentString(2) + "\n\n"
