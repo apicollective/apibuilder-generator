@@ -3,14 +3,13 @@ package models
 import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 import java.io.{File => JFile}
+
 import play.api.libs.json._
 import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import io.apibuilder.spec.v0.models.json._
 import io.apibuilder.spec.v0.models.Service
 import io.apibuilder.generator.v0.models.File
-
 import lib.Text
-
 import org.scalatest.matchers.should.Matchers
 
 object TestHelper extends Matchers {
@@ -135,6 +134,13 @@ object TestHelper extends Matchers {
     }
   }
 
+  /**
+   * If you want to rewrite the tests:
+   *   touch /tmp/apibuilder.generator.overwritetests.tmp
+   *   sbt test
+   */
+  private[this] val OverwriteTestsFile = Paths.get("/tmp/apibuilder.generator.overwritetests.tmp")
+
   def assertEqualsFile(filename: String, contents: String): Unit = {
     val actualPath = resolvePath(filename)
     val current = readFile(actualPath).trim
@@ -143,7 +149,10 @@ object TestHelper extends Matchers {
 
       val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
       TestHelper.writeToFile(expectedPath, contents.trim)
-      // TestHelper.writeToFile(actualPath, contents.trim)
+      if (Files.exists(OverwriteTestsFile)) {
+        System.out.println(s"Overwriting test output as File $OverwriteTestsFile exists")
+        TestHelper.writeToFile(actualPath, contents.trim)
+      }
 
       val cmd = s"diff $expectedPath $actualPath"
       println(cmd)
