@@ -127,7 +127,7 @@ class ScalaClientMethodGenerator(
     }
   }
 
-  protected def exceptionClass(
+  @silent protected def exceptionClass(
     className: String,
     body: Option[String] = None
   ): String = {
@@ -140,7 +140,9 @@ class ScalaClientMethodGenerator(
       s"final case class $className(",
       s"  response: ${config.responseClass},",
       s"  message: Option[String] = None",
-      s""") extends Exception(message.getOrElse(response.${config.responseStatusMethod} + ": " + response.${config.responseBodyMethod}))$bodyString"""
+      """) extends Exception(message.getOrElse(s"${response.%s}: ${response.%s}")) %s""".format(
+        config.responseStatusMethod, config.responseBodyMethod, bodyString
+      )
     ).mkString("\n")
 
   }

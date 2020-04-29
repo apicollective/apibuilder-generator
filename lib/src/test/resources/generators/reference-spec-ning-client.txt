@@ -911,7 +911,7 @@ package io.apibuilder.reference.api.v0 {
     final case class ErrorsResponse(
       response: _root_.com.ning.http.client.Response,
       message: Option[String] = None
-    ) extends Exception(message.getOrElse(response.getStatusCode + ": " + response.getResponseBody("UTF-8"))){
+    ) extends Exception(message.getOrElse(s"${response.getStatusCode}: ${response.getResponseBody("UTF-8")}")) {
       lazy val errors = _root_.io.apibuilder.reference.api.v0.Client.parseJson("Seq[io.apibuilder.reference.api.v0.models.Error]", response, _.validate[Seq[io.apibuilder.reference.api.v0.models.Error]])
     }
 

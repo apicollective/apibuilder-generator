@@ -742,7 +742,7 @@ package io.apibuilder.generator.v0 {
     final case class ErrorsResponse(
       response: play.api.libs.ws.WSResponse,
       message: Option[String] = None
-    ) extends Exception(message.getOrElse(response.status + ": " + response.body)){
+    ) extends Exception(message.getOrElse(s"${response.status}: ${response.body}")) {
       lazy val errors = _root_.io.apibuilder.generator.v0.Client.parseJson("Seq[io.apibuilder.generator.v0.models.Error]", response, _.validate[Seq[io.apibuilder.generator.v0.models.Error]])
     }
 
