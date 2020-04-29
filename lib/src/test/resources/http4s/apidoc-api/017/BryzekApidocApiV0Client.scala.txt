@@ -3860,7 +3860,7 @@ def closeAsyncHttpClient(): Unit = {
     final case class ErrorsResponse(
       response: org.http4s.Response,
       message: Option[String] = None
-    ) extends Exception(message.getOrElse(response.status.code + ": " + response.body)){
+    ) extends Exception(message.getOrElse(s"${response.status.code}: ${response.body}")) {
       lazy val errors = _root_.io.apibuilder.api.v0.Client.parseJson[Seq[io.apibuilder.api.v0.models.Error]]("Seq[io.apibuilder.api.v0.models.Error]", response)
     }
 
