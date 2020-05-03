@@ -150,8 +150,12 @@ object TestHelper extends Matchers {
       val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
       TestHelper.writeToFile(expectedPath, contents.trim)
       if (Files.exists(OverwriteTestsFile)) {
-        System.out.println(s"Overwriting test output as File $OverwriteTestsFile exists")
+        println(s"Overwriting test output as File $OverwriteTestsFile exists")
         TestHelper.writeToFile(actualPath, contents.trim)
+      } else {
+        println("If you would like to update the test output automatically")
+        println(s"  1. touch $expectedPath")
+        println("  2. rerun the tests")
       }
 
       val cmd = s"diff $expectedPath $actualPath"
