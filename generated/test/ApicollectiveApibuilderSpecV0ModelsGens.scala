@@ -122,6 +122,9 @@ package object gens {
   implicit lazy val arbitraryIoApibuilderSpecV0ModelsLicense
     : _root_.org.scalacheck.Arbitrary[io.apibuilder.spec.v0.models.License] =
     _root_.org.scalacheck.Arbitrary(genLicense)
+  implicit lazy val arbitraryIoApibuilderSpecV0ModelsInterface
+  : _root_.org.scalacheck.Arbitrary[io.apibuilder.spec.v0.models.Interface] =
+    _root_.org.scalacheck.Arbitrary(genInterface)
   implicit lazy val arbitraryIoApibuilderSpecV0ModelsModel
     : _root_.org.scalacheck.Arbitrary[io.apibuilder.spec.v0.models.Model] =
     _root_.org.scalacheck.Arbitrary(genModel)
@@ -407,21 +410,24 @@ package object gens {
         application <- _root_.org.scalacheck.Arbitrary
           .arbitrary[io.apibuilder.spec.v0.models.Application]
         version <- _root_.org.scalacheck.Arbitrary.arbitrary[String]
+        interfaces <- _root_.org.scalacheck.Arbitrary.arbitrary[Seq[String]]
         enums <- _root_.org.scalacheck.Arbitrary.arbitrary[Seq[String]]
         unions <- _root_.org.scalacheck.Arbitrary.arbitrary[Seq[String]]
         models <- _root_.org.scalacheck.Arbitrary.arbitrary[Seq[String]]
         annotations <- _root_.org.scalacheck.Arbitrary
           .arbitrary[Seq[io.apibuilder.spec.v0.models.Annotation]]
       } yield
-        io.apibuilder.spec.v0.models.Import(uri,
-                                            namespace,
-                                            organization,
-                                            application,
-                                            version,
-                                            enums,
-                                            unions,
-                                            models,
-                                            annotations)
+        io.apibuilder.spec.v0.models.Import(
+          uri = uri,
+          namespace = namespace,
+          organization = organization,
+          application = application,
+          version = version,
+          enums = enums,
+          interfaces = interfaces,
+          unions = unions,
+          models = models,
+          annotations = annotations)
     }
 
   lazy val genInfo
@@ -445,12 +451,38 @@ package object gens {
       } yield io.apibuilder.spec.v0.models.License(name, url)
     }
 
+  lazy val genInterface
+  : _root_.org.scalacheck.Gen[io.apibuilder.spec.v0.models.Interface] =
+    _root_.org.scalacheck.Gen.lzy {
+      for {
+        name <- _root_.org.scalacheck.Arbitrary.arbitrary[String]
+        plural <- _root_.org.scalacheck.Arbitrary.arbitrary[String]
+        description <- _root_.org.scalacheck.Arbitrary
+          .arbitrary[_root_.scala.Option[String]]
+        deprecation <- _root_.org.scalacheck.Arbitrary
+          .arbitrary[_root_.scala.Option[
+          io.apibuilder.spec.v0.models.Deprecation]]
+        fields <- _root_.org.scalacheck.Arbitrary
+          .arbitrary[Seq[io.apibuilder.spec.v0.models.Field]]
+        attributes <- _root_.org.scalacheck.Arbitrary
+          .arbitrary[Seq[io.apibuilder.spec.v0.models.Attribute]]
+      } yield
+        io.apibuilder.spec.v0.models.Interface(name,
+          plural,
+          description,
+          deprecation,
+          fields,
+          attributes)
+    }
+
   lazy val genModel
     : _root_.org.scalacheck.Gen[io.apibuilder.spec.v0.models.Model] =
     _root_.org.scalacheck.Gen.lzy {
       for {
         name <- _root_.org.scalacheck.Arbitrary.arbitrary[String]
         plural <- _root_.org.scalacheck.Arbitrary.arbitrary[String]
+        interfaces <- _root_.org.scalacheck.Arbitrary
+          .arbitrary[Seq[String]]
         description <- _root_.org.scalacheck.Arbitrary
           .arbitrary[_root_.scala.Option[String]]
         deprecation <- _root_.org.scalacheck.Arbitrary
@@ -466,7 +498,8 @@ package object gens {
                                            description,
                                            deprecation,
                                            fields,
-                                           attributes)
+                                           attributes,
+                                           interfaces)
     }
 
   lazy val genOperation
@@ -622,6 +655,8 @@ package object gens {
           .arbitrary[Seq[io.apibuilder.spec.v0.models.Import]]
         enums <- _root_.org.scalacheck.Arbitrary
           .arbitrary[Seq[io.apibuilder.spec.v0.models.Enum]]
+        interfaces <- _root_.org.scalacheck.Arbitrary
+          .arbitrary[Seq[io.apibuilder.spec.v0.models.Interface]]
         unions <- _root_.org.scalacheck.Arbitrary
           .arbitrary[Seq[io.apibuilder.spec.v0.models.Union]]
         models <- _root_.org.scalacheck.Arbitrary
@@ -633,23 +668,26 @@ package object gens {
         annotations <- _root_.org.scalacheck.Arbitrary
           .arbitrary[Seq[io.apibuilder.spec.v0.models.Annotation]]
       } yield
-        io.apibuilder.spec.v0.models.Service(apidoc,
-                                             name,
-                                             organization,
-                                             application,
-                                             namespace,
-                                             version,
-                                             baseUrl,
-                                             description,
-                                             info,
-                                             headers,
-                                             imports,
-                                             enums,
-                                             unions,
-                                             models,
-                                             resources,
-                                             attributes,
-                                             annotations)
+        io.apibuilder.spec.v0.models.Service(
+          apidoc = apidoc,
+          name = name,
+          organization = organization,
+          application = application,
+          namespace = namespace,
+          version = version,
+          baseUrl = baseUrl,
+          description = description,
+          info = info,
+          headers = headers,
+          imports = imports,
+          enums = enums,
+          interfaces = interfaces,
+          unions = unions,
+          models = models,
+          resources = resources,
+          attributes = attributes,
+          annotations = annotations,
+        )
     }
 
   lazy val genUnion

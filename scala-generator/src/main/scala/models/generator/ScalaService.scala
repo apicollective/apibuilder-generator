@@ -29,6 +29,8 @@ class ScalaService(
   def modelClassName(name: String): String = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
+  val interfaces: Seq[ScalaInterface] = service.interfaces.sortWith { _.name < _.name }.map { new ScalaInterface(this, _) }
+
   val models: Seq[ScalaModel] = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
 
   val enums: Seq[ScalaEnum] = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(this, _) }
@@ -104,6 +106,8 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   val name: String = ScalaUtil.toClassName(union.name)
 
   val qualifiedName: String = ssd.unionClassName(name)
+
+  val interfaces: Seq[String] = union.interfaces.map(ScalaUtil.toClassName)
 
   val discriminator: Option[String] = union.discriminator
 
@@ -189,7 +193,20 @@ object ScalaUnionType {
   }
 }
 
-class ScalaModel(val ssd: ScalaService, val model: Model) {
+case class ModelAndInterface(
+  name: String,
+  plural: String,
+  description: _root_.scala.Option[String],
+  deprecation: _root_.scala.Option[io.apibuilder.spec.v0.models.Deprecation],
+  fields: Seq[io.apibuilder.spec.v0.models.Field],
+  attributes: Seq[io.apibuilder.spec.v0.models.Attribute],
+  interfaces: Seq[String],
+)
+
+abstract class ScalaModelAndInterface(
+  ssd: ScalaService,
+  model: ModelAndInterface,
+) {
 
   val originalName: String = model.name
 
@@ -207,7 +224,34 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val deprecation: Option[Deprecation] = model.deprecation
 
+  val interfaces: Seq[String] = model.interfaces.map(ScalaUtil.toClassName)
 }
+
+class ScalaInterface(val ssd: ScalaService, val interface: Interface) extends ScalaModelAndInterface(
+  ssd,
+  ModelAndInterface(
+    name = interface.name,
+    plural = interface.plural ,
+    description = interface.description,
+    deprecation = interface.deprecation,
+    fields = interface.fields,
+    attributes = interface.attributes,
+    interfaces = Nil,
+  )
+)
+
+class ScalaModel(val ssd: ScalaService, val model: Model) extends ScalaModelAndInterface(
+  ssd,
+  ModelAndInterface(
+    name = model.name,
+    plural = model.plural ,
+    description = model.description,
+    deprecation = model.deprecation,
+    fields = model.fields,
+    attributes = model.attributes,
+    interfaces = model.interfaces,
+  )
+)
 
 class ScalaBody(ssd: ScalaService, val body: Body) {
 
