@@ -6,10 +6,11 @@ import org.scalatest.matchers.should.Matchers
 class ScalaUtilSpec extends AnyFunSpec with Matchers {
 
   it("extendsClause") {
-    ScalaUtil.extendsClause(Nil) should be(None)
-    ScalaUtil.extendsClause(Seq("Foo")).get should be(" extends Foo")
-    ScalaUtil.extendsClause(Seq("Foo", "Bar")).get should be(" extends Bar with Foo")
-    ScalaUtil.extendsClause(Seq("Foo", "Bar", "Baz")).get should be(" extends Bar with Baz with Foo")
+    ScalaUtil.extendsClause(Nil, Nil) should be(None)
+    ScalaUtil.extendsClause(Seq("Foo"), Nil).get should be(" extends Foo")
+    ScalaUtil.extendsClause(Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
+    ScalaUtil.extendsClause(Seq("Foo", "Bar", "Baz"), Nil).get should be(" extends Bar with Baz with Foo")
+    ScalaUtil.extendsClause(Seq("Foo"), Seq("Bar", "Baz")).get should be(" extends Bar with Baz with Foo")
   }
 
   it("toClassName") {
