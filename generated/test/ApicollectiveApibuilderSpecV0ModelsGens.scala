@@ -707,14 +707,19 @@ package object gens {
           .arbitrary[Seq[io.apibuilder.spec.v0.models.UnionType]]
         attributes <- _root_.org.scalacheck.Arbitrary
           .arbitrary[Seq[io.apibuilder.spec.v0.models.Attribute]]
+        interfaces <- _root_.org.scalacheck.Arbitrary
+          .arbitrary[_root_.scala.Seq[String]]
       } yield
-        io.apibuilder.spec.v0.models.Union(name,
-                                           plural,
-                                           discriminator,
-                                           description,
-                                           deprecation,
-                                           types,
-                                           attributes)
+        io.apibuilder.spec.v0.models.Union(
+          name = name,
+          plural = plural,
+          interfaces = interfaces,
+          discriminator = discriminator,
+          description = description,
+          deprecation = deprecation,
+          types = types,
+          attributes = attributes,
+        )
     }
 
   lazy val genUnionType
