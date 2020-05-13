@@ -69,8 +69,7 @@ object ModelsGens {
   }
 
 	def arbitrary(enum: ScalaEnum): String = arbitrary(enum.ssd.namespaces, enum.name, enum.qualifiedName)
-  def arbitrary(interface: ScalaInterface): String = arbitrary(interface.ssd.namespaces, interface.name, interface.qualifiedName)
-  def arbitrary(model: ScalaModel): String = arbitrary(model.ssd.namespaces, model.name, model.qualifiedName)
+	def arbitrary(model: ScalaModel): String = arbitrary(model.ssd.namespaces, model.name, model.qualifiedName)
 	def arbitrary(union: ScalaUnion): String = arbitrary(union.ssd.namespaces, union.name, union.qualifiedName)
   def arbitrary(@silent ns: Namespaces, name: String, tpe: String): String = {
 //    val collisionFreeName = s"""${ns.models.split('.').map(_.capitalize).mkString}${name}"""
@@ -107,11 +106,6 @@ object ModelsGens {
     genOneOf(enum.name, enum.qualifiedName, oneOf)
   }
 
-  def gen(interface: ScalaInterface): String = {
-    val args = interface.fields.map { field => (field.name, field.datatype.name) }
-    genFor(interface.name, interface.qualifiedName, args)
-  }
-
   def gen(model: ScalaModel): String = {
     val args = model.fields.map { field => (field.name, field.datatype.name) }
     genFor(model.name, model.qualifiedName, args)
@@ -135,14 +129,12 @@ object ModelsGens {
 
     val arbitraries =
       scalaService.enums.map(arbitrary) ++
-      scalaService.interfaces.map(arbitrary) ++
       scalaService.models.map(arbitrary) ++
       scalaService.unions.map(arbitrary) ++
       wrappers.map(w => arbitrary(w.model))
 
 		val gens =
       scalaService.enums.map(gen) ++
-      scalaService.interfaces.map(gen) ++
       scalaService.models.map(gen) ++
       scalaService.unions.map(gen) ++
       wrappers.map(w => gen(w.model))

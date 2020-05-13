@@ -36,11 +36,8 @@ class ModelsBodyParsersSpec extends AnyFunSpec with Matchers with ScalaCheckProp
 
   it("generates body parser for enum based on name, and qualifiedName") {
     forAll { enum: ScalaEnum =>
-      println(s"enum: $enum")
       val expected = ModelsBodyParsers.bodyParser(enum.name, enum.qualifiedName)
-      println(s"enum 2: $enum")
       val result = ModelsBodyParsers.bodyParser(enum)
-      println(s"enum 2: $enum")
 
       compareWithoutWhiteSpaces(result, expected)
     }
