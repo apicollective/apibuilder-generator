@@ -54,7 +54,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
       additionalImports.mkString("\n").indentString(2),
-      ssd.interfaces.map { i => generateCaseClassWithDoc(i, unions = Nil) }.mkString("\n\n").indentString(2),
+      ssd.interfaces.map { i => generateTraitWithDoc(i) }.mkString("\n\n").indentString(2),
       ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(u, ssd.unionsForUnion(u)) }.mkString("\n\n").indentString(2),
       "",
       ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indentString(2),
@@ -95,19 +95,34 @@ trait ScalaCaseClasses extends CodeGenerator {
       ScalaUnionDiscriminator(union).build()
     }
   }
+  def generateTraitWithDoc(interface: ScalaInterface): String = {
+    ScalaGeneratorUtil.scaladoc(interface.description, interface.fields.map(f => (f.name, f.description))) +
+      generateTrait(interface)
+  }
 
-  def generateCaseClassWithDoc(model: ScalaModelAndInterface, unions: Seq[ScalaUnion]): String = {
+  def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
     ScalaGeneratorUtil.scaladoc(model.description, model.fields.map(f => (f.name, f.description))) +
       generateCaseClass(model, unions)
   }
 
-  def generateCaseClass(model: ScalaModelAndInterface, unions: Seq[ScalaUnion]): String = {
+  def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
     Seq(
       Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
       Some(s"final case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(
         interfaces = model.interfaces,
         unions = unions.map(_.name),
       ).getOrElse(""))
+    ).flatten.mkString("\n")
+  }
+
+  def generateTrait(interface: ScalaInterface): String = {
+    val fullBody = interface.body match {
+      case None => ""
+      case Some(b) => s" {\n${b.indentString()}\n}"
+    }
+    Seq(
+      Some(ScalaUtil.deprecationString(interface.deprecation).trim).filter(_.nonEmpty),
+      Some(s"trait ${interface.name}$fullBody"),
     ).flatten.mkString("\n")
   }
 

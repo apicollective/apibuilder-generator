@@ -17,17 +17,24 @@ sealed trait ScalaDatatype {
 
   def name: String
 
+  def overrideString(isOverride: Boolean): String = {
+    if (isOverride) { "override val " } else { "" }
+  }
+
   def deprecationString(deprecation: Option[Deprecation]): String =
     ScalaUtil.deprecationString(deprecation)
 
   def definition(
     originalVarName: String,
     default: Option[String],
-    deprecation: Option[Deprecation]
+    deprecation: Option[Deprecation],
+    isOverride: Boolean,
   ): String = {
     val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-    default.fold(s"${deprecationString(deprecation)}$varName: $name") { default =>
-      s"$varName: $name = $default"
+    val base = s"${deprecationString(deprecation)}${overrideString(isOverride)}$varName: $name"
+    default match {
+      case None => base
+      case Some(d) => s"$base = $d"
     }
   }
 
@@ -278,10 +285,11 @@ object ScalaDatatype {
     override def definition(
       originalVarName: String,
       default: scala.Option[String],
-      deprecation: scala.Option[Deprecation]
+      deprecation: scala.Option[Deprecation],
+      isOverride: Boolean,
     ): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      default.fold(s"${deprecationString(deprecation)}$varName: $name = None") { default =>
+      default.fold(s"${deprecationString(deprecation)}${overrideString(isOverride)}$varName: $name = None") { default =>
         s"${deprecationString(deprecation)}$varName: $name = $default"
       }
     }

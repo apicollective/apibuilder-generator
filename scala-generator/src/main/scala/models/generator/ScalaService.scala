@@ -220,8 +220,6 @@ abstract class ScalaModelAndInterface(
 
   val fields: List[ScalaField] = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
-  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
-
   val deprecation: Option[Deprecation] = model.deprecation
 
   val interfaces: Seq[String] = model.interfaces.map(ScalaUtil.toClassName)
@@ -238,7 +236,16 @@ class ScalaInterface(val ssd: ScalaService, val interface: Interface) extends Sc
     attributes = interface.attributes,
     interfaces = Nil,
   )
-)
+) {
+  val body: Option[String] = fields match {
+    case Nil => None
+    case _ => Some(
+      fields.map { f =>
+        "def " + f.definition(isOverride = false)
+      }.mkString("\n")
+    )
+  }
+}
 
 class ScalaModel(val ssd: ScalaService, val model: Model) extends ScalaModelAndInterface(
   ssd,
@@ -251,7 +258,18 @@ class ScalaModel(val ssd: ScalaService, val model: Model) extends ScalaModelAndI
     attributes = model.attributes,
     interfaces = model.interfaces,
   )
-)
+) {
+  private[this] val scalaInterfaces: Seq[ScalaInterface] = model.interfaces.flatMap { i =>
+    ssd.interfaces.find(_.interface.name == i)
+  }
+  private[this] val inheritedFieldNames: Set[String] = scalaInterfaces.flatMap(_.fields.map(_.name)).toSet
+
+  val argList: Option[String] = ScalaUtil.fieldsToArgList(
+    fields.map { f =>
+      f.definition(isOverride = inheritedFieldNames.contains(f.name))
+    }
+  )
+}
 
 class ScalaBody(ssd: ScalaService, val body: Body) {
 
@@ -413,14 +431,16 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     sys.error(ssd.errorParsingType(field.`type`, s"model[$modelName] field[$name]"))
   }
 
+  def deprecation: Option[Deprecation] = field.deprecation
+
   def datatype: ScalaDatatype = ssd.scalaDatatype(`type`)
 
   def description: Option[String] = field.description
 
   def default: Option[String] = field.default.map(ScalaUtil.scalaDefault(_, datatype))
 
-  def definition(varName: String = name): String = {
-    datatype.definition(varName, default, field.deprecation)
+  def definition(varName: String = name, isOverride: Boolean): String = {
+    datatype.definition(varName, default, deprecation, isOverride = isOverride)
   }
 
   def limitation: ScalaField.Limitation = ScalaField.Limitation(field.minimum, field.maximum)
@@ -488,7 +508,7 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
   def required: Boolean = param.required
 
   def definition(varName: String = name): String = {
-    datatype.definition(varName, default, param.deprecation)
+    datatype.definition(varName, default, param.deprecation, isOverride = false)
   }
 
   def location: ParameterLocation = param.location
