@@ -1,7 +1,6 @@
 package lib
 
-import scala.util.Try
-import scala.util.Success
+import scala.util.{Failure, Success, Try}
 
 sealed abstract class Datatype(val name: String)
 
@@ -94,7 +93,7 @@ case class DatatypeResolver(
 
   /**
     * Parses a type string into an instance of a Datatype.
-    * 
+    *
     * @param value: Examples: "string", "uuid"
     */
   def parse(value: String, makePrimitiveType: Boolean = true): Try[Datatype] = {
@@ -117,6 +116,7 @@ case class DatatypeResolver(
       case MapDefaultRx() => Success(Datatype.Container.Map(Datatype.Primitive.String))
 
       case UserDefined(dt) => Success(dt)
+      case _ => Failure(new RuntimeException(s"Cannot map class[${value.getClass.getName}] to datatype"))
     }
 
     if (makePrimitiveType) dt else dt.map(Datatype.Container.Option)
