@@ -480,7 +480,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     }
   }
 
-  def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.nonEmpty
+  def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.isDefined
 }
 
 object ScalaField {
