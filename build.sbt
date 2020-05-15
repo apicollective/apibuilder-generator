@@ -153,6 +153,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   name ~= ("apibuilder-generator-" + _),
   organization := "io.apibuilder",
   ScoverageKeys.coverageFailOnMinimum := true,
+  testOptions += Tests.Argument("-oF"),
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
