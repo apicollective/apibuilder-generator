@@ -6,11 +6,21 @@ import org.scalatest.matchers.should.Matchers
 class ScalaUtilSpec extends AnyFunSpec with Matchers {
 
   it("extendsClause") {
-    ScalaUtil.extendsClause(Nil, Nil) should be(None)
-    ScalaUtil.extendsClause(Seq("Foo"), Nil).get should be(" extends Foo")
-    ScalaUtil.extendsClause(Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
-    ScalaUtil.extendsClause(Seq("Foo", "Bar", "Baz"), Nil).get should be(" extends Bar with Baz with Foo")
-    ScalaUtil.extendsClause(Seq("Foo"), Seq("Bar", "Baz")).get should be(" extends Bar with Baz with Foo")
+    ScalaUtil.extendsClause("TestClass", Nil, Nil) should be(None)
+    ScalaUtil.extendsClause("TestClass", Seq("Foo"), Nil).get should be(" extends Foo")
+    ScalaUtil.extendsClause("TestClass", Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
+    ScalaUtil.extendsClause("TestClass", Seq("Foo", "Bar", "Baz"), Nil).get should be(" extends Bar with Baz with Foo")
+    ScalaUtil.extendsClause("TestClass", Seq("Foo"), Seq("Bar", "Baz")).get should be(" extends Bar with Baz with Foo")
+  }
+
+  it("extendsClause excluded className") {
+    ScalaUtil.extendsClause("TestClass", Seq("TestClass"), Nil) should be(None)
+    ScalaUtil.extendsClause("TestClass", Seq("TestClass", "Foo"), Nil).get should be(" extends Foo")
+  }
+
+  it("extendsClause sorts") {
+    ScalaUtil.extendsClause("TestClass", Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
+    ScalaUtil.extendsClause("TestClass", Seq("Bar", "Foo"), Nil).get should be(" extends Bar with Foo")
   }
 
   it("toClassName") {

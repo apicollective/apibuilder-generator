@@ -21,13 +21,14 @@ object ScalaUtil {
   ).toSet
 
   def extendsClause(
+    className: String,
     interfaces: Seq[String],
     unions: Seq[String],
   ): Option[String] = {
-    val all = (interfaces ++ unions).toList.distinct
+    val all = (interfaces ++ unions).toList.filterNot(_ == className)
     all match {
       case Nil => None
-      case _ => Some(" extends " + all.sorted.mkString(" with "))
+      case _ => Some(" extends " + all.distinct.sorted.mkString(" with "))
     }
   }
 

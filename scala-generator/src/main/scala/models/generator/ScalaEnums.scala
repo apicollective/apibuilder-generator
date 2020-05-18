@@ -12,6 +12,7 @@ case class ScalaEnums(
     Seq(
       enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
       s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(
+        className = enum.name,
         interfaces = Nil,
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"),

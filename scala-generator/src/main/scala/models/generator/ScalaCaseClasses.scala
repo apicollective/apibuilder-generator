@@ -87,6 +87,7 @@ trait ScalaCaseClasses extends CodeGenerator {
         case v => Some(v)
       },
       Some(s"sealed trait ${union.name}" + ScalaUtil.extendsClause(
+        className = union.name,
         interfaces = unions.flatMap(_.interfaces),
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
@@ -112,6 +113,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     Seq(
       Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
       Some(s"final case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(
+        className = model.name,
         interfaces = model.interfaces,
         unions = unions.map(_.name),
       ).getOrElse(""))
