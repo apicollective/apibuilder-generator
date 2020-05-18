@@ -13,15 +13,16 @@ class ScalaCaseClassesUnionInterfacesSpec extends AnyFunSpec with Matchers with 
   private[this] def build(
     interface: Interface,
   ): ScalaService = {
-    val person = makeUnion(name = "person", types = Seq(makeUnionType(`type` = "user")), interfaces = Seq(interface.name))
-    val user = makeModel(name = "user", fields = Seq(IdField))
-
     ScalaService(
       makeService(
         namespace = "test",
         version = "0.0.1",
-        unions = Seq(person),
-        models = Seq(user),
+        unions = Seq(
+          makeUnion(name = "person", types = Seq(makeUnionType(`type` = "user")), interfaces = Seq(interface.name))
+        ),
+        models = Seq(
+          makeModel(name = "user", fields = Seq(IdField))
+        ),
         interfaces = Seq(interface),
       )
     )

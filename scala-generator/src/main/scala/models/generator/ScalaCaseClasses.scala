@@ -88,7 +88,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       },
       Some(s"sealed trait ${union.name}" + ScalaUtil.extendsClause(
         className = union.name,
-        interfaces = unions.flatMap(_.interfaces),
+        interfaces = union.interfaces,
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
     ).flatten.mkString("\n")

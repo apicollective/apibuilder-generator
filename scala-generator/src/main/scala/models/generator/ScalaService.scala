@@ -29,13 +29,13 @@ class ScalaService(
   def modelClassName(name: String): String = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
-  val interfaces: Seq[ScalaInterface] = service.interfaces.sortWith { _.name < _.name }.map { new ScalaInterface(this, _) }
+  val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }.sortBy(_.name)
 
-  val models: Seq[ScalaModel] = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
+  val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
-  val enums: Seq[ScalaEnum] = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(this, _) }
+  val enums: Seq[ScalaEnum] = service.enums.map { new ScalaEnum(this, _) }.sortBy(_.name)
 
-  val unions: Seq[ScalaUnion] = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
+  val unions: Seq[ScalaUnion] = service.unions.map { new ScalaUnion(this, _) }.sortBy(_.name)
 
   val resources: Seq[ScalaResource] = service.resources.map { r => new ScalaResource(this, r) }
 
@@ -116,7 +116,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   // Include an undefined instance to nudge the developer to think
   // about what happens in the future when a new type is added to the
   // union type.
-  val undefinedType = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
+  val undefinedType: ScalaPrimitive.Model = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
 
   val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
 
@@ -290,7 +290,7 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val name: String = ScalaUtil.toClassName(originalName)
 
-  def datatype = ScalaPrimitive.Enum(ssd.namespaces, name)
+  def datatype: ScalaPrimitive.Enum = ScalaPrimitive.Enum(ssd.namespaces, name)
 
   val qualifiedName: String = ssd.enumClassName(name)
 
