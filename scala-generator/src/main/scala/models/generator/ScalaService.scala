@@ -259,16 +259,19 @@ class ScalaModel(val ssd: ScalaService, val model: Model) extends ScalaModelAndI
     interfaces = model.interfaces,
   )
 ) {
-  private[this] val scalaInterfaces: Seq[ScalaInterface] = model.interfaces.flatMap { i =>
-    ssd.interfaces.find(_.interface.name == i)
-  }
-  private[this] val inheritedFieldNames: Set[String] = scalaInterfaces.flatMap(_.fields.map(_.name)).toSet
 
-  val argList: Option[String] = ScalaUtil.fieldsToArgList(
-    fields.map { f =>
-      f.definition(isOverride = inheritedFieldNames.contains(f.name))
+  def argList(unions: Seq[ScalaUnion]): Option[String] = {
+    val scalaInterfaces: Seq[ScalaInterface] = (model.interfaces ++ unions.flatMap(_.interfaces)).distinct.flatMap { i =>
+      ssd.interfaces.find(_.interface.name == i)
     }
-  )
+    val inheritedFieldNames: Set[String] = scalaInterfaces.flatMap(_.fields.map(_.name)).toSet
+    ScalaUtil.fieldsToArgList(
+      fields.map { f =>
+        f.definition(isOverride = inheritedFieldNames.contains(f.name))
+      }
+    )
+  }
+
 }
 
 class ScalaBody(ssd: ScalaService, val body: Body) {

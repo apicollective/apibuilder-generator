@@ -99,6 +99,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       ScalaUnionDiscriminator(union).build()
     }
   }
+
   def generateTraitWithDoc(interface: ScalaInterface): String = {
     ScalaGeneratorUtil.scaladoc(interface.description, interface.fields.map(f => (f.name, f.description))) +
       generateTrait(interface)
@@ -112,7 +113,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
     Seq(
       Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
-      Some(s"final case class ${model.name}(${model.argList.getOrElse("")})" + ScalaUtil.extendsClause(
+      Some(s"final case class ${model.name}(${model.argList(unions).getOrElse("")})" + ScalaUtil.extendsClause(
         className = model.name,
         interfaces = model.interfaces,
         unions = unions.map(_.name),
