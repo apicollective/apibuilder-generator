@@ -9,7 +9,9 @@ package test.models {
   }
   sealed trait Person extends _root_.scala.Product with _root_.scala.Serializable with Foo
 
-  final case class User(override val id: String) extends Person
+  final case class User(
+    override val id: String
+  ) extends Person
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -22,7 +24,7 @@ package test.models {
   final case class PersonUndefinedType(
     description: String
   ) extends Person {
-    override def id = ???
+    override def id: String = ???
   }
 
 }
