@@ -1,6 +1,6 @@
 package models.generator
 
-import io.apibuilder.spec.v0.models.Interface
+import io.apibuilder.spec.v0.models.{Field, Interface}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -8,11 +8,13 @@ import scala.generator.{ScalaCaseClasses, ScalaService}
 
 class ScalaCaseClassesUnionInterfacesSpec extends AnyFunSpec with Matchers with helpers.ServiceHelpers {
 
+  private[this] val IdField: Field = makeField(name = "id")
+
   private[this] def build(
     interface: Interface,
   ): ScalaService = {
     val person = makeUnion(name = "person", types = Seq(makeUnionType(`type` = "user")), interfaces = Seq(interface.name))
-    val user = makeModel(name = "user")
+    val user = makeModel(name = "user", fields = Seq(IdField))
 
     ScalaService(
       makeService(
@@ -57,7 +59,7 @@ class ScalaCaseClassesUnionInterfacesSpec extends AnyFunSpec with Matchers with 
     val ssd = build(
       makeInterface(
         name = "foo",
-        fields = Seq(makeField(name = "id")),
+        fields = Seq(IdField),
       )
     )
 
