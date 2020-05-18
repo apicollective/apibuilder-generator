@@ -35,7 +35,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
       case Nil => ""
       case models => {
-        models.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indentString(2) + "\n"
+        models.map(generateUnionTypeUndefined).mkString("\n\n").indentString(2)
       }
     }
 
@@ -67,6 +67,25 @@ trait ScalaCaseClasses extends CodeGenerator {
     s"\n\n}"
 
     Seq(ServiceFileNames.toFile(ssd.service.namespace, ssd.service.organization.key, ssd.service.application.key, ssd.service.version, "Models", source, Some("Scala")))
+  }
+
+  def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
+    val base = generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union))
+    if (wrapper.interfaceFields.isEmpty) {
+      base
+    } else {
+      Seq(
+        s"$base {",
+        unimplementedfields(wrapper.interfaceFields).indent(2),
+        "}",
+      ).mkString("\n")
+    }
+  }
+
+  private[this] def unimplementedfields(fields: Seq[ScalaField]): String = {
+    fields.map { f =>
+      s"override def ${f.name}: ${f.datatype.name} = ???"
+    }.mkString("\n")
   }
 
   def generateUnionTraitWithDocAndDiscriminator(union: ScalaUnion, unions: Seq[ScalaUnion]): String = {

@@ -17,6 +17,7 @@ class ScalaService(
   val service: Service,
   val attributes: Attributes = Attributes.PlayDefaultConfig,
 ) {
+
   val namespaces: Namespaces = Namespaces(service.namespace)
 
   private[this] val scalaTypeResolver = ScalaTypeResolver(namespaces)
@@ -38,6 +39,19 @@ class ScalaService(
   val unions: Seq[ScalaUnion] = service.unions.map { new ScalaUnion(this, _) }.sortBy(_.name)
 
   val resources: Seq[ScalaResource] = service.resources.map { r => new ScalaResource(this, r) }
+
+  /**
+   * @param interfaceNames The API Builder names of the interfaces
+   */
+  private[this] def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
+    interfaceNames.distinct.flatMap { i =>
+      interfaces.find(_.interface.name == i)
+    }
+  }
+
+  def findAllInterfaceFields(interfaceNames: Seq[String]): List[ScalaField] = {
+    findInterfaces(interfaceNames).flatMap(_.fields).toList.distinct
+  }
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
     def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
@@ -261,10 +275,9 @@ class ScalaModel(val ssd: ScalaService, val model: Model) extends ScalaModelAndI
 ) {
 
   def argList(unions: Seq[ScalaUnion]): Option[String] = {
-    val scalaInterfaces: Seq[ScalaInterface] = (model.interfaces ++ unions.flatMap(_.union.interfaces)).distinct.flatMap { i =>
-      ssd.interfaces.find(_.interface.name == i)
-    }
-    val inheritedFieldNames: Set[String] = scalaInterfaces.flatMap(_.fields.map(_.name)).toSet
+    val inheritedFieldNames = ssd.findAllInterfaceFields(model.interfaces ++ unions.flatMap(_.union.interfaces))
+      .map(_.name)
+      .toSet
     ScalaUtil.fieldsToArgList(
       fields.map { f =>
         f.definition(isOverride = inheritedFieldNames.contains(f.name))
