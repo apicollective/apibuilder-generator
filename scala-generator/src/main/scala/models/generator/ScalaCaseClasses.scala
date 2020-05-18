@@ -51,10 +51,13 @@ trait ScalaCaseClasses extends CodeGenerator {
       case code => "\n" + code.mkString("\n\n")
     }
 
+    val unionNames = ssd.unions.map(_.name)
     val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
     Seq(
       additionalImports.mkString("\n").indentString(2),
-      ssd.interfaces.map { i => generateTraitWithDoc(i) }.mkString("\n\n").indentString(2),
+      ssd.interfaces
+        .filterNot { i => unionNames.contains(i.name) }
+        .map { i => generateTraitWithDoc(i) }.mkString("\n\n").indentString(2),
       ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(u, ssd.unionsForUnion(u)) }.mkString("\n\n").indentString(2),
       "",
       ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indentString(2),

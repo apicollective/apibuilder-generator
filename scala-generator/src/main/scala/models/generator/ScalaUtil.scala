@@ -24,7 +24,7 @@ object ScalaUtil {
     interfaces: Seq[String],
     unions: Seq[String],
   ): Option[String] = {
-    val all = (interfaces ++ unions).toList
+    val all = (interfaces ++ unions).toList.distinct
     all match {
       case Nil => None
       case _ => Some(" extends " + all.sorted.mkString(" with "))
