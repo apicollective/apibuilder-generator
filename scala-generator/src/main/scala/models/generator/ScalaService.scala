@@ -261,7 +261,7 @@ class ScalaModel(val ssd: ScalaService, val model: Model) extends ScalaModelAndI
 ) {
 
   def argList(unions: Seq[ScalaUnion]): Option[String] = {
-    val scalaInterfaces: Seq[ScalaInterface] = (model.interfaces ++ unions.flatMap(_.interfaces)).distinct.flatMap { i =>
+    val scalaInterfaces: Seq[ScalaInterface] = (model.interfaces ++ unions.flatMap(_.union.interfaces)).distinct.flatMap { i =>
       ssd.interfaces.find(_.interface.name == i)
     }
     val inheritedFieldNames: Set[String] = scalaInterfaces.flatMap(_.fields.map(_.name)).toSet
