@@ -71,16 +71,16 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
     val base = generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union))
-    withInterfaceFields(base, wrapper.interfaceFields)
+    withInterfaceFields(base, unimplementedfields(wrapper.interfaceFields))
   }
 
-  private[this] def withInterfaceFields(base: String, fields: Seq[ScalaField]): String = {
+  private[this] def withInterfaceFields(base: String, fields: String): String = {
     if (fields.isEmpty) {
       base
     } else {
       Seq(
         s"$base {",
-        unimplementedfields(fields).indentString(),
+        fields.indentString(),
         "}",
       ).mkString("\n")
     }
@@ -115,7 +115,10 @@ trait ScalaCaseClasses extends CodeGenerator {
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
     ).flatten.mkString("\n")
-    withInterfaceFields(body, ssd.findAllInterfaceFields(union.union.interfaces))
+    val fieldBody = ssd.findAllInterfaceFields(union.union.interfaces).map { f =>
+      s"def ${f.name}: ${f.datatype.name}"
+    }.mkString("\n")
+    withInterfaceFields(body, fieldBody)
   }
 
   def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {
