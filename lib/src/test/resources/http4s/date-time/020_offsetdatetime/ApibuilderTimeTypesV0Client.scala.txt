@@ -45,7 +45,6 @@ package io.gregor.time.types.v0.models {
     description: String
   ) extends DateTimeUnion
 
-
   /**
    * Wrapper class to support the union types containing the datatype[date-iso8601]
    */
