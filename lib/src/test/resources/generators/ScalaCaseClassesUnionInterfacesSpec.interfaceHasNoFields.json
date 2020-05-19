@@ -5,9 +5,11 @@
 package test.models {
 
   trait Foo
-  sealed trait Person extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait Person extends Foo
 
-  final case class User() extends Person
+  final case class User(
+    id: String
+  ) extends Person
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
