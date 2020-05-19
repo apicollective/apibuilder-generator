@@ -76,7 +76,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     } else {
       Seq(
         s"$base {",
-        unimplementedfields(wrapper.interfaceFields).indent(2),
+        unimplementedfields(wrapper.interfaceFields).indentString(),
         "}",
       ).mkString("\n")
     }
