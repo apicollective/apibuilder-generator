@@ -7,7 +7,7 @@ package test.models {
   trait Foo {
     def id: String
   }
-  sealed trait Person extends _root_.scala.Product with _root_.scala.Serializable with Foo
+  sealed trait Person extends Foo
 
   final case class User(
     override val id: String
