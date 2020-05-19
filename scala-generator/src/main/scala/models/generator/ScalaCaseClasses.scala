@@ -58,7 +58,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       ssd.interfaces
         .filterNot { i => unionNames.contains(i.name) }
         .map { i => generateTraitWithDoc(i) }.mkString("\n\n").indentString(2),
-      ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(u, ssd.unionsForUnion(u)) }.mkString("\n\n").indentString(2),
+      ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(ssd, u, ssd.unionsForUnion(u)) }.mkString("\n\n").indentString(2),
       "",
       ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indentString(2),
       generatedClasses,
@@ -71,12 +71,16 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
     val base = generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union))
-    if (wrapper.interfaceFields.isEmpty) {
+    withInterfaceFields(base, wrapper.interfaceFields)
+  }
+
+  private[this] def withInterfaceFields(base: String, fields: Seq[ScalaField]): String = {
+    if (fields.isEmpty) {
       base
     } else {
       Seq(
         s"$base {",
-        unimplementedfields(wrapper.interfaceFields).indentString(),
+        unimplementedfields(fields).indentString(),
         "}",
       ).mkString("\n")
     }
@@ -88,29 +92,30 @@ trait ScalaCaseClasses extends CodeGenerator {
     }.mkString("\n")
   }
 
-  def generateUnionTraitWithDocAndDiscriminator(union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
+  def generateUnionTraitWithDocAndDiscriminator(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
     val disc = generateUnionDiscriminatorTrait(union) match {
       case None => ""
       case Some(code) => s"\n\n$code"
     }
 
-    ScalaGeneratorUtil.scaladoc(union.description, Nil) + generateUnionTrait(union, unions) + disc
+    ScalaGeneratorUtil.scaladoc(union.description, Nil) + generateUnionTrait(ssd, union, unions) + disc
   }
 
-  def generateUnionTrait(union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
+  def generateUnionTrait(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
     // TODO: handle primitive types
-
-    Seq(
+    val body = Seq(
       ScalaUtil.deprecationString(union.deprecation).trim match {
         case "" => None
         case v => Some(v)
       },
+
       Some(s"sealed trait ${union.name}" + ScalaUtil.extendsClause(
         className = union.name,
         interfaces = union.interfaces,
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
     ).flatten.mkString("\n")
+    withInterfaceFields(body, ssd.findAllInterfaceFields(union.union.interfaces))
   }
 
   def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {
