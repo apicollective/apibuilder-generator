@@ -20,10 +20,15 @@ object ScalaUtil {
     "with", "yield"
   ).toSet
 
-  def extendsClause(unions: Seq[String]): Option[String] = {
-    unions match {
+  def extendsClause(
+    className: String,
+    interfaces: Seq[String],
+    unions: Seq[String],
+  ): Option[String] = {
+    val all = (interfaces ++ unions).toList.filterNot(_ == className)
+    all match {
       case Nil => None
-      case _ => Some(" extends " + unions.sorted.mkString(" with "))
+      case _ => Some(" extends " + all.distinct.sorted.mkString(" with "))
     }
   }
 

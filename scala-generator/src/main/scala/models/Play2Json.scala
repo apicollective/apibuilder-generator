@@ -3,6 +3,7 @@ package scala.models
 import com.github.ghik.silencer.silent
 import lib.Text._
 
+import scala.annotation.tailrec
 import scala.generator.ScalaPrimitive.{Model, Union}
 import scala.generator._
 
@@ -52,7 +53,7 @@ case class Play2JsonCommon(ssd: ScalaService) {
     val methodName = implicitWriterName(name)
     s"implicit def $methodName: play.api.libs.json.Writes[$name]"
   }
-  
+
 }
 
 case class Play2Json(
@@ -66,7 +67,7 @@ case class Play2Json(
       ssd.models.map(readersAndWriters(_)).mkString("\n\n"),
       PrimitiveWrapper(ssd).wrappers.map(w => readers(w.model)).mkString("\n\n"),
       ssd.unions.map(readersAndWriters(_)).mkString("\n\n")
-    ).filter(!_.trim.isEmpty).mkString("\n\n")    
+    ).filter(!_.trim.isEmpty).mkString("\n\n")
   }
 
   /**
@@ -316,6 +317,7 @@ case class Play2Json(
       }
     }
 
+    @tailrec
     def getShortName(dt: ScalaDatatype): String = {
       dt match {
         case model: ScalaPrimitive.Model => model.shortName

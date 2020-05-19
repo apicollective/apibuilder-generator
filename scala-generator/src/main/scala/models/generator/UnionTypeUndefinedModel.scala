@@ -4,11 +4,11 @@ import lib.Datatype
 
 import io.apibuilder.spec.v0.models.{Field, Model}
 
+case class UnionTypeUndefinedModelWrapper(model: ScalaModel, union: ScalaUnion, interfaceFields: Seq[ScalaField])
+
 case class UnionTypeUndefinedModel(ssd: ScalaService) {
 
-  case class Wrapper(model: ScalaModel, union: ScalaUnion)
-
-  val models: Seq[Wrapper] = ssd.unions.map { union =>
+  val models: Seq[UnionTypeUndefinedModelWrapper] = ssd.unions.map { union =>
     // TODO: Verify another type does not exist with this name
     val name = s"${union.name}UndefinedType"
     val model = Model(
@@ -24,9 +24,11 @@ case class UnionTypeUndefinedModel(ssd: ScalaService) {
         )
       )
     )
-    Wrapper(
-      new ScalaModel(ssd, model),
-      union
+
+    UnionTypeUndefinedModelWrapper(
+      model = new ScalaModel(ssd, model),
+      union = union,
+      interfaceFields = ssd.findAllInterfaceFields(union.union.interfaces),
     )
   }
 

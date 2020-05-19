@@ -17,6 +17,7 @@ class ScalaService(
   val service: Service,
   val attributes: Attributes = Attributes.PlayDefaultConfig,
 ) {
+
   val namespaces: Namespaces = Namespaces(service.namespace)
 
   private[this] val scalaTypeResolver = ScalaTypeResolver(namespaces)
@@ -29,13 +30,28 @@ class ScalaService(
   def modelClassName(name: String): String = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
-  val models: Seq[ScalaModel] = service.models.sortWith { _.name < _.name }.map { new ScalaModel(this, _) }
+  val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }.sortBy(_.name)
 
-  val enums: Seq[ScalaEnum] = service.enums.sortWith { _.name < _.name }.map { new ScalaEnum(this, _) }
+  val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
-  val unions: Seq[ScalaUnion] = service.unions.sortWith { _.name < _.name }.map { new ScalaUnion(this, _) }
+  val enums: Seq[ScalaEnum] = service.enums.map { new ScalaEnum(this, _) }.sortBy(_.name)
+
+  val unions: Seq[ScalaUnion] = service.unions.map { new ScalaUnion(this, _) }.sortBy(_.name)
 
   val resources: Seq[ScalaResource] = service.resources.map { r => new ScalaResource(this, r) }
+
+  /**
+   * @param interfaceNames The API Builder names of the interfaces
+   */
+  private[this] def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
+    interfaceNames.distinct.flatMap { i =>
+      interfaces.find(_.interface.name == i)
+    }
+  }
+
+  def findAllInterfaceFields(interfaceNames: Seq[String]): List[ScalaField] = {
+    findInterfaces(interfaceNames).flatMap(_.fields).toList.distinct
+  }
 
   def scalaDatatype(t: Datatype): ScalaDatatype = {
     def convertObjectType(sd: ScalaDatatype): ScalaDatatype = sd match {
@@ -105,6 +121,8 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val qualifiedName: String = ssd.unionClassName(name)
 
+  val interfaces: Seq[String] = union.interfaces.map(ScalaUtil.toClassName)
+
   val discriminator: Option[String] = union.discriminator
 
   val description: Option[String] = union.description
@@ -112,7 +130,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
   // Include an undefined instance to nudge the developer to think
   // about what happens in the future when a new type is added to the
   // union type.
-  val undefinedType = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
+  val undefinedType: ScalaPrimitive.Model = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
 
   val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
 
@@ -189,7 +207,20 @@ object ScalaUnionType {
   }
 }
 
-class ScalaModel(val ssd: ScalaService, val model: Model) {
+case class ModelAndInterface(
+  name: String,
+  plural: String,
+  description: _root_.scala.Option[String],
+  deprecation: _root_.scala.Option[io.apibuilder.spec.v0.models.Deprecation],
+  fields: Seq[io.apibuilder.spec.v0.models.Field],
+  attributes: Seq[io.apibuilder.spec.v0.models.Attribute],
+  interfaces: Seq[String],
+)
+
+abstract class ScalaModelAndInterface(
+  ssd: ScalaService,
+  model: ModelAndInterface,
+) {
 
   val originalName: String = model.name
 
@@ -203,9 +234,56 @@ class ScalaModel(val ssd: ScalaService, val model: Model) {
 
   val fields: List[ScalaField] = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
 
-  val argList: Option[String] = ScalaUtil.fieldsToArgList(fields.map(_.definition()))
-
   val deprecation: Option[Deprecation] = model.deprecation
+
+  val interfaces: Seq[String] = model.interfaces.map(ScalaUtil.toClassName)
+}
+
+class ScalaInterface(val ssd: ScalaService, val interface: Interface) extends ScalaModelAndInterface(
+  ssd,
+  ModelAndInterface(
+    name = interface.name,
+    plural = interface.plural ,
+    description = interface.description,
+    deprecation = interface.deprecation,
+    fields = interface.fields,
+    attributes = interface.attributes,
+    interfaces = Nil,
+  )
+) {
+  val body: Option[String] = fields match {
+    case Nil => None
+    case _ => Some(
+      fields.map { f =>
+        "def " + f.definition(isOverride = false)
+      }.mkString("\n")
+    )
+  }
+}
+
+class ScalaModel(val ssd: ScalaService, val model: Model) extends ScalaModelAndInterface(
+  ssd,
+  ModelAndInterface(
+    name = model.name,
+    plural = model.plural ,
+    description = model.description,
+    deprecation = model.deprecation,
+    fields = model.fields,
+    attributes = model.attributes,
+    interfaces = model.interfaces,
+  )
+) {
+
+  def argList(unions: Seq[ScalaUnion]): Option[String] = {
+    val inheritedFieldNames = ssd.findAllInterfaceFields(model.interfaces ++ unions.flatMap(_.union.interfaces))
+      .map(_.name)
+      .toSet
+    ScalaUtil.fieldsToArgList(
+      fields.map { f =>
+        f.definition(isOverride = inheritedFieldNames.contains(f.name))
+      }
+    )
+  }
 
 }
 
@@ -228,7 +306,7 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val name: String = ScalaUtil.toClassName(originalName)
 
-  def datatype = ScalaPrimitive.Enum(ssd.namespaces, name)
+  def datatype: ScalaPrimitive.Enum = ScalaPrimitive.Enum(ssd.namespaces, name)
 
   val qualifiedName: String = ssd.enumClassName(name)
 
@@ -369,14 +447,16 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     sys.error(ssd.errorParsingType(field.`type`, s"model[$modelName] field[$name]"))
   }
 
+  def deprecation: Option[Deprecation] = field.deprecation
+
   def datatype: ScalaDatatype = ssd.scalaDatatype(`type`)
 
   def description: Option[String] = field.description
 
   def default: Option[String] = field.default.map(ScalaUtil.scalaDefault(_, datatype))
 
-  def definition(varName: String = name): String = {
-    datatype.definition(varName, default, field.deprecation)
+  def definition(varName: String = name, isOverride: Boolean): String = {
+    datatype.definition(varName, default, deprecation, isOverride = isOverride)
   }
 
   def limitation: ScalaField.Limitation = ScalaField.Limitation(field.minimum, field.maximum)
@@ -416,7 +496,7 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
     }
   }
 
-  def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.nonEmpty
+  def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.isDefined
 }
 
 object ScalaField {
@@ -444,7 +524,7 @@ class ScalaParameter(ssd: ScalaService, val param: Parameter) {
   def required: Boolean = param.required
 
   def definition(varName: String = name): String = {
-    datatype.definition(varName, default, param.deprecation)
+    datatype.definition(varName, default, param.deprecation, isOverride = false)
   }
 
   def location: ParameterLocation = param.location

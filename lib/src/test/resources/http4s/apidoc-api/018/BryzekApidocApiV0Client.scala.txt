@@ -569,7 +569,6 @@ package io.apibuilder.api.v0.models {
   final case class ItemDetailUndefinedType(
     description: String
   ) extends ItemDetail
-
   sealed trait OriginalType extends _root_.scala.Product with _root_.scala.Serializable
 
   object OriginalType {

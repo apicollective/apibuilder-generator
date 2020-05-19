@@ -11,6 +11,7 @@ package object gens {
   lazy val genScalaService: Gen[ScalaService] = for {
     service <- Arbitrary.arbitrary[Service]
     safeButBad = service.copy(
+      interfaces = service.interfaces.map(_.copy(fields = Seq.empty)),
       models = service.models.map(_.copy(fields = Seq.empty)),
       unions = service.unions.map(_.copy(types = Seq.empty)),
       resources = service.resources.map { r =>

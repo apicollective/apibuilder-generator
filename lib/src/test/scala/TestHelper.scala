@@ -65,7 +65,11 @@ object TestHelper extends Matchers {
   }
 
   def readFile(path: String): String = {
-    scala.io.Source.fromFile(new JFile(path)).getLines.mkString("\n")
+    readFile(new JFile(path))
+  }
+
+  def readFile(path: JFile): String = {
+    scala.io.Source.fromFile(path).getLines.mkString("\n")
   }
 
   def parseFile(path: String): Service = {
@@ -154,7 +158,7 @@ object TestHelper extends Matchers {
         TestHelper.writeToFile(actualPath, contents.trim)
       } else {
         println("If you would like to update the test output automatically")
-        println(s"  1. touch $expectedPath")
+        println(s"  1. touch $OverwriteTestsFile")
         println("  2. rerun the tests")
       }
 

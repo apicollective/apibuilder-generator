@@ -75,7 +75,6 @@ package io.apibuilder.example.union.types.v0.models {
     description: String
   ) extends User
 
-
   /**
    * Wrapper class to support the union types containing the datatype[uuid]
    */
