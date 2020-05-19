@@ -71,7 +71,10 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
     val base = generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union))
-    withInterfaceFields(base, unimplementedfields(wrapper.interfaceFields))
+    val fields = wrapper.interfaceFields.map { f =>
+      s"override def ${f.name}: ${f.datatype.name} = ???"
+    }.mkString("\n")
+    withInterfaceFields(base, fields)
   }
 
   private[this] def withInterfaceFields(base: String, fields: String): String = {
@@ -84,12 +87,6 @@ trait ScalaCaseClasses extends CodeGenerator {
         "}",
       ).mkString("\n")
     }
-  }
-
-  private[this] def unimplementedfields(fields: Seq[ScalaField]): String = {
-    fields.map { f =>
-      s"override def ${f.name}: ${f.datatype.name} = ???"
-    }.mkString("\n")
   }
 
   def generateUnionTraitWithDocAndDiscriminator(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
