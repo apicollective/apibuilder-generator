@@ -42,6 +42,20 @@ class ScalaCaseClassesUnionInterfacesSpec extends AnyFunSpec with Matchers with 
     )
   }
 
+  it("interfaceHasSameNameAndFields") {
+    val ssd = build(
+      makeInterface(
+        name = "person",
+        fields = Seq(IdField),
+      )
+    )
+
+    models.TestHelper.assertEqualsFile(
+      "/generators/ScalaCaseClassesUnionInterfacesSpec.interfaceHasSameNameAndFields.json",
+      ScalaCaseClasses.generateCode(ssd, userAgent = None).head.contents
+    )
+  }
+
   it("interfaceHasNoFields") {
     val ssd = build(
       makeInterface(
