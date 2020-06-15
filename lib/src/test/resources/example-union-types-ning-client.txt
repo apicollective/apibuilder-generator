@@ -168,7 +168,7 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     private[v0] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
-      _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)
+      _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime(str)
     }
 
     private[v0] implicit val jsonWritesJodaDateTime = new Writes[_root_.org.joda.time.DateTime] {

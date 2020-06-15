@@ -83,7 +83,7 @@ package io.gregor.time.types.v0.models {
       Encoder.encodeString.contramap[_root_.java.util.UUID](uuid => uuid.toString)
 
     private[v0] implicit val decodeDateTime: Decoder[_root_.org.joda.time.DateTime] =
-      Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)))
+      Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime(str)))
 
     private[v0] implicit val encodeDateTime: Encoder[_root_.org.joda.time.DateTime] =
       Encoder.encodeString.contramap[_root_.org.joda.time.DateTime](_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(_))

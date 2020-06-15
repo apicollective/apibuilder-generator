@@ -141,7 +141,7 @@ object ScalaPrimitive {
     def apidocType = "date-time-iso8601"
     def shortName = "DateTime"
     override def asString(originalVarName: String): String = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(${ScalaUtil.quoteNameIfKeyword(originalVarName)})"
-    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(${ScalaUtil.quoteNameIfKeyword(value)})"
+    override def fromStringValue(value: String) = s"_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime(${ScalaUtil.quoteNameIfKeyword(value)})"
     override def default(value: String): String = fromStringValue(ScalaUtil.wrapInQuotes(value))
     override protected def default(json: JsValue): String = default(json.toString)
   }

@@ -64,7 +64,7 @@ class ScalaDatatypeSpec extends AnyFunSpec with Matchers {
 
   it("DateTimeIso8601Joda sanity check") {
     DateTimeIso8601Joda.asString("myVar") shouldBe "_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(myVar)"
-    DateTimeIso8601Joda.default("2020-12-31") shouldBe "_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(\"2020-12-31\")"
+    DateTimeIso8601Joda.default("2020-12-31") shouldBe "_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime(\"2020-12-31\")"
     DateTimeIso8601Joda.name shouldBe "_root_.org.joda.time.DateTime"
   }
 

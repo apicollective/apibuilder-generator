@@ -214,7 +214,7 @@ class ScalaUtilSpec extends AnyFunSpec with Matchers {
     describe ("default: 2014-03-14T12:13:15Z, datatype: date-time-iso8601") {
       it("behaves for Joda-Time") {
         ScalaUtil.scalaDefault("2014-03-14T12:13:15Z", ScalaPrimitive.DateTimeIso8601Joda) should be {
-          """_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime("2014-03-14T12:13:15Z")"""
+          """_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime("2014-03-14T12:13:15Z")"""
         }
       }
       it("behaves for java.time") {

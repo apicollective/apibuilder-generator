@@ -18,7 +18,7 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
     org.http4s.QueryParamDecoder.fromUnsafeCast[BigDecimal](p => BigDecimal(p.value))("BigDecimal")
 
   implicit lazy val queryParamDecodeDateTime: org.http4s.QueryParamDecoder[_root_.org.joda.time.DateTime] =
-    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.org.joda.time.DateTime](p => _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(p.value))("_root_.org.joda.time.DateTime")
+    org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.org.joda.time.DateTime](p => _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime(p.value))("_root_.org.joda.time.DateTime")
 
   implicit lazy val queryParamDecodeLocalDate: org.http4s.QueryParamDecoder[_root_.org.joda.time.LocalDate] =
     org.http4s.QueryParamDecoder.fromUnsafeCast[_root_.org.joda.time.LocalDate](p => _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(p.value))("_root_.org.joda.time.LocalDate")
@@ -39,7 +39,7 @@ private[server] trait Matchers[F[_]] extends Http4sDsl[F] {
   }
 
   object DateTimeVal {
-    def unapply(s: String): Option[_root_.org.joda.time.DateTime] = scala.util.Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(s)).toOption
+    def unapply(s: String): Option[_root_.org.joda.time.DateTime] = scala.util.Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime(s)).toOption
   }
 
   object LocalDateVal {

@@ -27,7 +27,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
                                |    isFlashy: Boolean = true,
                                |    markets: Seq[String] = scala.List("USA","CAN"),
                                |    launchedOn: _root_.org.joda.time.LocalDate = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate("1986-02-01"),
-                               |    timestamp: _root_.org.joda.time.DateTime = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime("2018-03-21T02:20:52Z")
+                               |    timestamp: _root_.org.joda.time.DateTime = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime("2018-03-21T02:20:52Z")
                                |  )""".stripMargin) should be(true)
   }
 
@@ -51,7 +51,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
                                |    isFlashy: Boolean = true,
                                |    markets: Seq[String] = scala.List("USA","CAN"),
                                |    launchedOn: _root_.org.joda.time.LocalDate = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate("1986-02-01"),
-                               |    timestamp: _root_.org.joda.time.DateTime = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime("2018-03-21T02:20:52Z")
+                               |    timestamp: _root_.org.joda.time.DateTime = _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime("2018-03-21T02:20:52Z")
                                |  )""".stripMargin) should be(true)
   }
 
@@ -75,7 +75,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
                                |    isFlashy: _root_.scala.Option[Boolean] = Some(true),
                                |    markets: _root_.scala.Option[Seq[String]] = Some(scala.List("USA","CAN")),
                                |    launchedOn: _root_.scala.Option[_root_.org.joda.time.LocalDate] = Some(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate("1986-02-01")),
-                               |    timestamp: _root_.scala.Option[_root_.org.joda.time.DateTime] = Some(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime("2018-03-21T02:20:52Z"))
+                               |    timestamp: _root_.scala.Option[_root_.org.joda.time.DateTime] = Some(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.withOffsetParsed.parseDateTime("2018-03-21T02:20:52Z"))
                                 |  )""".stripMargin) should be(true)
   }
 
