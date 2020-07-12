@@ -65,7 +65,7 @@ lazy val scalaGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimum := 84.0),
+    Seq(ScoverageKeys.coverageMinimum := 85.4),
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "2.1.1",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
@@ -125,7 +125,7 @@ lazy val kotlinGenerator = project
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 92.49, ScoverageKeys.coverageFailOnMinimum := true))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 94.5, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val csvGenerator = project
   .in(file("csv-generator"))
