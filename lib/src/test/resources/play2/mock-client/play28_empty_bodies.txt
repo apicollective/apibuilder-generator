@@ -1,0 +1,75 @@
+package me.gheine.status.codes.v0.mock {
+
+  trait Client extends me.gheine.status.codes.v0.interfaces.Client {
+
+    val baseUrl: String = "http://mock.localhost"
+
+    override def foos: me.gheine.status.codes.v0.Foos = MockFoosImpl
+
+  }
+
+  object MockFoosImpl extends MockFoos
+
+  trait MockFoos extends me.gheine.status.codes.v0.Foos {
+
+    def get200(
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[me.gheine.status.codes.v0.Response[String]] = scala.concurrent.Future.successful {
+      me.gheine.status.codes.v0.ResponseImpl(
+        body = Factories.randomString(),
+        status = 200,
+        headers = me.gheine.status.codes.v0.ResponseHeaders(Map.empty)
+      )
+    }
+
+    def get205(
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[me.gheine.status.codes.v0.Response[String]] = scala.concurrent.Future.successful {
+      me.gheine.status.codes.v0.ResponseImpl(
+        body = Factories.randomString(),
+        status = 205,
+        headers = me.gheine.status.codes.v0.ResponseHeaders(Map.empty)
+      )
+    }
+
+    def get300(
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[me.gheine.status.codes.v0.Response[String]] = scala.concurrent.Future.successful {
+      me.gheine.status.codes.v0.ResponseImpl(
+        body = Factories.randomString(),
+        status = 300,
+        headers = me.gheine.status.codes.v0.ResponseHeaders(Map.empty)
+      )
+    }
+
+    def get303(
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[me.gheine.status.codes.v0.Response[Unit]] = scala.concurrent.Future.successful {
+      me.gheine.status.codes.v0.ResponseImpl(
+        body = (),
+        status = 303,
+        headers = me.gheine.status.codes.v0.ResponseHeaders(Map.empty)
+      )
+    }
+
+    def get401(
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[me.gheine.status.codes.v0.Response[Unit]] = scala.concurrent.Future.successful {
+      // No-op as there is no successful response defined
+    }
+
+  }
+
+  object Factories {
+
+    def randomString(length: Int = 24): String = {
+      _root_.scala.util.Random.alphanumeric.take(length).mkString
+    }
+
+    def makeFoo(): me.gheine.status.codes.v0.models.Foo = me.gheine.status.codes.v0.models.Foo(
+      id = Factories.randomString(24)
+    )
+
+  }
+
+}

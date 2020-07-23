@@ -411,7 +411,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
   }
 
   val isSuccess: Boolean = response.code match {
-    case ResponseCodeInt(value) => value >= 200 && value < 300
+    case ResponseCodeInt(value) => value >= 200 && value < 400
     case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
   }
 

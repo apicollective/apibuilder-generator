@@ -191,7 +191,7 @@ class MockClientGenerator(
     ).mkString("\n\n")
   }
 
-    def mockImplementation(cm: ScalaClientMethod): String = {
+  def mockImplementation(cm: ScalaClientMethod): String = {
     cm.operation.responses.find(_.isSuccess) match {
       case None => {
         "// No-op as there is no successful response defined"

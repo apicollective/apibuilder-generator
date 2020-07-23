@@ -98,6 +98,23 @@
         },
         {
           "method": "GET",
+          "path": "/foos/303",
+          "parameters": [],
+          "responses": [
+            {
+              "code": {
+                "integer": {
+                  "value": 303
+                }
+              },
+              "type": "unit",
+              "attributes": []
+            }
+          ],
+          "attributes": []
+        },
+        {
+          "method": "GET",
           "path": "/foos/401",
           "parameters": [],
           "responses": [
