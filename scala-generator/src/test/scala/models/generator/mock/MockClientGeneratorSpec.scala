@@ -5,7 +5,7 @@ import models.TestHelper.assertValidScalaSourceCode
 import scala.generator.{ScalaClientMethodConfigs, ScalaService}
 import scala.generator.mock.MockClientGenerator._
 import scala.generator.ScalaField.Limitation
-import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig}
+import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig, ResponseConfig}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -110,6 +110,21 @@ class MockClientGeneratorSpec extends AnyFunSpec with Matchers {
 
       assertValidScalaSourceCode(sourceCode)
       models.TestHelper.assertEqualsFile(s"/play2/mock-client/play28_date-time-offsetdatetime.txt", sourceCode)
+    }
+  }
+
+  describe("play 2.8 - response envelope") {
+    it("generates mock clients with ResponseImpl for empty bodies") {
+      val service = models.TestHelper.statusCodesService
+      val conf = Attributes.PlayDefaultConfig.copy(response = ResponseConfig.Envelope)
+      val ssd = new ScalaService(service, conf)
+
+      val config = ScalaClientMethodConfigs.Play28(namespace = "whatever", attributes = conf, baseUrl = None)
+
+      val sourceCode = new MockClientGenerator(ssd, None, config).generateCode()
+
+      assertValidScalaSourceCode(sourceCode)
+      models.TestHelper.assertEqualsFile(s"/play2/mock-client/play28_empty_bodies.txt", sourceCode)
     }
   }
 
