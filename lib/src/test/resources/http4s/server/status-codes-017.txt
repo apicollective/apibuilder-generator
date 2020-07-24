@@ -74,6 +74,17 @@ trait FooRoutes {
     _req: org.http4s.Request
   ): fs2.Task[Get300Response]
 
+  sealed trait Get303Response
+
+  object Get303Response {
+    case class HTTP303(location: org.http4s.Uri, headers: Seq[org.http4s.Header] = Nil) extends Get303Response
+    case class UndocumentedResponse(response: fs2.Task[org.http4s.Response]) extends Get303Response
+  }
+
+  def get303(
+    _req: org.http4s.Request
+  ): fs2.Task[Get303Response]
+
   sealed trait Get401Response
 
   object Get401Response {
@@ -111,6 +122,14 @@ trait FooRoutes {
         case Get300Response.UndocumentedResponse(response) => response
       }
     case _req @ GET -> Root / "foos" / "300" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
+      BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
+
+    case _req @ GET -> Root / "foos" / "303" if apiVersionMatch(_req) =>
+      get303(_req).flatMap {
+        case Get303Response.HTTP303(location, headers) => SeeOther(location).putHeaders(headers: _*)
+        case Get303Response.UndocumentedResponse(response) => response
+      }
+    case _req @ GET -> Root / "foos" / "303" if !_req.headers.get(ApiVersion.ApiVersionMajor).isDefined =>
       BadRequest(s"Missing required request header: ${ApiVersion.ApiVersionMajor}.")
 
     case _req @ GET -> Root / "foos" / "401" if apiVersionMatch(_req) =>
