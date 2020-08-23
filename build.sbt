@@ -98,7 +98,7 @@ lazy val androidGenerator = project
   .settings(Seq(ScoverageKeys.coverageMinimum := 76.90))
 
 val kotlinLangVersion = "1.3.72"
-val mockitoVersion = "3.4.4"
+val mockitoVersion = "3.5.5"
 val scalatestVersion = "3.2.0"
 
 lazy val kotlinGenerator = project
