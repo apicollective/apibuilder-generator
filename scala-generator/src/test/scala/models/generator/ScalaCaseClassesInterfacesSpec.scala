@@ -1,6 +1,8 @@
 package models.generator
 
+import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.Interface
+import models.TestHelper
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -40,6 +42,21 @@ class ScalaCaseClassesInterfacesSpec extends AnyFunSpec with Matchers with helpe
       "/generators/ScalaCaseClassesInterfacesSpec.interfaceWithSingleField.json",
       ScalaCaseClasses.generateTrait(ssd.interfaces.head)
     )
+  }
+
+  it("interfacesWithDeprecation") {
+    val service = models.TestHelper.parseFile(s"/examples/interfaces.json")
+    ScalaCaseClasses.invoke(InvocationForm(service = service)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        TestHelper.assertValidScalaSourceFiles(sourceFiles)
+        models.TestHelper.assertEqualsFile(
+          "/generators/scala-models-interfaces.txt",
+          sourceFiles.head.contents
+        )
+      }
+    }
   }
 
 }

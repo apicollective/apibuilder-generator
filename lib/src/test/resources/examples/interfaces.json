@@ -1,0 +1,265 @@
+{
+  "apidoc": {
+    "version": "0.13.11"
+  },
+  "name": "built-in-types",
+  "organization": {
+    "key": "apibuilder"
+  },
+  "application": {
+    "key": "built-in-types"
+  },
+  "namespace": "apibuilder",
+  "version": "0.0.1-dev",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [
+    {
+      "name": "fuel_type",
+      "plural": "fuel_types",
+      "values": [
+        {
+          "name": "petrol",
+          "attributes": []
+        },
+        {
+          "name": "diesel",
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "interfaces": [
+    {
+      "name" : "shape",
+      "plural": "shapes",
+      "fields" : [
+        {
+          "name" : "area",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "num_sides",
+          "type" : "integer",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "description",
+          "type" : "string",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name" : "vehicle",
+      "plural": "vehicles",
+      "fields" : [
+        {
+          "name" : "fuel_type",
+          "type" : "fuel_type",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "max_speed",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "unions": [
+    {
+      "name": "vehicle",
+      "plural": "vehicles",
+      "types": [
+        {
+          "type": "car",
+          "attributes": []
+        },
+        {
+          "type": "ship",
+          "attributes": []
+        }
+      ],
+      "interfaces": [
+        "vehicle"
+      ],
+      "attributes": []
+    }
+  ],
+  "models": [
+    {
+      "name": "car",
+      "plural": "cars",
+      "fields": [
+        {
+          "name" : "fuel_type",
+          "type" : "fuel_type",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "max_speed",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "make",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "ship",
+      "plural": "ships",
+      "fields": [
+        {
+          "name" : "fuel_type",
+          "type" : "fuel_type",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "max_speed",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "manufacturer",
+          "type": "string",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "name": "circle",
+      "plural": "circles",
+      "fields": [
+        {
+          "name" : "area",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "num_sides",
+          "type" : "integer",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "description",
+          "type" : "string",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
+        },
+        {
+          "name" : "radius",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "interfaces": [
+        "shape"
+      ]
+    },
+    {
+      "name": "square",
+      "plural": "squares",
+      "fields": [
+        {
+          "name" : "area",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "num_sides",
+          "type" : "integer",
+          "required": true,
+          "attributes": []
+        },
+        {
+          "name" : "description",
+          "type" : "string",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
+        },
+        {
+          "name" : "length",
+          "type" : "double",
+          "required": true,
+          "attributes": []
+        }
+      ],
+      "attributes": [],
+      "interfaces": [
+        "shape"
+      ]
+    },
+    {
+      "name": "apple",
+      "plural": "apples",
+      "fields": [
+        {
+          "name" : "colour",
+          "type" : "string",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
+        }
+      ],
+      "attributes": [],
+      "interfaces": [
+      ]
+    }
+  ],
+  "resources": [
+  ],
+  "attributes": []
+}
