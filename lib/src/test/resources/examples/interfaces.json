@@ -71,10 +71,19 @@
           "attributes": []
         },
         {
-          "name" : "max_speed",
+          "name" : "weight",
           "type" : "double",
           "required": true,
           "attributes": []
+        },
+        {
+          "name" : "max_speed",
+          "type" : "double",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
         }
       ],
       "attributes": []
@@ -112,10 +121,19 @@
           "attributes": []
         },
         {
-          "name" : "max_speed",
+          "name" : "weight",
           "type" : "double",
           "required": true,
           "attributes": []
+        },
+        {
+          "name" : "max_speed",
+          "type" : "double",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
         },
         {
           "name": "make",
@@ -143,10 +161,19 @@
           "attributes": []
         },
         {
-          "name" : "max_speed",
+          "name" : "weight",
           "type" : "double",
           "required": true,
           "attributes": []
+        },
+        {
+          "name" : "max_speed",
+          "type" : "double",
+          "required": true,
+          "attributes": [],
+          "deprecation": {
+            "description": "unused"
+          }
         },
         {
           "name": "manufacturer",

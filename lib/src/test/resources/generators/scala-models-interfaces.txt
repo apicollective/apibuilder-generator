@@ -11,6 +11,7 @@ package apibuilder.models {
   }
   sealed trait Vehicle extends _root_.scala.Product with _root_.scala.Serializable {
     def fuelType: apibuilder.models.FuelType
+    def weight: Double
     def maxSpeed: Double
   }
 
@@ -20,7 +21,8 @@ package apibuilder.models {
 
   final case class Car(
     override val fuelType: apibuilder.models.FuelType,
-    override val maxSpeed: Double,
+    override val weight: Double,
+    @deprecated("unused") override val maxSpeed: Double,
     make: String,
     model: String
   ) extends Vehicle
@@ -34,7 +36,8 @@ package apibuilder.models {
 
   final case class Ship(
     override val fuelType: apibuilder.models.FuelType,
-    override val maxSpeed: Double,
+    override val weight: Double,
+    @deprecated("unused") override val maxSpeed: Double,
     manufacturer: String,
     @deprecated("unused") model: String
   ) extends Vehicle
@@ -58,6 +61,7 @@ package apibuilder.models {
     description: String
   ) extends Vehicle {
     override def fuelType: apibuilder.models.FuelType = ???
+    override def weight: Double = ???
     override def maxSpeed: Double = ???
   }
   sealed trait FuelType extends _root_.scala.Product with _root_.scala.Serializable
