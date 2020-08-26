@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.github.ghik.silencer.silent
 import lib.Datatype
-import lib.Text.initLowerCase
+import lib.Text.{appendSpace, initLowerCase}
 import play.api.libs.json._
 import io.apibuilder.spec.v0.models.Deprecation
 
@@ -17,10 +17,6 @@ sealed trait ScalaDatatype {
 
   def name: String
 
-  def overrideString(isOverride: Boolean): String = {
-    if (isOverride) { "override val " } else { "" }
-  }
-
   def deprecationString(deprecation: Option[Deprecation]): String =
     ScalaUtil.deprecationString(deprecation)
 
@@ -28,10 +24,10 @@ sealed trait ScalaDatatype {
     originalVarName: String,
     default: Option[String],
     deprecation: Option[Deprecation],
-    isOverride: Boolean,
+    scalaTypeKind: ScalaTypeKind,
   ): String = {
     val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-    val base = s"${deprecationString(deprecation)}${overrideString(isOverride)}$varName: $name"
+    val base = s"${deprecationString(deprecation)}${appendSpace(scalaTypeKind.toString)}$varName: $name"
     default match {
       case None => base
       case Some(d) => s"$base = $d"
@@ -286,12 +282,10 @@ object ScalaDatatype {
       originalVarName: String,
       default: scala.Option[String],
       deprecation: scala.Option[Deprecation],
-      isOverride: Boolean,
+      scalaTypeKind: ScalaTypeKind,
     ): String = {
       val varName = ScalaUtil.quoteNameIfKeyword(originalVarName)
-      default.fold(s"${deprecationString(deprecation)}${overrideString(isOverride)}$varName: $name = None") { default =>
-        s"${deprecationString(deprecation)}$varName: $name = $default"
-      }
+      s"${deprecationString(deprecation)}${appendSpace(scalaTypeKind.toString)}$varName: $name = ${default.getOrElse("None")}"
     }
 
     // override, since options contain at most one element
@@ -363,4 +357,13 @@ case class ScalaTypeResolver(
     }
   }
 
+}
+
+sealed trait ScalaTypeKind
+
+object ScalaTypeKind {
+  case object DefKind extends ScalaTypeKind { override val toString = "def" }
+  case object CaseClassFieldKind extends ScalaTypeKind { override val toString = "" }
+  case object OverrideValKind extends ScalaTypeKind { override val toString = "override val" }
+  case object ParameterKind extends ScalaTypeKind { override val toString = "" }
 }
