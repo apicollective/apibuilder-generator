@@ -15,8 +15,6 @@ class GraphQLGeneratorSpec extends AnyWordSpec with Matchers
     }
   }
 
-  private[this] val generator = new GraphQLGenerator()
-
   "Services with no types" in {
     val s = makeService()
     rightOrErrors(GraphQLGenerator.invoke(InvocationForm(s))).map(_.name) must equal(
