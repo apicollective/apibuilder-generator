@@ -473,13 +473,23 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "graphql",
+        name = "GraphQL Schema Generator",
+        description = Some("Generates GraphQL Schema"),
+        language = Some("graphql")
+      ),
+      status = lib.generator.Status.Beta,
+      codeGenerator = Some(generator.graphql.GraphQLSchemaGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "graphql_apollo",
         name = "GraphQL Apollo Server Generator",
         description = Some("Generates GraphQL Schema and Apollo Server Adapters"),
         language = Some("graphql, typescript")
       ),
       status = lib.generator.Status.Beta,
-      codeGenerator = Some(generator.graphql.GraphQLGenerator)
+      codeGenerator = Some(generator.graphql.GraphQLApolloGenerator)
     )
   ).sortBy(_.metaData.key)
 }

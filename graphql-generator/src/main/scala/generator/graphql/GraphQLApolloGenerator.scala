@@ -6,7 +6,7 @@ import io.apibuilder.graphql.GraphQLCodeGenerator
 import io.apibuilder.validation.{ApiBuilderService, MultiService}
 import lib.generator.CodeGenerator
 
-object GraphQLGenerator extends CodeGenerator {
+object GraphQLApolloGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     GraphQLCodeGenerator.Default.generate(toMultiService(form)) match {
