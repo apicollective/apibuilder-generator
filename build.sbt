@@ -9,6 +9,12 @@ val scalaVer = "2.13.3"
 
 scalaVersion in ThisBuild := scalaVer
 
+lazy val resolversSettings = Seq(
+  resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
+  resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  resolvers += "Flow repository" at "https://flow.jfrog.io/flow/libs-release/",
+)
+
 lazy val generated = project
   .in(file("generated"))
   .enablePlugins(PlayScala)
@@ -31,8 +37,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -96,6 +102,18 @@ lazy val androidGenerator = project
     commonSettings: _*
   )
   .settings(Seq(ScoverageKeys.coverageMinimum := 76.90))
+
+lazy val graphQLGenerator = project
+  .in(file("graphql-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+  .settings(resolversSettings)
+//  .settings(Seq(ScoverageKeys.coverageMinimum := 66.98))
+  .settings(
+    libraryDependencies ++= Seq(
+      "io.apibuilder" %% "apibuilder-graphql" % "0.0.3",
+    ),
+  )
 
 val kotlinLangVersion = "1.3.72"
 val mockitoVersion = "3.5.10"
