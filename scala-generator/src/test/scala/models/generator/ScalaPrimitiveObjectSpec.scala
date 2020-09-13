@@ -169,17 +169,17 @@ class ScalaPrimitiveObjectSpec extends AnyFunSpec with Matchers {
 
       it("singleton") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("object"))
-        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-singleton.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-singleton.txt", generator.objects())
       }
 
       it("list") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("[object]"))
-        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-list.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-list.txt", generator.objects())
       }
 
       it("map") {
         val generator = new ScalaClientMethodGenerator(clientMethodConfig, ssd("map[object]"))
-        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-map.txt", generator.objects)
+        models.TestHelper.assertEqualsFile("/generators/scala-primitive-object-response-map.txt", generator.objects())
       }
 
     }

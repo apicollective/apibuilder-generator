@@ -10,7 +10,7 @@ object MockClient {
     val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
     val config = scala.generator.ScalaClientMethodConfigs.Play26(scalaService.namespaces.base, Attributes.PlayDefaultConfig, None)
 
-    new scala.generator.mock.MockClientGenerator(scalaService, form.userAgent, config).generateCode
+    new scala.generator.mock.MockClientGenerator(scalaService, form.userAgent, config).generateCode()
   }
 
 }

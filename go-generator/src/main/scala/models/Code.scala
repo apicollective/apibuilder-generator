@@ -490,7 +490,7 @@ case class Code(form: InvocationForm) {
           "}"
         ).mkString("\n") + "\n\n"
       }
-      
+
       val bodyParam: String = hasClientBody match {
         case false => {
           ""
@@ -663,7 +663,7 @@ type ClientRequestBody struct {
               Some(
                 Seq(
                   "request.Header = map[string][]string{",
-                  headers.all.map {
+                  headers.all().map {
                     case (name, value) => s""""$name": {$value},""".indentString(1)
                   }.mkString("\n").table(),
                   "}"

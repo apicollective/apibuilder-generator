@@ -86,12 +86,12 @@ object ScalaCheckGenerator extends CodeGenerator {
       import org.scalacheck.{Arbitrary, Gen}
 
       object ${objectName(ssd.name)} extends ${traitName(ssd.name)} {
-       ${abstractArbitraryImplementation}
+       ${abstractArbitraryImplementation()}
       }
 
       trait ${traitName(ssd.name)} ${extendsWith(form.service.imports)} {
 
-        ${abstractArbitrary}
+        ${abstractArbitrary()}
 
         ${ssd.models.map(model(ssd.namespaces.models, _)).mkString("\n\n")}
 

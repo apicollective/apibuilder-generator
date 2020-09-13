@@ -6,7 +6,7 @@ object VersionTag {
   val Dot = """\."""
   val Separator = "|99999|"
 
-  def isDigit(x: String) = {
+  def isDigit(x: String): Boolean = {
     x.matches("^\\d+$")
   }
 
@@ -51,7 +51,7 @@ case class VersionTag(version: String) extends Ordered[VersionTag] {
     }
   }
 
-  def compare(that: VersionTag) = {
+  override def compare(that: VersionTag): Int = {
     sortKey.compare(that.sortKey)
   }
 
@@ -59,7 +59,7 @@ case class VersionTag(version: String) extends Ordered[VersionTag] {
    * Computes the next micro version. If we cannot parse the current
    * version number, then returns None.
    */
-  def nextMicro(): Option[String] = {
+  def nextMicro: Option[String] = {
     trimmedVersion.split(VersionTag.Dash).size match {
       case 1 => {
         val pieces = splitOnDot(version)

@@ -65,7 +65,7 @@ class ScalaClientMethodGenerator (
 
       val reqType = op.body.fold("Unit")(b => b.datatype.name)
 
-      val hasOptionResult = featureMigration.hasImplicit404s match {
+      val hasOptionResult = featureMigration.hasImplicit404s() match {
         case true => {
           op.responses.filter(_.isSuccess).find(_.isOption).map { _ =>
             s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
@@ -125,7 +125,7 @@ class ScalaClientMethodGenerator (
           response.code match {
             case ResponseCodeInt(statusCode) => {
               if (response.isSuccess) {
-                if (featureMigration.hasImplicit404s && response.isOption) {
+                if (featureMigration.hasImplicit404s() && response.isOption) {
                   if (response.isUnit) {
                     Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncSuccessInvoke}(Some(()))")
                   } else {
@@ -140,7 +140,7 @@ class ScalaClientMethodGenerator (
                   val json = config.toJson("r", response.datatype.name)
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json")
                 }
-              } else if (featureMigration.hasImplicit404s && response.isNotFound && response.isOption) {
+              } else if (featureMigration.hasImplicit404s() && response.isNotFound && response.isOption) {
                 // will be added later
                 None
               } else {

@@ -78,7 +78,7 @@ case class DatatypeResolver(
     modelNames.foreach { name =>
       builder += name -> Datatype.UserDefined.Model(name)
     }
-    builder.result
+    builder.result()
   }
 
   private object UserDefined {

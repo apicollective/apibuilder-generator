@@ -9,7 +9,7 @@ object ModelsBindables {
   def contents(form: InvocationForm): String = {
     val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
     val bindables = scala.models.Play2Bindables(scalaService)
-      .build
+      .build()
       .split("\n")
       .drop(1)
       .dropRight(1)

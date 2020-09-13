@@ -8,7 +8,7 @@ import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaOperation, ScalaPara
 object Play2RouteGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    Play2RouteGenerator(form).invoke
+    Play2RouteGenerator(form).invoke()
   }
 }
 

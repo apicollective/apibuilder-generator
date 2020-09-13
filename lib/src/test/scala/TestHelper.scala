@@ -70,7 +70,12 @@ object TestHelper extends Matchers {
   }
 
   def readFile(path: JFile): String = {
-    scala.io.Source.fromFile(path).getLines.mkString("\n")
+    val source = scala.io.Source.fromFile(path)
+    try {
+      source.getLines().mkString("\n")
+    } finally {
+      source.close()
+    }
   }
 
   def parseFile(path: String): Service = {

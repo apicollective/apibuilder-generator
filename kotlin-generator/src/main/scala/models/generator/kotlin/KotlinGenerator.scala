@@ -178,7 +178,7 @@ class KotlinGenerator
       val jsonIgnorePropertiesAnnotation = AnnotationSpec.builder(classOf[JsonIgnoreProperties]).addMember("ignoreUnknown=true")
       builder.addAnnotation(jsonIgnorePropertiesAnnotation.build)
 
-      builder.addSuperinterface(classOf[java.io.Serializable], emptyCodeBlock)
+      builder.addSuperinterface(classOf[java.io.Serializable], emptyCodeBlock())
 
       model.description.map(builder.addKdoc(_))
 
@@ -389,7 +389,7 @@ class KotlinGenerator
               ParameterizedTypeName.get(
                 getRetrofitSingleTypeWrapperClass(),
                 ParameterizedTypeName.get(
-                  getRetrofitResponseTypeWrapperClass,
+                  getRetrofitResponseTypeWrapperClass(),
                   returnType)))
           })
 
@@ -762,7 +762,7 @@ class KotlinGenerator
 
       val singleParameterized =
         ParameterizedTypeName.get(
-          getRetrofitSingleTypeWrapperClass,
+          getRetrofitSingleTypeWrapperClass(),
           ParameterizedTypeName.get(
             getKotlinPairClassName(),
             n,
