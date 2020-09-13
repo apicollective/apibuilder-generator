@@ -9,7 +9,7 @@ object Routes {
   def contents(form: InvocationForm): String = {
     val header = scala.models.ApidocComments(form.service.version, form.userAgent).forPlayRoutes + "\n"
     scala.models.Play2RouteGenerator(form, Attributes.PlayGen2DefaultConfig)
-      .invoke
+      .invoke()
       .toOption
       .flatMap(_.headOption)
       .fold("")(_.contents)

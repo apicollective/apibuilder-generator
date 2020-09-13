@@ -34,7 +34,7 @@ object Play26Generator extends CodeGenerator {
       ("ModelsGens", files.ModelsGens.contents(form)),
       ("ModelsJson", files.ModelsJson.contents(form)),
     )
-    .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString)) }
+    .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString())) }
     .traverse { case (suffix, contents) => utils.ScalaFormatter.format(contents).map((suffix, _)) }
     .map(_.map { case (suffix, contents) => file(form, suffix, contents, Some("scala")) })
     .leftMap { t => Seq(t.toString) }

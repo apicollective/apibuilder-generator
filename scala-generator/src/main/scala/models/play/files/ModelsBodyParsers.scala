@@ -38,7 +38,7 @@ object ModelsBodyParsers {
 
 			package object bodyparsers {
 
-				${bodyParser}
+				${bodyParser()}
 
 				${bodyParsers.mkString("\n")}
 

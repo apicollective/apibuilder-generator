@@ -12,6 +12,6 @@ object Client {
         form,
         Attributes.PlayGen2DefaultConfig
       )
-      .client
+      .client()
 
 }

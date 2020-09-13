@@ -227,7 +227,7 @@ class ScalaClientMethodGenerator(
           response.code match {
             case ResponseCodeInt(statusCode) => {
               if (response.isSuccess) {
-                if (featureMigration.hasImplicit404s && response.isOption) {
+                if (featureMigration.hasImplicit404s() && response.isOption) {
                   if (response.isUnit) {
                     Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($unitResponse")
                   } else {
@@ -243,7 +243,7 @@ class ScalaClientMethodGenerator(
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $result")
                 }
 
-              } else if (featureMigration.hasImplicit404s && response.isNotFound && response.isOption) {
+              } else if (featureMigration.hasImplicit404s() && response.isNotFound && response.isOption) {
                 // will be added later
                 None
 
