@@ -474,7 +474,7 @@ object Generators {
     CodeGenTarget(
       metaData = Generator(
         key = "graphql",
-        name = "GraphQL Schema Generator",
+        name = "GraphQL Schema Generator. See https://github.com/apicollective/apibuilder-examples/tree/master/graphql/users",
         description = Some("Generates GraphQL Schema"),
         language = Some("graphql")
       ),
@@ -484,7 +484,7 @@ object Generators {
     CodeGenTarget(
       metaData = Generator(
         key = "graphql_apollo",
-        name = "GraphQL Apollo Server Generator",
+        name = "GraphQL Apollo Server Generator. See https://github.com/apicollective/apibuilder-examples/tree/master/graphql/users",
         description = Some("Generates GraphQL Schema and Apollo Server Adapters"),
         language = Some("graphql, typescript")
       ),
