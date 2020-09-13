@@ -5,7 +5,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-val scalaVer = "2.13.2"
+val scalaVer = "2.13.3"
 
 scalaVersion in ThisBuild := scalaVer
 
@@ -165,8 +165,8 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "com.github.javaparser" % "javaparser-core" % "3.16.1" % Test,
     "org.scalameta" %% "scalameta" % "4.3.20" % Test,
     "com.squareup" % "javapoet" % "1.12.1",
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full,
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.7.0" % Provided cross CrossVersion.full,
   ),
   libraryDependencies += guice,
   scalacOptions ++= Seq("-feature", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified"),
