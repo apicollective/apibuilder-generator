@@ -470,6 +470,16 @@ object Generators {
       ),
       status = lib.generator.Status.InDevelopment,
       codeGenerator = Some(generator.PostmanCollectionGeneratorImpl)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "graphql_apollo",
+        name = "GraphQL Apollo Server Generator",
+        description = Some("Generates GraphQL Schema and Apollo Server Adapters"),
+        language = Some("graphql, typescript")
+      ),
+      status = lib.generator.Status.Beta,
+      codeGenerator = Some(generator.graphql.GraphQLGenerator)
     )
   ).sortBy(_.metaData.key)
 }
