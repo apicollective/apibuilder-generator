@@ -5,8 +5,9 @@ import lib.{Datatype, DatatypeResolver}
 
 object ResponseBuilder {
 
-  val FromJson = "FromJson"
-  val FromMap = "FromMap"
+  sealed trait DataSource
+  object FromJson extends DataSource
+  object FromMap extends DataSource
 
 }
 
@@ -15,7 +16,7 @@ case class ResponseBuilder(
   datatypeResolver: DatatypeResolver
 ) {
 
-  def generate(readerName: String, datatype: Datatype, deserializer: String): Option[String] = {
+  def generate(readerName: String, datatype: Datatype, deserializer: ResponseBuilder.DataSource): Option[String] = {
     val goType = GoType(importBuilder, datatype)
 
     datatype match {
@@ -46,17 +47,24 @@ case class ResponseBuilder(
       }
 
       case Datatype.Primitive.String => {
-        val ioutil = importBuilder.ensureImport("io/ioutil")
-        Some(
-          Seq(
-            s"func() ${goType.klass.localName} {",
-            Seq(
-              s"body, _ := ${ioutil}.ReadAll($readerName)",
-              "return string(body)"
-            ).mkString("\n").indentString(1),
-            "}()"
-          ).mkString("\n")
-        )
+        deserializer match {
+          case ResponseBuilder.FromMap =>
+            Some(
+              s"$readerName.(string)"
+            )
+          case ResponseBuilder.FromJson =>
+            val ioutil = importBuilder.ensureImport("io/ioutil")
+            Some(
+              Seq(
+                s"func() ${goType.klass.localName} {",
+                Seq(
+                  s"body, _ := ${ioutil}.ReadAll($readerName)",
+                  "return string(body)"
+                ).mkString("\n").indentString(1),
+                "}()"
+              ).mkString("\n")
+            )
+        }
       }
 
       case _: Datatype.Primitive => {
