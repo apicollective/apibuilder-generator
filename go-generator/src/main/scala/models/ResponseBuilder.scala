@@ -6,8 +6,8 @@ import lib.{Datatype, DatatypeResolver}
 object ResponseBuilder {
 
   sealed trait DataSource
-  object FromJson extends DataSource
-  object FromMap extends DataSource
+  case object FromJson extends DataSource
+  case object FromMap extends DataSource
 
 }
 
