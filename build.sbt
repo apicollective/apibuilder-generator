@@ -108,10 +108,10 @@ lazy val graphQLGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(resolversSettings)
-//  .settings(Seq(ScoverageKeys.coverageMinimum := 66.98))
+  .settings(Seq(ScoverageKeys.coverageMinimum := 66.98))
   .settings(
     libraryDependencies ++= Seq(
-      "io.apibuilder" %% "apibuilder-graphql" % "0.0.3",
+      "io.apibuilder" %% "apibuilder-graphql" % "0.0.4",
     ),
   )
 
