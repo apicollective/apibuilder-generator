@@ -10,7 +10,7 @@ object GraphQLApolloGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     GraphQLCodeGenerator.Default.generate(toMultiService(form)) match {
-      case Valid(r) => Right(r.invocation.files)
+      case Valid(r) => Right(r.files)
       case Invalid(errors) => Left(errors.toNonEmptyList.toList)
     }
   }
