@@ -412,7 +412,7 @@ module HttpClient
     end
 
     def Helper.to_big_decimal(value)
-      value ? BigDecimal.new(value.to_s) : nil
+      value ? BigDecimal(value.to_s) : nil
     end
 
     def Helper.to_object(value)
