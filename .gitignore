@@ -5,6 +5,7 @@ logs/
 *.downloaded.rb
 *.swp
 *.swo
+.bsp/
 .idea/
 .idea_modules/
 .DS_Store
