@@ -182,7 +182,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.mockito" % "mockito-core" % mockitoVersion % Test,
     "com.github.javaparser" % "javaparser-core" % "3.16.1" % Test,
     "org.scalameta" %% "scalameta" % "4.4.0" % Test,
-    "com.squareup" % "javapoet" % "1.12.1",
+    "com.squareup" % "javapoet" % "1.13.0",
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % "1.7.1" % Provided cross CrossVersion.full,
   ),
