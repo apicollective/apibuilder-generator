@@ -21,6 +21,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
         scalaParameter.datatype match {
           case ScalaPrimitive.String if scalaParameter.param.minimum.isEmpty && scalaParameter.param.maximum.isEmpty => PlainString(scalaParameter.asScalaVal)
           case _: ScalaPrimitive => Extracted(scalaParameter)
+          case _: ScalaDatatype => Extracted(scalaParameter)
         }
       }
     }

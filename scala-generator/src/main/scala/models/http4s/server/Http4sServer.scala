@@ -56,6 +56,8 @@ object Http4sServer {
           QueryExtractor(extractor.name, s"cats.data.Validated.Valid(${extractor.handler})")
         case ScalaDatatype.Option(nested) =>
           recurse(nested, "Opt", true)
+        case ScalaDatatype.Map(nested) =>
+          recurse(nested, "Map", true)
       }
     }
     recurse(param.datatype, "", true)
