@@ -42,13 +42,13 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
   implicit def circeJsonDecoder[A](implicit decoder: _root_.io.circe.Decoder[A], sync: Sync[F]) = org.http4s.circe.jsonOf[F, A]
   implicit def circeJsonEncoder[A](implicit encoder: _root_.io.circe.Encoder[A], sync: Sync[F]) = org.http4s.circe.jsonEncoderOf[F, A]
 
-  case class PostRequest(id: String, model: io.apibuilder.http4s.test.models.Model, enum: io.apibuilder.http4s.test.models.Enum, opt: _root_.scala.Option[Int], list: Seq[String], map: Map[String, String])
+  case class PostRequest(id: String, model: io.apibuilder.http4s.test.models.Model, `enum`: io.apibuilder.http4s.test.models.Enum, opt: _root_.scala.Option[Int], list: Seq[String], map: Map[String, String])
 
   implicit val PostRequestDecoder: _root_.io.circe.Decoder[PostRequest] = _root_.io.circe.Decoder.instance { a =>
     for {
       id <- a.downField("id").as[String]
       model <- a.downField("model").as[io.apibuilder.http4s.test.models.Model]
-      enum <- a.downField("enum").as[io.apibuilder.http4s.test.models.Enum]
+      `enum` <- a.downField("enum").as[io.apibuilder.http4s.test.models.Enum]
       opt <- a.downField("opt").as[_root_.scala.Option[Int]]
       list <- a.downField("list").as[Seq[String]]
       map <- a.downField("map").as[Map[String, String]]
@@ -56,7 +56,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
       PostRequest(
         id = id,
         model = model,
-        enum = enum,
+        `enum` = `enum`,
         opt = opt,
         list = list,
         map = map
@@ -75,7 +75,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
     _req: org.http4s.Request[F],
     id: String,
     model: io.apibuilder.http4s.test.models.Model,
-    enum: io.apibuilder.http4s.test.models.Enum,
+    `enum`: io.apibuilder.http4s.test.models.Enum,
     opt: _root_.scala.Option[Int],
     list: Seq[String],
     map: Map[String, String]
@@ -88,7 +88,7 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
     if (_req.contentType.exists(_.mediaType == _root_.org.http4s.MediaType.`application/json`)) {
       _req.attemptAs[PostRequest].value.flatMap{
         case Right(req) =>
-          post(_req, req.id, req.model, req.enum, req.opt, req.list, req.map).flatMap {
+          post(_req, req.id, req.model, req.`enum`, req.opt, req.list, req.map).flatMap {
             case PostResponse.HTTP200(headers) => Ok(headers: _*)
             case PostResponse.UndocumentedResponse(response) => response
           }
@@ -100,12 +100,12 @@ trait ModelRoutes[F[_]] extends Matchers[F] {
             val responseOpt = for {
               id <- req.getFirst("id")
               model <- req.getFirst("model").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Model](f).toOption)
-              enum <- req.getFirst("enum").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Enum](f).toOption)
+              `enum` <- req.getFirst("`enum`").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Enum](f).toOption)
               opt <- Some(req.getFirst("opt").flatMap(f => _root_.io.circe.parser.decode[Int](f).toOption))
               list <- Some(req.get("list"))
               map <- req.getFirst("map").flatMap(f => _root_.io.circe.parser.decode[Map[String, String]](f).toOption)
             } yield {
-                post(_req, id, model, enum, opt, list, map).flatMap {
+                post(_req, id, model, `enum`, opt, list, map).flatMap {
                   case PostResponse.HTTP200(headers) => Ok(headers: _*)
                   case PostResponse.UndocumentedResponse(response) => response
                 }
