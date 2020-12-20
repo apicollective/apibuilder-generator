@@ -22,7 +22,7 @@ lazy val generated = project
   .settings(
     libraryDependencies ++= Seq(
       ws,
-      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test
+      "org.scalacheck" %% "scalacheck" % "1.15.2" % Test
     ),
     scalacOptions += "-P:silencer:pathFilters=.*",
   )
@@ -178,7 +178,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
     "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
     "org.scalatest" %% "scalatest" % scalatestVersion % Test,
-    "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
+    "org.scalatestplus" %% "scalacheck-1-15" % "3.2.3.0" % Test,
     "org.mockito" % "mockito-core" % mockitoVersion % Test,
     "com.github.javaparser" % "javaparser-core" % "3.18.0" % Test,
     "org.scalameta" %% "scalameta" % "4.4.2" % Test,
