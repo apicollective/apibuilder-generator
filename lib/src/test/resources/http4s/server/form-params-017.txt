@@ -98,7 +98,7 @@ trait ModelRoutes {
             val responseOpt = for {
               id <- req.getFirst("id")
               model <- req.getFirst("model").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Model](f).toOption)
-              `enum` <- req.getFirst("`enum`").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Enum](f).toOption)
+              `enum` <- req.getFirst("enum").flatMap(f => _root_.io.circe.parser.decode[io.apibuilder.http4s.test.models.Enum](f).toOption)
               opt <- Some(req.getFirst("opt").flatMap(f => _root_.io.circe.parser.decode[Int](f).toOption))
               list <- Some(req.get("list"))
               map <- req.getFirst("map").flatMap(f => _root_.io.circe.parser.decode[Map[String, String]](f).toOption)
