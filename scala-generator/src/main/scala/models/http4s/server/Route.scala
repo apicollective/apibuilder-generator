@@ -149,7 +149,7 @@ case class Route(ssd: ScalaService, resource: ScalaResource, op: ScalaOperation,
     val decodingParameters:Seq[String] = {
       op.nonHeaderParameters.map { field =>
         val name = field.asScalaVal
-        val originalName = ScalaUtil.quoteNameIfKeyword(field.originalName)
+        val originalName = field.originalName
         val datatype = field.datatype.name
 
         field.datatype match {
