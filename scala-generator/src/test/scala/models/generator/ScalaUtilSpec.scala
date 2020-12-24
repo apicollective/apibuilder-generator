@@ -45,6 +45,10 @@ class ScalaUtilSpec extends AnyFunSpec with Matchers {
     ScalaUtil.toVariable("FooBar") should be("fooBar")
     ScalaUtil.toVariable("Foo_Bar") should be("fooBar")
     ScalaUtil.toVariable("foo_bar") should be("fooBar")
+    ScalaUtil.toVariable("Foo.Bar") should be("fooBar")
+    ScalaUtil.toVariable("foo.bar") should be("fooBar")
+    ScalaUtil.toVariable("Foo-Bar") should be("fooBar")
+    ScalaUtil.toVariable("foo-bar") should be("fooBar")
 
     ScalaUtil.toVariable("error") should be("error")
     ScalaUtil.toVariable("errors") should be("errors")
