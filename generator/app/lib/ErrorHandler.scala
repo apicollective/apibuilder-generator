@@ -12,6 +12,7 @@ class ErrorHandler
   extends play.api.http.HttpErrorHandler with Logging {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String = ""): Future[Result] = {
+    logger.warn(s"client error - req[$request] statusCode[$statusCode] message[$message]")
     Future.successful(BadRequest(Json.toJson(Validation.serverError("Bad Request"))))
   }
 
