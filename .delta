@@ -1,5 +1,6 @@
 builds:
   - root:
+      cluster: k8s
       instance.type: t3.small
       port.container: 9000
       port.host: 7072
