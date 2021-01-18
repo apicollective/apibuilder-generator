@@ -116,7 +116,7 @@ lazy val graphQLGenerator = project
   )
 
 val kotlinLangVersion = "1.3.72"
-val mockitoVersion = "3.7.0"
+val mockitoVersion = "3.7.7"
 val scalatestVersion = "3.2.3"
 
 lazy val kotlinGenerator = project
