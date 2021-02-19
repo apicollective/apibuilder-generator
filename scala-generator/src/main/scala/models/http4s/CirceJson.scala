@@ -65,18 +65,14 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
   }
 
   private[this] def enumDecodersAndEncoders(enum: ScalaEnum): Option[String] = {
-    if (enum.values.isEmpty) {
-      None
-    } else {
-      Some(
-        Seq(
-          s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
-          s"""  Decoder.decodeString.map(${enum.qualifiedName}(_))""",
-          "",
-          s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] =""",
-          s"""  Encoder.encodeString.contramap[${enum.qualifiedName}](_.toString)"""
-        ).mkString("\n")
-      )
+    enum.values.headOption.map { _ =>
+      Seq(
+        s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
+        s"""  Decoder.decodeString.map(${enum.qualifiedName}(_))""",
+        "",
+        s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] =""",
+        s"""  Encoder.encodeString.contramap[${enum.qualifiedName}](_.toString)"""
+      ).mkString("\n")
     }
   }
 
@@ -164,43 +160,39 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
   private[this] def decoders(model: ScalaModel): Option[String] = {
     // backticks don't work correctly as enumerator names in for comprehensions
     def nobt(fieldName:String) = fieldName.replaceAll("`", "__")
-    if (model.fields.isEmpty) {
-      None
-    } else {
-      Some(
-        Seq(
-          s"${implicitDecoderDef(model.name)} = Decoder.instance { c =>",
-          s" for {",
-          model.fields.map { field =>
-            field.datatype match {
-              case ScalaDatatype.Option(inner) => {
-                s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
-              }
-              case datatype if field.shouldApplyDefaultOnRead => {
-                s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${datatype.name}]]"""
-              }
-              case datatype => {
-                s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[${datatype.name}]"""
-              }
+    model.fields.headOption.map { _ =>
+      Seq(
+        s"${implicitDecoderDef(model.name)} = Decoder.instance { c =>",
+        s" for {",
+        model.fields.map { field =>
+          field.datatype match {
+            case ScalaDatatype.Option(inner) => {
+              s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
             }
-          }.mkString("\n").indentString(4),
-          s"  } yield {",
-          s"    ${model.name}(",
+            case datatype if field.shouldApplyDefaultOnRead => {
+              s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${datatype.name}]]"""
+            }
+            case datatype => {
+              s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[${datatype.name}]"""
+            }
+          }
+        }.mkString("\n").indentString(4),
+        s"  } yield {",
+        s"    ${model.name}(",
 
-          model
-            .fields
-            .map { field =>
-              if (field.shouldApplyDefaultOnRead) {
-                s"""${field.name} = ${nobt(field.name)}.getOrElse(${field.default.get})"""
-              } else {
-                s"""${field.name} = ${nobt(field.name)}"""
-              }
-            }.mkString(",\n").indentString(6),
-          s"    )",
-          s"  }",
-          s"}"
-        ).mkString("\n")
-      )
+        model
+          .fields
+          .map { field =>
+            if (field.shouldApplyDefaultOnRead) {
+              s"""${field.name} = ${nobt(field.name)}.getOrElse(${field.default.get})"""
+            } else {
+              s"""${field.name} = ${nobt(field.name)}"""
+            }
+          }.mkString(",\n").indentString(6),
+        s"    )",
+        s"  }",
+        s"}"
+      ).mkString("\n")
     }
   }
 
