@@ -29,7 +29,7 @@ ${JsonImports(ssd.service).mkString("\n").indentString(4)}
 
     private[${ssd.namespaces.last}] implicit val encode${Uuid.shortName}: Encoder[${Uuid.fullName}] =
       Encoder.encodeString.contramap[${Uuid.fullName}](uuid => ${Uuid.asString("uuid")})
-${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).filter(!_.isEmpty).mkString("\n\n").indentString(4)}
+${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).filter(_.nonEmpty).mkString("\n\n").indentString(4)}
   }
 }"""
   }
@@ -46,14 +46,14 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
   }
 
   def generateModels(): String = {
-    Seq(
-      ssd.models.map(decodersAndEncoders(_)).mkString("\n\n"),
-      PrimitiveWrapper(ssd).wrappers.map(w => decodersAndEncoders(w.model)).mkString("\n\n")
-    ).filter(!_.trim.isEmpty).mkString("\n\n")
+    (ssd.models ++ PrimitiveWrapper(ssd).wrappers.map(_.model))
+      .flatMap(decodersAndEncoders)
+      .filter(_.trim.nonEmpty)
+      .mkString("\n\n")
   }
 
   def generateUnions(): String = {
-    ssd.unions.map(decodersAndEncoders(_)).mkString("\n\n")
+    ssd.unions.map(decodersAndEncoders).mkString("\n\n")
   }
 
   /**
@@ -61,17 +61,19 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     * conversion both from the string and object representations.
     */
   def generateEnums(): String = {
-    ssd.enums.map(enumDecodersAndEncoders(_)).mkString("\n\n")
+    ssd.enums.flatMap(enumDecodersAndEncoders).mkString("\n\n")
   }
 
-  private[models] def enumDecodersAndEncoders(enum: ScalaEnum): String = {
-    Seq(
-      s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
-      s"""  Decoder.decodeString.map(${enum.qualifiedName}(_))""",
-      "",
-      s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] =""",
-      s"""  Encoder.encodeString.contramap[${enum.qualifiedName}](_.toString)"""
-    ).mkString("\n")
+  private[this] def enumDecodersAndEncoders(enum: ScalaEnum): Option[String] = {
+    enum.values.headOption.map { _ =>
+      Seq(
+        s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
+        s"""  Decoder.decodeString.map(${enum.qualifiedName}(_))""",
+        "",
+        s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] =""",
+        s"""  Encoder.encodeString.contramap[${enum.qualifiedName}](_.toString)"""
+      ).mkString("\n")
+    }
   }
 
   private def decodersAndEncoders(union: ScalaUnion): String = {
@@ -86,6 +88,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
   }
 
   private[this] def decodersWithoutDiscriminator(union: ScalaUnion): String = {
+
     Seq(
       s"${implicitDecoderDef(union.name)} = Decoder.instance { c =>",
       unionTypesWithNames(union).map { case (t, typeName) =>
@@ -147,61 +150,72 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     ).mkString("\n")
   }
 
-  private[models] def decodersAndEncoders(model: ScalaModel): String = {
-    decoders(model) ++ "\n\n" ++ encoders(model)
+  private[this] def decodersAndEncoders(model: ScalaModel): Option[String] = {
+    Seq(decoders(model), encoders(model)).flatten.toList match {
+      case Nil => None
+      case all => Some(all.mkString("\n\n"))
+    }
   }
 
-  private[models] def decoders(model: ScalaModel): String = {
+  private[this] def decoders(model: ScalaModel): Option[String] = {
     // backticks don't work correctly as enumerator names in for comprehensions
     def nobt(fieldName:String) = fieldName.replaceAll("`", "__")
-    Seq(
-      s"${implicitDecoderDef(model.name)} = Decoder.instance { c =>",
-      s" for {",
-      model.fields.map { field =>
-        field.datatype match {
-          case ScalaDatatype.Option(inner) => {
-            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
+    model.fields.headOption.map { _ =>
+      Seq(
+        s"${implicitDecoderDef(model.name)} = Decoder.instance { c =>",
+        s" for {",
+        model.fields.map { field =>
+          field.datatype match {
+            case ScalaDatatype.Option(inner) => {
+              s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${inner.name}]]"""
+            }
+            case datatype if field.shouldApplyDefaultOnRead => {
+              s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${datatype.name}]]"""
+            }
+            case datatype => {
+              s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[${datatype.name}]"""
+            }
           }
-          case datatype if field.shouldApplyDefaultOnRead => {
-            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[Option[${datatype.name}]]"""
-          }
-          case datatype => {
-            s"""${nobt(field.name)} <- c.downField("${field.originalName}").as[${datatype.name}]"""
-          }
-        }
-      }.mkString("\n").indentString(4),
-      s"  } yield {",
-      s"    ${model.name}(",
+        }.mkString("\n").indentString(4),
+        s"  } yield {",
+        s"    ${model.name}(",
 
-      model
-        .fields
-        .map {field =>
-          if (field.shouldApplyDefaultOnRead){
-            s"""${field.name} = ${nobt(field.name)}.getOrElse(${field.default.get})"""
-          } else {
-            s"""${field.name} = ${nobt(field.name)}"""
-          }
-      }.mkString(",\n").indentString(6),
-      s"    )",
-      s"  }",
-      s"}"
-    ).mkString("\n")
+        model
+          .fields
+          .map { field =>
+            if (field.shouldApplyDefaultOnRead) {
+              s"""${field.name} = ${nobt(field.name)}.getOrElse(${field.default.get})"""
+            } else {
+              s"""${field.name} = ${nobt(field.name)}"""
+            }
+          }.mkString(",\n").indentString(6),
+        s"    )",
+        s"  }",
+        s"}"
+      ).mkString("\n")
+    }
   }
 
-  private[models] def encoders(model: ScalaModel): String = {
-    Seq(
-      s"${implicitEncoderDef(model.name)} = Encoder.instance { t =>",
-      s"  Json.fromFields(Seq(",
-      model.fields.map { field =>
-        if (field.shouldModelConcreteType) {
-          s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
-        } else {
-          s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""
-        }
-      }.mkString(",\n").indentString(4),
-      s"  ).flatten)",
-      "}"
-    ).mkString("\n")
+  private[this] def encoders(model: ScalaModel): Option[String] = {
+    if (model.fields.isEmpty) {
+      None
+    } else {
+      Some(
+        Seq(
+          s"${implicitEncoderDef(model.name)} = Encoder.instance { t =>",
+          s"  Json.fromFields(Seq(",
+          model.fields.map { field =>
+            if (field.shouldModelConcreteType) {
+              s"""Some("${field.originalName}" -> t.${field.name}.asJson)"""
+            } else {
+              s"""t.${field.name}.map(t => "${field.originalName}" -> t.asJson)"""
+            }
+          }.mkString(",\n").indentString(4),
+          s"  ).flatten)",
+          "}"
+        ).mkString("\n")
+      )
+    }
   }
 
   private[this] def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
