@@ -22,7 +22,7 @@ lazy val generated = project
   .settings(
     libraryDependencies ++= Seq(
       ws,
-      "org.scalacheck" %% "scalacheck" % "1.15.2" % Test
+      "org.scalacheck" %% "scalacheck" % "1.15.3" % Test
     ),
     scalacOptions += "-P:silencer:pathFilters=.*",
   )
