@@ -5,7 +5,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-val scalaVer = "2.13.4"
+val scalaVer = "2.13.5"
 
 scalaVersion in ThisBuild := scalaVer
 
