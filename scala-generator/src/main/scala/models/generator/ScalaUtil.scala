@@ -27,7 +27,6 @@ object ScalaUtil {
     "inline" /* Scala 3 */,
     "lazy", "match",
     "new", "null", "object",
-    "notify", // final def notify(): Unit (defined in class Object)
     "opaque" /* Scala 3 */,
     "open" /* Scala 3 */,
     "override",
