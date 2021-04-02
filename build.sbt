@@ -117,7 +117,7 @@ lazy val graphQLGenerator = project
 
 val kotlinLangVersion = "1.3.72"
 val mockitoVersion = "3.7.7"
-val scalatestVersion = "3.2.6"
+val scalatestVersion = "3.2.7"
 
 lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
@@ -178,7 +178,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
     "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
     "org.scalatest" %% "scalatest" % scalatestVersion % Test,
-    "org.scalatestplus" %% "scalacheck-1-15" % "3.2.6.0" % Test,
+    "org.scalatestplus" %% "scalacheck-1-15" % "3.2.7.0" % Test,
     "org.mockito" % "mockito-core" % mockitoVersion % Test,
     "com.github.javaparser" % "javaparser-core" % "3.18.0" % Test,
     "org.scalameta" %% "scalameta" % "4.4.3" % Test,
