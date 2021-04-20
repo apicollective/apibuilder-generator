@@ -5,7 +5,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-val scalaVer = "2.13.5"
+ThisBuild / scalaVersion := "2.13.5"
 
 lazy val allScalacOptions = Seq(
   "-deprecation",
@@ -122,7 +122,7 @@ lazy val graphQLGenerator = project
   .settings(Seq(ScoverageKeys.coverageMinimum := 66.98))
   .settings(
     libraryDependencies ++= Seq(
-      "io.apibuilder" %% "apibuilder-graphql" % "0.0.9",
+      "io.apibuilder" %% "apibuilder-graphql" % "0.0.10",
     ),
   )
 

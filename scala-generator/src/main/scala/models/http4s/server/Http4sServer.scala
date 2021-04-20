@@ -167,16 +167,20 @@ case class Http4sServer(form: InvocationForm,
     distinctParams.map { case (extractor, param) =>
       val filter = extractor.filter.getOrElse("")
 
+      def methodTry(value: String) = s"scala.util.Try(${value}).toOption"
+      def methodTryFilter(value: String) = s"${methodTry(value)}$filter"
+
       val toOption = param.datatype match {
-        case sp: ScalaPrimitive =>
-          sp match {
-            case dt @ ScalaPrimitive.String => s"Some(${dt.fromStringValue("s")})$filter"
-            case dt @ (ScalaPrimitive.Integer | ScalaPrimitive.Long) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption$filter"
-            case dt @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption"
-            case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
-            case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
-          }
-        case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
+        case dt @ ScalaPrimitive.String => s"Some(${dt.fromStringValue("s")})$filter"
+        case dt @ ScalaPrimitive.Integer => methodTryFilter(dt.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Long => methodTryFilter(dt.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Boolean => methodTry(dt.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Double => methodTry(dt.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Decimal => methodTry(dt.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Uuid => methodTry(dt.fromStringValue("s"))
+        case dt: ScalaPrimitive.DateIso8601 => methodTry(dt.fromStringValue("s"))
+        case dt: ScalaPrimitive.DateTimeIso8601 => methodTry(dt.fromStringValue("s"))
+        case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
       }
 
       s"""
