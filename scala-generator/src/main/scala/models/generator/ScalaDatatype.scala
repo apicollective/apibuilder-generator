@@ -2,7 +2,7 @@ package scala.generator
 
 import java.util.UUID
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 import lib.Datatype
 import lib.Text.{appendSpace, initLowerCase}
 import play.api.libs.json._
@@ -43,7 +43,7 @@ sealed trait ScalaDatatype {
     }
   }
 
-  protected def default(@silent json: JsValue): String = {
+  protected def default(@nowarn json: JsValue): String = {
     throw new UnsupportedOperationException(s"default for type ${name}")
   }
 

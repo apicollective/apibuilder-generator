@@ -2,7 +2,7 @@ package models.generator
 
 import java.util.UUID
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import play.api.libs.json._
 import lib.{Datatype, Text}
@@ -25,7 +25,7 @@ sealed trait JavaDatatype {
 
   def valueFromString(value: String): String = valueFromJson(Json.parse(value))
 
-  def valueFromJson(@silent json: JsValue): String = {
+  def valueFromJson(@nowarn json: JsValue): String = {
     throw new UnsupportedOperationException(s"Unable to create default value for type $name")
   }
 }

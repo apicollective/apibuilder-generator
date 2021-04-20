@@ -15,7 +15,7 @@ import lib.Text
 import lib.generator.CodeGenerator
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 
 import scala.jdk.CollectionConverters._
 
@@ -142,7 +142,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
         .addStatement("MAPPER.configure($T.FAIL_ON_UNKNOWN_PROPERTIES, false)", classOf[DeserializationFeature])
         .addStatement("MAPPER.configure($T.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)", classOf[DeserializationFeature])
         .addStatement("MAPPER.registerModule(module)")
-        .build: @silent("possible missing interpolator"))
+        .build: @nowarn("possible missing interpolator"))
 
       val getterBuilder = MethodSpec.methodBuilder("getInstance").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC)
       getterBuilder.returns(classOf[ObjectMapper])

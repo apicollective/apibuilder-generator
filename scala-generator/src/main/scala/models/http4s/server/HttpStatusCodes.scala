@@ -1,6 +1,6 @@
 package scala.models.http4s.server
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 
 import scala.generator.ScalaClientMethodConfigs
 
@@ -8,7 +8,7 @@ trait StatusCode {
   def code: Int
   def name: String
   def bodyType: Option[String] = None
-  def withBodyType(@silent typ: String): StatusCode = this
+  def withBodyType(@nowarn typ: String): StatusCode = this
   def responseParams(config: ScalaClientMethodConfigs.Http4s): String = (params(config).map { case (name, typ) => s"$name: $typ" } ++ Seq("headers: Seq[org.http4s.Header] = Nil")).mkString(", ")
   def responseExtractor(config: ScalaClientMethodConfigs.Http4s): String = (params(config).map(_._1) ++ Seq("headers")).mkString(", ")
   def applyArgs(config: ScalaClientMethodConfigs.Http4s): String = config match {
@@ -17,7 +17,7 @@ trait StatusCode {
     case _: ScalaClientMethodConfigs.Http4s018 | _: ScalaClientMethodConfigs.Http4s020 =>
       (params(config).map(_._1) ++ Seq("headers: _*")).mkString(", ")
   }
-  protected def params(@silent config: ScalaClientMethodConfigs.Http4s): Seq[(String, String)] = bodyType.toSeq.map(typ => "value" -> typ)
+  protected def params(@nowarn config: ScalaClientMethodConfigs.Http4s): Seq[(String, String)] = bodyType.toSeq.map(typ => "value" -> typ)
 }
 
 case class EmptyStatusCode(code: Int, name: String) extends StatusCode

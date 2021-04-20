@@ -1,6 +1,6 @@
 package scala.models
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 import lib.Text._
 
 import scala.annotation.tailrec
@@ -228,7 +228,7 @@ case class Play2Json(
             s"case x: ${typeName} => $json"
           }.mkString("\n"),
           s"case other => {",
-          """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""": @silent("possible missing interpolator"),
+          """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""": @nowarn("possible missing interpolator"),
           "}"
         ).mkString("\n").indentString(2),
         "}"
