@@ -16,7 +16,7 @@ import lib.generator.CodeGenerator
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 import scala.annotation.nowarn
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
 

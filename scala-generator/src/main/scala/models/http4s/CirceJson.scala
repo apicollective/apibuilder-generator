@@ -76,10 +76,6 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     }
   }
 
-  private def decodersAndEncoders(union: ScalaUnion): String = {
-    decoders(union) + "\n\n" + encoders(union)
-  }
-
   private[models] def decoders(union: ScalaUnion): String = {
     union.discriminator match {
       case None => decodersWithoutDiscriminator(union)

@@ -38,7 +38,7 @@ object JavaDatatypes {
     override val apidocType = "boolean"
     override val shortName = "boolean"
 
-    override def valueFromJson(json: JsValue) = json.as[scala.Boolean].toString
+    override def valueFromJson(json: JsValue): String = json.as[scala.Boolean].toString
   }
 
   case object Double extends NativeDatatype {
