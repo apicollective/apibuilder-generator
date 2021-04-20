@@ -1,8 +1,8 @@
 package lib.generator
 
-import com.github.ghik.silencer.silent
 import io.apibuilder.spec.v0.models.{Method, Service}
 import lib.DatatypeResolver
+import scala.annotation.nowarn
 
 object GeneratorUtil {
 
@@ -12,7 +12,7 @@ object GeneratorUtil {
     case object Union extends ObjectType { override def toString = "unions" }
     case object Model extends ObjectType { override def toString = "models" }
 
-    private val all = Seq(Enum, Union, Model)
+    private val all: Seq[ObjectType] = Seq(Enum, Union, Model)
 
     def fromString(value: String): Option[ObjectType] = {
       all.find(_.toString == value)
@@ -29,7 +29,7 @@ object GeneratorUtil {
     */
   def fullyQualifiedInternalName(
     namespace: String,
-    @silent objectType: ObjectType
+    @nowarn objectType: ObjectType
   ): String = {
     // API accepts object type parameter, but currently not used as we
     // place all internal names into the models namespace for

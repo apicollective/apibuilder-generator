@@ -134,8 +134,8 @@ lazy val kotlinGenerator = project
   .in(file("kotlin-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(
-    fork in Test := true,
-    baseDirectory in Test := file("."),
+    Test / fork := true,
+    Test / baseDirectory := file("."),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.module" % "jackson-module-kotlin" % "2.9.9",
       "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.9",
@@ -160,8 +160,8 @@ lazy val csvGenerator = project
   .in(file("csv-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(
-    fork in Test := true,
-    baseDirectory in Test := file("."),
+    Test / fork := true,
+    Test / baseDirectory := file("."),
     libraryDependencies ++= Seq(
       "org.apache.commons" % "commons-csv" % "1.7"
     )
@@ -197,7 +197,6 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ),
   libraryDependencies += guice,
   scalacOptions ++= allScalacOptions,
-  sources in(Compile, doc) := Seq.empty,
-  publishArtifact in(Compile, packageDoc) := false,
+  Compile / doc / sources := Seq.empty,
+  Compile / packageDoc / publishArtifact := false,
 )
-version := "0.8.97"
