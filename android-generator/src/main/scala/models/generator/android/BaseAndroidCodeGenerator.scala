@@ -16,16 +16,14 @@ import lib.generator.CodeGenerator
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 import scala.annotation.nowarn
-
-import scala.jdk.CollectionConverters._
-
+import collection.JavaConverters._
 
 trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
 
   def getJavaDocFileHeader() : String //abstract
   def getRetrofitReturnTypeWrapperClass() : ClassName //abstract
 
-  val JAVADOC_CLASS_MESSAGE = getJavaDocFileHeader()
+  val JAVADOC_CLASS_MESSAGE: String = getJavaDocFileHeader()
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = invoke(form, addHeader = true)
 
