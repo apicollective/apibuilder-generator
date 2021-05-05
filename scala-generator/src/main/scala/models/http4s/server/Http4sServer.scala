@@ -169,6 +169,7 @@ case class Http4sServer(form: InvocationForm,
 
       def methodTry(value: String) = s"scala.util.Try(${value}).toOption"
       def methodTryFilter(value: String) = s"${methodTry(value)}$filter"
+      val notSupported = "None // Type io.apibuilder.http4s.test.models.Model is not supported as a capture value"
 
       val toOption = param.datatype match {
         case ScalaPrimitive.String => s"Some(${ScalaPrimitive.String.fromStringValue("s")})$filter"
@@ -181,16 +182,16 @@ case class Http4sServer(form: InvocationForm,
         case dt: ScalaPrimitive.DateIso8601 => methodTry(dt.fromStringValue("s"))
         case dt: ScalaPrimitive.DateTimeIso8601 => methodTry(dt.fromStringValue("s"))
         case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
-        case _: ScalaPrimitive.Model => None
-        case _: ScalaPrimitive.Union => None
-        case ScalaPrimitive.Unit => None
-        case ScalaPrimitive.JsonValueAsCirce => None
-        case ScalaPrimitive.JsonValueAsPlay => None
-        case ScalaPrimitive.ObjectAsCirce => None
-        case ScalaPrimitive.ObjectAsPlay => None
-        case ScalaDatatype.List(_) => None
-        case ScalaDatatype.Map(_) => None
-        case ScalaDatatype.Option(_) => None
+        case _: ScalaPrimitive.Model => notSupported
+        case _: ScalaPrimitive.Union => notSupported
+        case ScalaPrimitive.Unit => notSupported
+        case ScalaPrimitive.JsonValueAsCirce => notSupported
+        case ScalaPrimitive.JsonValueAsPlay => notSupported
+        case ScalaPrimitive.ObjectAsCirce => notSupported
+        case ScalaPrimitive.ObjectAsPlay => notSupported
+        case ScalaDatatype.List(_) => notSupported
+        case ScalaDatatype.Map(_) => notSupported
+        case ScalaDatatype.Option(_) => notSupported
       }
 
       s"""

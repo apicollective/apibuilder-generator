@@ -115,7 +115,7 @@ object TestHelper extends Matchers {
   }
 
   def assertJodaTimeNotPresent(files: Seq[File]): Unit = {
-    files.foreach(assertJodaTimeNotPresent(_))
+    files.foreach(assertJodaTimeNotPresent)
   }
 
   def assertJodaTimeNotPresent(file: File): Unit = {
@@ -140,7 +140,7 @@ object TestHelper extends Matchers {
     val parseResult = virtualFile.parse[Source]
     parseResult.toEither match {
       case Left(parseError) => fail(s"Not valid Scala source. ${parseError.toString()}")
-      case Right(_) => { /* cool, we have valid source code */ }
+      case Right(_) => /* cool, we have valid source code */
     }
   }
 
