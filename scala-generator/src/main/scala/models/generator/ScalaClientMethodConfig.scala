@@ -4,7 +4,7 @@ import scala.annotation.nowarn
 
 import scala.models.{Attributes, ResponseConfig}
 
-trait ScalaClientMethodConfig {
+sealed trait ScalaClientMethodConfig {
 
   /**
     * Namespace in which the client is defined

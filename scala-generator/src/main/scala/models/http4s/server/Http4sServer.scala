@@ -173,14 +173,24 @@ case class Http4sServer(form: InvocationForm,
       val toOption = param.datatype match {
         case ScalaPrimitive.String => s"Some(${ScalaPrimitive.String.fromStringValue("s")})$filter"
         case ScalaPrimitive.Integer => methodTryFilter(ScalaPrimitive.Integer.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Long => methodTryFilter(ScalaPrimitive.Long.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Boolean => methodTry(ScalaPrimitive.Boolean.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Double => methodTry(ScalaPrimitive.Double.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Decimal => methodTry(ScalaPrimitive.Decimal.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Uuid => methodTry(ScalaPrimitive.Uuid.fromStringValue("s"))
+        case ScalaPrimitive.Long => methodTryFilter(ScalaPrimitive.Long.fromStringValue("s"))
+        case ScalaPrimitive.Boolean => methodTry(ScalaPrimitive.Boolean.fromStringValue("s"))
+        case ScalaPrimitive.Double => methodTry(ScalaPrimitive.Double.fromStringValue("s"))
+        case ScalaPrimitive.Decimal => methodTry(ScalaPrimitive.Decimal.fromStringValue("s"))
+        case ScalaPrimitive.Uuid => methodTry(ScalaPrimitive.Uuid.fromStringValue("s"))
         case dt: ScalaPrimitive.DateIso8601 => methodTry(dt.fromStringValue("s"))
         case dt: ScalaPrimitive.DateTimeIso8601 => methodTry(dt.fromStringValue("s"))
         case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
+        case _: ScalaPrimitive.Model => None
+        case _: ScalaPrimitive.Union => None
+        case ScalaPrimitive.Unit => None
+        case ScalaPrimitive.JsonValueAsCirce => None
+        case ScalaPrimitive.JsonValueAsPlay => None
+        case ScalaPrimitive.ObjectAsCirce => None
+        case ScalaPrimitive.ObjectAsPlay => None
+        case ScalaDatatype.List(_) => None
+        case ScalaDatatype.Map(_) => None
+        case ScalaDatatype.Option(_) => None
       }
 
       s"""

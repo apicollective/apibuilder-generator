@@ -14,7 +14,7 @@ object Conversions {
     ScalaPrimitive.Long,
   )
 
-  @nowarn
+  @nowarn("msg=possible missing interpolator")
   private val Header = """
 package %s {
 %s

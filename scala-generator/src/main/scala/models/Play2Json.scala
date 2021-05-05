@@ -2,7 +2,7 @@ package scala.models
 
 import lib.Text._
 
-import scala.annotation.tailrec
+import scala.annotation.{nowarn, tailrec}
 import scala.generator.ScalaPrimitive.{Model, Union}
 import scala.generator._
 
@@ -214,6 +214,7 @@ case class Play2Json(
     ).mkString("\n")
   }
 
+  @nowarn("msg=possible missing interpolator")
   private[models] def writersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
     val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
 

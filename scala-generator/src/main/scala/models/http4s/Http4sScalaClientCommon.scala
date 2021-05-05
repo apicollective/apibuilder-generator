@@ -4,6 +4,14 @@ import scala.generator.{Namespaces, ScalaClientCommon, ScalaClientMethodConfig, 
 import lib.Text._
 
 object Http4sScalaClientCommon extends ScalaClientCommon {
+
+  def mustGetHttp4sConfig(config: ScalaClientMethodConfig): ScalaClientMethodConfigs.Http4s = {
+    config match {
+      case cfg: ScalaClientMethodConfigs.Http4s => cfg
+      case _: ScalaClientMethodConfigs.Ning | _: ScalaClientMethodConfigs.Play => sys.error(s"Unexpected config: ${config.getClass.getName}")
+    }
+  }
+
   override def makeClientObject(
     config: ScalaClientMethodConfig
   ): String = {
@@ -12,9 +20,7 @@ object Http4sScalaClientCommon extends ScalaClientCommon {
       case _ => ""
     }
 
-    val http4sConfig = config match {
-      case cfg: ScalaClientMethodConfigs.Http4s => cfg
-    }
+    val http4sConfig = mustGetHttp4sConfig(config)
 
     s"""object Client {
         |  ${http4sConfig.asyncTypeImport}

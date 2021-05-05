@@ -14,9 +14,9 @@ class Play26ControllersSpec extends AnyFunSpec with Matchers {
       .fold(
         { msgs => Left(new Throwable(s"Generated errors: ${msgs.mkString("\n  - ", "\n  - ", "")}")) },
         {
+          case Nil => Left(new Throwable("Generated no files"))
           case one :: Nil => Right(one)
-          case _ :: _ => Left(new Throwable(s"Generated too many files"))
-          case Nil => Left(new Throwable(s"Generated no files"))
+          case _ => Left(new Throwable("Generated too many files"))
         }
       )
       .fold(throwable => throw throwable, identity)
