@@ -43,11 +43,11 @@ case class PrimitiveWrapper(ssd: ScalaService) {
       val model = Model(
         name = name,
         plural = s"${name}s",
-        description = Some(s"Wrapper class to support the union types containing the datatype[${p.apidocType}]"),
+        description = Some(s"Wrapper class to support the union types containing the datatype[${p.apiBuilderType}]"),
         fields = Seq(
           Field(
             name = PrimitiveWrapper.FieldName,
-            `type` = p.apidocType,
+            `type` = p.apiBuilderType,
             required = true
           )
         )

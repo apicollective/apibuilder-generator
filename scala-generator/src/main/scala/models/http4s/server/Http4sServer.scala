@@ -167,16 +167,31 @@ case class Http4sServer(form: InvocationForm,
     distinctParams.map { case (extractor, param) =>
       val filter = extractor.filter.getOrElse("")
 
+      def methodTry(value: String) = s"scala.util.Try(${value}).toOption"
+      def methodTryFilter(value: String) = s"${methodTry(value)}$filter"
+      val notSupported = "None // Type io.apibuilder.http4s.test.models.Model is not supported as a capture value"
+
       val toOption = param.datatype match {
-        case sp: ScalaPrimitive =>
-          sp match {
-            case dt @ ScalaPrimitive.String => s"Some(${dt.fromStringValue("s")})$filter"
-            case dt @ (ScalaPrimitive.Integer | ScalaPrimitive.Long) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption$filter"
-            case dt @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Decimal | ScalaPrimitive.Uuid | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601) => s"scala.util.Try(${dt.fromStringValue("s")}).toOption"
-            case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
-            case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
-          }
-        case _ => s"""None // Type ${param.datatype.name} is not supported as a capture value"""
+        case ScalaPrimitive.String => s"Some(${ScalaPrimitive.String.fromStringValue("s")})$filter"
+        case ScalaPrimitive.Integer => methodTryFilter(ScalaPrimitive.Integer.fromStringValue("s"))
+        case ScalaPrimitive.Long => methodTryFilter(ScalaPrimitive.Long.fromStringValue("s"))
+        case ScalaPrimitive.Boolean => methodTry(ScalaPrimitive.Boolean.fromStringValue("s"))
+        case ScalaPrimitive.Double => methodTry(ScalaPrimitive.Double.fromStringValue("s"))
+        case ScalaPrimitive.Decimal => methodTry(ScalaPrimitive.Decimal.fromStringValue("s"))
+        case ScalaPrimitive.Uuid => methodTry(ScalaPrimitive.Uuid.fromStringValue("s"))
+        case dt: ScalaPrimitive.DateIso8601 => methodTry(dt.fromStringValue("s"))
+        case dt: ScalaPrimitive.DateTimeIso8601 => methodTry(dt.fromStringValue("s"))
+        case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
+        case _: ScalaPrimitive.Model => notSupported
+        case _: ScalaPrimitive.Union => notSupported
+        case ScalaPrimitive.Unit => notSupported
+        case ScalaPrimitive.JsonValueAsCirce => notSupported
+        case ScalaPrimitive.JsonValueAsPlay => notSupported
+        case ScalaPrimitive.ObjectAsCirce => notSupported
+        case ScalaPrimitive.ObjectAsPlay => notSupported
+        case ScalaDatatype.List(_) => notSupported
+        case ScalaDatatype.Map(_) => notSupported
+        case ScalaDatatype.Option(_) => notSupported
       }
 
       s"""

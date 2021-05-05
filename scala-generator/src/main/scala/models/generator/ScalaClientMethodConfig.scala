@@ -1,10 +1,10 @@
 package scala.generator
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 
 import scala.models.{Attributes, ResponseConfig}
 
-trait ScalaClientMethodConfig {
+sealed trait ScalaClientMethodConfig {
 
   /**
     * Namespace in which the client is defined
@@ -100,9 +100,9 @@ trait ScalaClientMethodConfig {
     }
   }
 
-  def asyncTypeParam(@silent constraint: Option[String] = None): Option[String] = None
+  def asyncTypeParam(@nowarn constraint: Option[String] = None): Option[String] = None
 
-  def wrappedAsyncType(@silent instance: String = ""): Option[String] = None
+  def wrappedAsyncType(@nowarn instance: String = ""): Option[String] = None
 
   def asyncSuccessInvoke: String = wrappedAsyncType("Sync").getOrElse(asyncType) + "." + asyncSuccess
 

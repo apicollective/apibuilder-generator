@@ -1,9 +1,8 @@
 package scala.models
 
-import com.github.ghik.silencer.silent
 import lib.Text._
 
-import scala.annotation.tailrec
+import scala.annotation.{nowarn, tailrec}
 import scala.generator.ScalaPrimitive.{Model, Union}
 import scala.generator._
 
@@ -215,6 +214,7 @@ case class Play2Json(
     ).mkString("\n")
   }
 
+  @nowarn("msg=possible missing interpolator")
   private[models] def writersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
     val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
 
@@ -228,7 +228,7 @@ case class Play2Json(
             s"case x: ${typeName} => $json"
           }.mkString("\n"),
           s"case other => {",
-          """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""": @silent("possible missing interpolator"),
+          """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""",
           "}"
         ).mkString("\n").indentString(2),
         "}"

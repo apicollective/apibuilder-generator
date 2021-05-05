@@ -10,9 +10,7 @@ class ScalaClientMethodGenerator (
 )  extends scala.generator.ScalaClientMethodGenerator(config, ssd) {
   import lib.Text._
 
-  val http4sConfig = config match {
-    case cfg: ScalaClientMethodConfigs.Http4s => cfg
-  }
+  val http4sConfig: ScalaClientMethodConfigs.Http4s = Http4sScalaClientCommon.mustGetHttp4sConfig(config)
 
   override protected val generatorUtil = new scala.models.http4s.ScalaGeneratorUtil(config)
 

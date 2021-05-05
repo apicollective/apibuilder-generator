@@ -1,6 +1,6 @@
 package scala.generator
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 
 import scala.models.{FeatureMigration, JsonImports}
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
@@ -127,7 +127,7 @@ class ScalaClientMethodGenerator(
     }
   }
 
-  @silent protected def exceptionClass(
+  @nowarn protected def exceptionClass(
     className: String,
     body: Option[String] = None
   ): String = {
@@ -302,7 +302,7 @@ class ScalaClientMethod(
   methodCall: String,
   response: String,
   implicitArgs: Option[String],
-  @silent responseEnvelopeName: Option[String],
+  @nowarn responseEnvelopeName: Option[String],
 ) {
 
   val name: String = operation.name

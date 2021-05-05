@@ -1,6 +1,6 @@
 package scala.generator.anorm
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 import lib.Text._
 
 import scala.generator.{ScalaPrimitive, ScalaService}
@@ -14,7 +14,8 @@ object Conversions {
     ScalaPrimitive.Long,
   )
 
-  @silent("possible missing interpolator") private val Header = """
+  @nowarn("msg=possible missing interpolator")
+  private val Header = """
 package %s {
 %s
 
