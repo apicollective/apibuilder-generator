@@ -1,8 +1,5 @@
 package models.generator.android
 
-import java.io.IOException
-import javax.lang.model.element.Modifier
-
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, JsonProcessingException, Version}
 import com.fasterxml.jackson.databind._
@@ -15,7 +12,9 @@ import lib.Text
 import lib.generator.CodeGenerator
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
-import scala.annotation.nowarn
+
+import java.io.IOException
+import javax.lang.model.element.Modifier
 import scala.jdk.CollectionConverters._
 
 trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
@@ -140,7 +139,8 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
         .addStatement("MAPPER.configure($T.FAIL_ON_UNKNOWN_PROPERTIES, false)", classOf[DeserializationFeature])
         .addStatement("MAPPER.configure($T.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)", classOf[DeserializationFeature])
         .addStatement("MAPPER.registerModule(module)")
-        .build: @nowarn("possible missing interpolator"))
+        .build()
+      )
 
       val getterBuilder = MethodSpec.methodBuilder("getInstance").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.STATIC)
       getterBuilder.returns(classOf[ObjectMapper])

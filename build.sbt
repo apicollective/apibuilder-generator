@@ -1,4 +1,3 @@
-
 import scoverage.ScoverageKeys
 
 name := "apibuilder-generator"

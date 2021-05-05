@@ -171,13 +171,13 @@ case class Http4sServer(form: InvocationForm,
       def methodTryFilter(value: String) = s"${methodTry(value)}$filter"
 
       val toOption = param.datatype match {
-        case dt @ ScalaPrimitive.String => s"Some(${dt.fromStringValue("s")})$filter"
-        case dt @ ScalaPrimitive.Integer => methodTryFilter(dt.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Long => methodTryFilter(dt.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Boolean => methodTry(dt.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Double => methodTry(dt.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Decimal => methodTry(dt.fromStringValue("s"))
-        case dt @ ScalaPrimitive.Uuid => methodTry(dt.fromStringValue("s"))
+        case ScalaPrimitive.String => s"Some(${ScalaPrimitive.String.fromStringValue("s")})$filter"
+        case ScalaPrimitive.Integer => methodTryFilter(ScalaPrimitive.Integer.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Long => methodTryFilter(ScalaPrimitive.Long.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Boolean => methodTry(ScalaPrimitive.Boolean.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Double => methodTry(ScalaPrimitive.Double.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Decimal => methodTry(ScalaPrimitive.Decimal.fromStringValue("s"))
+        case dt @ ScalaPrimitive.Uuid => methodTry(ScalaPrimitive.Uuid.fromStringValue("s"))
         case dt: ScalaPrimitive.DateIso8601 => methodTry(dt.fromStringValue("s"))
         case dt: ScalaPrimitive.DateTimeIso8601 => methodTry(dt.fromStringValue("s"))
         case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
