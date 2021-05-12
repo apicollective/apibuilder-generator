@@ -25,7 +25,6 @@ lazy val resolversSettings = Seq(
   resolvers += "Flow repository" at "https://flow.jfrog.io/flow/libs-release/",
 )
 
-
 lazy val generated = project
   .in(file("generated"))
   .enablePlugins(PlayScala)
@@ -75,7 +74,6 @@ lazy val javaAwsLambdaPojos = project
       "org.projectlombok" % "lombok" % "1.18.4"
     )
   )
-
 
 lazy val scalaGenerator = project
   .in(file("scala-generator"))
