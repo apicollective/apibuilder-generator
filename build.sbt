@@ -4,7 +4,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-ThisBuild / scalaVersion := "2.13.5"
+ThisBuild / scalaVersion := "2.13.6"
 
 lazy val allScalacOptions = Seq(
   "-deprecation",
