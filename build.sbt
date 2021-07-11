@@ -68,7 +68,7 @@ lazy val javaAwsLambdaPojos = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimum := 69.5),
+    Seq(ScoverageKeys.coverageMinimumStmtTotal := 69.5),
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.461",
       "me.geso" % "tinyvalidator" % "0.9.1",
@@ -82,7 +82,7 @@ lazy val scalaGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimum := 85.4),
+    Seq(ScoverageKeys.coverageMinimumStmtTotal := 85.4),
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "2.1.1",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
@@ -93,13 +93,13 @@ lazy val rubyGenerator = project
   .in(file("ruby-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 86.5))
+  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 86.5))
 
 lazy val javaGenerator = project
   .in(file("java-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 66.98))
+  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 66.98))
 
 lazy val goGenerator = project
   .in(file("go-generator"))
@@ -112,14 +112,14 @@ lazy val androidGenerator = project
   .settings(
     commonSettings: _*
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 76.90))
+  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 76.90))
 
 lazy val graphQLGenerator = project
   .in(file("graphql-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(resolversSettings)
-  .settings(Seq(ScoverageKeys.coverageMinimum := 66.98))
+  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 66.98))
   .settings(
     libraryDependencies ++= Seq(
       "io.apibuilder" %% "apibuilder-graphql" % "0.0.10",
@@ -154,7 +154,7 @@ lazy val kotlinGenerator = project
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 94.5, ScoverageKeys.coverageFailOnMinimum := true))
+  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 94.5, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val csvGenerator = project
   .in(file("csv-generator"))
@@ -166,7 +166,7 @@ lazy val csvGenerator = project
       "org.apache.commons" % "commons-csv" % "1.7"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimum := 75.67, ScoverageKeys.coverageFailOnMinimum := true))
+  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 75.67, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val postmanGenerator = project
   .in(file("postman-generator"))
