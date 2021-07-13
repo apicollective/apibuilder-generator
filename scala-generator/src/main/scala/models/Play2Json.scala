@@ -2,7 +2,7 @@ package scala.models
 
 import lib.Text._
 
-import scala.annotation.{nowarn, tailrec}
+import scala.annotation.nowarn
 import scala.generator.ScalaPrimitive.{Model, Union}
 import scala.generator._
 
