@@ -135,28 +135,40 @@ trait ParserGenerator extends CodeGenerator {
       Seq(
         s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${model.qualifiedName}] = parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))""",
         "",
-        s"def parser(",
-        (model.fields.map { f =>
-          parserFieldDeclaration(f.name, f.datatype, f.originalName)
-        } ++ List("prefixOpt: Option[String] = None")).mkString(",\n").indentString(2),
-        s"): RowParser[${model.qualifiedName}] = {",
+        generateModelFieldsParser(model)
+      ).mkString("\n")
+    }
+
+    private[this] def generateModelFieldsParser(model: ScalaModel): String = {
+      if (model.fields.isEmpty)
         Seq(
-          model.fields.map { f => generateRowParser("""prefixOpt.getOrElse("") + """ + f.name, f.datatype, f.originalName) }.mkString(" ~\n") + " map {",
+          s"def parser(prefixOpt: Option[String] = None): RowParser[${model.qualifiedName}] =",
+          s"RowParser(_ => anorm.Success(${model.qualifiedName}))"
+        ).mkString("\n")
+      else
+        Seq(
+          s"def parser(",
+          (model.fields.map { f =>
+            parserFieldDeclaration(f.name, f.datatype, f.originalName)
+          } :+ "prefixOpt: Option[String] = None").mkString(",\n").indentString(2),
+          s"): RowParser[${model.qualifiedName}] = {",
           Seq(
-            "case " + model.fields.map(parserName).mkString(" ~ ") + " => {",
+            model.fields.map { f => generateRowParser("""prefixOpt.getOrElse("") + """ + f.name, f.datatype, f.originalName) }.mkString(" ~\n") + " map {",
             Seq(
-              s"${model.qualifiedName}(",
-              model.fields.map { f =>
-                s"${f.name} = ${parserName(f)}"
-              }.mkString(",\n").indentString(2),
-              ")"
+              "case " + model.fields.map(parserName).mkString(" ~ ") + " => {",
+              Seq(
+                s"${model.qualifiedName}(",
+                model.fields.map { f =>
+                  s"${f.name} = ${parserName(f)}"
+                }.mkString(",\n").indentString(2),
+                ")"
+              ).mkString("\n").indentString(2),
+              "}"
             ).mkString("\n").indentString(2),
             "}"
           ).mkString("\n").indentString(2),
           "}"
-        ).mkString("\n").indentString(2),
-        "}"
-      ).mkString("\n")
+        ).mkString("\n")
     }
 
     @scala.annotation.tailrec
