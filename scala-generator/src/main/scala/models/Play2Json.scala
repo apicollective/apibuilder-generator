@@ -317,20 +317,6 @@ case class Play2Json(
       }
     }
 
-    @tailrec
-    def getShortName(dt: ScalaDatatype): String = {
-      dt match {
-        case model: ScalaPrimitive.Model => model.shortName
-        case union: ScalaPrimitive.Union => union.shortName
-        case ScalaDatatype.Option(inner) => getShortName(inner)
-        case ScalaDatatype.List(inner)   => getShortName(inner)
-        case ScalaDatatype.Map(inner)    => getShortName(inner)
-        case _ => {
-          sys.error(s"Unexpected datatype: $dt")
-        }
-      }
-    }
-
     val serializations = model.fields.map { field =>
       val beLazy = hasReferenceToModel(field.datatype)
       val path = s"""(__ \\ "${field.originalName}")"""
