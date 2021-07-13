@@ -2,7 +2,7 @@ package scala.models
 
 import lib.Text._
 
-import scala.annotation.{nowarn, tailrec}
+import scala.annotation.nowarn
 import scala.generator.ScalaPrimitive.{Model, Union}
 import scala.generator._
 
@@ -313,20 +313,6 @@ case class Play2Json(
                 datatypes.exists(hasReferenceToModel(_, datatype :: visited))
             }
           case _ => false
-        }
-      }
-    }
-
-    @tailrec
-    def getShortName(dt: ScalaDatatype): String = {
-      dt match {
-        case model: ScalaPrimitive.Model => model.shortName
-        case union: ScalaPrimitive.Union => union.shortName
-        case ScalaDatatype.Option(inner) => getShortName(inner)
-        case ScalaDatatype.List(inner)   => getShortName(inner)
-        case ScalaDatatype.Map(inner)    => getShortName(inner)
-        case _ => {
-          sys.error(s"Unexpected datatype: $dt")
         }
       }
     }

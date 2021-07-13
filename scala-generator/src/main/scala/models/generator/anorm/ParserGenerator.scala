@@ -160,30 +160,6 @@ trait ParserGenerator extends CodeGenerator {
     }
 
     @scala.annotation.tailrec
-    private[this] def parserFieldName(name: String, datatype: ScalaDatatype): String = {
-      datatype match {
-        case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | _: ScalaPrimitive.Enum) => {
-          ScalaUtil.toVariable(name)
-        }
-        case ScalaPrimitive.Model(_, _) => {
-          ScalaUtil.toVariable(s"${name}Prefix")
-        }
-        case ScalaPrimitive.Union(_, _) => {
-          ScalaUtil.toVariable(s"${name}Prefix")
-        }
-        case ScalaDatatype.List(_) => {
-          ScalaUtil.toVariable(name)
-        }
-        case ScalaDatatype.Map(_) => {
-          ScalaUtil.toVariable(name)
-        }
-        case ScalaDatatype.Option(inner) => {
-          parserFieldName(name, inner)
-        }
-      }
-    }
-
-    @scala.annotation.tailrec
     private[this] def parserFieldDeclaration(name: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
         case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | _: ScalaPrimitive.Enum | _: ScalaDatatype.List | _: ScalaDatatype.Map) => {
