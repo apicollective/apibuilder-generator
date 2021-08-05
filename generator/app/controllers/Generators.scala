@@ -433,7 +433,9 @@ object Generators {
       metaData = Generator(
         key = "http4s_0_18",
         name = "Http4s 0.18",
-        description = Some("Http4s 0.18 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.18/client/'>http4s client</a>"),
+        description = Some(
+          """Http4s 0.18 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.18/client/'>http4s client</a>.
+            |Note: http4s 0.18 is now an end-of-life version.""".stripMargin),
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
@@ -446,12 +448,24 @@ object Generators {
         name = "Http4s 0.20",
         description = Some(
           """Http4s 0.20 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.20/client/'>http4s client</a>.
-            |Note: http4s 0.19 has been withdrawn by the authors due to issues with versioning. 0.20 is the supported http4s version.""".stripMargin),
+            |Note: http4s 0.20 is now an end-of-life version.""".stripMargin),
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(scala.models.http4s.Http4s020Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "http4s_0_22",
+        name = "Http4s 0.22",
+        description = Some(
+          """Http4s 0.22 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.22/client/'>http4s client</a>.""".stripMargin),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.http4s.Http4s022Generator)
     ),
     CodeGenTarget(
       metaData = Generator(

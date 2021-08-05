@@ -65,7 +65,7 @@ ${headerString.indentString(6)}
         apiHeaders ++
         defaultHeaders ++
         requestHeaders
-      ).groupBy(_._1).map { case (k, l) => org.http4s.Header(k, l.last._2) }.toList)
+      ).groupBy(_._1).map { case (k, l) => ${config.headerConstructor("k","l.last._2")} }.toList)
 
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
       val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
@@ -78,7 +78,7 @@ ${headerString.indentString(6)}
         case Authorization.Basic(username, passwordOpt) => {
           val userpass = s"$$username:$${passwordOpt.getOrElse("")}"
           val token = java.util.Base64.getEncoder.encodeToString(userpass.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1))
-          request.putHeaders(org.http4s.Header("Authorization", s"Basic $$token"))
+          request.putHeaders(${config.headerConstructor("\"Authorization\"","s\"Basic $token\"")})
         }
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }

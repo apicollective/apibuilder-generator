@@ -5,7 +5,7 @@ import models.TestHelper.{assertJodaTimeNotPresent, assertValidScalaSourceCode}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.models.http4s.{Http4s015Generator, Http4s017Generator, Http4s018Generator, Http4s020Generator}
+import scala.models.http4s._
 
 class Http4sGeneratorSpec extends AnyFunSpec with Matchers {
   describe("apidoc-api") {
@@ -62,6 +62,17 @@ class Http4sGeneratorSpec extends AnyFunSpec with Matchers {
         models.TestHelper.assertEqualsFile(s"/http4s/apidoc-api/020_instant/${file.name}.txt", file.contents)
       }
     }
+      it("http4s 0.22") {
+        val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+        val Right(files) = Http4s022Generator.invoke(form)
+        files.size shouldBe 7
+        files.zipWithIndex.foreach { case (file, idx) =>
+          file.name shouldBe fileNames(idx)
+          assertValidScalaSourceCode(file.contents)
+          models.TestHelper.assertEqualsFile(s"/http4s/apidoc-api/022/${file.name}.txt", file.contents)
+        }
+      }
+
   }
 
   describe("date-time-types") {
@@ -75,55 +86,55 @@ class Http4sGeneratorSpec extends AnyFunSpec with Matchers {
       Some("ApibuilderTimeTypesV0Server.scala"),
     )
 
-    it("http4s 0.20 java instant") {
+    it("http4s 0.22 java instant") {
       val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq.empty,
         None
       )
-      val Right(files) = Http4s020Generator.invoke(form)
+      val Right(files) = Http4s022Generator.invoke(form)
       files.size shouldBe 7
       assertJodaTimeNotPresent(files)
       files.zipWithIndex.foreach { case (file, idx) =>
         fileNames(idx).foreach { fileName =>
           file.name shouldBe fileName
           assertValidScalaSourceCode(file.contents)
-          models.TestHelper.assertEqualsFile(s"/http4s/date-time/020_instant/${file.name}.txt", file.contents)
+          models.TestHelper.assertEqualsFile(s"/http4s/date-time/022_instant/${file.name}.txt", file.contents)
         }
       }
     }
 
-    it("http4s 0.20 java offsetdatetime") {
+    it("http4s 0.22 java offsetdatetime") {
       val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate")),
         None
       )
-      val Right(files) = Http4s020Generator.invoke(form)
+      val Right(files) = Http4s022Generator.invoke(form)
       files.size shouldBe 7
       assertJodaTimeNotPresent(files)
       files.zipWithIndex.foreach { case (file, idx) =>
         fileNames(idx).foreach { fileName =>
           file.name shouldBe fileName
           assertValidScalaSourceCode(file.contents)
-          models.TestHelper.assertEqualsFile(s"/http4s/date-time/020_offsetdatetime/${file.name}.txt", file.contents)
+          models.TestHelper.assertEqualsFile(s"/http4s/date-time/022_offsetdatetime/${file.name}.txt", file.contents)
         }
       }
     }
 
-    it("http4s 0.20 joda datetime") {
+    it("http4s 0.22 joda datetime") {
       val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.time_library", "joda")),
         None
       )
-      val Right(files) = Http4s020Generator.invoke(form)
+      val Right(files) = Http4s022Generator.invoke(form)
       files.size shouldBe 7
       files.zipWithIndex.foreach { case (file, idx) =>
         fileNames(idx).foreach { fileName =>
           file.name shouldBe fileName
           assertValidScalaSourceCode(file.contents)
-          models.TestHelper.assertEqualsFile(s"/http4s/date-time/020_joda/${file.name}.txt", file.contents)
+          models.TestHelper.assertEqualsFile(s"/http4s/date-time/022_joda/${file.name}.txt", file.contents)
         }
       }
     }
