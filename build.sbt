@@ -195,6 +195,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalameta" %% "scalameta" % "4.4.3" % Test,
     "com.squareup" % "javapoet" % "1.13.0",
   ),
+  PlayKeys.fileWatchService := play.dev.filewatch.FileWatchService.jdk7(play.sbt.run.toLoggerProxy(sLog.value)),
   libraryDependencies += guice,
   scalacOptions ++= allScalacOptions,
   Compile / doc / sources := Seq.empty,

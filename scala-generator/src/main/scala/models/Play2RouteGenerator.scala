@@ -44,7 +44,7 @@ case class Play2RouteGenerator(form: InvocationForm, configDefault: Attributes =
           Seq(File(
             "routes",
             None,
-            ApidocComments(form.service.version, form.userAgent).forPlayRoutes + "\n\n" +
+            ApiBuilderComments(form.service.version, form.userAgent).forPlayRoutes + "\n\n" +
               (pathStart ++ paramStart).map { r =>
                 Seq(
                   r.verb,

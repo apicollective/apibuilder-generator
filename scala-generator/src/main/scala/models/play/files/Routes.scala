@@ -7,7 +7,7 @@ import scala.models.Attributes
 object Routes {
 
   def contents(form: InvocationForm): String = {
-    val header = scala.models.ApidocComments(form.service.version, form.userAgent).forPlayRoutes + "\n"
+    val header = scala.models.ApiBuilderComments(form.service.version, form.userAgent).forPlayRoutes + "\n"
     scala.models.Play2RouteGenerator(form, Attributes.PlayGen2DefaultConfig)
       .invoke()
       .toOption

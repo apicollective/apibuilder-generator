@@ -2,6 +2,6 @@ package lib
 
 object Constants {
 
-  val ApibuilderUrl = "https://www.apibuilder.io"
+  val ApiBuilderUrl = "https://www.apibuilder.io"
 
 }

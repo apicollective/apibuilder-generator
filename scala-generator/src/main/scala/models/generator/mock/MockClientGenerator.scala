@@ -6,7 +6,7 @@ import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, Respon
 import lib.generator.CodeGenerator
 import lib.Text._
 
-import scala.models.{ApidocComments, Attributes}
+import scala.models.{ApiBuilderComments, Attributes}
 import scala.generator._
 
 object MockClientGenerator {
@@ -87,7 +87,7 @@ class MockClientGenerator(
   val generator = new ScalaClientMethodGenerator(config, ssd)
 
   def invoke(): Either[Seq[String], Seq[File]] = {
-    val header = ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
+    val header = ApiBuilderComments(ssd.service.version, userAgent).toJavaString + "\n"
     val code = generateCode()
 
     Right(
