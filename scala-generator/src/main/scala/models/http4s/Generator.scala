@@ -5,7 +5,7 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
 
 import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
-import scala.models.{ApidocComments, Attributes}
+import scala.models.{ApiBuilderComments, Attributes}
 import scala.models.http4s.server.Http4sServer
 import generator.ServiceFileNames
 import models.http4s.mock.{Http4s018MockClientGenerator, Http4s020MockClientGenerator}
@@ -49,7 +49,7 @@ trait Generator extends CodeGenerator {
 
     val header = addHeader match {
       case false => ""
-      case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
+      case true => ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
     }
 
     val caseClasses = header + ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")

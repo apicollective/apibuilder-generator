@@ -13,7 +13,7 @@ object ScalaCheckGenerator extends CodeGenerator {
   def objectName(str: String): String = s"${str.split('-').map(_.capitalize).mkString}ScalaCheck"
   def traitName(str: String): String = objectName(str)
 
-  def header(form: InvocationForm) = ApidocComments(form.service.version, form.userAgent).toJavaString()
+  def header(form: InvocationForm) = ApiBuilderComments(form.service.version, form.userAgent).toJavaString
 
   def extendsWith(imports: Seq[Import]): String = {
     val traits = imports.map(i => s"${packageName(i.namespace)}.${traitName(i.application.key)}").toList

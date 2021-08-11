@@ -6,9 +6,9 @@ import lib.generator.CodeGenerator
 
 object Play26Generator extends CodeGenerator {
 
-  def prependHeader(contents: String, form: InvocationForm, formatHeader: scala.models.ApidocComments => String): String =
+  def prependHeader(contents: String, form: InvocationForm, formatHeader: scala.models.ApiBuilderComments => String): String =
     s"""
-      ${formatHeader(scala.models.ApidocComments(form.service.version, form.userAgent))}
+      ${formatHeader(scala.models.ApiBuilderComments(form.service.version, form.userAgent))}
 
       ${contents}
     """
@@ -34,7 +34,7 @@ object Play26Generator extends CodeGenerator {
       ("ModelsGens", files.ModelsGens.contents(form)),
       ("ModelsJson", files.ModelsJson.contents(form)),
     )
-    .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString())) }
+    .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString)) }
     .traverse { case (suffix, contents) => utils.ScalaFormatter.format(contents).map((suffix, _)) }
     .map(_.map { case (suffix, contents) => file(form, suffix, contents, Some("scala")) })
     .leftMap { t => Seq(t.toString) }

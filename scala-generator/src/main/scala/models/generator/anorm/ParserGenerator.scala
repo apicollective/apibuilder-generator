@@ -1,7 +1,7 @@
 package scala.generator.anorm
 
 import scala.generator._
-import scala.models.{ApidocComments, Attributes, DateTimeTypeConfig, DateTypeConfig}
+import scala.models.{ApiBuilderComments, Attributes, DateTimeTypeConfig, DateTypeConfig}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -58,7 +58,7 @@ trait ParserGenerator extends CodeGenerator {
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
-    val header = ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
+    val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
 
     Generator(ssd).code() match {
       case None => {

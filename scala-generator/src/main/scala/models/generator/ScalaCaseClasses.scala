@@ -1,6 +1,6 @@
 package scala.generator
 
-import scala.models.{ApidocComments, Attributes}
+import scala.models.{ApiBuilderComments, Attributes}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
@@ -27,7 +27,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     additionalImports: Seq[String] = Seq.empty
   ): Seq[File] = {
     val header = if (addHeader) {
-      ApidocComments(ssd.service.version, userAgent).toJavaString() + "\n"
+      ApiBuilderComments(ssd.service.version, userAgent).toJavaString + "\n"
     } else {
       ""
     }

@@ -34,7 +34,7 @@ trait Play2Models extends CodeGenerator {
 
     val header = addHeader match {
       case false => ""
-      case true => ApidocComments(form.service.version, form.userAgent).toJavaString() + "\n"
+      case true => ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
     }
 
     val bindables = addBindables match {
