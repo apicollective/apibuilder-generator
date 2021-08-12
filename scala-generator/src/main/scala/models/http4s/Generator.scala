@@ -8,7 +8,7 @@ import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfig, S
 import scala.models.{ApiBuilderComments, Attributes}
 import scala.models.http4s.server.Http4sServer
 import generator.ServiceFileNames
-import models.http4s.mock.{Http4s018MockClientGenerator, Http4s020MockClientGenerator}
+import models.http4s.mock.{Http4s018MockClientGenerator, Http4s020MockClientGenerator, Http4s022MockClientGenerator}
 
 object Http4s015Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s015(namespace, Attributes.Http4sDefaultConfig, baseUrl)
@@ -31,6 +31,14 @@ object Http4s020Generator extends Generator {
   override def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new Http4s020MockClientGenerator(ssd, userAgent, config).generateCode()
 }
+
+object Http4s022Generator extends Generator {
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s022(namespace, Attributes.Http4sDefaultConfig, baseUrl)
+
+  override def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
+    new Http4s022MockClientGenerator(ssd, userAgent, config).generateCode()
+}
+
 
 trait Generator extends CodeGenerator {
   def mkConfig(namespace: String, baseUrl: Option[String]): ScalaClientMethodConfigs.Http4s

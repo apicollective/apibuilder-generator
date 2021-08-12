@@ -29,8 +29,8 @@ package io.gregor.time.types.v0.models {
   }
 
   final case class DateTimeModel(
-    dateTime: _root_.java.time.OffsetDateTime,
-    date: _root_.java.time.LocalDate
+    dateTime: _root_.org.joda.time.DateTime,
+    date: _root_.org.joda.time.LocalDate
   )
 
   /**
@@ -46,18 +46,18 @@ package io.gregor.time.types.v0.models {
   ) extends DateTimeUnion
 
   /**
-   * Wrapper class to support the union types containing the datatype[date-iso8601]
-   */
-  final case class DateTimeUnionLocalDate(
-    value: _root_.java.time.LocalDate
-  ) extends DateTimeUnion
-
-  /**
    * Wrapper class to support the union types containing the
    * datatype[date-time-iso8601]
    */
-  final case class DateTimeUnionOffsetDateTime(
-    value: _root_.java.time.OffsetDateTime
+  final case class DateTimeUnionDateTime(
+    value: _root_.org.joda.time.DateTime
+  ) extends DateTimeUnion
+
+  /**
+   * Wrapper class to support the union types containing the datatype[date-iso8601]
+   */
+  final case class DateTimeUnionLocalDate(
+    value: _root_.org.joda.time.LocalDate
   ) extends DateTimeUnion
 
 }
@@ -82,22 +82,22 @@ package io.gregor.time.types.v0.models {
     private[v0] implicit val encodeUUID: Encoder[_root_.java.util.UUID] =
       Encoder.encodeString.contramap[_root_.java.util.UUID](uuid => uuid.toString)
 
-    private[v0] implicit val decodeOffsetDateTime: Decoder[_root_.java.time.OffsetDateTime] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.time.OffsetDateTime.parse(str)))
+    private[v0] implicit val decodeDateTime: Decoder[_root_.org.joda.time.DateTime] =
+      Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)))
 
-    private[v0] implicit val encodeOffsetDateTime: Encoder[_root_.java.time.OffsetDateTime] =
-      Encoder.encodeString.contramap[_root_.java.time.OffsetDateTime](_.toString)
+    private[v0] implicit val encodeDateTime: Encoder[_root_.org.joda.time.DateTime] =
+      Encoder.encodeString.contramap[_root_.org.joda.time.DateTime](_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(_))
 
-    private[v0] implicit val decodeLocalDate: Decoder[_root_.java.time.LocalDate] =
-      Decoder.decodeString.emapTry(str => Try(_root_.java.time.LocalDate.parse(str)))
+    private[v0] implicit val decodeLocalDate: Decoder[_root_.org.joda.time.LocalDate] =
+      Decoder.decodeString.emapTry(str => Try(_root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(str)))
 
-    private[v0] implicit val encodeLocalDate: Encoder[_root_.java.time.LocalDate] =
-      Encoder.encodeString.contramap[_root_.java.time.LocalDate](_.toString)
+    private[v0] implicit val encodeLocalDate: Encoder[_root_.org.joda.time.LocalDate] =
+      Encoder.encodeString.contramap[_root_.org.joda.time.LocalDate](_root_.org.joda.time.format.ISODateTimeFormat.date.print(_))
 
     implicit def decodeTimeTypesDateTimeModel: Decoder[DateTimeModel] = Decoder.instance { c =>
      for {
-        dateTime <- c.downField("date-time").as[_root_.java.time.OffsetDateTime]
-        date <- c.downField("date").as[_root_.java.time.LocalDate]
+        dateTime <- c.downField("date-time").as[_root_.org.joda.time.DateTime]
+        date <- c.downField("date").as[_root_.org.joda.time.LocalDate]
       } yield {
         DateTimeModel(
           dateTime = dateTime,
@@ -113,9 +113,25 @@ package io.gregor.time.types.v0.models {
       ).flatten)
     }
 
+    implicit def decodeTimeTypesDateTimeUnionDateTime: Decoder[DateTimeUnionDateTime] = Decoder.instance { c =>
+     for {
+        value <- c.downField("value").as[_root_.org.joda.time.DateTime]
+      } yield {
+        DateTimeUnionDateTime(
+          value = value
+        )
+      }
+    }
+
+    implicit def encodeTimeTypesDateTimeUnionDateTime: Encoder[DateTimeUnionDateTime] = Encoder.instance { t =>
+      Json.fromFields(Seq(
+        Some("value" -> t.value.asJson)
+      ).flatten)
+    }
+
     implicit def decodeTimeTypesDateTimeUnionLocalDate: Decoder[DateTimeUnionLocalDate] = Decoder.instance { c =>
      for {
-        value <- c.downField("value").as[_root_.java.time.LocalDate]
+        value <- c.downField("value").as[_root_.org.joda.time.LocalDate]
       } yield {
         DateTimeUnionLocalDate(
           value = value
@@ -129,25 +145,9 @@ package io.gregor.time.types.v0.models {
       ).flatten)
     }
 
-    implicit def decodeTimeTypesDateTimeUnionOffsetDateTime: Decoder[DateTimeUnionOffsetDateTime] = Decoder.instance { c =>
-     for {
-        value <- c.downField("value").as[_root_.java.time.OffsetDateTime]
-      } yield {
-        DateTimeUnionOffsetDateTime(
-          value = value
-        )
-      }
-    }
-
-    implicit def encodeTimeTypesDateTimeUnionOffsetDateTime: Encoder[DateTimeUnionOffsetDateTime] = Encoder.instance { t =>
-      Json.fromFields(Seq(
-        Some("value" -> t.value.asJson)
-      ).flatten)
-    }
-
     implicit def decodeTimeTypesDateTimeUnion: Decoder[DateTimeUnion] = Decoder.instance { c =>
       c.get[Option[String]]("type") match {
-        case Right(Some(s)) if s == "date-time-iso8601" => c.as[io.gregor.time.types.v0.models.DateTimeUnionOffsetDateTime]
+        case Right(Some(s)) if s == "date-time-iso8601" => c.as[io.gregor.time.types.v0.models.DateTimeUnionDateTime]
         case Right(Some(s)) if s == "date-iso8601" => c.as[io.gregor.time.types.v0.models.DateTimeUnionLocalDate]
         case Right(Some(s)) => Right(io.gregor.time.types.v0.models.DateTimeUnionUndefinedType(s))
         case _ => Left(DecodingFailure("Union[DateTimeUnion] requires a discriminator named 'type' - this field was not found in the Json", c.history))
@@ -155,7 +155,7 @@ package io.gregor.time.types.v0.models {
     }
 
     implicit def encodeTimeTypesDateTimeUnion: Encoder[DateTimeUnion] = Encoder.instance {
-      case t: io.gregor.time.types.v0.models.DateTimeUnionOffsetDateTime => t.asJson.mapObject(obj => ("type", Json.fromString("date-time-iso8601")) +: obj)
+      case t: io.gregor.time.types.v0.models.DateTimeUnionDateTime => t.asJson.mapObject(obj => ("type", Json.fromString("date-time-iso8601")) +: obj)
       case t: io.gregor.time.types.v0.models.DateTimeUnionLocalDate => t.asJson.mapObject(obj => ("type", Json.fromString("date-iso8601")) +: obj)
       case other => sys.error(s"The type[${other.getClass.getName}] has no JSON encoder")
     }
@@ -190,20 +190,20 @@ import io.circe.syntax._
 
     object DateTimeModels extends DateTimeModels[F] {
       override def postByPathDateAndPathTime(
-        pathDate: _root_.java.time.LocalDate,
-        pathTime: _root_.java.time.OffsetDateTime,
-        queryDate: _root_.java.time.LocalDate,
-        queryTime: _root_.java.time.OffsetDateTime,
+        pathDate: _root_.org.joda.time.LocalDate,
+        pathTime: _root_.org.joda.time.DateTime,
+        queryDate: _root_.org.joda.time.LocalDate,
+        queryTime: _root_.org.joda.time.DateTime,
         dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
         requestHeaders: Seq[(String, String)] = Nil
       ): F[io.gregor.time.types.v0.models.DateTimeModel] = {
-        val urlPath = Seq("date_time_models", pathDate.toString, pathTime.toString)
+        val urlPath = Seq("date_time_models", _root_.org.joda.time.format.ISODateTimeFormat.date.print(pathDate), _root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(pathTime))
 
         val (payload, formPayload) = (Some(dateTimeModel), None)
 
         val queryParameters = Seq(
-          Some("query_date" -> queryDate.toString),
-          Some("query_time" -> queryTime.toString)
+          Some("query_date" -> _root_.org.joda.time.format.ISODateTimeFormat.date.print(queryDate)),
+          Some("query_time" -> _root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(queryTime))
         ).flatten
 
         _executeRequest[io.gregor.time.types.v0.models.DateTimeModel, io.gregor.time.types.v0.models.DateTimeModel]("POST", path = urlPath, body = payload, formBody = formPayload, queryParameters = queryParameters, requestHeaders = requestHeaders) {
@@ -245,7 +245,7 @@ import io.circe.syntax._
         apiHeaders ++
         defaultHeaders ++
         requestHeaders
-      ).groupBy(_._1).map { case (k, l) => org.http4s.Header(k, l.last._2) }.toList)
+      ).groupBy(_._1).map { case (k, l) => org.http4s.Header.Raw(org.typelevel.ci.CIString(k), l.last._2) }.toList)
 
       val queryMap = queryParameters.groupBy(_._1).map { case (k, v) => k -> v.map(_._2) }
       val uri = path.foldLeft(baseUrl){ case (uri, segment) => uri / segment }.setQueryParams(queryMap)
@@ -258,7 +258,7 @@ import io.circe.syntax._
         case Authorization.Basic(username, passwordOpt) => {
           val userpass = s"$username:${passwordOpt.getOrElse("")}"
           val token = java.util.Base64.getEncoder.encodeToString(userpass.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1))
-          request.putHeaders(org.http4s.Header("Authorization", s"Basic $token"))
+          request.putHeaders(org.http4s.Header.Raw(org.typelevel.ci.CIString("Authorization"), s"Basic $token"))
         }
         case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
@@ -301,10 +301,10 @@ import io.circe.syntax._
 
   trait DateTimeModels[F[_]] {
     def postByPathDateAndPathTime(
-      pathDate: _root_.java.time.LocalDate,
-      pathTime: _root_.java.time.OffsetDateTime,
-      queryDate: _root_.java.time.LocalDate,
-      queryTime: _root_.java.time.OffsetDateTime,
+      pathDate: _root_.org.joda.time.LocalDate,
+      pathTime: _root_.org.joda.time.DateTime,
+      queryDate: _root_.org.joda.time.LocalDate,
+      queryTime: _root_.org.joda.time.DateTime,
       dateTimeModel: io.gregor.time.types.v0.models.DateTimeModel,
       requestHeaders: Seq[(String, String)] = Nil
     ): F[io.gregor.time.types.v0.models.DateTimeModel]

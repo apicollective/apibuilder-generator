@@ -84,7 +84,7 @@ case class Http4sServer(form: InvocationForm,
          |    "X-Apidoc-Version-Major".ci
          |  }
          |
-         |  def apply(req: ${config.messageClass}): Boolean = req.headers.get(ApiVersionMajor) match {
+         |  def apply(req: ${config.messageClass}): Boolean = ${config.headerOptSelection("req", "ApiVersionMajor")} match {
          |    case Some(v) if v.value == "$ver" => true
          |    case _ => false
          |  }
@@ -96,7 +96,7 @@ case class Http4sServer(form: InvocationForm,
       res -> res.operations.map(op => Route(ssd, res, op, config))
     }
 
-    val allRoutes = resourcesAndRoutes.map(_._2).flatten
+    val allRoutes = resourcesAndRoutes.flatMap(_._2)
 
     val path = genPathExtractors(allRoutes)
     val query = genQueryExtractors(allRoutes)

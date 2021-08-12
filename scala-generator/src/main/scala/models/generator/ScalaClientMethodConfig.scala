@@ -268,6 +268,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def monadTransformerInvoke: String
     def asyncFailure: String
     def requestClass: String = "org.http4s.Request"
+    def headerRawClass: String = "org.http4s.Header"
     def requestType:  String = s"$asyncType[$requestClass]"
     def messageClass: String = "org.http4s.Message"
     def httpServiceClass: String = "org.http4s.HttpService"
@@ -294,6 +295,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def matchersImport: String
     def httpClient: String
     def applicationJsonMediaType: String
+    def headerConstructor(headerName: String, headerValue: String) = s"org.http4s.Header($headerName, $headerValue)"
+    def headerOptSelection(requestVariableName:String, headerName: String) = s"${requestVariableName}.headers.get($headerName)"
   }
 
   case class Http4s015(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s {
@@ -368,7 +371,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.`application/json`"
   }
 
-  case class Http4s020(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s {
+  sealed trait Http4s02xSeries extends Http4s {
     override val asyncType = "F"
     override def asyncTypeParam(constraint: Option[String] = None) = Some(s"$asyncType[_]${constraint.map(c => s": $c").getOrElse("")}")
     override val leftType = "Left"
@@ -420,5 +423,19 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
                                                     |  else body.fold(reqAndMaybeAuth)(reqAndMaybeAuth.withEntity)""".stripMargin
 
     override val applicationJsonMediaType: String = "_root_.org.http4s.MediaType.application.json"
+  }
+
+  case class Http4s020(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s02xSeries
+
+  case class Http4s022(override val namespace: String, override val attributes: Attributes, override val baseUrl: Option[String]) extends Http4s02xSeries {
+
+    override def headerConstructor(headerName: String, headerValue: String): String =
+      s"""org.http4s.Header.Raw(org.typelevel.ci.CIString($headerName), $headerValue)"""
+
+    override def headerOptSelection(requestVariableName:String, headerName: String) =
+      s"${requestVariableName}.headers.get($headerName).map(_.head)"
+
+    override def headerRawClass: String = "org.http4s.Header.ToRaw"
+
   }
 }
