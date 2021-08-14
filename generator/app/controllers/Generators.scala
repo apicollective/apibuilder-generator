@@ -12,18 +12,18 @@ class Generators extends InjectedController {
     key: Option[String] = None,
     limit: Integer = 100,
     offset: Integer = 0
-  ) = Action {
+  ): Action[AnyContent] = Action {
     val generators = Generators.targets.
       filter(t => t.codeGenerator.isDefined && t.status != lib.generator.Status.Proposal).
-      filter(t => key.isEmpty || key == Some(t.metaData.key)).
+      filter(t => key.isEmpty || key.contains(t.metaData.key)).
       map(t => t.metaData)
 
     Ok(Json.toJson(generators.drop(offset).take(limit)))
   }
 
-  def getByKey(key: String) = Action {
+  def getByKey(key: String): Action[AnyContent] = Action {
     Generators.findGenerator(key) match {
-      case Some((target, _)) => Ok(Json.toJson(target.metaData))
+      case Some(gen) => Ok(Json.toJson(gen.target.metaData))
       case _ => NotFound
     }
   }
@@ -32,12 +32,18 @@ class Generators extends InjectedController {
 
 object Generators {
 
-  def findGenerator(key: String): Option[(CodeGenTarget, CodeGenerator)] = for {
-    target <- targets.find(_.metaData.key == key)
-    codeGenerator <- target.codeGenerator
-  } yield(target -> codeGenerator)
+  case class CodeGeneratorInfo(target: CodeGenTarget, generator: CodeGenerator)
 
-  val targets = Seq(
+  def findGenerator(key: String): Option[CodeGeneratorInfo] = {
+    for {
+      target <- targets.find(_.metaData.key == key)
+      codeGenerator <- target.codeGenerator
+    } yield {
+      CodeGeneratorInfo(target, codeGenerator)
+    }
+  }
+
+  val targets: Seq[CodeGenTarget] = Seq(
     CodeGenTarget(
       metaData = Generator(
         key = "anorm_2_x_parsers",
