@@ -160,7 +160,7 @@ object Text {
     parts.map(s => initCap(s)).mkString("")
   }
 
-  def appendSpace(s: String) = if (s.isEmpty) "" else s"$s "
+  def appendSpace(s: String): String = if (s.isEmpty) "" else s"$s "
 
   /**
     * Returns the word with first character in lower case

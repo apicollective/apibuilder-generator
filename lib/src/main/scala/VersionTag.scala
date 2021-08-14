@@ -60,7 +60,7 @@ case class VersionTag(version: String) extends Ordered[VersionTag] {
    * version number, then returns None.
    */
   def nextMicro: Option[String] = {
-    trimmedVersion.split(VersionTag.Dash).size match {
+    trimmedVersion.split(VersionTag.Dash).length match {
       case 1 => {
         val pieces = splitOnDot(version)
         if (pieces.forall(s => VersionTag.isDigit(s))) {

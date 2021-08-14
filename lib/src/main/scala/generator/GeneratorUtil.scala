@@ -88,9 +88,10 @@ object GeneratorUtil {
       case "" => substring
       case value => {
         val nextSubstring = substring + value(0)
-        values.forall(_.startsWith(nextSubstring)) match {
-          case true => internalFindLongestCommonPrefix(nextSubstring, values)
-          case false => substring
+        if (values.forall(_.startsWith(nextSubstring))) {
+          internalFindLongestCommonPrefix(nextSubstring, values)
+        } else {
+          substring
         }
       }
     }
@@ -118,14 +119,15 @@ object GeneratorUtil {
     val operationPath = prefix match {
       case None => url
       case Some(p) => {
-        url.startsWith(p) match {
-          case true => url.substring(p.length)
-          case false => url
+        if (url.startsWith(p)) {
+          url.substring(p.length)
+        } else {
+          url
         }
       }
     }
 
-    val pieces = operationPath.split("/").filter(!_.isEmpty)
+    val pieces = operationPath.split("/").filter(_.nonEmpty)
 
     val named = pieces.
       filter { _.startsWith(":") }.

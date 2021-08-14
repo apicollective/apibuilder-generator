@@ -14,18 +14,19 @@ object ServiceFileNames {
     contents: String,
     languages: Option[String] = None
   ): File = {
-    val language = languages.map { toLanguages(_) }.getOrElse(Nil).headOption.getOrElse(Language.Default)
+    val language = languages.map(toLanguages).getOrElse(Nil).headOption.getOrElse(Language.Default)
 
-    val baseName = Seq(
+    val baseName: String = Seq(
       Some(organizationKey),
       Some(applicationKey),
       VersionTag(version).major.map { v => s"V$v" },
       Some(suffix)
     ).flatten.mkString("_")
 
-    val name = language.isCamelCased match {
-      case true => Text.underscoreAndDashToInitCap(baseName)
-      case false => Text.splitIntoWords(baseName).map(_.toLowerCase).mkString("_")
+    val name = if (language.isCamelCased) {
+      Text.underscoreAndDashToInitCap(baseName)
+    } else {
+      Text.splitIntoWords(baseName).map(_.toLowerCase).mkString("_")
     }
 
     File(
@@ -103,7 +104,7 @@ object ServiceFileNames {
       All.find { _.name == language.trim.toLowerCase }
     }
 
-    val Default = Language("text").getOrElse {
+    val Default: Language = Language("text").getOrElse {
       sys.error("Failed to find text language")
     }
 
