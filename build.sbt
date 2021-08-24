@@ -29,8 +29,10 @@ lazy val resolversSettings = Seq(
 lazy val generated = project
   .in(file("generated"))
   .enablePlugins(PlayScala)
+  .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
   .settings(
+    javaAgents += "com.datadoghq" % "dd-java-agent" % "0.83.2",
     libraryDependencies ++= Seq(
       ws,
       "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
