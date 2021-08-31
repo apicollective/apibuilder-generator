@@ -9,6 +9,7 @@ import play.api.mvc._
 class Invocations extends InjectedController {
 
   def postByKey(key: String): Action[AnyContent] = Action { request =>
+    println(s"Invocations.postByKey $key")
     request.body.asJson match {
       case None => Conflict(Json.toJson(Validation.error("Must provide form data (JSON)")))
       case Some(js) => {
