@@ -13,7 +13,12 @@ class ErrorHandler
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String = ""): Future[Result] = {
     logger.warn(s"client error '${request.method} ${request.path}' req[$request] statusCode[$statusCode] message[$message]")
-    Future.successful(BadRequest(Json.toJson(Validation.serverError(s"Bad Request: $message"))))
+    val msg = if (message.isEmpty) {
+      statusCode.toString
+    } else {
+      message
+    }
+    Future.successful(BadRequest(Json.toJson(Validation.serverError(s"Bad Request: $msg"))))
   }
 
   def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {

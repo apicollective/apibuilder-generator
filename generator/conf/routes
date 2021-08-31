@@ -5,4 +5,5 @@
 GET      /generators                 controllers.Generators.get(key: _root_.scala.Option[String], limit: Int ?= 100, offset: Int ?= 0)
 GET      /generators/:key            controllers.Generators.getByKey(key: String)
 GET      /_internal_/healthcheck     controllers.Healthchecks.get()
+GET      /invocations/:key           controllers.Invocations.getByKey(key: String)
 POST     /invocations/:key           controllers.Invocations.postByKey(key: String)

@@ -8,6 +8,11 @@ import play.api.mvc._
 
 class Invocations extends InjectedController {
 
+  def getByKey(key: String): Action[AnyContent] = Action { _ =>
+    println(s"Invocations.getByKey $key")
+    Conflict(Json.toJson(Validation.error("Use HTTPS POST (not GET)")))
+  }
+
   def postByKey(key: String): Action[AnyContent] = Action { request =>
     println(s"Invocations.postByKey $key")
     request.body.asJson match {
