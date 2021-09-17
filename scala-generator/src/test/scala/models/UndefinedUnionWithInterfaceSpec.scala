@@ -1,32 +1,65 @@
-package scala.models
+package models
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import ning.Ning18ClientGenerator
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class ExampleUnionTypesSpec extends AnyFunSpec with Matchers {
+import scala.models.Play28ClientGenerator
 
-  private lazy val service = models.TestHelper.parseFile(s"/examples/apidoc-example-union-types.json")
+class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers {
 
-  it("generates expected code for play 2.3 client") {
-    Play23ClientGenerator.invoke(InvocationForm(service = service)) match {
-      case Left(errors) => fail(errors.mkString(", "))
-      case Right(sourceFiles) => {
-        sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/example-union-types-play-23.txt", sourceFiles.head.contents)
-      }
-    }
-  }
+  private[this] val json: String = models.TestHelper.buildJson("""
+      "imports": [],
+      "headers": [],
+      "info": [],
+      "enums": [],
+      "resources": [],
+      "attributes": [],
 
-  it("generates expected code for ning client") {
-    Ning18ClientGenerator.invoke(InvocationForm(service = service)) match {
-      case Left(errors) => fail(errors.mkString(", "))
-      case Right(sourceFiles) => {
-        sourceFiles.size shouldBe 1
-        models.TestHelper.assertEqualsFile("/example-union-types-ning-client.txt", sourceFiles.head.contents)
-      }
-    }
+      "unions": [
+        {
+          "name": "user",
+          "plural": "users",
+          "attributes": [],
+          "interfaces": ["user"],
+          "types": [
+            { "type": "registered_user", "attributes": [] }
+          ]
+        }
+      ],
+
+      "interfaces": [
+        {
+          "name": "user",
+          "plural": "user",
+          "attributes": [],
+          "fields": [
+            { "name": "description", "type": "string", "required": false, "attributes": [] }
+          ]
+        }
+      ],
+
+      "models": [
+        {
+          "name": "registered_user",
+          "plural": "registered_users",
+          "attributes": [],
+          "fields": [
+            { "name": "description", "type": "long", "required": true, "attributes": [] }
+          ]
+        }
+      ]
+  """)
+
+
+  it("codegen") {
+    val form = InvocationForm(
+      models.TestHelper.service(json),
+      attributes = Nil,
+      None
+    )
+    val Right(files) = Play28ClientGenerator.invoke(form)
+    models.TestHelper.assertEqualsFile("/undefined-union-with-interface-spec.txt", files.head.contents)
   }
 
 }
