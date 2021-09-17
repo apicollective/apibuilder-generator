@@ -1,0 +1,25 @@
+implicit def jsonReadsAPIBuilderTestUserType: play.api.libs.json.Reads[UserType] = {
+  (
+    (__ \ "member_type").read(jsonReadsAPIBuilderTestMemberType).asInstanceOf[play.api.libs.json.Reads[UserType]]
+    orElse
+    (__ \ "role_type").read(jsonReadsAPIBuilderTestRoleType).asInstanceOf[play.api.libs.json.Reads[UserType]]
+    orElse
+    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.UserTypeUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[UserType]]
+  )
+}
+
+def jsObjectUserType(obj: test.apidoc.apidoctest.v0.models.UserType): play.api.libs.json.JsObject = {
+  obj match {
+    case x: test.apidoc.apidoctest.v0.models.MemberType => play.api.libs.json.Json.obj("member_type" -> play.api.libs.json.JsString(x.toString))
+    case x: test.apidoc.apidoctest.v0.models.RoleType => play.api.libs.json.Json.obj("role_type" -> play.api.libs.json.JsString(x.toString))
+    case x: test.apidoc.apidoctest.v0.models.UserTypeUndefinedType => sys.error(s"The type[test.apidoc.apidoctest.v0.models.UserTypeUndefinedType] should never be serialized")
+  }
+}
+
+implicit def jsonWritesAPIBuilderTestUserType: play.api.libs.json.Writes[UserType] = {
+  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.UserType] {
+    def writes(obj: test.apidoc.apidoctest.v0.models.UserType) = {
+      jsObjectUserType(obj)
+    }
+  }
+}
