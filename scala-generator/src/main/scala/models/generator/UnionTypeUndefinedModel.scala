@@ -36,14 +36,16 @@ case class UnionTypeUndefinedModel(ssd: ScalaService) {
   }
 
   @tailrec
-  private[this] def buildFields(interfaceFieldNames: Set[String], prefix: String = ""): Seq[Field] = {
-    val finalName = s"${prefix}description"
-    println(s"buildFields names: ${interfaceFieldNames} prefix[$prefix] finalName: $finalName")
+  private[this] def buildFields(interfaceFieldNames: Set[String], count: Int = 0): Seq[Field] = {
+    val finalName = count match {
+      case 0 => "description"
+      case 1 => "typeDescription"
+      case n => s"type${n}Description"
+    }
+
     if (interfaceFieldNames.contains(finalName)) {
-      // There is already a field with this name (eg. 'description') - use an alias
-      buildFields(interfaceFieldNames, prefix = s"_$prefix")
+      buildFields(interfaceFieldNames, count = count + 1)
     } else {
-      println(s"Building field with name: $finalName")
       Seq(descriptionField(finalName))
     }
   }
