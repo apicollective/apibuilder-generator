@@ -26,7 +26,6 @@ case class UnionTypeUndefinedModel(ssd: ScalaService) {
       description = Some(s"Provides future compatibility in clients - in the future, when a type is added to the union ${union.name}, it will need to be handled in the client code. This implementation will deserialize these future types as an instance of this class."),
       fields = buildFields(interfaceFields.map(_.name).toSet),
     )
-    println(s"Model fields: ${model.fields.map(_.name)}")
 
     UnionTypeUndefinedModelWrapper(
       model = new ScalaModel(ssd, model),
