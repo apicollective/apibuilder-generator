@@ -9,7 +9,7 @@ package test.apidoc.apidoctest.v0.models {
   }
 
   final case class RegisteredUser(
-    override val description: Long
+    override val description: _root_.scala.Option[String] = None
   ) extends User
 
   /**
@@ -21,7 +21,7 @@ package test.apidoc.apidoctest.v0.models {
    *        the client.
    */
   final case class UserUndefinedType(
-    override val description: String
+    _description: String
   ) extends User {
     override def description: _root_.scala.Option[String] = ???
   }
@@ -66,13 +66,14 @@ package test.apidoc.apidoctest.v0.models {
     }
 
     implicit def jsonReadsAPIBuilderTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
-      (__ \ "description").read[Long].map { x => new RegisteredUser(description = x) }
+      (__ \ "description").readNullable[String].map { x => new RegisteredUser(description = x) }
     }
 
     def jsObjectRegisteredUser(obj: test.apidoc.apidoctest.v0.models.RegisteredUser): play.api.libs.json.JsObject = {
-      play.api.libs.json.Json.obj(
-        "description" -> play.api.libs.json.JsNumber(obj.description)
-      )
+      (obj.description match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("description" -> play.api.libs.json.JsString(x))
+      })
     }
 
     implicit def jsonWritesAPIBuilderTestRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {

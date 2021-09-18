@@ -45,7 +45,9 @@ class ScalaService(
    */
   private[this] def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
     interfaceNames.distinct.flatMap { i =>
-      interfaces.find(_.interface.name == i)
+      Some(interfaces.find(_.interface.name == i).getOrElse {
+        sys.error(s"Cannot find interface named: ${i}")
+      })
     }
   }
 

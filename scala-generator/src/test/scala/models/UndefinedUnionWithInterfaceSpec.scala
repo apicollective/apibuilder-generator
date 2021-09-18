@@ -45,7 +45,7 @@ class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers {
           "plural": "registered_users",
           "attributes": [],
           "fields": [
-            { "name": "description", "type": "long", "required": true, "attributes": [] }
+            { "name": "description", "type": "string", "required": false, "attributes": [] }
           ]
         }
       ]
