@@ -1,65 +1,55 @@
 package models
 
-import io.apibuilder.generator.v0.models.InvocationForm
+import helpers.ServiceHelpers
+import io.apibuilder.spec.v0.models.Field
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.models.Play28ClientGenerator
+import scala.generator.{ScalaService, UnionTypeUndefinedModel}
 
-class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers {
+class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers with ServiceHelpers {
 
-  private[this] val json: String = models.TestHelper.buildJson("""
-      "imports": [],
-      "headers": [],
-      "info": [],
-      "enums": [],
-      "resources": [],
-      "attributes": [],
-
-      "unions": [
-        {
-          "name": "user",
-          "plural": "users",
-          "attributes": [],
-          "interfaces": ["user"],
-          "types": [
-            { "type": "registered_user", "attributes": [] }
-          ]
-        }
-      ],
-
-      "interfaces": [
-        {
-          "name": "user",
-          "plural": "user",
-          "attributes": [],
-          "fields": [
-            { "name": "description", "type": "string", "required": false, "attributes": [] }
-          ]
-        }
-      ],
-
-      "models": [
-        {
-          "name": "registered_user",
-          "plural": "registered_users",
-          "attributes": [],
-          "fields": [
-            { "name": "description", "type": "string", "required": false, "attributes": [] }
-          ]
-        }
-      ]
-  """)
-
-
-  it("codegen") {
-    val form = InvocationForm(
-      models.TestHelper.service(json),
-      attributes = Nil,
-      None
+  private[this] def build(fields: Seq[Field]): ScalaService = {
+    ScalaService(
+      makeService(
+        interfaces = Seq(
+          makeInterface(name = "user", fields = fields)
+        ),
+        unions = Seq(
+          makeUnion(
+            name = "user",
+            interfaces = Seq("user"),
+            types = Seq(makeUnionType("registered_user")),
+          )
+        ),
+        models = Seq(
+          makeModel(
+            name = "registered_user",
+          )
+        )
+      )
     )
-    val Right(files) = Play28ClientGenerator.invoke(form)
-    models.TestHelper.assertEqualsFile("/undefined-union-with-interface-spec.txt", files.head.contents)
+  }
+
+  private[this] def fields(service: ScalaService): Seq[String] = {
+    UnionTypeUndefinedModel(service).models.head.model.model.fields.map(_.name)
+  }
+
+  it("defaults to 'description'") {
+    fields(build(Nil)) shouldBe Seq("description")
+  }
+
+  it("aliases description field") {
+    fields(build(Seq(
+      makeField("description", required = false),
+    ))) shouldBe Seq("typeDescription")
+  }
+
+  it("aliases description and typeDescription field") {
+    fields(build(Seq(
+      makeField("description", required = false),
+      makeField("type_description", required = false),
+    ))) shouldBe Seq("type2Description")
   }
 
 }
