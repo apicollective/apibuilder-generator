@@ -4,6 +4,8 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
 
+import java.util.UUID
+
 class FooSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   private[this] def mustParse[T](value: T)(implicit writes: Writes[T], reads: Reads[T]) = {
@@ -49,8 +51,26 @@ class FooSpec extends PlaySpec with GuiceOneAppPerSuite {
     }
   }
 
+  "registered_user" must {
+    val email = "test@apibuilder.io"
+    val registeredUser = RegisteredUser(guid = UUID.randomUUID(), email = email)
+
+    "toJson" in {
+      Json.toJson(registeredUser) mustBe Json.obj(
+        "discriminator" -> "guest_user",
+      )
+    }
+
+    "fromJson" in {
+      mustParse[RegisteredUser](registeredUser) match {
+        case u: RegisteredUser => u mustBe registeredUser
+        case other => fail(s"Parsed as class ${other.getClass} when Group expected")
+      }
+    }
+  }
+
   "party" must {
-    val party: Party = GuestUser(email = None)
+    val party = GuestUser(email = None)
 
     "toJson" in {
       Json.toJson(party) mustBe Json.obj(
