@@ -214,10 +214,8 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesBar: play.api.libs.json.Writes[Bar] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.Bar] {
-        def writes(obj: io.apibuilder.example.union.types.v0.models.Bar) = {
-          jsonWritesApidocExampleUnionTypesBar(obj)
-        }
+      (obj: io.apibuilder.example.union.types.v0.models.Bar) => {
+        jsonWritesApidocExampleUnionTypesBar(obj)
       }
     }
 
@@ -248,10 +246,8 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesFoo: play.api.libs.json.Writes[Foo] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.Foo] {
-        def writes(obj: io.apibuilder.example.union.types.v0.models.Foo) = {
-          jsonWritesApidocExampleUnionTypesFoo(obj)
-        }
+      (obj: io.apibuilder.example.union.types.v0.models.Foo) => {
+        jsonWritesApidocExampleUnionTypesFoo(obj)
       }
     }
 
@@ -270,10 +266,8 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesGuestUser: play.api.libs.json.Writes[GuestUser] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.GuestUser] {
-        def writes(obj: io.apibuilder.example.union.types.v0.models.GuestUser) = {
-          jsObjectGuestUser(obj)
-        }
+      (obj: io.apibuilder.example.union.types.v0.models.GuestUser) => {
+        jsObjectGuestUser(obj)
       }
     }
 
@@ -294,10 +288,8 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.RegisteredUser] {
-        def writes(obj: io.apibuilder.example.union.types.v0.models.RegisteredUser) = {
-          jsObjectRegisteredUser(obj)
-        }
+      (obj: io.apibuilder.example.union.types.v0.models.RegisteredUser) => {
+        jsObjectRegisteredUser(obj)
       }
     }
 
@@ -324,10 +316,8 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.Foobar] {
-        def writes(obj: io.apibuilder.example.union.types.v0.models.Foobar) = {
-          jsObjectFoobar(obj)
-        }
+      (obj: io.apibuilder.example.union.types.v0.models.Foobar) => {
+        jsObjectFoobar(obj)
       }
     }
 
@@ -354,10 +344,8 @@ package io.apibuilder.example.union.types.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesUser: play.api.libs.json.Writes[User] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.v0.models.User] {
-        def writes(obj: io.apibuilder.example.union.types.v0.models.User) = {
-          jsObjectUser(obj)
-        }
+      (obj: io.apibuilder.example.union.types.v0.models.User) => {
+        jsObjectUser(obj)
       }
     }
   }

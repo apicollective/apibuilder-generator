@@ -88,10 +88,8 @@ package io.gregor.time.types.v0.models {
     }
 
     implicit def jsonWritesTimeTypesDateTimeModel: play.api.libs.json.Writes[DateTimeModel] = {
-      new play.api.libs.json.Writes[io.gregor.time.types.v0.models.DateTimeModel] {
-        def writes(obj: io.gregor.time.types.v0.models.DateTimeModel) = {
-          jsObjectDateTimeModel(obj)
-        }
+      (obj: io.gregor.time.types.v0.models.DateTimeModel) => {
+        jsObjectDateTimeModel(obj)
       }
     }
 
@@ -124,10 +122,8 @@ package io.gregor.time.types.v0.models {
     }
 
     implicit def jsonWritesTimeTypesDateTimeUnion: play.api.libs.json.Writes[DateTimeUnion] = {
-      new play.api.libs.json.Writes[io.gregor.time.types.v0.models.DateTimeUnion] {
-        def writes(obj: io.gregor.time.types.v0.models.DateTimeUnion) = {
-          jsObjectDateTimeUnion(obj)
-        }
+      (obj: io.gregor.time.types.v0.models.DateTimeUnion) => {
+        jsObjectDateTimeUnion(obj)
       }
     }
   }
