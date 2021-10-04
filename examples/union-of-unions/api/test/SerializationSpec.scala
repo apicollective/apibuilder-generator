@@ -6,7 +6,7 @@ import play.api.libs.json._
 
 import java.util.UUID
 
-class FooSpec extends PlaySpec with GuiceOneAppPerSuite {
+class SerializationSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   private[this] def mustParse[T](value: T)(implicit writes: Writes[T], reads: Reads[T]) = {
     Json.parse(Json.toJson(value).toString()).validate[T] match {
