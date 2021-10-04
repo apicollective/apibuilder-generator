@@ -758,7 +758,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocApiOriginalType = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] {
+    implicit val jsonReadsApidocApiOriginalType: play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.api.v0.models.OriginalType] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.OriginalType(v.value))
@@ -790,7 +790,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocApiPublication = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Publication] {
+    implicit val jsonReadsApidocApiPublication: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Publication] = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Publication] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.api.v0.models.Publication] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Publication(v.value))
@@ -822,7 +822,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocApiVisibility = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Visibility] {
+    implicit val jsonReadsApidocApiVisibility: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Visibility] = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Visibility] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.api.v0.models.Visibility] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Visibility(v.value))

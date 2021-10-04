@@ -187,7 +187,7 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesBar = new play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Bar] {
+    implicit val jsonReadsApidocExampleUnionTypesBar: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Bar] = new play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Bar] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.example.union.types.v0.models.Bar] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Bar(v.value))
@@ -219,7 +219,7 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesFoo = new play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Foo] {
+    implicit val jsonReadsApidocExampleUnionTypesFoo: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Foo] = new play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Foo] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.example.union.types.v0.models.Foo] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.Foo(v.value))

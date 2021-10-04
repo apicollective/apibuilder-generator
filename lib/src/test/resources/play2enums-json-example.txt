@@ -1,4 +1,4 @@
-implicit val jsonReadsAPIBuilderTestAgeGroup = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.AgeGroup] {
+implicit val jsonReadsAPIBuilderTestAgeGroup: play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.AgeGroup] = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.AgeGroup] {
   def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[test.apidoc.apidoctest.v0.models.AgeGroup] = {
     js match {
       case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.AgeGroup(v.value))
@@ -30,7 +30,7 @@ implicit def jsonWritesAPIBuilderTestAgeGroup: play.api.libs.json.Writes[AgeGrou
   }
 }
 
-implicit val jsonReadsAPIBuilderTestGenre = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.Genre] {
+implicit val jsonReadsAPIBuilderTestGenre: play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.Genre] = new play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.Genre] {
   def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[test.apidoc.apidoctest.v0.models.Genre] = {
     js match {
       case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.Genre(v.value))

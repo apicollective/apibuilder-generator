@@ -158,7 +158,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocReferenceApiAgeGroup = new play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.AgeGroup] {
+    implicit val jsonReadsApidocReferenceApiAgeGroup: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.AgeGroup] = new play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.AgeGroup] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.reference.api.v0.models.AgeGroup] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.reference.api.v0.models.AgeGroup(v.value))

@@ -588,7 +588,7 @@ package com.gilt.quality.v0.models {
       }
     }
 
-    implicit val jsonReadsQualityExternalServiceName = new play.api.libs.json.Reads[com.gilt.quality.v0.models.ExternalServiceName] {
+    implicit val jsonReadsQualityExternalServiceName: play.api.libs.json.Reads[com.gilt.quality.v0.models.ExternalServiceName] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.ExternalServiceName] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.ExternalServiceName] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.ExternalServiceName(v.value))
@@ -620,7 +620,7 @@ package com.gilt.quality.v0.models {
       }
     }
 
-    implicit val jsonReadsQualityPublication = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Publication] {
+    implicit val jsonReadsQualityPublication: play.api.libs.json.Reads[com.gilt.quality.v0.models.Publication] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Publication] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Publication] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Publication(v.value))
@@ -652,7 +652,7 @@ package com.gilt.quality.v0.models {
       }
     }
 
-    implicit val jsonReadsQualityResponse = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Response] {
+    implicit val jsonReadsQualityResponse: play.api.libs.json.Reads[com.gilt.quality.v0.models.Response] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Response] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Response] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Response(v.value))
@@ -684,7 +684,7 @@ package com.gilt.quality.v0.models {
       }
     }
 
-    implicit val jsonReadsQualitySeverity = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Severity] {
+    implicit val jsonReadsQualitySeverity: play.api.libs.json.Reads[com.gilt.quality.v0.models.Severity] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Severity] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Severity] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Severity(v.value))
@@ -716,7 +716,7 @@ package com.gilt.quality.v0.models {
       }
     }
 
-    implicit val jsonReadsQualityTask = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Task] {
+    implicit val jsonReadsQualityTask: play.api.libs.json.Reads[com.gilt.quality.v0.models.Task] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Task] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Task] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Task(v.value))
