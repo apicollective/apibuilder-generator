@@ -166,7 +166,7 @@ case class Play2Json(
 
     val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
       case None => "case e: play.api.libs.json.JsError => e"
-      case Some(defaultValue) => s"case e: play.api.libs.json.JsError => readDiscriminator(\"${defaultValue}\")"
+      case Some(defaultValue) => s"case _: play.api.libs.json.JsError => readDiscriminator(\"${defaultValue}\")"
     }
 
     Seq(
