@@ -53,11 +53,14 @@ class FooSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   "registered_user" must {
     val email = "test@apibuilder.io"
-    val registeredUser = RegisteredUser(guid = UUID.randomUUID(), email = email)
+    val guid = UUID.randomUUID()
+    val registeredUser = RegisteredUser(guid = guid, email = email)
 
     "toJson" in {
       Json.toJson(registeredUser) mustBe Json.obj(
-        "discriminator" -> "guest_user",
+        "guid" -> guid,
+        "email" -> email,
+        "discriminator" -> "registered_user",
       )
     }
 
