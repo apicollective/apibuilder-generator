@@ -9,7 +9,7 @@ import play.api.libs.json.{JsObject, Json}
 
 object TestFixtures {
 
-  import models.TestHelper.{referenceApiService, generatorApiServiceWithUnionWithoutDescriminator}
+  import models.TestHelper.{referenceApiService, generatorApiServiceWithUnionWithoutDiscriminator}
 
   trait TrivialServiceContext {
     val trivialService = Service(
@@ -181,9 +181,9 @@ object TestFixtures {
   trait TrivialServiceWithUnionTypesImportCtx extends TrivialServiceContext {
 
     val unionType = "foobar"
-    val importedUnion = generatorApiServiceWithUnionWithoutDescriminator.unions.find(_.name == unionType)
+    val importedUnion = generatorApiServiceWithUnionWithoutDiscriminator.unions.find(_.name == unionType)
       .getOrElse(throw new NoSuchElementException(s"$unionType is expected in example apidoc-example-union-types.json"))
-    val importedUnionPath = s"${generatorApiServiceWithUnionWithoutDescriminator.namespace}.unions.$unionType"
+    val importedUnionPath = s"${generatorApiServiceWithUnionWithoutDiscriminator.namespace}.unions.$unionType"
 
     val modelWithImportedUnion = Model(
       name = "union",
@@ -218,10 +218,10 @@ object TestFixtures {
       imports = Seq(
         Import(
           uri = "some-uri-2",
-          namespace = generatorApiServiceWithUnionWithoutDescriminator.name,
-          organization = generatorApiServiceWithUnionWithoutDescriminator.organization,
-          application = generatorApiServiceWithUnionWithoutDescriminator.application,
-          version = generatorApiServiceWithUnionWithoutDescriminator.version,
+          namespace = generatorApiServiceWithUnionWithoutDiscriminator.name,
+          organization = generatorApiServiceWithUnionWithoutDiscriminator.organization,
+          application = generatorApiServiceWithUnionWithoutDiscriminator.application,
+          version = generatorApiServiceWithUnionWithoutDiscriminator.version,
           unions = Seq(unionType)
         )
       ),

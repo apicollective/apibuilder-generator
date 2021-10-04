@@ -38,8 +38,8 @@ class ScalaCheckGeneratorSpec extends AnyFunSpec with Matchers {
       apidocApiService,
       dateTimeService,
       builtInTypesService,
-      generatorApiServiceWithUnionAndDescriminator,
-      generatorApiServiceWithUnionWithoutDescriminator,
+      generatorApiServiceWithUnionAndDiscriminator,
+      generatorApiServiceWithUnionWithoutDiscriminator,
       emptyService,
     ).zipWithIndex.foreach { case (service, index) =>
       describe(s"for services ${index}") {

@@ -139,7 +139,7 @@ class ServiceImportResolverSpec extends AnyWordSpec with Matchers {
 
   trait ResolvedServiceWithUnionsTestContext extends TrivialServiceWithUnionTypesImportCtx {
     val mainService = trivialServiceWithUnionTypesImport
-    val importedService = models.TestHelper.generatorApiServiceWithUnionWithoutDescriminator
+    val importedService = models.TestHelper.generatorApiServiceWithUnionWithoutDiscriminator
 
     lazy val result = ServiceImportResolver.resolveService(mainService, Seq(importedService))
     lazy val resultService = result.service
@@ -148,7 +148,7 @@ class ServiceImportResolverSpec extends AnyWordSpec with Matchers {
   trait ResolvedServiceWithTwoImportsTestContext extends TrivialServiceWithTwoImportsCtx {
     val mainService = trivialServiceWithTwoImports
     val importedService1 = models.TestHelper.referenceApiService
-    val importedService2 = models.TestHelper.generatorApiServiceWithUnionWithoutDescriminator
+    val importedService2 = models.TestHelper.generatorApiServiceWithUnionWithoutDiscriminator
 
     lazy val result = ServiceImportResolver.resolveService(mainService, Seq(importedService1, importedService2))
     lazy val resultService = result.service

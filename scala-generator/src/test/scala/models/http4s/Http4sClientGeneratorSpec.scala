@@ -125,7 +125,7 @@ class Http4sClientGeneratorSpec extends AnyFunSpec with Matchers {
     }
 
     it("Circe generator handles primitive union types") {
-      val service = models.TestHelper.generatorApiServiceWithUnionAndDescriminator
+      val service = models.TestHelper.generatorApiServiceWithUnionAndDiscriminator
       val ssd = new ScalaService(service)
       val json = CirceJson(ssd)
       val scalaSourceCode = json.generate()
@@ -136,7 +136,7 @@ class Http4sClientGeneratorSpec extends AnyFunSpec with Matchers {
     }
 
     it("Circe generator produces valid json decoder for unions without descriminator") {
-      val service = models.TestHelper.generatorApiServiceWithUnionWithoutDescriminator
+      val service = models.TestHelper.generatorApiServiceWithUnionWithoutDiscriminator
       val ssd = new ScalaService(service)
       val json = CirceJson(ssd)
       val scalaSourceCode = json.generate()
