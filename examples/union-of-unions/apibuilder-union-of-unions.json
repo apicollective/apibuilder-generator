@@ -5,7 +5,7 @@
       "party": {
         "discriminator": "discriminator",
         "types": [
-          { "type": "user" },
+          { "type": "user", "default": true },
           { "type": "group" }
         ]
       },

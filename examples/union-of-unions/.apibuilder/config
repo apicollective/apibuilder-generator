@@ -1,5 +1,5 @@
 code:
-  bryzek:
+  apicollective:
     apibuilder-union-of-unions:
       version: latest
       generators:

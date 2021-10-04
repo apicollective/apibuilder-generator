@@ -1,5 +1,5 @@
-import com.bryzek.apibuilder.union.of.unions.v0.models._
-import com.bryzek.apibuilder.union.of.unions.v0.models.json._
+import io.apibuilder.union.of.unions.v0.models._
+import io.apibuilder.union.of.unions.v0.models.json._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
