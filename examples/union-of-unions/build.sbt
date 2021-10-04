@@ -1,5 +1,3 @@
-import play.PlayImport.PlayKeys._
-
 name := "apibuilder-union-of-unions"
 
 organization := "io.apibuilder.generator"
@@ -21,11 +19,10 @@ lazy val api = project
   .aggregate(generated)
   .enablePlugins(PlayScala)
   .settings(
-    routesImport += "io.apibuilder.example.union.types.v0._",
     libraryDependencies ++= Seq(
       ws,
       specs2 % Test,
-      "org.scalatest" %% "scalatest" % "2.2.5" % Test,
-      "org.scalatestplus" %% "play" % "1.4.0-M4" % Test
+      "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0",
+      "org.scalatest" %% "scalatest" % "3.2.10" % Test,
     )
   )
