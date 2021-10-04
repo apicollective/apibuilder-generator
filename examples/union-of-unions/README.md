@@ -1,8 +1,8 @@
 Overview
 ========
-This is a simple skeleton application demonstrating the user of union
-types with the scala clients.
 
+Provides an end to end example of json serialization/deserialization of a union type
+that itself includes a union type.
 
 Updating Code
 =============

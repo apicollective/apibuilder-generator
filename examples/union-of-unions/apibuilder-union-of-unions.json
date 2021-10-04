@@ -3,15 +3,17 @@
 
     "unions": {
       "party": {
+        "discriminator": "discriminator",
         "types": [
           { "type": "user" },
           { "type": "group" }
         ]
       },
       "user": {
+        "discriminator": "discriminator",
           "types": [
-          { "type": "registered_user" },
-          { "type": "guest_user" }
+            { "type": "registered_user" },
+            { "type": "guest_user" }
           ]
       }
     },

@@ -7,7 +7,51 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
 
   sealed trait Party extends _root_.scala.Product with _root_.scala.Serializable
 
+  /**
+   * Defines the valid discriminator values for the type Party
+   */
+  sealed trait PartyDiscriminator extends _root_.scala.Product with _root_.scala.Serializable
+
+  object PartyDiscriminator {
+
+    case object User extends PartyDiscriminator { override def toString = "user" }
+    case object Group extends PartyDiscriminator { override def toString = "group" }
+
+    final case class UNDEFINED(override val toString: String) extends PartyDiscriminator
+
+    val all: scala.List[PartyDiscriminator] = scala.List(User, Group)
+
+    private[this] val byName: Map[String, PartyDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def apply(value: String): PartyDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[PartyDiscriminator] = byName.get(value.toLowerCase)
+
+  }
+
   sealed trait User extends Party
+
+  /**
+   * Defines the valid discriminator values for the type User
+   */
+  sealed trait UserDiscriminator extends _root_.scala.Product with _root_.scala.Serializable
+
+  object UserDiscriminator {
+
+    case object RegisteredUser extends UserDiscriminator { override def toString = "registered_user" }
+    case object GuestUser extends UserDiscriminator { override def toString = "guest_user" }
+
+    final case class UNDEFINED(override val toString: String) extends UserDiscriminator
+
+    val all: scala.List[UserDiscriminator] = scala.List(RegisteredUser, GuestUser)
+
+    private[this] val byName: Map[String, UserDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def apply(value: String): UserDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[UserDiscriminator] = byName.get(value.toLowerCase)
+
+  }
 
   final case class Group(
     name: String
@@ -95,7 +139,7 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
     def jsObjectGroup(obj: com.bryzek.apibuilder.union.of.unions.v0.models.Group): play.api.libs.json.JsObject = {
       play.api.libs.json.Json.obj(
         "name" -> play.api.libs.json.JsString(obj.name)
-      )
+      ) ++ play.api.libs.json.Json.obj("discriminator" -> "group")
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsGroup: play.api.libs.json.Writes[Group] = {
@@ -114,7 +158,7 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
       (obj.email match {
         case None => play.api.libs.json.Json.obj()
         case Some(x) => play.api.libs.json.Json.obj("email" -> play.api.libs.json.JsString(x))
-      })
+      }) ++ play.api.libs.json.Json.obj("discriminator" -> "guest_user")
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsGuestUser: play.api.libs.json.Writes[GuestUser] = {
@@ -136,7 +180,7 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
       play.api.libs.json.Json.obj(
         "guid" -> play.api.libs.json.JsString(obj.guid.toString),
         "email" -> play.api.libs.json.JsString(obj.email)
-      )
+      ) ++ play.api.libs.json.Json.obj("discriminator" -> "registered_user")
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
@@ -147,21 +191,23 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
       }
     }
 
-    implicit def jsonReadsApibuilderUnionOfUnionsParty: play.api.libs.json.Reads[Party] = {
-      (
-        (__ \ "user").read(jsonReadsApibuilderUnionOfUnionsParty).asInstanceOf[play.api.libs.json.Reads[Party]]
-        orElse
-        (__ \ "group").read(jsonReadsApibuilderUnionOfUnionsGroup).asInstanceOf[play.api.libs.json.Reads[Party]]
-        orElse
-        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.apibuilder.union.of.unions.v0.models.PartyUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Party]]
-      )
+    implicit def jsonReadsApibuilderUnionOfUnionsParty: play.api.libs.json.Reads[Party] = new play.api.libs.json.Reads[Party] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[Party] = {
+        (js \ "discriminator").asOpt[String].getOrElse { sys.error("Union[Party] requires a discriminator named 'discriminator' - this field was not found in the Json Value") } match {
+          case "user" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.User]
+          case "group" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.Group]
+          case other => play.api.libs.json.JsSuccess(com.bryzek.apibuilder.union.of.unions.v0.models.PartyUndefinedType(other))
+        }
+      }
     }
 
     def jsObjectParty(obj: com.bryzek.apibuilder.union.of.unions.v0.models.Party): play.api.libs.json.JsObject = {
       obj match {
-        case x: com.bryzek.apibuilder.union.of.unions.v0.models.User => play.api.libs.json.Json.obj("user" -> jsObjectUser(x))
-        case x: com.bryzek.apibuilder.union.of.unions.v0.models.Group => play.api.libs.json.Json.obj("group" -> jsObjectGroup(x))
-        case x: com.bryzek.apibuilder.union.of.unions.v0.models.PartyUndefinedType => sys.error(s"The type[com.bryzek.apibuilder.union.of.unions.v0.models.PartyUndefinedType] should never be serialized")
+        case x: com.bryzek.apibuilder.union.of.unions.v0.models.User => jsObjectUser(x)
+        case x: com.bryzek.apibuilder.union.of.unions.v0.models.Group => jsObjectGroup(x)
+        case other => {
+          sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
+        }
       }
     }
 
@@ -173,21 +219,23 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
       }
     }
 
-    implicit def jsonReadsApibuilderUnionOfUnionsUser: play.api.libs.json.Reads[User] = {
-      (
-        (__ \ "registered_user").read(jsonReadsApibuilderUnionOfUnionsRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
-        orElse
-        (__ \ "guest_user").read(jsonReadsApibuilderUnionOfUnionsGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
-        orElse
-        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(com.bryzek.apibuilder.union.of.unions.v0.models.UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
-      )
+    implicit def jsonReadsApibuilderUnionOfUnionsUser: play.api.libs.json.Reads[User] = new play.api.libs.json.Reads[User] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[User] = {
+        (js \ "discriminator").asOpt[String].getOrElse { sys.error("Union[User] requires a discriminator named 'discriminator' - this field was not found in the Json Value") } match {
+          case "registered_user" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser]
+          case "guest_user" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser]
+          case other => play.api.libs.json.JsSuccess(com.bryzek.apibuilder.union.of.unions.v0.models.UserUndefinedType(other))
+        }
+      }
     }
 
     def jsObjectUser(obj: com.bryzek.apibuilder.union.of.unions.v0.models.User): play.api.libs.json.JsObject = {
       obj match {
-        case x: com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> jsObjectRegisteredUser(x))
-        case x: com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> jsObjectGuestUser(x))
-        case x: com.bryzek.apibuilder.union.of.unions.v0.models.UserUndefinedType => sys.error(s"The type[com.bryzek.apibuilder.union.of.unions.v0.models.UserUndefinedType] should never be serialized")
+        case x: com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser => jsObjectRegisteredUser(x)
+        case x: com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser => jsObjectGuestUser(x)
+        case other => {
+          sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
+        }
       }
     }
 
