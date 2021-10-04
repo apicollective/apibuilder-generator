@@ -1,0 +1,5 @@
+---
+bryzek:
+  apibuilder-union-of-unions:
+    play_2_6_client:
+    - generated/app/BryzekApibuilderUnionOfUnionsV0Client.scala
