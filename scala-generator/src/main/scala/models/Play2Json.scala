@@ -421,18 +421,22 @@ case class Play2Json(
 
   private[this] case class UnionTypeWithName(unionType: ScalaUnionType, typeName: String)
   private[this] def unionTypesWithNames(union: ScalaUnion): Seq[UnionTypeWithName] = {
-    union.types.map { t =>
-      UnionTypeWithName(
-        t,
-        t.datatype match {
-          case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
-            p.name
-          }
-          case p: ScalaPrimitive => ssd.modelClassName(PrimitiveWrapper.className(union, p))
-          case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encountered in union ${union.name}")
+    union.types.flatMap { t =>
+      def single(name: String) = Seq(UnionTypeWithName(t, name))
+      t.datatype match {
+        case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _)) => {
+          single(p.name)
         }
-      )
-    }
+        case p: ScalaPrimitive.Union => {
+          findUnionByName(p.fullName) match {
+            case None => single(p.name)
+            case Some(u) => unionTypesWithNames(u)
+          }
+        }
+        case p: ScalaPrimitive => single(ssd.modelClassName(PrimitiveWrapper.className(union, p)))
+        case c: ScalaDatatype.Container => sys.error(s"unsupported container type $c encountered in union ${union.name}")
+      }
+    }.distinct
   }
 
   private[this] def isOption(datatype: ScalaDatatype): Boolean = {
