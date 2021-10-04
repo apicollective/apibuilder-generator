@@ -135,7 +135,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser = new play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] {
+    implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] = new play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.discriminator.v0.models.SystemUser(v.value))

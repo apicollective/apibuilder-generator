@@ -30,15 +30,6 @@ case class Play2JsonCommon(ssd: ScalaService) {
       "  }",
       "}"
     ).mkString("\n")
-/*
-    s"  new play.api.libs.json.Writes[$qualifiedName] {",
-      s"    def writes(obj: $qualifiedName): play.api.libs.json.JsValue = {",
-      s"      $methodName(obj)",
-      "    }",
-      "  }",
-      "}"
-    ).mkString("\n")
-    */
   }
 
   def implicitReaderDef(name: String): String = {
@@ -101,7 +92,7 @@ case class Play2Json(
     }
 
     Seq(
-      s"implicit val jsonReads${ssd.name}${enum.name} = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
+      s"implicit val jsonReads${ssd.name}${enum.name}: play.api.libs.json.Reads[${enum.qualifiedName}] = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
       Seq(
         s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${enum.qualifiedName}] = {",
         Seq(
