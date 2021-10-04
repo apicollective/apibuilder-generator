@@ -25,13 +25,20 @@ case class Play2JsonCommon(ssd: ScalaService) {
   def implicitWriter(name: String, qualifiedName: String, methodName: String): String = {
     Seq(
       s"${implicitWriterDef(name)} = {",
-      s"  new play.api.libs.json.Writes[$qualifiedName] {",
-      s"    def writes(obj: $qualifiedName) = {",
+      s"  (obj: $qualifiedName) => {",
+      s"    ${methodName}(obj)",
+      "  }",
+      "}"
+    ).mkString("\n")
+/*
+    s"  new play.api.libs.json.Writes[$qualifiedName] {",
+      s"    def writes(obj: $qualifiedName): play.api.libs.json.JsValue = {",
       s"      $methodName(obj)",
       "    }",
       "  }",
       "}"
     ).mkString("\n")
+    */
   }
 
   def implicitReaderDef(name: String): String = {
@@ -436,10 +443,7 @@ case class Play2Json(
         case p: ScalaPrimitive.Union => {
           findUnionByName(p.fullName) match {
             case None => single(p.name)
-            case Some(u) => {
-              println(s"Recursing for union type ${u.name}")
-              unionTypesWithNames(u)
-            }
+            case Some(u) => unionTypesWithNames(u)
           }
         }
         case p: ScalaPrimitive => single(ssd.modelClassName(PrimitiveWrapper.className(union, p)))

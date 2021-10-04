@@ -143,10 +143,8 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsGroup: play.api.libs.json.Writes[Group] = {
-      new play.api.libs.json.Writes[com.bryzek.apibuilder.union.of.unions.v0.models.Group] {
-        def writes(obj: com.bryzek.apibuilder.union.of.unions.v0.models.Group) = {
-          jsObjectGroup(obj)
-        }
+      (obj: com.bryzek.apibuilder.union.of.unions.v0.models.Group) => {
+        jsObjectGroup(obj)
       }
     }
 
@@ -162,10 +160,8 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsGuestUser: play.api.libs.json.Writes[GuestUser] = {
-      new play.api.libs.json.Writes[com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser] {
-        def writes(obj: com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser) = {
-          jsObjectGuestUser(obj)
-        }
+      (obj: com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser) => {
+        jsObjectGuestUser(obj)
       }
     }
 
@@ -184,10 +180,8 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
-      new play.api.libs.json.Writes[com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser] {
-        def writes(obj: com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser) = {
-          jsObjectRegisteredUser(obj)
-        }
+      (obj: com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser) => {
+        jsObjectRegisteredUser(obj)
       }
     }
 
@@ -214,10 +208,8 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsParty: play.api.libs.json.Writes[Party] = {
-      new play.api.libs.json.Writes[com.bryzek.apibuilder.union.of.unions.v0.models.Party] {
-        def writes(obj: com.bryzek.apibuilder.union.of.unions.v0.models.Party) = {
-          jsObjectParty(obj)
-        }
+      (obj: com.bryzek.apibuilder.union.of.unions.v0.models.Party) => {
+        jsObjectParty(obj)
       }
     }
 
@@ -242,10 +234,8 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
     }
 
     implicit def jsonWritesApibuilderUnionOfUnionsUser: play.api.libs.json.Writes[User] = {
-      new play.api.libs.json.Writes[com.bryzek.apibuilder.union.of.unions.v0.models.User] {
-        def writes(obj: com.bryzek.apibuilder.union.of.unions.v0.models.User) = {
-          jsObjectUser(obj)
-        }
+      (obj: com.bryzek.apibuilder.union.of.unions.v0.models.User) => {
+        jsObjectUser(obj)
       }
     }
   }
