@@ -204,7 +204,8 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
 
     def jsObjectParty(obj: com.bryzek.apibuilder.union.of.unions.v0.models.Party): play.api.libs.json.JsObject = {
       obj match {
-        case x: com.bryzek.apibuilder.union.of.unions.v0.models.User => jsObjectUser(x)
+        case x: com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser => jsObjectRegisteredUser(x)
+        case x: com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser => jsObjectGuestUser(x)
         case x: com.bryzek.apibuilder.union.of.unions.v0.models.Group => jsObjectGroup(x)
         case other => {
           sys.error(s"The type[${other.getClass.getName}] has no JSON writer")

@@ -4,7 +4,7 @@ import lib.Text._
 
 import scala.annotation.nowarn
 import scala.generator.ScalaPrimitive.{Model, Union}
-import scala.generator._
+import scala.generator.{ScalaUnionType, _}
 
 case class Play2JsonCommon(ssd: ScalaService) {
 
@@ -63,6 +63,7 @@ case class Play2Json(
   private[this] val play2JsonCommon = Play2JsonCommon(ssd)
 
   def generateModelsAndUnions(): String = {
+    println(s"generateModelsAndUnions: ${ssd.name}")
     Seq(
       ssd.models.map(readersAndWriters).mkString("\n\n"),
       PrimitiveWrapper(ssd).wrappers.map(w => readers(w.model)).mkString("\n\n"),
@@ -164,6 +165,8 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    println(s"Generating reader for union type ${union.name}: discriminator '$discriminator'")
+
     val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.discriminatorName).headOption
 
     val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
@@ -175,8 +178,8 @@ case class Play2Json(
       s"${play2JsonCommon.implicitReaderDef(union.name)} = new play.api.libs.json.Reads[${union.name}] {",
       Seq(s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${union.name}] = {",
         Seq(s"""(js \\ "$discriminator").asOpt[String].getOrElse$defaultDiscriminatorClause match {""",
-          unionTypesWithNames(union).map { case (t, typeName) =>
-            s"""case "${t.discriminatorName}" => js.validate[$typeName]"""
+          unionTypesWithNames(union).map { t =>
+            s"""case "${t.unionType.discriminatorName}" => js.validate[${t.typeName}]"""
           }.mkString("\n").indentString(2),
           s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indentString(2),
           "}"
@@ -205,9 +208,9 @@ case class Play2Json(
     Seq(
       s"def $method(obj: ${union.qualifiedName}): play.api.libs.json.JsObject = {",
       s"  obj match {",
-      unionTypesWithNames(union).map { case (t, typeName) =>
-        val json = getJsonValueForUnion(t.datatype, "x")
-        s"""case x: $typeName => play.api.libs.json.Json.obj("${t.discriminatorName}" -> $json)"""
+      unionTypesWithNames(union).map { t =>
+        val json = getJsonValueForUnion(t.unionType.datatype, "x")
+        s"""case x: ${t.typeName} => play.api.libs.json.Json.obj("${t.unionType.discriminatorName}" -> $json)"""
       }.mkString("\n").indentString(4),
       s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
       "  }",
@@ -224,9 +227,9 @@ case class Play2Json(
       Seq(
         "obj match {",
         Seq(
-          unionTypesWithNames(union).map { case (t, typeName) =>
-            val json = getJsonValueForUnion(t.datatype, "x", Some(Discriminator(discriminator, t.discriminatorName)))
-            s"case x: $typeName => $json"
+          unionTypesWithNames(union).map { t =>
+            val json = getJsonValueForUnion(t.unionType.datatype, "x", Some(Discriminator(discriminator, t.unionType.discriminatorName)))
+            s"case x: ${t.typeName} => $json"
           }.mkString("\n"),
           s"case other => {",
           """  sys.error(s"The type[${other.getClass.getName}] has no JSON writer")""",
@@ -279,12 +282,13 @@ case class Play2Json(
     ).mkString("\n")
   }
 
-  private[models] def fieldReaders(model: ScalaModel): String = {
-    def findModelByName(name: String): Option[ScalaModel] =
-      ssd.models.find(_.qualifiedName == name)
+  private[this] def findModelByName(name: String): Option[ScalaModel] =
+    ssd.models.find(_.qualifiedName == name)
 
-    def findUnionByName(name: String): Option[ScalaUnion] =
-      ssd.unions.find(_.qualifiedName == name)
+  private[this] def findUnionByName(name: String): Option[ScalaUnion] =
+    ssd.unions.find(_.qualifiedName == name)
+
+  private[models] def fieldReaders(model: ScalaModel): String = {
 
     /** Does field have reference somewhere down the tree to model? */
     def hasReferenceToModel(datatype: ScalaDatatype, visited: List[ScalaDatatype] = Nil): Boolean = {
@@ -420,18 +424,28 @@ case class Play2Json(
     }
   }
 
-  private[this] def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
-    union.types.map { t =>
-      (t,
-        t.datatype match {
-          case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _)) => {
-            p.name
-          }
-          case p: ScalaPrimitive => ssd.modelClassName(PrimitiveWrapper.className(union, p))
-          case c: ScalaDatatype.Container => sys.error(s"unsupported container type $c encountered in union ${union.name}")
+  private[this] case class UnionTypeWithName(unionType: ScalaUnionType, typeName: String)
+
+  private[this] def unionTypesWithNames(union: ScalaUnion): Seq[UnionTypeWithName] = {
+    union.types.flatMap { t =>
+      def single(name: String) = Seq(UnionTypeWithName(t, name))
+      t.datatype match {
+        case p @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _)) => {
+          single(p.name)
         }
-      )
-    }
+        case p: ScalaPrimitive.Union => {
+          findUnionByName(p.fullName) match {
+            case None => single(p.name)
+            case Some(u) => {
+              println(s"Recursing for union type ${u.name}")
+              unionTypesWithNames(u)
+            }
+          }
+        }
+        case p: ScalaPrimitive => single(ssd.modelClassName(PrimitiveWrapper.className(union, p)))
+        case c: ScalaDatatype.Container => sys.error(s"unsupported container type $c encountered in union ${union.name}")
+      }
+    }.distinct
   }
 
   private[this] def isOption(datatype: ScalaDatatype): Boolean = {
