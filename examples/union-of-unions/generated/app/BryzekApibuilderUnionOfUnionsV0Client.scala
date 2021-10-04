@@ -193,9 +193,9 @@ package com.bryzek.apibuilder.union.of.unions.v0.models {
 
     implicit def jsonReadsApibuilderUnionOfUnionsParty: play.api.libs.json.Reads[Party] = new play.api.libs.json.Reads[Party] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[Party] = {
-        println(s"Reading party: ${js}")
         (js \ "discriminator").asOpt[String].getOrElse { sys.error("Union[Party] requires a discriminator named 'discriminator' - this field was not found in the Json Value") } match {
-          case "user" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.User]
+          case "registered_user" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.RegisteredUser]
+          case "guest_user" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.GuestUser]
           case "group" => js.validate[com.bryzek.apibuilder.union.of.unions.v0.models.Group]
           case other => play.api.libs.json.JsSuccess(com.bryzek.apibuilder.union.of.unions.v0.models.PartyUndefinedType(other))
         }
