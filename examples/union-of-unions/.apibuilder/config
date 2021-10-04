@@ -1,0 +1,6 @@
+code:
+  bryzek:
+    apibuilder-union-of-unions:
+      version: latest
+      generators:
+        play_2_6_client: generated/app

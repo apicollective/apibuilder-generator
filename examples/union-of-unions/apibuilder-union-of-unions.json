@@ -1,0 +1,68 @@
+{
+  "name": "apibuilder-union-of-unions",
+
+    "unions": {
+		"user": {
+			"types": [
+			{ "type": "registered_user" },
+			{ "type": "guest_user" },
+			{ "type": "uuid" }
+			]
+		},
+		"foobar": {
+			"types": [
+			{ "type": "foo" },
+			{ "type": "bar" }
+			]
+		}
+    },
+
+    "models": {
+
+	"registered_user": {
+	    "fields": [
+                { "name": "guid", "type": "uuid", "description": "Internal unique identifier for this user." },
+                { "name": "email", "type": "string" },
+                { "name": "preference", "type": "foobar" }
+            ]
+        },
+
+	"guest_user": {
+	    "fields": [
+                { "name": "guid", "type": "uuid", "description": "Internal unique identifier for this user." },
+                { "name": "email", "type": "string" }
+	    ]
+	}
+    },
+
+    "resources": {
+	"user": {
+	    "operations": [
+		{
+		    "method": "GET",
+                    "responses": {
+                        "200": { "type": "[user]" }
+                    }
+                },
+
+                {
+                    "method": "GET",
+                    "path": "/:guid",
+                    "responses": {
+                        "200": { "type": "user" },
+                        "404": { "type": "unit" }
+                    }
+                },
+
+		{
+		    "method": "POST",
+		    "body": { "type": "user" },
+                    "responses": {
+                        "201": { "type": "user" }
+                    }
+                }
+
+	    ]
+	}
+    }
+}
