@@ -66,18 +66,6 @@ object TestHelper extends Matchers {
     ()
   }
 
-  private[this] def readNonEmptyFile(path: String): String = {
-    readNonEmptyFile(new JFile(path))
-  }
-
-  private[this] def readNonEmptyFile(path: JFile): String = {
-    val c = readFile(path)
-    if (c.strip.nonEmpty) {
-      sys.error(s"File '$path' contents are empty when we expected there to be data")
-    }
-    c
-  }
-
   def readFile(path: String): String = {
     readFile(new JFile(path))
   }
@@ -99,7 +87,7 @@ object TestHelper extends Matchers {
   }
 
   def parseFile(path: String): Service = {
-    service(readNonEmptyFile(resolvePath(path)))
+    service(readFile(resolvePath(path)))
   }
 
   def writeFiles(dir: java.io.File, files: Seq[File]): Unit = {
