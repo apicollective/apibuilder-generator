@@ -331,7 +331,7 @@ package io.apibuilder.example.union.types.v0.models {
         }
       }
       (js \ "discriminator").validate[String] match {
-        case e: play.api.libs.json.JsError => readDiscriminator("registered_user")
+        case _: play.api.libs.json.JsError => readDiscriminator("registered_user")
         case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)
       }
     }
