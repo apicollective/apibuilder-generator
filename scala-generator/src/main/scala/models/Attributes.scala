@@ -10,12 +10,12 @@ sealed trait TimeConfig {
 }
 object TimeConfig {
   case object JodaTime extends TimeConfig {
-    override val dateType = DateTypeConfig.JodaLocalDate
-    override val dateTimeType = DateTimeTypeConfig.JodaDateTime
+    override val dateType: DateTypeConfig = DateTypeConfig.JodaLocalDate
+    override val dateTimeType: DateTimeTypeConfig = DateTimeTypeConfig.JodaDateTime
   }
   case object JavaTime extends TimeConfig {
-    override val dateType = DateTypeConfig.JavaLocalDate
-    override val dateTimeType = DateTimeTypeConfig.JavaInstant
+    override val dateType: DateTypeConfig = DateTypeConfig.JavaLocalDate
+    override val dateTimeType: DateTimeTypeConfig = DateTimeTypeConfig.JavaInstant
   }
 
   private val Key = "scala_generator.time_library"
@@ -33,10 +33,10 @@ sealed trait DateTypeConfig {
 }
 object DateTypeConfig {
   case object JodaLocalDate extends DateTypeConfig {
-    override val dataType = ScalaPrimitive.DateIso8601Joda
+    override val dataType: ScalaPrimitive.DateIso8601 = ScalaPrimitive.DateIso8601Joda
   }
   case object JavaLocalDate extends DateTypeConfig {
-    override val dataType = ScalaPrimitive.DateIso8601Java
+    override val dataType: ScalaPrimitive.DateIso8601 = ScalaPrimitive.DateIso8601Java
   }
 
   private val Key = "scala_generator.date.type"
@@ -54,13 +54,13 @@ sealed trait DateTimeTypeConfig {
 }
 object DateTimeTypeConfig {
   case object JodaDateTime extends DateTimeTypeConfig {
-    override val dataType = ScalaPrimitive.DateTimeIso8601Joda
+    override val dataType: ScalaPrimitive.DateTimeIso8601 = ScalaPrimitive.DateTimeIso8601Joda
   }
   case object JavaInstant extends DateTimeTypeConfig {
-    override val dataType = ScalaPrimitive.DateTimeIso8601JavaInstant
+    override val dataType: ScalaPrimitive.DateTimeIso8601 = ScalaPrimitive.DateTimeIso8601JavaInstant
   }
   case object JavaOffsetDateTime extends DateTimeTypeConfig {
-    override val dataType = ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime
+    override val dataType: ScalaPrimitive.DateTimeIso8601 = ScalaPrimitive.DateTimeIso8601JavaOffsetDateTime
   }
 
   private val Key = "scala_generator.date_time.type"
@@ -80,12 +80,12 @@ sealed trait JsonConfig {
 }
 object JsonConfig {
   case object PlayJson extends JsonConfig {
-    override val jsonValueType = ScalaPrimitive.JsonValueAsPlay
-    override val jsonObjectType = ScalaPrimitive.ObjectAsPlay
+    override val jsonValueType: ScalaPrimitive.JsonValue = ScalaPrimitive.JsonValueAsPlay
+    override val jsonObjectType: ScalaPrimitive.JsonObject = ScalaPrimitive.ObjectAsPlay
   }
   case object CirceJson extends JsonConfig {
-    override val jsonValueType = ScalaPrimitive.JsonValueAsCirce
-    override val jsonObjectType = ScalaPrimitive.ObjectAsCirce
+    override val jsonValueType: ScalaPrimitive.JsonValue = ScalaPrimitive.JsonValueAsCirce
+    override val jsonObjectType: ScalaPrimitive.JsonObject = ScalaPrimitive.ObjectAsCirce
   }
 
   private val Key = "scala_generator.json_library"

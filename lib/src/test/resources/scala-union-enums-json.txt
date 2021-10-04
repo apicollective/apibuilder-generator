@@ -17,9 +17,7 @@ def jsObjectUserType(obj: test.apidoc.apidoctest.v0.models.UserType): play.api.l
 }
 
 implicit def jsonWritesAPIBuilderTestUserType: play.api.libs.json.Writes[UserType] = {
-  new play.api.libs.json.Writes[test.apidoc.apidoctest.v0.models.UserType] {
-    def writes(obj: test.apidoc.apidoctest.v0.models.UserType) = {
-      jsObjectUserType(obj)
-    }
+  (obj: test.apidoc.apidoctest.v0.models.UserType) => {
+    jsObjectUserType(obj)
   }
 }

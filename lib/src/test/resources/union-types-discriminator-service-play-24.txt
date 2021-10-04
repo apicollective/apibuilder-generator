@@ -135,7 +135,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser = new play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] {
+    implicit val jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] = new play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.discriminator.v0.models.SystemUser(v.value))
@@ -162,10 +162,8 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Writes[SystemUser] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] {
-        def writes(obj: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser) = {
-          jsObjectSystemUser(obj)
-        }
+      (obj: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser) => {
+        jsObjectSystemUser(obj)
       }
     }
 
@@ -186,10 +184,8 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Writes[GuestUser] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.discriminator.v0.models.GuestUser] {
-        def writes(obj: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser) = {
-          jsObjectGuestUser(obj)
-        }
+      (obj: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser) => {
+        jsObjectGuestUser(obj)
       }
     }
 
@@ -208,10 +204,8 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser] {
-        def writes(obj: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser) = {
-          jsObjectRegisteredUser(obj)
-        }
+      (obj: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser) => {
+        jsObjectRegisteredUser(obj)
       }
     }
 
@@ -244,10 +238,8 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = {
-      new play.api.libs.json.Writes[io.apibuilder.example.union.types.discriminator.v0.models.User] {
-        def writes(obj: io.apibuilder.example.union.types.discriminator.v0.models.User) = {
-          jsObjectUser(obj)
-        }
+      (obj: io.apibuilder.example.union.types.discriminator.v0.models.User) => {
+        jsObjectUser(obj)
       }
     }
   }

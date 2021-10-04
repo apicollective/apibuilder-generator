@@ -758,7 +758,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocApiOriginalType = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] {
+    implicit val jsonReadsApidocApiOriginalType: play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.api.v0.models.OriginalType] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.OriginalType(v.value))
@@ -785,14 +785,12 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiOriginalType: play.api.libs.json.Writes[OriginalType] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.OriginalType] {
-        def writes(obj: io.apibuilder.api.v0.models.OriginalType) = {
-          jsonWritesApidocApiOriginalType(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.OriginalType) => {
+        jsonWritesApidocApiOriginalType(obj)
       }
     }
 
-    implicit val jsonReadsApidocApiPublication = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Publication] {
+    implicit val jsonReadsApidocApiPublication: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Publication] = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Publication] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.api.v0.models.Publication] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Publication(v.value))
@@ -819,14 +817,12 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiPublication: play.api.libs.json.Writes[Publication] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Publication] {
-        def writes(obj: io.apibuilder.api.v0.models.Publication) = {
-          jsonWritesApidocApiPublication(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Publication) => {
+        jsonWritesApidocApiPublication(obj)
       }
     }
 
-    implicit val jsonReadsApidocApiVisibility = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Visibility] {
+    implicit val jsonReadsApidocApiVisibility: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Visibility] = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.Visibility] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.api.v0.models.Visibility] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.Visibility(v.value))
@@ -853,10 +849,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiVisibility: play.api.libs.json.Writes[Visibility] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Visibility] {
-        def writes(obj: io.apibuilder.api.v0.models.Visibility) = {
-          jsonWritesApidocApiVisibility(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Visibility) => {
+        jsonWritesApidocApiVisibility(obj)
       }
     }
 
@@ -887,10 +881,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiApplication: play.api.libs.json.Writes[Application] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Application] {
-        def writes(obj: io.apibuilder.api.v0.models.Application) = {
-          jsObjectApplication(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Application) => {
+        jsObjectApplication(obj)
       }
     }
 
@@ -918,10 +910,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiApplicationForm: play.api.libs.json.Writes[ApplicationForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.ApplicationForm] {
-        def writes(obj: io.apibuilder.api.v0.models.ApplicationForm) = {
-          jsObjectApplicationForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.ApplicationForm) => {
+        jsObjectApplicationForm(obj)
       }
     }
 
@@ -942,10 +932,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiApplicationSummary: play.api.libs.json.Writes[ApplicationSummary] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.ApplicationSummary] {
-        def writes(obj: io.apibuilder.api.v0.models.ApplicationSummary) = {
-          jsObjectApplicationSummary(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.ApplicationSummary) => {
+        jsObjectApplicationSummary(obj)
       }
     }
 
@@ -970,10 +958,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiAttribute: play.api.libs.json.Writes[Attribute] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Attribute] {
-        def writes(obj: io.apibuilder.api.v0.models.Attribute) = {
-          jsObjectAttribute(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Attribute) => {
+        jsObjectAttribute(obj)
       }
     }
 
@@ -994,10 +980,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiAttributeForm: play.api.libs.json.Writes[AttributeForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.AttributeForm] {
-        def writes(obj: io.apibuilder.api.v0.models.AttributeForm) = {
-          jsObjectAttributeForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.AttributeForm) => {
+        jsObjectAttributeForm(obj)
       }
     }
 
@@ -1016,10 +1000,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiAttributeSummary: play.api.libs.json.Writes[AttributeSummary] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.AttributeSummary] {
-        def writes(obj: io.apibuilder.api.v0.models.AttributeSummary) = {
-          jsObjectAttributeSummary(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.AttributeSummary) => {
+        jsObjectAttributeSummary(obj)
       }
     }
 
@@ -1042,10 +1024,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiAttributeValue: play.api.libs.json.Writes[AttributeValue] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.AttributeValue] {
-        def writes(obj: io.apibuilder.api.v0.models.AttributeValue) = {
-          jsObjectAttributeValue(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.AttributeValue) => {
+        jsObjectAttributeValue(obj)
       }
     }
 
@@ -1060,10 +1040,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiAttributeValueForm: play.api.libs.json.Writes[AttributeValueForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.AttributeValueForm] {
-        def writes(obj: io.apibuilder.api.v0.models.AttributeValueForm) = {
-          jsObjectAttributeValueForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.AttributeValueForm) => {
+        jsObjectAttributeValueForm(obj)
       }
     }
 
@@ -1096,10 +1074,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiChange: play.api.libs.json.Writes[Change] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Change] {
-        def writes(obj: io.apibuilder.api.v0.models.Change) = {
-          jsObjectChange(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Change) => {
+        jsObjectChange(obj)
       }
     }
 
@@ -1118,10 +1094,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiChangeVersion: play.api.libs.json.Writes[ChangeVersion] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.ChangeVersion] {
-        def writes(obj: io.apibuilder.api.v0.models.ChangeVersion) = {
-          jsObjectChangeVersion(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.ChangeVersion) => {
+        jsObjectChangeVersion(obj)
       }
     }
 
@@ -1136,10 +1110,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiCleartextToken: play.api.libs.json.Writes[CleartextToken] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.CleartextToken] {
-        def writes(obj: io.apibuilder.api.v0.models.CleartextToken) = {
-          jsObjectCleartextToken(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.CleartextToken) => {
+        jsObjectCleartextToken(obj)
       }
     }
 
@@ -1160,10 +1132,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiCode: play.api.libs.json.Writes[Code] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Code] {
-        def writes(obj: io.apibuilder.api.v0.models.Code) = {
-          jsObjectCode(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Code) => {
+        jsObjectCode(obj)
       }
     }
 
@@ -1178,10 +1148,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiDiffBreaking: play.api.libs.json.Writes[DiffBreaking] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.DiffBreaking] {
-        def writes(obj: io.apibuilder.api.v0.models.DiffBreaking) = {
-          jsObjectDiffBreaking(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.DiffBreaking) => {
+        jsObjectDiffBreaking(obj)
       }
     }
 
@@ -1196,10 +1164,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiDiffNonBreaking: play.api.libs.json.Writes[DiffNonBreaking] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.DiffNonBreaking] {
-        def writes(obj: io.apibuilder.api.v0.models.DiffNonBreaking) = {
-          jsObjectDiffNonBreaking(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.DiffNonBreaking) => {
+        jsObjectDiffNonBreaking(obj)
       }
     }
 
@@ -1214,10 +1180,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiDomain: play.api.libs.json.Writes[Domain] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Domain] {
-        def writes(obj: io.apibuilder.api.v0.models.Domain) = {
-          jsObjectDomain(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Domain) => {
+        jsObjectDomain(obj)
       }
     }
 
@@ -1232,10 +1196,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiEmailVerificationConfirmationForm: play.api.libs.json.Writes[EmailVerificationConfirmationForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.EmailVerificationConfirmationForm] {
-        def writes(obj: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm) = {
-          jsObjectEmailVerificationConfirmationForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm) => {
+        jsObjectEmailVerificationConfirmationForm(obj)
       }
     }
 
@@ -1254,10 +1216,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiError: play.api.libs.json.Writes[Error] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Error] {
-        def writes(obj: io.apibuilder.api.v0.models.Error) = {
-          jsObjectError(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Error) => {
+        jsObjectError(obj)
       }
     }
 
@@ -1276,10 +1236,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiGeneratorForm: play.api.libs.json.Writes[GeneratorForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.GeneratorForm] {
-        def writes(obj: io.apibuilder.api.v0.models.GeneratorForm) = {
-          jsObjectGeneratorForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.GeneratorForm) => {
+        jsObjectGeneratorForm(obj)
       }
     }
 
@@ -1300,10 +1258,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiGeneratorService: play.api.libs.json.Writes[GeneratorService] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.GeneratorService] {
-        def writes(obj: io.apibuilder.api.v0.models.GeneratorService) = {
-          jsObjectGeneratorService(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.GeneratorService) => {
+        jsObjectGeneratorService(obj)
       }
     }
 
@@ -1318,10 +1274,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiGeneratorServiceForm: play.api.libs.json.Writes[GeneratorServiceForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.GeneratorServiceForm] {
-        def writes(obj: io.apibuilder.api.v0.models.GeneratorServiceForm) = {
-          jsObjectGeneratorServiceForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.GeneratorServiceForm) => {
+        jsObjectGeneratorServiceForm(obj)
       }
     }
 
@@ -1340,10 +1294,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiGeneratorWithService: play.api.libs.json.Writes[GeneratorWithService] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.GeneratorWithService] {
-        def writes(obj: io.apibuilder.api.v0.models.GeneratorWithService) = {
-          jsObjectGeneratorWithService(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.GeneratorWithService) => {
+        jsObjectGeneratorWithService(obj)
       }
     }
 
@@ -1368,10 +1320,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiItem: play.api.libs.json.Writes[Item] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Item] {
-        def writes(obj: io.apibuilder.api.v0.models.Item) = {
-          jsObjectItem(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Item) => {
+        jsObjectItem(obj)
       }
     }
 
@@ -1396,10 +1346,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiMembership: play.api.libs.json.Writes[Membership] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Membership] {
-        def writes(obj: io.apibuilder.api.v0.models.Membership) = {
-          jsObjectMembership(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Membership) => {
+        jsObjectMembership(obj)
       }
     }
 
@@ -1424,10 +1372,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiMembershipRequest: play.api.libs.json.Writes[MembershipRequest] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.MembershipRequest] {
-        def writes(obj: io.apibuilder.api.v0.models.MembershipRequest) = {
-          jsObjectMembershipRequest(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.MembershipRequest) => {
+        jsObjectMembershipRequest(obj)
       }
     }
 
@@ -1442,10 +1388,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiMoveForm: play.api.libs.json.Writes[MoveForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.MoveForm] {
-        def writes(obj: io.apibuilder.api.v0.models.MoveForm) = {
-          jsObjectMoveForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.MoveForm) => {
+        jsObjectMoveForm(obj)
       }
     }
 
@@ -1474,10 +1418,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiOrganization: play.api.libs.json.Writes[Organization] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Organization] {
-        def writes(obj: io.apibuilder.api.v0.models.Organization) = {
-          jsObjectOrganization(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Organization) => {
+        jsObjectOrganization(obj)
       }
     }
 
@@ -1507,10 +1449,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiOrganizationForm: play.api.libs.json.Writes[OrganizationForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.OrganizationForm] {
-        def writes(obj: io.apibuilder.api.v0.models.OrganizationForm) = {
-          jsObjectOrganizationForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.OrganizationForm) => {
+        jsObjectOrganizationForm(obj)
       }
     }
 
@@ -1529,10 +1469,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiOriginal: play.api.libs.json.Writes[Original] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Original] {
-        def writes(obj: io.apibuilder.api.v0.models.Original) = {
-          jsObjectOriginal(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Original) => {
+        jsObjectOriginal(obj)
       }
     }
 
@@ -1553,10 +1491,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiOriginalForm: play.api.libs.json.Writes[OriginalForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.OriginalForm] {
-        def writes(obj: io.apibuilder.api.v0.models.OriginalForm) = {
-          jsObjectOriginalForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.OriginalForm) => {
+        jsObjectOriginalForm(obj)
       }
     }
 
@@ -1575,10 +1511,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiPasswordReset: play.api.libs.json.Writes[PasswordReset] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.PasswordReset] {
-        def writes(obj: io.apibuilder.api.v0.models.PasswordReset) = {
-          jsObjectPasswordReset(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.PasswordReset) => {
+        jsObjectPasswordReset(obj)
       }
     }
 
@@ -1593,10 +1527,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiPasswordResetRequest: play.api.libs.json.Writes[PasswordResetRequest] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.PasswordResetRequest] {
-        def writes(obj: io.apibuilder.api.v0.models.PasswordResetRequest) = {
-          jsObjectPasswordResetRequest(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.PasswordResetRequest) => {
+        jsObjectPasswordResetRequest(obj)
       }
     }
 
@@ -1611,10 +1543,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiPasswordResetSuccess: play.api.libs.json.Writes[PasswordResetSuccess] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.PasswordResetSuccess] {
-        def writes(obj: io.apibuilder.api.v0.models.PasswordResetSuccess) = {
-          jsObjectPasswordResetSuccess(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.PasswordResetSuccess) => {
+        jsObjectPasswordResetSuccess(obj)
       }
     }
 
@@ -1639,10 +1569,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiSubscription: play.api.libs.json.Writes[Subscription] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Subscription] {
-        def writes(obj: io.apibuilder.api.v0.models.Subscription) = {
-          jsObjectSubscription(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Subscription) => {
+        jsObjectSubscription(obj)
       }
     }
 
@@ -1663,10 +1591,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiSubscriptionForm: play.api.libs.json.Writes[SubscriptionForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.SubscriptionForm] {
-        def writes(obj: io.apibuilder.api.v0.models.SubscriptionForm) = {
-          jsObjectSubscriptionForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.SubscriptionForm) => {
+        jsObjectSubscriptionForm(obj)
       }
     }
 
@@ -1693,10 +1619,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiToken: play.api.libs.json.Writes[Token] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Token] {
-        def writes(obj: io.apibuilder.api.v0.models.Token) = {
-          jsObjectToken(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Token) => {
+        jsObjectToken(obj)
       }
     }
 
@@ -1717,10 +1641,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiTokenForm: play.api.libs.json.Writes[TokenForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.TokenForm] {
-        def writes(obj: io.apibuilder.api.v0.models.TokenForm) = {
-          jsObjectTokenForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.TokenForm) => {
+        jsObjectTokenForm(obj)
       }
     }
 
@@ -1747,10 +1669,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiUser: play.api.libs.json.Writes[User] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.User] {
-        def writes(obj: io.apibuilder.api.v0.models.User) = {
-          jsObjectUser(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.User) => {
+        jsObjectUser(obj)
       }
     }
 
@@ -1778,10 +1698,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiUserForm: play.api.libs.json.Writes[UserForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.UserForm] {
-        def writes(obj: io.apibuilder.api.v0.models.UserForm) = {
-          jsObjectUserForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.UserForm) => {
+        jsObjectUserForm(obj)
       }
     }
 
@@ -1800,10 +1718,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiUserSummary: play.api.libs.json.Writes[UserSummary] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.UserSummary] {
-        def writes(obj: io.apibuilder.api.v0.models.UserSummary) = {
-          jsObjectUserSummary(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.UserSummary) => {
+        jsObjectUserSummary(obj)
       }
     }
 
@@ -1826,10 +1742,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiUserUpdateForm: play.api.libs.json.Writes[UserUpdateForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.UserUpdateForm] {
-        def writes(obj: io.apibuilder.api.v0.models.UserUpdateForm) = {
-          jsObjectUserUpdateForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.UserUpdateForm) => {
+        jsObjectUserUpdateForm(obj)
       }
     }
 
@@ -1848,10 +1762,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiValidation: play.api.libs.json.Writes[Validation] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Validation] {
-        def writes(obj: io.apibuilder.api.v0.models.Validation) = {
-          jsObjectValidation(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Validation) => {
+        jsObjectValidation(obj)
       }
     }
 
@@ -1882,10 +1794,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiVersion: play.api.libs.json.Writes[Version] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Version] {
-        def writes(obj: io.apibuilder.api.v0.models.Version) = {
-          jsObjectVersion(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Version) => {
+        jsObjectVersion(obj)
       }
     }
 
@@ -1906,10 +1816,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiVersionForm: play.api.libs.json.Writes[VersionForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.VersionForm] {
-        def writes(obj: io.apibuilder.api.v0.models.VersionForm) = {
-          jsObjectVersionForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.VersionForm) => {
+        jsObjectVersionForm(obj)
       }
     }
 
@@ -1934,10 +1842,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiWatch: play.api.libs.json.Writes[Watch] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Watch] {
-        def writes(obj: io.apibuilder.api.v0.models.Watch) = {
-          jsObjectWatch(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Watch) => {
+        jsObjectWatch(obj)
       }
     }
 
@@ -1958,10 +1864,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiWatchForm: play.api.libs.json.Writes[WatchForm] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.WatchForm] {
-        def writes(obj: io.apibuilder.api.v0.models.WatchForm) = {
-          jsObjectWatchForm(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.WatchForm) => {
+        jsObjectWatchForm(obj)
       }
     }
 
@@ -1986,10 +1890,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiDiff: play.api.libs.json.Writes[Diff] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.Diff] {
-        def writes(obj: io.apibuilder.api.v0.models.Diff) = {
-          jsObjectDiff(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.Diff) => {
+        jsObjectDiff(obj)
       }
     }
 
@@ -2012,10 +1914,8 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonWritesApidocApiItemDetail: play.api.libs.json.Writes[ItemDetail] = {
-      new play.api.libs.json.Writes[io.apibuilder.api.v0.models.ItemDetail] {
-        def writes(obj: io.apibuilder.api.v0.models.ItemDetail) = {
-          jsObjectItemDetail(obj)
-        }
+      (obj: io.apibuilder.api.v0.models.ItemDetail) => {
+        jsObjectItemDetail(obj)
       }
     }
   }

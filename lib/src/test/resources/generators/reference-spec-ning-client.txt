@@ -157,7 +157,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit val jsonReadsApidocReferenceApiAgeGroup = new play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.AgeGroup] {
+    implicit val jsonReadsApidocReferenceApiAgeGroup: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.AgeGroup] = new play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.AgeGroup] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[io.apibuilder.reference.api.v0.models.AgeGroup] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(io.apibuilder.reference.api.v0.models.AgeGroup(v.value))
@@ -184,10 +184,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiAgeGroup: play.api.libs.json.Writes[AgeGroup] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.AgeGroup] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.AgeGroup) = {
-          jsonWritesApidocReferenceApiAgeGroup(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.AgeGroup) => {
+        jsonWritesApidocReferenceApiAgeGroup(obj)
       }
     }
 
@@ -252,10 +250,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiBig: play.api.libs.json.Writes[Big] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Big] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.Big) = {
-          jsObjectBig(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.Big) => {
+        jsObjectBig(obj)
       }
     }
 
@@ -270,10 +266,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiEcho: play.api.libs.json.Writes[Echo] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Echo] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.Echo) = {
-          jsObjectEcho(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.Echo) => {
+        jsObjectEcho(obj)
       }
     }
 
@@ -292,10 +286,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiError: play.api.libs.json.Writes[Error] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Error] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.Error) = {
-          jsObjectError(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.Error) => {
+        jsObjectError(obj)
       }
     }
 
@@ -310,10 +302,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiGroup: play.api.libs.json.Writes[Group] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Group] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.Group) = {
-          jsObjectGroup(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.Group) => {
+        jsObjectGroup(obj)
       }
     }
 
@@ -336,10 +326,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiMember: play.api.libs.json.Writes[Member] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Member] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.Member) = {
-          jsObjectMember(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.Member) => {
+        jsObjectMember(obj)
       }
     }
 
@@ -358,10 +346,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiOrganization: play.api.libs.json.Writes[Organization] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.Organization] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.Organization) = {
-          jsObjectOrganization(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.Organization) => {
+        jsObjectOrganization(obj)
       }
     }
 
@@ -388,10 +374,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiUser: play.api.libs.json.Writes[User] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.User] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.User) = {
-          jsObjectUser(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.User) => {
+        jsObjectUser(obj)
       }
     }
 
@@ -406,10 +390,8 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonWritesApidocReferenceApiUserList: play.api.libs.json.Writes[UserList] = {
-      new play.api.libs.json.Writes[io.apibuilder.reference.api.v0.models.UserList] {
-        def writes(obj: io.apibuilder.reference.api.v0.models.UserList) = {
-          jsObjectUserList(obj)
-        }
+      (obj: io.apibuilder.reference.api.v0.models.UserList) => {
+        jsObjectUserList(obj)
       }
     }
   }

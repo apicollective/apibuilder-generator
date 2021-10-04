@@ -588,7 +588,7 @@ package com.gilt.quality.v0.models {
       }
     }
 
-    implicit val jsonReadsQualityExternalServiceName = new play.api.libs.json.Reads[com.gilt.quality.v0.models.ExternalServiceName] {
+    implicit val jsonReadsQualityExternalServiceName: play.api.libs.json.Reads[com.gilt.quality.v0.models.ExternalServiceName] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.ExternalServiceName] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.ExternalServiceName] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.ExternalServiceName(v.value))
@@ -615,14 +615,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityExternalServiceName: play.api.libs.json.Writes[ExternalServiceName] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.ExternalServiceName] {
-        def writes(obj: com.gilt.quality.v0.models.ExternalServiceName) = {
-          jsonWritesQualityExternalServiceName(obj)
-        }
+      (obj: com.gilt.quality.v0.models.ExternalServiceName) => {
+        jsonWritesQualityExternalServiceName(obj)
       }
     }
 
-    implicit val jsonReadsQualityPublication = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Publication] {
+    implicit val jsonReadsQualityPublication: play.api.libs.json.Reads[com.gilt.quality.v0.models.Publication] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Publication] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Publication] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Publication(v.value))
@@ -649,14 +647,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityPublication: play.api.libs.json.Writes[Publication] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Publication] {
-        def writes(obj: com.gilt.quality.v0.models.Publication) = {
-          jsonWritesQualityPublication(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Publication) => {
+        jsonWritesQualityPublication(obj)
       }
     }
 
-    implicit val jsonReadsQualityResponse = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Response] {
+    implicit val jsonReadsQualityResponse: play.api.libs.json.Reads[com.gilt.quality.v0.models.Response] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Response] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Response] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Response(v.value))
@@ -683,14 +679,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityResponse: play.api.libs.json.Writes[Response] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Response] {
-        def writes(obj: com.gilt.quality.v0.models.Response) = {
-          jsonWritesQualityResponse(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Response) => {
+        jsonWritesQualityResponse(obj)
       }
     }
 
-    implicit val jsonReadsQualitySeverity = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Severity] {
+    implicit val jsonReadsQualitySeverity: play.api.libs.json.Reads[com.gilt.quality.v0.models.Severity] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Severity] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Severity] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Severity(v.value))
@@ -717,14 +711,12 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualitySeverity: play.api.libs.json.Writes[Severity] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Severity] {
-        def writes(obj: com.gilt.quality.v0.models.Severity) = {
-          jsonWritesQualitySeverity(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Severity) => {
+        jsonWritesQualitySeverity(obj)
       }
     }
 
-    implicit val jsonReadsQualityTask = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Task] {
+    implicit val jsonReadsQualityTask: play.api.libs.json.Reads[com.gilt.quality.v0.models.Task] = new play.api.libs.json.Reads[com.gilt.quality.v0.models.Task] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.gilt.quality.v0.models.Task] = {
         js match {
           case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.gilt.quality.v0.models.Task(v.value))
@@ -751,10 +743,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityTask: play.api.libs.json.Writes[Task] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Task] {
-        def writes(obj: com.gilt.quality.v0.models.Task) = {
-          jsonWritesQualityTask(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Task) => {
+        jsonWritesQualityTask(obj)
       }
     }
 
@@ -770,10 +760,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityAdjournForm: play.api.libs.json.Writes[AdjournForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.AdjournForm] {
-        def writes(obj: com.gilt.quality.v0.models.AdjournForm) = {
-          jsObjectAdjournForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.AdjournForm) => {
+        jsObjectAdjournForm(obj)
       }
     }
 
@@ -796,10 +784,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityAgendaItem: play.api.libs.json.Writes[AgendaItem] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.AgendaItem] {
-        def writes(obj: com.gilt.quality.v0.models.AgendaItem) = {
-          jsObjectAgendaItem(obj)
-        }
+      (obj: com.gilt.quality.v0.models.AgendaItem) => {
+        jsObjectAgendaItem(obj)
       }
     }
 
@@ -820,10 +806,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityAgendaItemForm: play.api.libs.json.Writes[AgendaItemForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.AgendaItemForm] {
-        def writes(obj: com.gilt.quality.v0.models.AgendaItemForm) = {
-          jsObjectAgendaItemForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.AgendaItemForm) => {
+        jsObjectAgendaItemForm(obj)
       }
     }
 
@@ -838,10 +822,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityAuthenticationForm: play.api.libs.json.Writes[AuthenticationForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.AuthenticationForm] {
-        def writes(obj: com.gilt.quality.v0.models.AuthenticationForm) = {
-          jsObjectAuthenticationForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.AuthenticationForm) => {
+        jsObjectAuthenticationForm(obj)
       }
     }
 
@@ -860,10 +842,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityEmailMessage: play.api.libs.json.Writes[EmailMessage] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.EmailMessage] {
-        def writes(obj: com.gilt.quality.v0.models.EmailMessage) = {
-          jsObjectEmailMessage(obj)
-        }
+      (obj: com.gilt.quality.v0.models.EmailMessage) => {
+        jsObjectEmailMessage(obj)
       }
     }
 
@@ -882,10 +862,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityError: play.api.libs.json.Writes[Error] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Error] {
-        def writes(obj: com.gilt.quality.v0.models.Error) = {
-          jsObjectError(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Error) => {
+        jsObjectError(obj)
       }
     }
 
@@ -910,10 +888,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityExternalService: play.api.libs.json.Writes[ExternalService] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.ExternalService] {
-        def writes(obj: com.gilt.quality.v0.models.ExternalService) = {
-          jsObjectExternalService(obj)
-        }
+      (obj: com.gilt.quality.v0.models.ExternalService) => {
+        jsObjectExternalService(obj)
       }
     }
 
@@ -936,10 +912,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityExternalServiceForm: play.api.libs.json.Writes[ExternalServiceForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.ExternalServiceForm] {
-        def writes(obj: com.gilt.quality.v0.models.ExternalServiceForm) = {
-          jsObjectExternalServiceForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.ExternalServiceForm) => {
+        jsObjectExternalServiceForm(obj)
       }
     }
 
@@ -960,10 +934,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityFollowup: play.api.libs.json.Writes[Followup] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Followup] {
-        def writes(obj: com.gilt.quality.v0.models.Followup) = {
-          jsObjectFollowup(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Followup) => {
+        jsObjectFollowup(obj)
       }
     }
 
@@ -986,10 +958,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityFollowupResponse: play.api.libs.json.Writes[FollowupResponse] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.FollowupResponse] {
-        def writes(obj: com.gilt.quality.v0.models.FollowupResponse) = {
-          jsObjectFollowupResponse(obj)
-        }
+      (obj: com.gilt.quality.v0.models.FollowupResponse) => {
+        jsObjectFollowupResponse(obj)
       }
     }
 
@@ -1004,10 +974,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityHealthcheck: play.api.libs.json.Writes[Healthcheck] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Healthcheck] {
-        def writes(obj: com.gilt.quality.v0.models.Healthcheck) = {
-          jsObjectHealthcheck(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Healthcheck) => {
+        jsObjectHealthcheck(obj)
       }
     }
 
@@ -1026,10 +994,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityIcons: play.api.libs.json.Writes[Icons] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Icons] {
-        def writes(obj: com.gilt.quality.v0.models.Icons) = {
-          jsObjectIcons(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Icons) => {
+        jsObjectIcons(obj)
       }
     }
 
@@ -1073,10 +1039,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityIncident: play.api.libs.json.Writes[Incident] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Incident] {
-        def writes(obj: com.gilt.quality.v0.models.Incident) = {
-          jsObjectIncident(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Incident) => {
+        jsObjectIncident(obj)
       }
     }
 
@@ -1109,10 +1073,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityIncidentForm: play.api.libs.json.Writes[IncidentForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.IncidentForm] {
-        def writes(obj: com.gilt.quality.v0.models.IncidentForm) = {
-          jsObjectIncidentForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.IncidentForm) => {
+        jsObjectIncidentForm(obj)
       }
     }
 
@@ -1131,10 +1093,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityIncidentOrganizationChange: play.api.libs.json.Writes[IncidentOrganizationChange] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.IncidentOrganizationChange] {
-        def writes(obj: com.gilt.quality.v0.models.IncidentOrganizationChange) = {
-          jsObjectIncidentOrganizationChange(obj)
-        }
+      (obj: com.gilt.quality.v0.models.IncidentOrganizationChange) => {
+        jsObjectIncidentOrganizationChange(obj)
       }
     }
 
@@ -1155,10 +1115,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityIncidentSummary: play.api.libs.json.Writes[IncidentSummary] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.IncidentSummary] {
-        def writes(obj: com.gilt.quality.v0.models.IncidentSummary) = {
-          jsObjectIncidentSummary(obj)
-        }
+      (obj: com.gilt.quality.v0.models.IncidentSummary) => {
+        jsObjectIncidentSummary(obj)
       }
     }
 
@@ -1183,10 +1141,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityMeeting: play.api.libs.json.Writes[Meeting] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Meeting] {
-        def writes(obj: com.gilt.quality.v0.models.Meeting) = {
-          jsObjectMeeting(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Meeting) => {
+        jsObjectMeeting(obj)
       }
     }
 
@@ -1201,10 +1157,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityMeetingForm: play.api.libs.json.Writes[MeetingForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.MeetingForm] {
-        def writes(obj: com.gilt.quality.v0.models.MeetingForm) = {
-          jsObjectMeetingForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.MeetingForm) => {
+        jsObjectMeetingForm(obj)
       }
     }
 
@@ -1230,10 +1184,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityMeetingPager: play.api.libs.json.Writes[MeetingPager] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.MeetingPager] {
-        def writes(obj: com.gilt.quality.v0.models.MeetingPager) = {
-          jsObjectMeetingPager(obj)
-        }
+      (obj: com.gilt.quality.v0.models.MeetingPager) => {
+        jsObjectMeetingPager(obj)
       }
     }
 
@@ -1252,10 +1204,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityOrganization: play.api.libs.json.Writes[Organization] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Organization] {
-        def writes(obj: com.gilt.quality.v0.models.Organization) = {
-          jsObjectOrganization(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Organization) => {
+        jsObjectOrganization(obj)
       }
     }
 
@@ -1276,10 +1226,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityOrganizationForm: play.api.libs.json.Writes[OrganizationForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.OrganizationForm] {
-        def writes(obj: com.gilt.quality.v0.models.OrganizationForm) = {
-          jsObjectOrganizationForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.OrganizationForm) => {
+        jsObjectOrganizationForm(obj)
       }
     }
 
@@ -1306,10 +1254,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityPlan: play.api.libs.json.Writes[Plan] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Plan] {
-        def writes(obj: com.gilt.quality.v0.models.Plan) = {
-          jsObjectPlan(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Plan) => {
+        jsObjectPlan(obj)
       }
     }
 
@@ -1328,10 +1274,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityPlanForm: play.api.libs.json.Writes[PlanForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.PlanForm] {
-        def writes(obj: com.gilt.quality.v0.models.PlanForm) = {
-          jsObjectPlanForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.PlanForm) => {
+        jsObjectPlanForm(obj)
       }
     }
 
@@ -1365,10 +1309,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityStatistic: play.api.libs.json.Writes[Statistic] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Statistic] {
-        def writes(obj: com.gilt.quality.v0.models.Statistic) = {
-          jsObjectStatistic(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Statistic) => {
+        jsObjectStatistic(obj)
       }
     }
 
@@ -1391,10 +1333,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualitySubscription: play.api.libs.json.Writes[Subscription] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Subscription] {
-        def writes(obj: com.gilt.quality.v0.models.Subscription) = {
-          jsObjectSubscription(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Subscription) => {
+        jsObjectSubscription(obj)
       }
     }
 
@@ -1415,10 +1355,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualitySubscriptionForm: play.api.libs.json.Writes[SubscriptionForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.SubscriptionForm] {
-        def writes(obj: com.gilt.quality.v0.models.SubscriptionForm) = {
-          jsObjectSubscriptionForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.SubscriptionForm) => {
+        jsObjectSubscriptionForm(obj)
       }
     }
 
@@ -1443,10 +1381,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityTeam: play.api.libs.json.Writes[Team] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.Team] {
-        def writes(obj: com.gilt.quality.v0.models.Team) = {
-          jsObjectTeam(obj)
-        }
+      (obj: com.gilt.quality.v0.models.Team) => {
+        jsObjectTeam(obj)
       }
     }
 
@@ -1477,10 +1413,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityTeamForm: play.api.libs.json.Writes[TeamForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.TeamForm] {
-        def writes(obj: com.gilt.quality.v0.models.TeamForm) = {
-          jsObjectTeamForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.TeamForm) => {
+        jsObjectTeamForm(obj)
       }
     }
 
@@ -1499,10 +1433,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityTeamMember: play.api.libs.json.Writes[TeamMember] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.TeamMember] {
-        def writes(obj: com.gilt.quality.v0.models.TeamMember) = {
-          jsObjectTeamMember(obj)
-        }
+      (obj: com.gilt.quality.v0.models.TeamMember) => {
+        jsObjectTeamMember(obj)
       }
     }
 
@@ -1521,10 +1453,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityTeamMemberSummary: play.api.libs.json.Writes[TeamMemberSummary] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.TeamMemberSummary] {
-        def writes(obj: com.gilt.quality.v0.models.TeamMemberSummary) = {
-          jsObjectTeamMemberSummary(obj)
-        }
+      (obj: com.gilt.quality.v0.models.TeamMemberSummary) => {
+        jsObjectTeamMemberSummary(obj)
       }
     }
 
@@ -1552,10 +1482,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityUpdateTeamForm: play.api.libs.json.Writes[UpdateTeamForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.UpdateTeamForm] {
-        def writes(obj: com.gilt.quality.v0.models.UpdateTeamForm) = {
-          jsObjectUpdateTeamForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.UpdateTeamForm) => {
+        jsObjectUpdateTeamForm(obj)
       }
     }
 
@@ -1574,10 +1502,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityUser: play.api.libs.json.Writes[User] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.User] {
-        def writes(obj: com.gilt.quality.v0.models.User) = {
-          jsObjectUser(obj)
-        }
+      (obj: com.gilt.quality.v0.models.User) => {
+        jsObjectUser(obj)
       }
     }
 
@@ -1592,10 +1518,8 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonWritesQualityUserForm: play.api.libs.json.Writes[UserForm] = {
-      new play.api.libs.json.Writes[com.gilt.quality.v0.models.UserForm] {
-        def writes(obj: com.gilt.quality.v0.models.UserForm) = {
-          jsObjectUserForm(obj)
-        }
+      (obj: com.gilt.quality.v0.models.UserForm) => {
+        jsObjectUserForm(obj)
       }
     }
   }
