@@ -70,7 +70,6 @@ case class Play2Json(
   private[this] val play2JsonCommon = Play2JsonCommon(ssd)
 
   def generateModelsAndUnions(): String = {
-    println(s"generateModelsAndUnions: ${ssd.name}")
     Seq(
       ssd.models.map(readersAndWriters).mkString("\n\n"),
       PrimitiveWrapper(ssd).wrappers.map(w => readers(w.model)).mkString("\n\n"),
@@ -172,8 +171,6 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
-    println(s"Generating reader for union type ${union.name}: discriminator '$discriminator'")
-
     val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.discriminatorName).headOption
 
     val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
