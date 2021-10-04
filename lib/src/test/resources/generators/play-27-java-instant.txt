@@ -101,13 +101,17 @@ package io.gregor.time.types.v0.models {
       (__ \ "value").read[_root_.java.time.LocalDate].map { x => new DateTimeUnionLocalDate(value = x) }
     }
 
-    implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[DateTimeUnion] = new play.api.libs.json.Reads[DateTimeUnion] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[DateTimeUnion] = {
-        (js \ "type").asOpt[String].getOrElse { sys.error("Union[DateTimeUnion] requires a discriminator named 'type' - this field was not found in the Json Value") } match {
+    implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[DateTimeUnion] = (js: play.api.libs.json.JsValue) => {
+      def readDiscriminator(discriminator: String) = {
+        discriminator match {
           case "date-time-iso8601" => js.validate[io.gregor.time.types.v0.models.DateTimeUnionInstant]
           case "date-iso8601" => js.validate[io.gregor.time.types.v0.models.DateTimeUnionLocalDate]
           case other => play.api.libs.json.JsSuccess(io.gregor.time.types.v0.models.DateTimeUnionUndefinedType(other))
         }
+      }
+      (js \ "type").validate[String] match {
+        case e: play.api.libs.json.JsError => e
+        case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)
       }
     }
 

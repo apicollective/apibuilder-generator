@@ -1869,13 +1869,17 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiDiff: play.api.libs.json.Reads[Diff] = new play.api.libs.json.Reads[Diff] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[Diff] = {
-        (js \ "type").asOpt[String].getOrElse { sys.error("Union[Diff] requires a discriminator named 'type' - this field was not found in the Json Value") } match {
+    implicit def jsonReadsApidocApiDiff: play.api.libs.json.Reads[Diff] = (js: play.api.libs.json.JsValue) => {
+      def readDiscriminator(discriminator: String) = {
+        discriminator match {
           case "diff_breaking" => js.validate[io.apibuilder.api.v0.models.DiffBreaking]
           case "diff_non_breaking" => js.validate[io.apibuilder.api.v0.models.DiffNonBreaking]
           case other => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.DiffUndefinedType(other))
         }
+      }
+      (js \ "type").validate[String] match {
+        case e: play.api.libs.json.JsError => e
+        case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)
       }
     }
 
@@ -1895,12 +1899,16 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiItemDetail: play.api.libs.json.Reads[ItemDetail] = new play.api.libs.json.Reads[ItemDetail] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[ItemDetail] = {
-        (js \ "type").asOpt[String].getOrElse { sys.error("Union[ItemDetail] requires a discriminator named 'type' - this field was not found in the Json Value") } match {
+    implicit def jsonReadsApidocApiItemDetail: play.api.libs.json.Reads[ItemDetail] = (js: play.api.libs.json.JsValue) => {
+      def readDiscriminator(discriminator: String) = {
+        discriminator match {
           case "application_summary" => js.validate[io.apibuilder.api.v0.models.ApplicationSummary]
           case other => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.ItemDetailUndefinedType(other))
         }
+      }
+      (js \ "type").validate[String] match {
+        case e: play.api.libs.json.JsError => e
+        case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)
       }
     }
 
