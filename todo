@@ -1,0 +1,7 @@
+[error] Failed tests:
+[error] 	scala.models.Play2RouteGeneratorSpec
+[error] 	scala.models.Play2ClientGeneratorSpec
+[error] 	models.http4s.Http4sGeneratorSpec
+[error] Error during tests:
+[error] 	scala.models.ScalaCheckGeneratorSpec
+[error] 	scala.models.Play26ControllersSpec

@@ -12,7 +12,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class DependantOperationResolverSpec extends AnyWordSpec with Matchers {
 
-  import models.TestHelper.{referenceApiService, generatorApiServiceWithUnionWithoutDescriminator}
+  import models.TestHelper.{referenceApiService, generatorApiServiceWithUnionWithoutDiscriminator}
 
   "DependantOperationResolver" should {
 
@@ -53,14 +53,14 @@ class DependantOperationResolverSpec extends AnyWordSpec with Matchers {
 
     "resolve nested dependencies that span across 3 different services (main<-import1<-import2)" in new TestCtxWithTwoImportedServices {
       val objRefToThirdServiceAttrValue = ObjectReference(
-        relatedServiceNamespace = generatorApiServiceWithUnionWithoutDescriminator.namespace,
+        relatedServiceNamespace = generatorApiServiceWithUnionWithoutDiscriminator.namespace,
         resourceType = "user",
         operationMethod = Method.Post,
         operationPath = "/users",
         identifierField = "guid"
       )
       val dependencyToThirdServiceTarget = {
-        val dependantOperations = getTargetOperation(generatorApiServiceWithUnionWithoutDescriminator, objRefToThirdServiceAttrValue)
+        val dependantOperations = getTargetOperation(generatorApiServiceWithUnionWithoutDiscriminator, objRefToThirdServiceAttrValue)
         val referencedOperation = dependantOperations.referencedOperation
         val updatedBody = referencedOperation.body.get.copy(`type` = objRefToThirdServiceAttrValue.relatedServiceNamespace + ".unions." + referencedOperation.body.get.`type`)
         val updatedReferencedOperation = referencedOperation.copy(body = Some(updatedBody))
@@ -68,7 +68,7 @@ class DependantOperationResolverSpec extends AnyWordSpec with Matchers {
       }
       val testReferenceApiService = addAttributeToModelField(referenceApiService, "member", "role", objRefToThirdServiceAttrValue)
 
-      val resolvedService = ServiceImportResolver.resolveService(testMainServiceWithTwoImports, Seq(testReferenceApiService, generatorApiServiceWithUnionWithoutDescriminator))
+      val resolvedService = ServiceImportResolver.resolveService(testMainServiceWithTwoImports, Seq(testReferenceApiService, generatorApiServiceWithUnionWithoutDiscriminator))
       val result = DependantOperationResolver.resolve(resolvedService)
 
 

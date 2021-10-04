@@ -3,7 +3,6 @@ package models
 import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 import java.io.{File => JFile}
-
 import play.api.libs.json._
 import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import io.apibuilder.spec.v0.models.json._
@@ -12,20 +11,22 @@ import io.apibuilder.generator.v0.models.File
 import lib.Text
 import org.scalatest.matchers.should.Matchers
 
+import scala.util.{Try, Failure, Success}
+
 object TestHelper extends Matchers {
 
   lazy val collectionJsonDefaultsService: Service = parseFile("/examples/collection-json-defaults.json")
-  lazy val referenceApiService: Service = parseFile(s"/examples/reference-service.json")
-  lazy val referenceWithImportsApiService: Service = parseFile(s"/examples/reference-with-imports.json")
-  lazy val generatorApiService: Service = parseFile(s"/examples/apidoc-generator.json")
-  lazy val apidocApiService: Service = parseFile(s"/examples/apidoc-api.json")
-  lazy val dateTimeService: Service = parseFile(s"/examples/date-time-types.json")
-  lazy val builtInTypesService: Service = parseFile(s"/examples/built-in-types.json")
-  lazy val scalaKeywordsService: Service = parseFile(s"/examples/response-with-reserved-scala-keyword.json")
-  lazy val statusCodesService: Service = parseFile(s"/http4s/server/status-codes.json")
+  lazy val referenceApiService: Service = parseFile("/examples/reference-service.json")
+  lazy val referenceWithImportsApiService: Service = parseFile("/examples/reference-with-imports.json")
+  lazy val generatorApiService: Service = parseFile("/examples/apidoc-generator.json")
+  lazy val apidocApiService: Service = parseFile("/examples/apidoc-api.json")
+  lazy val dateTimeService: Service = parseFile("/examples/date-time-types.json")
+  lazy val builtInTypesService: Service = parseFile("/examples/built-in-types.json")
+  lazy val scalaKeywordsService: Service = parseFile("/examples/response-with-reserved-scala-keyword.json")
+  lazy val statusCodesService: Service = parseFile("/http4s/server/status-codes.json")
 
-  lazy val generatorApiServiceWithUnionAndDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
-  lazy val generatorApiServiceWithUnionWithoutDescriminator: Service = parseFile(s"/examples/apidoc-example-union-types.json")
+  lazy val generatorApiServiceWithUnionAndDiscriminator: Service = parseFile("/examples/apidoc-example-union-types-discriminator.json")
+  lazy val generatorApiServiceWithUnionWithoutDiscriminator: Service = parseFile("/examples/apidoc-example-union-types.json")
 
   lazy val emptyService: Service = service(buildJson("""
       "imports": [],
@@ -65,6 +66,18 @@ object TestHelper extends Matchers {
     ()
   }
 
+  private[this] def readNonEmptyFile(path: String): String = {
+    readNonEmptyFile(new JFile(path))
+  }
+
+  private[this] def readNonEmptyFile(path: JFile): String = {
+    val c = readFile(path)
+    if (c.strip.nonEmpty) {
+      sys.error(s"File '$path' contents are empty when we expected there to be data")
+    }
+    c
+  }
+
   def readFile(path: String): String = {
     readFile(new JFile(path))
   }
@@ -72,14 +85,21 @@ object TestHelper extends Matchers {
   def readFile(path: JFile): String = {
     val source = scala.io.Source.fromFile(path)
     try {
-      source.getLines().mkString("\n")
+      Try {
+        source.getLines().mkString("\n")
+      } match {
+        case Success(contents) => contents
+        case Failure(ex) => {
+          sys.error(s"Failed to read file '${path.getAbsolutePath}: ${ex.getMessage}")
+        }
+      }
     } finally {
       source.close()
     }
   }
 
   def parseFile(path: String): Service = {
-    service(readFile(resolvePath(path)))
+    service(readNonEmptyFile(resolvePath(path)))
   }
 
   def writeFiles(dir: java.io.File, files: Seq[File]): Unit = {

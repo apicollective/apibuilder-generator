@@ -43,8 +43,8 @@ class Play26ControllersSpec extends AnyFunSpec with Matchers {
       dateTimeService,
       builtInTypesService,
       scalaKeywordsService,
-      generatorApiServiceWithUnionAndDescriminator,
-      generatorApiServiceWithUnionWithoutDescriminator,
+      generatorApiServiceWithUnionAndDiscriminator,
+      generatorApiServiceWithUnionWithoutDiscriminator,
       emptyService,
     ).zipWithIndex.foreach { case (service, index) =>
       describe(s"for services ${index}") {
