@@ -165,14 +165,16 @@ case class Play2Json(
     val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.discriminatorName).headOption
 
     val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
-      case None => s""" { sys.error("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json Value") }"""
-      case Some(defaultValue) => s"""("$defaultValue")"""
+      case None => "case e: play.api.libs.json.JsError => e"
+      case Some(defaultValue) => s"case e: play.api.libs.json.JsError => readWithDiscriminator(\"${defaultValue}\")"
     }
 
     Seq(
-      s"${play2JsonCommon.implicitReaderDef(union.name)} = new play.api.libs.json.Reads[${union.name}] {",
-      Seq(s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${union.name}] = {",
-        Seq(s"""(js \\ "$discriminator").asOpt[String].getOrElse$defaultDiscriminatorClause match {""",
+      s"${play2JsonCommon.implicitReaderDef(union.name)} = (js: play.api.libs.json.JsValue) => {",
+      Seq(
+        "def readDiscriminator(discriminator: String) = {",
+        Seq(
+          "discriminator match {",
           unionTypesWithNames(union).map { t =>
             s"""case "${t.unionType.discriminatorName}" => js.validate[${t.typeName}]"""
           }.mkString("\n").indentString(2),
@@ -181,7 +183,14 @@ case class Play2Json(
         ).mkString("\n").indentString(2),
         "}"
       ).mkString("\n").indentString(2),
-      "}"
+      Seq(s"""(js \\ "$discriminator").validate[String] match {""",
+        Seq(
+          defaultDiscriminatorClause,
+          "case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)",
+        ).mkString("\n").indentString(2),
+        "}"
+      ).mkString("\n").indentString(2),
+      "}",
     ).mkString("\n")
   }
 
