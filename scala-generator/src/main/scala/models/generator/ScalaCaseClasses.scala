@@ -73,7 +73,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
     val base = generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union))
     val discriminatorField = wrapper.union.discriminatorField.map { d =>
-      s"override val ${d.name}: ${d.`type`} = ${d.`type`}(${ScalaUtil.quoteNameIfKeyword(wrapper.descriptionField.name)})"
+      s"override val ${d.name}: ${d.field.`type`} = ${d.field.`type`}(${ScalaUtil.quoteNameIfKeyword(wrapper.descriptionField.name)})"
     }
     val fields = wrapper.interfaceFields.map { f =>
       s"override def ${f.name}: ${f.datatype.name} = ???"
