@@ -8,7 +8,7 @@ case class ScalaUnionDiscriminatorGenerator(
   private[this] val discriminator: ScalaField = union.discriminatorField.getOrElse {
     sys.error(s"ScalaUnionDiscriminator requires a discriminator - union[${union.name}] does not have one defined")
   }
-  private[this] val className = discriminator.`type`
+  private[this] val className = discriminator.field.`type`
 
   def build(): String = {
     Seq(

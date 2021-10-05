@@ -116,6 +116,10 @@ case class ResponseBuilder(
         )
       }
 
+      case Datatype.Generated.Model(_) => {
+        sys.error("Generated types should not be available in responses")
+      }
+
       case Datatype.UserDefined.Model(name) => {
         Some(s"${importBuilder.publicName(name)}$deserializer($readerName)")
       }

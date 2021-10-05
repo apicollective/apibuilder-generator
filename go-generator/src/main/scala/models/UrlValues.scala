@@ -4,6 +4,8 @@ import Formatter._
 import io.apibuilder.spec.v0.models.Parameter
 import lib.{Datatype, DatatypeResolver}
 
+import scala.annotation.tailrec
+
 case class UrlValues(
   importBuilder: ImportBuilder,
   datatypeResolver: DatatypeResolver
@@ -26,6 +28,7 @@ case class UrlValues(
     }
   }
 
+  @tailrec
   private[this] def buildParam(prefix: String, param: Parameter, datatype: Datatype): String = {
     val goType = GoType(importBuilder, datatype)
     val varName = s"${prefix}." + GoUtil.publicName(param.name)
@@ -70,6 +73,10 @@ case class UrlValues(
         buildParam(prefix, param, inner)
       }
 
+      case _: Datatype.Generated.Model => {
+        sys.error("Generated models should not be available as parameters")
+      }
+
       case Datatype.UserDefined.Model(name) => {
         val privateName = GoUtil.privateName(name)
         Seq(
@@ -100,6 +107,7 @@ case class UrlValues(
     "urlValues.Add(" + GoUtil.wrapInQuotes(keyName) + s", " + buildValue(varName, goType) + ")"
   }
 
+  @tailrec
   private[this] def buildValue(
     varName: String,
     goType: GoType
@@ -107,6 +115,9 @@ case class UrlValues(
     goType.datatype match {
       case _: Datatype.Primitive => {
         goType.toString(varName)
+      }
+      case _: Datatype.Generated => {
+        sys.error("Cannot serialize generated types to parameters")
       }
       case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) => {
         sys.error("Cannot serialize model, union or map to parameter")

@@ -5,6 +5,8 @@ import lib.Datatype
 import lib.Text._
 import lib.generator.GeneratorUtil
 
+import scala.annotation.tailrec
+
 object ScalaGeneratorUtil {
 
   /**
@@ -52,6 +54,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
 
   // TODO this would be a lot more maintainable as a method
   // defined on ScalaDatatype
+  @tailrec
   private def isList(datatype: Datatype): Boolean = {
     datatype match {
       case Datatype.Container.List(_) => true
@@ -138,7 +141,10 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
     canSerializeUuid: Boolean
   ): Option[String] = {
     // Can have both or form params but not both as we can only send a single document
-    assert(op.body.isEmpty || op.formParameters.isEmpty)
+    assert(
+      op.body.isEmpty || op.formParameters.isEmpty,
+      s"Cannot specify body a body and form parameters",
+    )
 
     def encodeValue(varName: String, dt: ScalaDatatype): String = dt match {
       case ScalaPrimitive.Uuid if !canSerializeUuid =>
@@ -183,7 +189,7 @@ class ScalaGeneratorUtil(config: ScalaClientMethodConfig) {
         case ScalaPrimitive.Enum(_, _) => config.pathEncode(s"$name.toString")
         case dt @ (_: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601) =>
           config.pathEncode(dt.asString(name))
-        case _ @ (ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.Unit) => {
+        case _ @ (ScalaPrimitive.GeneratedModel(_) | ScalaPrimitive.Model(_, _) | ScalaPrimitive.Union(_, _) | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.Unit) => {
           sys.error(s"Cannot encode params of type[$d] as path parameters (name: $name)")
         }
         case c: ScalaDatatype.Container => sys.error(s"unsupported container type ${c} encounteered as path param($name)")

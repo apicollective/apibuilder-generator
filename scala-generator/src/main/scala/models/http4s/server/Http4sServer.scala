@@ -192,6 +192,7 @@ case class Http4sServer(form: InvocationForm,
         case ScalaDatatype.List(_) => notSupported
         case ScalaDatatype.Map(_) => notSupported
         case ScalaDatatype.Option(_) => notSupported
+        case ScalaPrimitive.GeneratedModel(_) => notSupported
       }
 
       s"""

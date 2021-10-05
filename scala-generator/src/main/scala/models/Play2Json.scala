@@ -457,6 +457,9 @@ case class Play2Json(
       case ScalaPrimitive.Enum(_, _) => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString($varName.toString)")
       }
+      case ScalaPrimitive.GeneratedModel(name) => {
+        sys.error(s"Cannot convert generated model named '$name' to JSON")
+      }
       case ScalaPrimitive.Model(ns, name) => {
         toJsObjectResult(originalName, play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)")
       }
@@ -545,6 +548,9 @@ case class Play2Json(
           case Some(_) =>
             play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
         }
+      }
+      case ScalaPrimitive.GeneratedModel(name) => {
+        sys.error(s"Cannot convert generated model named '$name' from JSON")
       }
       case ScalaPrimitive.Model(ns, name) => {
         play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"

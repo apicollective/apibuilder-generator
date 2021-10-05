@@ -226,6 +226,10 @@ object JavaDatatype {
     case Datatype.Container.Map(inner) => JavaDatatypes.Map(JavaDatatype(inner))
     case Datatype.Container.Option(inner) => JavaDatatypes.Option(JavaDatatype(inner))
 
+    case Datatype.Generated.Model(name) =>
+      val (ns, n) = parseQualifiedName(name)
+      JavaDatatypes.Model(ns, n)
+
     case Datatype.UserDefined.Model(name) =>
       val (ns, n) = parseQualifiedName(name)
       JavaDatatypes.Model(ns, n)

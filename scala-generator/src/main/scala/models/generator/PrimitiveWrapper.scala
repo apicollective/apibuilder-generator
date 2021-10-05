@@ -11,7 +11,7 @@ object PrimitiveWrapper {
       case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
         ScalaUtil.toClassName(union.name) + ScalaUtil.toClassName(primitive.shortName)
       }
-      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+      case _: ScalaPrimitive.GeneratedModel | _: ScalaPrimitive.Model | _: ScalaPrimitive.Enum | _: ScalaPrimitive.Union => {
         ScalaUtil.toClassName(union.name)
       }
     }
@@ -19,7 +19,7 @@ object PrimitiveWrapper {
 
   def isBasicType(primitive: ScalaPrimitive): Boolean = {
     primitive match {
-      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+      case _: ScalaPrimitive.GeneratedModel | _: ScalaPrimitive.Model | _: ScalaPrimitive.Enum | _: ScalaPrimitive.Union => {
         false
       }
       case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
