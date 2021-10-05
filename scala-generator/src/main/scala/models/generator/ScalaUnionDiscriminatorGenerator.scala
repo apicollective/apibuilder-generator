@@ -2,19 +2,18 @@ package scala.generator
 
 import lib.Text._
 
-case class ScalaUnionDiscriminator(
+case class ScalaUnionDiscriminatorGenerator(
   union: ScalaUnion
 ) {
-  val discriminator: String = union.discriminator.getOrElse {
+  private[this] val discriminator: ScalaField = union.discriminatorField.getOrElse {
     sys.error(s"ScalaUnionDiscriminator requires a discriminator - union[${union.name}] does not have one defined")
   }
-
-  val className = s"${union.name}${underscoreToInitCap(discriminator)}"
+  private[this] val className = discriminator.`type`
 
   def build(): String = {
     Seq(
       Seq(
-        ScalaUtil.textToComment(s"Defines the valid $discriminator values for the type ${union.name}"),
+        ScalaUtil.textToComment(s"Defines the valid ${discriminator.field.name} values for the type ${union.name}"),
         s"sealed trait $className extends _root_.scala.Product with _root_.scala.Serializable"
       ).mkString("\n"),
       Seq(

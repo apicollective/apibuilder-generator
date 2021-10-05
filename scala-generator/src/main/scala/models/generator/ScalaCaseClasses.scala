@@ -1,10 +1,11 @@
 package scala.generator
 
-import scala.models.{ApiBuilderComments, Attributes}
+import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.Text._
 import lib.generator.CodeGenerator
-import generator.ServiceFileNames
+
+import scala.models.{ApiBuilderComments, Attributes}
 
 object ScalaCaseClasses extends ScalaCaseClasses
 
@@ -46,7 +47,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       }
     }
 
-    val generatedClasses = Seq(undefinedModels, wrappers).filter(!_.isEmpty) match {
+    val generatedClasses = Seq(undefinedModels, wrappers).filter(_.nonEmpty) match {
       case Nil => ""
       case code => "\n" + code.mkString("\n\n")
     }
@@ -71,21 +72,25 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
     val base = generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union))
+    val discriminatorField = wrapper.union.discriminatorField.map { d =>
+      s"override val ${d.name}: ${d.`type`} = ${d.`type`}(${ScalaUtil.quoteNameIfKeyword(wrapper.descriptionField.name)})"
+    }
     val fields = wrapper.interfaceFields.map { f =>
       s"override def ${f.name}: ${f.datatype.name} = ???"
     }.mkString("\n")
-    withInterfaceFields(base, fields)
+    withInterfaceFields(base, fields, discriminatorField)
   }
 
-  private[this] def withInterfaceFields(base: String, fields: String): String = {
-    if (fields.isEmpty) {
+  private[this] def withInterfaceFields(base: String, fields: String, discriminatorField: Option[String] = None): String = {
+    if (discriminatorField.isEmpty && fields.isEmpty) {
       base
     } else {
       Seq(
         s"$base {",
+        discriminatorField.map(_.indentString()).getOrElse(""),
         fields.indentString(),
         "}",
-      ).mkString("\n")
+      ).filterNot(_.isEmpty).mkString("\n")
     }
   }
 
@@ -112,15 +117,19 @@ trait ScalaCaseClasses extends CodeGenerator {
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
     ).flatten.mkString("\n")
-    val fieldBody = ssd.findAllInterfaceFields(union.union.interfaces).map { f =>
+    val fieldBody = fields(ssd, union).map { f =>
       s"def ${f.name}: ${f.datatype.name}"
     }.mkString("\n")
     withInterfaceFields(body, fieldBody)
   }
 
+  private[this] def fields(ssd: ScalaService, union: ScalaUnion): List[ScalaField] = {
+    union.discriminatorField.toList ++ ssd.findAllInterfaceFields(union.union.interfaces)
+  }
+
   def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {
     union.discriminator.map { _ =>
-      ScalaUnionDiscriminator(union).build()
+      ScalaUnionDiscriminatorGenerator(union).build()
     }
   }
 

@@ -1,6 +1,7 @@
 package scala.generator
 
 import io.apibuilder.spec.v0.models._
+import lib.Text.underscoreToInitCap
 
 import scala.models.{Attributes, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
@@ -140,6 +141,35 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val deprecation: Option[Deprecation] = union.deprecation
 
+  val discriminatorField: Option[ScalaUnionDiscriminator] = discriminator.map { d =>
+    ScalaUnionDiscriminator(
+      this,
+      className = name + underscoreToInitCap(d),
+      discriminatorName = d,
+      defaultDiscriminatorValue = defaultType.map(_.discriminatorName)
+    )
+  }
+}
+
+/**
+ * @param className e.g. UserDiscriminator
+ */
+case class ScalaUnionDiscriminator(
+  union: ScalaUnion,
+  className: String,
+  discriminatorName: String,
+  defaultDiscriminatorValue: Option[String],
+) {
+  lazy val field = new ScalaField(
+    union.ssd,
+    modelName = union.name,
+    field = Field(
+      name = discriminatorName,
+      `type` = "string",
+      default = defaultDiscriminatorValue,
+      required = true,
+    )
+  )
 }
 
 /*
@@ -442,7 +472,7 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
   }
 }
 
-class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
+class ScalaField(ssd: ScalaService, modelName: String, val field: Field) {
 
   def name: String = ScalaUtil.quoteNameIfKeyword(Text.snakeToCamelCase(field.name))
 
