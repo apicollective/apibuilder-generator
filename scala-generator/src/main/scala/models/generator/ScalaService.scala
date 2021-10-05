@@ -141,12 +141,16 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val deprecation: Option[Deprecation] = union.deprecation
 
-  val discriminatorField: Option[ScalaUnionDiscriminator] = discriminator.map { d =>
-    ScalaUnionDiscriminator(
-      this,
-      className = name + underscoreToInitCap(d),
-      discriminatorName = d,
-      defaultDiscriminatorValue = defaultType.map(_.discriminatorName)
+  val discriminatorField: Option[ScalaField] = discriminator.map { d =>
+    new ScalaField(
+      ssd,
+      modelName = name,
+      field = Field(
+        name = d,
+        `type` = name + underscoreToInitCap(d),
+        default = defaultType.map(_.discriminatorName),
+        required = true,
+      )
     )
   }
 }
@@ -155,22 +159,9 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
  * @param className e.g. UserDiscriminator
  */
 case class ScalaUnionDiscriminator(
-  union: ScalaUnion,
   className: String,
-  discriminatorName: String,
-  defaultDiscriminatorValue: Option[String],
-) {
-  lazy val field = new ScalaField(
-    union.ssd,
-    modelName = union.name,
-    field = Field(
-      name = discriminatorName,
-      `type` = "string",
-      default = defaultDiscriminatorValue,
-      required = true,
-    )
-  )
-}
+  field: ScalaField,
+)
 
 /*
  * @param shortName The original short name to use in identifying objects of this
