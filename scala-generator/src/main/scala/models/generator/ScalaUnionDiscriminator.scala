@@ -26,8 +26,11 @@ case class ScalaUnionDiscriminator(
           Seq(
             s"object $className {",
             buildTypes().indentString(2),
+            union.defaultType.map { t =>
+              s"  val default: $className = ${t.name}"
+            }.getOrElse(""),
             s"}"
-          ).mkString("\n\n")
+          ).filterNot(_.isEmpty).mkString("\n\n")
         )
       ).flatten.mkString("\n")
     ).mkString("\n\n")

@@ -136,6 +136,8 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
 
+  val defaultType: Option[ScalaUnionType] = types.find(_.isDefault)
+
   val deprecation: Option[Deprecation] = union.deprecation
 
 }

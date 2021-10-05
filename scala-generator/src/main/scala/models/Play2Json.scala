@@ -162,11 +162,9 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
-    val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.discriminatorName).headOption
-
-    val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
+    val defaultDiscriminatorClause = union.defaultType match {
       case None => "case e: play.api.libs.json.JsError => e"
-      case Some(defaultValue) => s"case _: play.api.libs.json.JsError => readDiscriminator(\"${defaultValue}\")"
+      case Some(defaultType) => s"case _: play.api.libs.json.JsError => readDiscriminator(\"${defaultType.discriminatorName}\")"
     }
 
     Seq(
