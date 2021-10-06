@@ -202,7 +202,7 @@ trait ScalaCaseClasses extends CodeGenerator {
 
     case class TypeModel(discriminatorField: ScalaField, unionType: ScalaUnionType) extends DiscriminatorValue {
       override def generatorCode: String = {
-        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}(${ScalaUtil.wrapInQuotes(unionType.discriminatorName)})"
+        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}.${unionType.name}"
       }
     }
     case class Undefined(discriminatorField: ScalaField, wrapper: UnionTypeUndefinedModelWrapper) extends DiscriminatorValue {
