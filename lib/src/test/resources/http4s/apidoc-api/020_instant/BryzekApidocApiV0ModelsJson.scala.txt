@@ -7,7 +7,9 @@ package io.apibuilder.api.v0.models {
   /**
    * Represents a single diff in an application
    */
-  sealed trait Diff extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait Diff extends _root_.scala.Product with _root_.scala.Serializable {
+    def `type`: DiffType
+  }
 
   /**
    * Defines the valid type values for the type Diff
@@ -34,7 +36,9 @@ package io.apibuilder.api.v0.models {
   /**
    * Identifies the specific type of item that was indexed by search
    */
-  sealed trait ItemDetail extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait ItemDetail extends _root_.scala.Product with _root_.scala.Serializable {
+    def `type`: ItemDetailType
+  }
 
   /**
    * Defines the valid type values for the type ItemDetail
@@ -96,7 +100,9 @@ package io.apibuilder.api.v0.models {
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.common.v0.models.Reference,
     key: String
-  ) extends ItemDetail
+  ) extends ItemDetail {
+    override val `type`: ItemDetailType = ItemDetailType.ApplicationSummary
+  }
 
   /**
    * Attributes are globally unique key which allow users to specify additional
@@ -204,14 +210,18 @@ package io.apibuilder.api.v0.models {
    */
   final case class DiffBreaking(
     description: String
-  ) extends Diff
+  ) extends Diff {
+    override val `type`: DiffType = DiffType.DiffBreaking
+  }
 
   /**
    * Represents a single NON breaking diff of an application version.
    */
   final case class DiffNonBreaking(
     description: String
-  ) extends Diff
+  ) extends Diff {
+    override val `type`: DiffType = DiffType.DiffNonBreaking
+  }
 
   /**
    * Represents a single domain name (e.g. www.apidoc.me). When a new user registers
@@ -556,7 +566,9 @@ package io.apibuilder.api.v0.models {
    */
   final case class DiffUndefinedType(
     description: String
-  ) extends Diff
+  ) extends Diff {
+    override val `type`: DiffType = DiffType.UNDEFINED(description)
+  }
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -568,7 +580,9 @@ package io.apibuilder.api.v0.models {
    */
   final case class ItemDetailUndefinedType(
     description: String
-  ) extends ItemDetail
+  ) extends ItemDetail {
+    override val `type`: ItemDetailType = ItemDetailType.UNDEFINED(description)
+  }
   sealed trait OriginalType extends _root_.scala.Product with _root_.scala.Serializable
 
   object OriginalType {

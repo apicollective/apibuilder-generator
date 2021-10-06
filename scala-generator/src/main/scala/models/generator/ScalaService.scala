@@ -32,6 +32,7 @@ class ScalaService(
   def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
   val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }.sortBy(_.name)
+  private[this] val interfacesByName = interfaces.groupBy(_.interface.name)
 
   val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
@@ -45,10 +46,12 @@ class ScalaService(
    * @param interfaceNames The API Builder names of the interfaces
    */
   private[this] def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
-    interfaceNames.distinct.flatMap { i =>
-      Some(interfaces.find(_.interface.name == i).getOrElse {
-        sys.error(s"Cannot find interface named: ${i}")
-      })
+    interfaceNames.distinct.map { i =>
+      interfacesByName.getOrElse(i, Nil).toList match {
+        case Nil => sys.error(s"Cannot find interface named: $i")
+        case one :: Nil => one
+        case _ => sys.error(s"Multiple interfaces found with the name: $i")
+      }
     }
   }
 

@@ -4,7 +4,9 @@
  */
 package io.gregor.time.types.v0.models {
 
-  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable {
+    def `type`: DateTimeUnionType
+  }
 
   /**
    * Defines the valid type values for the type DateTimeUnion
@@ -43,7 +45,9 @@ package io.gregor.time.types.v0.models {
    */
   final case class DateTimeUnionUndefinedType(
     description: String
-  ) extends DateTimeUnion
+  ) extends DateTimeUnion {
+    override val `type`: DateTimeUnionType = DateTimeUnionType.UNDEFINED(description)
+  }
 
   /**
    * Wrapper class to support the union types containing the

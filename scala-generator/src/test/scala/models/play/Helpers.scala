@@ -1,15 +1,16 @@
 package scala.models.play
 
 import io.apibuilder.spec.v0.models.{Apidoc, Application, Info, Organization, Service}
+import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 
 object Helpers extends Matchers {
   def removeAllExtraWhiteSpaces(a: String): String = a.replaceAll("\\s+", " ").trim
 
-  def compareWithoutWhiteSpaces(a: String, b: String) =
+  def compareWithoutWhiteSpaces(a: String, b: String): Assertion =
     removeAllExtraWhiteSpaces(a) should be(removeAllExtraWhiteSpaces(b))
 
-  def basicService(namespace: String) = Service(
+  def basicService(namespace: String): Service = Service(
     apidoc = Apidoc("0"),
     name = "name",
     organization = Organization("foo"),
