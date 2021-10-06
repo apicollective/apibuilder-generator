@@ -10,8 +10,6 @@ import scala.models.play.gens._
 
 class ModelsBodyParsersSpec extends AnyFunSpec with Matchers with ScalaCheckPropertyChecks {
 
-  private[this] implicit val scalacheckConfig: PropertyCheckConfiguration = generatorDrivenConfig.copy(sizeRange = 10)
-
   it("generates generic body parser") {
     val expected = s"""
       private def bodyParser[A](parser: ${ModelsBodyParsers.BodyParser}[${ModelsBodyParsers.JsValue}])(implicit ec: ${ModelsBodyParsers.ExecutionContext}, rds: ${ModelsBodyParsers.JsReads}[A]): ${ModelsBodyParsers.BodyParser}[A] =
