@@ -7,7 +7,9 @@ package io.apibuilder.api.v0.models {
   /**
    * Represents a single diff in an application
    */
-  sealed trait Diff extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait Diff extends _root_.scala.Product with _root_.scala.Serializable {
+    def `type`: DiffType
+  }
 
   /**
    * Defines the valid type values for the type Diff
@@ -34,7 +36,9 @@ package io.apibuilder.api.v0.models {
   /**
    * Identifies the specific type of item that was indexed by search
    */
-  sealed trait ItemDetail extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait ItemDetail extends _root_.scala.Product with _root_.scala.Serializable {
+    def `type`: ItemDetailType
+  }
 
   /**
    * Defines the valid type values for the type ItemDetail
@@ -96,7 +100,9 @@ package io.apibuilder.api.v0.models {
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.common.v0.models.Reference,
     key: String
-  ) extends ItemDetail
+  ) extends ItemDetail {
+    override val `type`: ItemDetailType = ItemDetailType.ApplicationSummary
+  }
 
   /**
    * Attributes are globally unique key which allow users to specify additional
@@ -204,14 +210,18 @@ package io.apibuilder.api.v0.models {
    */
   final case class DiffBreaking(
     description: String
-  ) extends Diff
+  ) extends Diff {
+    override val `type`: DiffType = DiffType.DiffBreaking
+  }
 
   /**
    * Represents a single NON breaking diff of an application version.
    */
   final case class DiffNonBreaking(
     description: String
-  ) extends Diff
+  ) extends Diff {
+    override val `type`: DiffType = DiffType.DiffNonBreaking
+  }
 
   /**
    * Represents a single domain name (e.g. www.apidoc.me). When a new user registers
@@ -556,7 +566,9 @@ package io.apibuilder.api.v0.models {
    */
   final case class DiffUndefinedType(
     description: String
-  ) extends Diff
+  ) extends Diff {
+    override val `type`: DiffType = DiffType.UNDEFINED(description)
+  }
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -568,7 +580,9 @@ package io.apibuilder.api.v0.models {
    */
   final case class ItemDetailUndefinedType(
     description: String
-  ) extends ItemDetail
+  ) extends ItemDetail {
+    override val `type`: ItemDetailType = ItemDetailType.UNDEFINED(description)
+  }
   sealed trait OriginalType extends _root_.scala.Product with _root_.scala.Serializable
 
   object OriginalType {
@@ -730,32 +744,26 @@ package io.apibuilder.api.v0.models {
     import io.apibuilder.generator.v0.models.json._
     import io.apibuilder.spec.v0.models.json._
 
-    private[v0] implicit val jsonReadsUUID = __.read[String].map { str =>
+    private[v0] implicit val jsonReadsUUID: play.api.libs.json.Reads[_root_.java.util.UUID] = __.read[String].map { str =>
       _root_.java.util.UUID.fromString(str)
     }
 
-    private[v0] implicit val jsonWritesUUID = new Writes[_root_.java.util.UUID] {
-      def writes(x: _root_.java.util.UUID) = JsString(x.toString)
-    }
+    private[v0] implicit val jsonWritesUUID: play.api.libs.json.Writes[_root_.java.util.UUID] = (x: _root_.java.util.UUID) => play.api.libs.json.JsString(x.toString)
 
-    private[v0] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
+    private[v0] implicit val jsonReadsJodaDateTime: play.api.libs.json.Reads[_root_.org.joda.time.DateTime] = __.read[String].map { str =>
       _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)
     }
 
-    private[v0] implicit val jsonWritesJodaDateTime = new Writes[_root_.org.joda.time.DateTime] {
-      def writes(x: _root_.org.joda.time.DateTime) = {
-        JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x))
-      }
+    private[v0] implicit val jsonWritesJodaDateTime: play.api.libs.json.Writes[_root_.org.joda.time.DateTime] = (x: _root_.org.joda.time.DateTime) => {
+      play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x))
     }
 
-    private[v0] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
+    private[v0] implicit val jsonReadsJodaLocalDate: play.api.libs.json.Reads[_root_.org.joda.time.LocalDate] = __.read[String].map { str =>
       _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(str)
     }
 
-    private[v0] implicit val jsonWritesJodaLocalDate = new Writes[_root_.org.joda.time.LocalDate] {
-      def writes(x: _root_.org.joda.time.LocalDate) = {
-        JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
-      }
+    private[v0] implicit val jsonWritesJodaLocalDate: play.api.libs.json.Writes[_root_.org.joda.time.LocalDate] = (x: _root_.org.joda.time.LocalDate) => {
+      play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
     }
 
     implicit val jsonReadsApidocApiOriginalType: play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] = new play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalType] {
@@ -3209,7 +3217,7 @@ package io.apibuilder.api.v0 {
      */
     def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
       headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
-        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case None => headers ++ Seq("Content-Type" -> "application/json; charset=UTF-8")
         case Some(_) => headers
       }
     }

@@ -197,7 +197,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
   object DiscriminatorValue {
     private[this] def declaration(discriminatorField: ScalaField): String = {
-      s"override val ${discriminatorField.field.name}: ${discriminatorField.field.`type`} = ${discriminatorField.field.`type`}."
+      s"override val ${ScalaUtil.quoteNameIfKeyword(discriminatorField.field.name)}: ${discriminatorField.field.`type`} = ${discriminatorField.field.`type`}."
     }
 
     case class TypeModel(discriminatorField: ScalaField, unionType: ScalaUnionType) extends DiscriminatorValue {
