@@ -23,10 +23,11 @@ object Helpers extends Matchers {
     headers = Nil,
     imports = Nil,
     enums = Nil,
+    interfaces = Nil,
     unions = Nil,
     models = Nil,
     resources = Nil,
     attributes = Nil,
-    annotations = Nil
+    annotations = Nil,
   )
 }
