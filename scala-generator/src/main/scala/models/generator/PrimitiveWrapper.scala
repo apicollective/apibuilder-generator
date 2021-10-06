@@ -31,31 +31,35 @@ object PrimitiveWrapper {
 }
 
 case class PrimitiveWrapper(ssd: ScalaService) {
-  import PrimitiveWrapper.isBasicType
 
   case class Wrapper(model: ScalaModel, union: ScalaUnion)
 
   val wrappers: Seq[Wrapper] = ssd.unions.flatMap { union =>
-    union.types.map(_.datatype).collect {
-      case p: ScalaPrimitive => p
-    }.filter(isBasicType).sortWith(_.shortName < _.shortName).map { p =>
-      val name = PrimitiveWrapper.className(union, p)
-      val model = Model(
-        name = name,
-        plural = s"${name}s",
-        description = Some(s"Wrapper class to support the union types containing the datatype[${p.apiBuilderType}]"),
-        fields = Seq(
-          Field(
-            name = PrimitiveWrapper.FieldName,
-            `type` = p.apiBuilderType,
-            required = true
+    union.types.flatMap { t =>
+      t.datatype match {
+        case p: ScalaPrimitive if PrimitiveWrapper.isBasicType(p) => {
+          val name = PrimitiveWrapper.className(union, p)
+          val model = Model(
+            name = name,
+            plural = s"${name}s",
+            description = Some(s"Wrapper class to support the union types containing the datatype[${p.apiBuilderType}]"),
+            fields = Seq(
+              Field(
+                name = PrimitiveWrapper.FieldName,
+                `type` = p.apiBuilderType,
+                required = true
+              )
+            )
           )
-        )
-      )
-      Wrapper(
-        new ScalaModel(ssd, model),
-        union
-      )
+          Some(
+            Wrapper(
+              new ScalaModel(ssd, model),
+              union,
+            )
+          )
+        }
+        case _ => None
+      }
     }
   }
 

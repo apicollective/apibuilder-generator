@@ -152,10 +152,7 @@ trait ScalaCaseClasses extends CodeGenerator {
 
   private[this] def discriminatorFieldValue(model: ScalaModel, unions: Seq[ScalaUnion]): Option[String] = {
     unions.filter(_.discriminatorField.nonEmpty).flatMap { u =>
-      val value = discriminatorValue(u, model)
-      u.discriminatorField.map { d =>
-        s"override val ${d.field.name}: ${d.field.`type`} = ${d.field.`type`}($value)"
-      }
+      discriminatorValue(u, model).map(_.generatorCode)
     }.toList match {
       case Nil => None
       case lines => Some(
@@ -168,11 +165,13 @@ trait ScalaCaseClasses extends CodeGenerator {
     }
   }
 
-  private[this] def discriminatorValue(union: ScalaUnion, model: ScalaModel): String = {
-    union.types.find(_.name == model.name) match {
-      case Some(t) => ScalaUtil.wrapInQuotes(t.discriminatorName)
-      case None if model.name == union.undefinedType.shortName => "description"
-      case None => sys.error(s"Cannot find discriminator value for union[${union.union.name}] model[${model.model.name}]")
+  private[this] def discriminatorValue(union: ScalaUnion, model: ScalaModel): Option[DiscriminatorValue] = {
+    union.discriminatorField.flatMap { d =>
+      union.types.find(_.name == model.name) match {
+        case Some(t) => Some(DiscriminatorValue.TypeModel(d, t))
+        case None if model.name == union.undefinedType.shortName => Some(DiscriminatorValue.Undefined(d))
+        case None => None
+      }
     }
   }
 
@@ -191,4 +190,23 @@ trait ScalaCaseClasses extends CodeGenerator {
     ScalaEnums(ssd, enum).build()
   }
 
+  sealed trait DiscriminatorValue {
+    def generatorCode: String
+  }
+  object DiscriminatorValue {
+    private[this] def declaration(discriminatorField: ScalaField): String = {
+      s"override val ${discriminatorField.field.name}: ${discriminatorField.field.`type`}"
+    }
+
+    case class TypeModel(discriminatorField: ScalaField, unionType: ScalaUnionType) extends DiscriminatorValue {
+      override def generatorCode: String = {
+        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}(${ScalaUtil.wrapInQuotes(unionType.discriminatorName)})"
+      }
+    }
+    case class Undefined(discriminatorField: ScalaField) extends DiscriminatorValue {
+      override def generatorCode: String = {
+        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}.UNDEFINED(description)"
+      }
+    }
+  }
 }
