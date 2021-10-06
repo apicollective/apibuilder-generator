@@ -43,13 +43,16 @@ trait ScalaCaseClasses extends CodeGenerator {
     val wrappers = PrimitiveWrapper(ssd).wrappers match {
       case Nil => ""
       case primitives => {
-        primitives.map { w => generateCaseClassWithDoc(w.model, Seq(w.union)) }.mkString("\n\n").indentString(2) + "\n"
+        primitives.map { w =>
+          generateCaseClassWithDoc(w.model, Seq(w.union)).generateCode
+        }.mkString("\n\n").indentString(2) + "\n"
       }
     }
 
     val generatedClasses = Seq(undefinedModels, wrappers).filter(_.nonEmpty) match {
       case Nil => ""
-      case code => "\n" + code.mkString("\n\n")
+      case one :: Nil => "\n" + one
+      case multiple => "\n" + multiple.mkString("\n\n")
     }
 
     val unionNames = ssd.unions.map(_.name)
@@ -61,33 +64,21 @@ trait ScalaCaseClasses extends CodeGenerator {
         .map { i => generateTraitWithDoc(i) }.mkString("\n\n").indentString(2),
       ssd.unions.map { u => generateUnionTraitWithDocAndDiscriminator(ssd, u, ssd.unionsForUnion(u)) }.mkString("\n\n").indentString(2),
       "",
-      ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)) }.mkString("\n\n").indentString(2),
+      ssd.models.map { m => generateCaseClassWithDoc(m, ssd.unionsForModel(m)).generateCode }.mkString("\n\n").indentString(2),
       generatedClasses,
       ssd.enums.map { generateEnum(ssd, _) }.mkString("\n\n").indentString(2)
-    ).mkString("\n").trim +
+    ).filter(_.strip.nonEmpty).mkString("\n").trim +
     s"\n\n}"
 
     Seq(ServiceFileNames.toFile(ssd.service.namespace, ssd.service.organization.key, ssd.service.application.key, ssd.service.version, "Models", source, Some("Scala")))
   }
 
   def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
-    val base = generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union))
-    val fields = wrapper.interfaceFields.map { f =>
-      s"override def ${f.name}: ${f.datatype.name} = ???"
-    }.mkString("\n")
-    withInterfaceFields(base, fields)
-  }
-
-  private[this] def withInterfaceFields(base: String, fields: String): String = {
-    if (fields.isEmpty) {
-      base
-    } else {
-      Seq(
-        s"$base {",
-        fields.indentString(),
-        "}",
-      ).filterNot(_.isEmpty).mkString("\n")
-    }
+    generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union)).withBodyParts(
+      wrapper.interfaceFields.map { f =>
+        s"override def ${f.name}: ${f.datatype.name} = ???"
+      }
+    ).generateCode
   }
 
   def generateUnionTraitWithDocAndDiscriminator(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
@@ -113,10 +104,16 @@ trait ScalaCaseClasses extends CodeGenerator {
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
     ).flatten.mkString("\n")
-    val fieldBody = (union.discriminatorField.toList ++ fields(ssd, union)).map { f =>
+    (union.discriminatorField.toList ++ fields(ssd, union)).map { f =>
       s"def ${f.name}: ${f.datatype.name}"
-    }.mkString("\n")
-    withInterfaceFields(body, fieldBody)
+    } match {
+      case Nil => body
+      case parts => Seq(
+        s"$body {",
+        parts.mkString("\n").indent(2),
+        "}",
+      ).mkString("\n")
+    }
   }
 
   private[this] def fields(ssd: ScalaService, union: ScalaUnion): List[ScalaField] = {
@@ -134,35 +131,65 @@ trait ScalaCaseClasses extends CodeGenerator {
       generateTrait(interface)
   }
 
-  def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    ScalaGeneratorUtil.scaladoc(model.description, model.fields.map(f => (f.name, f.description))) +
-      generateCaseClass(model, unions)
+  private[generator] case class CaseClassData(
+    declaration: String,
+    deprecation: Option[String],
+    scaladoc: Option[String],
+    bodyParts: Seq[String] = Nil,
+  ) {
+    def withBodyParts(parts: Seq[String]): CaseClassData = {
+      this.copy(
+        bodyParts = bodyParts ++ parts
+      )
+    }
+
+    def generateCode: String = {
+      val base = Seq(
+        scaladoc,
+        deprecation,
+        Some(declaration),
+      ).flatten.mkString("\n").strip
+
+      if (bodyParts.isEmpty) {
+        base
+      } else {
+        Seq(
+          s"$base {",
+          bodyParts.filter(_.trim.nonEmpty).mkString("\n").strip.indent(2),
+          "}",
+        ).mkString("\n")
+      }
+    }
   }
 
-  def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion]): String = {
-    Seq(
-      Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
-      Some(s"final case class ${model.name}(${model.argList(unions).getOrElse("")})" + ScalaUtil.extendsClause(
+  private[generator] def generateCaseClassWithDoc(model: ScalaModel, unions: Seq[ScalaUnion]): CaseClassData = {
+    generateCaseClass(
+      model = model,
+      unions = unions,
+      scaladoc = Some(
+        ScalaGeneratorUtil.scaladoc(model.description, model.fields.map(f => (f.name, f.description)))
+      ).filter(_.nonEmpty),
+    )
+  }
+
+  private[generator] def generateCaseClass(model: ScalaModel, unions: Seq[ScalaUnion], scaladoc: Option[String]): CaseClassData = {
+    CaseClassData(
+      deprecation = Some(ScalaUtil.deprecationString(model.deprecation).trim).filter(_.nonEmpty),
+      scaladoc = scaladoc,
+      declaration = s"final case class ${model.name}(${model.argList(unions).getOrElse("")})" + ScalaUtil.extendsClause(
         className = model.name,
         interfaces = model.interfaces,
         unions = unions.map(_.name),
-      ).getOrElse("") + discriminatorFieldValue(model, unions).getOrElse(""))
-    ).flatten.mkString("\n")
+      ).getOrElse("")
+    ).withBodyParts(
+      discriminatorFieldValue(model, unions)
+    )
   }
 
-  private[this] def discriminatorFieldValue(model: ScalaModel, unions: Seq[ScalaUnion]): Option[String] = {
+  private[this] def discriminatorFieldValue(model: ScalaModel, unions: Seq[ScalaUnion]): Seq[String] = {
     unions.filter(_.discriminatorField.nonEmpty).flatMap { u =>
-      discriminatorValue(u, model).map(_.generatorCode)
-    }.toList match {
-      case Nil => None
-      case lines => Some(
-        Seq(
-          " {",
-          "  " + lines.mkString(", "),
-         "}"
-        ).mkString("\n")
-      )
-    }
+      discriminatorValue(u, model).map(_.generateCode)
+    }.distinct
   }
 
   private[this] def discriminatorValue(union: ScalaUnion, model: ScalaModel): Option[DiscriminatorValue] = {
@@ -193,7 +220,7 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
 
   sealed trait DiscriminatorValue {
-    def generatorCode: String
+    def generateCode: String
   }
   object DiscriminatorValue {
     private[this] def declaration(discriminatorField: ScalaField): String = {
@@ -201,12 +228,12 @@ trait ScalaCaseClasses extends CodeGenerator {
     }
 
     case class TypeModel(discriminatorField: ScalaField, unionType: ScalaUnionType) extends DiscriminatorValue {
-      override def generatorCode: String = {
+      override def generateCode: String = {
         s"${declaration(discriminatorField)}${unionType.name}"
       }
     }
     case class Undefined(discriminatorField: ScalaField, wrapper: UnionTypeUndefinedModelWrapper) extends DiscriminatorValue {
-      override def generatorCode: String = {
+      override def generateCode: String = {
         s"${declaration(discriminatorField)}UNDEFINED(${wrapper.descriptionField.name})"
       }
     }

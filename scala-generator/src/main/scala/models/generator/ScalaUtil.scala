@@ -96,7 +96,7 @@ object ScalaUtil {
   }
 
   def toClassName(name: String): String = {
-    val baseName =lib.Text.safeName(
+    val baseName = lib.Text.safeName(
       if (name == name.toUpperCase) {
         lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")
       } else {

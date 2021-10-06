@@ -141,11 +141,12 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val discriminatorField: Option[ScalaField] = discriminator.map { d =>
     val typeName = name + underscoreToInitCap(d)
+    val fieldName = ScalaUtil.toVariable(s"${union.name}_$d")
     ScalaField(
       ssd,
       modelName = name,
       field = Field(
-        name = d,
+        name = fieldName,
         `type` = typeName,
         default = defaultType.map(_.discriminatorName),
         required = true,
