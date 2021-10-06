@@ -2,6 +2,6 @@ implicit def jsonReadsAPIBuilderTestOuterType: play.api.libs.json.Reads[OuterTyp
   (
     (__ \ "inner_type").read(jsonReadsAPIBuilderTestOuterType).asInstanceOf[play.api.libs.json.Reads[OuterType]]
     orElse
-    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.OuterTypeUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[OuterType]]
+    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(OuterTypeUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[OuterType]]
   )
 }
