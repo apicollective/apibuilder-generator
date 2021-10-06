@@ -23,11 +23,17 @@ case class ScalaEnums(
   }
 
   private[this] def buildValues(): String = {
-    enum.values.map { value =>
-      Seq(
-        value.description.map { desc => ScalaUtil.textToComment(desc) },
-        Some(s"""${ScalaUtil.deprecationString(value.deprecation)}case object ${value.name} extends ${enum.name} { override def toString = "${value.serializedValue}" }""")
-      ).flatten.mkString("\n")
+    (enum.values ++ buildUndefinedValue()).map { value =>
+      CaseClassBuilder()
+        .withName(value.name)
+        .withExtendsClasses(Seq(enum.name))
+        .withDeprecation(value.deprecation)
+        .withScaladoc(value.description.map(ScalaUtil.textToComment))
+        .withBodyParts(Seq(
+          s"override def toString = ${ScalaUtil.wrapInQuotes(value.serializedValue)}"
+        ))
+        .withBodyParts(DiscriminatorValue.generateCode(enum, unions))
+        .build
     }.mkString("\n") + "\n" +
     s"""
 /**

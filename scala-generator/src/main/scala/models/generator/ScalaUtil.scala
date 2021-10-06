@@ -48,11 +48,18 @@ object ScalaUtil {
     interfaces: Seq[String],
     unions: Seq[String],
   ): Option[String] = {
-    val all = (interfaces ++ unions).toList.filterNot(_ == className)
-    all match {
+    extendsTypes(className, interfaces, unions).toList match {
       case Nil => None
-      case _ => Some(" extends " + all.distinct.sorted.mkString(" with "))
+      case all => Some(" extends " + all.distinct.sorted.mkString(" with "))
     }
+  }
+
+  def extendsTypes(
+    className: String,
+    interfaces: Seq[String],
+    unions: Seq[String],
+  ): Seq[String] = {
+    (interfaces ++ unions).toList.filterNot(_ == className).distinct.sorted
   }
 
   def trimTrailingWhitespace(text: String): String = {
