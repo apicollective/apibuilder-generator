@@ -197,17 +197,17 @@ trait ScalaCaseClasses extends CodeGenerator {
   }
   object DiscriminatorValue {
     private[this] def declaration(discriminatorField: ScalaField): String = {
-      s"override val ${discriminatorField.field.name}: ${discriminatorField.field.`type`}"
+      s"override val ${discriminatorField.field.name}: ${discriminatorField.field.`type`} = ${discriminatorField.field.`type`}."
     }
 
     case class TypeModel(discriminatorField: ScalaField, unionType: ScalaUnionType) extends DiscriminatorValue {
       override def generatorCode: String = {
-        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}.${unionType.name}"
+        s"${declaration(discriminatorField)}${unionType.name}"
       }
     }
     case class Undefined(discriminatorField: ScalaField, wrapper: UnionTypeUndefinedModelWrapper) extends DiscriminatorValue {
       override def generatorCode: String = {
-        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}.UNDEFINED(${wrapper.descriptionField.name})"
+        s"${declaration(discriminatorField)}UNDEFINED(${wrapper.descriptionField.name})"
       }
     }
   }
