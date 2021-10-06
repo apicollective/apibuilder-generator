@@ -4,7 +4,9 @@
  */
 package io.gregor.time.types.v0.models {
 
-  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable {
+    def `type`: DateTimeUnionType
+  }
 
   /**
    * Defines the valid type values for the type DateTimeUnion
@@ -43,14 +45,9 @@ package io.gregor.time.types.v0.models {
    */
   final case class DateTimeUnionUndefinedType(
     description: String
-  ) extends DateTimeUnion
-
-  /**
-   * Wrapper class to support the union types containing the datatype[date-iso8601]
-   */
-  final case class DateTimeUnionLocalDate(
-    value: _root_.java.time.LocalDate
-  ) extends DateTimeUnion
+  ) extends DateTimeUnion {
+    override val `type`: DateTimeUnionType = DateTimeUnionType.UNDEFINED(description)
+  }
 
   /**
    * Wrapper class to support the union types containing the
@@ -58,6 +55,13 @@ package io.gregor.time.types.v0.models {
    */
   final case class DateTimeUnionOffsetDateTime(
     value: _root_.java.time.OffsetDateTime
+  ) extends DateTimeUnion
+
+  /**
+   * Wrapper class to support the union types containing the datatype[date-iso8601]
+   */
+  final case class DateTimeUnionLocalDate(
+    value: _root_.java.time.LocalDate
   ) extends DateTimeUnion
 
 }
@@ -93,12 +97,12 @@ package io.gregor.time.types.v0.models {
       }
     }
 
-    implicit def jsonReadsTimeTypesDateTimeUnionLocalDate: play.api.libs.json.Reads[DateTimeUnionLocalDate] = {
-      (__ \ "value").read[_root_.java.time.LocalDate].map { x => new DateTimeUnionLocalDate(value = x) }
-    }
-
     implicit def jsonReadsTimeTypesDateTimeUnionOffsetDateTime: play.api.libs.json.Reads[DateTimeUnionOffsetDateTime] = {
       (__ \ "value").read[_root_.java.time.OffsetDateTime].map { x => new DateTimeUnionOffsetDateTime(value = x) }
+    }
+
+    implicit def jsonReadsTimeTypesDateTimeUnionLocalDate: play.api.libs.json.Reads[DateTimeUnionLocalDate] = {
+      (__ \ "value").read[_root_.java.time.LocalDate].map { x => new DateTimeUnionLocalDate(value = x) }
     }
 
     implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[DateTimeUnion] = (js: play.api.libs.json.JsValue) => {
@@ -349,7 +353,7 @@ package io.gregor.time.types.v0 {
      */
     def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
       headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
-        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case None => headers ++ Seq("Content-Type" -> "application/json; charset=UTF-8")
         case Some(_) => headers
       }
     }

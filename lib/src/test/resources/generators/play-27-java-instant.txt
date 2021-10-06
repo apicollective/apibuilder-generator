@@ -4,7 +4,9 @@
  */
 package io.gregor.time.types.v0.models {
 
-  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable {
+    def `type`: DateTimeUnionType
+  }
 
   /**
    * Defines the valid type values for the type DateTimeUnion
@@ -43,7 +45,9 @@ package io.gregor.time.types.v0.models {
    */
   final case class DateTimeUnionUndefinedType(
     description: String
-  ) extends DateTimeUnion
+  ) extends DateTimeUnion {
+    override val `type`: DateTimeUnionType = DateTimeUnionType.UNDEFINED(description)
+  }
 
   /**
    * Wrapper class to support the union types containing the
@@ -349,7 +353,7 @@ package io.gregor.time.types.v0 {
      */
     def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
       headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
-        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case None => headers ++ Seq("Content-Type" -> "application/json; charset=UTF-8")
         case Some(_) => headers
       }
     }
