@@ -150,15 +150,6 @@ trait ScalaCaseClasses extends CodeGenerator {
     ).flatten.mkString("\n")
   }
 
-  private[this] def discriminatorValue(union: ScalaUnion, model: ScalaModel): String = {
-    println(s"Model[${model.name}] union[${union.name}] undefinedTypeName: ${union.undefinedType.shortName}")
-    union.types.find(_.name == model.name) match {
-      case Some(t) => ScalaUtil.wrapInQuotes(t.discriminatorName)
-      case None if model.name == union.undefinedType.shortName => "description"
-      case None => sys.error(s"Cannot find discriminator value for union[${union.union.name}] model[${model.model.name}]")
-    }
-  }
-
   private[this] def discriminatorFieldValue(model: ScalaModel, unions: Seq[ScalaUnion]): Option[String] = {
     unions.filter(_.discriminatorField.nonEmpty).flatMap { u =>
       val value = discriminatorValue(u, model)
@@ -174,6 +165,14 @@ trait ScalaCaseClasses extends CodeGenerator {
          "}"
         ).mkString("\n")
       )
+    }
+  }
+
+  private[this] def discriminatorValue(union: ScalaUnion, model: ScalaModel): String = {
+    union.types.find(_.name == model.name) match {
+      case Some(t) => ScalaUtil.wrapInQuotes(t.discriminatorName)
+      case None if model.name == union.undefinedType.shortName => "description"
+      case None => sys.error(s"Cannot find discriminator value for union[${union.union.name}] model[${model.model.name}]")
     }
   }
 
