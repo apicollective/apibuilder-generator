@@ -155,7 +155,7 @@ case class Play2Json(
         s"""(__ \\ "${scalaUnionType.discriminatorName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indentString(4),
       s"    orElse",
-      s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
+      s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.model.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
       s"  )",
       s"}"
     ).mkString("\n")
@@ -176,7 +176,7 @@ case class Play2Json(
           unionTypesWithNames(union).map { t =>
             s"""case "${t.unionType.discriminatorName}" => js.validate[${t.typeName}]"""
           }.mkString("\n").indentString(2),
-          s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indentString(2),
+          s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.datatype.fullName}(other))""".indentString(2),
           "}"
         ).mkString("\n").indentString(2),
         "}"
@@ -214,7 +214,7 @@ case class Play2Json(
         val json = getJsonValueForUnion(t.unionType.datatype, "x")
         s"""case x: ${t.typeName} => play.api.libs.json.Json.obj("${t.unionType.discriminatorName}" -> $json)"""
       }.mkString("\n").indentString(4),
-      s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
+      s"""    case x: ${union.undefinedType.datatype.fullName} => sys.error(s"The type[${union.undefinedType.datatype.fullName}] should never be serialized")""",
       "  }",
       "}"
     ).mkString("\n")

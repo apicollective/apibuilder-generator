@@ -33,7 +33,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       ""
     }
 
-    val undefinedModels = UnionTypeUndefinedModel(ssd).models match {
+    val undefinedModels = ssd.unions.map(_.undefinedType).toList match {
       case Nil => ""
       case models => {
         models.map(generateUnionTypeUndefined).mkString("\n\n").indentString(2)
@@ -169,7 +169,9 @@ trait ScalaCaseClasses extends CodeGenerator {
     union.discriminatorField.flatMap { d =>
       union.types.find(_.name == model.name) match {
         case Some(t) => Some(DiscriminatorValue.TypeModel(d, t))
-        case None if model.name == union.undefinedType.shortName => Some(DiscriminatorValue.Undefined(d))
+        case None if model.name == union.undefinedType.model.name => Some(
+          DiscriminatorValue.Undefined(d, union.undefinedType)
+        )
         case None => None
       }
     }
@@ -203,9 +205,9 @@ trait ScalaCaseClasses extends CodeGenerator {
         s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}(${ScalaUtil.wrapInQuotes(unionType.discriminatorName)})"
       }
     }
-    case class Undefined(discriminatorField: ScalaField) extends DiscriminatorValue {
+    case class Undefined(discriminatorField: ScalaField, wrapper: UnionTypeUndefinedModelWrapper) extends DiscriminatorValue {
       override def generatorCode: String = {
-        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}.UNDEFINED(description)"
+        s"${declaration(discriminatorField)} = ${discriminatorField.field.`type`}.UNDEFINED(${wrapper.descriptionField.name})"
       }
     }
   }

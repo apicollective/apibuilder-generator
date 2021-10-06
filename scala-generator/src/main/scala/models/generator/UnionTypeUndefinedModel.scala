@@ -5,13 +5,19 @@ import io.apibuilder.spec.v0.models.{Field, Model}
 
 import scala.annotation.tailrec
 
-case class UnionTypeUndefinedModelWrapper(model: ScalaModel, union: ScalaUnion, interfaceFields: Seq[ScalaField], descriptionField: Field)
+case class UnionTypeUndefinedModelWrapper(
+  union: ScalaUnion,
+  model: ScalaModel,
+  interfaceFields: Seq[ScalaField],
+  descriptionField: Field,
+  datatype: ScalaPrimitive.Model,
+)
 
-case class UnionTypeUndefinedModel(ssd: ScalaService) {
+object UnionTypeUndefinedModel {
 
-  val models: Seq[UnionTypeUndefinedModelWrapper] = ssd.unions.map { union =>
+  def build(ssd: ScalaService, union: ScalaUnion): UnionTypeUndefinedModelWrapper = {
     // TODO: Verify another type does not exist with this name
-    val name = union.undefinedType.shortName
+    val name = union.name + "UndefinedType"
 
     val interfaceFields = ssd.findAllInterfaceFields(union.union.interfaces)
     val descField = buildDescriptionField(interfaceFields.map(_.name).toSet)
@@ -23,10 +29,11 @@ case class UnionTypeUndefinedModel(ssd: ScalaService) {
     )
 
     UnionTypeUndefinedModelWrapper(
-      model = new ScalaModel(ssd, model),
       union = union,
+      model = new ScalaModel(ssd, model),
       interfaceFields = interfaceFields,
       descriptionField = descField,
+      datatype = ScalaPrimitive.Model(ssd.namespaces, name)
     )
   }
 

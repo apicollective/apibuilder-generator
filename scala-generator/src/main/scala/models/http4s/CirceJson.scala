@@ -94,7 +94,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
       unionTypesWithNames(union).map { case (t, typeName) =>
         s"""c.get[$typeName]("${t.discriminatorName}") orElse"""
       }.mkString("\n").indentString(2),
-      s"  Right(${union.undefinedType.fullName}(c.value.toString))",
+      s"  Right(${union.undefinedType.datatype.fullName}(c.value.toString))",
       s"}"
     ).mkString("\n")
   }
@@ -112,7 +112,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
       typesWithNames.map { case (t, typeName) =>
         s"""  case Right(Some(s)) if s == "${t.discriminatorName}" => c.as[$typeName]"""
       }.mkString("\n").indentString(2),
-      s"""    case Right(Some(s)) => Right(${union.undefinedType.fullName}(s))""",
+      s"""    case Right(Some(s)) => Right(${union.undefinedType.datatype.fullName}(s))""",
       s"""    case _ => $defaultClause""",
       s"""  }""",
       s"""}"""

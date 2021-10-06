@@ -5,7 +5,7 @@ import io.apibuilder.spec.v0.models.Field
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.generator.{ScalaService, UnionTypeUndefinedModel}
+import scala.generator.ScalaService
 
 class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers with ServiceHelpers {
 
@@ -32,7 +32,7 @@ class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers with Serv
   }
 
   private[this] def fields(service: ScalaService): Seq[String] = {
-    UnionTypeUndefinedModel(service).models.head.model.model.fields.map(_.name)
+    service.unions.map(_.undefinedType).head.model.model.fields.map(_.name)
   }
 
   it("defaults to 'description'") {
