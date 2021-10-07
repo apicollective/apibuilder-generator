@@ -104,7 +104,7 @@ trait ScalaCaseClasses extends CodeGenerator {
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"))
     ).flatten.mkString("\n")
-    (union.discriminatorField.toList ++ fields(ssd, union)).map { f =>
+    (union.discriminatorField.map(_.field).toList ++ fields(ssd, union)).map { f =>
       s"def ${f.name}: ${f.datatype.name}"
     } match {
       case Nil => body

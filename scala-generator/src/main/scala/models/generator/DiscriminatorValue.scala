@@ -35,9 +35,9 @@ object DiscriminatorValue {
   private[this] def generate(union: ScalaUnion, typeName: String): Option[DiscriminatorValue] = {
     union.discriminatorField.flatMap { d =>
       union.types.find(_.name == typeName) match {
-        case Some(t) => Some(DiscriminatorValue.TypeModel(d, t))
+        case Some(t) => Some(DiscriminatorValue.TypeModel(d.field, t))
         case None if typeName == union.undefinedType.model.name => Some(
-          DiscriminatorValue.Undefined(d, union.undefinedType)
+          DiscriminatorValue.Undefined(d.field, union.undefinedType)
         )
         case None => None
       }

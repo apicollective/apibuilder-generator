@@ -139,12 +139,34 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val deprecation: Option[Deprecation] = union.deprecation
 
-  val discriminatorField: Option[ScalaField] = discriminator.map { d =>
-    val typeName = name + underscoreToInitCap(d)
-    val fieldName = ScalaUtil.toVariable(s"${union.name}_$d")
-    ScalaField(
+  lazy val discriminatorField: Option[ScalaUnionDiscriminator] = discriminator.map { d =>
+    ScalaUnionDiscriminator(
       ssd,
-      modelName = name,
+      discriminator = d,
+      fieldName = ScalaUtil.toVariable(s"${union.name}_$d"),
+      unionName = name,
+      defaultType = defaultType,
+    )
+  }
+
+  // Include an undefined instance to nudge the developer to think
+  // about what happens in the future when a new type is added to the
+  // union type.
+  val undefinedType: UnionTypeUndefinedModelWrapper = UnionTypeUndefinedModel.build(ssd, this)
+
+}
+
+case class ScalaUnionDiscriminator(
+  ssd: ScalaService,
+  discriminator: String,
+  fieldName: String,
+  unionName: String,
+  defaultType: Option[ScalaUnionType],
+) {
+  private[this] val typeName: String = unionName + underscoreToInitCap(discriminator)
+  lazy val field: ScalaField = ScalaField(
+      ssd,
+      modelName = unionName,
       field = Field(
         name = fieldName,
         `type` = typeName,
@@ -153,12 +175,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
       ),
       `type` = Datatype.Generated.Model(typeName),
     )
-  }
 
-  // Include an undefined instance to nudge the developer to think
-  // about what happens in the future when a new type is added to the
-  // union type.
-  val undefinedType: UnionTypeUndefinedModelWrapper = UnionTypeUndefinedModel.build(ssd, this)
 
 }
 

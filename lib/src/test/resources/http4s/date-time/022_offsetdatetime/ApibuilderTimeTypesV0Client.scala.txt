@@ -5,11 +5,12 @@
 package io.gregor.time.types.v0.models {
 
   sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable {
-    def `type`: DateTimeUnionType
+    def dateTimeUnionType: DateTimeUnionType
+
   }
 
   /**
-   * Defines the valid type values for the type DateTimeUnion
+   * Defines the valid dateTimeUnionType values for the type DateTimeUnion
    */
   sealed trait DateTimeUnionType extends _root_.scala.Product with _root_.scala.Serializable
 
@@ -29,7 +30,6 @@ package io.gregor.time.types.v0.models {
     def fromString(value: String): _root_.scala.Option[DateTimeUnionType] = byName.get(value.toLowerCase)
 
   }
-
   final case class DateTimeModel(
     dateTime: _root_.java.time.OffsetDateTime,
     date: _root_.java.time.LocalDate
@@ -43,16 +43,18 @@ package io.gregor.time.types.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class DateTimeUnionUndefinedType(
     description: String
   ) extends DateTimeUnion {
-    override val `type`: DateTimeUnionType = DateTimeUnionType.UNDEFINED(description)
+    override val dateTimeUnionType: DateTimeUnionType = DateTimeUnionType.UNDEFINED(description)
   }
 
   /**
    * Wrapper class to support the union types containing the
    * datatype[date-time-iso8601]
    */
+
   final case class DateTimeUnionOffsetDateTime(
     value: _root_.java.time.OffsetDateTime
   ) extends DateTimeUnion
@@ -60,6 +62,7 @@ package io.gregor.time.types.v0.models {
   /**
    * Wrapper class to support the union types containing the datatype[date-iso8601]
    */
+
   final case class DateTimeUnionLocalDate(
     value: _root_.java.time.LocalDate
   ) extends DateTimeUnion

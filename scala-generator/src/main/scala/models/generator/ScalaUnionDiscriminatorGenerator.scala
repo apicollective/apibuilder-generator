@@ -5,15 +5,16 @@ import lib.Text._
 case class ScalaUnionDiscriminatorGenerator(
   union: ScalaUnion
 ) {
-  private[this] val discriminator: ScalaField = union.discriminatorField.getOrElse {
+  private[this] val discriminator: ScalaUnionDiscriminator = union.discriminatorField.getOrElse {
     sys.error(s"ScalaUnionDiscriminator requires a discriminator - union[${union.name}] does not have one defined")
   }
-  private[this] val className = discriminator.field.`type`
+
+  private[this] val className = discriminator.field.field.`type`
 
   def build(): String = {
     Seq(
       Seq(
-        ScalaUtil.textToComment(s"Defines the valid ${discriminator.field.name} values for the type ${union.name}"),
+        ScalaUtil.textToComment(s"Defines the valid ${discriminator.discriminator} values for the type ${union.name}"),
         s"sealed trait $className extends _root_.scala.Product with _root_.scala.Serializable"
       ).mkString("\n"),
       Seq(
