@@ -7,6 +7,7 @@ package io.apibuilder.reference.api.v0.models {
   /**
    * A model with a lot of fields.
    */
+
   final case class Big(
     f1: String,
     f2: String,
@@ -42,6 +43,7 @@ package io.apibuilder.reference.api.v0.models {
   /**
    * Models an API error.
    */
+
   final case class Error(
     code: String,
     message: String
@@ -50,6 +52,7 @@ package io.apibuilder.reference.api.v0.models {
   /**
    * A group of users in an organization.
    */
+
   final case class Group(
     members: Seq[io.apibuilder.reference.api.v0.models.User]
   )
@@ -77,7 +80,6 @@ package io.apibuilder.reference.api.v0.models {
   final case class UserList(
     users: Seq[io.apibuilder.reference.api.v0.models.User]
   )
-
   sealed trait AgeGroup extends _root_.scala.Product with _root_.scala.Serializable
 
   object AgeGroup {
@@ -90,7 +92,6 @@ package io.apibuilder.reference.api.v0.models {
      * 18 and over
      */
     case object Adult extends AgeGroup { override def toString = "Adult" }
-
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was

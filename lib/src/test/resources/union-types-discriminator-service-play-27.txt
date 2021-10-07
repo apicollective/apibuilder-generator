@@ -5,11 +5,12 @@
 package io.apibuilder.example.union.types.discriminator.v0.models {
 
   sealed trait User extends _root_.scala.Product with _root_.scala.Serializable {
-    def discriminator: UserDiscriminator
+    def userDiscriminator: UserDiscriminator
+
   }
 
   /**
-   * Defines the valid discriminator values for the type User
+   * Defines the valid userDiscriminator values for the type User
    */
   sealed trait UserDiscriminator extends _root_.scala.Product with _root_.scala.Serializable
 
@@ -33,22 +34,22 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     val default: UserDiscriminator = RegisteredUser
 
   }
-
   /**
    * @param id Internal unique identifier for this user.
    */
+
   final case class GuestUser(
     id: String,
     email: _root_.scala.Option[String] = None
   ) extends User {
-    override val discriminator: UserDiscriminator = UserDiscriminator.GuestUser
+    override val userDiscriminator: UserDiscriminator = UserDiscriminator.GuestUser
   }
 
   final case class RegisteredUser(
     id: String,
     email: String
   ) extends User {
-    override val discriminator: UserDiscriminator = UserDiscriminator.RegisteredUser
+    override val userDiscriminator: UserDiscriminator = UserDiscriminator.RegisteredUser
   }
 
   /**
@@ -59,15 +60,17 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class UserUndefinedType(
     description: String
   ) extends User {
-    override val discriminator: UserDiscriminator = UserDiscriminator.UNDEFINED(description)
+    override val userDiscriminator: UserDiscriminator = UserDiscriminator.UNDEFINED(description)
   }
 
   /**
    * Wrapper class to support the union types containing the datatype[string]
    */
+
   final case class UserString(
     value: String
   ) extends User
@@ -76,9 +79,14 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
   object SystemUser {
 
-    case object System extends SystemUser { override def toString = "system" }
-    case object Anonymous extends SystemUser { override def toString = "anonymous" }
-
+    case object System extends SystemUser {
+      override def toString = "system"
+      override val userDiscriminator: UserDiscriminator = UserDiscriminator.SystemUser
+    }
+    case object Anonymous extends SystemUser {
+      override def toString = "anonymous"
+      override val userDiscriminator: UserDiscriminator = UserDiscriminator.SystemUser
+    }
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
@@ -88,7 +96,9 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
      * We use all CAPS for the variable name to avoid collisions
      * with the camel cased values above.
      */
-    final case class UNDEFINED(override val toString: String) extends SystemUser
+    final case class UNDEFINED(override val toString: String) extends SystemUser {
+      override val userDiscriminator: UserDiscriminator = UserDiscriminator.SystemUser
+    }
 
     /**
      * all returns a list of all the valid, known values. We use
