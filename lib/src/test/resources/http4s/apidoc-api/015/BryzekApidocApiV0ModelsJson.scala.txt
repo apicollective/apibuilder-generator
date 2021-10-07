@@ -8,7 +8,8 @@ package io.apibuilder.api.v0.models {
    * Represents a single diff in an application
    */
   sealed trait Diff extends _root_.scala.Product with _root_.scala.Serializable {
-    def `type`: DiffType
+    def diffType: DiffType
+
   }
 
   /**
@@ -37,7 +38,8 @@ package io.apibuilder.api.v0.models {
    * Identifies the specific type of item that was indexed by search
    */
   sealed trait ItemDetail extends _root_.scala.Product with _root_.scala.Serializable {
-    def `type`: ItemDetailType
+    def itemDetailType: ItemDetailType
+
   }
 
   /**
@@ -63,7 +65,6 @@ package io.apibuilder.api.v0.models {
     def fromString(value: String): _root_.scala.Option[ItemDetailType] = byName.get(value.toLowerCase)
 
   }
-
   /**
    * An application has a name and multiple versions of its API.
    *
@@ -73,6 +74,7 @@ package io.apibuilder.api.v0.models {
    *        application name.
    * @param visibility Controls who is able to view this application
    */
+
   final case class Application(
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.common.v0.models.Reference,
@@ -86,6 +88,7 @@ package io.apibuilder.api.v0.models {
   /**
    * @param key Defaults to a key generated from the application name
    */
+
   final case class ApplicationForm(
     name: String,
     key: _root_.scala.Option[String] = None,
@@ -96,12 +99,13 @@ package io.apibuilder.api.v0.models {
   /**
    * Summary of an application sufficient for display and links
    */
+
   final case class ApplicationSummary(
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.common.v0.models.Reference,
     key: String
   ) extends ItemDetail {
-    override val `type`: ItemDetailType = ItemDetailType.ApplicationSummary
+    override val itemDetailType: ItemDetailType = ItemDetailType.ApplicationSummary
   }
 
   /**
@@ -114,6 +118,7 @@ package io.apibuilder.api.v0.models {
    * @param description Optional description - a good description here will indicate which code
    *        generators it applies to and what effect it will have on those code generators.
    */
+
   final case class Attribute(
     guid: _root_.java.util.UUID,
     name: String,
@@ -131,6 +136,7 @@ package io.apibuilder.api.v0.models {
    * @param name The name of the attribute. Globally unique and an 'identifier' (lower case, url
    *        safe, etc.)
    */
+
   final case class AttributeSummary(
     guid: _root_.java.util.UUID,
     name: String
@@ -143,6 +149,7 @@ package io.apibuilder.api.v0.models {
    *
    * @param guid Internal unique identifier for this attribute value.
    */
+
   final case class AttributeValue(
     guid: _root_.java.util.UUID,
     attribute: io.apibuilder.api.v0.models.AttributeSummary,
@@ -161,6 +168,7 @@ package io.apibuilder.api.v0.models {
    *        the changed record)
    * @param changedBy Records who made the actual change
    */
+
   final case class Change(
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.common.v0.models.Reference,
@@ -177,6 +185,7 @@ package io.apibuilder.api.v0.models {
    * Represents a simpler model of a version specifically for the use case of
    * displaying changes
    */
+
   final case class ChangeVersion(
     guid: _root_.java.util.UUID,
     version: String
@@ -187,6 +196,7 @@ package io.apibuilder.api.v0.models {
    *
    * @param token The actual token. Guaranteed to be globally unique.
    */
+
   final case class CleartextToken(
     token: String
   )
@@ -197,6 +207,7 @@ package io.apibuilder.api.v0.models {
    * @param source The actual source code.
    * @param files A collection of source files
    */
+
   final case class Code(
     generator: io.apibuilder.api.v0.models.GeneratorWithService,
     @deprecated("Use files instead") source: String,
@@ -208,19 +219,21 @@ package io.apibuilder.api.v0.models {
    * indicates that it is possible for an existing client to now experience an error
    * or invalid data due to the diff.
    */
+
   final case class DiffBreaking(
     description: String
   ) extends Diff {
-    override val `type`: DiffType = DiffType.DiffBreaking
+    override val diffType: DiffType = DiffType.DiffBreaking
   }
 
   /**
    * Represents a single NON breaking diff of an application version.
    */
+
   final case class DiffNonBreaking(
     description: String
   ) extends Diff {
-    override val `type`: DiffType = DiffType.DiffNonBreaking
+    override val diffType: DiffType = DiffType.DiffNonBreaking
   }
 
   /**
@@ -233,6 +246,7 @@ package io.apibuilder.api.v0.models {
    *
    * @param name The domain name
    */
+
   final case class Domain(
     name: String
   )
@@ -242,6 +256,7 @@ package io.apibuilder.api.v0.models {
    * identifier used to lookup the specific email address and user account for which
    * we sent an email verification email.
    */
+
   final case class EmailVerificationConfirmationForm(
     token: String
   )
@@ -250,6 +265,7 @@ package io.apibuilder.api.v0.models {
    * @param code Machine readable code for this specific error message
    * @param message Description of the error
    */
+
   final case class Error(
     code: String,
     message: String
@@ -263,6 +279,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Defines a service that provides one or more code generators
    */
+
   final case class GeneratorService(
     guid: _root_.java.util.UUID,
     uri: String,
@@ -276,6 +293,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Wraps a service and a generator providing easier access for applications.
    */
+
   final case class GeneratorWithService(
     service: io.apibuilder.api.v0.models.GeneratorService,
     generator: io.apibuilder.generator.v0.models.Generator
@@ -289,6 +307,7 @@ package io.apibuilder.api.v0.models {
    * @param guid Unique identifer for this item. By using a UUID, you can combine with the type
    *        to figure out the URI for the resource
    */
+
   final case class Item(
     guid: _root_.java.util.UUID,
     detail: io.apibuilder.api.v0.models.ItemDetail,
@@ -304,6 +323,7 @@ package io.apibuilder.api.v0.models {
    * @param guid Internal unique identifier for this membership.
    * @param role The role this user plays for this organization. Typically member or admin.
    */
+
   final case class Membership(
     guid: _root_.java.util.UUID,
     user: io.apibuilder.api.v0.models.User,
@@ -322,6 +342,7 @@ package io.apibuilder.api.v0.models {
    * @param role The requested role for membership to this organization. Typically member or
    *        admin.
    */
+
   final case class MembershipRequest(
     guid: _root_.java.util.UUID,
     user: io.apibuilder.api.v0.models.User,
@@ -333,6 +354,7 @@ package io.apibuilder.api.v0.models {
   /**
    * @param orgKey The key of the organization to which we are moving this item
    */
+
   final case class MoveForm(
     orgKey: String
   )
@@ -346,6 +368,7 @@ package io.apibuilder.api.v0.models {
    * @param name The name of this organization.
    * @param namespace Global namespace for this organization.
    */
+
   final case class Organization(
     guid: _root_.java.util.UUID,
     key: String,
@@ -362,6 +385,7 @@ package io.apibuilder.api.v0.models {
    * @param visibility Public organizations will be listed in apidoc directory. Organizations with
    *        visibility organization will only be visible to members of that org.
    */
+
   final case class OrganizationForm(
     name: String,
     key: _root_.scala.Option[String] = None,
@@ -373,6 +397,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Represents the original input used to create an application version
    */
+
   final case class Original(
     `type`: io.apibuilder.api.v0.models.OriginalType,
     data: String
@@ -381,6 +406,7 @@ package io.apibuilder.api.v0.models {
   /**
    * @param `type` If not specified, we set the type by inspecting the data
    */
+
   final case class OriginalForm(
     `type`: _root_.scala.Option[io.apibuilder.api.v0.models.OriginalType] = None,
     data: String
@@ -391,6 +417,7 @@ package io.apibuilder.api.v0.models {
    *
    * @param token Unique one time use token to change a password
    */
+
   final case class PasswordReset(
     token: String,
     password: String
@@ -402,6 +429,7 @@ package io.apibuilder.api.v0.models {
    *
    * @param email The email address for which we generate the password reset.
    */
+
   final case class PasswordResetRequest(
     email: String
   )
@@ -409,6 +437,7 @@ package io.apibuilder.api.v0.models {
   /**
    * On a successful password reset, return some metadata about the user modified.
    */
+
   final case class PasswordResetSuccess(
     userGuid: _root_.java.util.UUID
   )
@@ -418,6 +447,7 @@ package io.apibuilder.api.v0.models {
    *
    * @param guid Internal unique identifier for this subscription record
    */
+
   final case class Subscription(
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.api.v0.models.Organization,
@@ -440,6 +470,7 @@ package io.apibuilder.api.v0.models {
    * @param maskedToken The masked from of the token.
    * @param description optional description to help the user manage the token.
    */
+
   final case class Token(
     guid: _root_.java.util.UUID,
     user: io.apibuilder.api.v0.models.User,
@@ -451,6 +482,7 @@ package io.apibuilder.api.v0.models {
   /**
    * @param userGuid The user for which we are creating the token.
    */
+
   final case class TokenForm(
     userGuid: _root_.java.util.UUID,
     description: _root_.scala.Option[String] = None
@@ -462,6 +494,7 @@ package io.apibuilder.api.v0.models {
    * @param guid Internal unique identifier for this user.
    * @param nickname Public unique identifier for this user.
    */
+
   final case class User(
     guid: _root_.java.util.UUID,
     email: String,
@@ -473,6 +506,7 @@ package io.apibuilder.api.v0.models {
   /**
    * @param nickname Defaults to a unique identifier based on email address
    */
+
   final case class UserForm(
     email: String,
     password: String,
@@ -483,6 +517,7 @@ package io.apibuilder.api.v0.models {
   /**
    * Summary of a user sufficient for display
    */
+
   final case class UserSummary(
     guid: _root_.java.util.UUID,
     nickname: String
@@ -503,6 +538,7 @@ package io.apibuilder.api.v0.models {
    * @param errors Contains any validation errors that result from parsing the json document. If
    *        empty, the document is valid.
    */
+
   final case class Validation(
     valid: Boolean,
     errors: Seq[String] = Nil
@@ -518,6 +554,7 @@ package io.apibuilder.api.v0.models {
    * @param original The original uploaded file describing this version, if available
    * @param service spec/spec.json description of this API
    */
+
   final case class Version(
     guid: _root_.java.util.UUID,
     organization: io.apibuilder.common.v0.models.Reference,
@@ -531,6 +568,7 @@ package io.apibuilder.api.v0.models {
   /**
    * @param visibility If provided, updates the visibility for all versions of this application
    */
+
   final case class VersionForm(
     originalForm: io.apibuilder.api.v0.models.OriginalForm,
     visibility: _root_.scala.Option[io.apibuilder.api.v0.models.Visibility] = None
@@ -542,6 +580,7 @@ package io.apibuilder.api.v0.models {
    *
    * @param guid Internal unique identifier for this watch
    */
+
   final case class Watch(
     guid: _root_.java.util.UUID,
     user: io.apibuilder.api.v0.models.User,
@@ -564,10 +603,11 @@ package io.apibuilder.api.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class DiffUndefinedType(
     description: String
   ) extends Diff {
-    override val `type`: DiffType = DiffType.UNDEFINED(description)
+    override val diffType: DiffType = DiffType.UNDEFINED(description)
   }
 
   /**
@@ -578,10 +618,11 @@ package io.apibuilder.api.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class ItemDetailUndefinedType(
     description: String
   ) extends ItemDetail {
-    override val `type`: ItemDetailType = ItemDetailType.UNDEFINED(description)
+    override val itemDetailType: ItemDetailType = ItemDetailType.UNDEFINED(description)
   }
   sealed trait OriginalType extends _root_.scala.Product with _root_.scala.Serializable
 
@@ -590,16 +631,21 @@ package io.apibuilder.api.v0.models {
     /**
      * The original is in the api.json format
      */
-    case object ApiJson extends OriginalType { override def toString = "api_json" }
+    case object ApiJson extends OriginalType {
+      override def toString = "api_json"
+    }
     /**
      * The original in the swagger.json format
      */
-    case object SwaggerJson extends OriginalType { override def toString = "swagger_json" }
+    case object SwaggerJson extends OriginalType {
+      override def toString = "swagger_json"
+    }
     /**
      * The original is in Avro Idl format
      */
-    case object AvroIdl extends OriginalType { override def toString = "avro_idl" }
-
+    case object AvroIdl extends OriginalType {
+      override def toString = "avro_idl"
+    }
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
@@ -640,22 +686,29 @@ package io.apibuilder.api.v0.models {
      * For organizations for which I am an administrator, email me whenever a user
      * applies to join the org.
      */
-    case object MembershipRequestsCreate extends Publication { override def toString = "membership_requests.create" }
+    case object MembershipRequestsCreate extends Publication {
+      override def toString = "membership_requests.create"
+    }
     /**
      * For organizations for which I am a member, email me whenever a user joins the
      * org.
      */
-    case object MembershipsCreate extends Publication { override def toString = "memberships.create" }
+    case object MembershipsCreate extends Publication {
+      override def toString = "memberships.create"
+    }
     /**
      * For organizations for which I am a member, email me whenever an application is
      * created.
      */
-    case object ApplicationsCreate extends Publication { override def toString = "applications.create" }
+    case object ApplicationsCreate extends Publication {
+      override def toString = "applications.create"
+    }
     /**
      * For applications that I watch, email me whenever a version is created.
      */
-    case object VersionsCreate extends Publication { override def toString = "versions.create" }
-
+    case object VersionsCreate extends Publication {
+      override def toString = "versions.create"
+    }
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
@@ -693,16 +746,21 @@ package io.apibuilder.api.v0.models {
     /**
      * Only the creator can view this application
      */
-    case object User extends Visibility { override def toString = "user" }
+    case object User extends Visibility {
+      override def toString = "user"
+    }
     /**
      * Any member of the organization can view this application
      */
-    case object Organization extends Visibility { override def toString = "organization" }
+    case object Organization extends Visibility {
+      override def toString = "organization"
+    }
     /**
      * Anybody, including non logged in users, can view this application
      */
-    case object Public extends Visibility { override def toString = "public" }
-
+    case object Public extends Visibility {
+      override def toString = "public"
+    }
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
