@@ -10,7 +10,7 @@ package io.gregor.time.types.v0.models {
   }
 
   /**
-   * Defines the valid dateTimeUnionType values for the type DateTimeUnion
+   * Defines the valid type values for the type DateTimeUnion
    */
   sealed trait DateTimeUnionType extends _root_.scala.Product with _root_.scala.Serializable
 

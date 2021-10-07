@@ -10,7 +10,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
   }
 
   /**
-   * Defines the valid userDiscriminator values for the type User
+   * Defines the valid discriminator values for the type User
    */
   sealed trait UserDiscriminator extends _root_.scala.Product with _root_.scala.Serializable
 

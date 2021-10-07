@@ -13,7 +13,7 @@ package io.apibuilder.api.v0.models {
   }
 
   /**
-   * Defines the valid diffType values for the type Diff
+   * Defines the valid type values for the type Diff
    */
   sealed trait DiffType extends _root_.scala.Product with _root_.scala.Serializable
 
@@ -43,7 +43,7 @@ package io.apibuilder.api.v0.models {
   }
 
   /**
-   * Defines the valid itemDetailType values for the type ItemDetail
+   * Defines the valid type values for the type ItemDetail
    */
   sealed trait ItemDetailType extends _root_.scala.Product with _root_.scala.Serializable
 
