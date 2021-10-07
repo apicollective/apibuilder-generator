@@ -9,17 +9,17 @@ import scala.models.ning.{AsyncHttpClientGenerator, Ning18ClientGenerator}
 
 class CollectionJsonDefaultsSpec extends AnyFunSpec with Matchers {
 
-  lazy val ssd = new ScalaService(models.TestHelper.collectionJsonDefaultsService)
+  private[this] lazy val ssd: ScalaService = new ScalaService(models.TestHelper.collectionJsonDefaultsService)
 
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get
-    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
+    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty).build
     models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-case-class.txt", code)
   }
 
   it("user_patch case classes") {
     val model = ssd.models.find(_.name == "UserPatch").get
-    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty)
+    val code = ScalaCaseClasses.generateCaseClassWithDoc(model, Seq.empty).build
     models.TestHelper.assertEqualsFile("/generators/collection-json-defaults-user-patch-case-class.txt", code)
   }
 
