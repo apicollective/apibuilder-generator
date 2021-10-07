@@ -337,7 +337,7 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val description: Option[String] = enum.description
 
-  val values: Seq[ScalaEnumValue] = enum.values.map { new ScalaEnumValue(_) }
+  val values: Seq[ScalaEnumValue] = enum.values.map(new ScalaEnumValue(_))
 
   val deprecation: Option[Deprecation] = enum.deprecation
 
@@ -345,9 +345,9 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
 class ScalaEnumValue(value: EnumValue) {
 
-  val serializedValue: String = value.value.getOrElse(value.name)
-
   val name: String = ScalaUtil.toClassName(value.name)
+
+  val serializedValue: String = value.value.getOrElse(value.name)
 
   val description: Option[String] = value.description
 
