@@ -155,33 +155,40 @@ case class Play2Json(
         s"""(__ \\ "${scalaUnionType.discriminatorName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
       }.mkString("\norElse\n").indentString(4),
       s"    orElse",
-      s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
+      s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.model.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
       s"  )",
       s"}"
     ).mkString("\n")
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
-    val defaultDiscriminatorTypeName: Option[String] = union.types.filter(_.isDefault).map(_.discriminatorName).headOption
-
-    val defaultDiscriminatorClause = defaultDiscriminatorTypeName match {
-      case None => s""" { sys.error("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json Value") }"""
-      case Some(defaultValue) => s"""("$defaultValue")"""
+    val defaultDiscriminatorClause = union.defaultType match {
+      case None => "case e: play.api.libs.json.JsError => e"
+      case Some(defaultType) => s"case _: play.api.libs.json.JsError => readDiscriminator(\"${defaultType.discriminatorName}\")"
     }
 
     Seq(
-      s"${play2JsonCommon.implicitReaderDef(union.name)} = new play.api.libs.json.Reads[${union.name}] {",
-      Seq(s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${union.name}] = {",
-        Seq(s"""(js \\ "$discriminator").asOpt[String].getOrElse$defaultDiscriminatorClause match {""",
+      s"${play2JsonCommon.implicitReaderDef(union.name)} = (js: play.api.libs.json.JsValue) => {",
+      Seq(
+        "def readDiscriminator(discriminator: String) = {",
+        Seq(
+          "discriminator match {",
           unionTypesWithNames(union).map { t =>
             s"""case "${t.unionType.discriminatorName}" => js.validate[${t.typeName}]"""
           }.mkString("\n").indentString(2),
-          s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.fullName}(other))""".indentString(2),
+          s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.datatype.fullName}(other))""".indentString(2),
           "}"
         ).mkString("\n").indentString(2),
         "}"
       ).mkString("\n").indentString(2),
-      "}"
+      Seq(s"""(js \\ "$discriminator").validate[String] match {""",
+        Seq(
+          defaultDiscriminatorClause,
+          "case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)",
+        ).mkString("\n").indentString(2),
+        "}"
+      ).mkString("\n").indentString(2),
+      "}",
     ).mkString("\n")
   }
 
@@ -207,7 +214,7 @@ case class Play2Json(
         val json = getJsonValueForUnion(t.unionType.datatype, "x")
         s"""case x: ${t.typeName} => play.api.libs.json.Json.obj("${t.unionType.discriminatorName}" -> $json)"""
       }.mkString("\n").indentString(4),
-      s"""    case x: ${union.undefinedType.fullName} => sys.error(s"The type[${union.undefinedType.fullName}] should never be serialized")""",
+      s"""    case x: ${union.undefinedType.datatype.fullName} => sys.error(s"The type[${union.undefinedType.datatype.fullName}] should never be serialized")""",
       "  }",
       "}"
     ).mkString("\n")
@@ -454,6 +461,9 @@ case class Play2Json(
       case ScalaPrimitive.Enum(_, _) => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString($varName.toString)")
       }
+      case ScalaPrimitive.GeneratedModel(name) => {
+        sys.error(s"Cannot convert generated model named '$name' to JSON")
+      }
       case ScalaPrimitive.Model(ns, name) => {
         toJsObjectResult(originalName, play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)")
       }
@@ -542,6 +552,9 @@ case class Play2Json(
           case Some(_) =>
             play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"
         }
+      }
+      case ScalaPrimitive.GeneratedModel(name) => {
+        sys.error(s"Cannot convert generated model named '$name' from JSON")
       }
       case ScalaPrimitive.Model(ns, name) => {
         play2JsonCommon.toJsonObjectMethodName(ns, name) + s"($varName)"

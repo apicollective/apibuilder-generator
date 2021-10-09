@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 class ExampleUnionTypesWithDiscriminatorSpec extends AnyFunSpec with Matchers {
 
-  private lazy val service = models.TestHelper.parseFile(s"/examples/apidoc-example-union-types-discriminator.json")
+  private lazy val service = models.TestHelper.parseFile("/examples/apidoc-example-union-types-discriminator.json")
 
   it("generates expected code for play 2.4 client") {
     Play24ClientGenerator.invoke(InvocationForm(service = service)) match {

@@ -5,7 +5,6 @@ package test.apidoc.apidoctest.v0.models {
   sealed trait OuterType extends _root_.scala.Product with _root_.scala.Serializable
 
   sealed trait SecondOuterType extends _root_.scala.Product with _root_.scala.Serializable
-
   final case class StringModel(
     name: String
   ) extends InnerType
@@ -18,6 +17,7 @@ package test.apidoc.apidoctest.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class InnerTypeUndefinedType(
     description: String
   ) extends InnerType
@@ -30,6 +30,7 @@ package test.apidoc.apidoctest.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class OuterTypeUndefinedType(
     description: String
   ) extends OuterType
@@ -43,6 +44,7 @@ package test.apidoc.apidoctest.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class SecondOuterTypeUndefinedType(
     description: String
   ) extends SecondOuterType

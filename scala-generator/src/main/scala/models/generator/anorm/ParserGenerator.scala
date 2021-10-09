@@ -8,8 +8,10 @@ import lib.generator.CodeGenerator
 import lib.Text
 import lib.Text._
 
+import scala.annotation.tailrec
+
 object ParserGenerator24 extends ParserGenerator {
-  override def attributes(ssd: ScalaService) = ParserGeneratorPlayVersionSpecificAttributes(
+  override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes = ParserGeneratorPlayVersionSpecificAttributes(
     imports = Seq(
       "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
       "play.api.libs.json.{JsArray, JsObject, JsValue}",
@@ -19,7 +21,7 @@ object ParserGenerator24 extends ParserGenerator {
 }
 
 object ParserGenerator26 extends ParserGenerator {
-  override def attributes(ssd: ScalaService) = {
+  override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes = {
     val dateImports = ssd.attributes.dateType match {
       case DateTypeConfig.JodaLocalDate => Seq(
         "play.api.libs.json.JodaReads._",
@@ -47,9 +49,7 @@ object ParserGenerator28 extends ParserGenerator {
     ParserGenerator26.attributes(ssd)
 }
 
-case class ParserGeneratorPlayVersionSpecificAttributes(
-                                                         imports: Seq[String]
-                                                       )
+case class ParserGeneratorPlayVersionSpecificAttributes(imports: Seq[String])
 
 trait ParserGenerator extends CodeGenerator {
 
@@ -93,7 +93,7 @@ trait ParserGenerator extends CodeGenerator {
 
   private[this] case class Generator(ssd: ScalaService) {
 
-    private[this] var requiredImports = scala.collection.mutable.Set[String]()
+    private[this] val requiredImports = scala.collection.mutable.Set[String]()
     addImports(ssd.namespaces)
 
     def code(): Option[String] = {
@@ -104,9 +104,9 @@ trait ParserGenerator extends CodeGenerator {
         case _ => {
 
           val clauses = Seq(
-            ssd.enums.map(generateEnum(_)),
-            ssd.models.map(generateModel(_)),
-            ssd.unions.map(generateUnion(_))
+            ssd.enums.map(generateEnum),
+            ssd.models.map(generateModel),
+            ssd.unions.map(generateUnion)
           )
 
           Some(
@@ -115,7 +115,7 @@ trait ParserGenerator extends CodeGenerator {
               s"package ${ssd.namespaces.anormParsers} {",
               s"import ${ssd.namespaces.anormConversions}.Standard._".indentString(2),
               requiredImports.toSeq.sorted.mkString("\n").indentString(2),
-              clauses.flatten.map(_.trim).filter(!_.isEmpty).mkString("\n\n").indentString(2),
+              clauses.flatten.map(_.trim).filter(_.nonEmpty).mkString("\n\n").indentString(2),
               "}"
             ).mkString("\n\n")
           )
@@ -176,6 +176,7 @@ trait ParserGenerator extends CodeGenerator {
         case ScalaDatatype.Option(inner) => {
           parserFieldDeclaration(name, inner, originalName)
         }
+        case ScalaPrimitive.GeneratedModel(_) => sys.error("Generated models should not be persisted")
       }
     }
 
@@ -188,6 +189,7 @@ trait ParserGenerator extends CodeGenerator {
       * Recursively adds anorm parser imports for any
       * datatype that is from an imported application.
       */
+    @tailrec
     private[this] def addImports(datatype: ScalaDatatype): Unit = {
       datatype match {
         case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
@@ -211,6 +213,7 @@ trait ParserGenerator extends CodeGenerator {
         case ScalaPrimitive.Union(ns, _) => {
           addImports(ns)
         }
+        case ScalaPrimitive.GeneratedModel(_) => sys.error("Generated models should not be persisted")
       }
     }
 
@@ -254,6 +257,7 @@ trait ParserGenerator extends CodeGenerator {
           val varName = ScalaUtil.toVariable(s"${originalName}Prefix")
           s"""${ns.anormParsers}.$name.parserWithPrefix(prefixOpt.getOrElse("") + $varName)"""
         }
+        case ScalaPrimitive.GeneratedModel(_) => sys.error("Generated models should not be persisted")
       }
     }
 
@@ -283,9 +287,10 @@ trait ParserGenerator extends CodeGenerator {
       * is a keyword, we append Instance (back ticks will not compile)
       */
     private[this] def parserName(field: ScalaField): String = {
-      Text.initLowerCase(ScalaUtil.isKeyword(field.originalName) match {
-        case true => Text.snakeToCamelCase(field.originalName) + "Instance"
-        case false => field.name
+      Text.initLowerCase(if (ScalaUtil.isKeyword(field.originalName)) {
+        Text.snakeToCamelCase(field.originalName) + "Instance"
+      } else {
+        field.name
       })
     }
 

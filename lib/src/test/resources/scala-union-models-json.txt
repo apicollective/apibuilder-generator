@@ -56,7 +56,7 @@ implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[User] = {
     orElse
     (__ \ "guest_user").read(jsonReadsAPIBuilderTestGuestUser).asInstanceOf[play.api.libs.json.Reads[User]]
     orElse
-    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
+    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(UserUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[User]]
   )
 }
 

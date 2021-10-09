@@ -1,6 +1,7 @@
 package scala.generator
 
 import io.apibuilder.spec.v0.models._
+import lib.Text.underscoreToInitCap
 
 import scala.models.{Attributes, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
@@ -31,6 +32,7 @@ class ScalaService(
   def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
   val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }.sortBy(_.name)
+  private[this] val interfacesByName = interfaces.groupBy(_.interface.name)
 
   val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
@@ -44,10 +46,12 @@ class ScalaService(
    * @param interfaceNames The API Builder names of the interfaces
    */
   private[this] def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
-    interfaceNames.distinct.flatMap { i =>
-      Some(interfaces.find(_.interface.name == i).getOrElse {
-        sys.error(s"Cannot find interface named: ${i}")
-      })
+    interfaceNames.distinct.map { i =>
+      interfacesByName.getOrElse(i, Nil).toList match {
+        case Nil => sys.error(s"Cannot find interface named: $i")
+        case one :: Nil => one
+        case _ => sys.error(s"Multiple interfaces found with the name: $i")
+      }
     }
   }
 
@@ -129,14 +133,49 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val description: Option[String] = union.description
 
+  val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
+
+  val defaultType: Option[ScalaUnionType] = types.find(_.isDefault)
+
+  val deprecation: Option[Deprecation] = union.deprecation
+
+  lazy val discriminatorField: Option[ScalaUnionDiscriminator] = discriminator.map { d =>
+    ScalaUnionDiscriminator(
+      ssd,
+      discriminator = d,
+      fieldName = ScalaUtil.toVariable(s"${union.name}_$d"),
+      unionName = name,
+      defaultType = defaultType,
+    )
+  }
+
   // Include an undefined instance to nudge the developer to think
   // about what happens in the future when a new type is added to the
   // union type.
-  val undefinedType: ScalaPrimitive.Model = ScalaPrimitive.Model(ssd.namespaces, name + "UndefinedType")
+  val undefinedType: UnionTypeUndefinedModelWrapper = UnionTypeUndefinedModel.build(ssd, this)
 
-  val types: Seq[ScalaUnionType] = union.types.map { ScalaUnionType(ssd, _) }
+}
 
-  val deprecation: Option[Deprecation] = union.deprecation
+case class ScalaUnionDiscriminator(
+  ssd: ScalaService,
+  discriminator: String,
+  fieldName: String,
+  unionName: String,
+  defaultType: Option[ScalaUnionType],
+) {
+  private[this] val typeName: String = unionName + underscoreToInitCap(discriminator)
+  lazy val field: ScalaField = ScalaField(
+      ssd,
+      modelName = unionName,
+      field = Field(
+        name = fieldName,
+        `type` = typeName,
+        default = defaultType.map(_.discriminatorName),
+        required = true,
+      ),
+      `type` = Datatype.Generated.Model(typeName),
+    )
+
 
 }
 
@@ -234,7 +273,7 @@ abstract class ScalaModelAndInterface(
 
   val description: Option[String] = model.description
 
-  val fields: List[ScalaField] = model.fields.map { f => new ScalaField(ssd, this.name, f) }.toList
+  val fields: List[ScalaField] = model.fields.map { f => ScalaField(ssd, this.name, f) }.toList
 
   val deprecation: Option[Deprecation] = model.deprecation
 
@@ -315,7 +354,7 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
   val description: Option[String] = enum.description
 
-  val values: Seq[ScalaEnumValue] = enum.values.map { new ScalaEnumValue(_) }
+  val values: Seq[ScalaEnumValue] = enum.values.map(new ScalaEnumValue(_))
 
   val deprecation: Option[Deprecation] = enum.deprecation
 
@@ -323,9 +362,9 @@ class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
 
 class ScalaEnumValue(value: EnumValue) {
 
-  val serializedValue: String = value.value.getOrElse(value.name)
-
   val name: String = ScalaUtil.toClassName(value.name)
+
+  val serializedValue: String = value.value.getOrElse(value.name)
 
   val description: Option[String] = value.description
 
@@ -440,15 +479,17 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
   }
 }
 
-class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
+case class ScalaField(
+  ssd: ScalaService,
+  modelName: String,
+  field: Field,
+  `type`: Datatype,
+  shouldModelConcreteType: Boolean,
+) {
 
   def name: String = ScalaUtil.quoteNameIfKeyword(Text.snakeToCamelCase(field.name))
 
   def originalName: String = field.name
-
-  val `type`: Datatype = ssd.datatypeResolver.parse(field.`type`, shouldModelConcreteType).getOrElse {
-    sys.error(ssd.errorParsingType(field.`type`, s"model[$modelName] field[$name]"))
-  }
 
   def deprecation: Option[Deprecation] = field.deprecation
 
@@ -464,26 +505,45 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
 
   def limitation: ScalaField.Limitation = ScalaField.Limitation(field.minimum, field.maximum)
 
+  def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.isDefined
+}
+
+object ScalaField {
+  final case class Limitation(minimum: Option[Long], maximum: Option[Long])
+
+  def apply(ssd: ScalaService, modelName: String, field: Field): ScalaField = {
+    val modelConcreteType = shouldModelConcreteType(field)
+    val `type`: Datatype = ssd.datatypeResolver.parse(field.`type`, modelConcreteType).getOrElse {
+      sys.error(ssd.errorParsingType(field.`type`, s"model[$modelName] field[${field.name}]"))
+    }
+    ScalaField(ssd, modelName, field, `type`, modelConcreteType)
+  }
+
+  def apply(ssd: ScalaService, modelName: String, field: Field, `type`: Datatype): ScalaField = {
+    val modelConcreteType = shouldModelConcreteType(field)
+    ScalaField(ssd, modelName, field, `type`, modelConcreteType)
+  }
+
   /**
-    * A Scala type can be modeled in one of two ways:
-    *  - Wire Friendly, in which the model captures the optionality of data on the wire.
-    *  - Developer Friendly, in which the model ignores optionality if defaults are in play.
-    *
-    * This materializes in the behavior of not-required fields with defaults.
-    *
-    * In a developer friendly model, such fields
-    * are modeled as concrete types (String, List[T], JsObject) as the default implies that an omitted value will be
-    * filled in when marshalling and/or unmarshalling the object, and thus never be null.
-    *
-    * In a wire friendly model, such fields are modeled wrapped in an Option. If omitted when creating the model, a default
-    * will be applied, and a default will be applied when unmarshalling the object as well. The Option exists so that a
-    * sender can choose to omit the data (rather than applying a sender-side default) and thus defer the defaulting
-    * behavior to the server.
-    *
-    * The global default is developer friendly. Wire friendly behavior can be introduced to any field by adding an
-    * attribute to the field's spec, <pre>"attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]</pre>
-    */
-  def shouldModelConcreteType: Boolean = {
+   * A Scala type can be modeled in one of two ways:
+   *  - Wire Friendly, in which the model captures the optionality of data on the wire.
+   *  - Developer Friendly, in which the model ignores optionality if defaults are in play.
+   *
+   * This materializes in the behavior of not-required fields with defaults.
+   *
+   * In a developer friendly model, such fields
+   * are modeled as concrete types (String, List[T], JsObject) as the default implies that an omitted value will be
+   * filled in when marshalling and/or unmarshalling the object, and thus never be null.
+   *
+   * In a wire friendly model, such fields are modeled wrapped in an Option. If omitted when creating the model, a default
+   * will be applied, and a default will be applied when unmarshalling the object as well. The Option exists so that a
+   * sender can choose to omit the data (rather than applying a sender-side default) and thus defer the defaulting
+   * behavior to the server.
+   *
+   * The global default is developer friendly. Wire friendly behavior can be introduced to any field by adding an
+   * attribute to the field's spec, <pre>"attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]</pre>
+   */
+  private[this] def shouldModelConcreteType(field: Field): Boolean = {
     val wireFriendly = field.attributes.exists(a =>
       a.name == "scala_generator" &&
         a.value.fields.exists(
@@ -498,12 +558,6 @@ class ScalaField(ssd: ScalaService, modelName: String, field: Field) {
       case (false, Some(_), false) => true
     }
   }
-
-  def shouldApplyDefaultOnRead: Boolean = !field.required && field.default.isDefined
-}
-
-object ScalaField {
-  final case class Limitation(minimum: Option[Long], maximum: Option[Long])
 }
 
 class ScalaParameter(ssd: ScalaService, val param: Parameter) {

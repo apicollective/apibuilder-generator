@@ -43,7 +43,7 @@ class KotlinGeneratorTest
 
   describe("Union") {
     val service = generatorApiServiceWithUnionAndDiscriminator
-    it(s"[${service.name}] sanity check") {
+    it(s"[${service.name}] completeness check") {
       service.models.map(_.name) shouldBe Seq("guest_user", "registered_user")
       service.unions.map(_.name) shouldBe Seq("user")
       val unionTypes = service.unions.flatMap(_.types)

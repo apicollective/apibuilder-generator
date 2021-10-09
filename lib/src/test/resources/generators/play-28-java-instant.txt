@@ -4,7 +4,10 @@
  */
 package io.gregor.time.types.v0.models {
 
-  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable {
+    def dateTimeUnionType: DateTimeUnionType
+
+  }
 
   /**
    * Defines the valid type values for the type DateTimeUnion
@@ -27,7 +30,6 @@ package io.gregor.time.types.v0.models {
     def fromString(value: String): _root_.scala.Option[DateTimeUnionType] = byName.get(value.toLowerCase)
 
   }
-
   final case class DateTimeModel(
     dateTime: _root_.java.time.Instant,
     date: _root_.java.time.LocalDate
@@ -41,14 +43,18 @@ package io.gregor.time.types.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class DateTimeUnionUndefinedType(
     description: String
-  ) extends DateTimeUnion
+  ) extends DateTimeUnion {
+    override val dateTimeUnionType: DateTimeUnionType = DateTimeUnionType.UNDEFINED(description)
+  }
 
   /**
    * Wrapper class to support the union types containing the
    * datatype[date-time-iso8601]
    */
+
   final case class DateTimeUnionInstant(
     value: _root_.java.time.Instant
   ) extends DateTimeUnion
@@ -56,6 +62,7 @@ package io.gregor.time.types.v0.models {
   /**
    * Wrapper class to support the union types containing the datatype[date-iso8601]
    */
+
   final case class DateTimeUnionLocalDate(
     value: _root_.java.time.LocalDate
   ) extends DateTimeUnion
@@ -101,13 +108,17 @@ package io.gregor.time.types.v0.models {
       (__ \ "value").read[_root_.java.time.LocalDate].map { x => new DateTimeUnionLocalDate(value = x) }
     }
 
-    implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[DateTimeUnion] = new play.api.libs.json.Reads[DateTimeUnion] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[DateTimeUnion] = {
-        (js \ "type").asOpt[String].getOrElse { sys.error("Union[DateTimeUnion] requires a discriminator named 'type' - this field was not found in the Json Value") } match {
+    implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[DateTimeUnion] = (js: play.api.libs.json.JsValue) => {
+      def readDiscriminator(discriminator: String) = {
+        discriminator match {
           case "date-time-iso8601" => js.validate[io.gregor.time.types.v0.models.DateTimeUnionInstant]
           case "date-iso8601" => js.validate[io.gregor.time.types.v0.models.DateTimeUnionLocalDate]
           case other => play.api.libs.json.JsSuccess(io.gregor.time.types.v0.models.DateTimeUnionUndefinedType(other))
         }
+      }
+      (js \ "type").validate[String] match {
+        case e: play.api.libs.json.JsError => e
+        case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)
       }
     }
 
@@ -345,7 +356,7 @@ package io.gregor.time.types.v0 {
      */
     def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
       headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
-        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case None => headers ++ Seq("Content-Type" -> "application/json; charset=UTF-8")
         case Some(_) => headers
       }
     }

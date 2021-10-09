@@ -32,21 +32,21 @@ trait Play2Models extends CodeGenerator {
     val enumJson: String = play2json.generateEnums()
     val modelAndUnionJson: String = play2json.generateModelsAndUnions()
 
-    val header = addHeader match {
-      case false => ""
-      case true => ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
+    val header = if (addHeader) {
+      ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
+    } else {
+      ""
     }
 
-    val bindables = addBindables match {
-      case false => ""
-      case true => {
-        "\n" +
+    val bindables = if (addBindables) {
+      "\n" +
         Seq(
           s"package ${ssd.namespaces.base} {",
           Play2Bindables(ssd).build().indentString(2),
           "}"
         ).mkString("\n\n")
-      }
+    } else {
+      ""
     }
 
     val serDes = if (useBuiltInImplicits) {
@@ -82,7 +82,7 @@ package ${ssd.namespaces.models} {
 ${JsonImports(form.service).mkString("\n").indentString(4)}
 ${serDes.distinct.mkString("\n").indentString(4)}
 
-${Seq(enumJson, modelAndUnionJson).filter(!_.isEmpty).mkString("\n\n").indentString(4)}
+${Seq(enumJson, modelAndUnionJson).filter(_.nonEmpty).mkString("\n\n").indentString(4)}
   }
 }
 $bindables
@@ -91,50 +91,44 @@ $bindables
     Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
   }
 
-  val timeImplicits = {
+  val timeImplicits: String = {
     s"""import play.api.libs.json.Writes._
        |import play.api.libs.json.Reads._""".stripMargin
 
   }
 
-  val jodaDateTimeImplicits = {
+  val jodaDateTimeImplicits: String = {
     s"""import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
        |import play.api.libs.json.JodaWrites.JodaDateTimeWrites""".stripMargin
   }
 
-  val jodaLocalDateImplicits = {
+  val jodaLocalDateImplicits: String = {
     s"""import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
        |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites""".stripMargin
   }
 
-  def manualImplicits(ssd: ScalaService) = {
+  def manualImplicits(ssd: ScalaService): String = {
     s"""
-       |private[${ssd.namespaces.last}] implicit val jsonReadsUUID = __.read[String].map { str =>
+       |private[${ssd.namespaces.last}] implicit val jsonReadsUUID: play.api.libs.json.Reads[_root_.java.util.UUID] = __.read[String].map { str =>
        |  ${Uuid.fromStringValue("str")}
        |}
        |
-       |private[${ssd.namespaces.last}] implicit val jsonWritesUUID = new Writes[${Uuid.fullName}] {
-       |  def writes(x: ${Uuid.fullName}) = JsString(${Uuid.asString("x")})
-       |}
+       |private[${ssd.namespaces.last}] implicit val jsonWritesUUID: play.api.libs.json.Writes[_root_.java.util.UUID] = (x: _root_.java.util.UUID) => play.api.libs.json.JsString(x.toString)
        |
-       |private[${ssd.namespaces.last}] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
+       |private[${ssd.namespaces.last}] implicit val jsonReadsJodaDateTime: play.api.libs.json.Reads[${DateTimeIso8601Joda.fullName}] = __.read[String].map { str =>
        |  ${DateTimeIso8601Joda.fromStringValue("str")}
        |}
        |
-       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaDateTime = new Writes[${DateTimeIso8601Joda.fullName}] {
-       |  def writes(x: ${DateTimeIso8601Joda.fullName}) = {
-       |    JsString(${DateTimeIso8601Joda.asString("x")})
-       |  }
+       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaDateTime: play.api.libs.json.Writes[${DateTimeIso8601Joda.fullName}] = (x: _root_.org.joda.time.DateTime) => {
+       |  play.api.libs.json.JsString(${DateTimeIso8601Joda.asString("x")})
        |}
        |
-       |private[${ssd.namespaces.last}] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
+       |private[${ssd.namespaces.last}] implicit val jsonReadsJodaLocalDate: play.api.libs.json.Reads[${DateIso8601Joda.fullName}] = __.read[String].map { str =>
        |  ${DateIso8601Joda.fromStringValue("str")}
        |}
        |
-       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaLocalDate = new Writes[${DateIso8601Joda.fullName}] {
-       |  def writes(x: ${DateIso8601Joda.fullName}) = {
-       |    JsString(${DateIso8601Joda.asString("x")})
-       |  }
+       |private[${ssd.namespaces.last}] implicit val jsonWritesJodaLocalDate: play.api.libs.json.Writes[${DateIso8601Joda.fullName}] = (x: _root_.org.joda.time.LocalDate) => {
+       |  play.api.libs.json.JsString(${DateIso8601Joda.asString("x")})
        |}""".stripMargin
   }
 }

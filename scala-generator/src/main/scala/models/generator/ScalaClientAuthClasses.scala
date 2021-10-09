@@ -1,6 +1,6 @@
 package scala.generator
 
-object ScalaClientAuthClassses {
+object ScalaClientAuthClasses {
 
   def apply(): String = """
 sealed trait Authorization extends _root_.scala.Product with _root_.scala.Serializable

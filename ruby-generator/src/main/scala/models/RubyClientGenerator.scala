@@ -1,7 +1,6 @@
 package ruby.models
 
 import java.util.UUID
-
 import scala.util.Failure
 import scala.util.Success
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
@@ -11,9 +10,11 @@ import lib.Text._
 import lib.generator.{CodeGenerator, GeneratorUtil}
 
 import scala.collection.mutable.ListBuffer
-import play.api.{Logging}
+import play.api.Logging
 import play.api.libs.json._
 import generator.ServiceFileNames
+
+import scala.annotation.tailrec
 
 object RubyUtil {
 
@@ -130,6 +131,7 @@ object RubyUtil {
   def toVariable(datatype: Datatype): String = {
     datatype match {
       case c: Datatype.Container => lib.Text.pluralize(toVariable(c.inner))
+      case u: Datatype.Generated => RubyUtil.toVariable(u.name)
       case u: Datatype.UserDefined => RubyUtil.toVariable(u.name)
       case _: Datatype.Primitive => RubyUtil.toDefaultVariable()
     }
@@ -216,7 +218,7 @@ object RubyUtil {
       case Datatype.UserDefined.Enum(_)  => {
         s""""${json.as[String]}""""
       }
-      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) |
+      case Datatype.Generated.Model(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) |
         Primitive.Object | Primitive.JsonValue | Primitive.Unit => {
         throw new UnsupportedOperationException(
           s"unsupported default for type ${datatype.name}")
@@ -932,6 +934,10 @@ ${headers.rubyModuleConstants.indentString(2)}
         s"HttpClient::Preconditions.assert_class('$name', $helperExpr, $className)"
       }
 
+      case m: Datatype.Generated.Model =>
+        val className = qualifiedClassName(m.name)
+        s"(x = $expr; x.is_a?($className) ? x : $className.new(x))"
+
       case m: UserDefined.Model =>
         val className = qualifiedClassName(m.name)
         s"(x = $expr; x.is_a?($className) ? x : $className.new(x))"
@@ -1037,6 +1043,7 @@ ${headers.rubyModuleConstants.indentString(2)}
       case Datatype.Container.Option(inner) =>
         s"$varName.nil? ? nil : ${asJson(varName, inner)}"
 
+      case _: Datatype.Generated => s"$varName"
       case _: Datatype.UserDefined => s"$varName"
     }
     s"$hash.to_json"
@@ -1061,6 +1068,7 @@ ${headers.rubyModuleConstants.indentString(2)}
 
       case Datatype.UserDefined.Enum(_) => s"$varName.value"
 
+      case _: Datatype.Generated => s"$varName.to_hash"
       case _: Datatype.UserDefined => s"$varName.to_hash"
     }
   }
@@ -1082,12 +1090,14 @@ ${headers.rubyModuleConstants.indentString(2)}
     `type`: String,
     fieldName: Option[String] = None
   ): RubyTypeInfo = {
-    val dt = datatypeResolver.parse(`type`, true).get
+    val dt = datatypeResolver.parse(`type`, makePrimitiveType = true).get
     var required = true
 
     val klass = {
+      @tailrec
       def iter(dt: Datatype): String = dt match {
         case p: Datatype.Primitive => rubyClass(p)
+        case u: Datatype.Generated => qualifiedClassName(u.name)
         case u: Datatype.UserDefined => qualifiedClassName(u.name)
         case Datatype.Container.Option(inner) => {
           required = false
@@ -1106,6 +1116,9 @@ ${headers.rubyModuleConstants.indentString(2)}
           case None => RubyUtil.toDefaultVariable()
         }
       }
+      case u: Datatype.Generated => {
+        RubyUtil.toVariable(fieldName.getOrElse(u.name))
+      }
       case u: Datatype.UserDefined => {
         RubyUtil.toVariable(fieldName.getOrElse(u.name))
       }
@@ -1117,7 +1130,7 @@ ${headers.rubyModuleConstants.indentString(2)}
     val parser = if (`type` == "unit") {
       "nil"
     } else {
-      parseArgument(varName, varName, dt, None, false)
+      parseArgument(varName, varName, dt, None, enumAsString = false)
     }
 
     RubyTypeInfo(
@@ -1153,7 +1166,7 @@ ${headers.rubyModuleConstants.indentString(2)}
           }
         }
       }
-      case t @ (UserDefined.Model(_) | UserDefined.Enum(_)) =>
+      case t @ (Datatype.Generated.Model(_) | UserDefined.Model(_) | UserDefined.Enum(_)) =>
         s"${qualifiedClassName(t.name)}.new($varName)"
       case UserDefined.Union(name) =>
         s"${qualifiedClassName(name)}.from_json($varName)"

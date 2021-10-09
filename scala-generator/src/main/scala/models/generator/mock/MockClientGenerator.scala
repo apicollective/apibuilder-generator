@@ -257,6 +257,7 @@ class MockClientGenerator(
       case ScalaPrimitive.Enum(ns, name) => s"${ns.mock}.Factories.make$name()"
       case ScalaPrimitive.Model(ns, name) => s"${ns.mock}.Factories.make$name()"
       case ScalaPrimitive.Union(ns, name) => s"${ns.mock}.Factories.make$name()"
+      case ScalaPrimitive.GeneratedModel(_) => sys.error("Generated models should not be mocked")
     }
   }
 }

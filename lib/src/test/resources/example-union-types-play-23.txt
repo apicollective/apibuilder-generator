@@ -7,7 +7,10 @@ package io.apibuilder.example.union.types.v0.models {
   sealed trait Foobar extends _root_.scala.Product with _root_.scala.Serializable
 
   @deprecated("to be removed")
-  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait User extends _root_.scala.Product with _root_.scala.Serializable {
+    def userDiscriminator: UserDiscriminator
+
+  }
 
   /**
    * Defines the valid discriminator values for the type User
@@ -32,24 +35,31 @@ package io.apibuilder.example.union.types.v0.models {
 
     def fromString(value: String): _root_.scala.Option[UserDiscriminator] = byName.get(value.toLowerCase)
 
+    val default: UserDiscriminator = RegisteredUser
+
+  }
+  /**
+   * @param guid Internal unique identifier for this user.
+   */
+
+  final case class GuestUser(
+    guid: _root_.java.util.UUID,
+    email: String
+  ) extends User {
+    override val userDiscriminator: UserDiscriminator = UserDiscriminator.GuestUser
   }
 
   /**
    * @param guid Internal unique identifier for this user.
    */
-  final case class GuestUser(
-    guid: _root_.java.util.UUID,
-    email: String
-  ) extends User
 
-  /**
-   * @param guid Internal unique identifier for this user.
-   */
   final case class RegisteredUser(
     guid: _root_.java.util.UUID,
     email: String,
     preference: io.apibuilder.example.union.types.v0.models.Foobar
-  ) extends User
+  ) extends User {
+    override val userDiscriminator: UserDiscriminator = UserDiscriminator.RegisteredUser
+  }
 
   /**
    * Provides future compatibility in clients - in the future, when a type is added
@@ -59,6 +69,7 @@ package io.apibuilder.example.union.types.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class FoobarUndefinedType(
     description: String
   ) extends Foobar
@@ -71,13 +82,17 @@ package io.apibuilder.example.union.types.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class UserUndefinedType(
     description: String
-  ) extends User
+  ) extends User {
+    override val userDiscriminator: UserDiscriminator = UserDiscriminator.UNDEFINED(description)
+  }
 
   /**
    * Wrapper class to support the union types containing the datatype[uuid]
    */
+
   final case class UserUuid(
     value: _root_.java.util.UUID
   ) extends User
@@ -86,8 +101,8 @@ package io.apibuilder.example.union.types.v0.models {
 
   @deprecated("to be removed") object Bar {
 
-    @deprecated case object B extends Bar { override def toString = "b" }
-
+    @deprecated
+    case object B extends Bar { override def toString = "b" }
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
@@ -120,7 +135,6 @@ package io.apibuilder.example.union.types.v0.models {
   object Foo {
 
     case object A extends Foo { override def toString = "a" }
-
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
@@ -159,32 +173,26 @@ package io.apibuilder.example.union.types.v0.models {
     import play.api.libs.functional.syntax._
     import io.apibuilder.example.union.types.v0.models.json._
 
-    private[v0] implicit val jsonReadsUUID = __.read[String].map { str =>
+    private[v0] implicit val jsonReadsUUID: play.api.libs.json.Reads[_root_.java.util.UUID] = __.read[String].map { str =>
       _root_.java.util.UUID.fromString(str)
     }
 
-    private[v0] implicit val jsonWritesUUID = new Writes[_root_.java.util.UUID] {
-      def writes(x: _root_.java.util.UUID) = JsString(x.toString)
-    }
+    private[v0] implicit val jsonWritesUUID: play.api.libs.json.Writes[_root_.java.util.UUID] = (x: _root_.java.util.UUID) => play.api.libs.json.JsString(x.toString)
 
-    private[v0] implicit val jsonReadsJodaDateTime = __.read[String].map { str =>
+    private[v0] implicit val jsonReadsJodaDateTime: play.api.libs.json.Reads[_root_.org.joda.time.DateTime] = __.read[String].map { str =>
       _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseDateTime(str)
     }
 
-    private[v0] implicit val jsonWritesJodaDateTime = new Writes[_root_.org.joda.time.DateTime] {
-      def writes(x: _root_.org.joda.time.DateTime) = {
-        JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x))
-      }
+    private[v0] implicit val jsonWritesJodaDateTime: play.api.libs.json.Writes[_root_.org.joda.time.DateTime] = (x: _root_.org.joda.time.DateTime) => {
+      play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(x))
     }
 
-    private[v0] implicit val jsonReadsJodaLocalDate = __.read[String].map { str =>
+    private[v0] implicit val jsonReadsJodaLocalDate: play.api.libs.json.Reads[_root_.org.joda.time.LocalDate] = __.read[String].map { str =>
       _root_.org.joda.time.format.ISODateTimeFormat.dateTimeParser.parseLocalDate(str)
     }
 
-    private[v0] implicit val jsonWritesJodaLocalDate = new Writes[_root_.org.joda.time.LocalDate] {
-      def writes(x: _root_.org.joda.time.LocalDate) = {
-        JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
-      }
+    private[v0] implicit val jsonWritesJodaLocalDate: play.api.libs.json.Writes[_root_.org.joda.time.LocalDate] = (x: _root_.org.joda.time.LocalDate) => {
+      play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
     }
 
     implicit val jsonReadsApidocExampleUnionTypesBar: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Bar] = new play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Bar] {
@@ -303,7 +311,7 @@ package io.apibuilder.example.union.types.v0.models {
         orElse
         (__ \ "bar").read(jsonReadsApidocExampleUnionTypesBar).asInstanceOf[play.api.libs.json.Reads[Foobar]]
         orElse
-        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.FoobarUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Foobar]]
+        play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(FoobarUndefinedType(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[Foobar]]
       )
     }
 
@@ -321,14 +329,18 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = new play.api.libs.json.Reads[User] {
-      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[User] = {
-        (js \ "discriminator").asOpt[String].getOrElse("registered_user") match {
+    implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = (js: play.api.libs.json.JsValue) => {
+      def readDiscriminator(discriminator: String) = {
+        discriminator match {
           case "registered_user" => js.validate[io.apibuilder.example.union.types.v0.models.RegisteredUser]
           case "guest_user" => js.validate[io.apibuilder.example.union.types.v0.models.GuestUser]
           case "uuid" => js.validate[io.apibuilder.example.union.types.v0.models.UserUuid]
           case other => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.v0.models.UserUndefinedType(other))
         }
+      }
+      (js \ "discriminator").validate[String] match {
+        case _: play.api.libs.json.JsError => readDiscriminator("registered_user")
+        case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)
       }
     }
 
@@ -601,7 +613,7 @@ package io.apibuilder.example.union.types.v0 {
      */
     def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
       headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
-        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case None => headers ++ Seq("Content-Type" -> "application/json; charset=UTF-8")
         case Some(_) => headers
       }
     }

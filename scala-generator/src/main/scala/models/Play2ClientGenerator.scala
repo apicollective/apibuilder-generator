@@ -18,7 +18,7 @@ case class PlayFrameworkVersion(
 
 object Play22ClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.2.x",
     config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
@@ -34,7 +34,7 @@ object Play22ClientGenerator extends CodeGenerator {
 
 object Play23ClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.3.x",
     config = ScalaClientMethodConfigs.Play23(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequestHolder",
@@ -50,7 +50,7 @@ object Play23ClientGenerator extends CodeGenerator {
 
 object Play24ClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.4.x",
     config = ScalaClientMethodConfigs.Play24(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes),form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
@@ -66,7 +66,7 @@ object Play24ClientGenerator extends CodeGenerator {
 
 object Play25ClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.5.x",
     config = ScalaClientMethodConfigs.Play25(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
@@ -82,7 +82,7 @@ object Play25ClientGenerator extends CodeGenerator {
 
 object Play26ClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.6.x",
     config = ScalaClientMethodConfigs.Play26(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
@@ -98,7 +98,7 @@ object Play26ClientGenerator extends CodeGenerator {
 
 object Play26EnvelopeClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.6.x",
     config = ScalaClientMethodConfigs.Play26Envelope(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
@@ -114,7 +114,7 @@ object Play26EnvelopeClientGenerator extends CodeGenerator {
 
 object Play27ClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.7.x",
     config = ScalaClientMethodConfigs.Play27(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
@@ -130,7 +130,7 @@ object Play27ClientGenerator extends CodeGenerator {
 
 object Play28ClientGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm) = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.8.x",
     config = ScalaClientMethodConfigs.Play28(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
@@ -182,14 +182,16 @@ case class Play2ClientGenerator(
 
     val methodGenerator = new ScalaClientMethodGenerator(version.config, ssd)
 
-    val (addHeadersMethod, addQueryStringMethod) = version.useSpecificAddMethods match {
-      case true => ("addHttpHeaders", "addQueryStringParameters")
-      case false => ("withHeaders", "withQueryString")
+    val (addHeadersMethod, addQueryStringMethod) = if (version.useSpecificAddMethods) {
+      ("addHttpHeaders", "addQueryStringParameters")
+    } else {
+      ("withHeaders", "withQueryString")
     }
 
-    val patchMethod = version.supportsHttpPatch match {
-      case true => s"""_logRequest("PATCH", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
-      case false => s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
+    val patchMethod = if (version.supportsHttpPatch) {
+      s"""_logRequest("PATCH", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
+    } else {
+      s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
     }
 
     val headers = Headers(form)
@@ -281,7 +283,7 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
      */
     def _withJsonContentType(headers: Seq[(String, String)]): Seq[(String, String)] = {
       headers.find { _._1.toUpperCase == "CONTENT-TYPE" } match {
-        case None => headers ++ Seq(("Content-Type" -> "application/json; charset=UTF-8"))
+        case None => headers ++ Seq("Content-Type" -> "application/json; charset=UTF-8")
         case Some(_) => headers
       }
     }

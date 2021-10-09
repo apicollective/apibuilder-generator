@@ -13,8 +13,8 @@ package apibuilder.models {
     def fuelType: apibuilder.models.FuelType
     def weight: Double
     def maxSpeed: Double
-  }
 
+  }
   final case class Apple(
     @deprecated("unused") colour: String
   )
@@ -57,6 +57,7 @@ package apibuilder.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class VehicleUndefinedType(
     description: String
   ) extends Vehicle {
@@ -70,7 +71,6 @@ package apibuilder.models {
 
     case object Petrol extends FuelType { override def toString = "petrol" }
     case object Diesel extends FuelType { override def toString = "diesel" }
-
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was

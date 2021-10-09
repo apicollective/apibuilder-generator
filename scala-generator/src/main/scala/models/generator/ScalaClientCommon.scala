@@ -11,7 +11,7 @@ class ScalaClientCommon {
   ): String = {
     Seq(
       makeClientObject(config),
-      ScalaClientAuthClassses()
+      ScalaClientAuthClasses()
     ).mkString("\n\n")
   }
 

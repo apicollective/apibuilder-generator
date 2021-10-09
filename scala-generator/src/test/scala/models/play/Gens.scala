@@ -12,8 +12,8 @@ package object gens {
     service <- Arbitrary.arbitrary[Service]
     safeButBad = service.copy(
       interfaces = service.interfaces.map(_.copy(fields = Seq.empty)),
-      models = service.models.map(_.copy(fields = Seq.empty)),
-      unions = service.unions.map(_.copy(types = Seq.empty)),
+      models = service.models.map(_.copy(interfaces = Nil, fields = Seq.empty)),
+      unions = service.unions.map(_.copy(interfaces = Nil, types = Seq.empty)),
       resources = service.resources.map { r =>
         val safe = r.operations.map(_.copy(
           body = None,
@@ -36,14 +36,14 @@ package object gens {
   lazy val genScalaModel: Gen[ScalaModel] = for {
     service <- Arbitrary.arbitrary[ScalaService]
     model <- Arbitrary.arbitrary[Model]
-    safeButBad = model.copy(fields = Seq.empty)
+    safeButBad = model.copy(interfaces = Nil, fields = Seq.empty)
   } yield new ScalaModel(service, safeButBad)
 
   implicit lazy val arbitraryScalaUnion: Arbitrary[ScalaUnion] = Arbitrary(genScalaUnion)
   lazy val genScalaUnion: Gen[ScalaUnion] = for {
     service <- Arbitrary.arbitrary[ScalaService]
     union <- Arbitrary.arbitrary[Union]
-    safeButBad = union.copy(types = Seq.empty)
+    safeButBad = union.copy(interfaces = Nil, types = Seq.empty)
   } yield new ScalaUnion(service, safeButBad)
 
   private val genNsPart = for {

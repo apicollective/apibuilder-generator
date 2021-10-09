@@ -4,8 +4,10 @@ import lib.{Datatype, Text}
 import Formatter._
 import play.api.libs.json._
 
+import scala.annotation.tailrec
+
 case class Klass(name: String) {
-  def localName = name
+  def localName: String = name
   def namespace: Option[String] = None
 }
 
@@ -41,7 +43,7 @@ case class GoType(
       case Datatype.Primitive.Unit => {
         "nil"
       }
-      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
+      case Datatype.Generated.Model(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
         throw new UnsupportedOperationException(s"default for type $datatype")
       }
       case Datatype.UserDefined.Enum(name) => {
@@ -91,6 +93,7 @@ case class GoType(
   private[this] def classVariableName(datatype: Datatype): String = {
     datatype match {
       case _: Datatype.Primitive => "value"
+      case Datatype.Generated.Model(name) => importBuilder.privateName(name)
       case Datatype.UserDefined.Model(name) => importBuilder.privateName(name)
       case Datatype.UserDefined.Union(name) => importBuilder.privateName(name)
       case Datatype.UserDefined.Enum(name) => importBuilder.privateName(name)
@@ -137,7 +140,7 @@ case class GoType(
       case Datatype.Primitive.String => varName
       case Datatype.Primitive.Unit => "nil"
       case Datatype.Primitive.Uuid => varName
-      case Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
+      case Datatype.Generated.Model(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) => {
         sys.error("User defined type cannot be converted to escaped string")
       }
       case Datatype.UserDefined.Enum(_) => {
@@ -158,6 +161,7 @@ case class GoType(
     compareToImplicitValue(varName, datatype, "!=")
   }
 
+  @tailrec
   private[this] def compareToImplicitValue(varName: String, dt: Datatype, operator: String): String = {
     dt match {
       case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
@@ -166,7 +170,7 @@ case class GoType(
       case Datatype.Primitive.Boolean | Datatype.Primitive.DateIso8601 | Datatype.Primitive.DateTimeIso8601 | Datatype.Primitive.Decimal | Datatype.Primitive.String | Datatype.Primitive.Uuid | Datatype.UserDefined.Enum(_) => {
         s""""" $operator $varName"""
       }
-      case Datatype.Primitive.Object | Datatype.Primitive.JsonValue | Datatype.Primitive.Unit | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
+      case Datatype.Primitive.Object | Datatype.Primitive.JsonValue | Datatype.Primitive.Unit | Datatype.Generated.Model(_) | Datatype.UserDefined.Model(_) | Datatype.UserDefined.Union(_) | Datatype.Container.Map(_) | Datatype.Container.List(_) => {
         s"""nil $operator $varName"""
       }
       case Datatype.Container.Option(inner) => {
@@ -205,12 +209,14 @@ object GoType {
       case Datatype.Primitive.Unit => Klass("nil")
       case Datatype.Primitive.Uuid => Klass("string")
       case u: Datatype.UserDefined => Klass(importBuilder.publicName(u.name))
+      case u: Datatype.Generated => Klass(importBuilder.publicName(u.name))
       case Datatype.Container.Option(inner) => klass(importBuilder, inner)
       case Datatype.Container.Map(inner) => Klass("map[string]" + klass(importBuilder, inner).localName)
       case Datatype.Container.List(inner) => Klass("[]" + klass(importBuilder, inner).localName)
     }
   }
 
+  @tailrec
   def isNumeric(datatype: Datatype): Boolean = {
     datatype match {
       case Datatype.Primitive.Double => true

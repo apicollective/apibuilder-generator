@@ -11,7 +11,7 @@ object PrimitiveWrapper {
       case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
         ScalaUtil.toClassName(union.name) + ScalaUtil.toClassName(primitive.shortName)
       }
-      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+      case _: ScalaPrimitive.GeneratedModel | _: ScalaPrimitive.Model | _: ScalaPrimitive.Enum | _: ScalaPrimitive.Union => {
         ScalaUtil.toClassName(union.name)
       }
     }
@@ -19,7 +19,7 @@ object PrimitiveWrapper {
 
   def isBasicType(primitive: ScalaPrimitive): Boolean = {
     primitive match {
-      case ScalaPrimitive.Model(_, _) | ScalaPrimitive.Enum(_, _) | ScalaPrimitive.Union(_, _) => {
+      case _: ScalaPrimitive.GeneratedModel | _: ScalaPrimitive.Model | _: ScalaPrimitive.Enum | _: ScalaPrimitive.Union => {
         false
       }
       case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
@@ -31,31 +31,35 @@ object PrimitiveWrapper {
 }
 
 case class PrimitiveWrapper(ssd: ScalaService) {
-  import PrimitiveWrapper.isBasicType
 
   case class Wrapper(model: ScalaModel, union: ScalaUnion)
 
   val wrappers: Seq[Wrapper] = ssd.unions.flatMap { union =>
-    union.types.map(_.datatype).collect {
-      case p: ScalaPrimitive => p
-    }.filter(isBasicType).sortWith(_.shortName < _.shortName).map { p =>
-      val name = PrimitiveWrapper.className(union, p)
-      val model = Model(
-        name = name,
-        plural = s"${name}s",
-        description = Some(s"Wrapper class to support the union types containing the datatype[${p.apiBuilderType}]"),
-        fields = Seq(
-          Field(
-            name = PrimitiveWrapper.FieldName,
-            `type` = p.apiBuilderType,
-            required = true
+    union.types.flatMap { t =>
+      t.datatype match {
+        case p: ScalaPrimitive if PrimitiveWrapper.isBasicType(p) => {
+          val name = PrimitiveWrapper.className(union, p)
+          val model = Model(
+            name = name,
+            plural = s"${name}s",
+            description = Some(s"Wrapper class to support the union types containing the datatype[${p.apiBuilderType}]"),
+            fields = Seq(
+              Field(
+                name = PrimitiveWrapper.FieldName,
+                `type` = p.apiBuilderType,
+                required = true
+              )
+            )
           )
-        )
-      )
-      Wrapper(
-        new ScalaModel(ssd, model),
-        union
-      )
+          Some(
+            Wrapper(
+              new ScalaModel(ssd, model),
+              union,
+            )
+          )
+        }
+        case _ => None
+      }
     }
   }
 
