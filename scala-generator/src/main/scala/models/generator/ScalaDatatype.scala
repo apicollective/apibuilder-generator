@@ -227,6 +227,12 @@ object ScalaPrimitive {
     override def toVariableName: String = initLowerCase(shortName)
   }
 
+  case class GeneratedModel(shortName: String) extends ScalaPrimitive {
+    override def namespace: Option[String] = None
+    def apiBuilderType: String = shortName
+    override def toVariableName: String = initLowerCase(shortName)
+  }
+
   case class Enum(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
     override def namespace: Option[String] = Some(namespaces.enums)
     def apiBuilderType: String = shortName
@@ -335,6 +341,7 @@ case class ScalaTypeResolver(
       case Datatype.Container.Map(t) => ScalaDatatype.Map(scalaDatatype(t))
       case Datatype.Container.Option(inner) => ScalaDatatype.Option(scalaDatatype(inner))
 
+      case Datatype.Generated.Model(name) => ScalaPrimitive.GeneratedModel(name)
       case Datatype.UserDefined.Model(name) => {
         name.split("\\.").toList match {
           case n :: Nil => ScalaPrimitive.Model(namespaces, ScalaUtil.toClassName(n))
@@ -352,7 +359,6 @@ case class ScalaTypeResolver(
         val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces, name)
         ScalaPrimitive.Union(ns, n)
       }
-      case e => sys.error(s"Unknown datatype: $e")
     }
   }
 

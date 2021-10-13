@@ -158,12 +158,12 @@ class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
     }
 
     it("generates apidoc-api") {
-      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Play26ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "BryzekApidocApiV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
-      models.TestHelper.assertEqualsFile(s"/generators/play-26-apidoc-api.txt", files(0).contents)
+      files.head.name shouldBe "BryzekApidocApiV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-26-apidoc-api.txt", files.head.contents)
     }
   }
 
@@ -196,27 +196,27 @@ class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
     }
 
     it("generates apidoc-api") {
-      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Play27ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "BryzekApidocApiV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
-      models.TestHelper.assertEqualsFile(s"/generators/play-27-apidoc-api.txt", files(0).contents)
+      files.head.name shouldBe "BryzekApidocApiV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-27-apidoc-api.txt", files.head.contents)
     }
   }
 
   describe("Play 2.7.x generator joda  vs. java time") {
     it("generates date-time with joda") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq.empty,
         None
       )
       val Right(files) = Play27ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
-      models.TestHelper.assertEqualsFile(s"/generators/play-27-joda-date-time.txt", files(0).contents)
+      files.head.name shouldBe "ApibuilderTimeTypesV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-27-joda-date-time.txt", files.head.contents)
     }
 
     it("generates date-time with java.time.Instant") {
@@ -227,24 +227,24 @@ class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
       )
       val Right(files) = Play27ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
+      files.head.name shouldBe "ApibuilderTimeTypesV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
       assertJodaTimeNotPresent(files)
-      models.TestHelper.assertEqualsFile(s"/generators/play-27-java-instant.txt", files(0).contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-27-java-instant.txt", files.head.contents)
     }
 
     it("generates date-time with java.time.OffsetDateTime") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate")),
         None
       )
       val Right(files) = Play27ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
+      files.head.name shouldBe "ApibuilderTimeTypesV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
       assertJodaTimeNotPresent(files)
-      models.TestHelper.assertEqualsFile(s"/generators/play-27-java-offsetdatetime.txt", files(0).contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-27-java-offsetdatetime.txt", files.head.contents)
     }
   }
 
@@ -277,27 +277,27 @@ class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
     }
 
     it("generates apidoc-api") {
-      val form = new InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
       val Right(files) = Play28ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "BryzekApidocApiV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
-      models.TestHelper.assertEqualsFile(s"/generators/play-28-apidoc-api.txt", files(0).contents)
+      files.head.name shouldBe "BryzekApidocApiV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-28-apidoc-api.txt", files.head.contents)
     }
   }
 
   describe("Play 2.8.x generator joda  vs. java time") {
     it("generates date-time with joda") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq.empty,
         None
       )
       val Right(files) = Play28ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
-      models.TestHelper.assertEqualsFile(s"/generators/play-28-joda-date-time.txt", files(0).contents)
+      files.head.name shouldBe "ApibuilderTimeTypesV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-28-joda-date-time.txt", files.head.contents)
     }
 
     it("generates date-time with java.time.Instant") {
@@ -308,24 +308,24 @@ class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
       )
       val Right(files) = Play28ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
+      files.head.name shouldBe "ApibuilderTimeTypesV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
       assertJodaTimeNotPresent(files)
-      models.TestHelper.assertEqualsFile(s"/generators/play-28-java-instant.txt", files(0).contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-28-java-instant.txt", files.head.contents)
     }
 
     it("generates date-time with java.time.OffsetDateTime") {
-      val form = new InvocationForm(
+      val form = InvocationForm(
         models.TestHelper.dateTimeService,
         Seq(Attribute("scala_generator.date_time.type", "java.offsetdatetime"), Attribute("scala_generator.date.type", "java.localdate")),
         None
       )
       val Right(files) = Play28ClientGenerator.invoke(form)
       files.size shouldBe 1
-      files(0).name shouldBe "ApibuilderTimeTypesV0Client.scala"
-      assertValidScalaSourceCode(files(0).contents)
+      files.head.name shouldBe "ApibuilderTimeTypesV0Client.scala"
+      assertValidScalaSourceCode(files.head.contents)
       assertJodaTimeNotPresent(files)
-      models.TestHelper.assertEqualsFile(s"/generators/play-28-java-offsetdatetime.txt", files(0).contents)
+      models.TestHelper.assertEqualsFile(s"/generators/play-28-java-offsetdatetime.txt", files.head.contents)
     }
   }
 

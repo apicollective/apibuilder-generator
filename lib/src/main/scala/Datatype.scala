@@ -38,8 +38,7 @@ object Datatype {
     case object Uuid extends Primitive("uuid")
   }
 
-  sealed abstract class UserDefined(override val name: String)
-    extends Datatype(name)
+  sealed abstract class UserDefined(override val name: String) extends Datatype(name)
 
   object UserDefined {
     case class Model(override val name: String) extends UserDefined(name)
@@ -47,6 +46,11 @@ object Datatype {
     case class Enum(override val name: String) extends UserDefined(name)
 
     case class Union(override val name: String) extends UserDefined(name)
+  }
+
+  sealed abstract class Generated(override val name: String) extends Datatype(name)
+  object Generated {
+    case class Model(override val name: String) extends Generated(name)
   }
 
   sealed abstract class Container(val inner: Datatype, prefix: String, suffix: String)

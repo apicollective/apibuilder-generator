@@ -4,7 +4,6 @@ object AgeGroup {
 
   case object Twenties extends AgeGroup { override def toString = "twenties" }
   case object Thirties extends AgeGroup { override def toString = "thirties" }
-
   /**
    * UNDEFINED captures values that are sent either in error or
    * that were added by the server after this library was
@@ -38,7 +37,6 @@ object Genre {
 
   case object Classical extends Genre { override def toString = "Classical" }
   case object Jazz extends Genre { override def toString = "Jazz" }
-
   /**
    * UNDEFINED captures values that are sent either in error or
    * that were added by the server after this library was

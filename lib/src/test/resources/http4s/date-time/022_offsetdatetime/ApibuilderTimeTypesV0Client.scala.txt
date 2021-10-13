@@ -4,7 +4,10 @@
  */
 package io.gregor.time.types.v0.models {
 
-  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable
+  sealed trait DateTimeUnion extends _root_.scala.Product with _root_.scala.Serializable {
+    def dateTimeUnionType: DateTimeUnionType
+
+  }
 
   /**
    * Defines the valid type values for the type DateTimeUnion
@@ -27,7 +30,6 @@ package io.gregor.time.types.v0.models {
     def fromString(value: String): _root_.scala.Option[DateTimeUnionType] = byName.get(value.toLowerCase)
 
   }
-
   final case class DateTimeModel(
     dateTime: _root_.java.time.OffsetDateTime,
     date: _root_.java.time.LocalDate
@@ -41,23 +43,28 @@ package io.gregor.time.types.v0.models {
    * @param description Information about the type that we received that is undefined in this version of
    *        the client.
    */
+
   final case class DateTimeUnionUndefinedType(
     description: String
-  ) extends DateTimeUnion
-
-  /**
-   * Wrapper class to support the union types containing the datatype[date-iso8601]
-   */
-  final case class DateTimeUnionLocalDate(
-    value: _root_.java.time.LocalDate
-  ) extends DateTimeUnion
+  ) extends DateTimeUnion {
+    override val dateTimeUnionType: DateTimeUnionType = DateTimeUnionType.UNDEFINED(description)
+  }
 
   /**
    * Wrapper class to support the union types containing the
    * datatype[date-time-iso8601]
    */
+
   final case class DateTimeUnionOffsetDateTime(
     value: _root_.java.time.OffsetDateTime
+  ) extends DateTimeUnion
+
+  /**
+   * Wrapper class to support the union types containing the datatype[date-iso8601]
+   */
+
+  final case class DateTimeUnionLocalDate(
+    value: _root_.java.time.LocalDate
   ) extends DateTimeUnion
 
 }
@@ -113,22 +120,6 @@ package io.gregor.time.types.v0.models {
       ).flatten)
     }
 
-    implicit def decodeTimeTypesDateTimeUnionLocalDate: Decoder[DateTimeUnionLocalDate] = Decoder.instance { c =>
-     for {
-        value <- c.downField("value").as[_root_.java.time.LocalDate]
-      } yield {
-        DateTimeUnionLocalDate(
-          value = value
-        )
-      }
-    }
-
-    implicit def encodeTimeTypesDateTimeUnionLocalDate: Encoder[DateTimeUnionLocalDate] = Encoder.instance { t =>
-      Json.fromFields(Seq(
-        Some("value" -> t.value.asJson)
-      ).flatten)
-    }
-
     implicit def decodeTimeTypesDateTimeUnionOffsetDateTime: Decoder[DateTimeUnionOffsetDateTime] = Decoder.instance { c =>
      for {
         value <- c.downField("value").as[_root_.java.time.OffsetDateTime]
@@ -140,6 +131,22 @@ package io.gregor.time.types.v0.models {
     }
 
     implicit def encodeTimeTypesDateTimeUnionOffsetDateTime: Encoder[DateTimeUnionOffsetDateTime] = Encoder.instance { t =>
+      Json.fromFields(Seq(
+        Some("value" -> t.value.asJson)
+      ).flatten)
+    }
+
+    implicit def decodeTimeTypesDateTimeUnionLocalDate: Decoder[DateTimeUnionLocalDate] = Decoder.instance { c =>
+     for {
+        value <- c.downField("value").as[_root_.java.time.LocalDate]
+      } yield {
+        DateTimeUnionLocalDate(
+          value = value
+        )
+      }
+    }
+
+    implicit def encodeTimeTypesDateTimeUnionLocalDate: Encoder[DateTimeUnionLocalDate] = Encoder.instance { t =>
       Json.fromFields(Seq(
         Some("value" -> t.value.asJson)
       ).flatten)
