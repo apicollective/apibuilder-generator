@@ -5,10 +5,11 @@ import io.apibuilder.spec.v0.models._
 import lib.Datatype
 import lib.generator.CodeGenerator
 
-import scala.collection.mutable.ListBuffer
 import scala.generator._
 
 object Play26Controllers extends CodeGenerator {
+
+  private[this] val BodyArgName: String = "body"
 
   private[this] def importJson(`import`: Import): String = {
     s"import ${Namespaces.quote(`import`.namespace)}.models.json._"
@@ -30,35 +31,54 @@ object Play26Controllers extends CodeGenerator {
 
   private[this] def responseObjectName(response: ScalaResponse): Option[String] = responseObjectCode(response).map(code => s"HTTP$code")
 
-  private[this] def overrideHeaders(responseConfig: ResponseConfig): Option[String] =  {
+  private[this] def overrideHeaders(responseConfig: ResponseConfig): Option[CaseClassArgument] =  {
     responseConfig match {
       case ResponseConfig.Standard => None
-      case ResponseConfig.Envelope => Some("override val headers: Seq[(String, String)] = Nil")
+      case ResponseConfig.Envelope => Some(
+        CaseClassArgument(
+          name = "headers",
+          `type` = "Seq[(String, String)]",
+          modifiers = Seq("override", "val"),
+          defaultValue = Some("Nil"),
+        )
+      )
     }
   }
 
 
+  private[this] case class CaseClassArgument(
+    name: String,
+    `type`: String,
+    modifiers: Seq[String] = Nil,
+    defaultValue: Option[String] = None,
+  ) {
+    def declaration: String = {
+      val base = (modifiers.mkString(" ").strip + s" ${name}: ${`type`}").strip
+      defaultValue match {
+        case None => base
+        case Some(dv) => s"$base = $dv"
+      }
+    }
+  }
+
   private[this] case class ResponseObjectArgs(
     extendsClass: String,
+    bodyArg: Option[CaseClassArgument],
+    extraArgs: Seq[CaseClassArgument],
     responseObjectName: String,
-    responseDatatype: Datatype,
+    responseDatatype: String,
     responseConfig: ResponseConfig,
     code: Int,
   )
 
   private[this] def responseObject(responseObjectArgs: ResponseObjectArgs): String = {
-    val args = ListBuffer[String]()
-    if (responseObjectArgs.responseDatatype != Datatype.Primitive.Unit) {
-      args.append(s"body: ${responseObjectArgs.responseDatatype.name}")
-    }
-    overrideHeaders(responseObjectArgs.responseConfig).foreach { code =>
-      args.append(code)
-    }
-
     CaseClassBuilder()
       .withName(responseObjectArgs.responseObjectName)
       .withExtendsClass(responseObjectArgs.extendsClass)
-      .withArgList(Some(args.toSeq.mkString(",\n").indent(6)).filter(_.trim.nonEmpty))
+      .withArgList(Some(
+        (responseObjectArgs.bodyArg.toSeq ++ responseObjectArgs.extraArgs).map(_.declaration).mkString(",\n")
+          .indent(6)).filter(_.trim.nonEmpty)
+      )
       .withBodyParts(
         responseObjectArgs.responseConfig match {
           case ResponseConfig.Standard => Nil
@@ -89,20 +109,13 @@ object Play26Controllers extends CodeGenerator {
     """
   }
 
-/*
-  private[this] def responseToPlayOrig(operation: ScalaOperation, response: ScalaResponse): Option[String] =
-    (responseObjectName(response), responseObjectCode(response), response.isUnit) match {
-      case (Some(name), Some(code), true) => Some(s"case r: ${responseEnumName(operation)}.$name => Status($code)(play.api.mvc.Results.EmptyContent())")
-      case (Some(name), Some(code), false) => Some(s"case r: ${responseEnumName(operation)}.$name => Status($code)(play.api.libs.json.Json.toJson(body))")
-      case _ => None
-    }
- */
-
-  private[this] def responseToPlay(args: ResponseObjectArgs): String = {
-    if (args.responseDatatype == Datatype.Primitive.Unit) {
-      s"case ${args.extendsClass}.${args.responseObjectName} => Status(${args.code})(play.api.mvc.Results.EmptyContent())"
+  private[this] def responseToPlay(obj: ResponseObjectArgs): String = {
+    if (obj.bodyArg.isEmpty && obj.extraArgs.isEmpty) {
+      s"case ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.mvc.Results.EmptyContent())"
+    } else if (obj.bodyArg.isEmpty) {
+      s"case _: ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.mvc.Results.EmptyContent())"
     } else {
-      s"case r: ${args.extendsClass}.${args.responseObjectName} => Status(${args.code})(play.api.libs.json.Json.toJson(body))"
+      s"case r: ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.libs.json.Json.toJson(r.body))"
     }
   }
 
@@ -113,21 +126,30 @@ object Play26Controllers extends CodeGenerator {
     val parameterNames =
       List("request") ++
       operation.parameters.map(p => ScalaUtil.quoteNameIfKeyword(p.name)) ++
-      operation.body.map(_ => "request.body").toList
+      operation.body.map(_ => s"request.${BodyArgName}").toList
 
     val parameterNameAndTypes =
       List(s"""request: play.api.mvc.Request[$bodyType]""") ++
       operation.parameters.map(p => s"${ScalaUtil.quoteNameIfKeyword(p.name)}: ${p.datatype.name}") ++
-      operation.body.map(body => s"body: ${body.datatype.name}").toList
+      operation.body.map(body => s"$BodyArgName: ${body.datatype.name}").toList
 
     val name = responseEnumName(operation)
+    val headerArg = overrideHeaders(response).toSeq
     val responseTypes = operation.responses.flatMap { r =>
       responseObjectName(r).flatMap { n =>
         responseObjectCode(r).map { code =>
+          val bodyArg = if (r.isUnit) {
+            None
+          } else {
+            Some(CaseClassArgument(BodyArgName, r.datatype.name))
+          }
+
           ResponseObjectArgs(
             extendsClass = name,
+            bodyArg = bodyArg,
+            extraArgs = headerArg,
             responseObjectName = n,
-            responseDatatype = r.`type`,
+            responseDatatype = r.datatype.name,
             responseConfig = response,
             code = code,
           )
@@ -136,8 +158,10 @@ object Play26Controllers extends CodeGenerator {
     } ++ Seq(
       ResponseObjectArgs(
         extendsClass = name,
+        bodyArg = None,
+        extraArgs = headerArg,
         responseObjectName = "Undocumented",
-        responseDatatype = Datatype.Primitive.Unit,
+        responseDatatype = Datatype.Primitive.Unit.name,
         responseConfig = response,
         code = 500,
       )
@@ -151,7 +175,6 @@ object Play26Controllers extends CodeGenerator {
         ${operation.name}(${parameterNames.mkString(", ")})
           .map {
             ${responseTypes.map(responseToPlay).mkString("\n")}
-            case ${responseEnumName(operation)}.Undocumented(result) => result
           }(defaultExecutionContext)
       }
     """
