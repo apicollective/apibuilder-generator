@@ -2,7 +2,7 @@ package scala.generator
 
 import io.apibuilder.spec.v0.models.Deprecation
 
-private[generator] case class CaseClassBuilder(
+case class CaseClassBuilder(
   name: Option[String] = None,
   extendsClasses: Seq[String] = Nil,
   deprecation: Option[Deprecation] = None,
@@ -27,6 +27,8 @@ private[generator] case class CaseClassBuilder(
   def withArgList(argList: Option[String]): CaseClassBuilder = {
     this.copy(argList = argList)
   }
+
+  def withExtendsClass(className: String): CaseClassBuilder = withExtendsClasses(Seq(className))
 
   def withExtendsClasses(classNames: Seq[String]): CaseClassBuilder = {
     this.copy(
