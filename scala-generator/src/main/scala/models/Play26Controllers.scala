@@ -90,9 +90,9 @@ object Play26Controllers extends CodeGenerator {
       .build
   }
 
-  private[this] def responses(operation: ScalaOperation, response: ResponseConfig, responseTypes: Seq[ResponseObjectArgs]) = {
+  private[this] def responses(operation: ScalaOperation, responseConfig: ResponseConfig, responseTypes: Seq[ResponseObjectArgs]) = {
     val name = responseEnumName(operation)
-    val headersCode = response match {
+    val headersCode = responseConfig match {
       case ResponseConfig.Standard => ""
       case ResponseConfig.Envelope => " " +
         s""" {
@@ -119,7 +119,7 @@ object Play26Controllers extends CodeGenerator {
     }
   }
 
-  private[this] def controllerMethod(operation: ScalaOperation, response: ResponseConfig): String = {
+  private[this] def controllerMethod(operation: ScalaOperation, responseConfig: ResponseConfig): String = {
     val bodyType = operation.body.fold("play.api.mvc.AnyContent")(_.datatype.name)
     val bodyParser = operation.body.fold("")(body => s"(parse.json[${body.datatype.name}])")
 
@@ -134,7 +134,7 @@ object Play26Controllers extends CodeGenerator {
       operation.body.map(body => s"$BodyArgName: ${body.datatype.name}").toList
 
     val name = responseEnumName(operation)
-    val headerArg = overrideHeaders(response).toSeq
+    val headerArg = overrideHeaders(responseConfig).toSeq
     val responseTypes = operation.responses.flatMap { r =>
       responseObjectName(r).flatMap { n =>
         responseObjectCode(r).map { code =>
@@ -150,7 +150,7 @@ object Play26Controllers extends CodeGenerator {
             extraArgs = headerArg,
             responseObjectName = n,
             responseDatatype = r.datatype.name,
-            responseConfig = response,
+            responseConfig = responseConfig,
             code = code,
           )
         }
@@ -162,13 +162,13 @@ object Play26Controllers extends CodeGenerator {
         extraArgs = headerArg,
         responseObjectName = "Undocumented",
         responseDatatype = Datatype.Primitive.Unit.name,
-        responseConfig = response,
+        responseConfig = responseConfig,
         code = 500,
       )
     )
 
     s"""
-      ${responses(operation, response, responseTypes)}
+      ${responses(operation, responseConfig, responseTypes)}
 
       def ${operation.name}(${parameterNameAndTypes.mkString(", ")}): scala.concurrent.Future[${responseEnumName(operation)}]
       final def ${operation.name}(${operation.parameters.map(p => s"${ScalaUtil.quoteNameIfKeyword(p.name)}: ${p.datatype.name}").mkString(", ")}): play.api.mvc.Action[$bodyType] = Action.async$bodyParser { request =>
@@ -180,20 +180,19 @@ object Play26Controllers extends CodeGenerator {
     """
   }
 
-  private[this] def controller(resource: ScalaResource, response: ResponseConfig) =
+  private[this] def controller(resource: ScalaResource, responseConfig: ResponseConfig) =
     s"""
       trait ${resource.plural}Controller extends play.api.mvc.BaseController {
-        ${resource.operations.map { op => controllerMethod(op, response) }.mkString("\n\n")}
+        ${resource.operations.map { op => controllerMethod(op, responseConfig) }.mkString("\n\n")}
       }
     """
 
-  private[this] def controllers(resources: Seq[ScalaResource], response: ResponseConfig): String = resources.map { r =>
-    controller(r, response)
+  private[this] def controllers(resources: Seq[ScalaResource], responseConfig: ResponseConfig): String = resources.map { r =>
+    controller(r, responseConfig)
   }.mkString("\n\n")
 
   private[this] def fileContents(form: InvocationForm, ssd: ScalaService): String = {
     val attributeResponse = Attributes.PlayDefaultConfig.withAttributes(form.attributes).response
-    println(s"Attributes.response: ${attributeResponse}")
     s"""
       ${ApiBuilderComments(form.service.version, form.userAgent).toJavaString}
       package ${ssd.namespaces.base}.controllers
@@ -211,7 +210,6 @@ object Play26Controllers extends CodeGenerator {
 
     utils.ScalaFormatter.format(contents) match {
       case Left(ex) => {
-        println(s"contents: $contents")
         Left(Seq(
           s"Error formatting the generated code. This likely indicates a bug in the code generator. Error message: ${ex.getMessage}"
         ))
