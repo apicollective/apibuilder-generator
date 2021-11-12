@@ -64,19 +64,22 @@ object Play26Controllers extends CodeGenerator {
   private[this] case class ResponseObjectArgs(
     extendsClass: String,
     bodyArg: Option[CaseClassArgument],
-    extraArgs: Seq[CaseClassArgument],
+    headerArg: Option[CaseClassArgument],
+    resultArg: Option[CaseClassArgument] = None,
     responseObjectName: String,
     responseDatatype: String,
     responseConfig: ResponseConfig,
     code: Int,
-  )
+  ) {
+    val allArgs: Seq[CaseClassArgument] = bodyArg.toSeq ++ headerArg.toSeq ++ resultArg.toSeq
+  }
 
   private[this] def responseObject(responseObjectArgs: ResponseObjectArgs): String = {
     CaseClassBuilder()
       .withName(responseObjectArgs.responseObjectName)
       .withExtendsClass(responseObjectArgs.extendsClass)
       .withArgList(Some(
-        (responseObjectArgs.bodyArg.toSeq ++ responseObjectArgs.extraArgs).map(_.declaration).mkString(",\n")
+        responseObjectArgs.allArgs.map(_.declaration).mkString(",\n")
           .indent(6)).filter(_.trim.nonEmpty)
       )
       .withBodyParts(
@@ -110,12 +113,23 @@ object Play26Controllers extends CodeGenerator {
   }
 
   private[this] def responseToPlay(obj: ResponseObjectArgs): String = {
-    if (obj.bodyArg.isEmpty && obj.extraArgs.isEmpty) {
+    if (obj.allArgs.isEmpty) {
       s"case ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.mvc.Results.EmptyContent())"
-    } else if (obj.bodyArg.isEmpty) {
-      s"case _: ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.mvc.Results.EmptyContent())"
     } else {
-      s"case r: ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.libs.json.Json.toJson(r.body))"
+      def withStatusBody(msg: String) = {
+        val base = s"case r: ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})($msg)"
+        if (obj.headerArg.isEmpty) {
+          base
+        } else {
+          s"${base}.withHeaders(r.headers: _*)"
+        }
+      }
+
+      if (obj.bodyArg.isEmpty) {
+        withStatusBody("play.api.mvc.Results.EmptyContent()")
+      } else {
+        withStatusBody("play.api.libs.json.Json.toJson(r.body)")
+      }
     }
   }
 
@@ -134,7 +148,7 @@ object Play26Controllers extends CodeGenerator {
       operation.body.map(body => s"$BodyArgName: ${body.datatype.name}").toList
 
     val name = responseEnumName(operation)
-    val headerArg = overrideHeaders(responseConfig).toSeq
+    val headerArg = overrideHeaders(responseConfig)
     val responseTypes = operation.responses.flatMap { r =>
       responseObjectName(r).flatMap { n =>
         responseObjectCode(r).map { code =>
@@ -147,7 +161,7 @@ object Play26Controllers extends CodeGenerator {
           ResponseObjectArgs(
             extendsClass = name,
             bodyArg = bodyArg,
-            extraArgs = headerArg,
+            headerArg = headerArg,
             responseObjectName = n,
             responseDatatype = r.datatype.name,
             responseConfig = responseConfig,
@@ -159,7 +173,12 @@ object Play26Controllers extends CodeGenerator {
       ResponseObjectArgs(
         extendsClass = name,
         bodyArg = None,
-        extraArgs = headerArg,
+        headerArg = headerArg,
+        resultArg = Option(
+          CaseClassArgument(
+            name = "result",
+            `type` = "play.api.mvc.Result"),
+        ),
         responseObjectName = "Undocumented",
         responseDatatype = Datatype.Primitive.Unit.name,
         responseConfig = responseConfig,
