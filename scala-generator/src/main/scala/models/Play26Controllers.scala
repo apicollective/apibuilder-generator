@@ -65,13 +65,13 @@ object Play26Controllers extends CodeGenerator {
     extendsClass: String,
     bodyArg: Option[CaseClassArgument],
     headerArg: Option[CaseClassArgument],
-    resultArg: Option[CaseClassArgument] = None,
+    responseArg: Option[CaseClassArgument] = None,
     responseObjectName: String,
     responseDatatype: String,
     responseConfig: ResponseConfig,
     code: Int,
   ) {
-    val allArgs: Seq[CaseClassArgument] = bodyArg.toSeq ++ headerArg.toSeq ++ resultArg.toSeq
+    val allArgs: Seq[CaseClassArgument] = bodyArg.toSeq ++ headerArg.toSeq ++ responseArg.toSeq
   }
 
   private[this] def responseObject(responseObjectArgs: ResponseObjectArgs): String = {
@@ -116,19 +116,24 @@ object Play26Controllers extends CodeGenerator {
     if (obj.allArgs.isEmpty) {
       s"case ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.mvc.Results.EmptyContent())"
     } else {
-      def withStatusBody(msg: String) = {
-        val base = s"case r: ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})($msg)"
+      def withHeaders(code: String) = {
+        val base = s"case r: ${obj.extendsClass}.${obj.responseObjectName} => $code"
         if (obj.headerArg.isEmpty) {
           base
         } else {
-          s"${base}.withHeaders(r.headers: _*)"
+          s"$base.withHeaders(r.headers: _*)"
         }
       }
 
+      def withStatus(msg: String) = withHeaders(s"Status(${obj.code})($msg)")
+
       if (obj.bodyArg.isEmpty) {
-        withStatusBody("play.api.mvc.Results.EmptyContent()")
+        obj.responseArg match {
+          case None => withStatus("play.api.mvc.Results.EmptyContent()")
+          case Some(arg) => withHeaders(s"r.${arg.name}")
+        }
       } else {
-        withStatusBody("play.api.libs.json.Json.toJson(r.body)")
+        withStatus("play.api.libs.json.Json.toJson(r.body)")
       }
     }
   }
@@ -174,7 +179,7 @@ object Play26Controllers extends CodeGenerator {
         extendsClass = name,
         bodyArg = None,
         headerArg = headerArg,
-        resultArg = Option(
+        responseArg = Option(
           CaseClassArgument(
             name = "result",
             `type` = "play.api.mvc.Result"),
