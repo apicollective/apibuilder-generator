@@ -65,13 +65,17 @@ object Play26Controllers extends CodeGenerator {
     extendsClass: String,
     bodyArg: Option[CaseClassArgument],
     headerArg: Option[CaseClassArgument],
-    resultArg: Option[CaseClassArgument] = None,
+    responseArg: Option[CaseClassArgument] = None,
     responseObjectName: String,
     responseDatatype: String,
     responseConfig: ResponseConfig,
     code: Int,
   ) {
-    val allArgs: Seq[CaseClassArgument] = bodyArg.toSeq ++ headerArg.toSeq ++ resultArg.toSeq
+    assert(
+      bodyArg.isEmpty || responseArg.isEmpty,
+      "Cannot declare both a body and a response"
+    )
+    val allArgs: Seq[CaseClassArgument] = bodyArg.toSeq ++ headerArg.toSeq ++ responseArg.toSeq
   }
 
   private[this] def responseObject(responseObjectArgs: ResponseObjectArgs): String = {
@@ -116,19 +120,22 @@ object Play26Controllers extends CodeGenerator {
     if (obj.allArgs.isEmpty) {
       s"case ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.mvc.Results.EmptyContent())"
     } else {
-      def withStatusBody(msg: String) = {
-        val base = s"case r: ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})($msg)"
+      def withHeaders(code: String) = {
+        val base = s"case r: ${obj.extendsClass}.${obj.responseObjectName} => $code"
         if (obj.headerArg.isEmpty) {
           base
         } else {
-          s"${base}.withHeaders(r.headers: _*)"
+          s"$base.withHeaders(r.headers: _*)"
         }
       }
 
-      if (obj.bodyArg.isEmpty) {
-        withStatusBody("play.api.mvc.Results.EmptyContent()")
-      } else {
-        withStatusBody("play.api.libs.json.Json.toJson(r.body)")
+      def withStatus(msg: String) = withHeaders(s"Status(${obj.code})($msg)")
+
+      (obj.bodyArg, obj.responseArg) match {
+        case (Some(_), Some(_)) => sys.error("Case class arguments cannot declare both a body and a response")
+        case (Some(body), None) => withStatus(s"play.api.libs.json.Json.toJson(r.${body.name})")
+        case (None, Some(res)) => withHeaders(s"r.${res.name}")
+        case (None, None) => withStatus("play.api.mvc.Results.EmptyContent()")
       }
     }
   }
@@ -174,10 +181,11 @@ object Play26Controllers extends CodeGenerator {
         extendsClass = name,
         bodyArg = None,
         headerArg = headerArg,
-        resultArg = Option(
+        responseArg = Option(
           CaseClassArgument(
             name = "result",
-            `type` = "play.api.mvc.Result"),
+            `type` = "play.api.mvc.Result"
+          ),
         ),
         responseObjectName = "Undocumented",
         responseDatatype = Datatype.Primitive.Unit.name,
