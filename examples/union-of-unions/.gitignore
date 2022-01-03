@@ -1,0 +1,12 @@
+target/
+logs/
+.ivy2
+*.downloaded.scala
+*.downloaded.rb
+*.swp
+*.swo
+.bsp/
+.idea/
+.idea_modules/
+.DS_Store
+out
