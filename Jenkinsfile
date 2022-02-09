@@ -68,7 +68,7 @@ pipeline {
           steps {
             script {
               container('helm') {
-                new helmDeploy().deploy('apibuilder-generator', VERSION.printable(), 300, 'apicollective')
+                new helmDeploy().deploy('apibuilder-generator', VERSION.printable(), 420, 'apicollective')
               }
             }
           }
