@@ -475,6 +475,18 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "http4s_0_23",
+        name = "Http4s 0.23",
+        description = Some(
+          """Http4s 0.23 client based on <a href='https://circe.github.io/circe/'>circe</a> and <a href='http://http4s.org/v0.23/client/'>http4s client</a>.""".stripMargin),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.models.http4s.Http4s023Generator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "play_2_6",
         name = "Play 2.6 (Gen. V2)"
       ),

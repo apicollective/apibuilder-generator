@@ -438,4 +438,22 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override def headerRawClass: String = "org.http4s.Header.ToRaw"
 
   }
+
+  case class Http4s023(override val namespace: String, override val attributes: Attributes, override val baseUrl: Option[String]) extends Http4s02xSeries {
+
+    override def headerConstructor(headerName: String, headerValue: String): String =
+      s"""org.http4s.Header.Raw(org.typelevel.ci.CIString($headerName), $headerValue)"""
+
+    override def headerOptSelection(requestVariableName:String, headerName: String) =
+      s"${requestVariableName}.headers.get($headerName).map(_.head)"
+
+    override def headerRawClass: String = "org.http4s.Header.ToRaw"
+
+
+    override val implicitArgs: Option[String] = Some(s"(implicit ev: Concurrent[$asyncType])")
+
+    override val extraClientObjectMethods = Some(
+      s"""implicit def circeJsonDecoder[${asyncTypeParam(Some("Concurrent")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]): EntityDecoder[$asyncType, A] = org.http4s.circe.jsonOf[$asyncType, A]"""
+    )
+  }
 }
