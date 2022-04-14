@@ -2,6 +2,7 @@ package scala.models.http4s
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import lib.Text._
+import scala.models.http4s.ScalaClientMethodGeneratorV0_23
 
 import scala.generator.{ScalaClientMethodConfigs, ScalaUtil}
 import scala.models.{Headers, JsonImports}
@@ -19,14 +20,14 @@ case class Http4sClientV0_23(
       s"(${ScalaUtil.wrapInQuotes(name)}, $value)"
     }.mkString(",\n")
 
-    val methodGenerator = new ScalaClientMethodGenerator(config, ssd)
+    val methodGenerator = new ScalaClientMethodGeneratorV0_23(config, ssd)
 
     s"""package ${ssd.namespaces.base} {
 ${config.clientImports}
 
 ${headers.objectConstants.indentString(2)}
 
-${Http4sScalaClientCommon.clientSignature(config).indentString(2)} {
+${Http4sScalaClientCommonV0_23.clientSignature(config).indentString(2)} {
     import org.http4s.Response
 ${JsonImports(form.service).mkString("\n").indentString(4)}
 ${config.closeClient.getOrElse("")}
@@ -43,7 +44,7 @@ ${headerString.indentString(6)}
 
     def modifyRequest(request: ${config.requestType}): ${config.requestType} = request
 
-    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A], ev: Sync[F]) = ${config.generateCirceJsonEncoderOf("A")}
+    implicit def circeJsonEncoder[A](implicit encoder: io.circe.Encoder[A], ev: Concurrent[F]) = ${config.generateCirceJsonEncoderOf("A")}
 
     def _executeRequest[T, U](
       method: String,

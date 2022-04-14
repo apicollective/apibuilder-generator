@@ -449,11 +449,10 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
     override def headerRawClass: String = "org.http4s.Header.ToRaw"
 
-
-    override val implicitArgs: Option[String] = Some(s"(implicit ev: Concurrent[$asyncType])")
-
     override val extraClientObjectMethods = Some(
       s"""implicit def circeJsonDecoder[${asyncTypeParam(Some("Concurrent")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]): EntityDecoder[$asyncType, A] = org.http4s.circe.jsonOf[$asyncType, A]"""
     )
+
+    override def asyncSuccessInvoke: String = wrappedAsyncType("Concurrent").getOrElse(asyncType) + "." + asyncSuccess
   }
 }

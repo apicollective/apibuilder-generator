@@ -69,7 +69,7 @@ class ScalaClientMethodGenerator(
       Seq(
         Some(ScalaUtil.deprecationString(resource.deprecation).trim).filter(_.nonEmpty),
         Some(
-          s"object ${resource.plural} extends ${resource.plural}${config.wrappedAsyncType().getOrElse("")} {\nimport Client._\n" +
+          s"object ${resource.plural} extends ${resource.plural}${config.wrappedAsyncType().getOrElse("")} {\n" +
             methods(resource).map(_.code).mkString("\n\n").indentString(2) +
             "\n}"
         )

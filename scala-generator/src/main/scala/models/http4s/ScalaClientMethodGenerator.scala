@@ -150,9 +150,7 @@ class ScalaClientMethodGenerator (
                       Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
                     case _ =>
                       val json = config.toJson("r", response.datatype.name)
-                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode =>\n" +
-                        s"  val unprocessable = $json\n" +
-                        s"  ev.flatMap(unprocessable)(body => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.headers, r.status.code, None, body)))")
+                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json.flatMap(body => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.headers, r.status.code, None, body)))")
                   }
                 }
               }
