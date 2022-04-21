@@ -62,16 +62,28 @@ class Http4sGeneratorSpec extends AnyFunSpec with Matchers {
         models.TestHelper.assertEqualsFile(s"/http4s/apidoc-api/020_instant/${file.name}.txt", file.contents)
       }
     }
-      it("http4s 0.22") {
-        val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
-        val Right(files) = Http4s022Generator.invoke(form)
-        files.size shouldBe 7
-        files.zipWithIndex.foreach { case (file, idx) =>
-          file.name shouldBe fileNames(idx)
-          assertValidScalaSourceCode(file.contents)
-          models.TestHelper.assertEqualsFile(s"/http4s/apidoc-api/022/${file.name}.txt", file.contents)
-        }
+
+    it("http4s 0.22") {
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val Right(files) = Http4s022Generator.invoke(form)
+      files.size shouldBe 7
+      files.zipWithIndex.foreach { case (file, idx) =>
+        file.name shouldBe fileNames(idx)
+        assertValidScalaSourceCode(file.contents)
+        models.TestHelper.assertEqualsFile(s"/http4s/apidoc-api/022/${file.name}.txt", file.contents)
       }
+    }
+
+    it("http4s 0.23") {
+      val form = InvocationForm(models.TestHelper.apidocApiService, Seq.empty, None)
+      val Right(files) = Http4s023Generator.invoke(form)
+      files.size shouldBe 6
+      files.zipWithIndex.foreach { case (file, idx) =>
+        file.name shouldBe fileNames(idx)
+        assertValidScalaSourceCode(file.contents)
+        models.TestHelper.assertEqualsFile(s"/http4s/apidoc-api/023/${file.name}.txt", file.contents)
+      }
+    }
 
   }
 
