@@ -17,7 +17,7 @@ class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
     it("Http4s 0.22 mock generator produces valid Scala source code") {
       val config = new ScalaClientMethodConfigs.Http4s022(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
-      val sourceCode = Http4s022Generator.generateMockClientCode(None, ssd, config)
+      val sourceCode = Http4s022Generator.mkMockClient(None, ssd, config)
 
       assertValidScalaSourceCode(sourceCode)
       sourceCode should include("Applicative[F]")
@@ -28,7 +28,7 @@ class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
     it("Http4s 0.20 mock generator produces valid Scala source code") {
       val config = new ScalaClientMethodConfigs.Http4s020(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
-      val sourceCode = Http4s020Generator.generateMockClientCode(None, ssd, config)
+      val sourceCode = Http4s020Generator.mkMockClient(None, ssd, config)
 
       assertValidScalaSourceCode(sourceCode)
       sourceCode should include("Applicative[F]")
@@ -39,7 +39,7 @@ class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
     it("Http4s 0.18 mock generator produces valid Scala source code") {
       val config = new ScalaClientMethodConfigs.Http4s018(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
-      val sourceCode = Http4s018Generator.generateMockClientCode(None, ssd, config)
+      val sourceCode = Http4s018Generator.mkMockClient(None, ssd, config)
 
       assertValidScalaSourceCode(sourceCode)
       sourceCode should include("Applicative[F]")
@@ -50,7 +50,7 @@ class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
     it("Http4s 0.17 mock generator produces valid Scala source code") {
       val config = new ScalaClientMethodConfigs.Http4s017(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
-      val sourceCode = Http4s017Generator.generateMockClientCode(None, ssd, config)
+      val sourceCode = Http4s017Generator.mkMockClient(None, ssd, config)
 
       assertValidScalaSourceCode(sourceCode)
       sourceCode should not include ("Applicative[F]")
@@ -66,7 +66,7 @@ class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
 
       val config = new ScalaClientMethodConfigs.Http4s022(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
-      val sourceCode = Http4s022Generator.generateMockClientCode(None, ssd, config)
+      val sourceCode = Http4s022Generator.mkMockClient(None, ssd, config)
 
       assertValidScalaSourceCode(sourceCode)
       models.TestHelper.assertEqualsFile(s"/http4s/mock-client/http4s_022_date-time-joda.txt", sourceCode)
@@ -78,7 +78,7 @@ class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
 
       val config = new ScalaClientMethodConfigs.Http4s022(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
-      val sourceCode = Http4s022Generator.generateMockClientCode(None, ssd, config)
+      val sourceCode = Http4s022Generator.mkMockClient(None, ssd, config)
 
       assertValidScalaSourceCode(sourceCode)
       models.TestHelper.assertEqualsFile(s"/http4s/mock-client/http4s_022_date-time-instant.txt", sourceCode)
@@ -90,7 +90,7 @@ class Http4sClientMockGeneratorSpec extends AnyFunSpec with Matchers {
 
       val config = new ScalaClientMethodConfigs.Http4s022(namespace = "whatever", Attributes.Http4sDefaultConfig, baseUrl = None)
 
-      val sourceCode = Http4s022Generator.generateMockClientCode(None, ssd, config)
+      val sourceCode = Http4s022Generator.mkMockClient(None, ssd, config)
 
       assertValidScalaSourceCode(sourceCode)
       models.TestHelper.assertEqualsFile(s"/http4s/mock-client/http4s_022_date-time-offsetdatetime.txt", sourceCode)

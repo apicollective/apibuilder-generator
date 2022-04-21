@@ -94,28 +94,28 @@ class ScalaClientMethodGenerator (
         })
       ).distinct.sorted
 
+      val raiseFailure = s"${http4sConfig.wrappedAsyncType(config.asyncTypeConstraint).getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}"
+
       val defaultResponse = op.responses.find { r =>
         r.code match {
           case ResponseCodeOption.Default => true
           case ResponseCodeOption.UNDEFINED(_) | ResponseCodeInt(_) | ResponseCodeUndefinedType(_) => false
         }
       } match {
-        case Some(response) => {
+        case Some(response) =>
           if (response.isUnit) {
-            s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
+            s"case r => $raiseFailure(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))"
           } else {
             config match {
               case _: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015 =>
-                s"case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))"
+                s"case r => $raiseFailure(new ${namespaces.errors}.${response.errorClassName}(r))"
               case _ =>
                 val json = config.toJson("r", response.datatype.name)
-                s"case r => $json.flatMap(body => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.headers, r.status.code, None, body)))"
+                s"case r => $json.flatMap(body => $raiseFailure(new ${namespaces.errors}.${response.errorClassName}(r.headers, r.status.code, None, body)))"
             }
           }
-        }
-        case None => {
-          s"""case r => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
-        }
+        case None =>
+          s"""case r => $raiseFailure(new ${namespaces.errors}.FailedRequest(r.${config.responseStatusMethod}, s"Unsupported response code[""" + "${r." + config.responseStatusMethod + s"""}]. Expected: ${allResponseCodes.mkString(", ")}"${Http4sScalaClientCommon.failedRequestUriParam(config)}))"""
       }
 
       val matchResponse: String = {
@@ -142,15 +142,17 @@ class ScalaClientMethodGenerator (
                 // will be added later
                 None
               } else {
+                val raiseFailure = s"${http4sConfig.wrappedAsyncType(config.asyncTypeConstraint).getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}"
+
                 if (response.isUnit) {
-                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
+                  Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $raiseFailure(new ${namespaces.errors}.${response.errorClassName}(r.${config.responseStatusMethod}))")
                 } else {
                   config match {
                     case _: ScalaClientMethodConfigs.Http4s017 | _: ScalaClientMethodConfigs.Http4s015 =>
-                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r))")
+                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $raiseFailure(new ${namespaces.errors}.${response.errorClassName}(r))")
                     case _ =>
                       val json = config.toJson("r", response.datatype.name)
-                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json.flatMap(body => ${http4sConfig.wrappedAsyncType("Sync").getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}(new ${namespaces.errors}.${response.errorClassName}(r.headers, r.status.code, None, body)))")
+                      Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json.flatMap(body => $raiseFailure(new ${namespaces.errors}.${response.errorClassName}(r.headers, r.status.code, None, body)))")
                   }
                 }
               }
