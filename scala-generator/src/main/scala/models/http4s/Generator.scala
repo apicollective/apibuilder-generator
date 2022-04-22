@@ -1,14 +1,14 @@
 package scala.models.http4s
 
-import scala.generator.mock.MockClientGenerator
+import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
-
-import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
-import scala.models.{ApiBuilderComments, Attributes}
-import scala.models.http4s.server.Http4sServer
-import generator.ServiceFileNames
 import models.http4s.mock.{Http4s018MockClientGenerator, Http4s020MockClientGenerator, Http4s022MockClientGenerator}
+
+import scala.generator.mock.MockClientGenerator
+import scala.generator.{Namespaces, ScalaCaseClasses, ScalaClientMethodConfig, ScalaClientMethodConfigs}
+import scala.models.http4s.server.Http4sServer
+import scala.models.{ApiBuilderComments, Attributes}
 
 object Http4s015Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s015(namespace, Attributes.Http4sDefaultConfig, baseUrl)
@@ -21,70 +21,93 @@ object Http4s017Generator extends Generator {
 object Http4s018Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s018(namespace, Attributes.Http4sDefaultConfig, baseUrl)
 
-  override def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
+  override def mkMockClient(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new Http4s018MockClientGenerator(ssd, userAgent, config).generateCode()
 }
 
 object Http4s020Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s020(namespace, Attributes.Http4sDefaultConfig, baseUrl)
 
-  override def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
+  override def mkMockClient(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new Http4s020MockClientGenerator(ssd, userAgent, config).generateCode()
 }
 
 object Http4s022Generator extends Generator {
   override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s022(namespace, Attributes.Http4sDefaultConfig, baseUrl)
 
-  override def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
+  override def mkMockClient(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new Http4s022MockClientGenerator(ssd, userAgent, config).generateCode()
 }
 
+object Http4s023Generator extends Generator {
+
+  override def mkConfig(namespace: String, baseUrl: Option[String]) = ScalaClientMethodConfigs.Http4s023(namespace, Attributes.Http4sDefaultConfig, baseUrl)
+
+  override def mkMockClient(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
+    new Http4s022MockClientGenerator(ssd, userAgent, config).generateCode()
+}
 
 trait Generator extends CodeGenerator {
   def mkConfig(namespace: String, baseUrl: Option[String]): ScalaClientMethodConfigs.Http4s
 
-  def generateMockClientCode(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig) =
+  override def invoke(form: InvocationForm) = Right(generateCode(form))
+
+  def mkMockClient(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new MockClientGenerator(ssd, userAgent, config).generateCode()
 
-  override def invoke(form: InvocationForm) = Right(generateCode(form = form, addHeader = true))
+  def mkHeader(form: InvocationForm): String =
+    ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
+
+  def mkCaseClasses(ssd: ScalaService, form: InvocationForm): String =
+    ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
+
+  def mkJsonCodecs(ssd: ScalaService): String =
+    CirceJson(ssd).generate()
+
+  def mkClient(ssd: ScalaService, form: InvocationForm, config: ScalaClientMethodConfigs.Http4s): String =
+    Http4sClient(form, ssd, config).generate()
+
+  def mkServer(ssd: ScalaService, form: InvocationForm, config: ScalaClientMethodConfigs.Http4s): String =
+    Http4sServer(form, ssd, config).generate()
 
   def generateCode(
-    form: InvocationForm,
-    addHeader: Boolean
-  ): Seq[File] = {
+                    form: InvocationForm
+                  ): Seq[File] = {
     val ssd = new ScalaService(form.service, Attributes.Http4sDefaultConfig.withAttributes(form.attributes))
     val config = mkConfig(Namespaces.quote(form.service.namespace), form.service.baseUrl)
 
-    val header = addHeader match {
-      case false => ""
-      case true => ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
-    }
+    val models = mkCaseClasses(ssd, form)
+    val json = mkJsonCodecs(ssd)
+    val mock = mkMockClient(form.userAgent, ssd, config)
+    val client = mkClient(ssd, form, config)
+    val server = mkServer(ssd, form, config)
 
-    val caseClasses = header + ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
-    val json = CirceJson(ssd).generate()
-    val client = Http4sClient(form, ssd, config).generate()
-    val mock = header + generateMockClientCode(form.userAgent, ssd, config)
+    val modelsAndJson = s"""$models\n\n$json"""
 
-    val modelAndJson =
-      s"""$caseClasses
-         |
-         |$json""".stripMargin
+    val filesToGenerate = List(
+      "Client" -> s"""$modelsAndJson\n\n$client""",
+      "ModelsJson" -> modelsAndJson,
+      "ModelsOnly" -> models,
+      "JsonOnly" -> json,
+      "ClientOnly" -> client,
+      "MockClient" -> mock,
+    ) ++
+      (if (config.doGenerateServer) List("Server" -> server) else Nil)
 
-    val all =
-      s"""$modelAndJson
-         |
-         |$client""".stripMargin
+    val header = mkHeader(form)
 
-    val server = header + Http4sServer(form, ssd, config).generate()
-
-    Seq(
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Client", all, Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ModelsJson", modelAndJson, Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ModelsOnly", caseClasses, Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "JsonOnly", s"$header$json", Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "ClientOnly", s"$header$client", Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "MockClient", mock, Some("Scala")),
-      ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Server", server, Some("Scala"))
-    )
+    filesToGenerate
+      .map {
+        case (suffix, content) =>
+          ServiceFileNames.toFile(
+            form.service.namespace,
+            form.service.organization.key,
+            form.service.application.key,
+            form.service.version,
+            suffix,
+            header + content,
+            Some("Scala")
+          )
+      }.toSeq
   }
 }

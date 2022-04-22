@@ -100,11 +100,13 @@ sealed trait ScalaClientMethodConfig {
     }
   }
 
+  def asyncTypeConstraint: String = "Sync"
+
   def asyncTypeParam(@nowarn constraint: Option[String] = None): Option[String] = None
 
   def wrappedAsyncType(@nowarn instance: String = ""): Option[String] = None
 
-  def asyncSuccessInvoke: String = wrappedAsyncType("Sync").getOrElse(asyncType) + "." + asyncSuccess
+  def asyncSuccessInvoke: String = wrappedAsyncType(asyncTypeConstraint).getOrElse(asyncType) + "." + asyncSuccess
 
   final def responseEnvelopeClassName: Option[String] = attributes.response match {
     case ResponseConfig.Envelope => Some("Response")
@@ -297,6 +299,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def applicationJsonMediaType: String
     def headerConstructor(headerName: String, headerValue: String) = s"org.http4s.Header($headerName, $headerValue)"
     def headerOptSelection(requestVariableName:String, headerName: String) = s"${requestVariableName}.headers.get($headerName)"
+
+    def doGenerateServer: Boolean = true
   }
 
   case class Http4s015(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s {
@@ -331,7 +335,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val responseClass = s"org.http4s.Response[$asyncType]"
     override val extraClientCtorArgs: Option[String] = Some(s",\n  httpClient: org.http4s.client.Client[$asyncType]")
     override val extraClientObjectMethods = Some(
-      s"""implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]"""
+      s"""implicit def circeJsonDecoder[${asyncTypeParam(Some(asyncTypeConstraint)).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]"""
     )
     override val asyncSuccess: String = "pure"
     override def asyncFailure: String = "raiseError"
@@ -380,7 +384,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override val responseClass = s"org.http4s.Response[$asyncType]"
     override val extraClientCtorArgs: Option[String] = Some(s",\n  httpClient: org.http4s.client.Client[$asyncType]")
     override val extraClientObjectMethods = Some(
-      s"""implicit def circeJsonDecoder[${asyncTypeParam(Some("Sync")).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]"""
+      s"""implicit def circeJsonDecoder[${asyncTypeParam(Some(asyncTypeConstraint)).map(_+", ").getOrElse("")}A](implicit decoder: io.circe.Decoder[A]) = org.http4s.circe.jsonOf[$asyncType, A]"""
     )
     override val asyncSuccess: String = "pure"
     override def asyncFailure: String = "raiseError"
@@ -427,8 +431,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
 
   case class Http4s020(namespace: String, attributes: Attributes, baseUrl: Option[String]) extends Http4s02xSeries
 
-  case class Http4s022(override val namespace: String, override val attributes: Attributes, override val baseUrl: Option[String]) extends Http4s02xSeries {
-
+  trait Http4s022Series extends Http4s02xSeries {
     override def headerConstructor(headerName: String, headerValue: String): String =
       s"""org.http4s.Header.Raw(org.typelevel.ci.CIString($headerName), $headerValue)"""
 
@@ -436,6 +439,19 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
       s"${requestVariableName}.headers.get($headerName).map(_.head)"
 
     override def headerRawClass: String = "org.http4s.Header.ToRaw"
-
   }
+
+  case class Http4s022(
+    override val namespace: String,
+    override val attributes: Attributes,
+    override val baseUrl: Option[String]
+  ) extends Http4s022Series
+
+  case class Http4s023(
+    override val namespace: String,
+    override val attributes: Attributes,
+    override val baseUrl: Option[String],
+    override val asyncTypeConstraint: String = "Concurrent",
+    override val doGenerateServer: Boolean = false
+  ) extends Http4s022Series
 }
