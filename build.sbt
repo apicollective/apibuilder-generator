@@ -128,7 +128,7 @@ lazy val graphQLGenerator = project
     ),
   )
 
-val kotlinLangVersion = "1.3.72"
+val kotlinLangVersion = "1.6.21"
 val mockitoVersion = "4.5.1"
 val scalatestVersion = "3.2.12"
 
@@ -144,7 +144,7 @@ lazy val kotlinGenerator = project
       "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.9",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.9.9",
       "org.threeten" % "threetenbp" % "1.3.8",
-      "com.squareup" % "kotlinpoet" % "1.3.0",
+      "com.squareup" % "kotlinpoet" % "1.11.0",
       "com.squareup.retrofit2" % "retrofit" % "2.5.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
       "org.jetbrains.kotlin" % "kotlin-stdlib" % kotlinLangVersion % "test",
