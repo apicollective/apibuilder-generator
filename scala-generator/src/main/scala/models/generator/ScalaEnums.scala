@@ -2,7 +2,7 @@ package scala.generator
 
 case class ScalaEnums(
   ssd: ScalaService,
-  enum: ScalaEnum
+  `enum`: ScalaEnum
 ) {
 
   private[this] val unions = ssd.unionsForEnum(enum)

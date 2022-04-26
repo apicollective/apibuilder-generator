@@ -63,7 +63,7 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  private[this] def generateEnum(enum: Enum): String = {
+  private[this] def generateEnum(`enum`: Enum): String = {
     val strings = importBuilder.ensureImport("strings")
     val enumName = importBuilder.publicName(enum.name)
 

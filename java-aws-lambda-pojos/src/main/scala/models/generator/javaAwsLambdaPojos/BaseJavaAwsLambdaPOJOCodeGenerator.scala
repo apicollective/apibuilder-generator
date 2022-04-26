@@ -69,7 +69,7 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
         generatedModels
     }
 
-    def generateEnum(enum: Enum): File = {
+    def generateEnum(`enum`: Enum): File = {
 
       val className = toClassName(enum.name)
 

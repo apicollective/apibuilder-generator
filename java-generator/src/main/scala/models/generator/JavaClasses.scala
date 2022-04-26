@@ -69,7 +69,7 @@ object JavaClasses extends CodeGenerator {
       datatypeResolver.parse(unionType.`type`, true).map(JavaDatatype(_)).toOption
     }
 
-    def generateEnum(enum: Enum): File = {
+    def generateEnum(`enum`: Enum): File = {
       def generateEnumValue(enumValue: EnumValue): String = {
         commentFromOpt(enumValue.description) +
           enumValue.name.toUpperCase

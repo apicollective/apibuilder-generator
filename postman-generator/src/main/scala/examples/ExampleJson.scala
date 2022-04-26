@@ -45,7 +45,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def makeEnum(enum: Enum, parentUnion: Option[(Union, UnionType)], outerField: Option[Field]): JsValue = {
+  private[this] def makeEnum(`enum`: Enum, parentUnion: Option[(Union, UnionType)], outerField: Option[Field]): JsValue = {
     def randomValue: JsValue = JsString(
       Random.shuffle(enum.values)
         .headOption.map(ev => ev.value.getOrElse(ev.name)).getOrElse("undefined")
