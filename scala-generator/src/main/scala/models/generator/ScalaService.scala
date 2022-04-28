@@ -89,10 +89,10 @@ class ScalaService(
       u.types.find(_.model.map(_.fullName).contains(model.qualifiedName)).map(u -> _)
     }
 
-  def unionsForEnum(enum: ScalaEnum): Seq[ScalaUnion] =
+  def unionsForEnum(`enum`: ScalaEnum): Seq[ScalaUnion] =
     unionsAndTypesForEnum(enum).map { case (u, _) => u }
 
-  def unionsAndTypesForEnum(enum: ScalaEnum): Seq[(ScalaUnion, ScalaUnionType)] =
+  def unionsAndTypesForEnum(`enum`: ScalaEnum): Seq[(ScalaUnion, ScalaUnionType)] =
     unions.flatMap { u =>
       u.types.find(_.enum.map(_.fullName).contains(enum.qualifiedName)).map(u -> _)
     }
@@ -191,7 +191,7 @@ case class ScalaUnionType(
   ssd: ScalaService,
   value: UnionType,
   datatype: ScalaDatatype,
-  enum: Option[ScalaPrimitive.Enum] = None,
+  `enum`: Option[ScalaPrimitive.Enum] = None,
   model: Option[ScalaPrimitive.Model] = None,
   union: Option[ScalaPrimitive.Union] = None
 ) {
@@ -342,7 +342,7 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
 
 }
 
-class ScalaEnum(val ssd: ScalaService, val enum: Enum) {
+class ScalaEnum(val ssd: ScalaService, val `enum`: Enum) {
 
   val originalName: String = enum.name
 

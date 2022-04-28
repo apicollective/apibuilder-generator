@@ -76,7 +76,7 @@ case class Play2Json(
     ssd.enums.map(enumReadersAndWriters).mkString("\n\n")
   }
 
-  private[models] def enumReadersAndWriters(enum: ScalaEnum): String = {
+  private[models] def enumReadersAndWriters(`enum`: ScalaEnum): String = {
     val jsValueWriterMethod = play2JsonCommon.implicitWriterName(enum.name)
     val jsObjectWriterMethod = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, enum.name)
 
@@ -399,7 +399,7 @@ case class Play2Json(
   private[this] def getDiscriminator(model: ScalaModel): Option[Discriminator] =
     getDiscriminator("Model", model.qualifiedName, ssd.unionAndTypesForModel(model))
 
-  private[this] def getDiscriminator(enum: ScalaEnum): Option[Discriminator] =
+  private[this] def getDiscriminator(`enum`: ScalaEnum): Option[Discriminator] =
     getDiscriminator("Enum", enum.qualifiedName, ssd.unionsAndTypesForEnum(enum))
 
   private[this] def getDiscriminator(

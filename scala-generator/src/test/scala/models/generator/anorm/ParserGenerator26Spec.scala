@@ -79,7 +79,7 @@ class ParserGenerator26Spec extends AnyFunSpec with Matchers {
       )
     }
 
-    def addEnum(enum: String): ServiceBuilder = {
+    def addEnum(`enum`: String): ServiceBuilder = {
       ServiceBuilder(
         unions = this.unions,
         models = this.models,

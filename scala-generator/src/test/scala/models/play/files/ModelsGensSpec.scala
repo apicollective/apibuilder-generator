@@ -132,7 +132,7 @@ class ModelsGensSpec extends AnyFunSpec with Matchers with ScalaCheckDrivenPrope
   }
 
   it("generates arbitrary for enum based on namespace, name, and qualifiedName") {
-    forAll { enum: ScalaEnum =>
+    forAll { `enum`: ScalaEnum =>
       val expected = ModelsGens.arbitrary(enum.ssd.namespaces, enum.name, enum.qualifiedName)
       val result = ModelsGens.arbitrary(enum)
 

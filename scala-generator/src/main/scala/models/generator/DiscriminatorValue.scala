@@ -20,7 +20,7 @@ object DiscriminatorValue {
     }
   }
 
-  def generateCode(enum: ScalaEnum, unions: Seq[ScalaUnion]): Seq[String] = {
+  def generateCode(`enum`: ScalaEnum, unions: Seq[ScalaUnion]): Seq[String] = {
     unions.flatMap { u =>
       generate(u, enum.name)
     }.distinct.map(_.generateCode)

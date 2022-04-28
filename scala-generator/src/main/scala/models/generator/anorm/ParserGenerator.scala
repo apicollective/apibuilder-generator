@@ -265,7 +265,7 @@ trait ParserGenerator extends CodeGenerator {
       s"SqlParser.get[${datatype.fullName}]($fieldName)"
     }
 
-    private[this] def generateEnum(enum: ScalaEnum): String = {
+    private[this] def generateEnum(`enum`: ScalaEnum): String = {
       Seq(
         s"object ${enum.name} {",
         Seq(

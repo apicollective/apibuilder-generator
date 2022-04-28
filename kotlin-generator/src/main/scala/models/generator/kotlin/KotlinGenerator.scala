@@ -62,7 +62,7 @@ class KotlinGenerator
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
-    def generateEnum(enum: io.apibuilder.spec.v0.models.Enum): File = {
+    def generateEnum(`enum`: io.apibuilder.spec.v0.models.Enum): File = {
       val className = toClassName(enum.name)
 
       val builder = TypeSpec.enumBuilder(className)

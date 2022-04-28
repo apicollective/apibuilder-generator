@@ -37,7 +37,7 @@ object ScalaCheckGenerator extends CodeGenerator {
     """
   }
 
-  def enum(namespace: String, enum: ScalaEnum): String = {
+  def `enum`(namespace: String, `enum`: ScalaEnum): String = {
     val gens = enum.values.map(value => s"${namespace}.${enum.name}.${value.name}").toList
     val gen = gens match {
       case Nil => "???"

@@ -259,7 +259,7 @@ object RubyClientGenerator extends CodeGenerator with Logging {
     union.discriminator.getOrElse(RubyUtil.DefaultDiscriminatorName)
   }
 
-  def generateEnum(enum: Enum, union: Option[Union]): String = {
+  def generateEnum(`enum`: Enum, union: Option[Union]): String = {
     val className = RubyUtil.toClassName(enum.name)
 
     val lines = ListBuffer[String]()
@@ -366,7 +366,7 @@ case class RubyClientGenerator(form: InvocationForm) extends Logging {
     }
   }
 
-  private def unionFor(enum: Enum): Option[Union] = {
+  private def unionFor(`enum`: Enum): Option[Union] = {
     service.unions.filter { u => u.types.map(_.`type`).contains(enum.name) }.toList match {
       case Nil => None
       case one :: Nil => Some(one)
