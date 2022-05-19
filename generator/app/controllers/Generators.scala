@@ -531,7 +531,7 @@ object Generators {
         language = Some("C#")
       ),
       status = lib.generator.Status.InDevelopment,
-      codeGenerator = Some(generator.graphql.GraphQLApolloGenerator)
+      codeGenerator = Some(generator.csharp.CSharpGenerator)
     )
   ).sortBy(_.metaData.key)
 }
