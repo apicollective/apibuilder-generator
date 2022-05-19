@@ -50,8 +50,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
-  .aggregate(scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .dependsOn(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .aggregate(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
@@ -88,6 +88,17 @@ lazy val scalaGenerator = project
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "2.1.1",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
+    )
+  )
+
+lazy val csharpGenerator = project
+  .in(file("csharp-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+  .settings(
+    Seq(ScoverageKeys.coverageMinimumStmtTotal := 85.4),
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "2.1.1"
     )
   )
 
@@ -197,10 +208,8 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalameta" %% "scalameta" % "4.4.3" % Test,
     "com.squareup" % "javapoet" % "1.13.0",
   ),
-  PlayKeys.fileWatchService := play.dev.filewatch.FileWatchService.jdk7(play.sbt.run.toLoggerProxy(sLog.value)),
   libraryDependencies += guice,
   scalacOptions ++= allScalacOptions,
   Compile / doc / sources := Seq.empty,
   Compile / packageDoc / publishArtifact := false,
 )
-version := "0.9.52"
