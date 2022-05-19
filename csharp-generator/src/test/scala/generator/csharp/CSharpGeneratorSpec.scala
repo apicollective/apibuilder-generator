@@ -2,7 +2,7 @@ package generator.csharp
 
 import helpers.{ServiceHelpers, TestHelpers}
 import io.apibuilder.generator.v0.models.InvocationForm
-import io.apibuilder.spec.v0.models.Service
+import io.apibuilder.spec.v0.models.{Field, Service}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -28,23 +28,49 @@ class CSharpGeneratorSpec extends AnyFunSpec with Matchers
     }
   }
 
-  it("generate mdoels") {
-    rightOrErrors {
-      CSharpGenerator.invoke(
-        makeInvocationForm(
-          service = makeService(
-            models = Seq(makeModel(
-              name = "user",
-              fields = Seq(makeField("id", `type` = "string"))
-            ))
+  describe("generate models") {
+    def setup(fields: Seq[Field]) = {
+      rightOrErrors {
+        CSharpGenerator.invoke(
+          makeInvocationForm(
+            service = makeService(
+              models = Seq(makeModel(
+                name = "user",
+                fields = fields
+              ))
+            )
           )
         )
-      )
-    }.head.contents mustBe """
-      |public record User (
-      |  string Id
-      |);
-      |""".stripMargin.trim
+      }.head.contents
+    }
+
+    it("with 1 field") {
+      setup(
+        Seq(makeField("id", `type` = "string"))
+      ) mustBe
+        """
+          |public record User (
+          |  string Id
+          |);
+          |""".stripMargin.trim
+    }
+
+    it("with 2 fields") {
+      setup(
+        Seq(
+          makeField("id", `type` = "string"),
+          makeField("name", `type` = "string"),
+          makeField("age", `type` = "long", required = false)
+        )
+      ) mustBe
+        """
+          |public record User (
+          |  string Id,
+          |  string Name,
+          |  long? Age
+          |);
+          |""".stripMargin.trim
+    }
   }
 
 }

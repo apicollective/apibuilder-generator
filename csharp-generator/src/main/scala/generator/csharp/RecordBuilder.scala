@@ -25,7 +25,8 @@ case class RecordBuilder(
     Seq(
       s"public record $n (",
       fields.map { f =>
-        s"${f.`type`} ${f.name}"
+        val opt = if (f.required) { "" } else { "?" }
+        s"${f.`type`}$opt ${f.name}"
       }.mkString(",\n").trim.indent(2).stripTrailing(),
       ");",
     ).mkString("\n")
