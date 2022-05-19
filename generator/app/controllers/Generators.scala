@@ -179,7 +179,7 @@ object Generators {
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Beta,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.models.Play26ClientGenerator)
     ),
     CodeGenTarget(
@@ -190,7 +190,7 @@ object Generators {
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Alpha,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.models.Play27ClientGenerator)
     ),
     CodeGenTarget(
@@ -201,7 +201,7 @@ object Generators {
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Alpha,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.models.Play28ClientGenerator)
     ),
     CodeGenTarget(
@@ -212,7 +212,7 @@ object Generators {
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Beta,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.models.Play2Models)
     ),
     CodeGenTarget(
@@ -223,7 +223,7 @@ object Generators {
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Beta,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.models.Play2StandaloneModelsJson)
     ),
     CodeGenTarget(
@@ -233,7 +233,7 @@ object Generators {
         description = Some("""Generate a routes file for play 2.x framework. See <a href="/doc/playRoutesFile">Play Routes File</a>."""),
         language = Some("Scala")
       ),
-      status = lib.generator.Status.Beta,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.models.Play2RouteGenerator)
     ),
     CodeGenTarget(
@@ -243,7 +243,7 @@ object Generators {
         description = Some("""Generate Play Controllers for the resources."""),
         language = Some("Scala")
       ),
-      status = lib.generator.Status.InDevelopment,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.models.Play26Controllers)
     ),
     CodeGenTarget(
@@ -254,7 +254,7 @@ object Generators {
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Beta,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.generator.ScalaCaseClasses)
     ),
     CodeGenTarget(
@@ -399,7 +399,7 @@ object Generators {
         language = Some("Java, Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Alpha,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play26)
     ),
     CodeGenTarget(
@@ -410,7 +410,7 @@ object Generators {
         language = Some("Java, Scala"),
         attributes = Seq("scala_generator")
       ),
-      status = lib.generator.Status.Alpha,
+      status = lib.generator.Status.Production,
       codeGenerator = Some(scala.generator.mock.MockClientGenerator.Play28)
     ),
     CodeGenTarget(
