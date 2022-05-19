@@ -98,8 +98,7 @@ lazy val csharpGenerator = project
   .settings(
     Seq(ScoverageKeys.coverageMinimumStmtTotal := 85.4),
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.1.1",
-      "io.apibuilder" %% "apibuilder-validation" % "0.4.32"
+      "org.typelevel" %% "cats-core" % "2.1.1"
     )
   )
 

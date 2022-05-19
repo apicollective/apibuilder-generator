@@ -522,6 +522,16 @@ object Generators {
       ),
       status = lib.generator.Status.Beta,
       codeGenerator = Some(generator.graphql.GraphQLApolloGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "csharp",
+        name = "C# Generator",
+        description = None,
+        language = Some("C#")
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(generator.graphql.GraphQLApolloGenerator)
     )
   ).sortBy(_.metaData.key)
 }
