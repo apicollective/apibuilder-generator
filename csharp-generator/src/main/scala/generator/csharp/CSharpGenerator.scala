@@ -26,13 +26,28 @@ case class CSharpGenerator() {
       "Service does not contain any models".invalidNec
     } else {
       Seq(File(
-        name = toFileName(service),
-        contents = service.models.map(generateCode).mkString("\n")
+        name = namespace(service) + ".cs",
+        contents = generateNamespace(
+          service,
+          generateModels(service)
+        )
       )).validNec
     }
   }
 
-  private[this] def generateCode(model: Model): String = {
+  private[this] def generateNamespace(service: Service, contents: String): String = {
+    Seq(
+      s"namespace ${namespace(service)} {",
+      contents.trim.indent(2),
+      "}"
+    ).mkString("\n\n")
+  }
+
+  def generateModels(service: Service): String = {
+    service.models.map(generateModel).mkString("\n")
+  }
+
+  private[this] def generateModel(model: Model): String = {
     model.fields.foldLeft(
       RecordBuilder().withName(Names.pascalCase(model.name))
     ) { case (b, f) =>
@@ -74,9 +89,8 @@ case class CSharpGenerator() {
     }
   }
 
-  private[this] def toFileName(service: Service): String = {
-    Names.pascalCase(
-      (service.namespace.split("\\.").filterNot(isVersion) ++ Seq(service.name)).mkString("_")
-    ) + ".cs"
+  private[this] def namespace(service: Service): String = {
+    val parts = service.namespace.split("\\.").filterNot(isVersion) ++ Seq(service.name).toList
+    Names.pascalCase(parts.distinct.mkString("_"))
   }
 }

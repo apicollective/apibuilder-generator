@@ -28,6 +28,10 @@ class CSharpGeneratorSpec extends AnyFunSpec with Matchers
     }
   }
 
+  private[this] def genModels(service: Service): String = {
+    CSharpGenerator().generateModels(service)
+  }
+
   it("invoke must returns errors") {
     leftOrErrors {
       CSharpGenerator.invoke(
@@ -46,16 +50,26 @@ class CSharpGeneratorSpec extends AnyFunSpec with Matchers
     ).head.name mustBe "IoApibuilderFoo.cs"
   }
 
+  it("filename dedups service name") {
+    setupValid(
+      makeService(
+        name = "foo",
+        namespace = "io.apibuilder.foo",
+        models = Seq(makeModel("bar"))
+      )
+    ).head.name mustBe "IoApibuilderFoo.cs"
+  }
+
   describe("generate models") {
     def setup(fields: Seq[Field]) = {
-      setupValid(
+      genModels(
         makeService(
           models = Seq(makeModel(
             name = "user",
             fields = fields
           ))
         )
-      ).head.contents
+      )
     }
 
     it("with 1 field") {
