@@ -4,7 +4,7 @@ import lib.Text
 
 object Names {
 
-  def pascalCase(name: String): String = maybeQuote(Text.initCap(Text.snakeToCamelCase(name)))
+  def pascalCase(name: String): String = maybeQuote(Text.pascalCase(name))
 
   def camelCase(name: String): String = maybeQuote(Text.snakeToCamelCase(name))
 

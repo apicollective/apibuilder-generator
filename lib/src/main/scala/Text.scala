@@ -145,6 +145,10 @@ object Text {
     WordDelimiterRx.split(lib.Text.camelCaseToUnderscore(value)).toSeq.map(_.trim).filter(!_.isEmpty)
   }
 
+  def pascalCase(value: String): String = {
+    initCap(snakeToCamelCase(value))
+  }
+
   def snakeToCamelCase(value: String): String = {
     splitIntoWords(value).toList match {
       case Nil => ""
