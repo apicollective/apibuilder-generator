@@ -32,12 +32,6 @@ case class CSharpGenerator() {
     }
   }
 
-  private[this] def toFileName(service: Service): String = {
-    Names.pascalCase(
-      (service.namespace.split("\\.").filterNot(_=="v0") ++ Seq(service.name)).mkString("_") + ".cs"
-    )
-  }
-
   private[this] def generateCode(model: Model): String = {
     model.fields.foldLeft(
       RecordBuilder().withName(Names.pascalCase(model.name))
@@ -69,4 +63,20 @@ case class CSharpGenerator() {
     }
   }
 
+  /**
+   * returns true if the value is 'v0', 'v1', etc indicating a version number
+   */
+  private[this] def isVersion(value: String): Boolean = {
+    if (value.startsWith("v")) {
+      value.drop(1).toLongOption.isDefined
+    } else {
+      false
+    }
+  }
+
+  private[this] def toFileName(service: Service): String = {
+    Names.pascalCase(
+      (service.namespace.split("\\.").filterNot(isVersion) ++ Seq(service.name)).mkString("_")
+    ) + ".cs"
+  }
 }
