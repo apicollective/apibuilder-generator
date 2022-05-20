@@ -1,7 +1,7 @@
 package generator.csharp
 
 import helpers.{ServiceHelpers, TestHelpers}
-import io.apibuilder.generator.v0.models.InvocationForm
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.{Field, Service}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -20,6 +20,14 @@ class CSharpGeneratorSpec extends AnyFunSpec with Matchers
     )
   }
 
+  private[this] def setupValid(service: Service): Seq[File] = {
+    rightOrErrors {
+      CSharpGenerator.invoke(
+        makeInvocationForm(service = service)
+      )
+    }
+  }
+
   it("invoke must returns errors") {
     leftOrErrors {
       CSharpGenerator.invoke(
@@ -28,20 +36,26 @@ class CSharpGeneratorSpec extends AnyFunSpec with Matchers
     }
   }
 
+  it("generates nice filename") {
+    setupValid(
+      makeService(
+        name = "foo",
+        namespace = "io.apibuilder",
+        models = Seq(makeModel("bar"))
+      )
+    ).head.name mustBe "IoApibuilderFoo.cs"
+  }
+
   describe("generate models") {
     def setup(fields: Seq[Field]) = {
-      rightOrErrors {
-        CSharpGenerator.invoke(
-          makeInvocationForm(
-            service = makeService(
-              models = Seq(makeModel(
-                name = "user",
-                fields = fields
-              ))
-            )
-          )
+      setupValid(
+        makeService(
+          models = Seq(makeModel(
+            name = "user",
+            fields = fields
+          ))
         )
-      }.head.contents
+      ).head.contents
     }
 
     it("with 1 field") {
