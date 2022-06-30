@@ -610,6 +610,7 @@ type Client struct {
 	Username   string
 	Password   string
 	BaseUrl    string
+	Headers    ${http}.Header
 }
     """.trim)
       }
@@ -654,28 +655,36 @@ type ClientRequestBody struct {
               Some(
                 Seq(
                   s"request, err := http.NewRequest(method, urlStr, $bodyNewRequestArg)",
-	          "if err != nil {",
+                  "if err != nil {",
                   "return nil, err".indentString(1),
                   "}"
                 ).mkString("\n")
               ),
 
               Some(
+                headers.all().map {
+                  case (name, value) => s"""request.Header.Add("$name", $value)"""
+                }.mkString("\n").table(),
+              ),
+
+              Some(
                 Seq(
-                  "request.Header = map[string][]string{",
-                  headers.all().map {
-                    case (name, value) => s""""$name": {$value},""".indentString(1)
-                  }.mkString("\n").table(),
-                  "}"
+                  "if client.Headers != nil {",
+                  "for key, values := range client.Headers {".indentString(1),
+                  "for _, value := range values {".indentString(2),
+                  "request.Header.Add(key, value)".indentString(3),
+                  "}".indentString(2),
+                  "}".indentString(1),
+                  "}",
                 ).mkString("\n")
               ),
 
               hasClientBody match {
                 case false => None
                 case true => Some(
-	          Seq(
+                  Seq(
                     """if body.contentType != "" {""",
-                    """request.Header["Content-type"] = []string{body.contentType}""".indentString(1),
+                    """request.Header.Add("Content-Type", body.contentType)""".indentString(1),
                     "}"
                   ).mkString("\n")
                 )

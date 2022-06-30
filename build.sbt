@@ -96,7 +96,6 @@ lazy val csharpGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimumStmtTotal := 85.4),
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "2.1.1"
     )
