@@ -32,7 +32,7 @@ istioIngress:
       hosts:
         - apibuilder-generator.flo.pub
 
-istioServices:
+istioService:
   live:
     hosts:
       - apibuilder-generator
