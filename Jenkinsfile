@@ -13,7 +13,7 @@ pipeline {
       inheritFrom 'default'
 
       containerTemplates([
-        containerTemplate(name: 'helm', image: "lachlanevenson/k8s-helm:v2.12.0", command: 'cat', ttyEnabled: true),
+        containerTemplate(name: 'helm', image: "lachlanevenson/k8s-helm:v2.17.0", command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'docker', image: 'docker:18', resourceRequestCpu: '1', resourceRequestMemory: '2Gi', command: 'cat', ttyEnabled: true)
       ])
     }
@@ -68,7 +68,7 @@ pipeline {
           steps {
             script {
               container('helm') {
-                new helmDeploy().deploy('apibuilder-generator', VERSION.printable(), 420, 'apicollective')
+                new helmCommonDeploy().deploy('apibuilder-generator', 'apicollective', VERSION.printable(), 420)
               }
             }
           }
