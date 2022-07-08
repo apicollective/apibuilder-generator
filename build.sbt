@@ -74,7 +74,7 @@ lazy val javaAwsLambdaPojos = project
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.461",
       "me.geso" % "tinyvalidator" % "0.9.1",
-      "org.projectlombok" % "lombok" % "1.18.4"
+      "org.projectlombok" % "lombok" % "1.18.24"
     )
   )
 
