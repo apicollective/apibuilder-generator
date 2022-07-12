@@ -1,14 +1,12 @@
 language: scala
-scala:
-  - 2.13.6
 jdk:
   - openjdk13
 cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
-script: 
-  - sbt  ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
+script:
+  - sbt clean coverage test coverageReport
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm -f
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm -f
