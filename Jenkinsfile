@@ -67,7 +67,7 @@ pipeline {
           changeRequest()
           expression {
             return changesCheck.hasChangesInDir('deploy')
-          }        
+          }
         }
       }
       steps {
