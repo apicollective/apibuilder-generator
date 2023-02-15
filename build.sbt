@@ -28,11 +28,8 @@ lazy val resolversSettings = Seq(
 
 lazy val generated = project
   .in(file("generated"))
-  .enablePlugins(PlayScala)
-  .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
   .settings(
-    javaAgents += "com.datadoghq" % "dd-java-agent" % "1.8.0",
     libraryDependencies ++= Seq(
       ws,
       "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
@@ -53,8 +50,10 @@ lazy val generator = project
   .dependsOn(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .aggregate(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
+  .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
   .settings(
+    javaAgents += "com.datadoghq" % "dd-java-agent" % "1.8.0",
     routesImport += "io.apibuilder.generator.v0.Bindables.Core._",
     routesImport += "io.apibuilder.generator.v0.Bindables.Models._",
     routesGenerator := InjectedRoutesGenerator,
