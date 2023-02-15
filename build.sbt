@@ -28,6 +28,7 @@ lazy val resolversSettings = Seq(
 
 lazy val generated = project
   .in(file("generated"))
+  .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
