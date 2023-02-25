@@ -16,7 +16,7 @@ resources:
     cpu: .05
 
 jvmOpts:
-  memory: 3000m
+  memory: 2600m
 
 istioIngress:
   enabled: true
