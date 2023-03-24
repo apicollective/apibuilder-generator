@@ -834,7 +834,7 @@ ${headers.rubyModuleConstants.indentString(2)}
     model.fields.filter( f => f.required && f.default.isEmpty ) match {
       case Nil => {}
       case required => {
-        sb.append("    HttpClient::Preconditions.require_keys(opts, [" + required.map { f => s":${RubyUtil.quoteNameIfKeyword(f.name)}" }.mkString(", ") + s"], '$className')")
+        sb.append("    HttpClient::Preconditions.require_keys(opts, [" + required.map { f => s":${f.name}" }.mkString(", ") + s"], '$className')")
       }
     }
 
