@@ -128,7 +128,9 @@ class ParserGenerator24Spec extends AnyFunSpec with Matchers {
         "fields": [
           { "name": "guid", "type": "uuid", "required": true, "attributes": [] },
           { "name": "email", "type": "string", "required": true, "attributes": [] },
-          { "name": "name", "type": "name", "required": false, "attributes": [] }
+          { "name": "name", "type": "name", "required": false, "attributes": [] },
+          { "name": "obj", "type": "object", "required": false, "attributes": [] },
+          { "name": "blob", "type": "json", "required": false, "attributes": [] }
         ]
       }
     """).form
