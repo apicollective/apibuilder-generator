@@ -89,7 +89,8 @@ package %s {
     (
       Seq(
         Seq(
-          s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }"
+          s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }",
+          s"implicit val columnToJsValue: Column[play.api.libs.json.JsValue] = Util.parser { _.as[play.api.libs.json.JsValue] }"
         )
       ) ++ types.map { t =>
         Seq(
