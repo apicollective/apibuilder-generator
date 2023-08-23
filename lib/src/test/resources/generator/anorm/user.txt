@@ -40,16 +40,22 @@ package test.apidoc.apidoctest.v0.anorm.parsers {
       guid: String = "guid",
       email: String = "email",
       namePrefix: String = "name",
+      obj: String = "obj",
+      blob: String = "blob",
       prefixOpt: Option[String] = None
     ): RowParser[test.apidoc.apidoctest.v0.models.User] = {
       SqlParser.get[_root_.java.util.UUID](prefixOpt.getOrElse("") + guid) ~
       SqlParser.str(prefixOpt.getOrElse("") + email) ~
-      test.apidoc.apidoctest.v0.anorm.parsers.Name.parserWithPrefix(prefixOpt.getOrElse("") + namePrefix).? map {
-        case guid ~ email ~ name => {
+      test.apidoc.apidoctest.v0.anorm.parsers.Name.parserWithPrefix(prefixOpt.getOrElse("") + namePrefix).? ~
+      SqlParser.get[_root_.play.api.libs.json.JsObject](prefixOpt.getOrElse("") + obj).? ~
+      SqlParser.get[_root_.play.api.libs.json.JsValue](prefixOpt.getOrElse("") + blob).? map {
+        case guid ~ email ~ name ~ obj ~ blob => {
           test.apidoc.apidoctest.v0.models.User(
             guid = guid,
             email = email,
-            name = name
+            name = name,
+            obj = obj,
+            blob = blob
           )
         }
       }
