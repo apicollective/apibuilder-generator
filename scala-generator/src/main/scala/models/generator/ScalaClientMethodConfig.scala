@@ -1,7 +1,5 @@
 package scala.generator
 
-import scala.annotation.nowarn
-
 import scala.models.{Attributes, ResponseConfig}
 
 sealed trait ScalaClientMethodConfig {
@@ -102,9 +100,9 @@ sealed trait ScalaClientMethodConfig {
 
   def asyncTypeConstraint: String = "Sync"
 
-  def asyncTypeParam(@nowarn constraint: Option[String] = None): Option[String] = None
+  def asyncTypeParam(constraint: Option[String] = None): Option[String] = None
 
-  def wrappedAsyncType(@nowarn instance: String = ""): Option[String] = None
+  def wrappedAsyncType(instance: String = ""): Option[String] = None
 
   def asyncSuccessInvoke: String = wrappedAsyncType(asyncTypeConstraint).getOrElse(asyncType) + "." + asyncSuccess
 

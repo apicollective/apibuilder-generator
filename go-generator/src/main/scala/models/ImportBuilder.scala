@@ -40,7 +40,7 @@ private[models] case class ImportBuilder(importMappings: Option[String]) {
 
   // Build a list of go imports as we use them so we only import
   // libraries we actually use
-  private[this] var importPaths = mutable.ListBuffer[ImportPath]()
+  private[this] val importPaths = mutable.ListBuffer[ImportPath]()
 
   /**
     * Ensures that this library is being imported, returning the alias
