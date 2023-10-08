@@ -4,7 +4,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.11"
 
 ThisBuild / javacOptions ++= Seq("-source", "17", "-target", "17")
 
@@ -54,8 +54,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
-  .aggregate(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .dependsOn(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .aggregate(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
@@ -96,7 +96,7 @@ lazy val scalaGenerator = project
   .settings(
     Seq(ScoverageKeys.coverageMinimumStmtTotal := 85.4),
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.1.1",
+      "org.typelevel" %% "cats-core" % "2.10.0",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
     )
   )
@@ -107,7 +107,17 @@ lazy val csharpGenerator = project
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.1.1"
+      "org.typelevel" %% "cats-core" % "2.10.0"
+    )
+  )
+
+lazy val elmGenerator = project
+  .in(file("elm-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "2.10.0"
     )
   )
 
