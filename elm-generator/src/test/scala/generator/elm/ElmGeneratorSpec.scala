@@ -22,19 +22,19 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
 
   private[this] def setupValid(service: Service): Seq[File] = {
     rightOrErrors {
-      CSharpGenerator.invoke(
+      ElmGenerator.invoke(
         makeInvocationForm(service = service)
       )
     }
   }
 
   private[this] def genModels(service: Service): String = {
-    CSharpGenerator().generateModels(service)
+    ElmGenerator().generateModels(service)
   }
 
   it("invoke must returns errors") {
     leftOrErrors {
-      CSharpGenerator.invoke(
+      ElmGenerator.invoke(
         makeInvocationForm()
       )
     }
