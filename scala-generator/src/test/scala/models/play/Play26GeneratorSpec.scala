@@ -10,7 +10,7 @@ import scala.models.play.Helpers.compareWithoutWhiteSpaces
 
 class Play26GeneratorSpec extends AnyFunSpec with Matchers with ScalaCheckPropertyChecks {
 
-  implicit val scalacheckConfig = generatorDrivenConfig.copy(sizeRange = 10)
+  private implicit val scalacheckConfig: PropertyCheckConfiguration = generatorDrivenConfig.copy(sizeRange = 10)
 
   it("prependHeader should prepend a header") {
     forAll { (header: String, contents: String, form: InvocationForm) =>
