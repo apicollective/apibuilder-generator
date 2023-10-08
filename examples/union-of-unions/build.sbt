@@ -2,7 +2,7 @@ name := "apibuilder-union-of-unions"
 
 organization := "io.apibuilder.generator"
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.11"
 
 lazy val generated = project
   .in(file("generated"))
