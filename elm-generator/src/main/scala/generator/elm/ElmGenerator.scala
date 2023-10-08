@@ -1,10 +1,10 @@
 package generator.elm
 
-import cats.implicits._
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.ValidatedNec
-import io.apibuilder.spec.v0.models._
+import cats.implicits._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import io.apibuilder.spec.v0.models._
 import lib.generator.CodeGenerator
 
 object ElmGenerator extends CodeGenerator {
@@ -56,24 +56,10 @@ case class ElmGenerator() {
     Seq(
       s"module ${moduleName(service)} exposing (..)",
       contents.trim
-    ).mKString("\n\n")
+    ).mkString("\n\n")
   }
 
   def generateModels(service: Service): String = {
-    service.models.map(generateModel).mkString("\n")
-  }
-
-  private[this] def generateModel(model: Model): String = {
-    model.fields.foldLeft(
-      RecordBuilder().withName(Names.pascalCase(model.name))
-    ) { case (b, f) =>
-      b.withField(
-        RecordField(
-          name = Names.pascalCase(f.name),
-          `type` = csharpType(f.`type`),
-          required = f.required
-        )
-      )
-    }.build
+    service.models.map(TypeAlias.generate).mkString("\n\n")
   }
 }
