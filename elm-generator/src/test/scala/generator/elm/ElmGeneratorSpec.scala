@@ -47,7 +47,7 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
         namespace = "io.apibuilder",
         models = Seq(makeModel("bar"))
       )
-    ).head.name mustBe "IoApibuilderFoo.cs"
+    ).head.name mustBe "IoApibuilderFoo.elm"
   }
 
   it("filename dedups service name") {
@@ -57,7 +57,7 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
         namespace = "io.apibuilder.foo",
         models = Seq(makeModel("bar"))
       )
-    ).head.name mustBe "IoApibuilderFoo.cs"
+    ).head.name mustBe "IoApibuilderFoo.elm"
   }
 
   describe("generate models") {

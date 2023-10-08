@@ -13,8 +13,7 @@ object TypeAlias {
           "Maybe "
         }
         s" ${f.name}: ${ElmType.lookup(f.`type`)}$opt"
-      }.mkString(",\n").trim.indent(2).stripTrailing(),
-      ");",
+      }.mkString("\n  ,").trim.stripTrailing()
     ).mkString("\n")
   }
 }
