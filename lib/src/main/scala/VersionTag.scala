@@ -64,7 +64,7 @@ case class VersionTag(version: String) extends Ordered[VersionTag] {
       case 1 => {
         val pieces = splitOnDot(version)
         if (pieces.forall(s => VersionTag.isDigit(s))) {
-          Some((Seq(pieces.last.toInt + 1) ++ pieces.reverse.drop(1)).reverse.mkString("."))
+          Some((Seq(pieces.last.toInt + 1).map(_.toString) ++ pieces.reverse.drop(1)).reverse.mkString("."))
         } else {
           None
         }

@@ -6,7 +6,6 @@ import lib.Text.{appendSpace, initLowerCase}
 import play.api.libs.json._
 
 import java.util.UUID
-import scala.annotation.nowarn
 import scala.util.{Failure, Success, Try}
 
 sealed trait ScalaDatatype {
@@ -42,7 +41,7 @@ sealed trait ScalaDatatype {
     }
   }
 
-  protected def default(@nowarn json: JsValue): String = {
+  protected def default(json: JsValue): String = {
     throw new UnsupportedOperationException(s"default for type ${name}")
   }
 

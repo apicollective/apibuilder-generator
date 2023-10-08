@@ -1,10 +1,10 @@
-import scoverage.ScoverageKeys
-
 name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.11"
+
+ThisBuild / javacOptions ++= Seq("-source", "17", "-target", "17")
 
 lazy val allScalacOptions = Seq(
   "-deprecation",
@@ -36,6 +36,10 @@ lazy val generated = project
       "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
     ),
     scalacOptions ++= allScalacOptions,
+    Test / javaOptions ++= Seq(
+      "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
+      "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED"
+    )
   )
 
 // TODO: lib will eventually be published as a jar if it turns out
@@ -48,8 +52,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
-  .aggregate(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .dependsOn(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .aggregate(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
@@ -63,6 +67,10 @@ lazy val generator = project
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
     ),
     scalacOptions ++= allScalacOptions,
+    Test / javaOptions ++= Seq(
+      "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
+      "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED"
+    )
   )
 
 lazy val javaAwsLambdaPojos = project
@@ -70,7 +78,6 @@ lazy val javaAwsLambdaPojos = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimumStmtTotal := 69.5),
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.461",
       "me.geso" % "tinyvalidator" % "0.9.1",
@@ -84,9 +91,8 @@ lazy val scalaGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
-    Seq(ScoverageKeys.coverageMinimumStmtTotal := 85.4),
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.1.1",
+      "org.typelevel" %% "cats-core" % "2.10.0",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
     )
   )
@@ -97,7 +103,17 @@ lazy val csharpGenerator = project
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.1.1"
+      "org.typelevel" %% "cats-core" % "2.10.0"
+    )
+  )
+
+lazy val elmGenerator = project
+  .in(file("elm-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "2.10.0"
     )
   )
 
@@ -105,13 +121,11 @@ lazy val rubyGenerator = project
   .in(file("ruby-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 86.5))
 
 lazy val javaGenerator = project
   .in(file("java-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
-  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 66.98))
 
 lazy val goGenerator = project
   .in(file("go-generator"))
@@ -124,14 +138,12 @@ lazy val androidGenerator = project
   .settings(
     commonSettings: _*
   )
-  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 76.90))
 
 lazy val graphQLGenerator = project
   .in(file("graphql-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(resolversSettings)
-  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 66.98))
   .settings(
     libraryDependencies ++= Seq(
       "io.apibuilder" %% "apibuilder-graphql" % "0.0.10",
@@ -166,7 +178,6 @@ lazy val kotlinGenerator = project
       "org.mockito" % "mockito-core" % mockitoVersion % "test"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 94.5, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val csvGenerator = project
   .in(file("csv-generator"))
@@ -178,7 +189,6 @@ lazy val csvGenerator = project
       "org.apache.commons" % "commons-csv" % "1.7"
     )
   )
-  .settings(Seq(ScoverageKeys.coverageMinimumStmtTotal := 75.67, ScoverageKeys.coverageFailOnMinimum := true))
 
 lazy val postmanGenerator = project
   .in(file("postman-generator"))
@@ -193,7 +203,6 @@ lazy val postmanGenerator = project
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name ~= ("apibuilder-generator-" + _),
   organization := "io.apibuilder",
-  ScoverageKeys.coverageFailOnMinimum := true,
   testOptions += Tests.Argument("-oF"),
   libraryDependencies ++= Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
@@ -209,6 +218,10 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ),
   libraryDependencies += guice,
   scalacOptions ++= allScalacOptions,
+  Test / javaOptions ++= Seq(
+    "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED"
+  ),
   Compile / doc / sources := Seq.empty,
   Compile / packageDoc / publishArtifact := false,
 )

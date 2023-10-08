@@ -1,11 +1,10 @@
 package models.generator
 
-import java.util.UUID
-
-import scala.annotation.nowarn
+import lib.{Datatype, Text}
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
 import play.api.libs.json._
-import lib.{Datatype, Text}
+
+import java.util.UUID
 
 sealed trait JavaDatatype {
   def apidocType: String
@@ -25,7 +24,7 @@ sealed trait JavaDatatype {
 
   def valueFromString(value: String): String = valueFromJson(Json.parse(value))
 
-  def valueFromJson(@nowarn json: JsValue): String = {
+  def valueFromJson(json: JsValue): String = {
     throw new UnsupportedOperationException(s"Unable to create default value for type $name")
   }
 }
