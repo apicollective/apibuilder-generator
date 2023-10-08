@@ -6,7 +6,7 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 script:
-  - sbt clean coverage test coverageReport
+  - sbt clean test
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm -f
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm -f
