@@ -6,6 +6,8 @@ organization := "io.apibuilder.generator"
 
 ThisBuild / scalaVersion := "2.13.8"
 
+ThisBuild / javacOptions ++= Seq("-source", "17", "-target", "17")
+
 lazy val allScalacOptions = Seq(
   "-deprecation",
   "-feature",
@@ -36,6 +38,10 @@ lazy val generated = project
       "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
     ),
     scalacOptions ++= allScalacOptions,
+    Test / javaOptions ++= Seq(
+      "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
+      "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED"
+    )
   )
 
 // TODO: lib will eventually be published as a jar if it turns out
@@ -63,6 +69,10 @@ lazy val generator = project
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
     ),
     scalacOptions ++= allScalacOptions,
+    Test / javaOptions ++= Seq(
+      "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
+      "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED"
+    )
   )
 
 lazy val javaAwsLambdaPojos = project
@@ -209,6 +219,10 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ),
   libraryDependencies += guice,
   scalacOptions ++= allScalacOptions,
+  Test / javaOptions ++= Seq(
+    "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED"
+  ),
   Compile / doc / sources := Seq.empty,
   Compile / packageDoc / publishArtifact := false,
 )
