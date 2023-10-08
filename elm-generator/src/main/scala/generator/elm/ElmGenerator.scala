@@ -26,8 +26,11 @@ case class ElmGenerator() {
       "Service does not contain any models".invalidNec
     } else {
       Seq(File(
-        name = namespace(service) + ".elm",
-        contents = "TODO"
+        name = moduleName(service) + ".elm",
+        contents = generate(
+          service,
+          generateModels(service)
+        )
       )).validNec
     }
   }
@@ -44,8 +47,33 @@ case class ElmGenerator() {
     }
   }
 
-  private[this] def namespace(service: Service): String = {
+  private[this] def moduleName(service: Service): String = {
     val parts = service.namespace.split("\\.").filterNot(isVersion) ++ Seq(service.name).toList
     Names.pascalCase(parts.distinct.mkString("_"))
+  }
+
+  private[this] def generate(service: Service, contents: String): String = {
+    Seq(
+      s"module ${moduleName(service)} exposing (..)",
+      contents.trim
+    ).mKString("\n\n")
+  }
+
+  def generateModels(service: Service): String = {
+    service.models.map(generateModel).mkString("\n")
+  }
+
+  private[this] def generateModel(model: Model): String = {
+    model.fields.foldLeft(
+      RecordBuilder().withName(Names.pascalCase(model.name))
+    ) { case (b, f) =>
+      b.withField(
+        RecordField(
+          name = Names.pascalCase(f.name),
+          `type` = csharpType(f.`type`),
+          required = f.required
+        )
+      )
+    }.build
   }
 }
