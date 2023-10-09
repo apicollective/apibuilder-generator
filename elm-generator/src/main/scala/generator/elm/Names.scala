@@ -8,7 +8,12 @@ object Names {
 
   def camelCase(name: String): String = maybeQuote(Text.snakeToCamelCase(name))
 
-  private[this] def maybeQuote(name: String): String = {
+  def wrapInQuotes(name: String): String = {
+    // TODO: Escape
+    s"\"$name\""
+  }
+
+  def maybeQuote(name: String): String = {
     if (Keywords.contains(name)) {
       name + "_"
     } else {
