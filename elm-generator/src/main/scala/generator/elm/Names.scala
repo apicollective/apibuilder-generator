@@ -4,6 +4,18 @@ import lib.Text
 
 object Names {
 
+  private[this] def withNamespace(imports: Imports, name: String)(f: String => String): String = {
+    NamespaceParser.parse(name) match {
+      case ParsedName.Local(name) => f(name)
+      case ParsedName.Imported(namespace, name) => {
+        imports.addExposingAll(s"Generated.${Names.pascalCase(namespace)}")
+        f(name)
+      }
+    }
+  }
+
+  def camelCase(imports: Imports, name: String): String = withNamespace(imports, name)(camelCase)
+
   def pascalCase(name: String): String = maybeQuote(Text.pascalCase(name))
 
   def camelCase(name: String): String = maybeQuote(Text.snakeToCamelCase(name))
