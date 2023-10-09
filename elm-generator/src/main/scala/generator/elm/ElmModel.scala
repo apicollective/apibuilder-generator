@@ -50,8 +50,19 @@ case class ElmModel(args: GenArgs) {
           val encoder = args.datatypeResolver.parse(f.`type`) match {
             case Success(v) => v match {
               case p: Datatype.Primitive => fieldEncoder(f, primitiveEncoder(p))
-              case u: UserDefined => fieldEncoder(f, Names.camelCase(u.name) + "Encoder")
-              case m: Generated.Model => fieldEncoder(f, Names.camelCase(m.name) + "Encoder")
+              case u: UserDefined => {
+                val name = NamespaceParser.parse(u.name) match {
+                  case ParsedName.Local(name) => Names.camelCase(u.name)
+                  case ParsedName.Imported(namespace, name) => {
+                    args.imports.addExposingAll(s"Generated.${Names.pascalCase(namespace)}")
+                    Names.camelCase(name)
+                  }
+                }
+                fieldEncoder(f, name + "Encoder")
+              }
+              case m: Generated.Model => {
+                fieldEncoder(f, Names.camelCase(m.name) + "Encoder")
+              }
               case u: Container.List => {
                 println(s"model ${m.name} Field ${f.name} has type list: ${u.name}")
               }

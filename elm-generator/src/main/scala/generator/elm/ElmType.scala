@@ -39,7 +39,7 @@ case class ElmType(args: GenArgs) {
           case ParsedName.Local(name) => Names.pascalCase(name)
           case ParsedName.Imported(namespace, name) => {
             args.imports.addExposingAll(s"Generated.${Names.pascalCase(namespace)}")
-            Names.pascalCase(Names.pascalCase(name))
+            Names.pascalCase(name)
           }
         }
       }
