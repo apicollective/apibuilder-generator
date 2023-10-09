@@ -5,6 +5,7 @@ import cats.data.ValidatedNec
 import cats.implicits._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
+import lib.DatatypeResolver
 import lib.generator.CodeGenerator
 
 object ElmGenerator extends CodeGenerator {
@@ -25,14 +26,15 @@ case class ElmGenerator() {
     if (service.models.isEmpty) {
       "Service does not contain any models".invalidNec
     } else {
-      val imports = Imports()
+      val args = GenArgs(service)
+
       Seq(File(
         name = s"Generated/" + pascalServiceName(service) + ".elm",
         contents = generate(
           service,
-          imports,
-          generateEnums(service, imports),
-          generateModels(service, imports)
+          args.imports,
+          generateEnums(args),
+          generateModels(args)
         )
       )).validNec
     }
@@ -63,13 +65,25 @@ case class ElmGenerator() {
     ).mkString("\n\n")
   }
 
-  private[this] def generateModels(service: Service, imports: Imports): String = {
-    val models = ElmModel(imports)
-    service.models.map(models.generate).mkString("\n\n")
+  private[this] def generateModels(args: GenArgs): String = {
+    val models = ElmModel(args)
+    args.service.models.map(models.generate).mkString("\n\n")
   }
 
-  private[this] def generateEnums(service: Service, imports: Imports): String = {
-    val enums = ElmEnum(imports)
-    service.enums.map(enums.generate).mkString("\n\n")
+  private[this] def generateEnums(args: GenArgs): String = {
+    val enums = ElmEnum(args)
+    args.service.enums.map(enums.generate).mkString("\n\n")
   }
+}
+
+case class GenArgs(service: Service) {
+
+  val imports: Imports = Imports()
+
+  val datatypeResolver: DatatypeResolver = DatatypeResolver(
+    enumNames = service.enums.map(_.name),
+    unionNames = service.unions.map(_.name),
+    modelNames = service.models.map(_.name),
+  )
+
 }

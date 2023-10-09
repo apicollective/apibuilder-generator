@@ -2,8 +2,8 @@ package generator.elm
 
 import io.apibuilder.spec.v0.models.{Enum, EnumValue}
 
-case class ElmEnum(imports: Imports) {
-  private[this] val elmJson = ElmJson(imports)
+case class ElmEnum(args: GenArgs) {
+  private[this] val elmJson = ElmJson(args.imports)
   private[this] val Unknown = "unknown"
 
   // "type MemberStatus = MemberStatusPending | MemberStatusActive | MemberStatusInactive | MemberStatusUnknown"

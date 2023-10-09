@@ -2,8 +2,8 @@ package generator.elm
 
 import io.apibuilder.spec.v0.models.Model
 
-case class ElmModel(imports: Imports) {
-  private[this] val elmJson = ElmJson(imports)
+case class ElmModel(args: GenArgs) {
+  private[this] val elmJson = ElmJson(args.imports)
 
   def generate(model: Model): String = {
     Seq(
@@ -36,12 +36,13 @@ case class ElmModel(imports: Imports) {
       Encode.string (memberStatusToString type_)
    */
   private[this] def genEncoder(m: Model): String = {
-    imports.addAs("Json.Encode", "Encode")
+    args.imports.addAs("Json.Encode", "Encode")
     elmJson.encoder(m.name) {
       Seq(
         "Encode.object",
         "[",
         m.fields.map { f =>
+
 
         }.mkString("\n").indent(4),
         "]"
