@@ -2,7 +2,7 @@ package generator.elm
 
 import io.apibuilder.spec.v0.models.{Enum, EnumValue}
 
-object ElmEnum {
+case class ElmEnum(imports: Imports) {
   private[this] val Unknown = "unknown"
 
   // "type MemberStatus = MemberStatusPending | MemberStatusActive | MemberStatusInactive | MemberStatusUnknown"
@@ -10,7 +10,8 @@ object ElmEnum {
     Seq(
       s"type ${Names.pascalCase(e.name)} = " + values(e).mkString(" | "),
       genToString(e),
-      genFromString(e)
+      genFromString(e),
+      genEncoder(e)
     ).mkString("\n\n")
   }
 
@@ -105,6 +106,20 @@ object ElmEnum {
       }.mkString("\n"),
       "    else",
       "        " + valueElmName(e, Unknown)
+    ).mkString("\n")
+  }
+
+  /*
+  memberStatusEncoder : MemberStatus -> Encode.Value
+  memberStatusEncoder type_ =
+      Encode.string (memberStatusToString type_)
+   */
+  def genEncoder(e: Enum): String = {
+    imports.addAs("Json.Encode", "Encode")
+    Seq(
+      s"${Names.camelCase(e.name)}Encoder : ${Names.pascalCase(e.name)} -> Encode.Value",
+      s"${Names.camelCase(e.name)}Encoder instance =",
+      s"    Encode.string (${Names.camelCase(e.name)}ToString instance)"
     ).mkString("\n")
   }
 

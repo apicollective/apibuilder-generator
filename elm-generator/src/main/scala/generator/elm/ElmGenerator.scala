@@ -25,11 +25,13 @@ case class ElmGenerator() {
     if (service.models.isEmpty) {
       "Service does not contain any models".invalidNec
     } else {
+      val imports = Imports()
       Seq(File(
         name = s"Generated/" + pascalServiceName(service) + ".elm",
         contents = generate(
           service,
-          generateEnums(service),
+          imports,
+          generateEnums(service, imports),
           generateModels(service)
         )
       )).validNec
@@ -53,9 +55,10 @@ case class ElmGenerator() {
     Names.pascalCase(parts.distinct.mkString("_"))
   }
 
-  private[this] def generate(service: Service, contents: String*): String = {
+  private[this] def generate(service: Service, imports: Imports, contents: String*): String = {
     Seq(
       s"module Generated.${pascalServiceName(service)} exposing (..)",
+      imports.generateCode(), // must be generated after the content
       contents.mkString("\n\n")
     ).mkString("\n\n")
   }
@@ -64,7 +67,8 @@ case class ElmGenerator() {
     service.models.map(TypeAlias.generate).mkString("\n\n")
   }
 
-  def generateEnums(service: Service): String = {
-    service.enums.map(ElmEnum.generate).mkString("\n\n")
+  def generateEnums(service: Service, imports: Imports): String = {
+    val enums = ElmEnum(imports)
+    service.enums.map(enums.generate).mkString("\n\n")
   }
 }
