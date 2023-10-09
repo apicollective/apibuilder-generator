@@ -94,12 +94,14 @@ object ElmEnum {
     Seq(
       s"${Names.camelCase(e.name)}FromString : String -> ${Names.pascalCase(e.name)}",
       s"${Names.camelCase(e.name)}FromString value =",
-      e.values.zipWithIndex.map { case (v, i) =>
-        singleValue(
-          isFirst = i==0,
-          name = valueElmName(e, v),
-          value = v.value.getOrElse(v.name)
-        )
+      e.values.zipWithIndex.flatMap { case (ev, i) =>
+        (ev.value.toSeq ++ Seq(ev.name)).map { v =>
+          singleValue(
+            isFirst = i == 0,
+            name = valueElmName(e, v),
+            value = v
+          )
+        }
       }.mkString("\n"),
       "    else",
       "        " + valueElmName(e, Unknown)
