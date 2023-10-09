@@ -1,10 +1,17 @@
 package generator.elm
 
 import io.apibuilder.spec.v0.models.Model
-import lib.Text._
 
-object TypeAlias {
+case class ElmModel(imports: Imports) {
   def generate(model: Model): String = {
+    Seq(
+      genTypeAlias(model),
+      //genEncoder(model),
+      //genDecoder(model)
+    ).mkString("\n\n")
+  }
+
+  private[this] def genTypeAlias(model: Model): String = {
     Seq(
       s"type alias ${Names.pascalCase(model.name)} =",
       "  {",
@@ -19,4 +26,5 @@ object TypeAlias {
       "  }"
     ).mkString("\n")
   }
+
 }

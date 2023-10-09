@@ -6,7 +6,9 @@ case class Imports() {
   private[this] val allAs: TrieMap[String, String] = TrieMap[String, String]()
 
   def addAs(name: String, as: String): Unit = {
-    allAs.put(name, as)
+    allAs.put(name, as).foreach { existing =>
+      assert(existing == as, s"Import $name previously added as '$existing' - must match")
+    }
     ()
   }
 

@@ -32,7 +32,7 @@ case class ElmGenerator() {
           service,
           imports,
           generateEnums(service, imports),
-          generateModels(service)
+          generateModels(service, imports)
         )
       )).validNec
     }
@@ -63,11 +63,12 @@ case class ElmGenerator() {
     ).mkString("\n\n")
   }
 
-  def generateModels(service: Service): String = {
-    service.models.map(TypeAlias.generate).mkString("\n\n")
+  private[this] def generateModels(service: Service, imports: Imports): String = {
+    val models = ElmModel(imports)
+    service.models.map(models.generate).mkString("\n\n")
   }
 
-  def generateEnums(service: Service, imports: Imports): String = {
+  private[this] def generateEnums(service: Service, imports: Imports): String = {
     val enums = ElmEnum(imports)
     service.enums.map(enums.generate).mkString("\n\n")
   }

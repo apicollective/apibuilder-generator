@@ -3,6 +3,7 @@ package generator.elm
 import io.apibuilder.spec.v0.models.{Enum, EnumValue}
 
 case class ElmEnum(imports: Imports) {
+  private[this] val elmJson = ElmJson(imports)
   private[this] val Unknown = "unknown"
 
   // "type MemberStatus = MemberStatusPending | MemberStatusActive | MemberStatusInactive | MemberStatusUnknown"
@@ -116,12 +117,9 @@ case class ElmEnum(imports: Imports) {
       Encode.string (memberStatusToString type_)
    */
   private[this] def genEncoder(e: Enum): String = {
-    imports.addAs("Json.Encode", "Encode")
-    Seq(
-      s"${Names.camelCase(e.name)}Encoder : ${Names.pascalCase(e.name)} -> Encode.Value",
-      s"${Names.camelCase(e.name)}Encoder instance =",
-      s"    Encode.string (${Names.camelCase(e.name)}ToString instance)"
-    ).mkString("\n")
+    elmJson.encoder(e.name) {
+      s"Encode.string (${Names.camelCase(e.name)}ToString instance)"
+    }
   }
 
   /*
@@ -130,12 +128,9 @@ case class ElmEnum(imports: Imports) {
       Decode.map memberStatusFromString string
    */
   private[this] def genDecoder(e: Enum): String = {
-    imports.addAs("Json.Decode", "Decode")
-    Seq(
-      s"${Names.camelCase(e.name)}Decoder : Decode.Decoder ${Names.pascalCase(e.name)}",
-      s"${Names.camelCase(e.name)}Decoder =",
-      s"    Decode.map ${Names.camelCase(e.name)}FromString Decode.string"
-    ).mkString("\n")
+    elmJson.decoder(e.name) {
+      s"Decode.map ${Names.camelCase(e.name)}FromString Decode.string"
+    }
   }
 
 }
