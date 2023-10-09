@@ -51,17 +51,11 @@ case class ElmModel(args: GenArgs) {
               case p: Datatype.Primitive => {
                 primitiveEncoder(f, p)
               }
-              case e: UserDefined.Enum => {
-                fieldEncoder(f, Names.camelCase(e.name) + "Encoder")
-              }
-              case m: UserDefined.Model => {
-                fieldEncoder(f, Names.camelCase(m.name) + "Encoder")
+              case u: UserDefined => {
+                fieldEncoder(f, Names.camelCase(u.name) + "Encoder")
               }
               case m: Generated.Model => {
                 fieldEncoder(f, Names.camelCase(m.name) + "Encoder")
-              }
-              case u: UserDefined.Union => {
-                fieldEncoder(f, Names.camelCase(u.name) + "Encoder")
               }
               case u: Container.List => {
                 println(s"model ${m.name} Field ${f.name} has type list: ${u.name}")
