@@ -5,7 +5,10 @@ import lib.Text
 object Names {
 
   def pascalCase(name: String): String = maybeQuote(Text.pascalCase(name))
-  def maybeQuote(name: String): String = {
+
+  def camelCase(name: String): String = maybeQuote(Text.snakeToCamelCase(name))
+
+  private[this] def maybeQuote(name: String): String = {
     if (Keywords.contains(name)) {
       s"#{name}_"
     } else {

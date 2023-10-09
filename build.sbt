@@ -35,11 +35,7 @@ lazy val generated = project
       ws,
       "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
     ),
-    scalacOptions ++= allScalacOptions,
-    Test / javaOptions ++= Seq(
-      "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
-      "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED"
-    )
+    scalacOptions ++= allScalacOptions
   )
 
 // TODO: lib will eventually be published as a jar if it turns out
@@ -205,6 +201,9 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   organization := "io.apibuilder",
   testOptions += Tests.Argument("-oF"),
   libraryDependencies ++= Seq(
+    guice,
+    "com.google.inject" % "guice" % "5.1.0",
+    "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
     "org.atteo" % "evo-inflector" % "1.2.2",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
@@ -216,7 +215,6 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalameta" %% "scalameta" % "4.4.3" % Test,
     "com.squareup" % "javapoet" % "1.13.0",
   ),
-  libraryDependencies += guice,
   scalacOptions ++= allScalacOptions,
   Test / javaOptions ++= Seq(
     "--add-exports=java.base/sun.security.x509=ALL-UNNAMED",
