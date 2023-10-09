@@ -26,7 +26,7 @@ case class ElmGenerator() {
       "Service does not contain any models".invalidNec
     } else {
       Seq(File(
-        name = moduleName(service) + ".elm",
+        name = s"Generated/" + pascalServiceName(service) + ".elm",
         contents = generate(
           service,
           generateModels(service)
@@ -47,16 +47,14 @@ case class ElmGenerator() {
     }
   }
 
-  private[this] def moduleName(service: Service): String = {
-    println(s"service.namespace: ${service.namespace}")
-    println(s"service.name: ${service.name}")
+  private[this] def pascalServiceName(service: Service): String = {
     val parts = service.namespace.split("\\.").filterNot(isVersion).toList
     Names.pascalCase(parts.distinct.mkString("_"))
   }
 
   private[this] def generate(service: Service, contents: String): String = {
     Seq(
-      s"module ${moduleName(service)} exposing (..)",
+      s"module Generated.${pascalServiceName(service)} exposing (..)",
       contents.trim
     ).mkString("\n\n")
   }

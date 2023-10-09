@@ -10,7 +10,7 @@ object Names {
 
   private[this] def maybeQuote(name: String): String = {
     if (Keywords.contains(name)) {
-      s"#{name}_"
+      name + "_"
     } else {
       name
     }
