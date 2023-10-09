@@ -48,7 +48,9 @@ case class ElmGenerator() {
   }
 
   private[this] def moduleName(service: Service): String = {
-    val parts = service.namespace.split("\\.").filterNot(isVersion) ++ Seq(service.name).toList
+    println(s"service.namespace: ${service.namespace}")
+    println(s"service.name: ${service.name}")
+    val parts = service.namespace.split("\\.").filterNot(isVersion).toList
     Names.pascalCase(parts.distinct.mkString("_"))
   }
 
