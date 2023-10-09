@@ -1,21 +1,38 @@
 package generator.elm
 
+import cats.implicits._
+import cats.data.ValidatedNec
 import io.apibuilder.spec.v0.models.{Field, Model}
 import lib.Datatype
 import lib.Datatype.{Container, Generated, Primitive, UserDefined}
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 case class ElmModel(args: GenArgs) {
   private[this] val elmJson = ElmJson(args.imports)
   private[this] val elmType = ElmType(args)
 
-  def generate(model: Model): String = {
-    Seq(
-      genTypeAlias(model),
-      genEncoder(model).code,
-      genDecoder(model).code
-    ).mkString("\n\n")
+  def generate(model: Model): ValidatedNec[String, String] = {
+    (
+      wrapErrors { genEncoder(model) },
+      wrapErrors { genDecoder(model) }
+    ).mapN { case (a, b) => (a, b) }.map { case (encoder, decoder) =>
+      Seq(
+        genTypeAlias(model),
+        encoder.code,
+        decoder.code
+      ).mkString("\n\n")
+    }
+  }
+
+  // TODO: Refactor to avoid sys.error
+  private[this] def wrapErrors[T](f: => T): ValidatedNec[String, T] = {
+    Try {
+      f
+    } match {
+      case Failure(ex) => ex.getMessage.invalidNec
+      case Success(r) => r.validNec
+    }
   }
 
   private[this] def genTypeAlias(model: Model): String = {
@@ -41,7 +58,7 @@ case class ElmModel(args: GenArgs) {
       Seq(
         "Encode.object",
         "[",
-        m.fields.zipWithIndex.map { case (f,i) =>
+        m.fields.zipWithIndex.map { case (f, i) =>
           val encoder = args.datatypeResolver.parse(f.`type`) match {
             case Success(v) => v match {
               case p: Datatype.Primitive => fieldEncoder(f, primitiveEncoder(p))

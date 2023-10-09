@@ -25,17 +25,22 @@ case class ElmGenerator() {
       "Service does not contain any models".invalidNec
     } else {
       val args = GenArgs(service)
-
-      Seq(File(
-        name = s"Generated/" + pascalServiceName(service) + ".elm",
-        contents = generate(
-          service,
-          args.imports,
-          ElmCommon(args).generate(),
-          generateEnums(args),
-          generateModels(args)
-        )
-      )).validNec
+      (
+        ElmCommon(args).generate().validNec,
+        generateEnums(args).validNec,
+        generateModels(args)
+      ).mapN { case (a,b,c) => (a,b,c) }.map { case (common, enums, models) =>
+        Seq(File(
+          name = s"Generated/" + pascalServiceName(service) + ".elm",
+          contents = generate(
+            service,
+            args.imports,
+            common,
+            enums,
+            models
+          )
+        ))
+      }
     }
   }
 
@@ -52,9 +57,9 @@ case class ElmGenerator() {
     ).mkString("\n\n")
   }
 
-  private[this] def generateModels(args: GenArgs): String = {
+  private[this] def generateModels(args: GenArgs): ValidatedNec[String, String] = {
     val models = ElmModel(args)
-    args.service.models.map(models.generate).mkString("\n\n")
+    args.service.models.map(models.generate).sequence.map(_.mkString("\n\n"))
   }
 
   private[this] def generateEnums(args: GenArgs): String = {
