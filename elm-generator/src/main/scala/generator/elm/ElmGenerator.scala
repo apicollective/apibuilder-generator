@@ -31,6 +31,7 @@ case class ElmGenerator() {
         contents = generate(
           service,
           args.imports,
+          ElmCommon(args).generate(),
           generateEnums(args),
           generateModels(args)
         )

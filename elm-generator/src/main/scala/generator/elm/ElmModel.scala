@@ -46,17 +46,12 @@ case class ElmModel(args: GenArgs) {
         "Encode.object",
         "[",
         m.fields.zipWithIndex.map { case (f,i) =>
+          println(s"${m.name} field ${f.name} type: ${f.`type`}")
           val encoder = args.datatypeResolver.parse(f.`type`) match {
             case Success(v) => v match {
-              case p: Datatype.Primitive => {
-                primitiveEncoder(f, p)
-              }
-              case u: UserDefined => {
-                fieldEncoder(f, Names.camelCase(u.name) + "Encoder")
-              }
-              case m: Generated.Model => {
-                fieldEncoder(f, Names.camelCase(m.name) + "Encoder")
-              }
+              case p: Datatype.Primitive => fieldEncoder(f, primitiveEncoder(p))
+              case u: UserDefined => fieldEncoder(f, Names.camelCase(u.name) + "Encoder")
+              case m: Generated.Model => fieldEncoder(f, Names.camelCase(m.name) + "Encoder")
               case u: Container.List => {
                 println(s"model ${m.name} Field ${f.name} has type list: ${u.name}")
               }
@@ -80,10 +75,10 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def primitiveEncoder(f: Field, p: Primitive): String = {
+  private[this] def primitiveEncoder(p: Primitive): String = {
     args.imports.addAs("Json.Encode", "Encode")
     import Datatype.Primitive._
-    val encoder = p match {
+    p match {
       case Boolean => "Encode.boolean"
       case Double => "Encode.float"
       case Integer => "Encode.int"
@@ -97,7 +92,6 @@ case class ElmModel(args: GenArgs) {
       case Unit => "(Encode.success Nothing)" // TODO Verify
       case Uuid => "Encode.string"
     }
-    fieldEncoder(f, encoder)
   }
 
   private[this] def fieldEncoder(f: Field, encoder: String): String = {
