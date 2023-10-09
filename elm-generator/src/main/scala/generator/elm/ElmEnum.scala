@@ -11,7 +11,8 @@ case class ElmEnum(imports: Imports) {
       s"type ${Names.pascalCase(e.name)} = " + values(e).mkString(" | "),
       genToString(e),
       genFromString(e),
-      genEncoder(e)
+      genEncoder(e),
+      genDecoder(e)
     ).mkString("\n\n")
   }
 
@@ -114,7 +115,7 @@ case class ElmEnum(imports: Imports) {
   memberStatusEncoder type_ =
       Encode.string (memberStatusToString type_)
    */
-  def genEncoder(e: Enum): String = {
+  private[this] def genEncoder(e: Enum): String = {
     imports.addAs("Json.Encode", "Encode")
     Seq(
       s"${Names.camelCase(e.name)}Encoder : ${Names.pascalCase(e.name)} -> Encode.Value",
@@ -124,12 +125,17 @@ case class ElmEnum(imports: Imports) {
   }
 
   /*
-  memberStatusEncoder : MemberStatus -> Encode.Value
-  memberStatusEncoder type_ =
-      Encode.string (memberStatusToString type_)
-
   memberStatusDecoder : Decoder MemberStatus
   memberStatusDecoder =
       Decode.map memberStatusFromString string
    */
+  private[this] def genDecoder(e: Enum): String = {
+    imports.addAs("Json.Decode", "Decode")
+    Seq(
+      s"${Names.camelCase(e.name)}Decoder : Decode.Decoder ${Names.pascalCase(e.name)}",
+      s"${Names.camelCase(e.name)}Decoder =",
+      s"    Decode.map ${Names.camelCase(e.name)}FromString Decode.string"
+    ).mkString("\n")
+  }
+
 }
