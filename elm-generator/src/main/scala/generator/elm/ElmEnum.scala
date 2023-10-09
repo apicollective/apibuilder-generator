@@ -10,8 +10,8 @@ case class ElmEnum(args: GenArgs) {
   def generate(e: Enum): String = {
     Seq(
       s"type ${Names.pascalCase(e.name)} = " + values(e).mkString(" | "),
-      genToString(e),
-      genFromString(e),
+      genToString(e).code,
+      genFromString(e).code,
       genEncoder(e).code,
       genDecoder(e).code
     ).mkString("\n\n")
@@ -48,16 +48,18 @@ case class ElmEnum(args: GenArgs) {
           MemberStatusUnknown ->
               "unknown"
    */
-  private[this] def genToString(e: Enum): String = {
+  private[this] def genToString(e: Enum): ElmFunction = {
     def singleValue(name: String, value: String) = {
       Seq(
         s"${Names.maybeQuote(name)} ->",
         s"    ${Names.wrapInQuotes(value)}",
       ).mkString("\n").indent(8)
     }
-    Seq(
-      s"${Names.camelCase(e.name)}ToString : ${Names.pascalCase(e.name)} -> String",
-      s"${Names.camelCase(e.name)}ToString instance =",
+
+    val n = s"${Names.camelCase(e.name)}ToString"
+    val code = Seq(
+      s"$n : ${Names.pascalCase(e.name)} -> String",
+      s"$n instance =",
       "    case instance of",
       (e.values.map { v =>
         singleValue(
@@ -71,6 +73,7 @@ case class ElmEnum(args: GenArgs) {
         )
       )).mkString("\n")
     ).mkString("\n")
+    ElmFunction(name = n, code = code)
   }
 
   /*
@@ -85,7 +88,7 @@ case class ElmEnum(args: GenArgs) {
       else
           MemberStatusUnknown
    */
-  private[this] def genFromString(e: Enum): String = {
+  private[this] def genFromString(e: Enum): ElmFunction = {
     def singleValue(isFirst: Boolean, name: String, value: String) = {
       val prefix = if (isFirst) { "" } else { "else " }
       Seq(
@@ -94,9 +97,10 @@ case class ElmEnum(args: GenArgs) {
       ).mkString("\n").indent(4)
     }
 
-    Seq(
-      s"${Names.camelCase(e.name)}FromString : String -> ${Names.pascalCase(e.name)}",
-      s"${Names.camelCase(e.name)}FromString value =",
+    val n = s"${Names.camelCase(e.name)}FromString"
+    val code = Seq(
+      s"$n : String -> ${Names.pascalCase(e.name)}",
+      s"$n value =",
       e.values.zipWithIndex.flatMap { case (ev, i) =>
         (ev.value.toSeq ++ Seq(ev.name)).map { v =>
           singleValue(
@@ -109,6 +113,7 @@ case class ElmEnum(args: GenArgs) {
       "    else",
       "        " + valueElmName(e, Unknown)
     ).mkString("\n")
+    ElmFunction(name = n, code = code)
   }
 
   /*
@@ -116,7 +121,7 @@ case class ElmEnum(args: GenArgs) {
   memberStatusEncoder type_ =
       Encode.string (memberStatusToString type_)
    */
-  private[this] def genEncoder(e: Enum): Encoder = {
+  private[this] def genEncoder(e: Enum): ElmFunction = {
     elmJson.encoder(e.name) {
       s"Encode.string (${Names.camelCase(e.name)}ToString instance)"
     }
@@ -127,7 +132,7 @@ case class ElmEnum(args: GenArgs) {
   memberStatusDecoder =
       Decode.map memberStatusFromString string
    */
-  private[this] def genDecoder(e: Enum): Decoder = {
+  private[this] def genDecoder(e: Enum): ElmFunction = {
     elmJson.decoder(e.name) {
       s"Decode.map ${Names.camelCase(e.name)}FromString Decode.string"
     }

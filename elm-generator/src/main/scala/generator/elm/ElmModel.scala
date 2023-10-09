@@ -52,7 +52,7 @@ case class ElmModel(args: GenArgs) {
   }
 
 
-  private[this] def genEncoder(m: Model): Encoder = {
+  private[this] def genEncoder(m: Model): ElmFunction = {
     args.imports.addAs("Json.Encode", "Encode")
     elmJson.encoder(m.name) {
       Seq(
@@ -118,7 +118,7 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def genDecoder(m: Model): Decoder = {
+  private[this] def genDecoder(m: Model): ElmFunction = {
     elmJson.decoder(m.name) {
       Seq(
         s"Decode.succeed ${Names.pascalCase(m.name)}",

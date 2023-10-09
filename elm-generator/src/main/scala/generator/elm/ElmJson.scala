@@ -2,7 +2,7 @@ package generator.elm
 
 case class ElmJson(imports: Imports) {
 
-  def encoder(name: String)(contents: String): Encoder = {
+  def encoder(name: String)(contents: String): ElmFunction = {
     imports.addAs("Json.Encode", "Encode")
     val n = s"${Names.camelCase(name)}Encoder"
     val code = Seq(
@@ -10,11 +10,11 @@ case class ElmJson(imports: Imports) {
       s"$n instance =",
       contents.indent(4)
     ).mkString("\n")
-    Encoder(name = n, code = code)
+    ElmFunction(name = n, code = code)
   }
 
 
-  def decoder(name: String)(contents: String): Decoder = {
+  def decoder(name: String)(contents: String): ElmFunction = {
     val n = s"${Names.camelCase(name)}Decoder"
     imports.addAs("Json.Decode", "Decode")
     val code = Seq(
@@ -22,9 +22,8 @@ case class ElmJson(imports: Imports) {
       s"$n =",
       contents.indent(4)
     ).mkString("\n")
-    Decoder(name = n, code = code)
+    ElmFunction(name = n, code = code)
   }
 }
 
-case class Encoder(name: String, code: String)
-case class Decoder(name: String, code: String)
+case class ElmFunction(name: String, code: String)
