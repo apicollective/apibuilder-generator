@@ -88,7 +88,6 @@ lazy val scalaGenerator = project
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.10.0",
       "org.scalameta" %% "scalafmt-core" % "2.3.2"
     )
   )
@@ -207,6 +206,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.atteo" % "evo-inflector" % "1.2.2",
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
+    "org.typelevel" %% "cats-core" % "2.10.0",
     "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
     "org.scalatest" %% "scalatest" % scalatestVersion % Test,
     "org.scalatestplus" %% "scalacheck-1-15" % "3.2.7.0" % Test,

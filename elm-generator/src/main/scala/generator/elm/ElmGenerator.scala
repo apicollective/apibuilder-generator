@@ -57,7 +57,7 @@ case class ElmGenerator() {
     ).mkString("\n\n")
   }
 
-  private[this] def generateModels(args: GenArgs): ValidatedNec[String, String] = {
+  private[elm] def generateModels(args: GenArgs): ValidatedNec[String, String] = {
     val models = ElmModel(args)
     args.service.models.map(models.generate).sequence.map(_.mkString("\n\n"))
   }
