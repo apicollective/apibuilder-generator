@@ -13,6 +13,10 @@ case class ElmCommon(args: GenArgs) {
       |
       |        Nothing ->
       |            Encode.null
+      |
+      |
+      |type alias UnitResponse =
+      |    { }
       |""".stripMargin
   }
 

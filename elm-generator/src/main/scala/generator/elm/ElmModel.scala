@@ -35,11 +35,6 @@ case class ElmModel(args: GenArgs) {
   }
 
 
-  /*
-  memberStatusEncoder : MemberStatus -> Encode.Value
-  memberStatusEncoder type_ =
-      Encode.string (memberStatusToString type_)
-   */
   private[this] def genEncoder(m: Model): String = {
     args.imports.addAs("Json.Encode", "Encode")
     elmJson.encoder(m.name) {
@@ -52,7 +47,7 @@ case class ElmModel(args: GenArgs) {
               case p: Datatype.Primitive => fieldEncoder(f, primitiveEncoder(p))
               case u: UserDefined => {
                 val name = NamespaceParser.parse(u.name) match {
-                  case ParsedName.Local(name) => Names.camelCase(u.name)
+                  case ParsedName.Local(name) => Names.camelCase(name)
                   case ParsedName.Imported(namespace, name) => {
                     args.imports.addExposingAll(s"Generated.${Names.pascalCase(namespace)}")
                     Names.camelCase(name)
@@ -95,7 +90,7 @@ case class ElmModel(args: GenArgs) {
       case Integer => "Encode.int"
       case Long => "Encode.int"
       case DateIso8601 => "Encode.string"
-      case DateTimeIso8601 => "Encode.float"
+      case DateTimeIso8601 => "Encode.string"
       case Decimal => "Encode.float"
       case Object => "Encode.string" // TODO
       case JsonValue => "Encode.string" // TODO

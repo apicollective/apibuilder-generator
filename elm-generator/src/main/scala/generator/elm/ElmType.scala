@@ -46,7 +46,10 @@ case class ElmType(args: GenArgs) {
       case u: Generated.Model => sys.error(s"TODO: Handle generated model: ${u.name}")
       case u: Container.List => "List (" + lookup(u.inner) + ")"
       case _: Container.Option => sys.error("Not sure hot to handle option yet")
-      case u: Container.Map => "Dict String " + lookup(u.inner)
+      case u: Container.Map => {
+        args.imports.addAs("Dict", "Dict")
+        "Dict String " + lookup(u.inner)
+      }
     }
   }
 }
