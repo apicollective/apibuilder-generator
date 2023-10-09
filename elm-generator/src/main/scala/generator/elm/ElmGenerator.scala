@@ -29,6 +29,7 @@ case class ElmGenerator() {
         name = s"Generated/" + pascalServiceName(service) + ".elm",
         contents = generate(
           service,
+          generateEnums(service),
           generateModels(service)
         )
       )).validNec
@@ -52,14 +53,18 @@ case class ElmGenerator() {
     Names.pascalCase(parts.distinct.mkString("_"))
   }
 
-  private[this] def generate(service: Service, contents: String): String = {
+  private[this] def generate(service: Service, contents: String*): String = {
     Seq(
       s"module Generated.${pascalServiceName(service)} exposing (..)",
-      contents.trim
+      contents.mkString("\n\n")
     ).mkString("\n\n")
   }
 
   def generateModels(service: Service): String = {
     service.models.map(TypeAlias.generate).mkString("\n\n")
+  }
+
+  def generateEnums(service: Service): String = {
+    service.enums.map(ElmEnum.generate).mkString("\n\n")
   }
 }
