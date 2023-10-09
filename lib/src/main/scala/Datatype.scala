@@ -120,7 +120,7 @@ case class DatatypeResolver(
       case MapDefaultRx() => Success(Datatype.Container.Map(Datatype.Primitive.String))
 
       case UserDefined(dt) => Success(dt)
-      case _ => Failure(new RuntimeException(s"Cannot map class[${value.getClass.getName}] to datatype"))
+      case other => Failure(new RuntimeException(s"Cannot map class[${value.getClass.getName}] with value [$other] to datatype"))
     }
 
     if (makePrimitiveType) dt else dt.map(Datatype.Container.Option)
