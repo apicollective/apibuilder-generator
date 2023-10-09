@@ -14,7 +14,7 @@ case class ElmModel(args: GenArgs) {
     Seq(
       genTypeAlias(model),
       genEncoder(model).code,
-      genDecoders(model).map(_.code)
+      genDecoder(model).code
     ).mkString("\n\n")
   }
 
@@ -99,18 +99,6 @@ case class ElmModel(args: GenArgs) {
     } else {
       s"""( ${Names.wrapInQuotes(f.name)}, encodeOptional $encoder instance.${Names.camelCase(f.name)} )"""
     }
-  }
-
-  private[this] def genDecoders(m: Model): Seq[Decoder] = {
-    val decoder = genDecoder(m)
-    val listDecoder = elmJson.decoder("list_" + m.name) {
-      s"list ${decoder.name}".indent(4)
-    }
-
-    Seq(
-      decoder,
-      listDecoder
-    )
   }
 
   private[this] def genDecoder(m: Model): Decoder = {
