@@ -9,7 +9,8 @@ object ElmEnum {
   def generate(e: Enum): String = {
     Seq(
       s"type ${Names.pascalCase(e.name)} = " + values(e).mkString(" | "),
-      genToString(e)
+      genToString(e),
+      genFromString(e)
     ).mkString("\n\n")
   }
 
@@ -70,14 +71,6 @@ object ElmEnum {
   }
 
   /*
-  memberStatusEncoder : MemberStatus -> Encode.Value
-  memberStatusEncoder type_ =
-      Encode.string (memberStatusToString type_)
-
-  memberStatusDecoder : Decoder MemberStatus
-  memberStatusDecoder =
-      Decode.map memberStatusFromString string
-
   memberStatusFromString : String -> MemberStatus
   memberStatusFromString value =
       if (value == "active") then
@@ -88,5 +81,38 @@ object ElmEnum {
           MemberStatusInactive
       else
           MemberStatusUnknown
+   */
+  private[this] def genFromString(e: Enum): String = {
+    def singleValue(isFirst: Boolean, name: String, value: String) = {
+      val prefix = if (isFirst) { "" } else { "else " }
+      Seq(
+        s"${prefix}if (value == ${Names.wrapInQuotes(value)}) then",
+        s"    $name"
+      ).mkString("\n").indent(4)
+    }
+
+    Seq(
+      s"${Names.camelCase(e.name)}FromString : String -> ${Names.pascalCase(e.name)}",
+      s"${Names.camelCase(e.name)}FromString value =",
+      e.values.zipWithIndex.map { case (v, i) =>
+        singleValue(
+          isFirst = i==0,
+          name = valueElmName(e, v),
+          value = v.value.getOrElse(v.name)
+        )
+      }.mkString("\n"),
+      "    else",
+      "        " + valueElmName(e, Unknown)
+    ).mkString("\n")
+  }
+
+  /*
+  memberStatusEncoder : MemberStatus -> Encode.Value
+  memberStatusEncoder type_ =
+      Encode.string (memberStatusToString type_)
+
+  memberStatusDecoder : Decoder MemberStatus
+  memberStatusDecoder =
+      Decode.map memberStatusFromString string
    */
 }
