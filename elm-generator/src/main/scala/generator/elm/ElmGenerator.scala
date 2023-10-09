@@ -16,8 +16,6 @@ object ElmGenerator extends CodeGenerator {
       case Valid(files) => Right(files)
     }
   }
-
-  val Default: ElmGenerator = ElmGenerator()
 }
 
 case class ElmGenerator() {
