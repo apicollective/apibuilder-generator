@@ -163,7 +163,7 @@ case class ElmModel(args: GenArgs) {
   }
 
   private[this] def todo(msg: String): Nothing = {
-    sys.error(s"TODO: $msg")
+    sys.error(s"The elm generator does not yet support this type: $msg")
   }
 
   private[this] def primitiveDecoder(p: Primitive): String = {
