@@ -29,7 +29,7 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
   }
 
   private[this] def genModels(service: Service): String = {
-    ElmGenerator().generateModels(service)
+    ElmGenerator().generate(service)
   }
 
   it("invoke must returns errors") {
