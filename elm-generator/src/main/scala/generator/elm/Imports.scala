@@ -3,9 +3,14 @@ package generator.elm
 import scala.collection.concurrent.TrieMap
 
 case class Imports() {
-  private[this] val Wildcard = "*"
+  private[this] sealed trait ExposingAllValue
+  private[this] object ExposingAllValue {
+    case object Wildcard extends ExposingAllValue
+    case class Types(types: Seq[String]) extends  ExposingAllValue
+  }
+
   private[this] val allAs: TrieMap[String, String] = TrieMap[String, String]()
-  private[this] val exposingAll: TrieMap[String, Unit] = TrieMap[String, Unit]()
+  private[this] val exposingAll: TrieMap[String, ExposingAllValue] = TrieMap[String, ExposingAllValue]()
 
   def addAs(name: String, as: String): Unit = {
     allAs.put(name, as).foreach { existing =>
@@ -15,12 +20,14 @@ case class Imports() {
   }
 
   def addExposingAll(name: String): Unit = {
-    exposingAll.put(name, Wildcard)
+    exposingAll.put(name, ExposingAllValue.Wildcard)
     ()
   }
 
-  def addExposing(name: String, exposing: String): Unit = {
-    exposingAll.put(name, exposing)
+  def addExposing(name: String, types: String): Unit = addExposing(name, Seq(types))
+
+  def addExposing(name: String, types: Seq[String]): Unit = {
+    exposingAll.put(name, ExposingAllValue.Types(types))
     ()
   }
 
@@ -29,9 +36,9 @@ case class Imports() {
       allAs.keysIterator.toSeq.sorted.map { name =>
        s"import $name as ${allAs(name)}"
       } ++ exposingAll.keysIterator.toSeq.sorted.map { name =>
-        exposingAll.get(name) match {
-          case Wildcard => s"import $name exposing (..)"
-          case names => s"import $name exposing (${names})"
+        exposingAll(name) match {
+          case ExposingAllValue.Wildcard => s"import $name exposing (..)"
+          case ExposingAllValue.Types(types) => s"import $name exposing (${types.mkString(", ")})"
         }
       }
     ).mkString("\n")
