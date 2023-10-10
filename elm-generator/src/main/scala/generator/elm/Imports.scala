@@ -3,6 +3,7 @@ package generator.elm
 import scala.collection.concurrent.TrieMap
 
 case class Imports() {
+  private[this] val Wildcard = "*"
   private[this] val allAs: TrieMap[String, String] = TrieMap[String, String]()
   private[this] val exposingAll: TrieMap[String, Unit] = TrieMap[String, Unit]()
 
@@ -14,7 +15,12 @@ case class Imports() {
   }
 
   def addExposingAll(name: String): Unit = {
-    exposingAll.put(name, ())
+    exposingAll.put(name, Wildcard)
+    ()
+  }
+
+  def addExposing(name: String, exposing: String): Unit = {
+    exposingAll.put(name, exposing)
     ()
   }
 
@@ -23,7 +29,10 @@ case class Imports() {
       allAs.keysIterator.toSeq.sorted.map { name =>
        s"import $name as ${allAs(name)}"
       } ++ exposingAll.keysIterator.toSeq.sorted.map { name =>
-        s"import $name exposing (..)"
+        exposingAll.get(name) match {
+          case Wildcard => s"import $name exposing (..)"
+          case names => s"import $name exposing (${names})"
+        }
       }
     ).mkString("\n")
   }
