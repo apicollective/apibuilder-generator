@@ -26,7 +26,7 @@ case class Imports() {
 
   def addExposing(name: String, types: String): Unit = addExposing(name, Seq(types))
 
-  def addExposing(name: String, types: Seq[String]): Unit = {
+  private[this] def addExposing(name: String, types: Seq[String]): Unit = {
     exposingAll.put(name, ExposingAllValue.Types(types))
     ()
   }
