@@ -40,29 +40,41 @@ case class ElmModel(args: GenArgs) {
       s"type alias ${Names.pascalCase(model.name)} =",
       "  {",
       model.fields.map { f =>
-        val opt = if (f.required) {
-          ""
-        } else {
-          "Maybe "
+        def maybe(contents: String): String = {
+          if (f.required) {
+            contents
+          } else {
+            maybeWrapInParens("Maybe", contents)
+          }
         }
-        s"${Names.camelCase(f.name)}: $opt${elmType.lookup(f.`type`)}"
+
+        s"${Names.camelCase(f.name)}: ${maybe(elmType.lookup(f.`type`))}"
       }.mkString("\n, ").indent(4).stripTrailing(),
       "  }"
     ).mkString("\n")
   }
 
+  private[this] def maybeWrapInParens(function: String, contents: String): String = {
+    val i = contents.indexOf(" ")
+    if (i > 0) {
+      s"$function ($contents)"
+    } else {
+      s"$function $contents"
+    }
+  }
+
   private[this] def genEncoderForDatatype(m: Model, f: Field, v: Datatype): String = {
     v match {
-      case p: Datatype.Primitive => fieldEncoder(f, primitiveEncoder(p))
+      case p: Datatype.Primitive => primitiveEncoder(p)
       case u: UserDefined => {
-        fieldEncoder(f, Names.camelCase(args.imports, u.name) + "Encoder")
+        Names.camelCase(args.imports, u.name) + "Encoder"
       }
       case m: Generated.Model => {
-        fieldEncoder(f, Names.camelCase(args.imports, m.name) + "Encoder")
+        Names.camelCase(args.imports, m.name) + "Encoder"
       }
       case u: Container.List => {
-        args.imports.addAs("Json.Decode", "Decode")
-        s"(Decode.list ${genEncoderForDatatype(m, f, u.inner)})"
+        args.imports.addAs("Json.Encode", "Encode")
+        s"(Encode.list ${genEncoderForDatatype(m, f, u.inner)})"
       }
       case u: Container.Option => {
         todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
@@ -82,7 +94,14 @@ case class ElmModel(args: GenArgs) {
         "[",
         m.fields.zipWithIndex.map { case (f, i) =>
           val encoder = args.datatypeResolver.parse(f.`type`) match {
-            case Success(v) => genEncoderForDatatype(m, f, v)
+            case Success(v) => {
+              val encoder = genEncoderForDatatype(m, f, v)
+              if (f.required) {
+                s"""( ${Names.wrapInQuotes(f.name)}, $encoder instance.${Names.camelCase(f.name)} )"""
+              } else {
+                s"""( ${Names.wrapInQuotes(f.name)}, encodeOptional $encoder instance.${Names.camelCase(f.name)} )"""
+              }
+            }
             case Failure(ex) => throw ex
           }
           if (i == 0) {
@@ -115,53 +134,49 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def fieldEncoder(f: Field, encoder: String): String = {
-    if (f.required) {
-      s"""( ${Names.wrapInQuotes(f.name)}, $encoder instance.${Names.camelCase(f.name)} )"""
-    } else {
-      s"""( ${Names.wrapInQuotes(f.name)}, encodeOptional $encoder instance.${Names.camelCase(f.name)} )"""
-    }
-  }
-
   private[this] def genDecoder(m: Model): ElmFunction = {
     elmJson.decoder(m.name) {
       Seq(
         s"Decode.succeed ${Names.pascalCase(m.name)}",
         m.fields.map { f =>
-          modelFieldDecoder(m, f)
+          val decoder = modelFieldDecoder(m, f)
+          pipelineDecoder(f, decoder)
         }.mkString("\n").indent(4)
       ).mkString("\n").indent(4)
     }
   }
 
-  private[this] def fieldDecoder(f: Field, decoder: String): String = {
+  private[this] def pipelineDecoder(f: Field, decoder: String): String = {
     args.imports.addAs("Json.Decode.Pipeline", "Pipeline")
+
     if (f.required) {
       s"""|> Pipeline.required ${Names.wrapInQuotes(f.name)} $decoder"""
     } else {
       args.imports.addAs("Json.Decode", "Decode")
-      s"""|> Pipeline.optional ${Names.wrapInQuotes(f.name)} (Decode.nullable $decoder) Nothing"""
+      val nullDecoder = maybeWrapInParens("Decode.nullable", decoder)
+      s"""|> Pipeline.optional ${Names.wrapInQuotes(f.name)} ($nullDecoder) Nothing"""
     }
   }
+
   private[this] def modelFieldDecoder(m: Model, f: Field): String = {
     args.datatypeResolver.parse(f.`type`) match {
-      case Success(v) => modelFieldDecoderForDatatype(m, f, v)
+      case Success(v) => genDecoderForDatatype(m, f, v)
       case Failure(ex) => throw ex
     }
   }
 
-  private[this] def modelFieldDecoderForDatatype(m: Model, f: Field, v: Datatype): String = {
+  private[this] def genDecoderForDatatype(m: Model, f: Field, v: Datatype): String = {
     v match {
-      case p: Datatype.Primitive => fieldDecoder(f, primitiveDecoder(p))
+      case p: Datatype.Primitive => primitiveDecoder(p)
       case u: UserDefined => {
-        fieldDecoder(f, Names.camelCase(args.imports, u.name) + "Decoder")
+        Names.camelCase(args.imports, u.name) + "Decoder"
       }
       case m: Generated.Model => {
-        fieldDecoder(f, Names.camelCase(args.imports, m.name) + "Decoder")
+        Names.camelCase(args.imports, m.name) + "Decoder"
       }
       case u: Container.List => {
         args.imports.addAs("Json.Decode", "Decode")
-        s"(Decode.list ${modelFieldDecoderForDatatype(m, f, u.inner)})"
+        "(" + maybeWrapInParens("Decode.list", genDecoderForDatatype(m, f, u.inner)) + ")"
       }
       case u: Container.Option => {
         todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
