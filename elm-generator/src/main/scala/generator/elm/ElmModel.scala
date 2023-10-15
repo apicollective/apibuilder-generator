@@ -51,6 +51,28 @@ case class ElmModel(args: GenArgs) {
     ).mkString("\n")
   }
 
+  private[this] def genEncoderForDatatype(m: Model, f: Field, v: Datatype): String = {
+    v match {
+      case p: Datatype.Primitive => fieldEncoder(f, primitiveEncoder(p))
+      case u: UserDefined => {
+        fieldEncoder(f, Names.camelCase(args.imports, u.name) + "Encoder")
+      }
+      case m: Generated.Model => {
+        fieldEncoder(f, Names.camelCase(args.imports, m.name) + "Encoder")
+      }
+      case u: Container.List => {
+        args.imports.addAs("Json.Decode", "Decode")
+        s"(Decode.list ${genEncoderForDatatype(m, f, u.inner)})"
+      }
+      case u: Container.Option => {
+        todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
+      }
+      case u: Container.Map => {
+        todo(s"model ${m.name} Field ${f.name} has type map: ${u.name}")
+      }
+    }
+  }
+
 
   private[this] def genEncoder(m: Model): ElmFunction = {
     args.imports.addAs("Json.Encode", "Encode")
@@ -60,24 +82,7 @@ case class ElmModel(args: GenArgs) {
         "[",
         m.fields.zipWithIndex.map { case (f, i) =>
           val encoder = args.datatypeResolver.parse(f.`type`) match {
-            case Success(v) => v match {
-              case p: Datatype.Primitive => fieldEncoder(f, primitiveEncoder(p))
-              case u: UserDefined => {
-                fieldEncoder(f, Names.camelCase(args.imports, u.name) + "Encoder")
-              }
-              case m: Generated.Model => {
-                fieldEncoder(f, Names.camelCase(args.imports, m.name) + "Encoder")
-              }
-              case u: Container.List => {
-                todo(s"model ${m.name} Field ${f.name} has type list: ${u.name}")
-              }
-              case u: Container.Option => {
-                todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
-              }
-              case u: Container.Map => {
-                todo(s"model ${m.name} Field ${f.name} has type map: ${u.name}")
-              }
-            }
+            case Success(v) => genEncoderForDatatype(m, f, v)
             case Failure(ex) => throw ex
           }
           if (i == 0) {
@@ -140,25 +145,30 @@ case class ElmModel(args: GenArgs) {
   }
   private[this] def modelFieldDecoder(m: Model, f: Field): String = {
     args.datatypeResolver.parse(f.`type`) match {
-      case Success(v) => v match {
-        case p: Datatype.Primitive => fieldDecoder(f, primitiveDecoder(p))
-        case u: UserDefined => {
-          fieldDecoder(f, Names.camelCase(args.imports, u.name) + "Decoder")
-        }
-        case m: Generated.Model => {
-          fieldDecoder(f, Names.camelCase(args.imports, m.name) + "Decoder")
-        }
-        case u: Container.List => {
-          todo(s"model ${m.name} Field ${f.name} has type list: ${u.name}")
-        }
-        case u: Container.Option => {
-          todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
-        }
-        case u: Container.Map => {
-          todo(s"model ${m.name} Field ${f.name} has type map: ${u.name}")
-        }
-      }
+      case Success(v) => modelFieldDecoderForDatatype(m, f, v)
       case Failure(ex) => throw ex
+    }
+  }
+
+  private[this] def modelFieldDecoderForDatatype(m: Model, f: Field, v: Datatype): String = {
+    v match {
+      case p: Datatype.Primitive => fieldDecoder(f, primitiveDecoder(p))
+      case u: UserDefined => {
+        fieldDecoder(f, Names.camelCase(args.imports, u.name) + "Decoder")
+      }
+      case m: Generated.Model => {
+        fieldDecoder(f, Names.camelCase(args.imports, m.name) + "Decoder")
+      }
+      case u: Container.List => {
+        args.imports.addAs("Json.Decode", "Decode")
+        s"(Decode.list ${modelFieldDecoderForDatatype(m, f, u.inner)})"
+      }
+      case u: Container.Option => {
+        todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
+      }
+      case u: Container.Map => {
+        todo(s"model ${m.name} Field ${f.name} has type map: ${u.name}")
+      }
     }
   }
 
