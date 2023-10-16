@@ -10,12 +10,7 @@ pipeline {
   agent {
     kubernetes {
       label 'worker-apibuilder-generator'
-      inheritFrom 'default'
-
-      containerTemplates([
-        containerTemplate(name: 'helm', image: "flowcommerce/k8s-build-helm2:0.0.50", command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'docker', image: 'docker:18', resourceRequestCpu: '1', resourceRequestMemory: '2Gi', command: 'cat', ttyEnabled: true)
-      ])
+      inheritFrom 'kaniko-slim'
     }
   }
 
@@ -46,14 +41,15 @@ pipeline {
     stage('Build and push docker image release') {
       when { branch 'main' }
       steps {
-        container('docker') {
+        container('kaniko') {
           script {
             semver = VERSION.printable()
             
-            docker.withRegistry('https://index.docker.io/v1/', 'jenkins-dockerhub') {
-              db = docker.build("$ORG/apibuilder-generator:$semver", '--network=host -f Dockerfile .')
-              db.push()
-            }
+            sh """
+              /kaniko/executor -f `pwd`/api/Dockerfile -c `pwd` \
+              --snapshot-mode=redo --use-new-run  \
+              --destination ${env.ORG}/apibuilder-generator:$semver
+            """ 
             
           }
         }
@@ -91,8 +87,7 @@ pipeline {
               }
             }
           }
-        }
-        
+        }       
       }
     }
   }
