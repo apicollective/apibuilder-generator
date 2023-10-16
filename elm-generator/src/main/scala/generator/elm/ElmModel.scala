@@ -119,7 +119,7 @@ case class ElmModel(args: GenArgs) {
     args.imports.addAs("Json.Encode", "Encode")
     import Datatype.Primitive._
     p match {
-      case Boolean => "Encode.boolean"
+      case Boolean => "Encode.bool"
       case Double => "Encode.float"
       case Integer => "Encode.int"
       case Long => "Encode.int"
@@ -195,7 +195,7 @@ case class ElmModel(args: GenArgs) {
     args.imports.addAs("Json.Decode", "Decode")
     import Datatype.Primitive._
     p match {
-      case Boolean => "Decode.boolean"
+      case Boolean => "Decode.bool"
       case Double => "Decode.float"
       case Integer => "Decode.int"
       case Long => "Decode.int"
