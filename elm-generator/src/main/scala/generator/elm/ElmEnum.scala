@@ -9,7 +9,7 @@ case class ElmEnum(args: GenArgs) {
   // "type MemberStatus = MemberStatusPending | MemberStatusActive | MemberStatusInactive | MemberStatusUnknown"
   def generate(e: Enum): String = {
     Seq(
-      s"type ${Names.pascalCase(e.name)} = " + values(e).mkString(" | "),
+      s"type ${Names.pascalCase(e.name)}\n    = " + values(e).mkString("\n    | "),
       genToString(e).code,
       genFromString(e).code,
       genEncoder(e).code,
@@ -79,11 +79,11 @@ case class ElmEnum(args: GenArgs) {
   /*
   memberStatusFromString : String -> MemberStatus
   memberStatusFromString value =
-      if (value == "active") then
+      if value == "active" then
           MemberStatusActive
-      else if (value == "pending") then
+      else if value == "pending" then
           MemberStatusPending
-      else if (value == "inactive") then
+      else if value == "inactive" then
           MemberStatusInactive
       else
           MemberStatusUnknown
@@ -92,7 +92,7 @@ case class ElmEnum(args: GenArgs) {
     def singleValue(isFirst: Boolean, name: String, value: String) = {
       val prefix = if (isFirst) { "" } else { "else " }
       Seq(
-        s"${prefix}if (value == ${Names.wrapInQuotes(value)}) then",
+        s"${prefix}if value == ${Names.wrapInQuotes(value)} then",
         s"    $name"
       ).mkString("\n").indent(4)
     }

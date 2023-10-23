@@ -123,7 +123,10 @@ case class ElmModel(args: GenArgs) {
       case Double => "Encode.float"
       case Integer => "Encode.int"
       case Long => "Encode.int"
-      case DateIso8601 => "Encode.string"
+      case DateIso8601 => {
+        args.imports.addAs("Types.Date", "Date")
+        "Date.encode"
+      }
       case DateTimeIso8601 => {
         args.imports.addAs("Iso8601", "Iso8601")
         "Iso8601.encode"
@@ -202,10 +205,13 @@ case class ElmModel(args: GenArgs) {
       case Double => "Decode.float"
       case Integer => "Decode.int"
       case Long => "Decode.int"
-      case DateIso8601 => "Decode.string"
+      case DateIso8601 => {
+        args.imports.addAs("Types.Date", "Date")
+        "Date.decoder"
+      }
       case DateTimeIso8601 => {
         args.imports.addAs("Iso8601", "Iso8601")
-        "Iso8601.decode"
+        "Iso8601.decoder"
       }
       case Decimal => "Decode.float"
       case Object => "Decode.string" // TODO
