@@ -24,8 +24,14 @@ case class ElmType(args: GenArgs) {
           case Double => "Float"
           case Integer => "Int"
           case Long => "Int"
-          case DateIso8601 => "String"
-          case DateTimeIso8601 => "String"
+          case DateIso8601 => {
+            args.imports.addExposing("Date", "Date")
+            "Date"
+          }
+          case DateTimeIso8601 => {
+            args.imports.addExposing("Time", "Posix")
+            "Posix"
+          }
           case Decimal => "Float"
           case Object => "String" // TODO
           case JsonValue => "String" // TODO
