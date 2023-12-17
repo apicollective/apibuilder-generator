@@ -16,7 +16,7 @@ case class ElmCommon(args: GenArgs) {
       |
       |
       |type alias UnitResponse =
-      |    { }
+      |    {}
       |""".stripMargin
   }
 
