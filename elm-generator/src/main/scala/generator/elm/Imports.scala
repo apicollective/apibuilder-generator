@@ -34,7 +34,12 @@ case class Imports() {
   def generateCode(): String = {
     (
       allAs.keysIterator.toSeq.sorted.map { name =>
-       s"import $name as ${allAs(name)}"
+        val alias = allAs(name)
+        if (alias == name) {
+          s"import $name"
+        } else {
+          s"import $name as ${allAs(name)}"
+        }
       } ++ exposingAll.keysIterator.toSeq.sorted.map { name =>
         exposingAll(name) match {
           case ExposingAllValue.Wildcard => s"import $name exposing (..)"
