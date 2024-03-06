@@ -1,0 +1,78 @@
+package io.apibuilder.reference.api.v0.mock {
+
+  object Factories {
+
+    def randomString(length: Int = 24): String = {
+      _root_.scala.util.Random.alphanumeric.take(length).mkString
+    }
+
+    def makeAgeGroup(): io.apibuilder.reference.api.v0.models.AgeGroup = io.apibuilder.reference.api.v0.models.AgeGroup.Youth
+
+    def makeBig(): io.apibuilder.reference.api.v0.models.Big = io.apibuilder.reference.api.v0.models.Big(
+      f1 = Factories.randomString(24),
+      f2 = Factories.randomString(24),
+      f3 = Factories.randomString(24),
+      f4 = Factories.randomString(24),
+      f5 = Factories.randomString(24),
+      f6 = Factories.randomString(24),
+      f7 = Factories.randomString(24),
+      f8 = Factories.randomString(24),
+      f9 = Factories.randomString(24),
+      f10 = Factories.randomString(24),
+      f11 = Factories.randomString(24),
+      f12 = Factories.randomString(24),
+      f13 = Factories.randomString(24),
+      f14 = Factories.randomString(24),
+      f15 = Factories.randomString(24),
+      f16 = Factories.randomString(24),
+      f17 = Factories.randomString(24),
+      f18 = Factories.randomString(24),
+      f19 = Factories.randomString(24),
+      f20 = Factories.randomString(24),
+      f21 = Factories.randomString(24),
+      f22 = Factories.randomString(24),
+      f23 = Factories.randomString(24),
+      f24 = Factories.randomString(24),
+      f25 = Factories.randomString(24)
+    )
+
+    def makeEcho(): io.apibuilder.reference.api.v0.models.Echo = io.apibuilder.reference.api.v0.models.Echo(
+      value = Factories.randomString(24)
+    )
+
+    def makeError(): io.apibuilder.reference.api.v0.models.Error = io.apibuilder.reference.api.v0.models.Error(
+      code = Factories.randomString(24),
+      message = Factories.randomString(24)
+    )
+
+    def makeGroup(): io.apibuilder.reference.api.v0.models.Group = io.apibuilder.reference.api.v0.models.Group(
+      members = Nil
+    )
+
+    def makeMember(): io.apibuilder.reference.api.v0.models.Member = io.apibuilder.reference.api.v0.models.Member(
+      guid = _root_.java.util.UUID.randomUUID,
+      organization = io.apibuilder.reference.api.v0.mock.Factories.makeOrganization(),
+      user = io.apibuilder.reference.api.v0.mock.Factories.makeUser(),
+      role = Factories.randomString(24)
+    )
+
+    def makeOrganization(): io.apibuilder.reference.api.v0.models.Organization = io.apibuilder.reference.api.v0.models.Organization(
+      guid = _root_.java.util.UUID.randomUUID,
+      name = Factories.randomString(24)
+    )
+
+    def makeUser(): io.apibuilder.reference.api.v0.models.User = io.apibuilder.reference.api.v0.models.User(
+      guid = _root_.java.util.UUID.randomUUID,
+      email = Factories.randomString(24),
+      active = true,
+      ageGroup = io.apibuilder.reference.api.v0.mock.Factories.makeAgeGroup(),
+      tags = None
+    )
+
+    def makeUserList(): io.apibuilder.reference.api.v0.models.UserList = io.apibuilder.reference.api.v0.models.UserList(
+      users = Nil
+    )
+
+  }
+
+}

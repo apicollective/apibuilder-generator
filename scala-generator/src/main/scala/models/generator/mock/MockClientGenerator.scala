@@ -1,13 +1,13 @@
 package scala.generator.mock
 
-import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
+import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import lib.generator.CodeGenerator
 import lib.Text._
+import lib.generator.CodeGenerator
 
-import scala.models.{ApiBuilderComments, Attributes}
 import scala.generator._
+import scala.models.{ApiBuilderComments, Attributes}
 
 object MockClientGenerator {
 
@@ -53,29 +53,6 @@ object MockClientGenerator {
       val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Ning19(ssd.namespaces.base, Attributes.PlayDefaultConfig, None)).invoke()
     }
-
-  }
-
-  private[mock] def calculateStringLength(limitation: ScalaField.Limitation): Int = {
-    val defaultCandidate = 24L
-
-    // TODO handle Int vs Long (really String of length Int.MaxValue + 1??!)
-    //   consider some artificial upper bound of e.g. 10,000; 100,000; 1,000,000 -- to be discussed
-
-    val withLimitationApplied = limitation match {
-      case ScalaField.Limitation(None, None) => defaultCandidate
-      case ScalaField.Limitation(Some(minimum), None) => Math.max(defaultCandidate, minimum)
-      case ScalaField.Limitation(None, Some(maximum)) => Math.min(defaultCandidate, maximum)
-      case ScalaField.Limitation(Some(minimum), Some(maximum)) =>
-        if (minimum < maximum) (minimum + maximum) / 2
-        else if (minimum == maximum) minimum
-        else 0
-    }
-
-    val withZeroAsLowerBound = Math.max(0L, withLimitationApplied)
-
-    if (!withZeroAsLowerBound.isValidInt) Int.MaxValue // TODO really?!
-    else withZeroAsLowerBound.toInt
   }
 }
 
@@ -118,21 +95,6 @@ class MockClientGenerator(
       }.mkString("\n\n")
     ).mkString("\n\n")
 
-  def factoriesCode: String = Seq(
-    "object Factories {",
-    Seq(
-      """def randomString(length: Int = 24): String = {""",
-      """  _root_.scala.util.Random.alphanumeric.take(length).mkString""",
-      """}"""
-    ).mkString("\n").indentString(2),
-    Seq(
-      ssd.enums.map { makeEnum },
-      ssd.models.map { makeModel },
-      ssd.unions.map { makeUnion }
-    ).flatten.mkString("\n\n").indentString(2),
-    "}"
-  ).mkString("\n\n")
-
   def generateCode(): String = {
     Seq(
       s"package ${ssd.namespaces.mock} {",
@@ -141,7 +103,7 @@ class MockClientGenerator(
           case Nil => None
           case _ => Some(clientCode)
         },
-        Some(factoriesCode)
+        Some(MockFactoriesGenerator.factoriesCode(ssd))
       ).flatten.mkString("\n\n").indentString(2),
       "}"
     ).mkString("\n\n")
@@ -159,22 +121,6 @@ class MockClientGenerator(
     s"def make${enum.name}(): ${enum.qualifiedName} = ${enum.qualifiedName}.$name"
   }
 
-  def makeModel(model: ScalaModel): String = {
-    Seq(
-      s"def make${model.name}(): ${model.qualifiedName} = ${model.qualifiedName}(",
-      model.fields.map { field =>
-        s"${field.name} = ${mockValue(field.datatype, Some(field.limitation))}"
-      }.mkString(",\n").indentString(2),
-      ")"
-    ).mkString("\n")
-  }
-
-  def makeUnion(union: ScalaUnion): String = {
-    val typ = union.types.headOption.getOrElse {
-      sys.error(s"Union type[${union.qualifiedName}] does not have any times")
-    }
-    s"def make${union.name}(): ${union.qualifiedName} = ${mockValue(typ.datatype)}"
-  }
 
   def generateMockResource(resource: ScalaResource): String = {
     Seq(
@@ -198,7 +144,7 @@ class MockClientGenerator(
       }
       case Some(r) => {
         val unitType = config.responseEnvelopeClassName.map { _ => "()" }.getOrElse("// unit type")
-        val resultType = mockValue(ssd.scalaDatatype(r.`type`), unitType = unitType)
+        val resultType = MockFactoriesGenerator.mockValue(ssd.scalaDatatype(r.`type`), unitType = unitType)
         config.responseEnvelopeClassName match {
           case None => resultType
           case Some(envelopeName) => {
@@ -223,41 +169,6 @@ class MockClientGenerator(
       case ResponseCodeOption.Default => 200
       case ResponseCodeOption.UNDEFINED(_) => 417
       case ResponseCodeUndefinedType(_) => 500
-    }
-  }
-
-  def mockValue(
-    datatype: ScalaDatatype,
-    limitation: Option[ScalaField.Limitation] = None,
-    unitType: String = "// unit type",
-  ): String = {
-    datatype match {
-      case ScalaPrimitive.Boolean => "true"
-      case ScalaPrimitive.Double => "1.0"
-      case ScalaPrimitive.Integer => "1"
-      case ScalaPrimitive.Long => "1L"
-      case dt: ScalaPrimitive.DateIso8601 => s"${dt.fullName}.now"
-      case dt: ScalaPrimitive.DateTimeIso8601 => s"${dt.fullName}.now"
-      case ScalaPrimitive.Decimal => """BigDecimal("1")"""
-      case ScalaPrimitive.ObjectAsPlay => "_root_.play.api.libs.json.Json.obj()"
-      case ScalaPrimitive.ObjectAsCirce => "Map()"
-      case ScalaPrimitive.JsonValueAsPlay => "_root_.play.api.libs.json.Json.obj().asInstanceOf[_root_.play.api.libs.json.JsValue]"
-      case dt @ ScalaPrimitive.JsonValueAsCirce => s"${dt.asInstanceOf[ScalaPrimitive].fullName}.obj()"
-      case ScalaPrimitive.String => {
-        limitation match {
-          case None => "Factories.randomString()"
-          case Some(limitationVal) => s"Factories.randomString(${MockClientGenerator.calculateStringLength(limitationVal)})"
-        }
-      }
-      case ScalaPrimitive.Unit => unitType
-      case dt @ ScalaPrimitive.Uuid => s"${dt.asInstanceOf[ScalaPrimitive].fullName}.randomUUID"
-      case ScalaDatatype.List(_) => "Nil"
-      case ScalaDatatype.Map(_) => "Map()"
-      case ScalaDatatype.Option(_) => "None"
-      case ScalaPrimitive.Enum(ns, name) => s"${ns.mock}.Factories.make$name()"
-      case ScalaPrimitive.Model(ns, name) => s"${ns.mock}.Factories.make$name()"
-      case ScalaPrimitive.Union(ns, name) => s"${ns.mock}.Factories.make$name()"
-      case ScalaPrimitive.GeneratedModel(_) => sys.error("Generated models should not be mocked")
     }
   }
 }
