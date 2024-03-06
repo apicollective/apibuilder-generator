@@ -259,6 +259,17 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "scala_mock_models",
+        name = "Scala mock models",
+        description = Some("Generate factory methods for mock models from the API description."),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Production,
+      codeGenerator = Some(scala.generator.mock.MockFactoriesGenerator)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "scalacheck",
         name = "ScalaCheck",
         description = Some("Generate <a href='https://github.com/typelevel/scalacheck'>ScalaCheck</a> generators for models, enums, and unions."),
