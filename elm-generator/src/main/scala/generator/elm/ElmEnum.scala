@@ -10,6 +10,7 @@ case class ElmEnum(args: GenArgs) {
   def generate(e: Enum): String = {
     Seq(
       s"type ${Names.pascalCase(e.name)}\n    = " + values(e).mkString("\n    | "),
+      genAll(e).code,
       genToString(e).code,
       genFromString(e).code,
       genEncoder(e).code,
@@ -72,6 +73,22 @@ case class ElmEnum(args: GenArgs) {
           value = Unknown
         )
       )).mkString("\n")
+    ).mkString("\n")
+    ElmFunction(name = n, code = code)
+  }
+
+  /*
+  * getAllValuesForNewsletterKey : List NewsletterKey
+  * getAllValuesForNewsletterKey =
+  *  [ NewsletterKeyGeneral, NewsletterKeyBilling ]
+   */
+  private[this] def genAll(e: Enum): ElmFunction = {
+    val n = s"getAll${Names.pascalCase(e.plural)}"
+
+    val code = Seq(
+      s"$n : List ${Names.pascalCase(e.name)}",
+      s"$n =",
+      s"  [ " + e.values.map { v => valueElmName(e, v) }.mkString(", ") + " ]"
     ).mkString("\n")
     ElmFunction(name = n, code = code)
   }
