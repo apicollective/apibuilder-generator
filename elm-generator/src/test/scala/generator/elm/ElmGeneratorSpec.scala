@@ -2,7 +2,7 @@ package generator.elm
 
 import helpers.{ServiceHelpers, TestHelpers}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models.{Field, Service}
+import io.apibuilder.spec.v0.models.Service
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -51,56 +51,23 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
       )
     ).head.name mustBe "Generated/IoApibuilder.elm"
   }
-/*
-  it("filename dedups service name") {
-    setupValid(
+
+  it("enum") {
+    val file = setupValid(
       makeService(
         name = "foo",
-        namespace = "io.apibuilder.foo",
-        models = Seq(makeModel("bar"))
+        namespace = "io.apibuilder",
+        models = Seq(makeModel()),
+        enums = Seq(makeEnum(
+          name = "newsletter_key",
+          plural = "newsletter_keys",
+          values = Seq(
+            makeEnumValue(name = "general"),
+            makeEnumValue(name = "billing"),
+          )
+        ))
       )
-    ).head.name mustBe "IoApibuilderFoo.elm"
+    )
+    println(s"File: $file")
   }
-
-  describe("generate models") {
-    def setup(fields: Seq[Field]) = {
-      genModels(
-        makeService(
-          models = Seq(makeModel(
-            name = "user",
-            fields = fields
-          ))
-        )
-      )
-    }
-
-    it("with 1 field") {
-      setup(
-        Seq(makeField("id", `type` = "string"))
-      ) mustBe
-        """
-          |public record User (
-          |  string Id
-          |);
-          |""".stripMargin.trim
-    }
-
-    it("with 2 fields") {
-      setup(
-        Seq(
-          makeField("id", `type` = "string"),
-          makeField("name", `type` = "string"),
-          makeField("age", `type` = "long", required = false)
-        )
-      ) mustBe
-        """
-          |public record User (
-          |  string Id,
-          |  string Name,
-          |  long? Age
-          |);
-          |""".stripMargin.trim
-    }
-  }
-*/
 }
