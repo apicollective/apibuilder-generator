@@ -108,6 +108,11 @@ private[models] case class Play2Route(
             case ScalaDatatype.Option(_) => None
             case p: ScalaPrimitive => Some("?= " + defaultForPrimitive(p, d))
           }
+        ).orElse(
+          param.datatype match {
+            case ScalaDatatype.Option(_) => Some("?= None")
+            case _ => None
+          }
         )
       ).flatten.mkString(" ")
     }
