@@ -70,7 +70,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
       val op = getScalaMethod(ssd, "Echoes", Method.Get, "/echoes")
       val r = Play2Route(ssd, op, echoResource)
       r.method should be("controllers.Echoes.get")
-      r.params.mkString(", ") should be("foo: _root_.scala.Option[String], optional_messages: _root_.scala.Option[List[String]], required_messages: List[String]")
+      r.params.mkString(", ") should be("foo: _root_.scala.Option[String], optional_messages: _root_.scala.Option[List[String]] ?= None, required_messages: List[String]")
 
       Play2RouteGenerator(InvocationForm(service)).invoke() match {
         case Left(errors) => fail(errors.mkString(", "))
