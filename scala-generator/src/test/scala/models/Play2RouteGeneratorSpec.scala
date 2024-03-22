@@ -70,7 +70,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
       val op = getScalaMethod(ssd, "Echoes", Method.Get, "/echoes")
       val r = Play2Route(ssd, op, echoResource)
       r.method should be("controllers.Echoes.get")
-      r.params.mkString(", ") should be("foo: _root_.scala.Option[String] ?= None, optional_messages: _root_.scala.Option[List[String]] ?= None, required_messages: List[String]")
+      r.params.mkString(", ") should be("foo: _root_.scala.Option[String], optional_messages: _root_.scala.Option[List[String]] ?= None, required_messages: List[String]")
 
       Play2RouteGenerator(InvocationForm(service)).invoke() match {
         case Left(errors) => fail(errors.mkString(", "))
@@ -118,7 +118,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
         r.verb should be(Method.Get)
         r.url should be("/users")
         r.method should be("controllers.Users.get")
-        r.params.mkString(", ") should be("guid: _root_.scala.Option[_root_.java.util.UUID] ?= None, email: _root_.scala.Option[String] ?= None, token: _root_.scala.Option[String] ?= None")
+        r.params.mkString(", ") should be("guid: _root_.scala.Option[_root_.java.util.UUID], email: _root_.scala.Option[String], token: _root_.scala.Option[String]")
       }
 
       it("GET w/ path, guid path param, no additional parameters") {

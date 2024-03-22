@@ -110,7 +110,8 @@ private[models] case class Play2Route(
           }
         ).orElse(
           param.datatype match {
-            case ScalaDatatype.Option(_) => Some("?= None")
+            case ScalaDatatype.Option(ScalaDatatype.List(_)) => Some("?= None")
+            case ScalaDatatype.Option(ScalaDatatype.Map(_)) => Some("?= None")
             case _ => None
           }
         )
