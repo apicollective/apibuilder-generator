@@ -80,7 +80,16 @@ case class ElmModel(args: GenArgs) {
         todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
       }
       case u: Container.Map => {
-        todo(s"model ${m.name} Field ${f.name} has type map: ${u.name}")
+        args.imports.addAs("Json.Encode", "Encode")
+        args.imports.addExposing("Dict", "Dict")
+        args.functions.add(
+          """
+            |mapEncoder : (a -> Encode.Value) -> Dict String a -> Encode.Value
+            |mapEncoder valueEncoder dict =
+            |    Encode.object (Dict.toList dict |> List.map (\( k, v ) -> ( k, valueEncoder v )))
+            |""".stripMargin
+        )
+        "(" + maybeWrapInParens("mapEncoder", genEncoderForDatatype(m, f, u.inner)) + ")"
       }
     }
   }
@@ -132,8 +141,8 @@ case class ElmModel(args: GenArgs) {
         "Iso8601.encode"
       }
       case Decimal => "Encode.float"
-      case Object => "Encode.string" // TODO
-      case JsonValue => "Encode.string" // TODO
+      case Object => "Encode.object"
+      case JsonValue => "Encode.object"
       case String => "Encode.string"
       case Unit => "(Encode.success Nothing)" // TODO Verify
       case Uuid => "Encode.string"
@@ -188,7 +197,8 @@ case class ElmModel(args: GenArgs) {
         todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
       }
       case u: Container.Map => {
-        todo(s"model ${m.name} Field ${f.name} has type map: ${u.name}")
+        args.imports.addAs("Json.Decode", "Decode")
+        "(" + maybeWrapInParens("Decode.dict", genDecoderForDatatype(m, f, u.inner)) + ")"
       }
     }
   }

@@ -27,7 +27,11 @@ case class Imports() {
   def addExposing(name: String, types: String): Unit = addExposing(name, Seq(types))
 
   private[this] def addExposing(name: String, types: Seq[String]): Unit = {
-    exposingAll.put(name, ExposingAllValue.Types(types))
+    exposingAll.get(name) match {
+      case None => exposingAll.put(name, ExposingAllValue.Types(types))
+      case Some(ExposingAllValue.Wildcard) => ()
+      case Some(ExposingAllValue.Types(existing)) => exposingAll.put(name, ExposingAllValue.Types(existing ++ types))
+    }
     ()
   }
 
@@ -43,7 +47,7 @@ case class Imports() {
       } ++ exposingAll.keysIterator.toSeq.sorted.map { name =>
         exposingAll(name) match {
           case ExposingAllValue.Wildcard => s"import $name exposing (..)"
-          case ExposingAllValue.Types(types) => s"import $name exposing (${types.mkString(", ")})"
+          case ExposingAllValue.Types(types) => s"import $name exposing (${types.distinct.sorted.mkString(", ")})"
         }
       }
     ).mkString("\n")

@@ -88,7 +88,7 @@ case class ElmEnum(args: GenArgs) {
     val code = Seq(
       s"$n : List ${Names.pascalCase(e.name)}",
       s"$n =",
-      s"  [ " + e.values.map { v => valueElmName(e, v) }.mkString(", ") + " ]"
+      s"    [ " + e.values.map { v => valueElmName(e, v) }.mkString(", ") + " ]"
     ).mkString("\n")
     ElmFunction(name = n, code = code)
   }
