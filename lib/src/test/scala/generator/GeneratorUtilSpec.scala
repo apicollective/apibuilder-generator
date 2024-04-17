@@ -6,6 +6,14 @@ import org.scalatest.matchers.should.Matchers
 
 class GeneratorUtilSpec extends AnyFunSpec with Matchers {
 
+  it("formatComment handles newlines") {
+    GeneratorUtil.formatComment("test\nthis") should be("""
+# test
+# this
+""".trim
+    )
+  }
+
   it("formatComment") {
     GeneratorUtil.formatComment("test") should be("# test")
     GeneratorUtil.formatComment("test this") should be("# test this")

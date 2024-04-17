@@ -160,9 +160,15 @@ object GeneratorUtil {
    * leading indentation.
    */
   def splitIntoLines(comment: String, maxLength: Int = 80): Seq[String] = {
+    comment.split("\\n").toSeq.flatMap { line =>
+      splitLineByLength(line, maxLength)
+    }
+  }
+
+  private[this] def splitLineByLength(comment: String, maxLength: Int = 80): Seq[String] = {
     val sb = new scala.collection.mutable.ListBuffer[String]()
     var currentWord = new StringBuilder()
-    comment.split(" ").map(_.trim).foreach { word =>
+    comment.split("\\s+").map(_.trim).foreach { word =>
       if (word.length + currentWord.length >= maxLength) {
         if (currentWord.nonEmpty) {
           sb.append(currentWord.toString)
