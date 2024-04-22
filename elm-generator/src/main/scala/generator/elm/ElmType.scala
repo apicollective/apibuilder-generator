@@ -1,5 +1,7 @@
 package generator.elm
 
+import cats.implicits._
+import cats.data.ValidatedNec
 import lib.Datatype
 import lib.Datatype._
 
@@ -7,54 +9,54 @@ import scala.util.{Failure, Success}
 
 case class ElmType(args: GenArgs) {
 
-  def lookup(typ: String): String = {
+  def validate(typ: String): ValidatedNec[String, String] = {
     args.datatypeResolver.parse(typ) match {
-      case Failure(ex) => throw ex
+      case Failure(ex) => ex.getMessage.invalidNec
       case Success(t) => lookup(t)
     }
   }
 
-  private[this] def lookup(t: Datatype): String = {
+  private[this] def lookup(t: Datatype): ValidatedNec[String, String] = {
     t match {
       case p: Primitive => {
         import lib.Datatype.Primitive._
 
         p match {
-          case Boolean => "Bool"
-          case Double => "Float"
-          case Integer => "Int"
-          case Long => "Int"
+          case Boolean => "Bool".validNec
+          case Double => "Float".validNec
+          case Integer => "Int".validNec
+          case Long => "Int".validNec
           case DateIso8601 => {
             args.imports.addExposing("Date", "Date")
-            "Date"
+            "Date".validNec
           }
           case DateTimeIso8601 => {
             args.imports.addExposing("Time", "Posix")
-            "Posix"
+            "Posix".validNec
           }
-          case Decimal => "Float"
-          case Object => "String" // TODO
-          case JsonValue => "String" // TODO
-          case String => "String"
-          case Unit => "Nothing" // TODO Verify
-          case Uuid => "String"
+          case Decimal => "Float".validNec
+          case Object => "String" .validNec // TODO
+          case JsonValue => "String".validNec // TODO
+          case String => "String".validNec
+          case Unit => "Nothing" .validNec // TODO Verify
+          case Uuid => "String".validNec
         }
       }
       case u: UserDefined => {
         NamespaceParser.parse(u.name) match {
-          case ParsedName.Local(name) => Names.pascalCase(name)
+          case ParsedName.Local(name) => Names.pascalCase(name).validNec
           case ParsedName.Imported(namespace, name) => {
             args.imports.addExposingAll(s"Generated.${Names.pascalCase(namespace)}")
-            Names.pascalCase(name)
+            Names.pascalCase(name).validNec
           }
         }
       }
-      case u: Generated.Model => sys.error(s"TODO: Handle generated model: ${u.name}")
-      case u: Container.List => "List (" + lookup(u.inner) + ")"
-      case _: Container.Option => sys.error("Not sure hot to handle option yet")
+      case u: Generated.Model => s"TODO: Handle generated model: ${u.name}".invalidNec
+      case u: Container.List => lookup(u.inner).map { v => Util.maybeWrapInParens("List", v) }
+      case u: Container.Option => lookup(u.inner).map { v => Util.maybeWrapInParens("Maybe", v) }
       case u: Container.Map => {
         args.imports.addAs("Dict", "Dict")
-        "Dict String " + lookup(u.inner)
+        lookup(u.inner).map { v => Util.maybeWrapInParens("Dict String", v) }
       }
     }
   }

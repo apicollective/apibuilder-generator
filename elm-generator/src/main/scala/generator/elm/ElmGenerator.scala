@@ -67,6 +67,11 @@ case class ElmGenerator() {
     val enums = ElmEnum(args)
     args.service.enums.map(enums.generate).mkString("\n\n")
   }
+
+  private[elm] def generateResources(args: GenArgs): ValidatedNec[String, String] = {
+    val resources = ElmResource(args)
+    args.service.resources.map(resources.generate).sequence.map(_.mkString("\n\n"))
+  }
 }
 
 case class GenArgs(service: Service) {
