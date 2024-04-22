@@ -1,5 +1,6 @@
 package generator.elm
 
+import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
 import cats.data.ValidatedNec
 import lib.Datatype
@@ -8,6 +9,13 @@ import lib.Datatype._
 import scala.util.{Failure, Success}
 
 case class ElmType(args: GenArgs) {
+
+  def lookup(typ: String): String = {
+    validate(typ) match {
+      case Invalid(e) => sys.error(s"Failed to lookup type '$typ': ${e.toList.mkString(", ")}")
+      case Valid(r) => r
+    }
+  }
 
   def validate(typ: String): ValidatedNec[String, String] = {
     args.datatypeResolver.parse(typ) match {
