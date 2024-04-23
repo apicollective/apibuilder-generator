@@ -25,5 +25,3 @@ case class ElmJson(imports: Imports) {
     ElmFunction(name = n, code = code)
   }
 }
-
-case class ElmFunction(name: String, code: String)

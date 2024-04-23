@@ -10,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 
 case class ElmModel(args: GenArgs) {
   private[this] val elmJson = ElmJson(args.imports)
-  private[this] val elmType = ElmType(args)
+  private[this] val elmType = ElmTypeLookup(args)
 
   def generate(model: Model): ValidatedNec[String, String] = {
     (
@@ -40,27 +40,10 @@ case class ElmModel(args: GenArgs) {
       s"type alias ${Names.pascalCase(model.name)} =",
       "  {",
       model.fields.map { f =>
-        def maybe(contents: String): String = {
-          if (f.required) {
-            contents
-          } else {
-            maybeWrapInParens("Maybe", contents)
-          }
-        }
-
-        s"${Names.camelCase(f.name)}: ${maybe(elmType.lookup(f.`type`))}"
+        s"${Names.camelCase(f.name)}: ${elmType.lookup(f.`type`, required = f.required).declaration}"
       }.mkString("\n, ").indent(4).stripTrailing(),
       "  }"
     ).mkString("\n")
-  }
-
-  private[this] def maybeWrapInParens(function: String, contents: String): String = {
-    val i = contents.indexOf(" ")
-    if (i > 0) {
-      s"$function ($contents)"
-    } else {
-      s"$function $contents"
-    }
   }
 
   private[this] def genEncoderForDatatype(m: Model, f: Field, v: Datatype): String = {
@@ -89,7 +72,7 @@ case class ElmModel(args: GenArgs) {
             |    Encode.object (Dict.toList dict |> List.map (\( k, v ) -> ( k, valueEncoder v )))
             |""".stripMargin
         )
-        "(" + maybeWrapInParens("mapEncoder", genEncoderForDatatype(m, f, u.inner)) + ")"
+        "(" + Util.maybeWrapInParens("mapEncoder", genEncoderForDatatype(m, f, u.inner)) + ")"
       }
     }
   }
@@ -168,7 +151,7 @@ case class ElmModel(args: GenArgs) {
       s"""|> Pipeline.required ${Names.wrapInQuotes(f.name)} $decoder"""
     } else {
       args.imports.addAs("Json.Decode", "Decode")
-      val nullDecoder = maybeWrapInParens("Decode.nullable", decoder)
+      val nullDecoder = Util.maybeWrapInParens("Decode.nullable", decoder)
       s"""|> Pipeline.optional ${Names.wrapInQuotes(f.name)} ($nullDecoder) Nothing"""
     }
   }
@@ -191,14 +174,14 @@ case class ElmModel(args: GenArgs) {
       }
       case u: Container.List => {
         args.imports.addAs("Json.Decode", "Decode")
-        "(" + maybeWrapInParens("Decode.list", genDecoderForDatatype(m, f, u.inner)) + ")"
+        "(" + Util.maybeWrapInParens("Decode.list", genDecoderForDatatype(m, f, u.inner)) + ")"
       }
       case u: Container.Option => {
         todo(s"model ${m.name} Field ${f.name} has type option: ${u.name}")
       }
       case u: Container.Map => {
         args.imports.addAs("Json.Decode", "Decode")
-        "(" + maybeWrapInParens("Decode.dict", genDecoderForDatatype(m, f, u.inner)) + ")"
+        "(" + Util.maybeWrapInParens("Decode.dict", genDecoderForDatatype(m, f, u.inner)) + ")"
       }
     }
   }

@@ -152,7 +152,7 @@ object Text {
   def snakeToCamelCase(value: String): String = {
     splitIntoWords(value).toList match {
       case Nil => ""
-      case part :: rest => part + initCap(rest)
+      case part :: rest => initLowerCase(part) + initCap(rest)
     }
   }
 
