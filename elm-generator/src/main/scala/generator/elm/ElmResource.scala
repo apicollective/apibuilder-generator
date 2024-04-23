@@ -11,16 +11,14 @@ case class ElmResource(args: GenArgs) {
 
 
   def generate(resource: Resource): ValidatedNec[String, String] = {
-    elmType.validate(resource.`type`).andThen { resourceType =>
-      args.imports.addAs("Env", "Env")
+    args.imports.addAs("Env", "Env")
 
-      resource.operations.map { op =>
-        Generator(resource, resourceType, op).generate()
-      }.sequence.map(_.mkString("\n\n"))
-    }
+    resource.operations.map { op =>
+      Generator(resource, op).generate()
+    }.sequence.map(_.mkString("\n\n"))
   }
 
-  case class Generator(resource: Resource, resourceType: ElmType, op: Operation) {
+  case class Generator(resource: Resource, op: Operation) {
     private[this] val name: String = {
       val (variables, words) = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").partition(_.startsWith(":"))
       def toOpt(all: Seq[String]) = {
@@ -30,7 +28,7 @@ case class ElmResource(args: GenArgs) {
         }
       }
 
-      val prefix = op.method.toString.toLowerCase() + resourceType.declaration
+      val prefix = op.method.toString.toLowerCase() + Names.pascalCase(resource.plural)
       Seq(
         Some(prefix),
         toOpt(words.toSeq).map(_.mkString("")),
