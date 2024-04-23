@@ -117,17 +117,22 @@ case class ElmResource(args: GenArgs) {
       }.mkString("\n++ ").indent(16)
     }
 
-    private[this] def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil)(currentVar: String): String = {
+    private[this] def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil, depth: Int = 0)(currentVar: String): String = {
       import ElmType._
       lazy val nextVar = variableIndex.next()
       def innerType(inner: ElmType): String = {
-        val v = Util.maybeWrapInParens(queryParameter(p.copy(typ = inner), functions)(nextVar))
+        val v = Util.maybeWrapInParens(queryParameter(p.copy(typ = inner), functions, depth = depth + 1)(nextVar))
         println(s"inner[${inner.declaration}] => $v")
         v
       }
 
       def asString(function: String) = {
-        queryParameter(p.copy(typ = ElmString), functions = functions ++ Seq(function))(currentVar)
+        val code = queryParameter(p.copy(typ = ElmString), functions = functions ++ Seq(function), depth = depth)(currentVar)
+        if (depth == 0) {
+          s"[ $code ]"
+        } else {
+          code
+        }
       }
 
       def declaration = Util.maybeWrapInParens(
