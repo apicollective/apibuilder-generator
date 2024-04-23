@@ -2,7 +2,7 @@ package generator.elm
 
 import cats.data.ValidatedNec
 import cats.implicits._
-import io.apibuilder.spec.v0.models.{Operation, Parameter, Resource}
+import io.apibuilder.spec.v0.models.{Method, Operation, Parameter, Resource}
 
 import scala.annotation.tailrec
 
@@ -13,6 +13,8 @@ case class ElmResource(args: GenArgs) {
 
   def generate(resource: Resource): ValidatedNec[String, String] = {
     elmType.validate(resource.`type`).andThen { resourceType =>
+      args.imports.addAs("Env", "Env")
+
       resource.operations.map { op =>
         Generator(resource, resourceType, op).generate()
       }.sequence.map(_.mkString("\n\n"))
@@ -21,15 +23,40 @@ case class ElmResource(args: GenArgs) {
 
   case class Generator(resource: Resource, resourceType: String, op: Operation) {
     private[this] val name: String = {
-      val params = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").filter(_.startsWith(":")).map(Names.pascalCase)
-      val prefix = op.method.toString.toLowerCase() + Names.pascalCase(resourceType)
-      if (params.isEmpty) {
-        prefix
-      } else {
-        prefix + "By" + params.mkString("And")
+      val (variables, words) = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").partition(_.startsWith(":"))
+      def toOpt(all: Seq[String]) = {
+        all.map(Names.pascalCase).toList match {
+          case Nil => None
+          case names => Some(names)
+        }
       }
+
+      val prefix = op.method.toString.toLowerCase() + Names.pascalCase(resourceType)
+      Seq(
+        Some(prefix),
+        toOpt(words.toSeq).map(_.mkString("")),
+        toOpt(variables.toSeq).map { w => "By" + w.mkString("And") }
+      ).flatten.mkString("")
     }
-    private[this] val url: String = {
+
+    private[this] val propsType = Names.pascalCase(name) + "Props"
+
+    private[this] def handlePossibleToString(params: Seq[ValidatedParameter], variable: String, code: String): String = {
+      params.find(_.name == variable) match {
+        case None => {
+          println(s"Could not find variable[$variable]")
+          code
+        }
+        case Some(p) => p.typ match {
+          case "String" => code
+          case "Int" => Util.wrapInParens("String.fromInt", code)
+          case other => code
+        }
+      }
+
+    }
+
+    private[this] def url(params: Seq[ValidatedParameter]): String = {
       @tailrec
       def buildUrl(remaining: String, u: Seq[String]): Seq[String] = {
         val i = remaining.indexOf(":")
@@ -39,7 +66,23 @@ case class ElmResource(args: GenArgs) {
           val prefix = remaining.take(i)
           val endIndex = remaining.drop(i).indexOf("/")
 
-          def gen(w: String) = u ++ Seq(Util.wrapInQuotes(prefix) + s" ++ props.${Names.camelCase(w)}")
+          def gen(w: String) = {
+            val code = w match {
+              case ":community_id" => {
+                "Env.config.community.id"
+              }
+              case _ => {
+                println(s"word: $w")
+                val code = s"props.${Names.camelCase(w)}"
+                if (w.startsWith(":")) {
+                  handlePossibleToString(params, w.drop(1), code)
+                } else {
+                  s"props.${Names.camelCase(w)}"
+                }
+              }
+            }
+            u ++ Seq(Util.wrapInQuotes(prefix) + s" ++ $code")
+          }
           if (endIndex < 0) {
             gen(remaining.drop(i))
           } else {
@@ -57,10 +100,7 @@ case class ElmResource(args: GenArgs) {
       import io.apibuilder.spec.v0.models.Method._
 
       validateParameters().map { params =>
-        op.method match {
-          case Delete => delete(params)
-          case _ => ""
-        }
+        generateMethod(op.method, params)
       }
     }
 
@@ -71,16 +111,24 @@ case class ElmResource(args: GenArgs) {
     private[this] def validateParameters(): ValidatedNec[String, Seq[ValidatedParameter]] = {
       op.parameters.map { p =>
         elmType.validate(p.`type`).map { t => ValidatedParameter(p, t) }
-      }.sequence
+      }.sequence.map(removeCommunityId)
     }
 
-    private[this] def delete(params: Seq[ValidatedParameter]): String = {
-      val propsType = Names.pascalCase(name) + "Props"
-      val propsTypeAlias: Option[ElmCode] = params.foldLeft(ElmTypeAliasBuilder(propsType)) { case (builder, p) =>
+    private[this] def removeCommunityId(all: Seq[ValidatedParameter]): Seq[ValidatedParameter] = {
+      all.filterNot { p =>
+        p.name == "community_id" && p.typ == "String"
+      }
+    }
+
+    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]) = {
+      params.foldLeft(ElmTypeAliasBuilder(propsType)) { case (builder, p) =>
         builder.addProperty(p.name, p.typ)
       }.build()
+    }
 
-      val function = propsTypeAlias.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, p) =>
+    private[this] def generateMethod(method: Method, params: Seq[ValidatedParameter]): String = {
+      val propsTypeAlias = makePropsTypeAlias(params)
+      val function = propsTypeAlias.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, _) =>
           builder.addParameter("props", propsType)
         }
         .addParameter("params", "HttpRequestParams msg")
@@ -88,8 +136,8 @@ case class ElmResource(args: GenArgs) {
         .addBody(
           s"""
              |Http.request
-             |    { method = "DELETE"
-             |    , url = $url
+             |    { method = "${method.toString.toUpperCase}"
+             |    , url = Env.config.apiHost ++ ${url(params)}
              |    , expect = params.expect
              |    , headers = params.headers
              |    , timeout = Nothing

@@ -11,9 +11,12 @@ object Util {
     if (i > 0) {
       s"($contents)"
     } else {
-      s"$contents"
+      contents
     }
   }
+
+  def wrapInParens(prefix: String, contents: String): String = s"($prefix $contents)"
+
   def wrapInQuotes(contents: String): String = {
     s""""$contents""""
   }
