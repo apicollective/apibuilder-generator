@@ -71,7 +71,6 @@ case class ElmResource(args: GenArgs) {
             val code = w match {
               case ":community_id" => "Env.config.community.id" // TODO: Move to config
               case _ => {
-                println(s"word: $w")
                 val code = s"props.${Names.camelCase(w)}"
                 if (w.startsWith(":")) {
                   handlePossibleToString(params, w.drop(1), code)
@@ -121,9 +120,7 @@ case class ElmResource(args: GenArgs) {
       import ElmType._
       lazy val nextVar = variableIndex.next()
       def innerType(inner: ElmType): String = {
-        val v = Util.maybeWrapInParens(queryParameter(p.copy(typ = inner), functions, depth = depth + 1)(nextVar))
-        println(s"inner[${inner.declaration}] => $v")
-        v
+        Util.maybeWrapInParens(queryParameter(p.copy(typ = inner), functions, depth = depth + 1)(nextVar))
       }
 
       def asString(function: String) = {
