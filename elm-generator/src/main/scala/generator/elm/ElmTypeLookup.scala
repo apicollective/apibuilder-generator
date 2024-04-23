@@ -51,17 +51,23 @@ object ElmType {
 
 case class ElmTypeLookup(args: GenArgs) {
 
-  def lookup(typ: String): ElmType = {
-    validate(typ) match {
+  def lookup(typ: String, required: Boolean): ElmType = {
+    validate(typ, required = required) match {
       case Invalid(e) => sys.error(s"Failed to lookup type '$typ': ${e.toList.mkString(", ")}")
       case Valid(r) => r
     }
   }
 
-  def validate(typ: String): ValidatedNec[String, ElmType] = {
+  def validate(typ: String, required: Boolean): ValidatedNec[String, ElmType] = {
     args.datatypeResolver.parse(typ) match {
       case Failure(ex) => ex.getMessage.invalidNec
-      case Success(t) => lookup(t)
+      case Success(t) => lookup(t).map { typ =>
+        if (required) {
+          typ
+        } else {
+          ElmType.ElmMaybe(typ)
+        }
+      }
     }
   }
 

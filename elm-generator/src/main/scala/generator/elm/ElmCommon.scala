@@ -15,6 +15,13 @@ case class ElmCommon(args: GenArgs) {
       |        Nothing ->
       |            Encode.null
       |
+      |boolToString : Bool -> String
+      |boolToString value =
+      |    if value then
+      |        "true"
+      |
+      |    else
+      |        "false"
       |
       |type alias UnitResponse =
       |    {}

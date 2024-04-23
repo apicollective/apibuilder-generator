@@ -40,15 +40,7 @@ case class ElmModel(args: GenArgs) {
       s"type alias ${Names.pascalCase(model.name)} =",
       "  {",
       model.fields.map { f =>
-        def maybe(typ: ElmType): String = {
-          if (f.required) {
-            typ.declaration
-          } else {
-            ElmType.ElmMaybe(typ).declaration
-          }
-        }
-
-        s"${Names.camelCase(f.name)}: ${maybe(elmType.lookup(f.`type`))}"
+        s"${Names.camelCase(f.name)}: ${elmType.lookup(f.`type`, required = f.required).declaration}"
       }.mkString("\n, ").indent(4).stripTrailing(),
       "  }"
     ).mkString("\n")

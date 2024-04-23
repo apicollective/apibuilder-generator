@@ -2,7 +2,8 @@ package generator.elm
 
 import cats.data.ValidatedNec
 import cats.implicits._
-import io.apibuilder.spec.v0.models.{Method, Operation, Parameter, Resource}
+import generator.elm.ElmType.{ElmFloat, ElmInt, ElmString}
+import io.apibuilder.spec.v0.models.{Method, Operation, Parameter, ParameterLocation, Resource}
 
 import scala.annotation.tailrec
 
@@ -49,6 +50,7 @@ case class ElmResource(args: GenArgs) {
           case ElmString => code
           case ElmInt => wrap("String.fromInt")
           case ElmFloat => wrap("String.fromFloat")
+          case ElmBool => wrap("boolToString")
           case _ => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to String")
         }
       }
@@ -67,9 +69,7 @@ case class ElmResource(args: GenArgs) {
 
           def gen(w: String) = {
             val code = w match {
-              case ":community_id" => {
-                "Env.config.community.id"
-              }
+              case ":community_id" => "Env.config.community.id" // TODO: Move to config
               case _ => {
                 println(s"word: $w")
                 val code = s"props.${Names.camelCase(w)}"
@@ -92,7 +92,51 @@ case class ElmResource(args: GenArgs) {
           }
         }
       }
-      buildUrl(op.path, Nil).mkString(" ++ ")
+
+      val url = buildUrl(op.path, Nil).mkString(" ++ ")
+      params.filter(_.p.location == ParameterLocation.Query).toList match {
+        case Nil => url
+        case all => {
+          val queryParams = queryParameters(all)
+          args.imports.addExposing("Url.Builder", "toQuery")
+          s"String.append $url (toQuery $queryParams)"
+        }
+      }
+    }
+
+    /*
+            [ string "sort" sort
+        , int "limit" (lo.limit + 1)
+        , int "offset" lo.offset
+        ]
+     */
+    private[this] def queryParameters(params: Seq[ValidatedParameter]): String = {
+      assert(params.nonEmpty, "Must have at least one param")
+      "[ " + params.map { p =>
+        queryParameter(p)
+      }.mkString("\n, ") + "\n]"
+    }
+
+    @tailrec
+    private[this] def queryParameter(p: ValidatedParameter): String = {
+      import ElmType._
+      val declaration = s"props.${p.name}"
+      def gen(f: String, decl: String = declaration) = {
+        args.imports.addExposing("Url.Builder", f)
+        s"$f \"${p.p.name}\" $decl"
+      }
+
+      p.typ match {
+        case ElmString => gen("string")
+        case ElmBool => gen("string", Util.wrapInParens("boolToString", declaration))
+        case ElmInt => gen("int")
+        case ElmFloat => gen("string", Util.wrapInParens("String.fromFloat", declaration))
+        case ElmMaybe(inner) => queryParameter(p.copy(typ = inner))
+        case ElmList(inner) => queryParameter(p.copy(typ = inner))
+        case ElmDict(inner) => queryParameter(p.copy(typ = inner))
+        case ElmUserDefined(inner) => gen("string", Util.wrapInParens(Names.camelCase(inner) + "ToString", declaration))
+        case _ => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to a query parameter")
+      }
     }
 
     def generate(): ValidatedNec[String, String] = {
@@ -109,7 +153,7 @@ case class ElmResource(args: GenArgs) {
 
     private[this] def validateParameters(): ValidatedNec[String, Seq[ValidatedParameter]] = {
       op.parameters.map { p =>
-        elmType.validate(p.`type`).map { t => ValidatedParameter(p, t) }
+        elmType.validate(p.`type`, required = p.required).map { t => ValidatedParameter(p, t) }
       }.sequence.map(removeCommunityId)
     }
 
@@ -133,6 +177,7 @@ case class ElmResource(args: GenArgs) {
         .addParameter("params", "HttpRequestParams msg")
         .addReturnType("Cmd msg")
         .addBody(
+          // TODO: Move Env.config.apiHost to config
           s"""
              |Http.request
              |    { method = "${method.toString.toUpperCase}"
