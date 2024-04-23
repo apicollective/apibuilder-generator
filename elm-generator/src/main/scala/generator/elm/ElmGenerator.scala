@@ -81,3 +81,13 @@ case class GenArgs(service: Service) {
 
   val functions: ElmFunctions = ElmFunctions()
 }
+
+case class VariableIndex() {
+  private[this] var index = 0
+  def next(): String = {
+    index = index + 1
+    current
+  }
+  def current: String = s"v$index"
+  def isFirst: Boolean = index == 0
+}

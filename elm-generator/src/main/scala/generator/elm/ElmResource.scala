@@ -2,14 +2,12 @@ package generator.elm
 
 import cats.data.ValidatedNec
 import cats.implicits._
-import generator.elm.ElmType.{ElmFloat, ElmInt, ElmString}
-import io.apibuilder.spec.v0.models.{Method, Operation, Parameter, ParameterLocation, Resource}
+import io.apibuilder.spec.v0.models._
 
 import scala.annotation.tailrec
 
 case class ElmResource(args: GenArgs) {
   private[this] val elmType = ElmTypeLookup(args)
-
 
   def generate(resource: Resource): ValidatedNec[String, String] = {
     args.imports.addAs("Env", "Env")
@@ -20,6 +18,8 @@ case class ElmResource(args: GenArgs) {
   }
 
   case class Generator(resource: Resource, op: Operation) {
+    private[this] val variableIndex = VariableIndex()
+
     private[this] val name: String = {
       val (variables, words) = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").partition(_.startsWith(":"))
       def toOpt(all: Seq[String]) = {
@@ -99,48 +99,66 @@ case class ElmResource(args: GenArgs) {
         case all => {
           val queryParams = queryParameters(all)
           args.imports.addExposing("Url.Builder", "toQuery")
-          s"String.append ${Util.maybeWrapInParens(url)} (toQuery $queryParams)"
+          s"String.append ${Util.maybeWrapInParens(url)} (toQuery(\n        $queryParams\n        ))"
         }
       }
     }
 
     /*
-            [ string "sort" sort
+        [ string "sort" sort
         , int "limit" (lo.limit + 1)
         , int "offset" lo.offset
         ]
      */
     private[this] def queryParameters(params: Seq[ValidatedParameter]): String = {
       assert(params.nonEmpty, "Must have at least one param")
-      "[ " + params.map { p =>
-        queryParameter(p)
-      }.mkString("\n, ") + "\n]"
+      params.map { p =>
+        queryParameter(p)(s"props.${p.name}")
+      }.mkString("\n++ ").indent(16)
     }
 
-    @tailrec
-    private[this] def queryParameter(p: ValidatedParameter): String = {
+    private[this] def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil)(currentVar: String): String = {
       import ElmType._
-      val declaration = s"props.${p.name}"
-      def gen(f: String, decl: String = declaration) = {
-        args.imports.addExposing("Url.Builder", f)
-        s"$f \"${p.p.name}\" $decl"
+      lazy val nextVar = variableIndex.next()
+      def innerType(inner: ElmType): String = {
+        val v = Util.maybeWrapInParens(queryParameter(p.copy(typ = inner), functions)(nextVar))
+        println(s"inner[${inner.declaration}] => $v")
+        v
       }
 
+      def asString(function: String) = {
+        queryParameter(p.copy(typ = ElmString), functions = functions ++ Seq(function))(currentVar)
+      }
+
+      def declaration = Util.maybeWrapInParens(
+        functions.foldLeft(currentVar) { case (v, f) =>
+          Util.maybeWrapInParens(f, v)
+        }
+      )
+
       p.typ match {
-        case ElmString => gen("string")
-        case ElmBool => gen("string", Util.wrapInParens("boolToString", declaration))
-        case ElmInt => gen("int")
-        case ElmFloat => gen("string", Util.wrapInParens("String.fromFloat", declaration))
-        case ElmMaybe(inner) => queryParameter(p.copy(typ = inner))
-        case ElmList(inner) => queryParameter(p.copy(typ = inner))
-        case ElmDict(inner) => queryParameter(p.copy(typ = inner))
-        case ElmUserDefined(inner) => gen("string", Util.wrapInParens(Names.camelCase(inner) + "ToString", declaration))
+        case ElmString => {
+          args.imports.addExposing("Url.Builder", "string")
+
+          s"string \"${p.p.name}\" $declaration"
+        }
+        case ElmBool => asString("boolToString")
+        case ElmInt => asString("String.fromInt")
+        case ElmFloat => asString("String.fromFlow")
+        case ElmMaybe(inner) => {
+          val code = inner match {
+            case ElmList(_) => s"${innerType(inner)}"
+            case _ => s"[${innerType(inner)}]"
+          }
+          s"(Maybe.withDefault [] (Maybe.map (\\$nextVar -> $code) $declaration))"
+        }
+        case ElmList(inner) => s"List.map (\\$nextVar -> ${innerType(inner)}) $currentVar"
+        case ElmUserDefined(inner) => asString(Names.camelCase(inner) + "ToString")
         case _ => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to a query parameter")
       }
     }
 
     def generate(): ValidatedNec[String, String] = {
-      import io.apibuilder.spec.v0.models.Method._
 
       validateParameters().map { params =>
         generateMethod(op.method, params)
