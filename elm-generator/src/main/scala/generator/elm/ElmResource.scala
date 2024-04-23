@@ -113,7 +113,7 @@ case class ElmResource(args: GenArgs) {
     private[this] def queryParameters(params: Seq[ValidatedParameter]): String = {
       assert(params.nonEmpty, "Must have at least one param")
       params.map { p =>
-        queryParameter(p)(s"props.${p.name}")
+        queryParameter(p)(s"props.${Names.camelCase(p.name)}")
       }.mkString("\n++ ").indent(16)
     }
 
