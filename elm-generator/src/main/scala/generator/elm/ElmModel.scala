@@ -10,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 
 case class ElmModel(args: GenArgs) {
   private[this] val elmJson = ElmJson(args.imports)
-  private[this] val elmType = ElmType(args)
+  private[this] val elmType = ElmTypeLookup(args)
 
   def generate(model: Model): ValidatedNec[String, String] = {
     (
@@ -40,11 +40,11 @@ case class ElmModel(args: GenArgs) {
       s"type alias ${Names.pascalCase(model.name)} =",
       "  {",
       model.fields.map { f =>
-        def maybe(contents: String): String = {
+        def maybe(typ: ElmType): String = {
           if (f.required) {
-            contents
+            typ.declaration
           } else {
-            Util.maybeWrapInParens("Maybe", contents)
+            ElmType.ElmMaybe(typ).declaration
           }
         }
 

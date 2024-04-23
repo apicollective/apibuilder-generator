@@ -7,8 +7,7 @@ import io.apibuilder.spec.v0.models.{Method, Operation, Parameter, Resource}
 import scala.annotation.tailrec
 
 case class ElmResource(args: GenArgs) {
-  //private[this] val elmJson = ElmJson(args.imports)
-  private[this] val elmType = ElmType(args)
+  private[this] val elmType = ElmTypeLookup(args)
 
 
   def generate(resource: Resource): ValidatedNec[String, String] = {
@@ -21,7 +20,7 @@ case class ElmResource(args: GenArgs) {
     }
   }
 
-  case class Generator(resource: Resource, resourceType: String, op: Operation) {
+  case class Generator(resource: Resource, resourceType: ElmType, op: Operation) {
     private[this] val name: String = {
       val (variables, words) = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").partition(_.startsWith(":"))
       def toOpt(all: Seq[String]) = {
@@ -31,7 +30,7 @@ case class ElmResource(args: GenArgs) {
         }
       }
 
-      val prefix = op.method.toString.toLowerCase() + Names.pascalCase(resourceType)
+      val prefix = op.method.toString.toLowerCase() + resourceType.declaration
       Seq(
         Some(prefix),
         toOpt(words.toSeq).map(_.mkString("")),
@@ -42,15 +41,17 @@ case class ElmResource(args: GenArgs) {
     private[this] val propsType = Names.pascalCase(name) + "Props"
 
     private[this] def handlePossibleToString(params: Seq[ValidatedParameter], variable: String, code: String): String = {
+      import ElmType._
+
+      def wrap(fun: String): String = Util.wrapInParens(fun, code)
+
       params.find(_.name == variable) match {
-        case None => {
-          println(s"Could not find variable[$variable]")
-          code
-        }
+        case None => code
         case Some(p) => p.typ match {
-          case "String" => code
-          case "Int" => Util.wrapInParens("String.fromInt", code)
-          case other => code
+          case ElmString => code
+          case ElmInt => wrap("String.fromInt")
+          case ElmFloat => wrap("String.fromFloat")
+          case _ => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to String")
         }
       }
 
@@ -104,7 +105,7 @@ case class ElmResource(args: GenArgs) {
       }
     }
 
-    private[this] case class ValidatedParameter(p: Parameter, typ: String) {
+    private[this] case class ValidatedParameter(p: Parameter, typ: ElmType) {
       val name: String = p.name
     }
 
@@ -116,7 +117,7 @@ case class ElmResource(args: GenArgs) {
 
     private[this] def removeCommunityId(all: Seq[ValidatedParameter]): Seq[ValidatedParameter] = {
       all.filterNot { p =>
-        p.name == "community_id" && p.typ == "String"
+        p.name == "community_id" && p.typ == ElmType.ElmString
       }
     }
 

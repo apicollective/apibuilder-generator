@@ -12,11 +12,11 @@ case class ElmFunction(name: String, code: String) extends ElmCode
 
 case class ElmTypeAliasBuilder(
                               name: String,
-                              properties: Seq[(String, String)] = Nil
+                              properties: Seq[(String, ElmType)] = Nil
                               ) {
   assert(Names.pascalCase(name) == name, s"Name must be in pascal case")
 
-  def addProperty(name: String, typ: String): ElmTypeAliasBuilder = {
+  def addProperty(name: String, typ: ElmType): ElmTypeAliasBuilder = {
     this.copy(
       properties = properties ++ Seq((Names.camelCase(name), typ))
     )
@@ -26,7 +26,7 @@ case class ElmTypeAliasBuilder(
     if (properties.isEmpty) {
       None
     } else {
-      val code = s"type alias $name =\n" + properties.map { case (k,v) => s"$k : $v"}.mkString("    {", "\n    , ", "\n    }")
+      val code = s"type alias $name =\n" + properties.map { case (k,v) => s"$k : ${v.declaration}"}.mkString("    {", "\n    , ", "\n    }")
       Some(ElmTypeAlias(name, code))
     }
   }
