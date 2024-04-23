@@ -28,16 +28,15 @@ case class ElmGenerator() {
       (
         ElmCommon(args).generate().validNec,
         generateEnums(args).validNec,
-        generateModels(args)
-      ).mapN { case (a,b,c) => (a,b,c) }.map { case (common, enums, models) =>
+        generateModels(args),
+        generateResources(args)
+      ).mapN { case (a,b,c,d) => Seq(a,b,c,d) }.map { contents =>
         Seq(File(
           name = s"Generated/" + pascalServiceName(service) + ".elm",
           contents = generate(
             service,
             args,
-            common,
-            enums,
-            models
+            contents: _*
           )
         ))
       }
@@ -80,5 +79,5 @@ case class GenArgs(service: Service) {
 
   val datatypeResolver: DatatypeResolver = GeneratorUtil.datatypeResolver(service)
 
-  val functions: Functions = Functions()
+  val functions: ElmFunctions = ElmFunctions()
 }

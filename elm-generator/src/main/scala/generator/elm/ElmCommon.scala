@@ -4,6 +4,7 @@ case class ElmCommon(args: GenArgs) {
 
   def generate(): String = {
     args.imports.addAs("Json.Encode", "Encode")
+    args.imports.addExposing("Http", "Header, Expect")
     """
       |encodeOptional : (a -> Encode.Value) -> Maybe a -> Encode.Value
       |encodeOptional encoder value =
@@ -17,6 +18,11 @@ case class ElmCommon(args: GenArgs) {
       |
       |type alias UnitResponse =
       |    {}
+      |
+      |type alias HttpRequestParams msg =
+      |     { headers : List Header
+      |       , expect : Expect msg
+      |     }
       |""".stripMargin
   }
 

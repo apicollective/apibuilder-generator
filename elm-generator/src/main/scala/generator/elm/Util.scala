@@ -14,4 +14,7 @@ object Util {
       s"$contents"
     }
   }
+  def wrapInQuotes(contents: String): String = {
+    s""""$contents""""
+  }
 }
