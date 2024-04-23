@@ -99,7 +99,7 @@ case class ElmResource(args: GenArgs) {
         case all => {
           val queryParams = queryParameters(all)
           args.imports.addExposing("Url.Builder", "toQuery")
-          s"String.append $url (toQuery $queryParams)"
+          s"String.append ${Util.maybeWrapInParens(url)} (toQuery $queryParams)"
         }
       }
     }
