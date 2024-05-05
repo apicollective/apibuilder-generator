@@ -7,14 +7,22 @@ sealed trait ElmCode {
   def code: String
 }
 
-case class ElmTypeAlias(name: String, code: String) extends ElmCode
+sealed trait ElmVariable {
+  def name: String
+  def typeName: String
+}
+
+case class ElmTypeAlias(name: String, typeName: String, code: String) extends ElmCode with ElmVariable
 case class ElmFunction(name: String, code: String) extends ElmCode
+case class ElmParameter(name: String, typeName: String) extends ElmVariable
+
 
 case class ElmTypeAliasBuilder(
-                              name: String,
-                              properties: Seq[(String, ElmType)] = Nil
+                              variableName: String,
+                                typeName: String,
+                                properties: Seq[(String, ElmType)] = Nil
                               ) {
-  assert(Names.pascalCase(name) == name, s"Name must be in pascal case")
+  assert(Names.pascalCase(typeName) == typeName, s"Name must be in pascal case")
 
   def addProperty(name: String, typ: ElmType): ElmTypeAliasBuilder = {
     this.copy(
@@ -22,12 +30,30 @@ case class ElmTypeAliasBuilder(
     )
   }
 
-  def build(): Option[ElmTypeAlias] = {
+  private[this] def singleRequiredProperty: Option[ElmParameter] = {
+    properties.toList match {
+      case (name, typ) :: Nil => {
+        import ElmType._
+        typ match {
+          case ElmString | ElmInt | ElmBool | ElmDate | ElmFloat | ElmPosix | ElmDict(_) | ElmList(_) | ElmUserDefined(_) => Some(
+            ElmParameter(name, typ.declaration)
+          )
+          case ElmNothing | ElmMaybe(_) => None
+        }
+      }
+      case _ => None
+    }
+  }
+
+  def build(): Option[ElmVariable] = {
     if (properties.isEmpty) {
       None
+
     } else {
-      val code = s"type alias $name =\n" + properties.map { case (k,v) => s"$k : ${v.declaration}"}.mkString("    {", "\n    , ", "\n    }")
-      Some(ElmTypeAlias(name, code))
+      singleRequiredProperty.orElse {
+        val code = s"type alias $typeName =\n" + properties.map { case (k,v) => s"$k : ${v.declaration}"}.mkString("    {", "\n    , ", "\n    }")
+        Some(ElmTypeAlias(variableName, typeName, code))
+      }
     }
   }
 }

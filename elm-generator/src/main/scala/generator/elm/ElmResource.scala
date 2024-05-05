@@ -57,7 +57,7 @@ case class ElmResource(args: GenArgs) {
 
     }
 
-    private[this] def url(params: Seq[ValidatedParameter]): String = {
+    private[this] def url(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
       @tailrec
       def buildUrl(remaining: String, u: Seq[String]): Seq[String] = {
         val i = remaining.indexOf(":")
@@ -71,12 +71,13 @@ case class ElmResource(args: GenArgs) {
             val code = w match {
               case ":community_id" => "Env.config.community.id" // TODO: Move to config
               case _ => {
-                val code = s"props.${Names.camelCase(w)}"
-                if (w.startsWith(":")) {
-                  handlePossibleToString(params, w.drop(1), code)
+                val bareWord = if (w.startsWith(":")) {
+                  w.drop(1)
                 } else {
-                  s"props.${Names.camelCase(w)}"
+                  w
                 }
+                val code = dereferenceVariable(variable, bareWord)
+                handlePossibleToString(params, bareWord, code)
               }
             }
             u ++ Seq(Util.wrapInQuotes(prefix) + s" ++ $code")
@@ -96,7 +97,7 @@ case class ElmResource(args: GenArgs) {
       params.filter(_.p.location == ParameterLocation.Query).toList match {
         case Nil => url
         case all => {
-          val queryParams = queryParameters(all)
+          val queryParams = queryParameters(variable, all)
           args.imports.addExposing("Url.Builder", "toQuery")
           s"String.append ${Util.maybeWrapInParens(url)} (toQuery(\n        $queryParams\n        ))"
         }
@@ -109,11 +110,18 @@ case class ElmResource(args: GenArgs) {
         , int "offset" lo.offset
         ]
      */
-    private[this] def queryParameters(params: Seq[ValidatedParameter]): String = {
+    private[this] def queryParameters(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
       assert(params.nonEmpty, "Must have at least one param")
       params.map { p =>
-        queryParameter(p)(s"props.${Names.camelCase(p.name)}")
+        queryParameter(p)(dereferenceVariable(variable, p.name))
       }.mkString("\n++ ").indent(16)
+    }
+
+    private[this] def dereferenceVariable(variable: ElmVariable, name: String): String = {
+      variable match {
+        case _: ElmParameter => name
+        case a: ElmTypeAlias => s"${a.name}.${Names.camelCase(name)}"
+      }
     }
 
     private[this] def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil, depth: Int = 0)(currentVar: String): String = {
@@ -183,16 +191,19 @@ case class ElmResource(args: GenArgs) {
       }
     }
 
-    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]) = {
-      params.foldLeft(ElmTypeAliasBuilder(propsType)) { case (builder, p) =>
+    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]): Option[ElmVariable] = {
+      params.foldLeft(ElmTypeAliasBuilder("props", propsType)) { case (builder, p) =>
         builder.addProperty(p.name, p.typ)
       }.build()
     }
 
     private[this] def generateMethod(method: Method, params: Seq[ValidatedParameter]): String = {
-      val propsTypeAlias = makePropsTypeAlias(params)
-      val function = propsTypeAlias.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, _) =>
-          builder.addParameter("props", propsType)
+      val param = makePropsTypeAlias(params)
+      val variable = param.getOrElse {
+        ElmParameter("placeholder", "String")
+      }
+      val function = param.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, _) =>
+          builder.addParameter(variable.name, variable.typeName)
         }
         .addParameter("params", "HttpRequestParams msg")
         .addReturnType("Cmd msg")
@@ -201,7 +212,7 @@ case class ElmResource(args: GenArgs) {
           s"""
              |Http.request
              |    { method = "${method.toString.toUpperCase}"
-             |    , url = Env.config.apiHost ++ ${url(params)}
+             |    , url = Env.config.apiHost ++ ${url(variable, params)}
              |    , expect = params.expect
              |    , headers = params.headers
              |    , timeout = Nothing
@@ -211,7 +222,10 @@ case class ElmResource(args: GenArgs) {
              |""".stripMargin).build()
 
       Seq(
-        propsTypeAlias,
+        param.flatMap {
+          case _: ElmParameter => None
+          case a: ElmTypeAlias => Some(a)
+        },
         Some(function)
       ).flatten.map(_.code).mkString("\n\n")
     }
