@@ -57,7 +57,7 @@ case class ElmResource(args: GenArgs) {
 
     }
 
-    private[this] def url(params: Seq[ValidatedParameter]): String = {
+    private[this] def url(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
       @tailrec
       def buildUrl(remaining: String, u: Seq[String]): Seq[String] = {
         val i = remaining.indexOf(":")
@@ -71,7 +71,11 @@ case class ElmResource(args: GenArgs) {
             val code = w match {
               case ":community_id" => "Env.config.community.id" // TODO: Move to config
               case _ => {
-                val code = s"props.${Names.camelCase(w)}"
+                val code = variable match {
+                  case p: ElmParameter => p.name
+                  case a: ElmTypeAlias => s"${a.name}.${Names.camelCase(w)}"
+                }
+
                 if (w.startsWith(":")) {
                   handlePossibleToString(params, w.drop(1), code)
                 } else {
@@ -183,19 +187,19 @@ case class ElmResource(args: GenArgs) {
       }
     }
 
-    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]): Option[ElmMethodProps] = {
-      params.foldLeft(ElmTypeAliasBuilder(propsType)) { case (builder, p) =>
+    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]): Option[ElmVariable] = {
+      params.foldLeft(ElmTypeAliasBuilder("props", propsType)) { case (builder, p) =>
         builder.addProperty(p.name, p.typ)
       }.build()
     }
 
     private[this] def generateMethod(method: Method, params: Seq[ValidatedParameter]): String = {
       val param = makePropsTypeAlias(params)
-      val function = param.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, p) =>
-          p match {
-            case ElmParameter(name, typeName) => builder.addParameter(name, typeName)
-            case _: ElmTypeAlias => builder.addParameter("props", propsType)
-          }
+      val variable = param.getOrElse {
+        ElmParameter("placeholder", "String")
+      }
+      val function = param.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, _) =>
+          builder.addParameter(variable.name, variable.typeName)
         }
         .addParameter("params", "HttpRequestParams msg")
         .addReturnType("Cmd msg")
@@ -204,7 +208,7 @@ case class ElmResource(args: GenArgs) {
           s"""
              |Http.request
              |    { method = "${method.toString.toUpperCase}"
-             |    , url = Env.config.apiHost ++ ${url(params)}
+             |    , url = Env.config.apiHost ++ ${url(variable, params)}
              |    , expect = params.expect
              |    , headers = params.headers
              |    , timeout = Nothing
