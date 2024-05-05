@@ -183,16 +183,19 @@ case class ElmResource(args: GenArgs) {
       }
     }
 
-    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]) = {
+    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]): Option[ElmMethodProps] = {
       params.foldLeft(ElmTypeAliasBuilder(propsType)) { case (builder, p) =>
         builder.addProperty(p.name, p.typ)
       }.build()
     }
 
     private[this] def generateMethod(method: Method, params: Seq[ValidatedParameter]): String = {
-      val propsTypeAlias = makePropsTypeAlias(params)
-      val function = propsTypeAlias.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, _) =>
-          builder.addParameter("props", propsType)
+      val param = makePropsTypeAlias(params)
+      val function = param.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, p) =>
+          p match {
+            case ElmParameter(name, typeName) => builder.addParameter(name, typeName)
+            case _: ElmTypeAlias => builder.addParameter("props", propsType)
+          }
         }
         .addParameter("params", "HttpRequestParams msg")
         .addReturnType("Cmd msg")
@@ -211,7 +214,10 @@ case class ElmResource(args: GenArgs) {
              |""".stripMargin).build()
 
       Seq(
-        propsTypeAlias,
+        param.flatMap {
+          case _: ElmParameter => None
+          case a: ElmTypeAlias => Some(a)
+        },
         Some(function)
       ).flatten.map(_.code).mkString("\n\n")
     }

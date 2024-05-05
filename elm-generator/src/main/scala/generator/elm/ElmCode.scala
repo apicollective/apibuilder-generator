@@ -7,8 +7,17 @@ sealed trait ElmCode {
   def code: String
 }
 
-case class ElmTypeAlias(name: String, code: String) extends ElmCode
+sealed trait ElmMethodProps {
+  def name: String
+  def typeName: String
+}
+
+case class ElmTypeAlias(name: String, code: String) extends ElmCode with ElmMethodProps {
+  override def typeName: String = name
+}
 case class ElmFunction(name: String, code: String) extends ElmCode
+case class ElmParameter(name: String, typeName: String) extends ElmMethodProps
+
 
 case class ElmTypeAliasBuilder(
                               name: String,
@@ -22,12 +31,30 @@ case class ElmTypeAliasBuilder(
     )
   }
 
-  def build(): Option[ElmTypeAlias] = {
+  private[this] def singleRequiredProperty: Option[ElmParameter] = {
+    properties.toList match {
+      case (name, typ) :: Nil => {
+        import ElmType._
+        typ match {
+          case ElmString | ElmInt | ElmBool | ElmDate | ElmFloat | ElmPosix | ElmDict(_) | ElmList(_) | ElmUserDefined(_) => Some(
+            ElmParameter(name, typ.declaration)
+          )
+          case ElmNothing | ElmMaybe(_) => None
+        }
+      }
+      case _ => None
+    }
+  }
+
+  def build(): Option[ElmMethodProps] = {
     if (properties.isEmpty) {
       None
+
     } else {
-      val code = s"type alias $name =\n" + properties.map { case (k,v) => s"$k : ${v.declaration}"}.mkString("    {", "\n    , ", "\n    }")
-      Some(ElmTypeAlias(name, code))
+      singleRequiredProperty.orElse {
+        val code = s"type alias $name =\n" + properties.map { case (k,v) => s"$k : ${v.declaration}"}.mkString("    {", "\n    , ", "\n    }")
+        Some(ElmTypeAlias(name, code))
+      }
     }
   }
 }
