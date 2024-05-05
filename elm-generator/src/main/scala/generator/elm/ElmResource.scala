@@ -71,16 +71,13 @@ case class ElmResource(args: GenArgs) {
             val code = w match {
               case ":community_id" => "Env.config.community.id" // TODO: Move to config
               case _ => {
-                val code = variable match {
-                  case p: ElmParameter => p.name
-                  case a: ElmTypeAlias => s"${a.name}.${Names.camelCase(w)}"
-                }
-
-                if (w.startsWith(":")) {
-                  handlePossibleToString(params, w.drop(1), code)
+                val bareWord = if (w.startsWith(":")) {
+                  w.drop(1)
                 } else {
-                  s"props.${Names.camelCase(w)}"
+                  w
                 }
+                val code = dereferenceVariable(variable, bareWord)
+                handlePossibleToString(params, bareWord, code)
               }
             }
             u ++ Seq(Util.wrapInQuotes(prefix) + s" ++ $code")
@@ -100,7 +97,7 @@ case class ElmResource(args: GenArgs) {
       params.filter(_.p.location == ParameterLocation.Query).toList match {
         case Nil => url
         case all => {
-          val queryParams = queryParameters(all)
+          val queryParams = queryParameters(variable, all)
           args.imports.addExposing("Url.Builder", "toQuery")
           s"String.append ${Util.maybeWrapInParens(url)} (toQuery(\n        $queryParams\n        ))"
         }
@@ -113,11 +110,18 @@ case class ElmResource(args: GenArgs) {
         , int "offset" lo.offset
         ]
      */
-    private[this] def queryParameters(params: Seq[ValidatedParameter]): String = {
+    private[this] def queryParameters(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
       assert(params.nonEmpty, "Must have at least one param")
       params.map { p =>
-        queryParameter(p)(s"props.${Names.camelCase(p.name)}")
+        queryParameter(p)(dereferenceVariable(variable, p.name))
       }.mkString("\n++ ").indent(16)
+    }
+
+    private[this] def dereferenceVariable(variable: ElmVariable, name: String): String = {
+      variable match {
+        case _: ElmParameter => name
+        case a: ElmTypeAlias => s"${a.name}.${Names.camelCase(name)}"
+      }
     }
 
     private[this] def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil, depth: Int = 0)(currentVar: String): String = {
