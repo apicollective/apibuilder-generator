@@ -1,10 +1,15 @@
 package generator.elm
 
+object ElmJson {
+  def encoderName(t: ElmType): String = encoderName(t.declaration)
+  private[elm] def encoderName(name: String): String = s"${Names.camelCase(name)}Encoder"
+}
+
 case class ElmJson(imports: Imports) {
 
   def encoder(name: String)(contents: String): ElmFunction = {
     imports.addAs("Json.Encode", "Encode")
-    val n = s"${Names.camelCase(name)}Encoder"
+    val n = ElmJson.encoderName(name)
     val code = Seq(
       s"$n : ${Names.pascalCase(name)} -> Encode.Value",
       s"$n instance =",

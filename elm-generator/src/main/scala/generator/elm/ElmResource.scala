@@ -19,6 +19,7 @@ case class ElmResource(args: GenArgs) {
 
   case class Generator(resource: Resource, op: Operation) {
     private[this] val variableIndex = VariableIndex()
+    private[this] val elmJson = ElmJson(args.imports)
 
     private[this] val name: String = {
       val (variables, words) = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").partition(_.startsWith(":"))
@@ -170,8 +171,10 @@ case class ElmResource(args: GenArgs) {
 
     def generate(): ValidatedNec[String, String] = {
 
-      validateParameters().map { params =>
-        generateMethod(op.method, params)
+      (validateParameters(),
+        validateBody(op.body)
+      ).mapN { case (params, bodyType) =>
+        generateMethod(op.method, params, bodyType)
       }
     }
 
@@ -197,14 +200,23 @@ case class ElmResource(args: GenArgs) {
       }.build()
     }
 
-    private[this] def generateMethod(method: Method, params: Seq[ValidatedParameter]): String = {
+    private[this] def validateBody(body: Option[Body]): ValidatedNec[String, Option[ElmType]] = {
+      body match {
+        case None => None.validNec
+        case Some(b) => elmType.validate(b.`type`, required = true).map(Some(_))
+      }
+    }
+
+    private[this] def generateMethod(method: Method, params: Seq[ValidatedParameter], body: Option[ElmType]): String = {
       val param = makePropsTypeAlias(params)
       val variable = param.getOrElse {
         ElmParameter("placeholder", "String")
       }
+
       val function = param.toSeq.foldLeft(ElmFunctionBuilder(name)) { case (builder, _) =>
           builder.addParameter(variable.name, variable.typeName)
         }
+        .addParameter("body", body.map(_.declaration))
         .addParameter("params", "HttpRequestParams msg")
         .addReturnType("Cmd msg")
         .addBody(
@@ -217,7 +229,7 @@ case class ElmResource(args: GenArgs) {
              |    , headers = params.headers
              |    , timeout = Nothing
              |    , tracker = Nothing
-             |    , body = Http.emptyBody
+             |    , body = ${body.map(b => s"Http.jsonBody (${ElmJson.encoderName(b)} body)").getOrElse("Http.emptyBody")}
              |    }
              |""".stripMargin).build()
 

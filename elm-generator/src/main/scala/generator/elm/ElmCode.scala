@@ -66,10 +66,17 @@ case class ElmFunctionBuilder(
                               ) {
   assert(Names.camelCase(name) == name, s"Name must be in camel case")
 
+  def addParameter(name: String, typ: Option[String]): ElmFunctionBuilder = {
+    typ match {
+      case None => this
+      case Some(t) => this.copy(
+        parameters = parameters ++ Seq((name, t))
+      )
+    }
+  }
+
   def addParameter(name: String, typ: String): ElmFunctionBuilder = {
-    this.copy(
-      parameters = parameters ++ Seq((name, typ))
-    )
+    addParameter(name, Some(typ))
   }
 
   def addBody(body: String): ElmFunctionBuilder = {
