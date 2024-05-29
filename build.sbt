@@ -162,7 +162,7 @@ lazy val kotlinGenerator = project
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % jacksonVersion,
       "org.threeten" % "threetenbp" % "1.6.9",
-      "com.squareup" % "kotlinpoet" % "1.17.0",
+      "com.squareup" % "kotlinpoet" % "1.3.0",
       "com.squareup.retrofit2" % "retrofit" % "2.11.0",
       "com.jakewharton.retrofit" % "retrofit2-rxjava2-adapter" % "1.0.0",
       "org.jetbrains.kotlin" % "kotlin-stdlib" % kotlinLangVersion % "test",
