@@ -202,6 +202,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   testOptions += Tests.Argument("-oF"),
   libraryDependencies ++= Seq(
     guice,
+    "com.typesafe.play" %% "play-json-joda" % "2.9.4",
     "com.google.inject" % "guice" % "5.1.0",
     "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
     "org.atteo" % "evo-inflector" % "1.3",
