@@ -13,7 +13,7 @@ class KotlinGeneratorTest
 
   private val serviceDefs = Seq(builtInTypesService,
                                 // dateTimeService,
-                                // generatorApiServiceWithUnionAndDescriminator,
+                                // generatorApiServiceWithUnionAndDiscriminator,
                                 apidocApiService,
                                 collectionJsonDefaultsService,
                                 referenceApiService,
