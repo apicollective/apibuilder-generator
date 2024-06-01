@@ -60,7 +60,7 @@ lazy val generator = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
+      "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % "test"
     ),
     scalacOptions ++= allScalacOptions,
     Test / javaOptions ++= Seq(
@@ -209,7 +209,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "com.squareup.retrofit2" % "retrofit" % "2.11.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.21",
     "org.typelevel" %% "cats-core" % "2.12.0",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % "test",
     "org.scalatest" %% "scalatest" % scalatestVersion % Test,
     "org.scalatestplus" %% "scalacheck-1-15" % "3.2.11.0" % Test,
     "org.mockito" % "mockito-core" % mockitoVersion % Test,
