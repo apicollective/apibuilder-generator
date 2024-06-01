@@ -52,10 +52,20 @@ case class ElmResource(args: GenArgs) {
           case ElmInt => wrap("String.fromInt")
           case ElmFloat => wrap("String.fromFloat")
           case ElmBool => wrap("boolToString")
-          case _ => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to String")
+          case ElmEnumLocal(name) => wrap(Names.camelCase(name) + "ToString")
+          case ElmEnumImported(ns, name) => {
+            args.imports.addExposing(ns, name)
+            wrap(Names.camelCase(name) + "ToString")
+          }
+          case ElmNothing | ElmDate |
+            ElmDict(_) |
+            ElmList(_) |
+            ElmMaybe(_) |
+            ElmPosix |
+            _: ElmUserDefinedLocal |
+           _: ElmUserDefinedImported => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to String")
         }
       }
-
     }
 
     private[this] def url(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
@@ -156,6 +166,11 @@ case class ElmResource(args: GenArgs) {
         case ElmBool => asString("boolToString")
         case ElmInt => asString("String.fromInt")
         case ElmFloat => asString("String.fromFlow")
+        case ElmEnumLocal(name) => asString(Names.camelCase(name) + "ToString")
+        case ElmEnumImported(ns, name) => {
+          args.imports.addExposing(ns, name)
+          asString(Names.camelCase(name) + "ToString")
+        }
         case ElmMaybe(inner) => {
           val code = inner match {
             case ElmList(_) => s"${innerType(inner)}"
@@ -164,8 +179,12 @@ case class ElmResource(args: GenArgs) {
           s"(Maybe.withDefault [] (Maybe.map (\\$nextVar -> $code) $declaration))"
         }
         case ElmList(inner) => s"List.map (\\$nextVar -> ${innerType(inner)}) $currentVar"
-        case ElmUserDefined(inner) => asString(Names.camelCase(inner) + "ToString")
-        case _ => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to a query parameter")
+        case ElmUserDefinedLocal(inner) => asString(Names.camelCase(inner) + "ToString")
+        case ElmUserDefinedImported(ns, inner) => {
+          args.imports.addExposing(ns, inner)
+          asString(Names.camelCase(inner) + "ToString")
+        }
+        case ElmDate | ElmDict(_) | ElmPosix | ElmNothing => sys.error(s"Do not know how to convert parameter named ${p.name} with type ${p.typ} to a query parameter")
       }
     }
 

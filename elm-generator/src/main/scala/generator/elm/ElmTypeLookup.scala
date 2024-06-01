@@ -34,7 +34,19 @@ object ElmType {
   case object ElmNothing extends ElmType {
     override def declaration: String = "Nothing"
   }
-  case class ElmUserDefined(name: String) extends ElmType {
+  case class ElmEnumLocal(name: String) extends ElmType {
+    assert(name == Names.pascalCase(name), "Name must be pascal case")
+    override def declaration: String = name
+  }
+  case class ElmEnumImported(namespace: String, name: String) extends ElmType {
+    assert(name == Names.pascalCase(name), "Name must be pascal case")
+    override def declaration: String = name
+  }
+  case class ElmUserDefinedLocal(name: String) extends ElmType {
+    assert(name == Names.pascalCase(name), "Name must be pascal case")
+    override def declaration: String = name
+  }
+  case class ElmUserDefinedImported(namespace: String, name: String) extends ElmType {
     assert(name == Names.pascalCase(name), "Name must be pascal case")
     override def declaration: String = name
   }
@@ -101,10 +113,21 @@ case class ElmTypeLookup(args: GenArgs) {
       }
       case u: UserDefined => {
         NamespaceParser.parse(u.name) match {
-          case ParsedName.Local(name) => ElmUserDefined(Names.pascalCase(name)).validNec
-          case ParsedName.Imported(namespace, name) => {
-            args.imports.addExposingAll(s"Generated.${Names.pascalCase(namespace)}")
-            ElmUserDefined(Names.pascalCase(name)).validNec
+          case ParsedName.Local(n) => {
+            val name = Names.pascalCase(n)
+            u match {
+              case _: UserDefined.Enum => ElmEnumLocal(name).validNec
+              case _: UserDefined.Model | _: UserDefined.Union => ElmUserDefinedLocal(name).validNec
+            }
+          }
+          case ParsedName.Imported(ns, n) => {
+            val namespace = s"Generated.${Names.pascalCase(ns)}"
+            val name = Names.pascalCase(n)
+            args.imports.addExposingAll(namespace)
+            u match {
+              case _: UserDefined.Enum => ElmEnumImported(namespace, name).validNec
+              case _: UserDefined.Model | _: UserDefined.Union => ElmUserDefinedImported(namespace, name).validNec
+            }
           }
         }
       }
