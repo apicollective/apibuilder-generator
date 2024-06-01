@@ -35,7 +35,7 @@ case class ElmTypeAliasBuilder(
       case (name, typ) :: Nil => {
         import ElmType._
         typ match {
-          case ElmString | ElmInt | ElmBool | ElmDate | ElmFloat | ElmPosix | ElmDict(_) | ElmList(_) | ElmUserDefined(_) => Some(
+          case ElmString | ElmInt | ElmBool | ElmDate | ElmFloat | ElmPosix | ElmDict(_) | ElmList(_) | ElmEnumLocal(_) | _: ElmEnumImported | ElmUserDefinedLocal(_) | _: ElmUserDefinedImported => Some(
             ElmParameter(name, typ.declaration)
           )
           case ElmNothing | ElmMaybe(_) => None
