@@ -43,7 +43,7 @@ case class ElmResource(args: GenArgs) {
     private[this] def handlePossibleToString(params: Seq[ValidatedParameter], variable: String, code: String): String = {
       import ElmType._
 
-      def wrap(fun: String): String = Util.wrapInParens(fun, code)
+      def wrap(fun: String): String = Util.wrapInParens(fun, Names.maybeQuote(code))
 
       params.find(_.name == variable) match {
         case None => code
