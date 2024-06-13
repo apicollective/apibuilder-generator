@@ -27,7 +27,9 @@ case class ElmCommon(args: GenArgs) {
       |    {}
       |
       |type alias HttpRequestParams msg =
-      |     { headers : List Header
+      |     { apiHost: String
+      |       , communityId: String
+      |       , headers : List Header
       |       , expect : Expect msg
       |     }
       |""".stripMargin

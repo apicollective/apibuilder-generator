@@ -10,8 +10,6 @@ case class ElmResource(args: GenArgs) {
   private[this] val elmType = ElmTypeLookup(args)
 
   def generate(resource: Resource): ValidatedNec[String, String] = {
-    args.imports.addAs("Env", "Env")
-
     resource.operations.map { op =>
       Generator(resource, op).generate()
     }.sequence.map(_.mkString("\n\n"))
@@ -80,7 +78,7 @@ case class ElmResource(args: GenArgs) {
 
           def gen(w: String) = {
             val code = w match {
-              case ":community_id" => "Env.config.community.id" // TODO: Move to config
+              case ":community_id" => "params.communityId" // TODO: Move to config
               case _ => {
                 val bareWord = if (w.startsWith(":")) {
                   w.drop(1)
@@ -239,11 +237,10 @@ case class ElmResource(args: GenArgs) {
         .addParameter("params", "HttpRequestParams msg")
         .addReturnType("Cmd msg")
         .addBody(
-          // TODO: Move Env.config.apiHost to config
           s"""
              |Http.request
              |    { method = "${method.toString.toUpperCase}"
-             |    , url = Env.config.apiHost ++ ${url(variable, params)}
+             |    , url = params.apiHost ++ ${url(variable, params)}
              |    , expect = params.expect
              |    , headers = params.headers
              |    , timeout = Nothing
