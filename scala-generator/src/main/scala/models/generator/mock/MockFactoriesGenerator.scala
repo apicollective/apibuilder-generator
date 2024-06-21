@@ -2,6 +2,7 @@ package scala.generator.mock
 
 import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
+import lib.Text
 import lib.Text._
 import lib.generator.CodeGenerator
 
@@ -53,10 +54,21 @@ object MockFactoriesGenerator extends CodeGenerator {
   }
 
   private[mock] def makeUnion(union: ScalaUnion): String = {
-    val typ = union.types.headOption.getOrElse {
-      sys.error(s"Union type[${union.qualifiedName}] does not have any times")
+    val impl = union.types.headOption match {
+      case Some(typ) => {
+        val value = mockValue(typ.datatype)
+        typ.datatype match {
+          case p: ScalaPrimitive => {
+            // Union type wrapping a primitive
+            val className = Text.pascalCase(union.name) + Text.pascalCase(p.shortName)
+            union.ssd.namespaces.unions + "." + className + s"($value)"
+          }
+          case _ => value
+        }
+      }
+      case None => "???"
     }
-    s"def make${union.name}(): ${union.qualifiedName} = ${mockValue(typ.datatype)}"
+    s"def make${union.name}(): ${union.qualifiedName} = $impl"
   }
 
   private[mock] def mockValue(
