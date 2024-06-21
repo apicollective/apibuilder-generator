@@ -54,21 +54,28 @@ object MockFactoriesGenerator extends CodeGenerator {
   }
 
   private[mock] def makeUnion(union: ScalaUnion): String = {
-    val impl = union.types.headOption match {
-      case Some(typ) => {
-        val value = mockValue(typ.datatype)
-        typ.datatype match {
-          case p: ScalaPrimitive => {
-            // Union type wrapping a primitive
-            val className = Text.pascalCase(union.name) + Text.pascalCase(p.shortName)
-            union.ssd.namespaces.unions + "." + className + s"($value)"
-          }
-          case _ => value
+    val impl = union.types.headOption.map(_.datatype) match {
+      case Some(datatype: ScalaPrimitive) => {
+        val value = mockValue(datatype)
+        if (needsWrapper(datatype)) {
+          val className = Text.pascalCase(union.name) + Text.pascalCase(datatype.shortName)
+          union.ssd.namespaces.unions + "." + className + s"($value)"
+        } else {
+          value
         }
       }
-      case None => "???"
+      case _ => "???" // no types defined
     }
     s"def make${union.name}(): ${union.qualifiedName} = $impl"
+  }
+
+  private[this] def needsWrapper(datatype: ScalaDatatype): Boolean = {
+    datatype match {
+      case _: ScalaPrimitive.Model | _: ScalaPrimitive.GeneratedModel | _: ScalaPrimitive.Union => {
+        false
+      }
+      case _ => true
+    }
   }
 
   private[mock] def mockValue(
