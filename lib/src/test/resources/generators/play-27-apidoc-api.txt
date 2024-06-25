@@ -1096,7 +1096,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiAttributeValueForm: play.api.libs.json.Reads[AttributeValueForm] = {
-      (__ \ "value").read[String].map { x => new AttributeValueForm(value = x) }
+      (__ \ "value").read[String].map { x => AttributeValueForm(value = x) }
     }
 
     def jsObjectAttributeValueForm(obj: io.apibuilder.api.v0.models.AttributeValueForm): play.api.libs.json.JsObject = {
@@ -1166,7 +1166,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiCleartextToken: play.api.libs.json.Reads[CleartextToken] = {
-      (__ \ "token").read[String].map { x => new CleartextToken(token = x) }
+      (__ \ "token").read[String].map { x => CleartextToken(token = x) }
     }
 
     def jsObjectCleartextToken(obj: io.apibuilder.api.v0.models.CleartextToken): play.api.libs.json.JsObject = {
@@ -1204,7 +1204,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiDiffBreaking: play.api.libs.json.Reads[DiffBreaking] = {
-      (__ \ "description").read[String].map { x => new DiffBreaking(description = x) }
+      (__ \ "description").read[String].map { x => DiffBreaking(description = x) }
     }
 
     def jsObjectDiffBreaking(obj: io.apibuilder.api.v0.models.DiffBreaking): play.api.libs.json.JsObject = {
@@ -1220,7 +1220,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiDiffNonBreaking: play.api.libs.json.Reads[DiffNonBreaking] = {
-      (__ \ "description").read[String].map { x => new DiffNonBreaking(description = x) }
+      (__ \ "description").read[String].map { x => DiffNonBreaking(description = x) }
     }
 
     def jsObjectDiffNonBreaking(obj: io.apibuilder.api.v0.models.DiffNonBreaking): play.api.libs.json.JsObject = {
@@ -1236,7 +1236,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiDomain: play.api.libs.json.Reads[Domain] = {
-      (__ \ "name").read[String].map { x => new Domain(name = x) }
+      (__ \ "name").read[String].map { x => Domain(name = x) }
     }
 
     def jsObjectDomain(obj: io.apibuilder.api.v0.models.Domain): play.api.libs.json.JsObject = {
@@ -1252,7 +1252,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiEmailVerificationConfirmationForm: play.api.libs.json.Reads[EmailVerificationConfirmationForm] = {
-      (__ \ "token").read[String].map { x => new EmailVerificationConfirmationForm(token = x) }
+      (__ \ "token").read[String].map { x => EmailVerificationConfirmationForm(token = x) }
     }
 
     def jsObjectEmailVerificationConfirmationForm(obj: io.apibuilder.api.v0.models.EmailVerificationConfirmationForm): play.api.libs.json.JsObject = {
@@ -1330,7 +1330,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiGeneratorServiceForm: play.api.libs.json.Reads[GeneratorServiceForm] = {
-      (__ \ "uri").read[String].map { x => new GeneratorServiceForm(uri = x) }
+      (__ \ "uri").read[String].map { x => GeneratorServiceForm(uri = x) }
     }
 
     def jsObjectGeneratorServiceForm(obj: io.apibuilder.api.v0.models.GeneratorServiceForm): play.api.libs.json.JsObject = {
@@ -1444,7 +1444,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiMoveForm: play.api.libs.json.Reads[MoveForm] = {
-      (__ \ "org_key").read[String].map { x => new MoveForm(orgKey = x) }
+      (__ \ "org_key").read[String].map { x => MoveForm(orgKey = x) }
     }
 
     def jsObjectMoveForm(obj: io.apibuilder.api.v0.models.MoveForm): play.api.libs.json.JsObject = {
@@ -1583,7 +1583,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiPasswordResetRequest: play.api.libs.json.Reads[PasswordResetRequest] = {
-      (__ \ "email").read[String].map { x => new PasswordResetRequest(email = x) }
+      (__ \ "email").read[String].map { x => PasswordResetRequest(email = x) }
     }
 
     def jsObjectPasswordResetRequest(obj: io.apibuilder.api.v0.models.PasswordResetRequest): play.api.libs.json.JsObject = {
@@ -1599,7 +1599,7 @@ package io.apibuilder.api.v0.models {
     }
 
     implicit def jsonReadsApidocApiPasswordResetSuccess: play.api.libs.json.Reads[PasswordResetSuccess] = {
-      (__ \ "user_guid").read[_root_.java.util.UUID].map { x => new PasswordResetSuccess(userGuid = x) }
+      (__ \ "user_guid").read[_root_.java.util.UUID].map { x => PasswordResetSuccess(userGuid = x) }
     }
 
     def jsObjectPasswordResetSuccess(obj: io.apibuilder.api.v0.models.PasswordResetSuccess): play.api.libs.json.JsObject = {
@@ -1938,8 +1938,8 @@ package io.apibuilder.api.v0.models {
     implicit def jsonReadsApidocApiDiff: play.api.libs.json.Reads[Diff] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
-          case "diff_breaking" => js.validate[io.apibuilder.api.v0.models.DiffBreaking]
-          case "diff_non_breaking" => js.validate[io.apibuilder.api.v0.models.DiffNonBreaking]
+          case "diff_breaking" => jsonReadsApidocApiDiffBreaking.reads(js)
+          case "diff_non_breaking" => jsonReadsApidocApiDiffNonBreaking.reads(js)
           case other => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.DiffUndefinedType(other))
         }
       }
@@ -1958,7 +1958,6 @@ package io.apibuilder.api.v0.models {
         }
       }
     }
-
     implicit def jsonWritesApidocApiDiff: play.api.libs.json.Writes[Diff] = {
       (obj: io.apibuilder.api.v0.models.Diff) => {
         jsObjectDiff(obj)
@@ -1968,7 +1967,7 @@ package io.apibuilder.api.v0.models {
     implicit def jsonReadsApidocApiItemDetail: play.api.libs.json.Reads[ItemDetail] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
-          case "application_summary" => js.validate[io.apibuilder.api.v0.models.ApplicationSummary]
+          case "application_summary" => jsonReadsApidocApiApplicationSummary.reads(js)
           case other => play.api.libs.json.JsSuccess(io.apibuilder.api.v0.models.ItemDetailUndefinedType(other))
         }
       }
@@ -1986,7 +1985,6 @@ package io.apibuilder.api.v0.models {
         }
       }
     }
-
     implicit def jsonWritesApidocApiItemDetail: play.api.libs.json.Writes[ItemDetail] = {
       (obj: io.apibuilder.api.v0.models.ItemDetail) => {
         jsObjectItemDetail(obj)

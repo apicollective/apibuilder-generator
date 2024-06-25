@@ -224,16 +224,16 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Reads[UserString] = {
-      (__ \ "value").read[String].map { x => new UserString(value = x) }
+      (__ \ "value").read[String].map { x => UserString(value = x) }
     }
 
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Reads[User] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
-          case "registered_user" => js.validate[io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser]
-          case "guest_user" => js.validate[io.apibuilder.example.union.types.discriminator.v0.models.GuestUser]
-          case "system_user" => js.validate[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser]
-          case "string" => js.validate[io.apibuilder.example.union.types.discriminator.v0.models.UserString]
+          case "registered_user" => jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser.reads(js)
+          case "guest_user" => jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser.reads(js)
+          case "system_user" => jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser.reads(js)
+          case "string" => jsonReadsApidocExampleUnionTypesDiscriminatorString.reads(js)
           case other => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.discriminator.v0.models.UserUndefinedType(other))
         }
       }
@@ -254,7 +254,6 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
         }
       }
     }
-
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = {
       (obj: io.apibuilder.example.union.types.discriminator.v0.models.User) => {
         jsObjectUser(obj)

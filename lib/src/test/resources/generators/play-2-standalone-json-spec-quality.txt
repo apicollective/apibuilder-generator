@@ -776,7 +776,7 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityAdjournForm: play.api.libs.json.Reads[AdjournForm] = {
-      (__ \ "adjourned_at").readNullable[_root_.org.joda.time.DateTime].map { x => new AdjournForm(adjournedAt = x) }
+      (__ \ "adjourned_at").readNullable[_root_.org.joda.time.DateTime].map { x => AdjournForm(adjournedAt = x) }
     }
 
     def jsObjectAdjournForm(obj: com.gilt.quality.v0.models.AdjournForm): play.api.libs.json.JsObject = {
@@ -839,7 +839,7 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityAuthenticationForm: play.api.libs.json.Reads[AuthenticationForm] = {
-      (__ \ "email").read[String].map { x => new AuthenticationForm(email = x) }
+      (__ \ "email").read[String].map { x => AuthenticationForm(email = x) }
     }
 
     def jsObjectAuthenticationForm(obj: com.gilt.quality.v0.models.AuthenticationForm): play.api.libs.json.JsObject = {
@@ -991,7 +991,7 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityHealthcheck: play.api.libs.json.Reads[Healthcheck] = {
-      (__ \ "status").read[String].map { x => new Healthcheck(status = x) }
+      (__ \ "status").read[String].map { x => Healthcheck(status = x) }
     }
 
     def jsObjectHealthcheck(obj: com.gilt.quality.v0.models.Healthcheck): play.api.libs.json.JsObject = {
@@ -1174,7 +1174,7 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityMeetingForm: play.api.libs.json.Reads[MeetingForm] = {
-      (__ \ "scheduled_at").read[_root_.org.joda.time.DateTime].map { x => new MeetingForm(scheduledAt = x) }
+      (__ \ "scheduled_at").read[_root_.org.joda.time.DateTime].map { x => MeetingForm(scheduledAt = x) }
     }
 
     def jsObjectMeetingForm(obj: com.gilt.quality.v0.models.MeetingForm): play.api.libs.json.JsObject = {
@@ -1535,7 +1535,7 @@ package com.gilt.quality.v0.models {
     }
 
     implicit def jsonReadsQualityUserForm: play.api.libs.json.Reads[UserForm] = {
-      (__ \ "email").read[String].map { x => new UserForm(email = x) }
+      (__ \ "email").read[String].map { x => UserForm(email = x) }
     }
 
     def jsObjectUserForm(obj: com.gilt.quality.v0.models.UserForm): play.api.libs.json.JsObject = {
