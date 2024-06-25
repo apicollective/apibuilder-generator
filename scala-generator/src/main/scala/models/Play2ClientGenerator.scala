@@ -14,6 +14,7 @@ case class PlayFrameworkVersion(
   authSchemeClass: String,
   supportsHttpPatch: Boolean,
   useSpecificAddMethods: Boolean,
+  supportScala3: Boolean
 )
 
 object Play22ClientGenerator extends CodeGenerator {
@@ -25,6 +26,7 @@ object Play22ClientGenerator extends CodeGenerator {
     authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
     supportsHttpPatch = false,
     useSpecificAddMethods = false,
+    supportScala3 = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -41,6 +43,7 @@ object Play23ClientGenerator extends CodeGenerator {
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = false,
+    supportScala3 = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -57,6 +60,7 @@ object Play24ClientGenerator extends CodeGenerator {
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = false,
+    supportScala3 = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -73,6 +77,7 @@ object Play25ClientGenerator extends CodeGenerator {
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = false,
+    supportScala3 = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -89,6 +94,7 @@ object Play26ClientGenerator extends CodeGenerator {
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
+    supportScala3 = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -105,6 +111,7 @@ object Play26EnvelopeClientGenerator extends CodeGenerator {
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
+    supportScala3 = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -121,6 +128,7 @@ object Play27ClientGenerator extends CodeGenerator {
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
+    supportScala3 = false,
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -137,6 +145,18 @@ object Play28ClientGenerator extends CodeGenerator {
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
+    supportScala3 = false,
+  )
+
+  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
+    Play2ClientGenerator.invoke(config(form), form)
+
+}
+
+object Play30ClientGenerator extends CodeGenerator {
+
+  def config(form: InvocationForm): PlayFrameworkVersion = Play28ClientGenerator.config(form).copy(
+    supportScala3 = true
   )
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
@@ -171,7 +191,7 @@ case class Play2ClientGenerator(
   private def generateCode(): Seq[File] = {
     val source = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n" +
       Seq(
-        Play2Models.generateCode(form, addBindables = true, addHeader = false, useBuiltInImplicits = false).map(_.contents).mkString("\n\n"),
+        Play2Models.generateCode(form, addBindables = true, addHeader = false, useBuiltInImplicits = false, supportScala3 = version.supportScala3).map(_.contents).mkString("\n\n"),
         client()
       ).mkString("\n\n")
 
