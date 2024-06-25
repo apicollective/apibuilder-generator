@@ -44,7 +44,7 @@ case class Play2JsonCommon(ssd: ScalaService, scala3Support: Boolean) {
          |}
          |""".stripMargin
     } else {
-      implicitWriter(name, union.qualifiedName, methodName, model = None)
+      implicitWriter(union.name, union.qualifiedName, methodName, model = None)
     }
   }
 
