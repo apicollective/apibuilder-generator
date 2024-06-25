@@ -36,7 +36,7 @@ package io.gregor.time.types.v0.mock {
       date = _root_.java.time.LocalDate.now
     )
 
-    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = _root_.java.time.OffsetDateTime.now
+    def makeDateTimeUnion(): io.gregor.time.types.v0.models.DateTimeUnion = io.gregor.time.types.v0.models.DateTimeUnionOffsetDateTime(_root_.java.time.OffsetDateTime.now)
 
   }
 
