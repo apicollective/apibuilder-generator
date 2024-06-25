@@ -359,7 +359,7 @@ case class Play2Json(
 
     model.fields match {
       case field :: Nil =>
-        serializations.head + s""".map { x => new ${model.name}(${field.name} = x) }"""
+        serializations.head + s""".map { x => ${model.name}(${field.name} = x) }"""
 
       case fields =>
         val constructorCall = s"${model.name}(${fields.map(_.name).mkString(", ")})"
