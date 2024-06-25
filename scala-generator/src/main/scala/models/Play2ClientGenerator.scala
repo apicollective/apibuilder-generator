@@ -191,7 +191,7 @@ case class Play2ClientGenerator(
   private def generateCode(): Seq[File] = {
     val source = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n" +
       Seq(
-        Play2Models.generateCode(form, addBindables = true, addHeader = false, useBuiltInImplicits = false, supportScala3 = version.supportScala3).map(_.contents).mkString("\n\n"),
+        Play2Models.generateCode(form, addBindables = true, addHeader = false, useBuiltInImplicits = false).map(_.contents).mkString("\n\n"),
         client()
       ).mkString("\n\n")
 
@@ -215,12 +215,20 @@ case class Play2ClientGenerator(
     }
 
     val headers = Headers(form)
+
     val headerString = headers.scala.
       map { case (name, value) => s""""$name" -> ${value}""" }.
       mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders : _*)"
     val responseEnvelopeString = version.config.responseEnvelopeClassName match {
       case None => ""
       case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indentString() + "\n\n"
+    }
+
+    println(s"version.name[${version.name}] / version.supportScala3: ${version.supportScala3}")
+    val scala3Imports = if (version.supportScala3) {
+      "\nimport play.api.libs.ws.WSBodyWritables.writeableOf_JsValue\n\n"
+    } else {
+      ""
     }
 
     s"""package ${ssd.namespaces.base} {
@@ -267,7 +275,7 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
       queryParameters: Seq[(String, String)] = Nil,
       requestHeaders: Seq[(String, String)] = Nil,
       body: Option[play.api.libs.json.JsValue] = None
-    ): scala.concurrent.Future[${version.config.responseClass}] = {
+    ): scala.concurrent.Future[${version.config.responseClass}] = {$scala3Imports
       method.toUpperCase match {
         case "GET" => {
           _logRequest("GET", _requestHolder(path).$addHeadersMethod(requestHeaders:_*).$addQueryStringMethod(queryParameters:_*)).get()

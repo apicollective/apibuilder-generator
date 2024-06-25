@@ -16,7 +16,7 @@ trait Play2Models extends CodeGenerator {
   override def invoke(
     form: InvocationForm
   ): Either[Seq[String], Seq[File]] = {
-    Right(generateCode(form = form, addBindables = true, addHeader = true, useBuiltInImplicits = false, supportScala3 = false))
+    Right(generateCode(form = form, addBindables = true, addHeader = true, useBuiltInImplicits = false))
   }
 
   def generateCode(
@@ -24,7 +24,6 @@ trait Play2Models extends CodeGenerator {
     addBindables: Boolean,
     addHeader: Boolean,
     useBuiltInImplicits: Boolean,
-    supportScala3: Boolean = false,
   ): Seq[File] = {
     val ssd = ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
@@ -35,12 +34,6 @@ trait Play2Models extends CodeGenerator {
 
     val header = if (addHeader) {
       ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
-    } else {
-      ""
-    }
-
-    val scala3Imports = if (supportScala3) {
-      "import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue\n"
     } else {
       ""
     }
@@ -77,7 +70,7 @@ trait Play2Models extends CodeGenerator {
       })
     }
 
-    val source = s"""$header$scala3Imports$caseClasses
+    val source = s"""$header$caseClasses
 
 package ${ssd.namespaces.models} {
 
