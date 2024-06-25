@@ -91,7 +91,7 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
       val ssd = ScalaService(models.TestHelper.service(json1))
       val model = ssd.models.head
       play2Json(ssd).fieldReaders(model) should be (
-        """(__ \ "one").read[String].map { x => new A(one = x) }""".stripMargin)
+        """(__ \ "one").read[String].map { x => A(one = x) }""".stripMargin)
     }
 
     it("generates valid json readers for complex objects") {
@@ -155,7 +155,7 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
       val ssd = ScalaService(models.TestHelper.service(json1))
       val model = ssd.models.head
       play2Json(ssd).fieldReaders(model) should be (
-        """(__ \ "one").readWithDefault[String]("adefault").map { x => new A(one = x) }""".stripMargin)
+        """(__ \ "one").readWithDefault[String]("adefault").map { x => A(one = x) }""".stripMargin)
     }
 
     it("generates valid json readers for complex objects") {
