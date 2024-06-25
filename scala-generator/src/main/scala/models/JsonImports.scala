@@ -9,11 +9,13 @@ import io.apibuilder.spec.v0.models.Service
   */
 object JsonImports {
 
-  def apply(service: Service, includeSelf: Boolean = true): Seq[String] = {
-    val namespaces  = (Seq(service.namespace) ++ service.imports.map(_.namespace)).sorted.distinct.filter { ns =>
-      includeSelf || ns != service.namespace
-    }
-    namespaces.map { ns => Namespaces(ns).models }.map { ns => s"import ${ns}.json._" }
+  def apply(service: Service): Seq[String] = {
+    (
+      Seq(s"import ${Namespaces(service.namespace).models}.json._") ++
+      service.imports.map { imp =>
+        s"import ${Namespaces(imp.namespace).models}.json._"
+      }
+    ).sorted
   }
 
 }

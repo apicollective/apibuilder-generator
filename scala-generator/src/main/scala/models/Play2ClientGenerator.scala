@@ -213,7 +213,7 @@ case class Play2ClientGeneratorImpl(
 ${headers.objectConstants.indentString(2)}
 
 $responseEnvelopeString${PlayScalaClientCommon.clientSignature(version.config).indentString(2)} {
-${JsonImports(form.service, includeSelf = false).mkString("\n").indentString(4)}
+${JsonImports(form.service).mkString("\n").indentString(4)}
 
     private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
