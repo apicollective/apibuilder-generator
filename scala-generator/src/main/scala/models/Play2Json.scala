@@ -208,7 +208,10 @@ case class Play2Json(
 
   private[this] def implicitUnionWriter(union: ScalaUnion): Option[String] = {
     if (scala3Support) {
-      None
+      val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
+      Some(
+        play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method)
+      )
     } else {
       val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
       Some(

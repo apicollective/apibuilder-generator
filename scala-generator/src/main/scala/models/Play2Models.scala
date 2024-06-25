@@ -98,7 +98,7 @@ package ${ssd.namespaces.models} {
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
     import play.api.libs.functional.syntax._
-${JsonImports(form.service).mkString("\n").indentString(4)}
+${JsonImports(form.service, includeSelf = false).mkString("\n").indentString(4)}
 ${serDes.distinct.mkString("\n").indentString(4)}
 
 ${Seq(enumJson, modelAndUnionJson).filter(_.nonEmpty).mkString("\n\n").indentString(4)}
