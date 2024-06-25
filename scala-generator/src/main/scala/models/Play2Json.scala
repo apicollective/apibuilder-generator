@@ -22,7 +22,7 @@ case class Play2JsonCommon(ssd: ScalaService) {
     }
   }
 
-  def implicitWriter(name: String, qualifiedName: String, methodName: String): String = {
+  private[models] def implicitWriter(name: String, qualifiedName: String, methodName: String): String = {
     println(s"Creating implicit writer with name[$name]: ${implicitWriterDef(name)}")
     Seq(
       s"${implicitWriterDef(name)} = {",
@@ -33,16 +33,16 @@ case class Play2JsonCommon(ssd: ScalaService) {
     ).mkString("\n")
   }
 
-  def implicitReaderDef(name: String): String = {
+  private[models] def implicitReaderDef(name: String): String = {
     s"implicit def ${implicitReaderName(name)}: play.api.libs.json.Reads[$name]"
   }
 
-  def implicitReaderName(name: String): String = {
+  private[models] def implicitReaderName(name: String): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     s"jsonReads${ssd.name}$name"
   }
 
-  def implicitWriterName(name: String): String = {
+  private[models] def implicitWriterName(name: String): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     s"jsonWrites${ssd.name}$name"
   }
@@ -207,17 +207,10 @@ case class Play2Json(
   }
 
   private[this] def implicitUnionWriter(union: ScalaUnion): Option[String] = {
-    if (scala3Support) {
-      val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
-      Some(
-        play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method)
-      )
-    } else {
-      val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
-      Some(
-        play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method)
-      )
-    }
+    val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
+    Some(
+      play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method)
+    )
   }
 
   private[models] def writersWithoutDiscriminator(union: ScalaUnion): String = {
