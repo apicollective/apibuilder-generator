@@ -13,18 +13,18 @@ object Play2ModelsScala2 extends Play2Models(scala3Support = false)
 object Play2ModelsScala3 extends Play2Models(scala3Support = true)
 
 object Play2ModelImplicits {
-  val timeImplicits: String = {
+  val play: String = {
     s"""import play.api.libs.json.Writes._
        |import play.api.libs.json.Reads._""".stripMargin
 
   }
 
-  val jodaDateTimeImplicits: String = {
+  val jodaDateTime: String = {
     s"""import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
        |import play.api.libs.json.JodaWrites.JodaDateTimeWrites""".stripMargin
   }
 
-  val jodaLocalDateImplicits: String = {
+  val jodaLocalDate: String = {
     s"""import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
        |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites""".stripMargin
   }
@@ -69,23 +69,23 @@ case class Play2Models(scala3Support: Boolean) extends CodeGenerator {
     }
 
     val serDes = if (useBuiltInImplicits) {
-      Seq(Play2ModelImplicits.timeImplicits) ++
+      Seq(Play2ModelImplicits.play) ++
       (ssd.attributes.dateTimeType match {
-        case DateTimeTypeConfig.JodaDateTime => Seq(Play2ModelImplicits.jodaDateTimeImplicits)
+        case DateTimeTypeConfig.JodaDateTime => Seq(Play2ModelImplicits.jodaDateTime)
         case _ => Nil
       }) ++
       (ssd.attributes.dateType match {
-        case DateTypeConfig.JodaLocalDate => Seq(Play2ModelImplicits.jodaLocalDateImplicits)
+        case DateTypeConfig.JodaLocalDate => Seq(Play2ModelImplicits.jodaLocalDate)
         case _ => Nil
       })
     } else {
       (ssd.attributes.dateTimeType match {
         case DateTimeTypeConfig.JodaDateTime => Seq(manualImplicits(ssd))
-        case _ => Seq(Play2ModelImplicits.timeImplicits)
+        case _ => Seq(Play2ModelImplicits.play)
       }) ++
       (ssd.attributes.dateType match {
         case DateTypeConfig.JodaLocalDate => Seq(manualImplicits(ssd))
-        case _ => Seq(Play2ModelImplicits.timeImplicits)
+        case _ => Seq(Play2ModelImplicits.play)
       })
     }
 

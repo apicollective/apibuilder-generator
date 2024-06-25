@@ -6,13 +6,13 @@ import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig, Play2ModelI
 
 object ModelsJson {
 
-  private def implicits(ssd: scala.generator.ScalaService) = Seq(Play2ModelImplicits.timeImplicits) ++
+  private def implicits(ssd: scala.generator.ScalaService) = Seq(Play2ModelImplicits.play) ++
     (ssd.attributes.dateTimeType match {
-      case DateTimeTypeConfig.JodaDateTime => Seq(Play2ModelImplicits.jodaDateTimeImplicits)
+      case DateTimeTypeConfig.JodaDateTime => Seq(Play2ModelImplicits.jodaDateTime)
       case _ => Nil
     }) ++
     (ssd.attributes.dateType match {
-      case DateTypeConfig.JodaLocalDate => Seq(Play2ModelImplicits.jodaLocalDateImplicits)
+      case DateTypeConfig.JodaLocalDate => Seq(Play2ModelImplicits.jodaLocalDate)
       case _ => Nil
     })
 
