@@ -224,9 +224,8 @@ case class Play2ClientGenerator(
       case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indentString() + "\n\n"
     }
 
-    println(s"version.name[${version.name}] / version.supportScala3: ${version.supportScala3}")
     val scala3Imports = if (version.supportScala3) {
-      "\nimport play.api.libs.ws.WSBodyWritables.writeableOf_JsValue\n\n"
+      "\n      import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue\n"
     } else {
       ""
     }
