@@ -23,7 +23,6 @@ case class Play2JsonCommon(ssd: ScalaService) {
   }
 
   private[models] def implicitWriter(name: String, qualifiedName: String, methodName: String, model: Option[ScalaModel]): String = {
-    println(s"Creating implicit writer with name[$name]: ${implicitWriterDef(name, model = model)}")
     Seq(
       s"${implicitWriterDef(name, model = model)} = {",
       s"  (obj: $qualifiedName) => {",
@@ -45,9 +44,7 @@ case class Play2JsonCommon(ssd: ScalaService) {
   }
 
   private[this] def partOfUnion(model: ScalaModel): Boolean = {
-    val all = ssd.unionsForModel(model)
-    println(s"partOfUnion(${model.name}}: $all")
-    all.nonEmpty
+    ssd.unionsForModel(model).nonEmpty
   }
 
   private[models] def implicitReaderName(name: String): String = {
@@ -151,7 +148,6 @@ case class Play2Json(
   }
 
   private def readersAndWriters(union: ScalaUnion): String = {
-    println(s"readersAndWriters union: ${union.name}")
     readers(union) + "\n\n" + writers(union)
   }
 
