@@ -13,7 +13,7 @@ class ModelsJsonSpec extends AnyFunSpec with Matchers {
       service = Helpers.basicService("x"),
       attributes = Seq(Attribute("scala_generator.time_library", "joda"))
     )
-    ModelsJson.contents(form).replaceAll(" +", " ").replaceAll(" +\n", "\n").trim shouldBe
+    ModelsJson.contents(form, scala3Support = false).replaceAll(" +", " ").replaceAll(" +\n", "\n").trim shouldBe
       """package x.models
         |
         | package object json {
@@ -41,7 +41,7 @@ class ModelsJsonSpec extends AnyFunSpec with Matchers {
       service = Helpers.basicService("x"),
       attributes = Nil
     )
-    ModelsJson.contents(form).replaceAll(" +", " ").replaceAll(" +\n", "\n").trim shouldBe
+    ModelsJson.contents(form, scala3Support = false).replaceAll(" +", " ").replaceAll(" +\n", "\n").trim shouldBe
       """package x.models
         |
         | package object json {

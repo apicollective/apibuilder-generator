@@ -206,14 +206,14 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
-        key = "play_3_0_client",
-        name = "Play 3.0 client",
-        description = Some("Play Framework 3.0 (and 2.9) / scala 3 client based on <a href='http://www.playframework.com/documentation/2.8.x/ScalaWS'>WS API</a>."),
+        key = "play_2_9_scala_3_client",
+        name = "Play 2.9 with scala3 client",
+        description = Some("Play Framework 2.9 + scala 3 client based on <a href='http://www.playframework.com/documentation/2.9.x/ScalaWS'>WS API</a>."),
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Production,
-      codeGenerator = Some(scala.models.Play30ClientGenerator)
+      codeGenerator = Some(scala.models.Play29Scala3ClientGenerator)
     ),
     CodeGenTarget(
       metaData = Generator(
@@ -224,7 +224,18 @@ object Generators {
         attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Production,
-      codeGenerator = Some(scala.models.Play2Models)
+      codeGenerator = Some(scala.models.Play2ModelsScala2)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "play_2_x_scala3_json",
+        name = "Play 2.x Scala 3 json",
+        description = Some("Generate play 2.x with scala 3 support case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Production,
+      codeGenerator = Some(scala.models.Play2ModelsScala3)
     ),
     CodeGenTarget(
       metaData = Generator(

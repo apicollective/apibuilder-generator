@@ -60,7 +60,7 @@ class ScalaAnnotationsSpec extends AnyFunSpec with Matchers {
     }
 
     it("generates valid json conversions") {
-      val jsonConversions = Play2Json(ssd).generateEnums()
+      val jsonConversions = Play2Json(ssd, scala3Support = false).generateEnums()
       models.TestHelper.assertEqualsFile("/play2enums-json-example.txt", jsonConversions)
     }
   }

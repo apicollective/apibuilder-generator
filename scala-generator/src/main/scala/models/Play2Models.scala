@@ -9,9 +9,28 @@ import generator.ServiceFileNames
 
 import scala.generator.ScalaPrimitive.{DateIso8601Joda, DateTimeIso8601Joda, Uuid}
 
-object Play2Models extends Play2Models
+object Play2ModelsScala2 extends Play2Models(scala3Support = false)
+object Play2ModelsScala3 extends Play2Models(scala3Support = true)
 
-trait Play2Models extends CodeGenerator {
+object Play2ModelImplicits {
+  val timeImplicits: String = {
+    s"""import play.api.libs.json.Writes._
+       |import play.api.libs.json.Reads._""".stripMargin
+
+  }
+
+  val jodaDateTimeImplicits: String = {
+    s"""import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
+       |import play.api.libs.json.JodaWrites.JodaDateTimeWrites""".stripMargin
+  }
+
+  val jodaLocalDateImplicits: String = {
+    s"""import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
+       |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites""".stripMargin
+  }
+}
+
+case class Play2Models(scala3Support: Boolean) extends CodeGenerator {
 
   override def invoke(
     form: InvocationForm
@@ -28,7 +47,7 @@ trait Play2Models extends CodeGenerator {
     val ssd = ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
 
     val caseClasses = ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
-    val play2json = Play2Json(ssd)
+    val play2json = Play2Json(ssd, scala3Support)
     val enumJson: String = play2json.generateEnums()
     val modelAndUnionJson: String = play2json.generateModelsAndUnions()
 
@@ -50,23 +69,23 @@ trait Play2Models extends CodeGenerator {
     }
 
     val serDes = if (useBuiltInImplicits) {
-      Seq(timeImplicits) ++
+      Seq(Play2ModelImplicits.timeImplicits) ++
       (ssd.attributes.dateTimeType match {
-        case DateTimeTypeConfig.JodaDateTime => Seq(jodaDateTimeImplicits)
+        case DateTimeTypeConfig.JodaDateTime => Seq(Play2ModelImplicits.jodaDateTimeImplicits)
         case _ => Nil
       }) ++
       (ssd.attributes.dateType match {
-        case DateTypeConfig.JodaLocalDate => Seq(jodaLocalDateImplicits)
+        case DateTypeConfig.JodaLocalDate => Seq(Play2ModelImplicits.jodaLocalDateImplicits)
         case _ => Nil
       })
     } else {
       (ssd.attributes.dateTimeType match {
         case DateTimeTypeConfig.JodaDateTime => Seq(manualImplicits(ssd))
-        case _ => Seq(timeImplicits)
+        case _ => Seq(Play2ModelImplicits.timeImplicits)
       }) ++
       (ssd.attributes.dateType match {
         case DateTypeConfig.JodaLocalDate => Seq(manualImplicits(ssd))
-        case _ => Seq(timeImplicits)
+        case _ => Seq(Play2ModelImplicits.timeImplicits)
       })
     }
 
@@ -89,22 +108,6 @@ $bindables
 """
 
     Seq(ServiceFileNames.toFile(form.service.namespace, form.service.organization.key, form.service.application.key, form.service.version, "Models", source, Some("Scala")))
-  }
-
-  val timeImplicits: String = {
-    s"""import play.api.libs.json.Writes._
-       |import play.api.libs.json.Reads._""".stripMargin
-
-  }
-
-  val jodaDateTimeImplicits: String = {
-    s"""import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
-       |import play.api.libs.json.JodaWrites.JodaDateTimeWrites""".stripMargin
-  }
-
-  val jodaLocalDateImplicits: String = {
-    s"""import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
-       |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites""".stripMargin
   }
 
   def manualImplicits(ssd: ScalaService): String = {

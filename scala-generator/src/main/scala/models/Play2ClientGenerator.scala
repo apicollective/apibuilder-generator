@@ -8,174 +8,144 @@ import lib.generator.CodeGenerator
 import scala.generator._
 
 case class PlayFrameworkVersion(
-  name: String,
-  config: ScalaClientMethodConfig,
-  requestHolderClass: String,
-  authSchemeClass: String,
-  supportsHttpPatch: Boolean,
-  useSpecificAddMethods: Boolean,
-  supportScala3: Boolean
+                                 name: String,
+                                 config: ScalaClientMethodConfig,
+                                 requestHolderClass: String,
+                                 authSchemeClass: String,
+                                 supportsHttpPatch: Boolean,
+                                 useSpecificAddMethods: Boolean,
+                                 scala3Support: Boolean
 )
 
-object Play22ClientGenerator extends CodeGenerator {
+trait Play2CodeGenerator extends CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  def config(form: InvocationForm): PlayFrameworkVersion
+
+  final override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
+    Play2ClientGeneratorImpl(config(form), form).invoke()
+  }
+
+}
+
+object Play22ClientGenerator extends Play2CodeGenerator {
+
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.2.x",
     config = ScalaClientMethodConfigs.Play22(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WS.WSRequestHolder",
     authSchemeClass = "com.ning.http.client.Realm.AuthScheme",
     supportsHttpPatch = false,
     useSpecificAddMethods = false,
-    supportScala3 = false,
+    scala3Support = false,
   )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
 
 }
 
-object Play23ClientGenerator extends CodeGenerator {
+object Play23ClientGenerator extends Play2CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.3.x",
     config = ScalaClientMethodConfigs.Play23(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequestHolder",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = false,
-    supportScala3 = false,
+    scala3Support = false,
   )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
 
 }
 
-object Play24ClientGenerator extends CodeGenerator {
+object Play24ClientGenerator extends Play2CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.4.x",
     config = ScalaClientMethodConfigs.Play24(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes),form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = false,
-    supportScala3 = false,
+    scala3Support = false,
   )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
 
 }
 
-object Play25ClientGenerator extends CodeGenerator {
+object Play25ClientGenerator extends Play2CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.5.x",
     config = ScalaClientMethodConfigs.Play25(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = false,
-    supportScala3 = false,
+    scala3Support = false,
   )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
-
 }
 
-object Play26ClientGenerator extends CodeGenerator {
+object Play26ClientGenerator extends Play2CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.6.x",
     config = ScalaClientMethodConfigs.Play26(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
-    supportScala3 = false,
+    scala3Support = false,
   )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
 
 }
 
-object Play26EnvelopeClientGenerator extends CodeGenerator {
+object Play26EnvelopeClientGenerator extends Play2CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.6.x",
     config = ScalaClientMethodConfigs.Play26Envelope(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
-    supportScala3 = false,
+    scala3Support = false,
   )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
 
 }
 
-object Play27ClientGenerator extends CodeGenerator {
+object Play27ClientGenerator extends Play2CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.7.x",
     config = ScalaClientMethodConfigs.Play27(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
-    supportScala3 = false,
+    scala3Support = false,
   )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
 
 }
 
-object Play28ClientGenerator extends CodeGenerator {
+object Play28ClientGenerator extends Play2CodeGenerator {
 
-  def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
+  override def config(form: InvocationForm): PlayFrameworkVersion = PlayFrameworkVersion(
     name = "2.8.x",
     config = ScalaClientMethodConfigs.Play28(Namespaces.quote(form.service.namespace), Attributes.PlayDefaultConfig.withAttributes(form.attributes), form.service.baseUrl),
     requestHolderClass = "play.api.libs.ws.WSRequest",
     authSchemeClass = "play.api.libs.ws.WSAuthScheme",
     supportsHttpPatch = true,
     useSpecificAddMethods = true,
-    supportScala3 = false,
+    scala3Support = false,
+  )
+}
+
+object Play29Scala3ClientGenerator extends Play2CodeGenerator {
+
+  override def config(form: InvocationForm): PlayFrameworkVersion = Play28ClientGenerator.config(form).copy(
+    scala3Support = true
   )
 
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
-
 }
 
-object Play30ClientGenerator extends CodeGenerator {
-
-  def config(form: InvocationForm): PlayFrameworkVersion = Play28ClientGenerator.config(form).copy(
-    supportScala3 = true
-  )
-
-  override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] =
-    Play2ClientGenerator.invoke(config(form), form)
-
-}
-
-object Play2ClientGenerator {
-
-  def invoke(
-    version: PlayFrameworkVersion,
-    form: InvocationForm
-  ): Either[Seq[String], Seq[File]] = {
-    Play2ClientGenerator(version, form).invoke()
-  }
-
-}
-
-case class Play2ClientGenerator(
+case class Play2ClientGeneratorImpl(
   version: PlayFrameworkVersion,
   form: InvocationForm,
   defaultAttributes: Attributes = Attributes.PlayDefaultConfig
@@ -188,10 +158,18 @@ case class Play2ClientGenerator(
     Right(generateCode())
   }
 
+  private def play2Models: Play2Models = {
+    if (version.scala3Support) {
+      Play2ModelsScala3
+    } else {
+      Play2ModelsScala2
+    }
+  }
+
   private def generateCode(): Seq[File] = {
     val source = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n" +
       Seq(
-        Play2Models.generateCode(form, addBindables = true, addHeader = false, useBuiltInImplicits = false).map(_.contents).mkString("\n\n"),
+        play2Models.generateCode(form, addBindables = true, addHeader = false, useBuiltInImplicits = false).map(_.contents).mkString("\n\n"),
         client()
       ).mkString("\n\n")
 
@@ -224,7 +202,7 @@ case class Play2ClientGenerator(
       case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indentString() + "\n\n"
     }
 
-    val scala3Imports = if (version.supportScala3) {
+    val scala3Imports = if (version.scala3Support) {
       "\n      import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue\n"
     } else {
       ""

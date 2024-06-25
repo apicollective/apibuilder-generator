@@ -6,6 +6,8 @@ import org.scalatest.matchers.should.Matchers
 
 class Play2JsonSpec extends AnyFunSpec with Matchers {
 
+  private def play2Json(ssd: ScalaService): Play2Json = Play2Json(ssd, scala3Support = false)
+
   describe("for models with lists") {
 
     val json = models.TestHelper.buildJson("""
@@ -35,7 +37,7 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
       val model = ssd.models.head
       models.TestHelper.assertEqualsFile(
         "/play2-json-spec-model-readers.txt",
-        Play2Json(ssd).fieldReaders(model)
+        play2Json(ssd).fieldReaders(model)
       )
     }
 
@@ -88,14 +90,14 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
     it("generates valid json readers for basic objects") {
       val ssd = ScalaService(models.TestHelper.service(json1))
       val model = ssd.models.head
-      Play2Json(ssd).fieldReaders(model) should be (
+      play2Json(ssd).fieldReaders(model) should be (
         """(__ \ "one").read[String].map { x => new A(one = x) }""".stripMargin)
     }
 
     it("generates valid json readers for complex objects") {
       val ssd = ScalaService(models.TestHelper.service(json2))
       val model = ssd.models.head
-      Play2Json(ssd).fieldReaders(model) should be (
+      play2Json(ssd).fieldReaders(model) should be (
         """for {
           |  one <- (__ \ "one").read[Seq[String]]
           |  two <- (__ \ "two").read[Int]
@@ -152,14 +154,14 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
     it("generates valid json readers for basic objects") {
       val ssd = ScalaService(models.TestHelper.service(json1))
       val model = ssd.models.head
-      Play2Json(ssd).fieldReaders(model) should be (
+      play2Json(ssd).fieldReaders(model) should be (
         """(__ \ "one").readWithDefault[String]("adefault").map { x => new A(one = x) }""".stripMargin)
     }
 
     it("generates valid json readers for complex objects") {
       val ssd = ScalaService(models.TestHelper.service(json2))
       val model = ssd.models.head
-      Play2Json(ssd).fieldReaders(model) should be (
+      play2Json(ssd).fieldReaders(model) should be (
         """for {
           |  one <- (__ \ "one").readWithDefault[Seq[String]](Nil)
           |  two <- (__ \ "two").readWithDefault[Int](7)
@@ -172,6 +174,7 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
   describe("quality schema") {
 
     lazy val quality = new ScalaService(models.TestHelper.parseFile("/examples/quality.json"))
+    lazy val play2Json = Play2Json(quality, scala3Support = false)
 
     describe("plan") {
 
@@ -180,14 +183,14 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
       it("readers") {
         models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-plan-readers.txt",
-          Play2Json(quality).readers(plan)
+          play2Json.readers(plan)
         )
       }
 
       it("writers") {
         models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-plan-writers.txt",
-          Play2Json(quality).writers(plan)
+          play2Json.writers(plan)
         )
       }
     }
@@ -199,14 +202,14 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
       it("readers") {
         models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-healthcheck-readers.txt",
-          Play2Json(quality).readers(healthcheck)
+          play2Json.readers(healthcheck)
         )
       }
 
       it("writers") {
         models.TestHelper.assertEqualsFile(
           "/generators/play-2-json-spec-quality-healthcheck-writers.txt",
-          Play2Json(quality).writers(healthcheck)
+          play2Json.writers(healthcheck)
         )
       }
     }

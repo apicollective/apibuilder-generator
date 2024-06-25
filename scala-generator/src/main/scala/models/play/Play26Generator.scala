@@ -32,7 +32,7 @@ object Play26Generator extends CodeGenerator {
       ("ModelsBindables", files.ModelsBindables.contents(form)),
       ("ModelsBodyParsers", files.ModelsBodyParsers.contents(form)),
       ("ModelsGens", files.ModelsGens.contents(form)),
-      ("ModelsJson", files.ModelsJson.contents(form)),
+      ("ModelsJson", files.ModelsJson.contents(form, scala3Support = false)),
     )
     .map { case (suffix, contents) => (suffix, prependHeader(contents, form, _.toJavaString)) }
     .traverse { case (suffix, contents) => utils.ScalaFormatter.format(contents).map((suffix, _)) }

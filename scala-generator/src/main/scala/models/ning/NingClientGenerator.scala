@@ -53,7 +53,7 @@ case class NingClientGenerator(
   private def generateCode(): Seq[File] = {
     val source = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n" +
       Seq(
-        Play2Models.generateCode(form, addBindables = false, addHeader = false, useBuiltInImplicits = false).map(_.contents).mkString("\n\n"),
+        Play2ModelsScala2.generateCode(form, addBindables = false, addHeader = false, useBuiltInImplicits = false).map(_.contents).mkString("\n\n"),
         client()
       ).mkString("\n\n")
 

@@ -23,6 +23,7 @@ case class Play2JsonCommon(ssd: ScalaService) {
   }
 
   def implicitWriter(name: String, qualifiedName: String, methodName: String): String = {
+    println(s"Creating implicit writer with name[$name]: ${implicitWriterDef(name)}")
     Seq(
       s"${implicitWriterDef(name)} = {",
       s"  (obj: $qualifiedName) => {",
@@ -46,7 +47,7 @@ case class Play2JsonCommon(ssd: ScalaService) {
     s"jsonWrites${ssd.name}$name"
   }
 
-  def implicitWriterDef(name: String): String = {
+  private[this] def implicitWriterDef(name: String): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     val methodName = implicitWriterName(name)
     s"implicit def $methodName: play.api.libs.json.Writes[$name]"
@@ -55,7 +56,7 @@ case class Play2JsonCommon(ssd: ScalaService) {
 }
 
 case class Play2Json(
-  ssd: ScalaService
+  ssd: ScalaService, scala3Support: Boolean
 ) {
 
   private[this] val play2JsonCommon = Play2JsonCommon(ssd)
@@ -137,6 +138,7 @@ case class Play2Json(
   }
 
   private def readersAndWriters(union: ScalaUnion): String = {
+    println(s"readersAndWriters union: ${union.name}")
     readers(union) + "\n\n" + writers(union)
   }
 
@@ -193,15 +195,26 @@ case class Play2Json(
   }
 
   private[models] def writers(union: ScalaUnion): String = {
-    val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
 
-    Seq(
+    Seq(Some(
       union.discriminator match {
         case None => writersWithoutDiscriminator(union)
         case Some(discriminator) => writersWithDiscriminator(union, discriminator)
-      },
-      play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method)
-    ).mkString("\n\n")
+      }
+      ),
+      implicitUnionWriter(union).toSeq
+    ).flatten.mkString("\n\n")
+  }
+
+  private[this] def implicitUnionWriter(union: ScalaUnion): Option[String] = {
+    if (scala3Support) {
+      None
+    } else {
+      val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
+      Some(
+        play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method)
+      )
+    }
   }
 
   private[models] def writersWithoutDiscriminator(union: ScalaUnion): String = {
