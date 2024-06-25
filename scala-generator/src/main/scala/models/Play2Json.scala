@@ -6,7 +6,7 @@ import scala.annotation.nowarn
 import scala.generator.ScalaPrimitive.{Model, Union}
 import scala.generator.{ScalaUnionType, _}
 
-case class Play2JsonCommon(ssd: ScalaService) {
+case class Play2JsonCommon(ssd: ScalaService, scala3Support: Boolean) {
 
   /**
     * Never use the service name in the method name. We never import
@@ -32,13 +32,58 @@ case class Play2JsonCommon(ssd: ScalaService) {
     ).mkString("\n")
   }
 
+  private[models] def implicitUnionWriter(union: ScalaUnion): String = {
+    val name = implicitWriterName(union.name)
+    val methodName = toJsonObjectMethodName(ssd.namespaces, union.name)
+    if (scala3Support) {
+      s"""
+         |implicit def $name[T <: ${union.qualifiedName}]: play.api.libs.json.Writes[T] = {
+         |  (obj: ${union.qualifiedName}) => {
+         |    $methodName(obj)
+         |  }
+         |}
+         |""".stripMargin
+    } else {
+      implicitWriter(name, union.qualifiedName, methodName, model = None)
+    }
+  }
+
+  private[models] def scala3CollectionReaders(union: ScalaUnion): Option[String] = {
+    if (scala3Support) {
+      val readerName = implicitReaderName(union.name)
+      val name = readerName + "Seq"
+      Some(s"""
+        |implicit def $name[T <: ${union.qualifiedName}]: play.api.libs.json.Reads[Seq[T]] = {
+        |  case a: play.api.libs.json.JsArray => {
+        |    val all: Seq[play.api.libs.json.JsResult[${union.qualifiedName}]] = a.value.map(${readerName}.reads).toSeq
+        |
+        |    all.collect { case e: play.api.libs.json.JsError => e }.toList match {
+        |      case Nil => play.api.libs.json.JsSuccess(all.collect { case play.api.libs.json.JsSuccess(v, _) => v.asInstanceOf[T] })
+        |      case errors => play.api.libs.json.JsError(play.api.libs.json.JsError.merge(errors.flatMap(_.errors), Nil))
+        |    }
+        |  }
+        |  case other => play.api.libs.json.JsError(s"Expected array but found [" + other.getClass.getName + "]")
+        |}
+        |""".stripMargin)
+    } else {
+      None
+    }
+  }
+
   private[models] def implicitReaderDef(name: String, model: Option[ScalaModel]): String = {
     s"${maybeImplicit(model)}def ${implicitReaderName(name)}: play.api.libs.json.Reads[$name]"
   }
 
+  /**
+   * Scala3 changed the inference model which results in some cases multiple implicits
+   * matching when there are multiple reads/writes for a Model and its parent Union.
+   *
+   * For scala3, we remove implicit readers/writes for models that are part of a union type -
+   * they must be read/written with the parent type.
+   */
   private[this] def maybeImplicit(model: Option[ScalaModel]): String = {
     model match {
-      case Some(m) if partOfUnion(m) => ""
+      case Some(m) if scala3Support && partOfUnion(m) => ""
       case _ => "implicit "
     }
   }
@@ -57,10 +102,10 @@ case class Play2JsonCommon(ssd: ScalaService) {
     s"jsonWrites${ssd.name}$name"
   }
 
-  private[this] def implicitWriterDef(name: String, model: Option[ScalaModel]): String = {
+  private[this] def implicitWriterDef(name: String, model: Option[ScalaModel])(implicit typeDecl: String = name): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     val methodName = implicitWriterName(name)
-    s"${maybeImplicit(model)}def $methodName: play.api.libs.json.Writes[$name]"
+    s"${maybeImplicit(model)}def $methodName: play.api.libs.json.Writes[$typeDecl]"
   }
 
 }
@@ -69,7 +114,7 @@ case class Play2Json(
   ssd: ScalaService, scala3Support: Boolean
 ) {
 
-  private[this] val play2JsonCommon = Play2JsonCommon(ssd)
+  private[this] val play2JsonCommon = Play2JsonCommon(ssd, scala3Support = scala3Support)
 
   def generateModelsAndUnions(): String = {
     Seq(
@@ -152,10 +197,14 @@ case class Play2Json(
   }
 
   private[models] def readers(union: ScalaUnion): String = {
-    union.discriminator match {
-      case None => readersWithoutDiscriminator(union)
-      case Some(discriminator) => readersWithDiscriminator(union, discriminator)
-    }
+    (
+      Seq(
+          union.discriminator match {
+            case None => readersWithoutDiscriminator(union)
+            case Some(discriminator) => readersWithDiscriminator(union, discriminator)
+          }
+        ) ++ play2JsonCommon.scala3CollectionReaders(union).toSeq
+      ).mkString("\n\n").trim
   }
 
   private[this] def readersWithoutDiscriminator(union: ScalaUnion): String = {
@@ -205,22 +254,13 @@ case class Play2Json(
   }
 
   private[models] def writers(union: ScalaUnion): String = {
-
-    Seq(Some(
+    Seq(
       union.discriminator match {
         case None => writersWithoutDiscriminator(union)
         case Some(discriminator) => writersWithDiscriminator(union, discriminator)
-      }
-      ),
-      implicitUnionWriter(union).toSeq
-    ).flatten.mkString("\n\n")
-  }
-
-  private[this] def implicitUnionWriter(union: ScalaUnion): Option[String] = {
-    val method = play2JsonCommon.toJsonObjectMethodName(ssd.namespaces, union.name)
-    Some(
-      play2JsonCommon.implicitWriter(union.name, union.qualifiedName, method, model = None)
-    )
+      },
+      play2JsonCommon.implicitUnionWriter(union)
+    ).mkString("\n")
   }
 
   private[models] def writersWithoutDiscriminator(union: ScalaUnion): String = {
