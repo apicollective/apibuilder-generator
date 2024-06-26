@@ -31,7 +31,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
 
   private def generateCode(form: InvocationForm, addHeader: Boolean): Seq[File] = {
     val header =
-      if (addHeader) Some(new ApidocComments(form.service.version, form.userAgent).forClassFile)
+      if (addHeader) Some(new ApiBuilderComments(form.service.version, form.userAgent).forClassFile)
       else None
 
     new Generator(form.service, header).generateSourceFiles()

@@ -50,7 +50,7 @@ case class Code(form: InvocationForm) {
         Some(
           Seq(
             Some(s"package ${GoUtil.packageName(service.name)}"),
-            Some(ApidocComments(service.version: String, form.userAgent).comments.trim),
+            Some(ApiBuilderComments(service.version: String, form.userAgent).comments.trim),
             Some(importBuilder.generate()),
             Some(headers.generate()),
             client,
