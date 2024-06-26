@@ -51,7 +51,7 @@ package com.gilt.test.v0.models {
       play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
     }
 
-    implicit def jsonReadsTestUser: play.api.libs.json.Reads[User] = {
+    implicit def jsonReadsTestUser: play.api.libs.json.Reads[com.gilt.test.v0.models.User] = {
       for {
         email <- (__ \ "email").read[String]
         role <- (__ \ "role").read[String]
@@ -75,7 +75,7 @@ package com.gilt.test.v0.models {
       }
     }
 
-    implicit def jsonReadsTestUserPatch: play.api.libs.json.Reads[UserPatch] = {
+    implicit def jsonReadsTestUserPatch: play.api.libs.json.Reads[com.gilt.test.v0.models.UserPatch] = {
       for {
         groups <- (__ \ "groups").readNullable[Seq[String]]
         permissions <- (__ \ "permissions").read[Seq[String]]

@@ -1,4 +1,4 @@
-implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[User] = {
+implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.User] = {
   (
     (__ \ "registered_user").read(jsonReadsAPIBuilderTestRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
     orElse

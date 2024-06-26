@@ -1,4 +1,4 @@
-implicit def jsonReadsAPIBuilderTestGuestUser: play.api.libs.json.Reads[GuestUser] = {
+implicit def jsonReadsAPIBuilderTestGuestUser: play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.GuestUser] = {
   for {
     id <- (__ \ "id").read[Long]
     email <- (__ \ "email").read[String]
@@ -24,7 +24,7 @@ implicit def jsonWritesAPIBuilderTestGuestUser: play.api.libs.json.Writes[GuestU
   }
 }
 
-implicit def jsonReadsAPIBuilderTestRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
+implicit def jsonReadsAPIBuilderTestRegisteredUser: play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.RegisteredUser] = {
   for {
     id <- (__ \ "id").read[Long]
     email <- (__ \ "email").read[String]
@@ -50,7 +50,7 @@ implicit def jsonWritesAPIBuilderTestRegisteredUser: play.api.libs.json.Writes[R
   }
 }
 
-implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[User] = {
+implicit def jsonReadsAPIBuilderTestUser: play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.User] = {
   (
     (__ \ "registered_user").read(jsonReadsAPIBuilderTestRegisteredUser).asInstanceOf[play.api.libs.json.Reads[User]]
     orElse

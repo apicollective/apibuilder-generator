@@ -80,7 +80,7 @@ package io.gregor.time.types.v0.models {
     import play.api.libs.json.Writes._
     import play.api.libs.json.Reads._
 
-    implicit def jsonReadsTimeTypesDateTimeModel: play.api.libs.json.Reads[DateTimeModel] = {
+    implicit def jsonReadsTimeTypesDateTimeModel: play.api.libs.json.Reads[io.gregor.time.types.v0.models.DateTimeModel] = {
       for {
         dateTime <- (__ \ "date-time").read[_root_.java.time.Instant]
         date <- (__ \ "date").read[_root_.java.time.LocalDate]
@@ -100,15 +100,15 @@ package io.gregor.time.types.v0.models {
       }
     }
 
-    implicit def jsonReadsTimeTypesDateTimeUnionInstant: play.api.libs.json.Reads[DateTimeUnionInstant] = {
+    implicit def jsonReadsTimeTypesDateTimeUnionInstant: play.api.libs.json.Reads[io.gregor.time.types.v0.models.DateTimeUnionInstant] = {
       (__ \ "value").read[_root_.java.time.Instant].map { x => DateTimeUnionInstant(value = x) }
     }
 
-    implicit def jsonReadsTimeTypesDateTimeUnionLocalDate: play.api.libs.json.Reads[DateTimeUnionLocalDate] = {
+    implicit def jsonReadsTimeTypesDateTimeUnionLocalDate: play.api.libs.json.Reads[io.gregor.time.types.v0.models.DateTimeUnionLocalDate] = {
       (__ \ "value").read[_root_.java.time.LocalDate].map { x => DateTimeUnionLocalDate(value = x) }
     }
 
-    implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[DateTimeUnion] = (js: play.api.libs.json.JsValue) => {
+    implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[io.gregor.time.types.v0.models.DateTimeUnion] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
           case "date-time-iso8601" => jsonReadsTimeTypesDateTimeIso8601.reads(js)

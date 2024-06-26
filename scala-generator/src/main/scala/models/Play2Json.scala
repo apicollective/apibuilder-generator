@@ -70,8 +70,20 @@ case class Play2JsonCommon(ssd: ScalaService, scala3Support: Boolean) {
     }
   }
 
-  private[models] def implicitReaderDef(name: String, model: Option[ScalaModel]): String = {
-    s"${maybeImplicit(model)}def ${implicitReaderName(name)}: play.api.libs.json.Reads[$name]"
+  private[models] def implicitUnionReader(union: ScalaUnion): String = {
+    if (scala3Support) {
+      s"implicit def ${implicitReaderName(union.name)}[T <: ${union.qualifiedName}]: play.api.libs.json.Reads[T]"
+    } else {
+      implicitReaderDefStatic(union.name, qualifiedName = union.qualifiedName, model = None)
+    }
+  }
+
+  private[models] def implicitModelReader(model: ScalaModel): String = {
+    implicitReaderDefStatic(model.name, qualifiedName=  model.qualifiedName, model = Some(model))
+  }
+
+  private[this] def implicitReaderDefStatic(name: String, qualifiedName: String, model: Option[ScalaModel]): String = {
+    s"${maybeImplicit(model)}def ${implicitReaderName(name)}: play.api.libs.json.Reads[$qualifiedName]"
   }
 
   /**
@@ -209,7 +221,7 @@ case class Play2Json(
 
   private[this] def readersWithoutDiscriminator(union: ScalaUnion): String = {
     Seq(
-      s"${play2JsonCommon.implicitReaderDef(union.name, model = None)} = {",
+      s"${play2JsonCommon.implicitUnionReader(union)} = {",
       s"  (",
       union.types.map { scalaUnionType =>
         s"""(__ \\ "${scalaUnionType.discriminatorName}").read(${reader(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
@@ -222,13 +234,18 @@ case class Play2Json(
   }
 
   private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+    val scala3Cast = if (scala3Support) {
+      ".map(_.asInstanceOf[T])"
+    } else {
+      ""
+    }
     val defaultDiscriminatorClause = union.defaultType match {
       case None => "case e: play.api.libs.json.JsError => e"
       case Some(defaultType) => s"case _: play.api.libs.json.JsError => readDiscriminator(\"${defaultType.discriminatorName}\")"
     }
 
     Seq(
-      s"${play2JsonCommon.implicitReaderDef(union.name, model = None)} = (js: play.api.libs.json.JsValue) => {",
+      s"${play2JsonCommon.implicitUnionReader(union)} = (js: play.api.libs.json.JsValue) => {",
       Seq(
         "def readDiscriminator(discriminator: String) = {",
         Seq(
@@ -245,7 +262,7 @@ case class Play2Json(
       Seq(s"""(js \\ "$discriminator").validate[String] match {""",
         Seq(
           defaultDiscriminatorClause,
-          "case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)",
+          s"case s: play.api.libs.json.JsSuccess[String] => readDiscriminator(s.value)$scala3Cast",
         ).mkString("\n").indentString(2),
         "}"
       ).mkString("\n").indentString(2),
@@ -337,7 +354,7 @@ case class Play2Json(
 
   private[models] def readers(model: ScalaModel): String = {
     Seq(
-      s"${play2JsonCommon.implicitReaderDef(model.name, model = Some(model))} = {",
+      s"${play2JsonCommon.implicitModelReader(model)} = {",
       fieldReaders(model).indentString(2),
       s"}"
     ).mkString("\n")

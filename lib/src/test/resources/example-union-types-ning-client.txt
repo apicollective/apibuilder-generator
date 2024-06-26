@@ -259,7 +259,7 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[GuestUser] = {
+    implicit def jsonReadsApidocExampleUnionTypesGuestUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.GuestUser] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         email <- (__ \ "email").read[String]
@@ -279,7 +279,7 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
+    implicit def jsonReadsApidocExampleUnionTypesRegisteredUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.RegisteredUser] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         email <- (__ \ "email").read[String]
@@ -301,11 +301,11 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesUserUuid: play.api.libs.json.Reads[UserUuid] = {
+    implicit def jsonReadsApidocExampleUnionTypesUserUuid: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.UserUuid] = {
       (__ \ "value").read[_root_.java.util.UUID].map { x => UserUuid(value = x) }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[Foobar] = {
+    implicit def jsonReadsApidocExampleUnionTypesFoobar: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.Foobar] = {
       (
         (__ \ "foo").read(jsonReadsApidocExampleUnionTypesFoo).asInstanceOf[play.api.libs.json.Reads[Foobar]]
         orElse
@@ -328,7 +328,7 @@ package io.apibuilder.example.union.types.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[User] = (js: play.api.libs.json.JsValue) => {
+    implicit def jsonReadsApidocExampleUnionTypesUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.v0.models.User] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
           case "registered_user" => jsonReadsApidocExampleUnionTypesRegisteredUser.reads(js)
