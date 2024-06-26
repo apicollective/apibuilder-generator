@@ -228,7 +228,7 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
-        key = "play_2_x_scala3_json",
+        key = "play_2_x_scala_3_json",
         name = "Play 2.x Scala 3 json",
         description = Some("Generate play 2.x with scala 3 support case classes with json serialization based on <a href='http://www.playframework.com/documentation/2.3.x/ScalaJsonCombinators'>Scala Json combinators</a>. No need to use this target if you are already using the Play Client target."),
         language = Some("Scala"),
