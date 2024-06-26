@@ -7,7 +7,7 @@ import scala.models.Attributes
 object Client {
 
   def contents(form: InvocationForm): String =
-    scala.models.Play2ClientGenerator(
+    scala.models.Play2ClientGeneratorImpl(
         scala.models.Play26ClientGenerator.config(form),
         form,
         Attributes.PlayGen2DefaultConfig

@@ -121,18 +121,18 @@ package io.gregor.time.types.v0.models {
     }
 
     implicit def jsonReadsTimeTypesDateTimeUnionDateTime: play.api.libs.json.Reads[DateTimeUnionDateTime] = {
-      (__ \ "value").read[_root_.org.joda.time.DateTime].map { x => new DateTimeUnionDateTime(value = x) }
+      (__ \ "value").read[_root_.org.joda.time.DateTime].map { x => DateTimeUnionDateTime(value = x) }
     }
 
     implicit def jsonReadsTimeTypesDateTimeUnionLocalDate: play.api.libs.json.Reads[DateTimeUnionLocalDate] = {
-      (__ \ "value").read[_root_.org.joda.time.LocalDate].map { x => new DateTimeUnionLocalDate(value = x) }
+      (__ \ "value").read[_root_.org.joda.time.LocalDate].map { x => DateTimeUnionLocalDate(value = x) }
     }
 
     implicit def jsonReadsTimeTypesDateTimeUnion: play.api.libs.json.Reads[DateTimeUnion] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
-          case "date-time-iso8601" => js.validate[io.gregor.time.types.v0.models.DateTimeUnionDateTime]
-          case "date-iso8601" => js.validate[io.gregor.time.types.v0.models.DateTimeUnionLocalDate]
+          case "date-time-iso8601" => jsonReadsTimeTypesDateTimeIso8601.reads(js)
+          case "date-iso8601" => jsonReadsTimeTypesDateIso8601.reads(js)
           case other => play.api.libs.json.JsSuccess(io.gregor.time.types.v0.models.DateTimeUnionUndefinedType(other))
         }
       }
@@ -151,7 +151,6 @@ package io.gregor.time.types.v0.models {
         }
       }
     }
-
     implicit def jsonWritesTimeTypesDateTimeUnion: play.api.libs.json.Writes[DateTimeUnion] = {
       (obj: io.gregor.time.types.v0.models.DateTimeUnion) => {
         jsObjectDateTimeUnion(obj)

@@ -5,7 +5,6 @@ def jsObjectUser(obj: test.apidoc.apidoctest.v0.models.User): play.api.libs.json
     case x: test.apidoc.apidoctest.v0.models.UserUndefinedType => sys.error(s"The type[test.apidoc.apidoctest.v0.models.UserUndefinedType] should never be serialized")
   }
 }
-
 implicit def jsonWritesAPIBuilderTestUser: play.api.libs.json.Writes[User] = {
   (obj: test.apidoc.apidoctest.v0.models.User) => {
     jsObjectUser(obj)

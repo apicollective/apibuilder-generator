@@ -1,13 +1,14 @@
 package scala.models
 
-import scala.generator.{ScalaCaseClasses, ScalaClientMethodConfigs, ScalaService}
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
+import scala.generator.{ScalaCaseClasses, ScalaService}
+
 class ScalaUnionSpec extends AnyFunSpec with Matchers {
 
-  val clientMethodConfig = ScalaClientMethodConfigs.Play23("test.apidoc", Attributes.PlayDefaultConfig, None)
+  private def play2Json(ssd: ScalaService): Play2Json = Play2Json(ssd, scala3Support = false)
 
   describe("models") {
 
@@ -72,18 +73,18 @@ class ScalaUnionSpec extends AnyFunSpec with Matchers {
 
     it("generates valid readers for the union type itself") {
       val user = ssd.unions.find(_.name == "User").get
-      val code = Play2Json(ssd).readers(user)
+      val code = play2Json(ssd).readers(user)
       models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-readers.txt", code)
     }
 
     it("generates valid writers for the union type itself") {
       val user = ssd.unions.find(_.name == "User").get
-      val code = Play2Json(ssd).writers(user)
+      val code = play2Json(ssd).writers(user)
       models.TestHelper.assertEqualsFile("/scala-union-models-json-union-type-writers.txt", code)
     }
 
     it("codegen") {
-      val code = Play2Json(ssd).generateModelsAndUnions()
+      val code = play2Json(ssd).generateModelsAndUnions()
       models.TestHelper.assertEqualsFile("/scala-union-models-json.txt", code)
     }
   }
@@ -135,7 +136,7 @@ class ScalaUnionSpec extends AnyFunSpec with Matchers {
     lazy val ssd = ScalaService(service)
 
     it("codegen") {
-      val code = Play2Json(ssd).generateModelsAndUnions()
+      val code = play2Json(ssd).generateModelsAndUnions()
       models.TestHelper.assertEqualsFile("/scala-union-enums-json.txt", code)
     }
   }

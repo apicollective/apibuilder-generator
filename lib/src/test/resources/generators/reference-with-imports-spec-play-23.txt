@@ -252,7 +252,7 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiEcho: play.api.libs.json.Reads[Echo] = {
-      (__ \ "value").read[String].map { x => new Echo(value = x) }
+      (__ \ "value").read[String].map { x => Echo(value = x) }
     }
 
     def jsObjectEcho(obj: io.apibuilder.reference.api.v0.models.Echo): play.api.libs.json.JsObject = {
@@ -288,7 +288,7 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiGroup: play.api.libs.json.Reads[Group] = {
-      (__ \ "members").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => new Group(members = x) }
+      (__ \ "members").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => Group(members = x) }
     }
 
     def jsObjectGroup(obj: io.apibuilder.reference.api.v0.models.Group): play.api.libs.json.JsObject = {
@@ -376,7 +376,7 @@ package io.apibuilder.reference.api.v0.models {
     }
 
     implicit def jsonReadsApidocReferenceApiUserList: play.api.libs.json.Reads[UserList] = {
-      (__ \ "users").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => new UserList(users = x) }
+      (__ \ "users").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => UserList(users = x) }
     }
 
     def jsObjectUserList(obj: io.apibuilder.reference.api.v0.models.UserList): play.api.libs.json.JsObject = {
