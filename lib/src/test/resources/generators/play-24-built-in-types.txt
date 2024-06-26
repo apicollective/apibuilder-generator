@@ -93,7 +93,7 @@ package apibuilder.models {
       play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
     }
 
-    implicit def jsonReadsBuiltInTypesArray: play.api.libs.json.Reads[Array] = {
+    implicit def jsonReadsBuiltInTypesArray: play.api.libs.json.Reads[apibuilder.models.Array] = {
       for {
         boolean <- (__ \ "boolean").read[Seq[Boolean]]
         dateiso8601 <- (__ \ "dateiso8601").read[Seq[_root_.org.joda.time.LocalDate]]
@@ -131,7 +131,7 @@ package apibuilder.models {
       }
     }
 
-    implicit def jsonReadsBuiltInTypesOptarray: play.api.libs.json.Reads[Optarray] = {
+    implicit def jsonReadsBuiltInTypesOptarray: play.api.libs.json.Reads[apibuilder.models.Optarray] = {
       for {
         boolean <- (__ \ "boolean").readNullable[Seq[Boolean]]
         dateiso8601 <- (__ \ "dateiso8601").readNullable[Seq[_root_.org.joda.time.LocalDate]]
@@ -200,7 +200,7 @@ package apibuilder.models {
       }
     }
 
-    implicit def jsonReadsBuiltInTypesOptional: play.api.libs.json.Reads[Optional] = {
+    implicit def jsonReadsBuiltInTypesOptional: play.api.libs.json.Reads[apibuilder.models.Optional] = {
       for {
         boolean <- (__ \ "boolean").readNullable[Boolean]
         dateiso8601 <- (__ \ "dateiso8601").readNullable[_root_.org.joda.time.LocalDate]
@@ -269,7 +269,7 @@ package apibuilder.models {
       }
     }
 
-    implicit def jsonReadsBuiltInTypesRequired: play.api.libs.json.Reads[Required] = {
+    implicit def jsonReadsBuiltInTypesRequired: play.api.libs.json.Reads[apibuilder.models.Required] = {
       for {
         boolean <- (__ \ "boolean").read[Boolean]
         dateiso8601 <- (__ \ "dateiso8601").read[_root_.org.joda.time.LocalDate]

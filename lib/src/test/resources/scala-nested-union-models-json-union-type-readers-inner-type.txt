@@ -1,4 +1,4 @@
-implicit def jsonReadsAPIBuilderTestInnerType: play.api.libs.json.Reads[InnerType] = {
+implicit def jsonReadsAPIBuilderTestInnerType: play.api.libs.json.Reads[test.apidoc.apidoctest.v0.models.InnerType] = {
   (
     (__ \ "string_model").read(jsonReadsAPIBuilderTestStringModel).asInstanceOf[play.api.libs.json.Reads[InnerType]]
     orElse

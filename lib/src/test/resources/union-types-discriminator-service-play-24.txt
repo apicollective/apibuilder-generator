@@ -181,7 +181,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Reads[GuestUser] = {
+    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.GuestUser] = {
       for {
         id <- (__ \ "id").read[String]
         email <- (__ \ "email").readNullable[String]
@@ -203,7 +203,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Reads[RegisteredUser] = {
+    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser] = {
       for {
         id <- (__ \ "id").read[String]
         email <- (__ \ "email").read[String]
@@ -223,11 +223,11 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Reads[UserString] = {
+    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUserString: play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.UserString] = {
       (__ \ "value").read[String].map { x => UserString(value = x) }
     }
 
-    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Reads[User] = (js: play.api.libs.json.JsValue) => {
+    implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.User] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
           case "registered_user" => jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser.reads(js)

@@ -185,7 +185,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiBig: play.api.libs.json.Reads[Big] = {
+    implicit def jsonReadsApidocReferenceApiBig: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.Big] = {
       for {
         f1 <- (__ \ "f1").read[String]
         f2 <- (__ \ "f2").read[String]
@@ -251,7 +251,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiEcho: play.api.libs.json.Reads[Echo] = {
+    implicit def jsonReadsApidocReferenceApiEcho: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.Echo] = {
       (__ \ "value").read[String].map { x => Echo(value = x) }
     }
 
@@ -267,7 +267,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiError: play.api.libs.json.Reads[Error] = {
+    implicit def jsonReadsApidocReferenceApiError: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.Error] = {
       for {
         code <- (__ \ "code").read[String]
         message <- (__ \ "message").read[String]
@@ -287,7 +287,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiGroup: play.api.libs.json.Reads[Group] = {
+    implicit def jsonReadsApidocReferenceApiGroup: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.Group] = {
       (__ \ "members").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => Group(members = x) }
     }
 
@@ -303,7 +303,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiMember: play.api.libs.json.Reads[Member] = {
+    implicit def jsonReadsApidocReferenceApiMember: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.Member] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         organization <- (__ \ "organization").read[io.apibuilder.reference.api.v0.models.Organization]
@@ -327,7 +327,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiOrganization: play.api.libs.json.Reads[Organization] = {
+    implicit def jsonReadsApidocReferenceApiOrganization: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.Organization] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         name <- (__ \ "name").read[String]
@@ -347,7 +347,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiUser: play.api.libs.json.Reads[User] = {
+    implicit def jsonReadsApidocReferenceApiUser: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.User] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         email <- (__ \ "email").read[String]
@@ -375,7 +375,7 @@ package io.apibuilder.reference.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocReferenceApiUserList: play.api.libs.json.Reads[UserList] = {
+    implicit def jsonReadsApidocReferenceApiUserList: play.api.libs.json.Reads[io.apibuilder.reference.api.v0.models.UserList] = {
       (__ \ "users").read[Seq[io.apibuilder.reference.api.v0.models.User]].map { x => UserList(users = x) }
     }
 

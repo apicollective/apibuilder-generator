@@ -920,7 +920,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiApplication: play.api.libs.json.Reads[Application] = {
+    implicit def jsonReadsApidocApiApplication: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Application] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         organization <- (__ \ "organization").read[io.apibuilder.common.v0.models.Reference]
@@ -952,7 +952,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiApplicationForm: play.api.libs.json.Reads[ApplicationForm] = {
+    implicit def jsonReadsApidocApiApplicationForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.ApplicationForm] = {
       for {
         name <- (__ \ "name").read[String]
         key <- (__ \ "key").readNullable[String]
@@ -981,7 +981,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiApplicationSummary: play.api.libs.json.Reads[ApplicationSummary] = {
+    implicit def jsonReadsApidocApiApplicationSummary: play.api.libs.json.Reads[io.apibuilder.api.v0.models.ApplicationSummary] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         organization <- (__ \ "organization").read[io.apibuilder.common.v0.models.Reference]
@@ -1003,7 +1003,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiAttribute: play.api.libs.json.Reads[Attribute] = {
+    implicit def jsonReadsApidocApiAttribute: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Attribute] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         name <- (__ \ "name").read[String]
@@ -1029,7 +1029,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiAttributeForm: play.api.libs.json.Reads[AttributeForm] = {
+    implicit def jsonReadsApidocApiAttributeForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.AttributeForm] = {
       for {
         name <- (__ \ "name").read[String]
         description <- (__ \ "description").readNullable[String]
@@ -1051,7 +1051,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiAttributeSummary: play.api.libs.json.Reads[AttributeSummary] = {
+    implicit def jsonReadsApidocApiAttributeSummary: play.api.libs.json.Reads[io.apibuilder.api.v0.models.AttributeSummary] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         name <- (__ \ "name").read[String]
@@ -1071,7 +1071,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiAttributeValue: play.api.libs.json.Reads[AttributeValue] = {
+    implicit def jsonReadsApidocApiAttributeValue: play.api.libs.json.Reads[io.apibuilder.api.v0.models.AttributeValue] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         attribute <- (__ \ "attribute").read[io.apibuilder.api.v0.models.AttributeSummary]
@@ -1095,7 +1095,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiAttributeValueForm: play.api.libs.json.Reads[AttributeValueForm] = {
+    implicit def jsonReadsApidocApiAttributeValueForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.AttributeValueForm] = {
       (__ \ "value").read[String].map { x => AttributeValueForm(value = x) }
     }
 
@@ -1111,7 +1111,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiChange: play.api.libs.json.Reads[Change] = {
+    implicit def jsonReadsApidocApiChange: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Change] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         organization <- (__ \ "organization").read[io.apibuilder.common.v0.models.Reference]
@@ -1145,7 +1145,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiChangeVersion: play.api.libs.json.Reads[ChangeVersion] = {
+    implicit def jsonReadsApidocApiChangeVersion: play.api.libs.json.Reads[io.apibuilder.api.v0.models.ChangeVersion] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         version <- (__ \ "version").read[String]
@@ -1165,7 +1165,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiCleartextToken: play.api.libs.json.Reads[CleartextToken] = {
+    implicit def jsonReadsApidocApiCleartextToken: play.api.libs.json.Reads[io.apibuilder.api.v0.models.CleartextToken] = {
       (__ \ "token").read[String].map { x => CleartextToken(token = x) }
     }
 
@@ -1181,7 +1181,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiCode: play.api.libs.json.Reads[Code] = {
+    implicit def jsonReadsApidocApiCode: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Code] = {
       for {
         generator <- (__ \ "generator").read[io.apibuilder.api.v0.models.GeneratorWithService]
         source <- (__ \ "source").read[String]
@@ -1203,7 +1203,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiDiffBreaking: play.api.libs.json.Reads[DiffBreaking] = {
+    implicit def jsonReadsApidocApiDiffBreaking: play.api.libs.json.Reads[io.apibuilder.api.v0.models.DiffBreaking] = {
       (__ \ "description").read[String].map { x => DiffBreaking(description = x) }
     }
 
@@ -1219,7 +1219,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiDiffNonBreaking: play.api.libs.json.Reads[DiffNonBreaking] = {
+    implicit def jsonReadsApidocApiDiffNonBreaking: play.api.libs.json.Reads[io.apibuilder.api.v0.models.DiffNonBreaking] = {
       (__ \ "description").read[String].map { x => DiffNonBreaking(description = x) }
     }
 
@@ -1235,7 +1235,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiDomain: play.api.libs.json.Reads[Domain] = {
+    implicit def jsonReadsApidocApiDomain: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Domain] = {
       (__ \ "name").read[String].map { x => Domain(name = x) }
     }
 
@@ -1251,7 +1251,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiEmailVerificationConfirmationForm: play.api.libs.json.Reads[EmailVerificationConfirmationForm] = {
+    implicit def jsonReadsApidocApiEmailVerificationConfirmationForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.EmailVerificationConfirmationForm] = {
       (__ \ "token").read[String].map { x => EmailVerificationConfirmationForm(token = x) }
     }
 
@@ -1267,7 +1267,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiError: play.api.libs.json.Reads[Error] = {
+    implicit def jsonReadsApidocApiError: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Error] = {
       for {
         code <- (__ \ "code").read[String]
         message <- (__ \ "message").read[String]
@@ -1287,7 +1287,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiGeneratorForm: play.api.libs.json.Reads[GeneratorForm] = {
+    implicit def jsonReadsApidocApiGeneratorForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.GeneratorForm] = {
       for {
         serviceGuid <- (__ \ "service_guid").read[_root_.java.util.UUID]
         generator <- (__ \ "generator").read[io.apibuilder.generator.v0.models.Generator]
@@ -1307,7 +1307,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiGeneratorService: play.api.libs.json.Reads[GeneratorService] = {
+    implicit def jsonReadsApidocApiGeneratorService: play.api.libs.json.Reads[io.apibuilder.api.v0.models.GeneratorService] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         uri <- (__ \ "uri").read[String]
@@ -1329,7 +1329,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiGeneratorServiceForm: play.api.libs.json.Reads[GeneratorServiceForm] = {
+    implicit def jsonReadsApidocApiGeneratorServiceForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.GeneratorServiceForm] = {
       (__ \ "uri").read[String].map { x => GeneratorServiceForm(uri = x) }
     }
 
@@ -1345,7 +1345,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiGeneratorWithService: play.api.libs.json.Reads[GeneratorWithService] = {
+    implicit def jsonReadsApidocApiGeneratorWithService: play.api.libs.json.Reads[io.apibuilder.api.v0.models.GeneratorWithService] = {
       for {
         service <- (__ \ "service").read[io.apibuilder.api.v0.models.GeneratorService]
         generator <- (__ \ "generator").read[io.apibuilder.generator.v0.models.Generator]
@@ -1365,7 +1365,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiItem: play.api.libs.json.Reads[Item] = {
+    implicit def jsonReadsApidocApiItem: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Item] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         detail <- (__ \ "detail").read[io.apibuilder.api.v0.models.ItemDetail]
@@ -1391,7 +1391,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiMembership: play.api.libs.json.Reads[Membership] = {
+    implicit def jsonReadsApidocApiMembership: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Membership] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         user <- (__ \ "user").read[io.apibuilder.api.v0.models.User]
@@ -1417,7 +1417,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiMembershipRequest: play.api.libs.json.Reads[MembershipRequest] = {
+    implicit def jsonReadsApidocApiMembershipRequest: play.api.libs.json.Reads[io.apibuilder.api.v0.models.MembershipRequest] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         user <- (__ \ "user").read[io.apibuilder.api.v0.models.User]
@@ -1443,7 +1443,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiMoveForm: play.api.libs.json.Reads[MoveForm] = {
+    implicit def jsonReadsApidocApiMoveForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.MoveForm] = {
       (__ \ "org_key").read[String].map { x => MoveForm(orgKey = x) }
     }
 
@@ -1459,7 +1459,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiOrganization: play.api.libs.json.Reads[Organization] = {
+    implicit def jsonReadsApidocApiOrganization: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Organization] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         key <- (__ \ "key").read[String]
@@ -1489,7 +1489,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiOrganizationForm: play.api.libs.json.Reads[OrganizationForm] = {
+    implicit def jsonReadsApidocApiOrganizationForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.OrganizationForm] = {
       for {
         name <- (__ \ "name").read[String]
         key <- (__ \ "key").readNullable[String]
@@ -1520,7 +1520,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiOriginal: play.api.libs.json.Reads[Original] = {
+    implicit def jsonReadsApidocApiOriginal: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Original] = {
       for {
         `type` <- (__ \ "type").read[io.apibuilder.api.v0.models.OriginalType]
         data <- (__ \ "data").read[String]
@@ -1540,7 +1540,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiOriginalForm: play.api.libs.json.Reads[OriginalForm] = {
+    implicit def jsonReadsApidocApiOriginalForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.OriginalForm] = {
       for {
         `type` <- (__ \ "type").readNullable[io.apibuilder.api.v0.models.OriginalType]
         data <- (__ \ "data").read[String]
@@ -1562,7 +1562,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiPasswordReset: play.api.libs.json.Reads[PasswordReset] = {
+    implicit def jsonReadsApidocApiPasswordReset: play.api.libs.json.Reads[io.apibuilder.api.v0.models.PasswordReset] = {
       for {
         token <- (__ \ "token").read[String]
         password <- (__ \ "password").read[String]
@@ -1582,7 +1582,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiPasswordResetRequest: play.api.libs.json.Reads[PasswordResetRequest] = {
+    implicit def jsonReadsApidocApiPasswordResetRequest: play.api.libs.json.Reads[io.apibuilder.api.v0.models.PasswordResetRequest] = {
       (__ \ "email").read[String].map { x => PasswordResetRequest(email = x) }
     }
 
@@ -1598,7 +1598,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiPasswordResetSuccess: play.api.libs.json.Reads[PasswordResetSuccess] = {
+    implicit def jsonReadsApidocApiPasswordResetSuccess: play.api.libs.json.Reads[io.apibuilder.api.v0.models.PasswordResetSuccess] = {
       (__ \ "user_guid").read[_root_.java.util.UUID].map { x => PasswordResetSuccess(userGuid = x) }
     }
 
@@ -1614,7 +1614,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiSubscription: play.api.libs.json.Reads[Subscription] = {
+    implicit def jsonReadsApidocApiSubscription: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Subscription] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         organization <- (__ \ "organization").read[io.apibuilder.api.v0.models.Organization]
@@ -1640,7 +1640,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiSubscriptionForm: play.api.libs.json.Reads[SubscriptionForm] = {
+    implicit def jsonReadsApidocApiSubscriptionForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.SubscriptionForm] = {
       for {
         organizationKey <- (__ \ "organization_key").read[String]
         userGuid <- (__ \ "user_guid").read[_root_.java.util.UUID]
@@ -1662,7 +1662,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiToken: play.api.libs.json.Reads[Token] = {
+    implicit def jsonReadsApidocApiToken: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Token] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         user <- (__ \ "user").read[io.apibuilder.api.v0.models.User]
@@ -1690,7 +1690,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiTokenForm: play.api.libs.json.Reads[TokenForm] = {
+    implicit def jsonReadsApidocApiTokenForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.TokenForm] = {
       for {
         userGuid <- (__ \ "user_guid").read[_root_.java.util.UUID]
         description <- (__ \ "description").readNullable[String]
@@ -1712,7 +1712,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiUser: play.api.libs.json.Reads[User] = {
+    implicit def jsonReadsApidocApiUser: play.api.libs.json.Reads[io.apibuilder.api.v0.models.User] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         email <- (__ \ "email").read[String]
@@ -1740,7 +1740,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiUserForm: play.api.libs.json.Reads[UserForm] = {
+    implicit def jsonReadsApidocApiUserForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.UserForm] = {
       for {
         email <- (__ \ "email").read[String]
         password <- (__ \ "password").read[String]
@@ -1769,7 +1769,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiUserSummary: play.api.libs.json.Reads[UserSummary] = {
+    implicit def jsonReadsApidocApiUserSummary: play.api.libs.json.Reads[io.apibuilder.api.v0.models.UserSummary] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         nickname <- (__ \ "nickname").read[String]
@@ -1789,7 +1789,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiUserUpdateForm: play.api.libs.json.Reads[UserUpdateForm] = {
+    implicit def jsonReadsApidocApiUserUpdateForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.UserUpdateForm] = {
       for {
         email <- (__ \ "email").read[String]
         nickname <- (__ \ "nickname").read[String]
@@ -1813,7 +1813,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiValidation: play.api.libs.json.Reads[Validation] = {
+    implicit def jsonReadsApidocApiValidation: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Validation] = {
       for {
         valid <- (__ \ "valid").read[Boolean]
         errors <- (__ \ "errors").read[Seq[String]]
@@ -1833,7 +1833,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiVersion: play.api.libs.json.Reads[Version] = {
+    implicit def jsonReadsApidocApiVersion: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Version] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         organization <- (__ \ "organization").read[io.apibuilder.common.v0.models.Reference]
@@ -1865,7 +1865,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiVersionForm: play.api.libs.json.Reads[VersionForm] = {
+    implicit def jsonReadsApidocApiVersionForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.VersionForm] = {
       for {
         originalForm <- (__ \ "original_form").read[io.apibuilder.api.v0.models.OriginalForm]
         visibility <- (__ \ "visibility").readNullable[io.apibuilder.api.v0.models.Visibility]
@@ -1887,7 +1887,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiWatch: play.api.libs.json.Reads[Watch] = {
+    implicit def jsonReadsApidocApiWatch: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Watch] = {
       for {
         guid <- (__ \ "guid").read[_root_.java.util.UUID]
         user <- (__ \ "user").read[io.apibuilder.api.v0.models.User]
@@ -1913,7 +1913,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiWatchForm: play.api.libs.json.Reads[WatchForm] = {
+    implicit def jsonReadsApidocApiWatchForm: play.api.libs.json.Reads[io.apibuilder.api.v0.models.WatchForm] = {
       for {
         userGuid <- (__ \ "user_guid").read[_root_.java.util.UUID]
         organizationKey <- (__ \ "organization_key").read[String]
@@ -1935,7 +1935,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiDiff: play.api.libs.json.Reads[Diff] = (js: play.api.libs.json.JsValue) => {
+    implicit def jsonReadsApidocApiDiff: play.api.libs.json.Reads[io.apibuilder.api.v0.models.Diff] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
           case "diff_breaking" => jsonReadsApidocApiDiffBreaking.reads(js)
@@ -1964,7 +1964,7 @@ package io.apibuilder.api.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocApiItemDetail: play.api.libs.json.Reads[ItemDetail] = (js: play.api.libs.json.JsValue) => {
+    implicit def jsonReadsApidocApiItemDetail: play.api.libs.json.Reads[io.apibuilder.api.v0.models.ItemDetail] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
           case "application_summary" => jsonReadsApidocApiApplicationSummary.reads(js)

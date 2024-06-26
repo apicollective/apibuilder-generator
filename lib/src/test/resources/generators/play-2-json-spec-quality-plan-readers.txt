@@ -1,4 +1,4 @@
-implicit def jsonReadsQualityPlan: play.api.libs.json.Reads[Plan] = {
+implicit def jsonReadsQualityPlan: play.api.libs.json.Reads[com.gilt.quality.v0.models.Plan] = {
   for {
     id <- (__ \ "id").read[Long]
     incidentId <- (__ \ "incident_id").read[Long]
