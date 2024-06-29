@@ -43,7 +43,7 @@ package %s {
       }
     }
 
-    private[this] def parseJson[T](f: play.api.libs.json.JsValue => T, columnName: String, value: String) = {
+    private def parseJson[T](f: play.api.libs.json.JsValue => T, columnName: String, value: String) = {
       Try {
         f(
           play.api.libs.json.Json.parse(value)
@@ -101,9 +101,9 @@ package %s {
     ).flatten.mkString("\n")
   }
 
-  private[this] case class Name(shortName: String, qualifiedName: String)
+  private case class Name(shortName: String, qualifiedName: String)
 
-  private[this] def buildCollectionConversions(ssd: ScalaService): Option[String] = {
+  private def buildCollectionConversions(ssd: ScalaService): Option[String] = {
     (
       ssd.enums.map(e => Name(e.name, e.qualifiedName)) ++
         ssd.models.map(m => Name(m.name, m.qualifiedName)) ++

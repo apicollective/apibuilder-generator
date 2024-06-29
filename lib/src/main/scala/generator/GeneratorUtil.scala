@@ -40,7 +40,7 @@ object GeneratorUtil {
   /**
     * The external name is used to import these elements via the specified.
     */
-  private[this] def fullyQualifiedExternalName(
+  private def fullyQualifiedExternalName(
     namespace: String,
     objectType: ObjectType,
     name: Option[String] = None
@@ -83,7 +83,7 @@ object GeneratorUtil {
   }
 
   @scala.annotation.tailrec
-  private[this] def internalFindLongestCommonPrefix(substring: String, values: Seq[String]): String = {
+  private def internalFindLongestCommonPrefix(substring: String, values: Seq[String]): String = {
     values.head.substring(substring.length) match {
       case "" => substring
       case value => {
@@ -165,7 +165,7 @@ object GeneratorUtil {
     }
   }
 
-  private[this] def splitLineByLength(comment: String, maxLength: Int = 80): Seq[String] = {
+  private def splitLineByLength(comment: String, maxLength: Int = 80): Seq[String] = {
     val sb = new scala.collection.mutable.ListBuffer[String]()
     var currentWord = new StringBuilder()
     comment.split("\\s+").map(_.trim).foreach { word =>

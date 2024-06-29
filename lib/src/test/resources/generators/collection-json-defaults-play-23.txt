@@ -218,7 +218,7 @@ package com.gilt.test.v0 {
   ) extends interfaces.Client {
     import com.gilt.test.v0.models.json._
 
-    private[this] val logger = play.api.Logger("com.gilt.test.v0.Client")
+    private val logger = play.api.Logger("com.gilt.test.v0.Client")
 
     logger.info(s"Initializing com.gilt.test.v0.Client for url $baseUrl")
 

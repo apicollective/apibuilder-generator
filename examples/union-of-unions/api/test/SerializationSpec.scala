@@ -8,7 +8,7 @@ import java.util.UUID
 
 class SerializationSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  private[this] def mustParse[T](value: T)(implicit writes: Writes[T], reads: Reads[T]) = {
+  private def mustParse[T](value: T)(implicit writes: Writes[T], reads: Reads[T]) = {
     Json.parse(Json.toJson(value).toString()).validate[T] match {
       case JsSuccess(value, _) => value
       case e: JsError          => sys.error(s"Failed to parse: ${e.errors.mkString(", ")}")

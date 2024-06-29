@@ -7,7 +7,7 @@ import io.apibuilder.spec.v0.models._
 import scala.annotation.tailrec
 
 case class ElmResource(args: GenArgs) {
-  private[this] val elmType = ElmTypeLookup(args)
+  private val elmType = ElmTypeLookup(args)
 
   def generate(resource: Resource): ValidatedNec[String, String] = {
     resource.operations.map { op =>
@@ -16,10 +16,10 @@ case class ElmResource(args: GenArgs) {
   }
 
   case class Generator(resource: Resource, op: Operation) {
-    private[this] val variableIndex = VariableIndex()
-    private[this] val elmJson = ElmJson(args.imports)
+    private val variableIndex = VariableIndex()
+    private val elmJson = ElmJson(args.imports)
 
-    private[this] val name: String = {
+    private val name: String = {
       val (variables, words) = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").partition(_.startsWith(":"))
       def toOpt(all: Seq[String]) = {
         all.map(Names.pascalCase).toList match {
@@ -36,9 +36,9 @@ case class ElmResource(args: GenArgs) {
       ).flatten.mkString("")
     }
 
-    private[this] val propsType = Names.pascalCase(name) + "Props"
+    private val propsType = Names.pascalCase(name) + "Props"
 
-    private[this] def handlePossibleToString(params: Seq[ValidatedParameter], variable: String, code: String): String = {
+    private def handlePossibleToString(params: Seq[ValidatedParameter], variable: String, code: String): String = {
       import ElmType._
 
       def wrap(fun: String): String = Util.wrapInParens(fun, Names.maybeQuote(code))
@@ -66,7 +66,7 @@ case class ElmResource(args: GenArgs) {
       }
     }
 
-    private[this] def url(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
+    private def url(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
       @tailrec
       def buildUrl(remaining: String, u: Seq[String]): Seq[String] = {
         val i = remaining.indexOf(":")
@@ -119,21 +119,21 @@ case class ElmResource(args: GenArgs) {
         , int "offset" lo.offset
         ]
      */
-    private[this] def queryParameters(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
+    private def queryParameters(variable: ElmVariable, params: Seq[ValidatedParameter]): String = {
       assert(params.nonEmpty, "Must have at least one param")
       params.map { p =>
         queryParameter(p)(dereferenceVariable(variable, p.name))
       }.mkString("\n++ ").indent(16)
     }
 
-    private[this] def dereferenceVariable(variable: ElmVariable, name: String): String = {
+    private def dereferenceVariable(variable: ElmVariable, name: String): String = {
       variable match {
         case _: ElmParameter => name
         case a: ElmTypeAlias => s"${a.name}.${Names.camelCase(name)}"
       }
     }
 
-    private[this] def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil, depth: Int = 0)(currentVar: String): String = {
+    private def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil, depth: Int = 0)(currentVar: String): String = {
       import ElmType._
       lazy val nextVar = variableIndex.next()
       def innerType(inner: ElmType): String = {
@@ -195,36 +195,36 @@ case class ElmResource(args: GenArgs) {
       }
     }
 
-    private[this] case class ValidatedParameter(p: Parameter, typ: ElmType) {
+    private case class ValidatedParameter(p: Parameter, typ: ElmType) {
       val name: String = p.name
     }
 
-    private[this] def validateParameters(): ValidatedNec[String, Seq[ValidatedParameter]] = {
+    private def validateParameters(): ValidatedNec[String, Seq[ValidatedParameter]] = {
       op.parameters.map { p =>
         elmType.validate(p.`type`, required = p.required).map { t => ValidatedParameter(p, t) }
       }.sequence.map(removeCommunityId)
     }
 
-    private[this] def removeCommunityId(all: Seq[ValidatedParameter]): Seq[ValidatedParameter] = {
+    private def removeCommunityId(all: Seq[ValidatedParameter]): Seq[ValidatedParameter] = {
       all.filterNot { p =>
         p.name == "community_id" && p.typ == ElmType.ElmString
       }
     }
 
-    private[this] def makePropsTypeAlias(params: Seq[ValidatedParameter]): Option[ElmVariable] = {
+    private def makePropsTypeAlias(params: Seq[ValidatedParameter]): Option[ElmVariable] = {
       params.foldLeft(ElmTypeAliasBuilder("props", propsType)) { case (builder, p) =>
         builder.addProperty(p.name, p.typ)
       }.build()
     }
 
-    private[this] def validateBody(body: Option[Body]): ValidatedNec[String, Option[ElmType]] = {
+    private def validateBody(body: Option[Body]): ValidatedNec[String, Option[ElmType]] = {
       body match {
         case None => None.validNec
         case Some(b) => elmType.validate(b.`type`, required = true).map(Some(_))
       }
     }
 
-    private[this] def generateMethod(method: Method, params: Seq[ValidatedParameter], body: Option[ElmType]): String = {
+    private def generateMethod(method: Method, params: Seq[ValidatedParameter], body: Option[ElmType]): String = {
       val param = makePropsTypeAlias(params)
       val variable = param.getOrElse {
         ElmParameter("placeholder", "String")

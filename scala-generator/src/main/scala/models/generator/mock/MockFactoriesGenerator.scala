@@ -69,7 +69,7 @@ object MockFactoriesGenerator extends CodeGenerator {
     s"def make${union.name}(): ${union.qualifiedName} = $impl"
   }
 
-  private[this] def needsWrapper(datatype: ScalaDatatype): Boolean = {
+  private def needsWrapper(datatype: ScalaDatatype): Boolean = {
     datatype match {
       case _: ScalaPrimitive.Enum | _: ScalaPrimitive.Model | _: ScalaPrimitive.GeneratedModel | _: ScalaPrimitive.Union => {
         false

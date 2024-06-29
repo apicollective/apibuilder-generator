@@ -10,7 +10,7 @@ import scala.generator.{ScalaCaseClasses, ScalaService}
 
 class ScalaCaseClassesInterfacesSpec extends AnyFunSpec with Matchers with helpers.ServiceHelpers {
 
-  private[this] def build(interfaces: Seq[Interface]): ScalaService = {
+  private def build(interfaces: Seq[Interface]): ScalaService = {
     ScalaService(
       makeService(interfaces = interfaces)
     )

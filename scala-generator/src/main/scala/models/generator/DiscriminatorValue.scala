@@ -5,7 +5,7 @@ sealed trait DiscriminatorValue {
 }
 
 object DiscriminatorValue {
-  private[this] def declaration(discriminatorField: ScalaField): String = {
+  private def declaration(discriminatorField: ScalaField): String = {
     s"override val ${ScalaUtil.quoteNameIfKeyword(discriminatorField.field.name)}: ${discriminatorField.field.`type`} = ${discriminatorField.field.`type`}."
   }
 
@@ -32,7 +32,7 @@ object DiscriminatorValue {
     }.distinct.map(_.generateCode)
   }
 
-  private[this] def generate(union: ScalaUnion, typeName: String): Option[DiscriminatorValue] = {
+  private def generate(union: ScalaUnion, typeName: String): Option[DiscriminatorValue] = {
     union.discriminatorField.flatMap { d =>
       union.types.find(_.name == typeName) match {
         case Some(t) => Some(DiscriminatorValue.TypeModel(d.field, t))

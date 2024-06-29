@@ -14,7 +14,7 @@ private[models] object RubyPrimitiveWrapper {
 
 private[models] case class RubyPrimitiveWrapper(service: Service) {
 
-  private[this] val primitives: Seq[Primitive] = service.unions.flatMap(_.types).map(_.`type`).flatMap { name =>
+  private val primitives: Seq[Primitive] = service.unions.flatMap(_.types).map(_.`type`).flatMap { name =>
     Primitive(name).toOption
   }.distinct.sortBy(_.toString)
 

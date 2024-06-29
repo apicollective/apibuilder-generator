@@ -345,7 +345,7 @@ package com.gilt.test.v0 {
       if (x < 10) (x + '0') else (x - 10 + 'A')
     }
 
-    private[this] val segmentChars: java.util.BitSet = membershipTable(pchar)
+    private val segmentChars: java.util.BitSet = membershipTable(pchar)
 
     private def pchar: Seq[Char] = {
       val alphaDigit = for ((min, max) <- Seq(('a', 'z'), ('A', 'Z'), ('0', '9')); c <- min to max) yield c

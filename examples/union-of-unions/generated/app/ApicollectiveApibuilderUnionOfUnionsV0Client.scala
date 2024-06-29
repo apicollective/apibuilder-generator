@@ -21,7 +21,7 @@ package io.apibuilder.union.of.unions.v0.models {
 
     val all: scala.List[PartyDiscriminator] = scala.List(User, Group)
 
-    private[this] val byName: Map[String, PartyDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
+    private val byName: Map[String, PartyDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): PartyDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -45,7 +45,7 @@ package io.apibuilder.union.of.unions.v0.models {
 
     val all: scala.List[UserDiscriminator] = scala.List(RegisteredUser, GuestUser)
 
-    private[this] val byName: Map[String, UserDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
+    private val byName: Map[String, UserDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): UserDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -359,7 +359,7 @@ package io.apibuilder.union.of.unions.v0 {
   ) extends interfaces.Client {
     import io.apibuilder.union.of.unions.v0.models.json._
 
-    private[this] val logger = play.api.Logger("io.apibuilder.union.of.unions.v0.Client")
+    private val logger = play.api.Logger("io.apibuilder.union.of.unions.v0.Client")
 
     logger.info(s"Initializing io.apibuilder.union.of.unions.v0.Client for url $baseUrl")
 

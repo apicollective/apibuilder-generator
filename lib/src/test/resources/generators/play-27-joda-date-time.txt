@@ -23,7 +23,7 @@ package io.gregor.time.types.v0.models {
 
     val all: scala.List[DateTimeUnionType] = scala.List(DateTimeIso8601, DateIso8601)
 
-    private[this] val byName: Map[String, DateTimeUnionType] = all.map(x => x.toString.toLowerCase -> x).toMap
+    private val byName: Map[String, DateTimeUnionType] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): DateTimeUnionType = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -277,7 +277,7 @@ package io.gregor.time.types.v0 {
   ) extends interfaces.Client {
     import io.gregor.time.types.v0.models.json._
 
-    private[this] val logger = play.api.Logger("io.gregor.time.types.v0.Client")
+    private val logger = play.api.Logger("io.gregor.time.types.v0.Client")
 
     logger.info(s"Initializing io.gregor.time.types.v0.Client for url $baseUrl")
 

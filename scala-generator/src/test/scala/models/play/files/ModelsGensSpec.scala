@@ -13,7 +13,7 @@ import scala.models.play.gens._
 
 class ModelsGensSpec extends AnyFunSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
-  private[this] implicit val scalacheckConfig: PropertyCheckConfiguration = generatorDrivenConfig.copy(sizeRange = 10)
+  private implicit val scalacheckConfig: PropertyCheckConfiguration = generatorDrivenConfig.copy(sizeRange = 10)
 
   it("generates joda DateTime generator") {
     forAll(genNsStr) { (str: String) =>

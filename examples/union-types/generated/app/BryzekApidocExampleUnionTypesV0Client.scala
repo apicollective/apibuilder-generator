@@ -70,7 +70,7 @@ package io.apibuilder.example.union.types.v0.models {
      */
     val all = Seq(B)
 
-    private[this]
+    private
     val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Bar = fromString(value).getOrElse(UNDEFINED(value))
@@ -103,7 +103,7 @@ package io.apibuilder.example.union.types.v0.models {
      */
     val all = Seq(A)
 
-    private[this]
+    private
     val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Foo = fromString(value).getOrElse(UNDEFINED(value))
@@ -321,7 +321,7 @@ package io.apibuilder.example.union.types.v0 {
     )
 
     // Enum: Bar
-    private[this] val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.v0.models.Bar.all.mkString(", ")}"
+    private val enumBarNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.v0.models.Bar.all.mkString(", ")}"
 
     implicit val pathBindableEnumBar = new PathBindable.Parsing[io.apibuilder.example.union.types.v0.models.Bar] (
       Bar.fromString(_).get, _.toString, enumBarNotFound
@@ -332,7 +332,7 @@ package io.apibuilder.example.union.types.v0 {
     )
 
     // Enum: Foo
-    private[this] val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.v0.models.Foo.all.mkString(", ")}"
+    private val enumFooNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.v0.models.Foo.all.mkString(", ")}"
 
     implicit val pathBindableEnumFoo = new PathBindable.Parsing[io.apibuilder.example.union.types.v0.models.Foo] (
       Foo.fromString(_).get, _.toString, enumFooNotFound
@@ -365,7 +365,7 @@ package io.apibuilder.example.union.types.v0 {
   ) extends interfaces.Client {
     import io.apibuilder.example.union.types.v0.models.json._
 
-    private[this] val logger = play.api.Logger("io.apibuilder.example.union.types.v0.Client")
+    private val logger = play.api.Logger("io.apibuilder.example.union.types.v0.Client")
 
     logger.info(s"Initializing io.apibuilder.example.union.types.v0.Client for url $baseUrl")
 

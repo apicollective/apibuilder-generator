@@ -163,7 +163,7 @@ class MockClientGenerator(
     }
   }
 
-  private[this] def getStatus(r: ScalaResponse): Int = {
+  private def getStatus(r: ScalaResponse): Int = {
     r.code match {
       case ResponseCodeInt(value) => value
       case ResponseCodeOption.Default => 200

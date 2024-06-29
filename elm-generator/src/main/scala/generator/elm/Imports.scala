@@ -3,14 +3,14 @@ package generator.elm
 import scala.collection.concurrent.TrieMap
 
 case class Imports() {
-  private[this] sealed trait ExposingAllValue
-  private[this] object ExposingAllValue {
+  private sealed trait ExposingAllValue
+  private object ExposingAllValue {
     case object Wildcard extends ExposingAllValue
     case class Types(types: Seq[String]) extends  ExposingAllValue
   }
 
-  private[this] val allAs: TrieMap[String, String] = TrieMap[String, String]()
-  private[this] val exposingAll: TrieMap[String, ExposingAllValue] = TrieMap[String, ExposingAllValue]()
+  private val allAs: TrieMap[String, String] = TrieMap[String, String]()
+  private val exposingAll: TrieMap[String, ExposingAllValue] = TrieMap[String, ExposingAllValue]()
 
   def addAs(name: String, as: String): Unit = {
     allAs.put(name, as).foreach { existing =>
@@ -26,7 +26,7 @@ case class Imports() {
 
   def addExposing(name: String, types: String): Unit = addExposing(name, Seq(types))
 
-  private[this] def addExposing(name: String, types: Seq[String]): Unit = {
+  private def addExposing(name: String, types: Seq[String]): Unit = {
     exposingAll.get(name) match {
       case None => exposingAll.put(name, ExposingAllValue.Types(types))
       case Some(ExposingAllValue.Wildcard) => ()

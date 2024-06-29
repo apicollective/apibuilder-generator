@@ -71,7 +71,7 @@ case class DatatypeResolver(
   modelNames: Iterable[String]
 ) {
 
-  private[this] val userDefinedTypes = {
+  private val userDefinedTypes = {
     val builder = Map.newBuilder[String, Datatype.UserDefined]
     enumNames.foreach { name =>
       builder += name -> Datatype.UserDefined.Enum(name)

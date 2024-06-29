@@ -43,12 +43,12 @@ case class ElmGenerator() {
     }
   }
 
-  private[this] def pascalServiceName(service: Service): String = {
+  private def pascalServiceName(service: Service): String = {
     val parts = service.namespace.split("\\.").filterNot(NamespaceParser.isVersion).toList
     Names.pascalCase(parts.distinct.mkString("_"))
   }
 
-  private[this] def generate(service: Service, args: GenArgs, contents: String*): String = {
+  private def generate(service: Service, args: GenArgs, contents: String*): String = {
     Seq(
       s"module Generated.${pascalServiceName(service)} exposing (..)",
       args.imports.generateCode(), // must be generated after the contents
@@ -62,7 +62,7 @@ case class ElmGenerator() {
     args.service.models.map(models.generate).sequence.map(_.mkString("\n\n"))
   }
 
-  private[this] def generateEnums(args: GenArgs): String = {
+  private def generateEnums(args: GenArgs): String = {
     val enums = ElmEnum(args)
     args.service.enums.map(enums.generate).mkString("\n\n")
   }
@@ -83,7 +83,7 @@ case class GenArgs(service: Service) {
 }
 
 case class VariableIndex() {
-  private[this] var index = 0
+  private var index = 0
   def next(): String = {
     index = index + 1
     current

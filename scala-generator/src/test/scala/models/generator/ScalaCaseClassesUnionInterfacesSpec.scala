@@ -8,9 +8,9 @@ import scala.generator.{ScalaCaseClasses, ScalaService}
 
 class ScalaCaseClassesUnionInterfacesSpec extends AnyFunSpec with Matchers with helpers.ServiceHelpers {
 
-  private[this] val IdField: Field = makeField(name = "id")
+  private val IdField: Field = makeField(name = "id")
 
-  private[this] def build(
+  private def build(
     interface: Interface,
   ): ScalaService = {
     ScalaService(

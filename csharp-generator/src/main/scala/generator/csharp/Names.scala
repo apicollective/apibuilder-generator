@@ -17,7 +17,7 @@ object Names {
   }
 
   // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
-  private[this] val Keywords: Set[String] = Set(
+  private val Keywords: Set[String] = Set(
     "abstract",
     "as",
     "base",

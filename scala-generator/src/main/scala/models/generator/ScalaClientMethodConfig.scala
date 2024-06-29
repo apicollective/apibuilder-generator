@@ -87,7 +87,7 @@ sealed trait ScalaClientMethodConfig {
     toClientMethodCall("parseJson", responseName, className)
   }
 
-  private[this] def toClientMethodCall(methodName: String, responseName: String, className: String): String = {
+  private def toClientMethodCall(methodName: String, responseName: String, className: String): String = {
     s"""_root_.$namespace.Client.$methodName("$className", $responseName, _.validate[$className])"""
   }
 

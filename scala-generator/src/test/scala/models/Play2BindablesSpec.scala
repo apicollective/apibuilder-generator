@@ -9,8 +9,8 @@ import org.scalatest.matchers.should.Matchers
 
 class Play2BindablesSpec extends AnyFunSpec with Matchers {
 
-  private[this] lazy val service: Service = models.TestHelper.referenceApiService
-  private[this] lazy val ssd: ScalaService = new ScalaService(service)
+  private lazy val service: Service = models.TestHelper.referenceApiService
+  private lazy val ssd: ScalaService = new ScalaService(service)
 
   it("generates bindable for a single enum") {
     models.TestHelper.assertEqualsFile(

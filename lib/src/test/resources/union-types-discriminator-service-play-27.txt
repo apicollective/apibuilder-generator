@@ -25,7 +25,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
     val all: scala.List[UserDiscriminator] = scala.List(RegisteredUser, GuestUser, SystemUser, String)
 
-    private[this] val byName: Map[String, UserDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
+    private val byName: Map[String, UserDiscriminator] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): UserDiscriminator = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -107,7 +107,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
      */
     val all: scala.List[SystemUser] = scala.List(System, Anonymous)
 
-    private[this]
+    private
     val byName: Map[String, SystemUser] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): SystemUser = fromString(value).getOrElse(UNDEFINED(value))
@@ -394,7 +394,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
   ) extends interfaces.Client {
     import io.apibuilder.example.union.types.discriminator.v0.models.json._
 
-    private[this] val logger = play.api.Logger("io.apibuilder.example.union.types.discriminator.v0.Client")
+    private val logger = play.api.Logger("io.apibuilder.example.union.types.discriminator.v0.Client")
 
     logger.info(s"Initializing io.apibuilder.example.union.types.discriminator.v0.Client for url $baseUrl")
 

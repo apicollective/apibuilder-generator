@@ -9,7 +9,7 @@ import scala.generator.ScalaService
 
 class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers with ServiceHelpers {
 
-  private[this] def build(fields: Seq[Field]): ScalaService = {
+  private def build(fields: Seq[Field]): ScalaService = {
     ScalaService(
       makeService(
         interfaces = Seq(
@@ -31,7 +31,7 @@ class UndefinedUnionWithInterfaceSpec extends AnyFunSpec with Matchers with Serv
     )
   }
 
-  private[this] def fields(service: ScalaService): Seq[String] = {
+  private def fields(service: ScalaService): Seq[String] = {
     service.unions.map(_.undefinedType).head.model.model.fields.map(_.name)
   }
 

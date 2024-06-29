@@ -45,7 +45,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def makeEnum(`enum`: Enum, parentUnion: Option[(Union, UnionType)], outerField: Option[Field]): JsValue = {
+  private def makeEnum(`enum`: Enum, parentUnion: Option[(Union, UnionType)], outerField: Option[Field]): JsValue = {
     def randomValue: JsValue = JsString(
       Random.shuffle(enum.values)
         .headOption.map(ev => ev.value.getOrElse(ev.name)).getOrElse("undefined")
@@ -71,7 +71,7 @@ case class ExampleJson(
 
   }
 
-  private[this] def makeModel(model: Model, parentUnion: Option[(Union, UnionType)]): JsValue = {
+  private def makeModel(model: Model, parentUnion: Option[(Union, UnionType)]): JsValue = {
     val value = JsObject(
       Map(
         model.fields.
@@ -115,7 +115,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def makeUnion(unionName: String, unionTypeName: String): Option[JsValue] = {
+  private def makeUnion(unionName: String, unionTypeName: String): Option[JsValue] = {
     val unions = for {
       union <- service.unions if union.name == unionName
       unionType <- union.types if (unionType.`type` == unionTypeName)
@@ -123,7 +123,7 @@ case class ExampleJson(
     unions.headOption
   }
 
-  private[this] def makeUnion(union: Union, unionType: Option[UnionType] = None): JsValue = {
+  private def makeUnion(union: Union, unionType: Option[UnionType] = None): JsValue = {
     unionType.orElse(union.types.headOption).fold {
       Json.obj(): JsValue
     } { unionType =>
@@ -138,7 +138,7 @@ case class ExampleJson(
   }
 
   // primitives in a union type are wrapped in a 'value' field
-  private[this] def primitiveUnionWrapper(union: Union, unionType: UnionType, js: JsValue): JsValue = {
+  private def primitiveUnionWrapper(union: Union, unionType: UnionType, js: JsValue): JsValue = {
     val discrVal = unionType.discriminatorValue.getOrElse(unionType.`type`)
     union.discriminator.fold {
       Json.obj(discrVal -> Json.obj("value" -> js))
@@ -150,7 +150,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def mockValue(types: Seq[TextDatatype], parentUnion: Option[(Union, UnionType)]): JsValue = {
+  private def mockValue(types: Seq[TextDatatype], parentUnion: Option[(Union, UnionType)]): JsValue = {
     types.toList match {
       case Nil => JsNull
       case TextDatatype.Singleton(one) :: Nil => singleton(one, parentUnion)
@@ -160,7 +160,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def singleton(typ: String, parentUnion: Option[(Union, UnionType)]): JsValue = {
+  private def singleton(typ: String, parentUnion: Option[(Union, UnionType)]): JsValue = {
     Primitives(typ) match {
       case None => {
         service.enums.find(_.name == typ) match {
@@ -184,7 +184,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def mockValue(field: Field): JsValue = {
+  private def mockValue(field: Field): JsValue = {
     val types = TextDatatype.parse(field.`type`)
     types.toList match {
       case Nil => JsNull
@@ -221,7 +221,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def singleton(field: Field): JsValue = {
+  private def singleton(field: Field): JsValue = {
     Primitives(field.`type`) match {
       case None => {
         service.enums.find(_.name == field.`type`) match {
@@ -254,7 +254,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def mockPrimitive(p: Primitives, fieldOpt: Option[Field] = None): JsValue = {
+  private def mockPrimitive(p: Primitives, fieldOpt: Option[Field] = None): JsValue = {
     p match {
       case Primitives.Boolean => JsBoolean(true)
       case Primitives.Double => JsNumber(1.0)
@@ -274,7 +274,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def primitiveExample(p: Primitives, ex: String): JsValue = {
+  private def primitiveExample(p: Primitives, ex: String): JsValue = {
     p match {
       case Primitives.Boolean => JsBoolean(parseBoolean(ex, true))
       case Primitives.Double => JsNumber(parseDouble(ex, 1.0))
@@ -297,7 +297,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseBoolean(value: String, default: Boolean): Boolean = {
+  private def parseBoolean(value: String, default: Boolean): Boolean = {
     if (ExampleJson.TrueStrings.contains(value.toLowerCase().trim)) {
       true
     } else if (ExampleJson.TrueStrings.contains(value.toLowerCase().trim)) {
@@ -307,7 +307,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseDouble(value: String, default: Double): Double = {
+  private def parseDouble(value: String, default: Double): Double = {
     try {
       value.toDouble
     } catch {
@@ -315,7 +315,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseInt(value: String, default: Int): Int = {
+  private def parseInt(value: String, default: Int): Int = {
     try {
       value.toInt
     } catch {
@@ -323,7 +323,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseUUID(value: String, default: UUID): UUID = {
+  private def parseUUID(value: String, default: UUID): UUID = {
     try {
       UUID.fromString(value)
     } catch {
@@ -331,7 +331,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseObject(value: String, default: JsObject): JsObject = {
+  private def parseObject(value: String, default: JsObject): JsObject = {
     try {
       Json.parse(value).as[JsObject]
     } catch {
@@ -339,7 +339,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseJsonValue(value: String, default: JsValue): JsValue = {
+  private def parseJsonValue(value: String, default: JsValue): JsValue = {
     try {
       Json.parse(value)
     } catch {
@@ -347,7 +347,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseDate(value: String, default: LocalDate): LocalDate = {
+  private def parseDate(value: String, default: LocalDate): LocalDate = {
     try {
       ISODateTimeFormat.dateTimeParser.parseLocalDate(value)
     } catch {
@@ -355,7 +355,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def parseDateTime(value: String, default: DateTime): DateTime = {
+  private def parseDateTime(value: String, default: DateTime): DateTime = {
     try {
       ISODateTimeFormat.dateTimeParser.parseDateTime(value)
     } catch {
@@ -363,7 +363,7 @@ case class ExampleJson(
     }
   }
 
-  private[this] def randomString(fieldOpt: Option[Field]): String = {
+  private def randomString(fieldOpt: Option[Field]): String = {
     val seed = {
       fieldOpt
         .map(_.name)
@@ -403,7 +403,7 @@ object Primitives {
     }
   }
 
-  private[this] val byName: Map[String, Primitives] = All.map(x => x.toString.toLowerCase -> x).toMap
+  private val byName: Map[String, Primitives] = All.map(x => x.toString.toLowerCase -> x).toMap
 
   def apply(value: String): Option[Primitives] = byName.get(value.toLowerCase.trim)
 
@@ -417,9 +417,9 @@ object TextDatatype {
   case object Map extends TextDatatype
   case class Singleton(name: String) extends TextDatatype
 
-  private[this] val ListRx = "^\\[(.*)\\]$".r
-  private[this] val MapRx = "^map\\[(.*)\\]$".r
-  private[this] val MapDefaultRx = "^map$".r
+  private val ListRx = "^\\[(.*)\\]$".r
+  private val MapRx = "^map\\[(.*)\\]$".r
+  private val MapDefaultRx = "^map$".r
 
   def parse(value: String): Seq[TextDatatype] = {
     value match {
@@ -437,8 +437,8 @@ import scala.util.Random
 
 object TokenGenerator {
 
-  private[this] val random = new Random(new SecureRandom())
-  private[this] val Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  private val random = new Random(new SecureRandom())
+  private val Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
   def generate(n: Int = 80): String = {
     LazyList.continually(random.nextInt(Alphabet.size)).map(Alphabet).take(n).mkString

@@ -10,7 +10,7 @@ case class CaseClassBuilder(
   argList: Option[String] = None,
   bodyParts: Seq[String] = Nil,
 ) {
-  private[this] val MaxLineLength = 120
+  private val MaxLineLength = 120
 
   def withName(name: String): CaseClassBuilder = {
     this.copy(name = Some(name))
@@ -42,7 +42,7 @@ case class CaseClassBuilder(
     )
   }
 
-  private[this] def buildClassType: String = {
+  private def buildClassType: String = {
     if (argList.isEmpty) {
       "case object"
     } else {
@@ -50,14 +50,14 @@ case class CaseClassBuilder(
     }
   }
 
-  private[this] def buildArgs: String = {
+  private def buildArgs: String = {
     argList match {
       case None => ""
       case Some(a) => s"($a)"
     }
   }
 
-  private[this] def buildDeclaration: String = {
+  private def buildDeclaration: String = {
     val n = name.getOrElse(
       sys.error("Name must be provided")
     )
@@ -69,7 +69,7 @@ case class CaseClassBuilder(
     }
   }
 
-  private[this] def buildDeprecation: Option[String] = {
+  private def buildDeprecation: Option[String] = {
     Some(ScalaUtil.deprecationString(deprecation).trim).filter(_.nonEmpty)
   }
 

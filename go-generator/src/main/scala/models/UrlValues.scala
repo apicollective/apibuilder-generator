@@ -29,7 +29,7 @@ case class UrlValues(
   }
 
   @tailrec
-  private[this] def buildParam(prefix: String, param: Parameter, datatype: Datatype): String = {
+  private def buildParam(prefix: String, param: Parameter, datatype: Datatype): String = {
     val goType = GoType(importBuilder, datatype)
     val varName = s"${prefix}." + GoUtil.publicName(param.name)
 
@@ -99,7 +99,7 @@ case class UrlValues(
     }
   }
 
-  private[this] def build(
+  private def build(
     keyName: String,
     varName: String,
     goType: GoType
@@ -108,7 +108,7 @@ case class UrlValues(
   }
 
   @tailrec
-  private[this] def buildValue(
+  private def buildValue(
     varName: String,
     goType: GoType
   ): String = {
@@ -134,7 +134,7 @@ case class UrlValues(
     }
   }
 
-  private[this] def datatype(typeName: String, required: Boolean): Datatype = {
+  private def datatype(typeName: String, required: Boolean): Datatype = {
     datatypeResolver.parse(typeName, required).getOrElse {
       sys.error(s"Unknown datatype[$typeName]")
     }

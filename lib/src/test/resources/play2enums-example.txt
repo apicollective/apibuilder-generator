@@ -22,7 +22,7 @@ object AgeGroup {
    */
   val all: scala.List[AgeGroup] = scala.List(Twenties, Thirties)
 
-  private[this]
+  private
   val byName: Map[String, AgeGroup] = all.map(x => x.toString.toLowerCase -> x).toMap
 
   def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
@@ -55,7 +55,7 @@ object Genre {
    */
   val all: scala.List[Genre] = scala.List(Classical, Jazz)
 
-  private[this]
+  private
   val byName: Map[String, Genre] = all.map(x => x.toString.toLowerCase -> x).toMap
 
   def apply(value: String): Genre = fromString(value).getOrElse(UNDEFINED(value))

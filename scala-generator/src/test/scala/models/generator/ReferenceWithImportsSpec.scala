@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 
 class ReferenceWithImportsSpec extends AnyFunSpec with Matchers {
 
-  private[this] lazy val ssd: ScalaService = new ScalaService(models.TestHelper.referenceWithImportsApiService)
+  private lazy val ssd: ScalaService = new ScalaService(models.TestHelper.referenceWithImportsApiService)
 
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get

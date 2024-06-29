@@ -20,7 +20,7 @@ object RubyUtil {
 
   val DefaultDiscriminatorName = "__discriminator__"
 
-  private[this] val ReservedWords = Seq(
+  private val ReservedWords = Seq(
     "alias", "and", "begin", "break", "case", "class", "def", "defined?", "do",
     "else", "elsif", "end", "ensure", "false", "for", "if", "module",
     "next, nil, not", "or", "redo, rescue", "retry", "return", "self, super",
@@ -326,7 +326,7 @@ object RubyClientGenerator extends CodeGenerator with Logging {
     lines.mkString("\n")
   }
 
-  private[this] def enumValueString(value: EnumValue): String = {
+  private def enumValueString(value: EnumValue): String = {
     value.value.getOrElse(value.name)
   }
 
@@ -347,13 +347,13 @@ object RubyClientGenerator extends CodeGenerator with Logging {
  * from api.json
  */
 case class RubyClientGenerator(form: InvocationForm) extends Logging {
-  private[this] val service = form.service
+  private val service = form.service
 
-  private[this] val module = RubyUtil.Module(service.namespace)
+  private val module = RubyUtil.Module(service.namespace)
 
-  private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
+  private val datatypeResolver = GeneratorUtil.datatypeResolver(service)
 
-  private[this] val primitiveWrapper = RubyPrimitiveWrapper(service)
+  private val primitiveWrapper = RubyPrimitiveWrapper(service)
 
   private def unionFor(model: Model): Option[Union] = {
     service.unions.filter(u => u.types.map(_.`type`).contains(model.name)).toList match {
@@ -698,7 +698,7 @@ ${headers.rubyModuleConstants.indentString(2)}
   /**
     * Turns id.html => id
     */
-  private[this] def toParameterName(name: String): String = {
+  private def toParameterName(name: String): String = {
     val i = name.indexOf(".")
     if (i > 0) {
       name.substring(0, i)
@@ -707,11 +707,11 @@ ${headers.rubyModuleConstants.indentString(2)}
     }
   }
 
-  private[this] def unionTypeDiscriminatorValue(ut: UnionType): String = {
+  private def unionTypeDiscriminatorValue(ut: UnionType): String = {
     ut.discriminatorValue.getOrElse(ut.`type`)
   }
 
-  private[this] def generateUnionClassToHash(union: Union): String = {
+  private def generateUnionClassToHash(union: Union): String = {
     val discName = discriminatorName(union)
     Seq(
       "def to_hash",
@@ -727,7 +727,7 @@ ${headers.rubyModuleConstants.indentString(2)}
     ).mkString("\n")
   }
 
-  private[this] def generateUnionClassFromJson(union: Union): String = {
+  private def generateUnionClassFromJson(union: Union): String = {
     val className = RubyUtil.toClassName(union.name)
 
     union.discriminator match {
@@ -876,7 +876,7 @@ ${headers.rubyModuleConstants.indentString(2)}
     sb.mkString("\n")
   }
 
-  private[this] def parseArgument(
+  private def parseArgument(
     fieldName: String,
     `type`: String,
     required: Boolean,
@@ -891,7 +891,7 @@ ${headers.rubyModuleConstants.indentString(2)}
   }
 
   // TODO should be encapsulated in the RubyDatatype model
-  private[this] def parseArgument(
+  private def parseArgument(
     name: String,
     rawExpr: String,
     dt: Datatype,
@@ -1072,7 +1072,7 @@ ${headers.rubyModuleConstants.indentString(2)}
       case _: Datatype.UserDefined => s"$varName.to_hash"
     }
   }
-  private[this] def primitiveAsHash(varName: String, p: Datatype.Primitive): String = {
+  private def primitiveAsHash(varName: String, p: Datatype.Primitive): String = {
     p.name match {
       case "decimal" => s"${varName}.to_f.to_s"
       case _ => varName

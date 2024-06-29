@@ -30,7 +30,7 @@ case class ElmTypeAliasBuilder(
     )
   }
 
-  private[this] def singleRequiredProperty: Option[ElmParameter] = {
+  private def singleRequiredProperty: Option[ElmParameter] = {
     properties.toList match {
       case (name, typ) :: Nil => {
         import ElmType._
@@ -100,7 +100,7 @@ case class ElmFunctionBuilder(
     ElmFunction(name, body)
   }
 
-  private[this] def argList(all: Seq[String]): String = {
+  private def argList(all: Seq[String]): String = {
     name + (all.toList match {
       case Nil => ""
       case one :: Nil => s" : $one"
@@ -111,7 +111,7 @@ case class ElmFunctionBuilder(
 
 
 case class ElmFunctions() {
-  private[this] val all = TrieMap[String, Unit]()
+  private val all = TrieMap[String, Unit]()
 
   def add(body: String): Unit = {
     all.put(body.strip, ())

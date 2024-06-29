@@ -9,8 +9,8 @@ import lib.Datatype.{Container, Generated, Primitive, UserDefined}
 import scala.util.{Failure, Success, Try}
 
 case class ElmModel(args: GenArgs) {
-  private[this] val elmJson = ElmJson(args.imports)
-  private[this] val elmType = ElmTypeLookup(args)
+  private val elmJson = ElmJson(args.imports)
+  private val elmType = ElmTypeLookup(args)
 
   def generate(model: Model): ValidatedNec[String, String] = {
     (
@@ -26,7 +26,7 @@ case class ElmModel(args: GenArgs) {
   }
 
   // TODO: Refactor to avoid sys.error
-  private[this] def wrapErrors[T](f: => T): ValidatedNec[String, T] = {
+  private def wrapErrors[T](f: => T): ValidatedNec[String, T] = {
     Try {
       f
     } match {
@@ -35,7 +35,7 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def genTypeAlias(model: Model): String = {
+  private def genTypeAlias(model: Model): String = {
     Seq(
       s"type alias ${Names.pascalCase(model.name)} =",
       "  {",
@@ -46,7 +46,7 @@ case class ElmModel(args: GenArgs) {
     ).mkString("\n")
   }
 
-  private[this] def genEncoderForDatatype(m: Model, f: Field, v: Datatype): String = {
+  private def genEncoderForDatatype(m: Model, f: Field, v: Datatype): String = {
     v match {
       case p: Datatype.Primitive => primitiveEncoder(p)
       case u: UserDefined => {
@@ -78,7 +78,7 @@ case class ElmModel(args: GenArgs) {
   }
 
 
-  private[this] def genEncoder(m: Model): ElmFunction = {
+  private def genEncoder(m: Model): ElmFunction = {
     args.imports.addAs("Json.Encode", "Encode")
     elmJson.encoder(m.name) {
       Seq(
@@ -107,7 +107,7 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def primitiveEncoder(p: Primitive): String = {
+  private def primitiveEncoder(p: Primitive): String = {
     args.imports.addAs("Json.Encode", "Encode")
     import Datatype.Primitive._
     p match {
@@ -132,7 +132,7 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def genDecoder(m: Model): ElmFunction = {
+  private def genDecoder(m: Model): ElmFunction = {
     elmJson.decoder(m.name) {
       Seq(
         s"Decode.succeed ${Names.pascalCase(m.name)}",
@@ -144,7 +144,7 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def pipelineDecoder(f: Field, decoder: String): String = {
+  private def pipelineDecoder(f: Field, decoder: String): String = {
     args.imports.addAs("Json.Decode.Pipeline", "Pipeline")
 
     if (f.required) {
@@ -156,14 +156,14 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def modelFieldDecoder(m: Model, f: Field): String = {
+  private def modelFieldDecoder(m: Model, f: Field): String = {
     args.datatypeResolver.parse(f.`type`) match {
       case Success(v) => genDecoderForDatatype(m, f, v)
       case Failure(ex) => throw ex
     }
   }
 
-  private[this] def genDecoderForDatatype(m: Model, f: Field, v: Datatype): String = {
+  private def genDecoderForDatatype(m: Model, f: Field, v: Datatype): String = {
     v match {
       case p: Datatype.Primitive => primitiveDecoder(p)
       case u: UserDefined => {
@@ -186,11 +186,11 @@ case class ElmModel(args: GenArgs) {
     }
   }
 
-  private[this] def todo(msg: String): Nothing = {
+  private def todo(msg: String): Nothing = {
     sys.error(s"The elm generator does not yet support this type: $msg")
   }
 
-  private[this] def primitiveDecoder(p: Primitive): String = {
+  private def primitiveDecoder(p: Primitive): String = {
     args.imports.addAs("Json.Decode", "Decode")
     import Datatype.Primitive._
     p match {

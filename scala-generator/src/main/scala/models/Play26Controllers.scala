@@ -9,29 +9,29 @@ import scala.generator._
 
 object Play26Controllers extends CodeGenerator {
 
-  private[this] val BodyArgName: String = "body"
+  private val BodyArgName: String = "body"
 
-  private[this] def importJson(`import`: Import): String = {
+  private def importJson(`import`: Import): String = {
     s"import ${Namespaces.quote(`import`.namespace)}.models.json._"
   }
 
-  private[this] def imports(ssd: ScalaService): String = {
+  private def imports(ssd: ScalaService): String = {
     s"""
       import ${ssd.namespaces.json}._
       ${ssd.service.imports.map(importJson).mkString("\n")}
     """
   }
 
-  private[this] def responseEnumName(operation: ScalaOperation) = s"${operation.name.capitalize}"
+  private def responseEnumName(operation: ScalaOperation) = s"${operation.name.capitalize}"
 
-  private[this] def responseObjectCode(response: ScalaResponse): Option[Int] = response.code match {
+  private def responseObjectCode(response: ScalaResponse): Option[Int] = response.code match {
     case ResponseCodeInt(code) => Some(code)
     case _ => None
   }
 
-  private[this] def responseObjectName(response: ScalaResponse): Option[String] = responseObjectCode(response).map(code => s"HTTP$code")
+  private def responseObjectName(response: ScalaResponse): Option[String] = responseObjectCode(response).map(code => s"HTTP$code")
 
-  private[this] def overrideHeaders(responseConfig: ResponseConfig): Option[CaseClassArgument] =  {
+  private def overrideHeaders(responseConfig: ResponseConfig): Option[CaseClassArgument] =  {
     responseConfig match {
       case ResponseConfig.Standard => None
       case ResponseConfig.Envelope => Some(
@@ -46,7 +46,7 @@ object Play26Controllers extends CodeGenerator {
   }
 
 
-  private[this] case class CaseClassArgument(
+  private case class CaseClassArgument(
     name: String,
     `type`: String,
     modifiers: Seq[String] = Nil,
@@ -61,7 +61,7 @@ object Play26Controllers extends CodeGenerator {
     }
   }
 
-  private[this] case class ResponseObjectArgs(
+  private case class ResponseObjectArgs(
     extendsClass: String,
     bodyArg: Option[CaseClassArgument],
     headerArg: Option[CaseClassArgument],
@@ -78,7 +78,7 @@ object Play26Controllers extends CodeGenerator {
     val allArgs: Seq[CaseClassArgument] = bodyArg.toSeq ++ headerArg.toSeq ++ responseArg.toSeq
   }
 
-  private[this] def responseObject(responseObjectArgs: ResponseObjectArgs): String = {
+  private def responseObject(responseObjectArgs: ResponseObjectArgs): String = {
     CaseClassBuilder()
       .withName(responseObjectArgs.responseObjectName)
       .withExtendsClass(responseObjectArgs.extendsClass)
@@ -97,7 +97,7 @@ object Play26Controllers extends CodeGenerator {
       .build
   }
 
-  private[this] def responses(operation: ScalaOperation, responseConfig: ResponseConfig, responseTypes: Seq[ResponseObjectArgs]) = {
+  private def responses(operation: ScalaOperation, responseConfig: ResponseConfig, responseTypes: Seq[ResponseObjectArgs]) = {
     val name = responseEnumName(operation)
     val headersCode = responseConfig match {
       case ResponseConfig.Standard => ""
@@ -116,7 +116,7 @@ object Play26Controllers extends CodeGenerator {
     """
   }
 
-  private[this] def responseToPlay(obj: ResponseObjectArgs): String = {
+  private def responseToPlay(obj: ResponseObjectArgs): String = {
     if (obj.allArgs.isEmpty) {
       s"case ${obj.extendsClass}.${obj.responseObjectName} => Status(${obj.code})(play.api.mvc.Results.EmptyContent())"
     } else {
@@ -140,7 +140,7 @@ object Play26Controllers extends CodeGenerator {
     }
   }
 
-  private[this] def controllerMethod(operation: ScalaOperation, responseConfig: ResponseConfig): String = {
+  private def controllerMethod(operation: ScalaOperation, responseConfig: ResponseConfig): String = {
     val bodyType = operation.body.fold("play.api.mvc.AnyContent")(_.datatype.name)
     val bodyParser = operation.body.fold("")(body => s"(parse.json[${body.datatype.name}])")
 
@@ -207,18 +207,18 @@ object Play26Controllers extends CodeGenerator {
     """
   }
 
-  private[this] def controller(resource: ScalaResource, responseConfig: ResponseConfig) =
+  private def controller(resource: ScalaResource, responseConfig: ResponseConfig) =
     s"""
       trait ${resource.plural}Controller extends play.api.mvc.BaseController {
         ${resource.operations.map { op => controllerMethod(op, responseConfig) }.mkString("\n\n")}
       }
     """
 
-  private[this] def controllers(resources: Seq[ScalaResource], responseConfig: ResponseConfig): String = resources.map { r =>
+  private def controllers(resources: Seq[ScalaResource], responseConfig: ResponseConfig): String = resources.map { r =>
     controller(r, responseConfig)
   }.mkString("\n\n")
 
-  private[this] def fileContents(form: InvocationForm, ssd: ScalaService): String = {
+  private def fileContents(form: InvocationForm, ssd: ScalaService): String = {
     val attributeResponse = Attributes.PlayDefaultConfig.withAttributes(form.attributes).response
     s"""
       ${ApiBuilderComments(form.service.version, form.userAgent).toJavaString}

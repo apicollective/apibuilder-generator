@@ -20,8 +20,8 @@ object NamespaceParser {
     }
   }
 
-  private[this] val TypeIndicators = Seq("enums", "models", "unions")
-  private[this] def isTypeIndicator(value: String): Boolean = TypeIndicators.contains(value)
+  private val TypeIndicators = Seq("enums", "models", "unions")
+  private def isTypeIndicator(value: String): Boolean = TypeIndicators.contains(value)
 
   def parse(name: String): ParsedName = {
     name.split("\\.").filterNot(isVersion).filterNot(isTypeIndicator).toList match {

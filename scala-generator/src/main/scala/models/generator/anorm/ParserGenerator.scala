@@ -91,9 +91,9 @@ trait ParserGenerator extends CodeGenerator {
     }
   }
 
-  private[this] case class Generator(ssd: ScalaService) {
+  private case class Generator(ssd: ScalaService) {
 
-    private[this] val requiredImports = scala.collection.mutable.Set[String]()
+    private val requiredImports = scala.collection.mutable.Set[String]()
     addImports(ssd.namespaces)
 
     def code(): Option[String] = {
@@ -123,7 +123,7 @@ trait ParserGenerator extends CodeGenerator {
       }
     }
 
-    private[this] def generateModel(model: ScalaModel): String = {
+    private def generateModel(model: ScalaModel): String = {
       Seq(
         s"object ${model.name} {",
         generateModelParser(model).indentString(2),
@@ -131,7 +131,7 @@ trait ParserGenerator extends CodeGenerator {
       ).mkString("\n\n")
     }
 
-    private[this] def generateModelParser(model: ScalaModel): String = {
+    private def generateModelParser(model: ScalaModel): String = {
       Seq(
         s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${model.qualifiedName}] = parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))""",
         "",
@@ -160,7 +160,7 @@ trait ParserGenerator extends CodeGenerator {
     }
 
     @scala.annotation.tailrec
-    private[this] def parserFieldDeclaration(name: String, datatype: ScalaDatatype, originalName: String): String = {
+    private def parserFieldDeclaration(name: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
         case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid | _: ScalaPrimitive.Enum | _: ScalaDatatype.List | _: ScalaDatatype.Map) => {
           s"""$name: String = "$originalName""""
@@ -180,7 +180,7 @@ trait ParserGenerator extends CodeGenerator {
       }
     }
 
-    private[this] def addImports(ns: Namespaces): Unit = {
+    private def addImports(ns: Namespaces): Unit = {
       requiredImports += s"import ${ns.anormConversions}.Types._"
       ()
     }
@@ -190,7 +190,7 @@ trait ParserGenerator extends CodeGenerator {
       * datatype that is from an imported application.
       */
     @tailrec
-    private[this] def addImports(datatype: ScalaDatatype): Unit = {
+    private def addImports(datatype: ScalaDatatype): Unit = {
       datatype match {
         case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
           // no-op
@@ -217,7 +217,7 @@ trait ParserGenerator extends CodeGenerator {
       }
     }
 
-    private[this] def generateRowParser(fieldName: String, datatype: ScalaDatatype, originalName: String): String = {
+    private def generateRowParser(fieldName: String, datatype: ScalaDatatype, originalName: String): String = {
       datatype match {
         case _ @ ScalaPrimitive.Boolean => s"SqlParser.bool($fieldName)"
         case f @ ScalaPrimitive.Double => generatePrimitiveRowParser(fieldName, f.asInstanceOf[ScalaPrimitive])
@@ -261,11 +261,11 @@ trait ParserGenerator extends CodeGenerator {
       }
     }
 
-    private[this] def generatePrimitiveRowParser(fieldName: String, datatype: ScalaPrimitive) = {
+    private def generatePrimitiveRowParser(fieldName: String, datatype: ScalaPrimitive) = {
       s"SqlParser.get[${datatype.fullName}]($fieldName)"
     }
 
-    private[this] def generateEnum(`enum`: ScalaEnum): String = {
+    private def generateEnum(`enum`: ScalaEnum): String = {
       Seq(
         s"object ${enum.name} {",
         Seq(
@@ -286,7 +286,7 @@ trait ParserGenerator extends CodeGenerator {
       * Parsers require special quoting of keywords - if the field name
       * is a keyword, we append Instance (back ticks will not compile)
       */
-    private[this] def parserName(field: ScalaField): String = {
+    private def parserName(field: ScalaField): String = {
       Text.initLowerCase(if (ScalaUtil.isKeyword(field.originalName)) {
         Text.snakeToCamelCase(field.originalName) + "Instance"
       } else {
@@ -294,7 +294,7 @@ trait ParserGenerator extends CodeGenerator {
       })
     }
 
-    private[this] def generateUnion(union: ScalaUnion): String = {
+    private def generateUnion(union: ScalaUnion): String = {
       import PrimitiveWrapper._
       Seq(
         s"object ${union.name} {",

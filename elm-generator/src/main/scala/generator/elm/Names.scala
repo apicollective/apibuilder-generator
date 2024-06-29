@@ -4,7 +4,7 @@ import lib.Text
 
 object Names {
 
-  private[this] def withNamespace(imports: Imports, name: String)(f: String => String): String = {
+  private def withNamespace(imports: Imports, name: String)(f: String => String): String = {
     NamespaceParser.parse(name) match {
       case ParsedName.Local(name) => f(name)
       case ParsedName.Imported(namespace, name) => {
@@ -34,7 +34,7 @@ object Names {
   }
 
   // https://github.com/elm/compiler/blob/d07679322ef5d71de1bd2b987ddc660a85599b87/compiler/src/Parse/Primitives/Keyword.hs#L3-L12
-  private[this] val Keywords: Set[String] = Set(
+  private val Keywords: Set[String] = Set(
     "type",
     "alias",
     "port",
