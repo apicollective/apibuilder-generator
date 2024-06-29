@@ -83,7 +83,7 @@ case class ElmTypeLookup(args: GenArgs) {
     }
   }
 
-  private[this] def lookup(t: Datatype): ValidatedNec[String, ElmType] = {
+  private def lookup(t: Datatype): ValidatedNec[String, ElmType] = {
     import ElmType._
 
     t match {

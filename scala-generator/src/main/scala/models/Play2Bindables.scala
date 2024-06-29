@@ -47,7 +47,7 @@ case class Play2Bindables(ssd: ScalaService) {
     }
   }
 
-  private[this] def buildImports(): String = {
+  private def buildImports(): String = {
     Seq(
       "// import models directly for backwards compatibility with prior versions of the generator",
       "import Core._",
@@ -150,7 +150,7 @@ case class Play2Bindables(ssd: ScalaService) {
     ).mkString("\n")
   }
 
-  private[this] def buildEnumConverter(enumName: String): String = {
+  private def buildEnumConverter(enumName: String): String = {
     val fullyQualifiedName = ssd.enumClassName(enumName)
     val example = exampleEnumValue(enumName)
 
@@ -164,7 +164,7 @@ case class Play2Bindables(ssd: ScalaService) {
     ).mkString("\n")
   }
 
-  private[this] def exampleEnumValue(enumName: String): ScalaEnumValue = {
+  private def exampleEnumValue(enumName: String): ScalaEnumValue = {
     val fullyQualifiedName = ssd.enumClassName(enumName)
     val `enum` = ssd.enums.find(_.qualifiedName == fullyQualifiedName).getOrElse {
       sys.error(

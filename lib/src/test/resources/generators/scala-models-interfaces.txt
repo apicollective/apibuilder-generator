@@ -89,7 +89,7 @@ package apibuilder.models {
      */
     val all: scala.List[FuelType] = scala.List(Petrol, Diesel)
 
-    private[this]
+    private
     val byName: Map[String, FuelType] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): FuelType = fromString(value).getOrElse(UNDEFINED(value))

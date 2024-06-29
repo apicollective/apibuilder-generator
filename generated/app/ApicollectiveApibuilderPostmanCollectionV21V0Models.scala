@@ -21,7 +21,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
 
     val all: scala.List[ItemsType] = scala.List(Item, Folder)
 
-    private[this] val byName: Map[String, ItemsType] = all.map(x => x.toString.toLowerCase -> x).toMap
+    private val byName: Map[String, ItemsType] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): ItemsType = fromString(value).getOrElse(UNDEFINED(value))
 
@@ -319,7 +319,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
      */
     val all: scala.List[AuthEnum] = scala.List(Awsv4, Basic, Bearer, Digest, Hawk, Noauth, Oauth1, Oauth2, Ntlm)
 
-    private[this]
+    private
     val byName: Map[String, AuthEnum] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): AuthEnum = fromString(value).getOrElse(UNDEFINED(value))
@@ -355,7 +355,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
      */
     val all: scala.List[BodyMode] = scala.List(Raw, Urlencoded, Formdata, File)
 
-    private[this]
+    private
     val byName: Map[String, BodyMode] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): BodyMode = fromString(value).getOrElse(UNDEFINED(value))
@@ -389,7 +389,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
      */
     val all: scala.List[EventType] = scala.List(Test, Prerequest)
 
-    private[this]
+    private
     val byName: Map[String, EventType] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): EventType = fromString(value).getOrElse(UNDEFINED(value))
@@ -436,7 +436,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
      */
     val all: scala.List[Method] = scala.List(Get, Put, Post, Patch, Delete, Copy, Head, Options, Link, Unlink, Purge, Lock, Unlock, Propfind, View)
 
-    private[this]
+    private
     val byName: Map[String, Method] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): Method = fromString(value).getOrElse(UNDEFINED(value))

@@ -6,8 +6,8 @@ import scala.generator.ScalaService
 import org.scalatest.funspec.AnyFunSpec
 
 class RecursiveJsonSpec extends AnyFunSpec {
-  private[this] val service: ScalaService = ScalaService(models.TestHelper.parseFile("/examples/recursive-types.json"))
-  private[this] val play2Json = Play2Json(service, scala3Support = false)
+  private val service: ScalaService = ScalaService(models.TestHelper.parseFile("/examples/recursive-types.json"))
+  private val play2Json = Play2Json(service, scala3Support = false)
 
   describe("recursive models") {
     it("should have lazy readers") {

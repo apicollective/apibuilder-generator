@@ -5,7 +5,7 @@ case class ScalaEnums(
   `enum`: ScalaEnum
 ) {
 
-  private[this] val unions = ssd.unionsForEnum(enum)
+  private val unions = ssd.unionsForEnum(enum)
 
   def build(): String = {
     import lib.Text._
@@ -22,7 +22,7 @@ case class ScalaEnums(
     ).mkString("\n\n")
   }
   
-  private[this] def buildValues(): String = {
+  private def buildValues(): String = {
     (enum.values.map { value =>
       CaseClassBuilder()
         .withName(value.name)
@@ -64,7 +64,7 @@ case class ScalaEnums(
  */
     """.stripTrailing() + "\n" +
     s"val all: scala.List[${enum.name}] = scala.List(" + enum.values.map(_.name).mkString(", ") + ")\n\n" +
-    s"private[this]\n" +
+    s"private\n" +
     s"val byName: Map[String, ${enum.name}] = all.map(x => x.toString.toLowerCase -> x).toMap\n\n" +
     s"def apply(value: String): ${enum.name} = fromString(value).getOrElse(UNDEFINED(value))\n\n" +
     s"def fromString(value: String): _root_.scala.Option[${enum.name}] = byName.get(value.toLowerCase)\n\n"

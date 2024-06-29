@@ -7,7 +7,7 @@ import io.apibuilder.spec.v0.models.Deprecation
 
 object ScalaUtil {
 
-  private[this] val ReservedWords = Seq(
+  private val ReservedWords = Seq(
     "abstract",
     "as" /* Scala 3 */,
     "case", "catch", "class", "def",

@@ -10,17 +10,17 @@ import scala.collection.mutable
 
 case class Code(form: InvocationForm) {
 
-  private[this] val GoImportMappings = "go_import_mappings"
-  private[this] case class ResponseType(goType: GoType, name: String)
+  private val GoImportMappings = "go_import_mappings"
+  private case class ResponseType(goType: GoType, name: String)
 
-  private[this] val service = form.service
-  private[this] val datatypeResolver = GeneratorUtil.datatypeResolver(service)
-  private[this] val importBuilder = ImportBuilder(form.attributes.find(_.name == GoImportMappings).map(_.value))
-  private[this] val headers = Headers(importBuilder, form)
-  private[this] val urlValues = UrlValues(importBuilder, datatypeResolver)
-  private[this] val responseBuilder = ResponseBuilder(importBuilder, datatypeResolver)
+  private val service = form.service
+  private val datatypeResolver = GeneratorUtil.datatypeResolver(service)
+  private val importBuilder = ImportBuilder(form.attributes.find(_.name == GoImportMappings).map(_.value))
+  private val headers = Headers(importBuilder, form)
+  private val urlValues = UrlValues(importBuilder, datatypeResolver)
+  private val responseBuilder = ResponseBuilder(importBuilder, datatypeResolver)
 
-  private[this] val hasClientBody: Boolean = {
+  private val hasClientBody: Boolean = {
     service.resources.map(_.operations).flatten.find { op =>
       !op.body.isEmpty || !op.parameters.find { _.location == ParameterLocation.Form }.isEmpty
     } match {
@@ -63,7 +63,7 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  private[this] def generateEnum(`enum`: Enum): String = {
+  private def generateEnum(`enum`: Enum): String = {
     val strings = importBuilder.ensureImport("strings")
     val enumName = importBuilder.publicName(enum.name)
 
@@ -111,7 +111,7 @@ case class Code(form: InvocationForm) {
     ).mkString("\n\n")
   }
 
-  private[this] def generateModel(model: Model): String = {
+  private def generateModel(model: Model): String = {
     val io = importBuilder.ensureImport("io")
     val json = importBuilder.ensureImport("encoding/json")
     val bytes = importBuilder.ensureImport("bytes")
@@ -185,7 +185,7 @@ case class Code(form: InvocationForm) {
     ).mkString("\n")
   }
 
-  private[this] def generateUnion(union: Union): String = {
+  private def generateUnion(union: Union): String = {
     // TODO: Make sure there is no other union type is named 'Undefined'
     // TODO: Handle case w/out discriminator
 
@@ -291,28 +291,28 @@ case class Code(form: InvocationForm) {
     ).mkString("\n\n")
   }
 
-  private[this] def datatype(typeName: String, required: Boolean): Datatype = {
+  private def datatype(typeName: String, required: Boolean): Datatype = {
     datatypeResolver.parse(typeName, required).getOrElse {
       sys.error(s"Unknown datatype[$typeName]")
     }
   }
 
-  private[this] def imp(name: String): String = {
+  private def imp(name: String): String = {
     importBuilder.ensureImport(name)
   }
 
-  private[this] case class MethodArgumentsType(
+  private case class MethodArgumentsType(
     name: String,
     params: Seq[Parameter]
   ) {
     assert(!params.isEmpty, "Must have at least one parameter")
   }
 
-  private[this] case class MethodResponsesType(
+  private case class MethodResponsesType(
     name: String
   )
 
-  private[this] def generateResource(resource: Resource): String = {
+  private def generateResource(resource: Resource): String = {
     resource.operations.map { op =>
       val functionName = Seq(
         importBuilder.publicName(resource.plural),
@@ -544,7 +544,7 @@ case class Code(form: InvocationForm) {
     }.mkString("\n\n")
   }
 
-  private[this] def buildBody(varName: String, typ: GoType, responseType: MethodResponsesType): String = {
+  private def buildBody(varName: String, typ: GoType, responseType: MethodResponsesType): String = {
     val json = importBuilder.ensureImport("encoding/json")
 
     val bodyDefaults: Option[String] = typ.datatype match {
@@ -597,7 +597,7 @@ case class Code(form: InvocationForm) {
     ).flatten.mkString("\n")
   }
 
-  private[this] def generateClientStruct(): Option[String] = {
+  private def generateClientStruct(): Option[String] = {
     service.resources match {
       case Nil => {
         None
@@ -634,7 +634,7 @@ type ClientRequestBody struct {
     }
   }
 
-  private[this] def generateFooter(): Option[String] = {
+  private def generateFooter(): Option[String] = {
     service.resources match {
       case Nil => {
         None

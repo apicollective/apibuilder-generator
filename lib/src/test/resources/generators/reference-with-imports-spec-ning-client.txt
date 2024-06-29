@@ -110,7 +110,7 @@ package io.apibuilder.reference.api.v0.models {
      */
     val all: scala.List[AgeGroup] = scala.List(Youth, Adult)
 
-    private[this]
+    private
     val byName: Map[String, AgeGroup] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): AgeGroup = fromString(value).getOrElse(UNDEFINED(value))
@@ -922,7 +922,7 @@ package io.apibuilder.reference.api.v0 {
       if (x < 10) (x + '0') else (x - 10 + 'A')
     }
 
-    private[this] val segmentChars: java.util.BitSet = membershipTable(pchar)
+    private val segmentChars: java.util.BitSet = membershipTable(pchar)
 
     private def pchar: Seq[Char] = {
       val alphaDigit = for ((min, max) <- Seq(('a', 'z'), ('A', 'Z'), ('0', '9')); c <- min to max) yield c

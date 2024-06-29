@@ -5,7 +5,7 @@ import play.api.mvc._
 
 class Healthchecks extends InjectedController {
 
-  private[this] val Result = Json.toJson(Map("status" -> "healthy"))
+  private val Result = Json.toJson(Map("status" -> "healthy"))
 
   def get() = Action {
     Ok(Result)

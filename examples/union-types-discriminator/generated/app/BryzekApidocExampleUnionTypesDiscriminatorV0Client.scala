@@ -59,7 +59,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
      */
     val all = Seq(System, Anonymous)
 
-    private[this]
+    private
     val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): SystemUser = fromString(value).getOrElse(UNDEFINED(value))
@@ -229,7 +229,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
     )
 
     // Enum: SystemUser
-    private[this] val enumSystemUserNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.discriminator.v0.models.SystemUser.all.mkString(", ")}"
+    private val enumSystemUserNotFound = (key: String, e: Exception) => s"Unrecognized $key, should be one of ${io.apibuilder.example.union.types.discriminator.v0.models.SystemUser.all.mkString(", ")}"
 
     implicit val pathBindableEnumSystemUser = new PathBindable.Parsing[io.apibuilder.example.union.types.discriminator.v0.models.SystemUser] (
       SystemUser.fromString(_).get, _.toString, enumSystemUserNotFound
@@ -262,7 +262,7 @@ package io.apibuilder.example.union.types.discriminator.v0 {
   ) extends interfaces.Client {
     import io.apibuilder.example.union.types.discriminator.v0.models.json._
 
-    private[this] val logger = play.api.Logger("io.apibuilder.example.union.types.discriminator.v0.Client")
+    private val logger = play.api.Logger("io.apibuilder.example.union.types.discriminator.v0.Client")
 
     logger.info(s"Initializing io.apibuilder.example.union.types.discriminator.v0.Client for url $baseUrl")
 

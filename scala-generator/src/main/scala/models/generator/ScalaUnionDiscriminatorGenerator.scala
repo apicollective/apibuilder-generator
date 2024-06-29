@@ -5,11 +5,11 @@ import lib.Text._
 case class ScalaUnionDiscriminatorGenerator(
   union: ScalaUnion
 ) {
-  private[this] val discriminator: ScalaUnionDiscriminator = union.discriminatorField.getOrElse {
+  private val discriminator: ScalaUnionDiscriminator = union.discriminatorField.getOrElse {
     sys.error(s"ScalaUnionDiscriminator requires a discriminator - union[${union.name}] does not have one defined")
   }
 
-  private[this] val className = discriminator.field.field.`type`
+  private val className = discriminator.field.field.`type`
 
   def build(): String = {
     Seq(
@@ -36,7 +36,7 @@ case class ScalaUnionDiscriminatorGenerator(
     ).mkString("\n\n")
   }
 
-  private[this] def buildTypes(): String = {
+  private def buildTypes(): String = {
     Seq(
       union.types.map { typ =>
         Seq(
@@ -50,7 +50,7 @@ case class ScalaUnionDiscriminatorGenerator(
       }.mkString("\n"),
       s"final case class UNDEFINED(override val toString: String) extends $className",
       s"val all: scala.List[$className] = scala.List(" + union.types.map(_.name).mkString(", ") + ")",
-      s"private[this] val byName: Map[String, $className] = all.map(x => x.toString.toLowerCase -> x).toMap",
+      s"private val byName: Map[String, $className] = all.map(x => x.toString.toLowerCase -> x).toMap",
       s"def apply(value: String): $className = fromString(value).getOrElse(UNDEFINED(value))",
       s"def fromString(value: String): _root_.scala.Option[$className] = byName.get(value.toLowerCase)"
     ).mkString("\n\n")

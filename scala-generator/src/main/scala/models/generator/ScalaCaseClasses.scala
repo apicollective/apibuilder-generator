@@ -116,7 +116,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     }
   }
 
-  private[this] def fields(ssd: ScalaService, union: ScalaUnion): List[ScalaField] = {
+  private def fields(ssd: ScalaService, union: ScalaUnion): List[ScalaField] = {
     ssd.findAllInterfaceFields(union.union.interfaces)
   }
 

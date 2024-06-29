@@ -151,8 +151,8 @@ case class Play2ClientGeneratorImpl(
   defaultAttributes: Attributes = Attributes.PlayDefaultConfig
 ) {
 
-  private[this] val attributes = defaultAttributes.withAttributes(form.attributes)
-  private[this] val ssd = new ScalaService(form.service, attributes)
+  private val attributes = defaultAttributes.withAttributes(form.attributes)
+  private val ssd = new ScalaService(form.service, attributes)
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     Right(generateCode())
@@ -215,7 +215,7 @@ ${headers.objectConstants.indentString(2)}
 $responseEnvelopeString${PlayScalaClientCommon.clientSignature(version.config).indentString(2)} {
 ${JsonImports(form.service).mkString("\n").indentString(4)}
 
-    private[this] val logger = play.api.Logger("${ssd.namespaces.base}.Client")
+    private val logger = play.api.Logger("${ssd.namespaces.base}.Client")
 
     logger.info(s"Initializing ${ssd.namespaces.base}.Client for url $$baseUrl")
 

@@ -82,7 +82,7 @@ case class Play2JsonCommon(ssd: ScalaService, scala3Support: Boolean) {
     implicitReaderDefStatic(model.name, qualifiedName=  model.qualifiedName, model = Some(model))
   }
 
-  private[this] def implicitReaderDefStatic(name: String, qualifiedName: String, model: Option[ScalaModel]): String = {
+  private def implicitReaderDefStatic(name: String, qualifiedName: String, model: Option[ScalaModel]): String = {
     s"${maybeImplicit(model)}def ${implicitReaderName(name)}: play.api.libs.json.Reads[$qualifiedName]"
   }
 
@@ -93,14 +93,14 @@ case class Play2JsonCommon(ssd: ScalaService, scala3Support: Boolean) {
    * For scala3, we remove implicit readers/writes for models that are part of a union type -
    * they must be read/written with the parent type.
    */
-  private[this] def maybeImplicit(model: Option[ScalaModel]): String = {
+  private def maybeImplicit(model: Option[ScalaModel]): String = {
     model match {
       case Some(m) if scala3Support && partOfUnion(m) => ""
       case _ => "implicit "
     }
   }
 
-  private[this] def partOfUnion(model: ScalaModel): Boolean = {
+  private def partOfUnion(model: ScalaModel): Boolean = {
     ssd.unionsForModel(model).nonEmpty
   }
 
@@ -114,7 +114,7 @@ case class Play2JsonCommon(ssd: ScalaService, scala3Support: Boolean) {
     s"jsonWrites${ssd.name}$name"
   }
 
-  private[this] def implicitWriterDef(name: String, model: Option[ScalaModel])(implicit typeDecl: String = name): String = {
+  private def implicitWriterDef(name: String, model: Option[ScalaModel])(implicit typeDecl: String = name): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     val methodName = implicitWriterName(name)
     s"${maybeImplicit(model)}def $methodName: play.api.libs.json.Writes[$typeDecl]"
@@ -126,7 +126,7 @@ case class Play2Json(
   ssd: ScalaService, scala3Support: Boolean
 ) {
 
-  private[this] val play2JsonCommon = Play2JsonCommon(ssd, scala3Support = scala3Support)
+  private val play2JsonCommon = Play2JsonCommon(ssd, scala3Support = scala3Support)
 
   def generateModelsAndUnions(): String = {
     Seq(
@@ -219,7 +219,7 @@ case class Play2Json(
       ).mkString("\n\n").trim
   }
 
-  private[this] def readersWithoutDiscriminator(union: ScalaUnion): String = {
+  private def readersWithoutDiscriminator(union: ScalaUnion): String = {
     Seq(
       s"${play2JsonCommon.implicitUnionReader(union)} = {",
       s"  (",
@@ -233,7 +233,7 @@ case class Play2Json(
     ).mkString("\n")
   }
 
-  private[this] def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+  private def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
     val scala3Cast = if (scala3Support) {
       ".map(_.asInstanceOf[T])"
     } else {
@@ -360,10 +360,10 @@ case class Play2Json(
     ).mkString("\n")
   }
 
-  private[this] def findModelByName(name: String): Option[ScalaModel] =
+  private def findModelByName(name: String): Option[ScalaModel] =
     ssd.models.find(_.qualifiedName == name)
 
-  private[this] def findUnionByName(name: String): Option[ScalaUnion] =
+  private def findUnionByName(name: String): Option[ScalaUnion] =
     ssd.unions.find(_.qualifiedName == name)
 
   private[models] def fieldReaders(model: ScalaModel): String = {
@@ -472,13 +472,13 @@ case class Play2Json(
     ).mkString("\n\n")
   }
 
-  private[this] def getDiscriminator(model: ScalaModel): Option[Discriminator] =
+  private def getDiscriminator(model: ScalaModel): Option[Discriminator] =
     getDiscriminator("Model", model.qualifiedName, ssd.unionAndTypesForModel(model))
 
-  private[this] def getDiscriminator(`enum`: ScalaEnum): Option[Discriminator] =
+  private def getDiscriminator(`enum`: ScalaEnum): Option[Discriminator] =
     getDiscriminator("Enum", enum.qualifiedName, ssd.unionsAndTypesForEnum(enum))
 
-  private[this] def getDiscriminator(
+  private def getDiscriminator(
     name: String,
     modelType: String,
     unionAndTypes: Seq[(ScalaUnion, ScalaUnionType)]
@@ -495,15 +495,15 @@ case class Play2Json(
       discriminatorNameValues.headOption.flatMap { case (name, v) => name.map(Discriminator(_, v)) }
   }
 
-  private[this] def nilToOption[T](values: Seq[T]): Option[Seq[T]] = {
+  private def nilToOption[T](values: Seq[T]): Option[Seq[T]] = {
     values match {
       case Nil => None
       case _ => Some(values)
     }
   }
 
-  private[this] case class UnionTypeWithName(unionType: ScalaUnionType, typeName: String)
-  private[this] def unionTypesWithNames(union: ScalaUnion): Seq[UnionTypeWithName] = {
+  private case class UnionTypeWithName(unionType: ScalaUnionType, typeName: String)
+  private def unionTypesWithNames(union: ScalaUnion): Seq[UnionTypeWithName] = {
     union.types.flatMap { t =>
       def single(name: String) = Seq(UnionTypeWithName(t, name))
       t.datatype match {
@@ -522,7 +522,7 @@ case class Play2Json(
     }.distinct
   }
 
-  private[this] def isOption(datatype: ScalaDatatype): Boolean = {
+  private def isOption(datatype: ScalaDatatype): Boolean = {
     datatype match {
       case ScalaDatatype.Option(_) => true
       case _ => false
@@ -532,7 +532,7 @@ case class Play2Json(
   /**
    * Returns a JSON Object containing only this value
    */
-  private[this] def getJsonObject(originalName: String, datatype: ScalaDatatype, varName: String): JsObjectResult = {
+  private def getJsonObject(originalName: String, datatype: ScalaDatatype, varName: String): JsObjectResult = {
     datatype match {
       case ScalaPrimitive.Enum(_, _) => {
         toJsObjectResult(originalName, s"play.api.libs.json.JsString($varName.toString)")
@@ -579,25 +579,25 @@ case class Play2Json(
     }
   }
 
-  private[this] case class JsObjectResult(obj: String, value: String)
+  private case class JsObjectResult(obj: String, value: String)
 
-  private[this] def toJsObjectResult(name: String, value: String): JsObjectResult = {
+  private def toJsObjectResult(name: String, value: String): JsObjectResult = {
     JsObjectResult(
       createJsonObject(name, value),
       value
     )
   }
 
-  private[this] def createJsonObject(discriminator: Discriminator): String =
+  private def createJsonObject(discriminator: Discriminator): String =
     createJsonObject(discriminator.name, s""""${discriminator.value}"""")
 
-  private[this] def createJsonObject(name: String, value: String): String =
+  private def createJsonObject(name: String, value: String): String =
     s"""play.api.libs.json.Json.obj("$name" -> $value)"""
 
   /**
    * Assumes all primitives are wrapped in primitive wrappers
    */
-  private[this] def getJsonValueForUnion(
+  private def getJsonValueForUnion(
     datatype: ScalaDatatype,
     varName: String,
     discriminator: Option[Discriminator] = None
@@ -644,7 +644,7 @@ case class Play2Json(
     }
   }
 
-  private[this] def wrapInObject(
+  private def wrapInObject(
     value: String,
     discriminator: Option[Discriminator]
   ): String = {
@@ -658,6 +658,6 @@ case class Play2Json(
     }
   }
 
-  private[this] case class Discriminator(name: String, value: String)
+  private case class Discriminator(name: String, value: String)
 
 }

@@ -35,7 +35,7 @@ case class CSharpGenerator() {
     }
   }
 
-  private[this] def generateNamespace(service: Service, contents: String): String = {
+  private def generateNamespace(service: Service, contents: String): String = {
     Seq(
       s"namespace ${namespace(service)} {",
       contents.trim.indent(2),
@@ -47,7 +47,7 @@ case class CSharpGenerator() {
     service.models.map(generateModel).mkString("\n")
   }
 
-  private[this] def generateModel(model: Model): String = {
+  private def generateModel(model: Model): String = {
     model.fields.foldLeft(
       RecordBuilder().withName(Names.pascalCase(model.name))
     ) { case (b, f) =>
@@ -61,7 +61,7 @@ case class CSharpGenerator() {
     }.build
   }
 
-  private[this] def csharpType(typ: String): String = {
+  private def csharpType(typ: String): String = {
     typ match {
       case "boolean" => "bool"
       case "date-iso8601" => "string"
@@ -81,7 +81,7 @@ case class CSharpGenerator() {
   /**
    * returns true if the value is 'v0', 'v1', etc indicating a version number
    */
-  private[this] def isVersion(value: String): Boolean = {
+  private def isVersion(value: String): Boolean = {
     if (value.startsWith("v")) {
       value.drop(1).toLongOption.isDefined
     } else {
@@ -89,7 +89,7 @@ case class CSharpGenerator() {
     }
   }
 
-  private[this] def namespace(service: Service): String = {
+  private def namespace(service: Service): String = {
     val parts = service.namespace.split("\\.").filterNot(isVersion) ++ Seq(service.name).toList
     Names.pascalCase(parts.distinct.mkString("_"))
   }

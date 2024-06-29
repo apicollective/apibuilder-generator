@@ -107,7 +107,7 @@ object TestHelper extends Matchers {
     * need this to easily overwrite the resource when updating our
     * generated code.
     */
-  private[this] def resolvePath(filename: String): String = {
+  private def resolvePath(filename: String): String = {
     import sys.process._
 
     val targetPath = Option(getClass.getResource(filename)).map(r => new JFile(r.getPath)).getOrElse {
@@ -157,7 +157,7 @@ object TestHelper extends Matchers {
    *   touch /tmp/apibuilder.generator.overwritetests.tmp
    *   sbt test
    */
-  private[this] val OverwriteTestsFile = Paths.get("/tmp/apibuilder.generator.overwritetests.tmp")
+  private val OverwriteTestsFile = Paths.get("/tmp/apibuilder.generator.overwritetests.tmp")
 
   def assertEqualsFile(filename: String, contents: String): Unit = {
     val actualPath = resolvePath(filename)

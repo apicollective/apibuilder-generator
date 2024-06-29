@@ -7,7 +7,7 @@ import play.api.libs.json._
 
 object Users extends Controller {
 
-  private[this] val users: Seq[User] = Seq(
+  private val users: Seq[User] = Seq(
     RegisteredUser("usr-1", "registered@test.apidoc.me"),
     GuestUser("usr-2"),
     UserString("usr-3"),

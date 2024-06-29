@@ -64,7 +64,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     ssd.enums.flatMap(enumDecodersAndEncoders).mkString("\n\n")
   }
 
-  private[this] def enumDecodersAndEncoders(`enum`: ScalaEnum): Option[String] = {
+  private def enumDecodersAndEncoders(`enum`: ScalaEnum): Option[String] = {
     enum.values.headOption.map { _ =>
       Seq(
         s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
@@ -87,7 +87,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     }
   }
 
-  private[this] def decodersWithoutDiscriminator(union: ScalaUnion): String = {
+  private def decodersWithoutDiscriminator(union: ScalaUnion): String = {
 
     Seq(
       s"${implicitDecoderDef(union.name)} = Decoder.instance { c =>",
@@ -99,7 +99,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     ).mkString("\n")
   }
 
-  private[this] def decodersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
+  private def decodersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
     val typesWithNames = unionTypesWithNames(union)
     val defaultClause = typesWithNames.filter(_._1.isDefault).headOption match {
       case Some((_, typeName)) => s"""c.as[$typeName]"""
@@ -150,14 +150,14 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     ).mkString("\n")
   }
 
-  private[this] def decodersAndEncoders(model: ScalaModel): Option[String] = {
+  private def decodersAndEncoders(model: ScalaModel): Option[String] = {
     Seq(decoders(model), encoders(model)).flatten.toList match {
       case Nil => None
       case all => Some(all.mkString("\n\n"))
     }
   }
 
-  private[this] def decoders(model: ScalaModel): Option[String] = {
+  private def decoders(model: ScalaModel): Option[String] = {
     // backticks don't work correctly as enumerator names in for comprehensions
     def nobt(fieldName:String) = fieldName.replaceAll("`", "__")
     model.fields.headOption.map { _ =>
@@ -196,7 +196,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     }
   }
 
-  private[this] def encoders(model: ScalaModel): Option[String] = {
+  private def encoders(model: ScalaModel): Option[String] = {
     if (model.fields.isEmpty) {
       None
     } else {
@@ -218,7 +218,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     }
   }
 
-  private[this] def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
+  private def unionTypesWithNames(union: ScalaUnion): Seq[(ScalaUnionType, String)] = {
     union.types.map { t =>
       (t,
         t.datatype match {
@@ -232,12 +232,12 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     }
   }
 
-  private[this] def implicitDecoderDef(name: String): String = {
+  private def implicitDecoderDef(name: String): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     s"implicit def decode${ssd.name}$name: Decoder[$name]"
   }
 
-  private[this] def implicitEncoderDef(name: String): String = {
+  private def implicitEncoderDef(name: String): String = {
     assert(name.indexOf(".") < 0, s"Invalid name[$name]")
     s"implicit def encode${ssd.name}$name: Encoder[$name]"
   }

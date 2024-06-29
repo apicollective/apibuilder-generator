@@ -24,7 +24,7 @@ case class GoType(
     declaration(value, datatype)
   }
 
-  private[this] def declaration(value: String, datatype: Datatype): String = {
+  private def declaration(value: String, datatype: Datatype): String = {
     datatype match {
       case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
         value
@@ -74,7 +74,7 @@ case class GoType(
     isUnit(datatype)
   }
 
-  private[this] def isUnit(datatype: Datatype): Boolean = {
+  private def isUnit(datatype: Datatype): Boolean = {
     datatype match {
       case Datatype.Primitive.Unit => true
       case Datatype.Container.Option(inner) => isUnit(inner)
@@ -90,7 +90,7 @@ case class GoType(
     classVariableName(datatype)
   }
 
-  private[this] def classVariableName(datatype: Datatype): String = {
+  private def classVariableName(datatype: Datatype): String = {
     datatype match {
       case _: Datatype.Primitive => "value"
       case Datatype.Generated.Model(name) => importBuilder.privateName(name)
@@ -118,7 +118,7 @@ case class GoType(
     toString(varName, datatype)
   }
 
-  private[this] def toString(varName: String, dt: Datatype): String = {
+  private def toString(varName: String, dt: Datatype): String = {
     dt match {
       case Datatype.Primitive.Boolean => {
         varName
@@ -162,7 +162,7 @@ case class GoType(
   }
 
   @tailrec
-  private[this] def compareToImplicitValue(varName: String, dt: Datatype, operator: String): String = {
+  private def compareToImplicitValue(varName: String, dt: Datatype, operator: String): String = {
     dt match {
       case Datatype.Primitive.Double | Datatype.Primitive.Integer | Datatype.Primitive.Long => {
         s"0 $operator $varName"
@@ -194,7 +194,7 @@ object GoType {
     )
   }
 
-  private[this] def klass(importBuilder: ImportBuilder, dt: Datatype): Klass = {
+  private def klass(importBuilder: ImportBuilder, dt: Datatype): Klass = {
     dt match {
       case Datatype.Primitive.Boolean => Klass("string")
       case Datatype.Primitive.Double => Klass("float64")

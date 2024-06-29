@@ -90,7 +90,7 @@ package io.postman.generator.attributes.v0.models {
      */
     val all: scala.List[AttributeName] = scala.List(PostmanBasicAuth, ObjectReference, ValueSubstitute)
 
-    private[this]
+    private
     val byName: Map[String, AttributeName] = all.map(x => x.toString.toLowerCase -> x).toMap
 
     def apply(value: String): AttributeName = fromString(value).getOrElse(UNDEFINED(value))

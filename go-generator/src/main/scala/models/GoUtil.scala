@@ -9,7 +9,7 @@ object GoUtil {
   // See
   //   https://golang.org/ref/spec#Keywords
   //   https://golang.org/ref/spec#Predeclared_identifiers
-  private[this] val ReservedWords = Set(
+  private val ReservedWords = Set(
     "break", "default", "func", "interface", "select", "case", "defer", "go",
     "map", "struct", "chan", "else", "goto", "package", "switch", "const", "fallthrough",
     "if", "range", "type", "continue", "for", "import", "return", "var",

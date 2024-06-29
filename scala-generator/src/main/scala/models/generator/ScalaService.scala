@@ -21,7 +21,7 @@ class ScalaService(
 
   val namespaces: Namespaces = Namespaces(service.namespace)
 
-  private[this] val scalaTypeResolver = ScalaTypeResolver(namespaces)
+  private val scalaTypeResolver = ScalaTypeResolver(namespaces)
 
   val datatypeResolver: DatatypeResolver = GeneratorUtil.datatypeResolver(service)
 
@@ -32,7 +32,7 @@ class ScalaService(
   def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
   val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }.sortBy(_.name)
-  private[this] val interfacesByName = interfaces.groupBy(_.interface.name)
+  private val interfacesByName = interfaces.groupBy(_.interface.name)
 
   val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
@@ -45,7 +45,7 @@ class ScalaService(
   /**
    * @param interfaceNames The API Builder names of the interfaces
    */
-  private[this] def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
+  private def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
     interfaceNames.distinct.map { i =>
       interfacesByName.getOrElse(i, Nil).toList match {
         case Nil => sys.error(s"Cannot find interface named: $i")
@@ -163,7 +163,7 @@ case class ScalaUnionDiscriminator(
   unionName: String,
   defaultType: Option[ScalaUnionType],
 ) {
-  private[this] val typeName: String = unionName + underscoreToInitCap(discriminator)
+  private val typeName: String = unionName + underscoreToInitCap(discriminator)
   lazy val field: ScalaField = ScalaField(
       ssd,
       modelName = unionName,
@@ -543,7 +543,7 @@ object ScalaField {
    * The global default is developer friendly. Wire friendly behavior can be introduced to any field by adding an
    * attribute to the field's spec, <pre>"attributes": [{"name": "scala_generator", "value": {"model_hint": "optional"}}]</pre>
    */
-  private[this] def shouldModelConcreteType(field: Field): Boolean = {
+  private def shouldModelConcreteType(field: Field): Boolean = {
     val wireFriendly = field.attributes.exists(a =>
       a.name == "scala_generator" &&
         a.value.fields.exists(

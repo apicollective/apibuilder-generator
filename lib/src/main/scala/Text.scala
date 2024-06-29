@@ -27,7 +27,7 @@ object Text {
     alphaNumericError ++ startsWithLetterError
   }
 
-  private[this] val AlphaNumericRx = "^[a-zA-Z0-9-_.\\.]*$".r
+  private val AlphaNumericRx = "^[a-zA-Z0-9-_.\\.]*$".r
 
   def isAlphaNumeric(value: String): Boolean = {
     value match {
@@ -36,7 +36,7 @@ object Text {
     }
   }
 
-  private[this] val StartsWithLetterRx = "^[a-zA-Z].*".r
+  private val StartsWithLetterRx = "^[a-zA-Z].*".r
 
   def startsWithLetter(value: String): Boolean = {
     val result = value match {
@@ -46,7 +46,7 @@ object Text {
     result
   }
 
-  private[this] val Ellipsis = "..."
+  private val Ellipsis = "..."
 
   /**
     * if value is longer than maxLength characters, it wil be truncated
@@ -84,7 +84,7 @@ object Text {
     }
   }
 
-  private[this] val Plurals = Map(
+  private val Plurals = Map(
     "metadatum" -> "metadata",
     "datum" -> "data",
     "person" -> "people",
@@ -126,7 +126,7 @@ object Text {
     }
   }
 
-  private[this] val RemoveUnsafeCharacters = """([^0-9a-zA-Z\-\_])""".r
+  private val RemoveUnsafeCharacters = """([^0-9a-zA-Z\-\_])""".r
   def safeName(name: String): String = {
     RemoveUnsafeCharacters.replaceAllIn(name, _ => "").replaceAll("\\.", "_").replaceAll("\\_+", "_").trim
   }
@@ -139,7 +139,7 @@ object Text {
     initCap(splitIntoWords(value).flatMap(_.split("-")))
   }
 
-  private[this] val WordDelimiterRx = "_|\\-|\\.|:|/| ".r
+  private val WordDelimiterRx = "_|\\-|\\.|:|/| ".r
 
   def splitIntoWords(value: String): Seq[String] = {
     WordDelimiterRx.split(lib.Text.camelCaseToUnderscore(value)).toSeq.map(_.trim).filter(!_.isEmpty)
@@ -169,12 +169,12 @@ object Text {
   /**
     * Returns the word with first character in lower case
     */
-  private[this] val InitLowerCaseRx = """^([A-Z])""".r
+  private val InitLowerCaseRx = """^([A-Z])""".r
   def initLowerCase(word: String): String = {
     InitLowerCaseRx.replaceAllIn(word, m => s"${m.toString.toLowerCase}")
   }
 
-  private[this] val Capitals = """([A-Z])""".r
+  private val Capitals = """([A-Z])""".r
   def camelCaseToUnderscore(phrase: String): String = {
     if (phrase == phrase.toUpperCase) {
       phrase.toLowerCase

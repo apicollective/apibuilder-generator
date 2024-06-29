@@ -3,8 +3,8 @@ package generator.elm
 import io.apibuilder.spec.v0.models.{Enum, EnumValue}
 
 case class ElmEnum(args: GenArgs) {
-  private[this] val elmJson = ElmJson(args.imports)
-  private[this] val Unknown = "unknown"
+  private val elmJson = ElmJson(args.imports)
+  private val Unknown = "unknown"
 
   // "type MemberStatus = MemberStatusPending | MemberStatusActive | MemberStatusInactive | MemberStatusUnknown"
   def generate(e: Enum): String = {
@@ -18,17 +18,17 @@ case class ElmEnum(args: GenArgs) {
     ).mkString("\n\n")
   }
 
-  private[this] def values(e: Enum): Seq[String] = {
+  private def values(e: Enum): Seq[String] = {
     (e.values.map(_.name) ++ Seq(Unknown)).map { name =>
       valueElmName(e, name)
     }
   }
 
-  private[this] def valueElmName(e: Enum, value: EnumValue): String = {
+  private def valueElmName(e: Enum, value: EnumValue): String = {
     valueElmName(e, value.name)
   }
 
-  private[this] def valueElmName(e: Enum, value: String): String = {
+  private def valueElmName(e: Enum, value: String): String = {
     Names.pascalCase(e.name + "_" + value)
   }
 
@@ -49,7 +49,7 @@ case class ElmEnum(args: GenArgs) {
           MemberStatusUnknown ->
               "unknown"
    */
-  private[this] def genToString(e: Enum): ElmFunction = {
+  private def genToString(e: Enum): ElmFunction = {
     def singleValue(name: String, value: String) = {
       Seq(
         s"${Names.maybeQuote(name)} ->",
@@ -82,7 +82,7 @@ case class ElmEnum(args: GenArgs) {
   * getAllValuesForNewsletterKey =
   *  [ NewsletterKeyGeneral, NewsletterKeyBilling ]
    */
-  private[this] def genAll(e: Enum): ElmFunction = {
+  private def genAll(e: Enum): ElmFunction = {
     val n = s"getAll${Names.pascalCase(e.plural)}"
 
     val code = Seq(
@@ -105,7 +105,7 @@ case class ElmEnum(args: GenArgs) {
       else
           MemberStatusUnknown
    */
-  private[this] def genFromString(e: Enum): ElmFunction = {
+  private def genFromString(e: Enum): ElmFunction = {
     def singleValue(isFirst: Boolean, name: String, value: String) = {
       val prefix = if (isFirst) { "" } else { "else " }
       Seq(
@@ -138,7 +138,7 @@ case class ElmEnum(args: GenArgs) {
   memberStatusEncoder type_ =
       Encode.string (memberStatusToString type_)
    */
-  private[this] def genEncoder(e: Enum): ElmFunction = {
+  private def genEncoder(e: Enum): ElmFunction = {
     elmJson.encoder(e.name) {
       s"Encode.string (${Names.camelCase(e.name)}ToString instance)"
     }
@@ -149,7 +149,7 @@ case class ElmEnum(args: GenArgs) {
   memberStatusDecoder =
       Decode.map memberStatusFromString string
    */
-  private[this] def genDecoder(e: Enum): ElmFunction = {
+  private def genDecoder(e: Enum): ElmFunction = {
     elmJson.decoder(e.name) {
       s"Decode.map ${Names.camelCase(e.name)}FromString Decode.string"
     }

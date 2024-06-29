@@ -20,7 +20,7 @@ object ScalaGeneratorUtil {
     }
   }
 
-  private[this] def internalScaladoc(description: Option[String], params: Seq[(String, Option[String])]): Option[String] = {
+  private def internalScaladoc(description: Option[String], params: Seq[(String, Option[String])]): Option[String] = {
     val modelDesc = description.map(_.trim).filter(_.nonEmpty)
 
     val prefix = s"@param "

@@ -36,11 +36,11 @@ object ImportBuilder {
   */
 private[models] case class ImportBuilder(importMappings: Option[String]) {
 
-  private[this] val mappings = ImportBuilder.parseMappings(importMappings)
+  private val mappings = ImportBuilder.parseMappings(importMappings)
 
   // Build a list of go imports as we use them so we only import
   // libraries we actually use
-  private[this] val importPaths = mutable.ListBuffer[ImportPath]()
+  private val importPaths = mutable.ListBuffer[ImportPath]()
 
   /**
     * Ensures that this library is being imported, returning the alias
@@ -91,7 +91,7 @@ private[models] case class ImportBuilder(importMappings: Option[String]) {
     GoUtil.privateName(publicName(name))
   }
 
-  private[this] def uniqueAlias(path: ImportPath, index: Int = 0): String = {
+  private def uniqueAlias(path: ImportPath, index: Int = 0): String = {
     val target = index match {
       case 0 => path.alias
       case 1 => {

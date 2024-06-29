@@ -38,7 +38,7 @@ object UnionTypeUndefinedModel {
   }
 
   @tailrec
-  private[this] def buildDescriptionField(interfaceFieldNames: Set[String], count: Int = 0): Field = {
+  private def buildDescriptionField(interfaceFieldNames: Set[String], count: Int = 0): Field = {
     val finalName = count match {
       case 0 => "description"
       case 1 => "typeDescription"

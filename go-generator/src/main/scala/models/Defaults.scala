@@ -52,7 +52,7 @@ object Defaults {
     }
   }
 
-  private[this] def toBigDecimal(json: JsValue): BigDecimal = {
+  private def toBigDecimal(json: JsValue): BigDecimal = {
     json match {
       case v: JsString => {
         if (v.value.matches("0+")) {
@@ -66,7 +66,7 @@ object Defaults {
     }
   }
 
-  private[this] def wrapInQuotes(value: String): String = {
+  private def wrapInQuotes(value: String): String = {
     val inQuotesAlready = "\".*\"".r
     value match {
       case inQuotesAlready() => value

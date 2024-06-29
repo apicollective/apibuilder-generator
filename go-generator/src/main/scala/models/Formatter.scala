@@ -2,7 +2,7 @@ package go.models
 
 object Formatter {
 
-  private[this] val LeadingWhitespace = """^(\s+)(.*)$""".r
+  private val LeadingWhitespace = """^(\s+)(.*)$""".r
 
   implicit class Indentable(s: String) {
 
@@ -33,7 +33,7 @@ object Formatter {
       formatTable(table.toSeq)
     }
 
-    private[this] def splitLine(line: String): Seq[String] = {
+    private def splitLine(line: String): Seq[String] = {
       line.split("\\=").toList match {
         case Nil => Nil
         case one :: Nil => one.split("\\s+").toSeq
@@ -51,11 +51,11 @@ object Formatter {
       }.mkString("\n")
     }
 
-    private[this] def isComment(value: String): Boolean = {
+    private def isComment(value: String): Boolean = {
       value.trim.startsWith("//")
     }
 
-    private[this] def formatTable(table: Seq[Seq[String]]): String = {
+    private def formatTable(table: Seq[Seq[String]]): String = {
       table match {
         case Nil => {
           ""

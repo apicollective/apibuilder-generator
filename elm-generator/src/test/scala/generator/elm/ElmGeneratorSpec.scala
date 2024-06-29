@@ -11,7 +11,7 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
   with TestHelpers
 {
 
-  private[this] def makeInvocationForm(service: Service = makeService()): InvocationForm = {
+  private def makeInvocationForm(service: Service = makeService()): InvocationForm = {
     InvocationForm(
       service = service,
       attributes = Nil,
@@ -20,7 +20,7 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
     )
   }
 
-  private[this] def setupValid(service: Service): Seq[File] = {
+  private def setupValid(service: Service): Seq[File] = {
     rightOrErrors {
       ElmGenerator.invoke(
         makeInvocationForm(service = service)
@@ -28,7 +28,7 @@ class ElmGeneratorSpec extends AnyFunSpec with Matchers
     }
   }
 
-  private[this] def genModels(service: Service): String = {
+  private def genModels(service: Service): String = {
     expectValid {
       ElmGenerator().generateModels(GenArgs(service))
     }

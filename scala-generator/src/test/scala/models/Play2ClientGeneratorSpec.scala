@@ -11,7 +11,7 @@ import org.scalatest.matchers.should.Matchers
 
 class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
 
-  private[this] val clientMethodConfig: ScalaClientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", Attributes.PlayDefaultConfig, None)
+  private val clientMethodConfig: ScalaClientMethodConfig = ScalaClientMethodConfigs.Play24("test.apidoc", Attributes.PlayDefaultConfig, None)
 
   it("errorTypeClass") {
     val service = models.TestHelper.generatorApiService

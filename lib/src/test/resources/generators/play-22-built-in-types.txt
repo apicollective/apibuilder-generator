@@ -426,7 +426,7 @@ package apibuilder {
   ) extends interfaces.Client {
     import apibuilder.models.json._
 
-    private[this] val logger = play.api.Logger("apibuilder.Client")
+    private val logger = play.api.Logger("apibuilder.Client")
 
     logger.info(s"Initializing apibuilder.Client for url $baseUrl")
 
