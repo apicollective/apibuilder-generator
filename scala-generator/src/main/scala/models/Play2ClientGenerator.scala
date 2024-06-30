@@ -7,6 +7,10 @@ import lib.generator.CodeGenerator
 
 import scala.generator._
 
+case class ScalaVersion(major: Int) {
+  val splat: String = if (major >= 3) { "*" } else { ": _*" }
+}
+
 case class PlayFrameworkVersion(
                                  name: String,
                                  config: ScalaClientMethodConfig,
@@ -16,7 +20,7 @@ case class PlayFrameworkVersion(
                                  useSpecificAddMethods: Boolean,
                                  scala3Support: Boolean
 ) {
-  val splat: String = if (scala3Support) { "*" } else { ": _*" }
+  val scalaVersion: ScalaVersion = ScalaVersion(if (scala3Support) { 3 } else { 2 })
 }
 
 trait Play2CodeGenerator extends CodeGenerator {
@@ -189,7 +193,7 @@ case class Play2ClientGeneratorImpl(
     }
 
     val patchMethod = if (version.supportsHttpPatch) {
-      s"""_logRequest("PATCH", _requestHolder(path).$addHeadersMethod(requestHeaders${version.splat}).$addQueryStringMethod(queryParameters${version.splat})).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
+      s"""_logRequest("PATCH", _requestHolder(path).$addHeadersMethod(requestHeaders${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat})).patch(body.getOrElse(play.api.libs.json.Json.obj()))"""
     } else {
       s"""sys.error("PATCH method is not supported in Play Framework Version ${version.name}")"""
     }
@@ -197,8 +201,8 @@ case class Play2ClientGeneratorImpl(
     val headers = Headers(form)
 
     val headerString = headers.scala.
-      map { case (name, value) => s""""$name" -> ${value}""" }.
-      mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders${version.splat})"
+      map { case (name, value) => s""""$name" -> $value""" }.
+      mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders${version.scalaVersion.splat})"
     val responseEnvelopeString = version.config.responseEnvelopeClassName match {
       case None => ""
       case Some(name) => PlayScalaClientCommon.responseEnvelopeTrait(name).indentString() + "\n\n"
@@ -262,28 +266,28 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
     ): scala.concurrent.Future[${version.config.responseClass}] = {$scala3Imports
       method.toUpperCase match {
         case "GET" => {
-          _logRequest("GET", _requestHolder(path).$addHeadersMethod(requestHeaders${version.splat}).$addQueryStringMethod(queryParameters${version.splat})).get()
+          _logRequest("GET", _requestHolder(path).$addHeadersMethod(requestHeaders${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat})).get()
         }
         case "POST" => {
-          _logRequest("POST", _requestHolder(path).$addHeadersMethod(_withJsonContentType(requestHeaders)${version.splat}).$addQueryStringMethod(queryParameters${version.splat})).post(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("POST", _requestHolder(path).$addHeadersMethod(_withJsonContentType(requestHeaders)${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat})).post(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PUT" => {
-          _logRequest("PUT", _requestHolder(path).$addHeadersMethod(_withJsonContentType(requestHeaders)${version.splat}).$addQueryStringMethod(queryParameters${version.splat})).put(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("PUT", _requestHolder(path).$addHeadersMethod(_withJsonContentType(requestHeaders)${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat})).put(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PATCH" => {
           $patchMethod
         }
         case "DELETE" => {
-          _logRequest("DELETE", _requestHolder(path).$addHeadersMethod(requestHeaders${version.splat}).$addQueryStringMethod(queryParameters${version.splat})).delete()
+          _logRequest("DELETE", _requestHolder(path).$addHeadersMethod(requestHeaders${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat})).delete()
         }
          case "HEAD" => {
-          _logRequest("HEAD", _requestHolder(path).$addHeadersMethod(requestHeaders${version.splat}).$addQueryStringMethod(queryParameters${version.splat})).head()
+          _logRequest("HEAD", _requestHolder(path).$addHeadersMethod(requestHeaders${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat})).head()
         }
          case "OPTIONS" => {
-          _logRequest("OPTIONS", _requestHolder(path).$addHeadersMethod(requestHeaders${version.splat}).$addQueryStringMethod(queryParameters${version.splat})).options()
+          _logRequest("OPTIONS", _requestHolder(path).$addHeadersMethod(requestHeaders${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat})).options()
         }
         case _ => {
-          _logRequest(method, _requestHolder(path).$addHeadersMethod(requestHeaders${version.splat}).$addQueryStringMethod(queryParameters${version.splat}))
+          _logRequest(method, _requestHolder(path).$addHeadersMethod(requestHeaders${version.scalaVersion.splat}).$addQueryStringMethod(queryParameters${version.scalaVersion.splat}))
           sys.error("Unsupported method[%s]".format(method))
         }
       }

@@ -270,6 +270,16 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
+        key = "play_2_9_scala_3_controllers",
+        name = "Play 2.9 Scala 3 controllers",
+        description = Some("""Generate Play Controllers for the resources with scala 3 support."""),
+        language = Some("Scala")
+      ),
+      status = lib.generator.Status.Production,
+      codeGenerator = Some(scala.models.Play29Scala3Controllers)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
         key = "scala_models",
         name = "Scala models",
         description = Some("Generate scala models from the API description."),
