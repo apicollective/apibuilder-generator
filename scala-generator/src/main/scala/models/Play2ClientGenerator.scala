@@ -201,7 +201,7 @@ case class Play2ClientGeneratorImpl(
     val headers = Headers(form)
 
     val headerString = headers.scala.
-      map { case (name, value) => s""""$name" -> ${value}""" }.
+      map { case (name, value) => s""""$name" -> $value""" }.
       mkString(s".$addHeadersMethod(\n        ", ",\n        ", "") + s"\n      ).$addHeadersMethod(defaultHeaders${version.scalaVersion.splat})"
     val responseEnvelopeString = version.config.responseEnvelopeClassName match {
       case None => ""
