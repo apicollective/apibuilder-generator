@@ -7,7 +7,11 @@ import lib.generator.CodeGenerator
 
 import scala.generator._
 
-object Play26Controllers extends CodeGenerator {
+
+object Play26Controllers extends PlayControllers(scalaVersion = ScalaVersion(3))
+object Play29Scala3Controllers extends PlayControllers(scalaVersion = ScalaVersion(3))
+
+abstract class PlayControllers(scalaVersion: ScalaVersion) extends CodeGenerator {
 
   private val BodyArgName: String = "body"
 
@@ -125,7 +129,7 @@ object Play26Controllers extends CodeGenerator {
         if (obj.headerArg.isEmpty) {
           base
         } else {
-          s"$base.withHeaders(r.headers: _*)"
+          s"$base.withHeaders(r.headers${scalaVersion.splat})"
         }
       }
 
