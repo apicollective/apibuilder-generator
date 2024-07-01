@@ -214,12 +214,6 @@ case class Play2ClientGeneratorImpl(
       ""
     }
 
-    val defaultAuthMatch = if (version.scala3Support) {
-      ""
-    } else {
-      """\n        case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")""".stripMargin
-    }
-
     s"""package ${ssd.namespaces.base} {
 
 ${headers.objectConstants.indentString(2)}
@@ -241,7 +235,7 @@ ${if (version.config.expectsInjectedWsClient) "" else "      import play.api.Pla
       auth.fold(holder) {
         case Authorization.Basic(username, password) => {
           holder.withAuth(username, password.getOrElse(""), ${version.authSchemeClass}.BASIC)
-        }$defaultAuthMatch
+        }
       }
     }
 
