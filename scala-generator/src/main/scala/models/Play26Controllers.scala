@@ -8,7 +8,7 @@ import lib.generator.CodeGenerator
 import scala.generator._
 
 
-object Play26Controllers extends PlayControllers(scalaVersion = ScalaVersion(3))
+object Play26Controllers extends PlayControllers(scalaVersion = ScalaVersion(2))
 object Play29Scala3Controllers extends PlayControllers(scalaVersion = ScalaVersion(3))
 
 abstract class PlayControllers(scalaVersion: ScalaVersion) extends CodeGenerator {
