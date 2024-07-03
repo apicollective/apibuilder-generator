@@ -291,7 +291,6 @@ case class Play2Json(
         Seq(
           "discriminator match {",
           unionTypesWithNames(union).map { t =>
-            // OLD: Pre scala3: s"""case "${t.unionType.discriminatorName}" => js.validate[${t.typeName}]"""
             s"""case "${t.unionType.discriminatorName}" => ${play2JsonCommon.implicitReaderNameQualified(ssd.namespaces, t.unionType.name)}.reads(js)"""
           }.mkString("\n").indentString(2),
           s"""case other => play.api.libs.json.JsSuccess(${union.undefinedType.datatype.fullName}(other))""".indentString(2),
