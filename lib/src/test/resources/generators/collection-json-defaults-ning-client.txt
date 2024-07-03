@@ -71,7 +71,7 @@ package com.gilt.test.v0.models {
 
     implicit def jsonWritesTestUser: play.api.libs.json.Writes[User] = {
       (obj: com.gilt.test.v0.models.User) => {
-        jsObjectUser(obj)
+        com.gilt.test.v0.models.json.jsObjectUser(obj)
       }
     }
 
@@ -95,7 +95,7 @@ package com.gilt.test.v0.models {
 
     implicit def jsonWritesTestUserPatch: play.api.libs.json.Writes[UserPatch] = {
       (obj: com.gilt.test.v0.models.UserPatch) => {
-        jsObjectUserPatch(obj)
+        com.gilt.test.v0.models.json.jsObjectUserPatch(obj)
       }
     }
   }

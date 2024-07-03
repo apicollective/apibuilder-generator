@@ -26,7 +26,7 @@ def jsObjectAgeGroup(obj: test.apidoc.apidoctest.v0.models.AgeGroup) = {
 
 implicit def jsonWritesAPIBuilderTestAgeGroup: play.api.libs.json.Writes[AgeGroup] = {
   (obj: test.apidoc.apidoctest.v0.models.AgeGroup) => {
-    jsonWritesAPIBuilderTestAgeGroup(obj)
+    test.apidoc.apidoctest.v0.models.json.jsonWritesAPIBuilderTestAgeGroup(obj)
   }
 }
 
@@ -58,6 +58,6 @@ def jsObjectGenre(obj: test.apidoc.apidoctest.v0.models.Genre) = {
 
 implicit def jsonWritesAPIBuilderTestGenre: play.api.libs.json.Writes[Genre] = {
   (obj: test.apidoc.apidoctest.v0.models.Genre) => {
-    jsonWritesAPIBuilderTestGenre(obj)
+    test.apidoc.apidoctest.v0.models.json.jsonWritesAPIBuilderTestGenre(obj)
   }
 }

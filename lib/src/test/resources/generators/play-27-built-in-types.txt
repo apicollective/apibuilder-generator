@@ -127,7 +127,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesArray: play.api.libs.json.Writes[Array] = {
       (obj: apibuilder.models.Array) => {
-        jsObjectArray(obj)
+        apibuilder.models.json.jsObjectArray(obj)
       }
     }
 
@@ -196,7 +196,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesOptarray: play.api.libs.json.Writes[Optarray] = {
       (obj: apibuilder.models.Optarray) => {
-        jsObjectOptarray(obj)
+        apibuilder.models.json.jsObjectOptarray(obj)
       }
     }
 
@@ -265,7 +265,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesOptional: play.api.libs.json.Writes[Optional] = {
       (obj: apibuilder.models.Optional) => {
-        jsObjectOptional(obj)
+        apibuilder.models.json.jsObjectOptional(obj)
       }
     }
 
@@ -303,7 +303,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesRequired: play.api.libs.json.Writes[Required] = {
       (obj: apibuilder.models.Required) => {
-        jsObjectRequired(obj)
+        apibuilder.models.json.jsObjectRequired(obj)
       }
     }
   }
