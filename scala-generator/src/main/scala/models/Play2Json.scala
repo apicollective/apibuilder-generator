@@ -238,8 +238,7 @@ case class Play2Json(
       readersWithoutDiscriminatorScala2(union)
     }
   }
-  private def readersWithoutDiscriminatorScala2(union: ScalaUnion): String = {
-  }
+
   private def readersWithoutDiscriminatorScala3(union: ScalaUnion): String = {
     union.types.toList match {
       case Nil => {
@@ -258,6 +257,20 @@ case class Play2Json(
            |""".stripMargin
       }
     }
+  }
+
+  private def readersWithoutDiscriminatorScala2(union: ScalaUnion): String = {
+    Seq(
+      s"${play2JsonCommon.implicitUnionReader(union)} = {",
+      s"  (",
+      union.types.map { scalaUnionType =>
+        s"""(__ \\ "${scalaUnionType.discriminatorName}").read(${readerUnqualified(union, scalaUnionType)}).asInstanceOf[play.api.libs.json.Reads[${union.name}]]"""
+      }.mkString("\norElse\n").indentString(4),
+      s"    orElse",
+      s"    play.api.libs.json.Reads(jsValue => play.api.libs.json.JsSuccess(${union.undefinedType.model.name}(jsValue.toString))).asInstanceOf[play.api.libs.json.Reads[${union.name}]]",
+      s"  )",
+      s"}"
+    ).mkString("\n")
   }
 
   private def readersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
