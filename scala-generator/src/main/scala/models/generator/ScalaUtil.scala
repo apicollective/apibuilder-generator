@@ -62,7 +62,7 @@ object ScalaUtil {
     (interfaces ++ unions).toList.filterNot(_ == className).distinct.sorted
   }
 
-  def trimTrailingWhitespace(text: String): String = {
+  private def trimTrailingWhitespace(text: String): String = {
     text.reverse.dropWhile(_ == ' ').reverse
   }
 
@@ -128,7 +128,6 @@ object ScalaUtil {
       case ScalaDatatype.Option(inner) => s"Some(${inner.default(value)})"
       case _ => datatype.default(value)
     }
-
   } catch {
     case e: Exception => {
       throw new RuntimeException(s"parsing default `$value` for datatype $datatype", e)
