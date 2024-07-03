@@ -232,20 +232,31 @@ case class Play2Json(
   }
 
   private def readersWithoutDiscriminator(union: ScalaUnion): String = {
-    if (union.types.isEmpty) {
-      s"${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => play.api.libs.json.JsError(\"Union has no declared types\")"
+    if (scala3Support) {
+      readersWithoutDiscriminatorScala3(union)
     } else {
-      val types = union.types.map { scalaUnionType =>
-        s"${readerUnqualified(union, scalaUnionType)}.reads(json).map(_.asInstanceOf[T])"
-      }.mkString("Seq(\n        ", ",\n        ", "\n      )")
-      s"""
-         |${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => {
-         |      val all: Seq[play.api.libs.json.JsResult[T]] = $types
-         |      all.view.find(_.isSuccess).getOrElse {
-         |        all.head
-         |      }
-         |    }
-         |""".stripMargin
+      readersWithoutDiscriminatorScala2(union)
+    }
+  }
+  private def readersWithoutDiscriminatorScala2(union: ScalaUnion): String = {
+  }
+  private def readersWithoutDiscriminatorScala3(union: ScalaUnion): String = {
+    union.types.toList match {
+      case Nil => {
+        s"${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => play.api.libs.json.JsError(\"Union has no declared types\")"
+      }
+      case first :: rest => {
+        val types = (Seq("default") ++ rest.map { scalaUnionType =>
+          s"${readerUnqualified(union, scalaUnionType)}.reads(json).map(_.asInstanceOf[T])"
+        }).mkString("Seq(\n    ", ",\n    ", "\n  )")
+        s"""
+           |${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => {
+           |  val default = ${readerUnqualified(union, first)}.reads(json).map(_.asInstanceOf[T])
+           |  val all: Seq[play.api.libs.json.JsResult[T]] = $types
+           |  all.view.find(_.isSuccess).getOrElse(default)
+           |}
+           |""".stripMargin
+      }
     }
   }
 
