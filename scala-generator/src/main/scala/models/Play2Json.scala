@@ -237,12 +237,10 @@ case class Play2Json(
     } else {
       val types = union.types.map { scalaUnionType =>
         s"${readerUnqualified(union, scalaUnionType)}.reads(json).map(_.asInstanceOf[T])"
-      }.mkString(",\n").indent(2)
+      }.mkString("Seq(\n        ", ",\n        ", "\n      )")
       s"""
          |${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => {
-         |      val all: Seq[play.api.libs.json.JsResult[T]] = Seq(
-         |        $types
-         |      )
+         |      val all: Seq[play.api.libs.json.JsResult[T]] = $types
          |      all.view.find(_.isSuccess).getOrElse {
          |        all.head
          |      }
