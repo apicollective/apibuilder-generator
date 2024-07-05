@@ -87,36 +87,40 @@ package %s {
   private def standard(
     types: Seq[ScalaPrimitive],
   ): String = {
+    val jsObject = if (scalaVersion.major >= 3) {
+      Nil
+    } else {
+      Seq(s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }")
+    }
     (
       Seq(
-        Seq(
-          s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }",
+        jsObject ++ Seq(
           s"implicit val columnToJsValue: Column[play.api.libs.json.JsValue] = Util.parser { _.as[play.api.libs.json.JsValue] }"
         )
       ) ++ types.map { t =>
-        Seq(
-          s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }"
-        ) ++ mapConversion(t)
+        if (scalaVersion.major >= 3) {
+          Nil
+        } else {
+          Seq(
+            s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }",
+            s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }"
+          )
+        }
       }
     ).flatten.mkString("\n")
-  }
-
-  private[this] def mapConversion(t: ScalaPrimitive): Seq[String] = {
-    if (scalaVersion.major >= 3) {
-      // scala 3 results in an error - only support implicit Seq
-      // [error]    |Ambiguous given instances: both
-      //   value columnToMapApibuilderSpecApidoc in object Types and
-      //   value columnToSeqApibuilderSpecHeader
-      // in object Types match type anorm.Column[String] of parameter c of method str in object SqlParser
-      Nil
-    } else {
-      Seq(s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }")
-    }
   }
 
   private case class Name(shortName: String, qualifiedName: String)
 
   private def buildCollectionConversions(ssd: ScalaService): Option[String] = {
+    if (scalaVersion.major >= 3) {
+      None
+    } else {
+      buildCollectionConversionsScala2(ssd)
+    }
+  }
+
+  private def buildCollectionConversionsScala2(ssd: ScalaService): Option[String] = {
     (
       ssd.enums.map(e => Name(e.name, e.qualifiedName)) ++
         ssd.models.map(m => Name(m.name, m.qualifiedName)) ++

@@ -75,7 +75,18 @@ object Generators {
         attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
-      codeGenerator = Some(scala.generator.anorm.ParserGenerator28)
+      codeGenerator = Some(scala.generator.anorm.ParserGenerator28Scala2)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "anorm_2_8_scala_3_parsers",
+        name = "Anorm 2.8 Scala 3 parsers",
+        description = Some("Generates anorm parsers. Depends on apidoc_0_x_libs generators. See https://playframework.github.io/anorm/"),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(scala.generator.anorm.ParserGenerator28Scala3)
     ),
     CodeGenTarget(
       metaData = Generator(
