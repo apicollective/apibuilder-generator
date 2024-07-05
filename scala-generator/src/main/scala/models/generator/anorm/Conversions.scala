@@ -4,8 +4,9 @@ import scala.annotation.nowarn
 import lib.Text._
 
 import scala.generator.{ScalaPrimitive, ScalaService}
+import scala.models.ScalaVersion
 
-object Conversions {
+case class Conversions(scalaVersion: ScalaVersion) {
 
   private val JavaPrimitiveTypes = Seq(
     ScalaPrimitive.Boolean,
@@ -94,11 +95,23 @@ package %s {
         )
       ) ++ types.map { t =>
         Seq(
-          s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }",
-          s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }"
-        )
+          s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }"
+        ) ++ mapConversion(t)
       }
     ).flatten.mkString("\n")
+  }
+
+  private[this] def mapConversion(t: ScalaPrimitive): Seq[String] = {
+    if (scalaVersion.major >= 3) {
+      // scala 3 results in an error - only support implicit Seq
+      // [error]    |Ambiguous given instances: both
+      //   value columnToMapApibuilderSpecApidoc in object Types and
+      //   value columnToSeqApibuilderSpecHeader
+      // in object Types match type anorm.Column[String] of parameter c of method str in object SqlParser
+      Nil
+    } else {
+      Seq(s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }")
+    }
   }
 
   private case class Name(shortName: String, qualifiedName: String)
