@@ -21,36 +21,49 @@ object ParserGenerator24 extends ParserGenerator {
   )
 }
 
-object ParserGenerator26 extends ParserGenerator {
-  override val version: ScalaVersion = ScalaVersion(2)
+object ParserGenerator26 extends AbstractParserGenerator26(ScalaVersion(2))
+
+class AbstractParserGenerator26(override val version: ScalaVersion) extends ParserGenerator {
   override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes = {
-    val dateImports = ssd.attributes.dateType match {
-      case DateTypeConfig.JodaLocalDate => Seq(
-        "play.api.libs.json.JodaReads._",
-      )
-      case _ => Nil
-    }
-    val dateTimeImports = ssd.attributes.dateTimeType match {
-      case DateTimeTypeConfig.JodaDateTime => Seq(
-        "play.api.libs.json.JodaReads._",
-      )
-      case _ => Nil
-    }
     ParserGeneratorPlayVersionSpecificAttributes(
-      imports = Seq(
-        "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
-        "play.api.libs.json.{JsArray, JsObject, JsValue}",
-        "scala.util.{Failure, Success, Try}",
-      ) ++ (dateImports ++ dateTimeImports).distinct
+      baseImports ++ jodaImports(ssd)
     )
+  }
+
+  private[this] val baseImports: Seq[String] = {
+    Seq(
+      "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
+      "play.api.libs.json.{JsArray, JsObject, JsValue}",
+      "scala.util.{Failure, Success, Try}",
+    )
+  }
+
+  private[this] def jodaImports(ssd: ScalaService): Seq[String] = {
+    if (version.major >= 3) {
+      Nil
+    } else {
+      val dateImports = ssd.attributes.dateType match {
+        case DateTypeConfig.JodaLocalDate => Seq(
+          "play.api.libs.json.JodaReads._",
+        )
+        case _ => Nil
+      }
+      val dateTimeImports = ssd.attributes.dateTimeType match {
+        case DateTimeTypeConfig.JodaDateTime => Seq(
+          "play.api.libs.json.JodaReads._",
+        )
+        case _ => Nil
+      }
+      (dateImports ++ dateTimeImports).distinct
+    }
   }
 }
 
 object ParserGenerator28Scala2 extends AbstractParserGenerator(ScalaVersion(2))
-object ParserGenerator28Scala3 extends AbstractParserGenerator(ScalaVersion(3))
+object ParserGenerator29Scala3 extends AbstractParserGenerator(ScalaVersion(3))
 abstract class AbstractParserGenerator(override val version: ScalaVersion) extends ParserGenerator {
   override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes =
-    ParserGenerator26.attributes(ssd)
+    new AbstractParserGenerator26(version).attributes(ssd)
 }
 
 case class ParserGeneratorPlayVersionSpecificAttributes(imports: Seq[String])

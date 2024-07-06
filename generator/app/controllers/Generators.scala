@@ -79,14 +79,14 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
-        key = "anorm_2_8_scala_3_parsers",
-        name = "Anorm 2.8 Scala 3 parsers",
-        description = Some("Generates anorm parsers. Depends on apidoc_0_x_libs generators. See https://playframework.github.io/anorm/"),
+        key = "anorm_2_9_scala_3_parsers",
+        name = "Anorm 2.9 Scala 3 parsers",
+        description = Some("Generates anorm parsers. See https://playframework.github.io/anorm/"),
         language = Some("Scala"),
         attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Alpha,
-      codeGenerator = Some(scala.generator.anorm.ParserGenerator28Scala3)
+      codeGenerator = Some(scala.generator.anorm.ParserGenerator29Scala3)
     ),
     CodeGenTarget(
       metaData = Generator(
