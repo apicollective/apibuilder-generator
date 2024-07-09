@@ -5,16 +5,18 @@ import org.scalatest.matchers.should.Matchers
 
 class ScalaFormatterSpec extends AnyFunSpec with Matchers {
 
-  private[this] def format(code: String) = {
-    ScalaFormatter.format(code)
-  }
-
   it("ScalaFormatter should format valid scala code") {
-    format("case class Foo(bar: String)") should be(Symbol("right"))
+    val contents = "case class Foo(bar: String)"
+    val result = ScalaFormatter.format(contents)
+
+    result should be(Symbol("right"))
   }
 
   it("ScalaFormatter should fail to format invalid scala code") {
-    format("Foo Bar {") should be(Symbol("left"))
+    val contents = "Foo Bar"
+    val result = ScalaFormatter.format(contents)
+
+    result should be(Symbol("left"))
   }
 
 }

@@ -80,8 +80,8 @@ object KotlinTestHelper extends Matchers {
 
   def assertKotlinCodeCompiles(kotlinSourceDirectory: java.io.File): Unit = {
     assert(kotlinSourceDirectory.exists())
-    assert(kotlinSourceDirectory.canRead)
-    assert(kotlinSourceDirectory.isDirectory)
+    assert(kotlinSourceDirectory.canRead())
+    assert(kotlinSourceDirectory.isDirectory())
     val result = new KotlinCompiler().compileSourceDir(kotlinSourceDirectory.toPath)
     result.isSuccess shouldBe true
     ()
