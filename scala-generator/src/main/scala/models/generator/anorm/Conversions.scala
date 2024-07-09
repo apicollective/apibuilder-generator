@@ -4,8 +4,9 @@ import scala.annotation.nowarn
 import lib.Text._
 
 import scala.generator.{ScalaPrimitive, ScalaService}
+import scala.models.ScalaVersion
 
-object Conversions {
+case class Conversions(scalaVersion: ScalaVersion) {
 
   private val JavaPrimitiveTypes = Seq(
     ScalaPrimitive.Boolean,
@@ -86,17 +87,25 @@ package %s {
   private def standard(
     types: Seq[ScalaPrimitive],
   ): String = {
+    val jsObject = if (scalaVersion.major >= 3) {
+      Nil
+    } else {
+      Seq(s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }")
+    }
     (
       Seq(
-        Seq(
-          s"implicit val columnToJsObject: Column[play.api.libs.json.JsObject] = Util.parser { _.as[play.api.libs.json.JsObject] }",
+        jsObject ++ Seq(
           s"implicit val columnToJsValue: Column[play.api.libs.json.JsValue] = Util.parser { _.as[play.api.libs.json.JsValue] }"
         )
       ) ++ types.map { t =>
-        Seq(
-          s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }",
-          s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }"
-        )
+        if (scalaVersion.major >= 3) {
+          Nil
+        } else {
+          Seq(
+            s"implicit val columnToSeq${t.shortName}: Column[Seq[${t.fullName}]] = Util.parser { _.as[Seq[${t.fullName}]] }",
+            s"implicit val columnToMap${t.shortName}: Column[Map[String, ${t.fullName}]] = Util.parser { _.as[Map[String, ${t.fullName}]] }"
+          )
+        }
       }
     ).flatten.mkString("\n")
   }
@@ -104,6 +113,14 @@ package %s {
   private case class Name(shortName: String, qualifiedName: String)
 
   private def buildCollectionConversions(ssd: ScalaService): Option[String] = {
+    if (scalaVersion.major >= 3) {
+      None
+    } else {
+      buildCollectionConversionsScala2(ssd)
+    }
+  }
+
+  private def buildCollectionConversionsScala2(ssd: ScalaService): Option[String] = {
     (
       ssd.enums.map(e => Name(e.name, e.qualifiedName)) ++
         ssd.models.map(m => Name(m.name, m.qualifiedName)) ++
