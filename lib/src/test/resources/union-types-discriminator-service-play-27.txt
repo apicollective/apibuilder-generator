@@ -177,7 +177,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorSystemUser: play.api.libs.json.Writes[SystemUser] = {
       (obj: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser) => {
-        jsObjectSystemUser(obj)
+        io.apibuilder.example.union.types.discriminator.v0.models.json.jsObjectSystemUser(obj)
       }
     }
 
@@ -199,7 +199,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorGuestUser: play.api.libs.json.Writes[GuestUser] = {
       (obj: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser) => {
-        jsObjectGuestUser(obj)
+        io.apibuilder.example.union.types.discriminator.v0.models.json.jsObjectGuestUser(obj)
       }
     }
 
@@ -219,7 +219,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorRegisteredUser: play.api.libs.json.Writes[RegisteredUser] = {
       (obj: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser) => {
-        jsObjectRegisteredUser(obj)
+        io.apibuilder.example.union.types.discriminator.v0.models.json.jsObjectRegisteredUser(obj)
       }
     }
 
@@ -230,10 +230,10 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     implicit def jsonReadsApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Reads[io.apibuilder.example.union.types.discriminator.v0.models.User] = (js: play.api.libs.json.JsValue) => {
       def readDiscriminator(discriminator: String) = {
         discriminator match {
-          case "registered_user" => jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser.reads(js)
-          case "guest_user" => jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser.reads(js)
-          case "system_user" => jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser.reads(js)
-          case "string" => jsonReadsApidocExampleUnionTypesDiscriminatorString.reads(js)
+          case "registered_user" => io.apibuilder.example.union.types.discriminator.v0.models.json.jsonReadsApidocExampleUnionTypesDiscriminatorRegisteredUser.reads(js)
+          case "guest_user" => io.apibuilder.example.union.types.discriminator.v0.models.json.jsonReadsApidocExampleUnionTypesDiscriminatorGuestUser.reads(js)
+          case "system_user" => io.apibuilder.example.union.types.discriminator.v0.models.json.jsonReadsApidocExampleUnionTypesDiscriminatorSystemUser.reads(js)
+          case "string" => io.apibuilder.example.union.types.discriminator.v0.models.json.jsonReadsApidocExampleUnionTypesDiscriminatorString.reads(js)
           case other => play.api.libs.json.JsSuccess(io.apibuilder.example.union.types.discriminator.v0.models.UserUndefinedType(other))
         }
       }
@@ -245,9 +245,9 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
 
     def jsObjectUser(obj: io.apibuilder.example.union.types.discriminator.v0.models.User): play.api.libs.json.JsObject = {
       obj match {
-        case x: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser => jsObjectRegisteredUser(x)
-        case x: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser => jsObjectGuestUser(x)
-        case x: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser => jsObjectSystemUser(x)
+        case x: io.apibuilder.example.union.types.discriminator.v0.models.RegisteredUser => io.apibuilder.example.union.types.discriminator.v0.models.json.jsObjectRegisteredUser(x)
+        case x: io.apibuilder.example.union.types.discriminator.v0.models.GuestUser => io.apibuilder.example.union.types.discriminator.v0.models.json.jsObjectGuestUser(x)
+        case x: io.apibuilder.example.union.types.discriminator.v0.models.SystemUser => io.apibuilder.example.union.types.discriminator.v0.models.json.jsObjectSystemUser(x)
         case x: io.apibuilder.example.union.types.discriminator.v0.models.UserString => play.api.libs.json.Json.obj("discriminator" -> "string", "value" -> play.api.libs.json.JsString(x.value))
         case other => {
           sys.error(s"The type[${other.getClass.getName}] has no JSON writer")
@@ -256,7 +256,7 @@ package io.apibuilder.example.union.types.discriminator.v0.models {
     }
     implicit def jsonWritesApidocExampleUnionTypesDiscriminatorUser: play.api.libs.json.Writes[User] = {
       (obj: io.apibuilder.example.union.types.discriminator.v0.models.User) => {
-        jsObjectUser(obj)
+        io.apibuilder.example.union.types.discriminator.v0.models.json.jsObjectUser(obj)
       }
     }
   }
@@ -440,12 +440,11 @@ package io.apibuilder.example.union.types.discriminator.v0 {
         "User-Agent" -> Constants.UserAgent,
         "X-Apidoc-Version" -> Constants.Version,
         "X-Apidoc-Version-Major" -> Constants.VersionMajor.toString
-      ).addHttpHeaders(defaultHeaders : _*)
+      ).addHttpHeaders(defaultHeaders: _*)
       auth.fold(holder) {
         case Authorization.Basic(username, password) => {
           holder.withAuth(username, password.getOrElse(""), play.api.libs.ws.WSAuthScheme.BASIC)
         }
-        case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
     }
 
@@ -470,28 +469,28 @@ package io.apibuilder.example.union.types.discriminator.v0 {
     ): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
       method.toUpperCase match {
         case "GET" => {
-          _logRequest("GET", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).get()
+          _logRequest("GET", _requestHolder(path).addHttpHeaders(requestHeaders: _*).addQueryStringParameters(queryParameters: _*)).get()
         }
         case "POST" => {
-          _logRequest("POST", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("POST", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders): _*).addQueryStringParameters(queryParameters: _*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PUT" => {
-          _logRequest("PUT", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders):_*).addQueryStringParameters(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("PUT", _requestHolder(path).addHttpHeaders(_withJsonContentType(requestHeaders): _*).addQueryStringParameters(queryParameters: _*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PATCH" => {
-          _logRequest("PATCH", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("PATCH", _requestHolder(path).addHttpHeaders(requestHeaders: _*).addQueryStringParameters(queryParameters: _*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "DELETE" => {
-          _logRequest("DELETE", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).delete()
+          _logRequest("DELETE", _requestHolder(path).addHttpHeaders(requestHeaders: _*).addQueryStringParameters(queryParameters: _*)).delete()
         }
          case "HEAD" => {
-          _logRequest("HEAD", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).head()
+          _logRequest("HEAD", _requestHolder(path).addHttpHeaders(requestHeaders: _*).addQueryStringParameters(queryParameters: _*)).head()
         }
          case "OPTIONS" => {
-          _logRequest("OPTIONS", _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*)).options()
+          _logRequest("OPTIONS", _requestHolder(path).addHttpHeaders(requestHeaders: _*).addQueryStringParameters(queryParameters: _*)).options()
         }
         case _ => {
-          _logRequest(method, _requestHolder(path).addHttpHeaders(requestHeaders:_*).addQueryStringParameters(queryParameters:_*))
+          _logRequest(method, _requestHolder(path).addHttpHeaders(requestHeaders: _*).addQueryStringParameters(queryParameters: _*))
           sys.error("Unsupported method[%s]".format(method))
         }
       }

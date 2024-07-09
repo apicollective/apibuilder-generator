@@ -12,6 +12,6 @@ def jsObjectPlan(obj: com.gilt.quality.v0.models.Plan): play.api.libs.json.JsObj
 
 implicit def jsonWritesQualityPlan: play.api.libs.json.Writes[Plan] = {
   (obj: com.gilt.quality.v0.models.Plan) => {
-    jsObjectPlan(obj)
+    com.gilt.quality.v0.models.json.jsObjectPlan(obj)
   }
 }

@@ -127,7 +127,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesArray: play.api.libs.json.Writes[Array] = {
       (obj: apibuilder.models.Array) => {
-        jsObjectArray(obj)
+        apibuilder.models.json.jsObjectArray(obj)
       }
     }
 
@@ -196,7 +196,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesOptarray: play.api.libs.json.Writes[Optarray] = {
       (obj: apibuilder.models.Optarray) => {
-        jsObjectOptarray(obj)
+        apibuilder.models.json.jsObjectOptarray(obj)
       }
     }
 
@@ -265,7 +265,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesOptional: play.api.libs.json.Writes[Optional] = {
       (obj: apibuilder.models.Optional) => {
-        jsObjectOptional(obj)
+        apibuilder.models.json.jsObjectOptional(obj)
       }
     }
 
@@ -303,7 +303,7 @@ package apibuilder.models {
 
     implicit def jsonWritesBuiltInTypesRequired: play.api.libs.json.Writes[Required] = {
       (obj: apibuilder.models.Required) => {
-        jsObjectRequired(obj)
+        apibuilder.models.json.jsObjectRequired(obj)
       }
     }
   }
@@ -489,12 +489,11 @@ package apibuilder {
         "User-Agent" -> Constants.UserAgent,
         "X-Apidoc-Version" -> Constants.Version,
         "X-Apidoc-Version-Major" -> Constants.VersionMajor.toString
-      ).withHeaders(defaultHeaders : _*)
+      ).withHeaders(defaultHeaders: _*)
       auth.fold(holder) {
         case Authorization.Basic(username, password) => {
           holder.withAuth(username, password.getOrElse(""), play.api.libs.ws.WSAuthScheme.BASIC)
         }
-        case a => sys.error("Invalid authorization scheme[" + a.getClass + "]")
       }
     }
 
@@ -519,28 +518,28 @@ package apibuilder {
     ): scala.concurrent.Future[play.api.libs.ws.WSResponse] = {
       method.toUpperCase match {
         case "GET" => {
-          _logRequest("GET", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*)).get()
+          _logRequest("GET", _requestHolder(path).withHeaders(requestHeaders: _*).withQueryString(queryParameters: _*)).get()
         }
         case "POST" => {
-          _logRequest("POST", _requestHolder(path).withHeaders(_withJsonContentType(requestHeaders):_*).withQueryString(queryParameters:_*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("POST", _requestHolder(path).withHeaders(_withJsonContentType(requestHeaders): _*).withQueryString(queryParameters: _*)).post(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PUT" => {
-          _logRequest("PUT", _requestHolder(path).withHeaders(_withJsonContentType(requestHeaders):_*).withQueryString(queryParameters:_*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("PUT", _requestHolder(path).withHeaders(_withJsonContentType(requestHeaders): _*).withQueryString(queryParameters: _*)).put(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "PATCH" => {
-          _logRequest("PATCH", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))
+          _logRequest("PATCH", _requestHolder(path).withHeaders(requestHeaders: _*).withQueryString(queryParameters: _*)).patch(body.getOrElse(play.api.libs.json.Json.obj()))
         }
         case "DELETE" => {
-          _logRequest("DELETE", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*)).delete()
+          _logRequest("DELETE", _requestHolder(path).withHeaders(requestHeaders: _*).withQueryString(queryParameters: _*)).delete()
         }
          case "HEAD" => {
-          _logRequest("HEAD", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*)).head()
+          _logRequest("HEAD", _requestHolder(path).withHeaders(requestHeaders: _*).withQueryString(queryParameters: _*)).head()
         }
          case "OPTIONS" => {
-          _logRequest("OPTIONS", _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*)).options()
+          _logRequest("OPTIONS", _requestHolder(path).withHeaders(requestHeaders: _*).withQueryString(queryParameters: _*)).options()
         }
         case _ => {
-          _logRequest(method, _requestHolder(path).withHeaders(requestHeaders:_*).withQueryString(queryParameters:_*))
+          _logRequest(method, _requestHolder(path).withHeaders(requestHeaders: _*).withQueryString(queryParameters: _*))
           sys.error("Unsupported method[%s]".format(method))
         }
       }

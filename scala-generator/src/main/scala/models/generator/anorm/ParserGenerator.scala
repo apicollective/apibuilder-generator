@@ -1,7 +1,7 @@
 package scala.generator.anorm
 
 import scala.generator._
-import scala.models.{ApiBuilderComments, Attributes, DateTimeTypeConfig, DateTypeConfig}
+import scala.models.{ApiBuilderComments, Attributes, DateTimeTypeConfig, DateTypeConfig, ScalaVersion}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -11,6 +11,7 @@ import lib.Text._
 import scala.annotation.tailrec
 
 object ParserGenerator24 extends ParserGenerator {
+  override val version: ScalaVersion = ScalaVersion(2)
   override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes = ParserGeneratorPlayVersionSpecificAttributes(
     imports = Seq(
       "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
@@ -20,38 +21,57 @@ object ParserGenerator24 extends ParserGenerator {
   )
 }
 
-object ParserGenerator26 extends ParserGenerator {
+object ParserGenerator26 extends AbstractParserGenerator26(ScalaVersion(2))
+
+class AbstractParserGenerator26(override val version: ScalaVersion) extends ParserGenerator {
   override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes = {
-    val dateImports = ssd.attributes.dateType match {
-      case DateTypeConfig.JodaLocalDate => Seq(
-        "play.api.libs.json.JodaReads._",
-      )
-      case _ => Nil
-    }
-    val dateTimeImports = ssd.attributes.dateTimeType match {
-      case DateTimeTypeConfig.JodaDateTime => Seq(
-        "play.api.libs.json.JodaReads._",
-      )
-      case _ => Nil
-    }
     ParserGeneratorPlayVersionSpecificAttributes(
-      imports = Seq(
-        "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
-        "play.api.libs.json.{JsArray, JsObject, JsValue}",
-        "scala.util.{Failure, Success, Try}",
-      ) ++ (dateImports ++ dateTimeImports).distinct
+      baseImports ++ jodaImports(ssd)
     )
+  }
+
+  private[this] val baseImports: Seq[String] = {
+    Seq(
+      "anorm.{Column, MetaDataItem, TypeDoesNotMatch}",
+      "play.api.libs.json.{JsArray, JsObject, JsValue}",
+      "scala.util.{Failure, Success, Try}",
+    )
+  }
+
+  private[this] def jodaImports(ssd: ScalaService): Seq[String] = {
+    if (version.major >= 3) {
+      Nil
+    } else {
+      val dateImports = ssd.attributes.dateType match {
+        case DateTypeConfig.JodaLocalDate => Seq(
+          "play.api.libs.json.JodaReads._",
+        )
+        case _ => Nil
+      }
+      val dateTimeImports = ssd.attributes.dateTimeType match {
+        case DateTimeTypeConfig.JodaDateTime => Seq(
+          "play.api.libs.json.JodaReads._",
+        )
+        case _ => Nil
+      }
+      (dateImports ++ dateTimeImports).distinct
+    }
   }
 }
 
-object ParserGenerator28 extends ParserGenerator {
+object ParserGenerator28Scala2 extends AbstractParserGenerator(ScalaVersion(2))
+object ParserGenerator29Scala3 extends AbstractParserGenerator(ScalaVersion(3))
+abstract class AbstractParserGenerator(override val version: ScalaVersion) extends ParserGenerator {
   override def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes =
-    ParserGenerator26.attributes(ssd)
+    new AbstractParserGenerator26(version).attributes(ssd)
 }
 
 case class ParserGeneratorPlayVersionSpecificAttributes(imports: Seq[String])
 
 trait ParserGenerator extends CodeGenerator {
+
+  def version: ScalaVersion
+  private[this] lazy val conversions = Conversions(version)
 
   def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes
 
@@ -73,7 +93,7 @@ trait ParserGenerator extends CodeGenerator {
               form.service.application.key,
               form.service.version,
               "Conversions",
-              header ++ Conversions.code(ssd, attributes(ssd)),
+              header ++ conversions.code(ssd, attributes(ssd)),
               Some("Scala")
             ),
             ServiceFileNames.toFile(
