@@ -2,15 +2,15 @@ package models.generator.anorm
 
 import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 
-import scala.generator.anorm.ParserGenerator28
+import scala.generator.anorm.ParserGenerator28Scala2
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class ParserGenerator28Spec extends AnyFunSpec with Matchers {
+class ParserGenerator28Scala2Spec extends AnyFunSpec with Matchers {
 
-  val fileNames = Seq("TestApidocTestV1Conversions.scala", "TestApidocTestV1Parsers.scala")
+  private val fileNames = Seq("TestApidocTestV1Conversions.scala", "TestApidocTestV1Parsers.scala")
 
-  val referenceModel = """
+  private val referenceModel = """
     {
       "name": "reference",
       "plural": "references",
@@ -107,7 +107,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
 
   it("service with no models") {
     val form = ServiceBuilder().form
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(_) => {
         // Success
       }
@@ -119,7 +119,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
 
   it("model with one field") {
     val form = ServiceBuilder(models = Seq(referenceModel)).form
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -133,7 +133,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
 
   it("model with multiple fields") {
     val form = ServiceBuilder(models = Seq(nameModel)).form
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -147,7 +147,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
 
   it("model with capitalized fields") {
     val form = ServiceBuilder(models = Seq(capModel)).form
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -175,7 +175,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
       }
     """).form
 
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -210,7 +210,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -235,7 +235,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -278,7 +278,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -302,7 +302,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
     }
     """).form
 
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -316,7 +316,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
 
   it("anorm bindings for joda time types") {
     val form = ServiceBuilder(models = Seq(dateTimeModel)).form
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
@@ -330,7 +330,7 @@ class ParserGenerator28Spec extends AnyFunSpec with Matchers {
 
   it("anorm bindings for java time types") {
     val form = ServiceBuilder(models = Seq(dateTimeModel)).form.copy(attributes = Seq(Attribute("scala_generator.time_library", "java")))
-    ParserGenerator28.invoke(form) match {
+    ParserGenerator28Scala2.invoke(form) match {
       case Left(errors) => {
         fail(errors.mkString(", "))
       }
