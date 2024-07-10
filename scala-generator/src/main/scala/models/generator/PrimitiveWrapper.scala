@@ -28,6 +28,12 @@ object PrimitiveWrapper {
     }
   }
 
+  def needsWrapper(datatype: ScalaDatatype): Boolean = {
+    datatype match {
+      case p: ScalaPrimitive if PrimitiveWrapper.isBasicType(p) => true
+      case _ => false
+    }
+  }
 }
 
 case class PrimitiveWrapper(ssd: ScalaService) {

@@ -244,15 +244,18 @@ case class Play2Json(
       case Nil => {
         s"${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => play.api.libs.json.JsError(\"Union has no declared types\")"
       }
-      case first :: rest => {
-        val types = (Seq("default") ++ rest.map { scalaUnionType =>
+      case all => {
+        val types = all.map { scalaUnionType =>
+          if (PrimitiveWrapper.needsWrapper(scalaUnionType.datatype)) {
+            // TODO: add a deserializer for the wrapper type
+          }
           s"${readerUnqualified(union, scalaUnionType)}.reads(json).map(_.asInstanceOf[T])"
-        }).mkString("Seq(\n    ", ",\n    ", "\n  )")
+        }.mkString("Seq(\n    ", ",\n    ", "\n  )")
         s"""
            |${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => {
-           |  val default = ${readerUnqualified(union, first)}.reads(json).map(_.asInstanceOf[T])
-           |  val all: Seq[play.api.libs.json.JsResult[T]] = $types
-           |  all.view.find(_.isSuccess).getOrElse(default)
+           |  $types.view.find(_.isSuccess).getOrElse {
+           |    play.api.libs.json.JsSuccess(${union.name}UndefinedType(json.toString).asInstanceOf[T])
+           |  }
            |}
            |""".stripMargin
       }
