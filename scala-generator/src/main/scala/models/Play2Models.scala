@@ -9,8 +9,8 @@ import generator.ServiceFileNames
 
 import scala.generator.ScalaPrimitive.{DateIso8601Joda, DateTimeIso8601Joda, Uuid}
 
-object Play2ModelsScala2 extends Play2Models(scala3Support = false)
-object Play2ModelsScala3 extends Play2Models(scala3Support = true)
+object Play2ModelsScala2 extends Play2Models(ScalaVersion(2))
+object Play2ModelsScala3 extends Play2Models(ScalaVersion(3))
 
 object Play2ModelImplicits {
   val play: String = {
@@ -30,7 +30,8 @@ object Play2ModelImplicits {
   }
 }
 
-case class Play2Models(scala3Support: Boolean) extends CodeGenerator {
+case class Play2Models(version: ScalaVersion) extends CodeGenerator {
+  private[this] val scala3Support: Boolean = version.major >= 3
 
   override def invoke(
     form: InvocationForm

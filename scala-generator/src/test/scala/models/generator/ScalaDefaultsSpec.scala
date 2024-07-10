@@ -1,10 +1,10 @@
 package models.generator
 import io.apibuilder.generator.v0.models.InvocationForm
 import models.FieldDefaultHelper._
-
-import scala.models.Play2StandaloneModelsJson
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+
+import scala.models.Play2Scala2StandaloneModelsJson
 
 class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
   it("Should produce models with defaults and scala_generator.model_hint missing") {
@@ -12,7 +12,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
 
     val form = InvocationForm(models.TestHelper.service(json.format()))
 
-    val Right(res) = Play2StandaloneModelsJson.invoke(form)
+    val Right(res) = Play2Scala2StandaloneModelsJson.invoke(form)
 
     val jsOnly = res.head
 
@@ -36,7 +36,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
 
     val form = InvocationForm(models.TestHelper.service(json.format()))
 
-    val Right(res) = Play2StandaloneModelsJson.invoke(form)
+    val Right(res) = Play2Scala2StandaloneModelsJson.invoke(form)
 
     val jsOnly = res.head
 
@@ -60,7 +60,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
 
     val form = InvocationForm(models.TestHelper.service(json.format()))
 
-    val Right(res) = Play2StandaloneModelsJson.invoke(form)
+    val Right(res) = Play2Scala2StandaloneModelsJson.invoke(form)
 
     val jsOnly = res.head
 
@@ -84,7 +84,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
 
     val form = InvocationForm(models.TestHelper.service(json.format()))
 
-    val Right(res) = Play2StandaloneModelsJson.invoke(form)
+    val Right(res) = Play2Scala2StandaloneModelsJson.invoke(form)
 
     val jsOnly = res.head
 
@@ -111,7 +111,7 @@ class ScalaDefaultsSpec extends AnyFunSpec with Matchers {
 
     val form = InvocationForm(models.TestHelper.service(json.format()))
 
-    val Right(res) = Play2StandaloneModelsJson.invoke(form)
+    val Right(res) = Play2Scala2StandaloneModelsJson.invoke(form)
 
     val jsOnly = res.head
 

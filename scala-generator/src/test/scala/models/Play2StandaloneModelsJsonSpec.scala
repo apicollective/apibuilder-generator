@@ -9,7 +9,7 @@ class Play2StandaloneModelsJsonSpec extends AnyFunSpec with Matchers {
   it("quality") {
     val quality = models.TestHelper.parseFile("/examples/quality.json")
 
-    Play2StandaloneModelsJson.invoke(InvocationForm(quality)) match {
+    Play2Scala2StandaloneModelsJson.invoke(InvocationForm(quality)) match {
       case Left(errors) => fail(errors.mkString(", "))
       case Right(files) => {
         files.map(_.name) should be (Seq("GiltQualityV0Models.scala"))

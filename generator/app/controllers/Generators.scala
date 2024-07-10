@@ -257,7 +257,18 @@ object Generators {
         attributes = Seq("scala_generator")
       ),
       status = lib.generator.Status.Production,
-      codeGenerator = Some(scala.models.Play2StandaloneModelsJson)
+      codeGenerator = Some(scala.models.Play2Scala2StandaloneModelsJson)
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "play_2_x_scala_3_standalone_json",
+        name = "Play 2.x Scala 3 standalone json",
+        description = Some("Generate case class with json serialization based on play-json, but do NOT include any other features that depend on the play framework (like QueryStringBindable)"),
+        language = Some("Scala"),
+        attributes = Seq("scala_generator")
+      ),
+      status = lib.generator.Status.Production,
+      codeGenerator = Some(scala.models.Play2Scala3StandaloneModelsJson)
     ),
     CodeGenTarget(
       metaData = Generator(

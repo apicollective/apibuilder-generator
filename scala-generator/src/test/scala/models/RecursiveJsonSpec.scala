@@ -1,9 +1,9 @@
 package scala.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.generator.ScalaService
-import org.scalatest.funspec.AnyFunSpec
 
 class RecursiveJsonSpec extends AnyFunSpec {
   private val service: ScalaService = ScalaService(models.TestHelper.parseFile("/examples/recursive-types.json"))
@@ -18,7 +18,7 @@ class RecursiveJsonSpec extends AnyFunSpec {
     }
 
     it("should work with imports") {
-      Play2StandaloneModelsJson.invoke(InvocationForm(service.service)) match {
+      Play2Scala2StandaloneModelsJson.invoke(InvocationForm(service.service)) match {
         case Left(errors) => fail(errors.mkString(", "))
         case Right(_) => //println(files.head.contents)
       }
