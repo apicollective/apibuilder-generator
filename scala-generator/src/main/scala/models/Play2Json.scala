@@ -332,7 +332,19 @@ case class Play2Json(
         val json = getJsonValueForUnion(t.unionType.datatype, "x")
         s"""case x: ${t.typeName} => play.api.libs.json.Json.obj("${t.unionType.discriminatorName}" -> $json)"""
       }.mkString("\n").indentString(4),
-      s"""    case x: ${union.undefinedType.datatype.fullName} => sys.error(s"The type[${union.undefinedType.datatype.fullName}] should never be serialized")""",
+      s"""
+        |case x: ${union.undefinedType.datatype.fullName} => {
+        |  scala.util.Try {
+        |    // If we received a JSON object - echo it back. This is a workaround for a bug in
+        |    // serialization for unions w/out discriminators where they sometimes have the
+        |    // type wrapper and sometimes do not
+        |    play.api.libs.json.Json.parse(x.description).asInstanceOf[play.api.libs.json.JsObject]
+        |  } match {
+        |    case scala.util.Success(o) => o
+        |    case scala.util.Failure(_) => sys.error("The type[${union.undefinedType.datatype.fullName}] should never be serialized")
+        |  }
+        |}
+        |""".stripMargin.indent(4).stripTrailing(),
       "  }",
       "}"
     ).mkString("\n")
