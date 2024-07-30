@@ -332,8 +332,7 @@ case class Play2Json(
         val json = getJsonValueForUnion(t.unionType.datatype, "x")
         s"""case x: ${t.typeName} => play.api.libs.json.Json.obj("${t.unionType.discriminatorName}" -> $json)"""
       }.mkString("\n").indentString(4),
-      s"""
-        |case x: ${union.undefinedType.datatype.fullName} => {
+      s"""case x: ${union.undefinedType.datatype.fullName} => {
         |  scala.util.Try {
         |    // If we received a JSON object - echo it back. This is a workaround for a bug in
         |    // serialization for unions w/out discriminators where they sometimes have the

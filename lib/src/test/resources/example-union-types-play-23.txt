@@ -319,7 +319,17 @@ package io.apibuilder.example.union.types.v0.models {
       obj match {
         case x: io.apibuilder.example.union.types.v0.models.Foo => play.api.libs.json.Json.obj("foo" -> play.api.libs.json.JsString(x.toString))
         case x: io.apibuilder.example.union.types.v0.models.Bar => play.api.libs.json.Json.obj("bar" -> play.api.libs.json.JsString(x.toString))
-        case x: io.apibuilder.example.union.types.v0.models.FoobarUndefinedType => sys.error(s"The type[io.apibuilder.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
+        case x: io.apibuilder.example.union.types.v0.models.FoobarUndefinedType => {
+          scala.util.Try {
+            // If we received a JSON object - echo it back. This is a workaround for a bug in
+            // serialization for unions w/out discriminators where they sometimes have the
+            // type wrapper and sometimes do not
+            play.api.libs.json.Json.parse(x.description).asInstanceOf[play.api.libs.json.JsObject]
+          } match {
+            case scala.util.Success(o) => o
+            case scala.util.Failure(_) => sys.error("The type[io.apibuilder.example.union.types.v0.models.FoobarUndefinedType] should never be serialized")
+          }
+        }
       }
     }
     implicit def jsonWritesApidocExampleUnionTypesFoobar: play.api.libs.json.Writes[Foobar] = {
