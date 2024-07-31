@@ -2,7 +2,17 @@ def jsObjectUser(obj: test.apidoc.apidoctest.v0.models.User): play.api.libs.json
   obj match {
     case x: test.apidoc.apidoctest.v0.models.RegisteredUser => play.api.libs.json.Json.obj("registered_user" -> test.apidoc.apidoctest.v0.models.json.jsObjectRegisteredUser(x))
     case x: test.apidoc.apidoctest.v0.models.GuestUser => play.api.libs.json.Json.obj("guest_user" -> test.apidoc.apidoctest.v0.models.json.jsObjectGuestUser(x))
-    case x: test.apidoc.apidoctest.v0.models.UserUndefinedType => sys.error(s"The type[test.apidoc.apidoctest.v0.models.UserUndefinedType] should never be serialized")
+    case x: test.apidoc.apidoctest.v0.models.UserUndefinedType => {
+      scala.util.Try {
+        // If we received a JSON object - echo it back. This is a workaround for a bug in
+        // serialization for unions w/out discriminators where they sometimes have the
+        // type wrapper and sometimes do not
+        play.api.libs.json.Json.parse(x.description).asInstanceOf[play.api.libs.json.JsObject]
+      } match {
+        case scala.util.Success(o) => o
+        case scala.util.Failure(_) => sys.error("The type[test.apidoc.apidoctest.v0.models.UserUndefinedType] should never be serialized")
+      }
+    }
   }
 }
 implicit def jsonWritesAPIBuilderTestUser: play.api.libs.json.Writes[User] = {
