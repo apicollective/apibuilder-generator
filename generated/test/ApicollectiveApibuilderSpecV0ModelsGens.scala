@@ -669,7 +669,7 @@ package object gens {
           .arbitrary[Seq[io.apibuilder.spec.v0.models.Annotation]]
       } yield
         io.apibuilder.spec.v0.models.Service(
-          apidoc = apidoc,
+          apidoc = Some(apidoc),
           name = name,
           organization = organization,
           application = application,

@@ -17,7 +17,8 @@ class ScalaClientMethodGenerator(
 
   protected val sortedResources: Seq[ScalaResource] = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
-  protected val featureMigration: FeatureMigration = FeatureMigration(ssd.service.apidoc.version)
+  @nowarn("msg=value apidoc in class Service is deprecated")
+  protected val featureMigration: FeatureMigration = FeatureMigration(ssd.service.apidoc)
 
   def traitsAndErrors(): String = {
     Seq(

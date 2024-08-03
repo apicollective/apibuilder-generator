@@ -13,7 +13,7 @@ object TestFixtures {
 
   trait TrivialServiceContext {
     val trivialService = Service(
-      apidoc = Apidoc("0.1"),
+      apidoc = Some(Apidoc("0.1")),
       name = "trivial",
       organization = Organization("test-org"),
       application = Application("test-app"),

@@ -11,7 +11,7 @@ object Helpers extends Matchers {
     removeAllExtraWhiteSpaces(a) should be(removeAllExtraWhiteSpaces(b))
 
   def basicService(namespace: String): Service = Service(
-    apidoc = Apidoc("0"),
+    apidoc = Some(Apidoc("0")),
     name = "name",
     organization = Organization("foo"),
     application = Application("bar"),
