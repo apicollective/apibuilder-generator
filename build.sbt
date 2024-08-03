@@ -2,7 +2,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-ThisBuild / scalaVersion := "2.13.14"
+ThisBuild / scalaVersion := "3.4.2"
 
 ThisBuild / javacOptions ++= Seq("-source", "17", "-target", "17")
 
@@ -30,9 +30,17 @@ lazy val generated = project
   .in(file("generated"))
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
+  .settings(resolversSettings)
   .settings(
     libraryDependencies ++= Seq(
       ws,
+      jdbc,
+      "com.github.mbryzek" % "lib-query" % "0.0.5",
+      "com.github.mbryzek" % "lib-util" % "0.0.7",
+      "joda-time" % "joda-time" % "2.12.7",
+      "org.playframework.anorm" %% "anorm-postgres" % "2.7.0",
+      "org.postgresql" % "postgresql" % "42.7.3",
+      "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test,
       "org.scalacheck" %% "scalacheck" % "1.18.0" % Test
     ),
     scalacOptions ++= allScalacOptions
@@ -48,10 +56,8 @@ lazy val generator = project
   .dependsOn(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .aggregate(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
-  .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
   .settings(
-    javaAgents += "com.datadoghq" % "dd-java-agent" % "1.37.1",
     routesImport += "io.apibuilder.generator.v0.Bindables.Core._",
     routesImport += "io.apibuilder.generator.v0.Bindables.Models._",
     routesGenerator := InjectedRoutesGenerator,
