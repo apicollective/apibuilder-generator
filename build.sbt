@@ -2,7 +2,7 @@ name := "apibuilder-generator"
 
 organization := "io.apibuilder.generator"
 
-ThisBuild / scalaVersion := "2.13.11"
+ThisBuild / scalaVersion := "2.13.14"
 
 ThisBuild / javacOptions ++= Seq("-source", "17", "-target", "17")
 
@@ -22,9 +22,9 @@ lazy val allScalacOptions = Seq(
 
 lazy val resolversSettings = Seq(
   resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
-  resolvers += "Flow repository" at "https://flow.jfrog.io/flow/libs-release/",
+  resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  resolvers += "jitpack" at "https://jitpack.io",
 )
-
 
 lazy val generated = project
   .in(file("generated"))
@@ -33,14 +33,11 @@ lazy val generated = project
   .settings(
     libraryDependencies ++= Seq(
       ws,
-      "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
+      "org.scalacheck" %% "scalacheck" % "1.18.0" % Test
     ),
     scalacOptions ++= allScalacOptions
   )
 
-// TODO: lib will eventually be published as a jar if it turns out
-// that we need it. For now it is here mostly for reference - hoping
-// we end up not needing it.
 lazy val lib = project
   .in(file("lib"))
   .dependsOn(generated % "compile; test->test")
@@ -54,13 +51,13 @@ lazy val generator = project
   .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
   .settings(
-    javaAgents += "com.datadoghq" % "dd-java-agent" % "1.8.0",
+    javaAgents += "com.datadoghq" % "dd-java-agent" % "1.37.1",
     routesImport += "io.apibuilder.generator.v0.Bindables.Core._",
     routesImport += "io.apibuilder.generator.v0.Bindables.Models._",
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test"
+      "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % "test"
     ),
     scalacOptions ++= allScalacOptions,
     Test / javaOptions ++= Seq(
@@ -207,9 +204,9 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "com.squareup.retrofit2" % "retrofit" % "2.5.0",
     "io.reactivex.rxjava2" % "rxjava" % "2.2.4",
     "org.typelevel" %% "cats-core" % "2.10.0",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test,
     "org.scalatest" %% "scalatest" % scalatestVersion % Test,
-    "org.scalatestplus" %% "scalacheck-1-15" % "3.2.7.0" % Test,
+    "org.scalatestplus" %% "scalacheck-1-15" % "3.2.11.0" % Test,
     "org.mockito" % "mockito-core" % mockitoVersion % Test,
     "com.github.javaparser" % "javaparser-core" % "3.24.2" % Test,
     "org.scalameta" %% "scalameta" % "4.4.3" % Test,
@@ -223,4 +220,3 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   Compile / doc / sources := Seq.empty,
   Compile / packageDoc / publishArtifact := false,
 )
-version := "0.10.19"
