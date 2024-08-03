@@ -11,11 +11,11 @@ import org.scalatest.matchers.should.Matchers
 
 class JavaClassesSpec extends AnyFunSpec with Matchers {
 
-  val testHeader = """/** Test Header */"""
-  val userDefinedModel = Model("user_defined", "", None, None, Seq.empty[Field])
-  val org = Organization("org" + System.currentTimeMillis)
-  val app = Application("app" + System.currentTimeMillis)
-  val testService = Service(Apidoc("1.0.0"), "test_service", org, app, "com.jkenny.test", "", info = io.apibuilder.spec.v0.models.Info(None, None), models = Seq(userDefinedModel))
+  val testHeader: String = """/** Test Header */"""
+  val userDefinedModel: Model = Model("user_defined", "", None, None, Seq.empty[Field])
+  val org: Organization = Organization("org" + System.currentTimeMillis)
+  val app: Application = Application("app" + System.currentTimeMillis)
+  val testService: Service = Service(Some(Apidoc("1.0.0")), "test_service", org, app, "com.jkenny.test", "", info = io.apibuilder.spec.v0.models.Info(None, None), models = Seq(userDefinedModel))
   val generator = new Generator(testService, Some(testHeader))
 
   describe("generateEnum") {

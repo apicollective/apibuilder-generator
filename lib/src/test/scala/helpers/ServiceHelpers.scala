@@ -166,7 +166,7 @@ trait ServiceHelpers {
     unions: Seq[Union] = Nil,
   ): Service = {
     Service(
-      apidoc = makeApidoc(),
+      apidoc = Some(makeApidoc()),
       name = name,
       organization = organization,
       application = application,
