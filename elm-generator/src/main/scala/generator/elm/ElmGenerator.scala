@@ -29,8 +29,9 @@ case class ElmGenerator() {
         ElmCommon(args).generate().validNec,
         generateEnums(args).validNec,
         generateModels(args),
+        generateUnions(args),
         generateResources(args)
-      ).mapN { case (a,b,c,d) => Seq(a,b,c,d) }.map { contents =>
+      ).mapN { case (a,b,c,d,e) => Seq(a,b,c,d,e) }.map { contents =>
         Seq(File(
           name = s"Generated/" + pascalServiceName(service) + ".elm",
           contents = generate(
@@ -60,6 +61,11 @@ case class ElmGenerator() {
   private[elm] def generateModels(args: GenArgs): ValidatedNec[String, String] = {
     val models = ElmModel(args)
     args.service.models.map(models.generate).sequence.map(_.mkString("\n\n"))
+  }
+
+  private[elm] def generateUnions(args: GenArgs): ValidatedNec[String, String] = {
+    val unions = ElmUnion(args)
+    args.service.unions.map(unions.generate).sequence.map(_.mkString("\n\n"))
   }
 
   private def generateEnums(args: GenArgs): String = {
