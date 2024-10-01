@@ -2,7 +2,7 @@ package controllers
 
 import io.apibuilder.generator.v0.models.json._
 import io.apibuilder.generator.v0.models.{Invocation, InvocationForm}
-import lib.{InvalidSpecBug, Validation}
+import lib.{ServiceApidocBug, Validation}
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -18,7 +18,7 @@ class Invocations extends InjectedController {
     request.body.asJson match {
       case None => Conflict(Json.toJson(Validation.error("Must provide form data (JSON)")))
       case Some(incomingJs) => {
-        val js = InvalidSpecBug.rewrite(incomingJs)
+        val js = ServiceApidocBug.rewrite(incomingJs)
         Generators.findGenerator(key).map(_.generator) match {
           case Some(generator) =>
             println(s"DEBUG 1")

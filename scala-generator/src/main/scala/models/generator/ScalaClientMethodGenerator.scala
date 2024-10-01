@@ -2,7 +2,7 @@ package scala.generator
 
 import scala.annotation.nowarn
 
-import scala.models.{FeatureMigration, JsonImports}
+import scala.models.JsonImports
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 import lib.Text._
 
@@ -16,9 +16,6 @@ class ScalaClientMethodGenerator(
   protected val generatorUtil: ScalaGeneratorUtil = new ScalaGeneratorUtil(config)
 
   protected val sortedResources: Seq[ScalaResource] = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
-
-  @nowarn("msg=value apidoc in class Service is deprecated")
-  protected val featureMigration: FeatureMigration = FeatureMigration(ssd.service.apidoc)
 
   def traitsAndErrors(): String = {
     Seq(
@@ -112,7 +109,7 @@ class ScalaClientMethodGenerator(
 
   protected def includeJsonImportsInErrorsPackage: Boolean = true
 
-  protected def errorTypeClass(response: ScalaResponse): String = {
+  private def errorTypeClass(response: ScalaResponse): String = {
     require(!response.isSuccess)
 
     if (response.isUnit) {
@@ -128,7 +125,7 @@ class ScalaClientMethodGenerator(
     }
   }
 
-  @nowarn protected def exceptionClass(
+  @nowarn private def exceptionClass(
     className: String,
     body: Option[String] = None
   ): String = {
@@ -185,25 +182,14 @@ class ScalaClientMethodGenerator(
         case v => s"""${v.mkString("\n\n")}\n\n_executeRequest("${op.method}", $path, ${args.mkString(", ")})"""
       }
 
-      val hasOptionResult = if (featureMigration.hasImplicit404s()) {
-        op.responses.filter(_.isSuccess).find(_.isOption).map { _ =>
-          s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
-        }
-      } else {
-        None
-      }
+      val hasOptionResult = None
 
-      val allResponseCodes = (
-        op.responses.flatMap { r =>
-          r.code match {
-            case ResponseCodeInt(value) => Some(value)
-            case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => None
-          }
-        } ++ (hasOptionResult match {
-          case None => Seq.empty
-          case Some(_) => Seq(404)
-        })
-      ).distinct.sorted
+      val allResponseCodes = op.responses.flatMap { r =>
+        r.code match {
+          case ResponseCodeInt(value) => Some(value)
+          case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => None
+        }
+      }.distinct.sorted
 
       val defaultResponse = op.responses.find { r =>
         r.code match {
@@ -228,25 +214,13 @@ class ScalaClientMethodGenerator(
           response.code match {
             case ResponseCodeInt(statusCode) => {
               if (response.isSuccess) {
-                if (featureMigration.hasImplicit404s() && response.isOption) {
-                  if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($unitResponse")
-                  } else {
-                    val result = config.buildResponse("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => Some($result)")
-                  }
-
-                } else if (response.isUnit) {
+                if (response.isUnit) {
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $unitResponse")
 
                 } else {
                   val result = config.buildResponse("r", response.datatype.name)
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $result")
                 }
-
-              } else if (featureMigration.hasImplicit404s() && response.isNotFound && response.isOption) {
-                // will be added later
-                None
 
               } else {
                 if (response.isUnit) {
