@@ -19,8 +19,12 @@ case class ElmJson(imports: Imports) {
   }
 
 
+  def decoderName(name: String): String = {
+    s"${Names.camelCase(name)}Decoder"
+  }
+
   def decoder(name: String)(contents: String): ElmFunction = {
-    val n = s"${Names.camelCase(name)}Decoder"
+    val n = decoderName(name)
     imports.addAs("Json.Decode", "Decode")
     val code = Seq(
       s"$n : Decode.Decoder ${Names.pascalCase(name)}",

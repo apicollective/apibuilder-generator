@@ -62,37 +62,19 @@ class ScalaClientMethodGenerator (
       }
 
       val reqType = op.body.fold("Unit")(b => b.datatype.name)
-
-      val hasOptionResult = featureMigration.hasImplicit404s() match {
-        case true => {
-          op.responses.filter(_.isSuccess).find(_.isOption).map { _ =>
-            s"\ncase r if r.${config.responseStatusMethod} == 404 => None"
-          }
-        }
-        case false => None
-      }
-
-      val resType: String = hasOptionResult match {
-        case None => op.resultType
-        case Some(_) => s"_root_.scala.Option[${op.resultType}]"
-      }
+      val resType: String = op.resultType
 
       val methodCall = code.toList match {
         case Nil => s"""_executeRequest[$reqType, $resType]("${op.method}", ${args.mkString(", ")})"""
         case v => s"""${v.mkString("\n\n")}\n\n_executeRequest[$reqType, $resType]("${op.method}", ${args.mkString(", ")})"""
       }
 
-      val allResponseCodes = (
-        op.responses.flatMap { r =>
-          r.code match {
-            case ResponseCodeInt(value) => Some(value)
-            case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => None
-          }
-        } ++ (hasOptionResult match {
-          case None => Seq.empty
-          case Some(_) => Seq(404)
-        })
-      ).distinct.sorted
+      val allResponseCodes = op.responses.flatMap { r =>
+        r.code match {
+          case ResponseCodeInt(value) => Some(value)
+          case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => None
+        }
+      }.distinct.sorted
 
       val raiseFailure = s"${http4sConfig.wrappedAsyncType(config.asyncTypeConstraint).getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}"
 
@@ -123,24 +105,13 @@ class ScalaClientMethodGenerator (
           response.code match {
             case ResponseCodeInt(statusCode) => {
               if (response.isSuccess) {
-                if (featureMigration.hasImplicit404s() && response.isOption) {
-                  if (response.isUnit) {
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncSuccessInvoke}(Some(()))")
-                  } else {
-                    val json = config.toJson("r", response.datatype.name)
-                    Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncSuccessInvoke}(Some($json))")
-                  }
-
-                } else if (response.isUnit) {
+                if (response.isUnit) {
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => ${http4sConfig.asyncSuccessInvoke}(())")
 
                 } else {
                   val json = config.toJson("r", response.datatype.name)
                   Some(s"case r if r.${config.responseStatusMethod} == $statusCode => $json")
                 }
-              } else if (featureMigration.hasImplicit404s() && response.isNotFound && response.isOption) {
-                // will be added later
-                None
               } else {
                 val raiseFailure = s"${http4sConfig.wrappedAsyncType(config.asyncTypeConstraint).getOrElse(http4sConfig.asyncType)}.${http4sConfig.asyncFailure}"
 
@@ -163,7 +134,7 @@ class ScalaClientMethodGenerator (
             }
           }
         }.mkString("\n")
-      } + hasOptionResult.getOrElse("") + s"\n$defaultResponse\n"
+      } + s"\n$defaultResponse\n"
 
       new ScalaClientMethod(
         operation = op,
