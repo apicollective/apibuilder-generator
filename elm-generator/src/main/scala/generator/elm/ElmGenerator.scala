@@ -54,7 +54,7 @@ case class ElmGenerator() {
       s"module Generated.${pascalServiceName(service)} exposing (..)",
       args.imports.generateCode(), // must be generated after the contents
       args.functions.generateCode(),
-      contents.mkString("\n\n")
+      contents.filterNot(_.isEmpty).mkString("\n\n")
     ).mkString("\n\n")
   }
 

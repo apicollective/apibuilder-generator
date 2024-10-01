@@ -33,10 +33,7 @@ object ServiceApidocBug {
       case JsDefined(svc: JsObject) => {
         js ++ Json.obj("service" -> maybeAddApidoc(svc))
       }
-      case _ => {
-        println(s"rewriteService: Skipping service as field not found")
-        js
-      }
+      case _ => js
     }
   }
 

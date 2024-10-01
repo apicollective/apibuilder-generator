@@ -21,14 +21,9 @@ class Invocations extends InjectedController {
         val js = ServiceApidocBug.rewrite(incomingJs)
         Generators.findGenerator(key).map(_.generator) match {
           case Some(generator) =>
-            println(s"DEBUG 1")
             js.validate[InvocationForm] match {
-              case e: JsError => {
-                println(s"DEBUG 2")
-                Conflict(Json.toJson(Validation.invalidJson(e)))
-              }
+              case e: JsError => Conflict(Json.toJson(Validation.invalidJson(e)))
               case s: JsSuccess[InvocationForm] => {
-                println(s"DEBUG 3")
                 val form = s.get
                 generator.invoke(form) match {
                   case Left(errors) => Conflict(Json.toJson(Validation.errors(errors)))
