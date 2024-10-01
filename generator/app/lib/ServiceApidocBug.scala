@@ -57,7 +57,6 @@ object ServiceApidocBug {
     if (js.fields.contains("apidoc")) {
       js
     } else {
-      println("Adding default apidoc field")
       js ++ DefaultApiDoc
     }
   }
