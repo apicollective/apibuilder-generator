@@ -19,6 +19,18 @@ class ExampleUnionTypesSpec extends AnyFunSpec with Matchers {
     }
   }
 
+  it("generates expected code for play 2.9 client and scala 3") {
+    lazy val service = models.TestHelper.parseFile(s"/examples/apidoc-example-union-types-primitives.json")
+
+    Play29Scala3ClientGenerator.invoke(InvocationForm(service = service)) match {
+      case Left(errors) => fail(errors.mkString(", "))
+      case Right(sourceFiles) => {
+        sourceFiles.size shouldBe 1
+        models.TestHelper.assertEqualsFile("/example-union-types-play-29-scala-3.txt", sourceFiles.head.contents)
+      }
+    }
+  }
+
   it("generates expected code for ning client") {
     Ning18ClientGenerator.invoke(InvocationForm(service = service)) match {
       case Left(errors) => fail(errors.mkString(", "))

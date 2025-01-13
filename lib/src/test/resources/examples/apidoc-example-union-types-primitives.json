@@ -1,0 +1,34 @@
+{
+  "apidoc": {
+    "version": "0.11.17"
+  },
+  "name": "apidoc-example-union-types-primitives",
+  "organization": {
+    "key": "bryzek"
+  },
+  "application": {
+    "key": "apidoc-example-union-types-primitives"
+  },
+  "namespace": "io.apibuilder.example.union.types.v0",
+  "version": "0.3.46",
+  "info": {},
+  "headers": [],
+  "imports": [],
+  "enums": [],
+  "unions": [
+    {
+      "name": "baz",
+      "plural": "bazes",
+      "types": [
+        {
+          "type": "integer",
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "models": [],
+  "resources": [],
+  "attributes": []
+}
