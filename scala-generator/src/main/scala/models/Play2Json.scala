@@ -247,9 +247,10 @@ case class Play2Json(
       case all => {
         val types = all.map { scalaUnionType =>
           if (PrimitiveWrapper.needsWrapper(scalaUnionType.datatype)) {
-            // TODO: add a deserializer for the wrapper type
+            s"""(__ \\ "${scalaUnionType.discriminatorName}").read(${readerUnqualified(union, scalaUnionType)}).reads(json).map(_.asInstanceOf[T])"""
+          } else {
+            s"${readerUnqualified(union, scalaUnionType)}.reads(json).map(_.asInstanceOf[T])"
           }
-          s"${readerUnqualified(union, scalaUnionType)}.reads(json).map(_.asInstanceOf[T])"
         }.mkString("Seq(\n    ", ",\n    ", "\n  )")
         s"""
            |${play2JsonCommon.implicitUnionReader(union)} = (json: play.api.libs.json.JsValue) => {
