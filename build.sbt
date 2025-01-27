@@ -214,6 +214,8 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "com.github.javaparser" % "javaparser-core" % "3.24.2" % Test,
     "org.scalameta" %% "scalameta" % "4.4.3" % Test,
     "com.squareup" % "javapoet" % "1.13.0",
+    // aws core version 1.11.461, picking same version for sts - com.amazonaws:aws-java-sdk-core:1.11.461
+    "com.amazonaws" % "aws-java-sdk-sts" % "1.11.461",
   ),
   scalacOptions ++= allScalacOptions,
   Test / javaOptions ++= Seq(
