@@ -184,7 +184,7 @@ case class Play2Json(
               """(js \ "value").validate[String] match {""",
               Seq(
                 s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
-                "case err: play.api.libs.json.JsError =>",
+                "case _: play.api.libs.json.JsError =>",
                 Seq(
                   s"""(js \\ "${enum.originalName}").validate[String] match {""",
                   Seq(

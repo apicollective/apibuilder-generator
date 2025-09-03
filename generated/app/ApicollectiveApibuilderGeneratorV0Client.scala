@@ -172,7 +172,7 @@ package io.apibuilder.generator.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.generator.v0.models.FileFlag(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "file_flag").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.generator.v0.models.FileFlag(v))
                   case err: play.api.libs.json.JsError => err

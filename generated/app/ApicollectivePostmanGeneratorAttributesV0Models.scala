@@ -141,7 +141,7 @@ package io.postman.generator.attributes.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.postman.generator.attributes.v0.models.AttributeName(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "attribute_name").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.postman.generator.attributes.v0.models.AttributeName(v))
                   case err: play.api.libs.json.JsError => err

@@ -493,7 +493,7 @@ package io.apibuilder.spec.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.spec.v0.models.Method(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "method").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.spec.v0.models.Method(v))
                   case err: play.api.libs.json.JsError => err
@@ -525,7 +525,7 @@ package io.apibuilder.spec.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.spec.v0.models.ParameterLocation(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "parameter_location").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.spec.v0.models.ParameterLocation(v))
                   case err: play.api.libs.json.JsError => err
@@ -557,7 +557,7 @@ package io.apibuilder.spec.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.spec.v0.models.ResponseCodeOption(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "response_code_option").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.spec.v0.models.ResponseCodeOption(v))
                   case err: play.api.libs.json.JsError => err

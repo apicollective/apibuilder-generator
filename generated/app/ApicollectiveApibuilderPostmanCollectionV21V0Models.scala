@@ -499,7 +499,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.AuthEnum(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "auth_enum").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.AuthEnum(v))
                   case err: play.api.libs.json.JsError => err
@@ -531,7 +531,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.BodyMode(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "body_mode").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.BodyMode(v))
                   case err: play.api.libs.json.JsError => err
@@ -563,7 +563,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.EventType(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "event_type").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.EventType(v))
                   case err: play.api.libs.json.JsError => err
@@ -595,7 +595,7 @@ package io.apibuilder.postman.collection.v21.v0.models {
           case _ => {
             (js \ "value").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.Method(v))
-              case err: play.api.libs.json.JsError =>
+              case _: play.api.libs.json.JsError =>
                 (js \ "method").validate[String] match {
                   case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(io.apibuilder.postman.collection.v21.v0.models.Method(v))
                   case err: play.api.libs.json.JsError => err

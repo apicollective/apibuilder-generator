@@ -5,7 +5,7 @@ implicit val jsonReadsAPIBuilderTestAgeGroup: play.api.libs.json.Reads[test.apid
       case _ => {
         (js \ "value").validate[String] match {
           case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.AgeGroup(v))
-          case err: play.api.libs.json.JsError =>
+          case _: play.api.libs.json.JsError =>
             (js \ "age_group").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.AgeGroup(v))
               case err: play.api.libs.json.JsError => err
@@ -37,7 +37,7 @@ implicit val jsonReadsAPIBuilderTestGenre: play.api.libs.json.Reads[test.apidoc.
       case _ => {
         (js \ "value").validate[String] match {
           case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.Genre(v))
-          case err: play.api.libs.json.JsError =>
+          case _: play.api.libs.json.JsError =>
             (js \ "genre").validate[String] match {
               case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(test.apidoc.apidoctest.v0.models.Genre(v))
               case err: play.api.libs.json.JsError => err
