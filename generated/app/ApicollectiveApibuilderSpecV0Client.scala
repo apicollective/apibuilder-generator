@@ -362,7 +362,7 @@ package io.apibuilder.spec.v0.models {
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
-     * generated. We want to make it easy and obvious for users of
+     * generated. We want to make it easy and obvious to users of
      * this library to handle this case gracefully.
      *
      * We use all CAPS for the variable name to avoid collisions
@@ -397,7 +397,7 @@ package io.apibuilder.spec.v0.models {
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
-     * generated. We want to make it easy and obvious for users of
+     * generated. We want to make it easy and obvious to users of
      * this library to handle this case gracefully.
      *
      * We use all CAPS for the variable name to avoid collisions
@@ -429,7 +429,7 @@ package io.apibuilder.spec.v0.models {
     /**
      * UNDEFINED captures values that are sent either in error or
      * that were added by the server after this library was
-     * generated. We want to make it easy and obvious for users of
+     * generated. We want to make it easy and obvious to users of
      * this library to handle this case gracefully.
      *
      * We use all CAPS for the variable name to avoid collisions
