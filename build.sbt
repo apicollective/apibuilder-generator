@@ -54,6 +54,7 @@ lazy val generator = project
   .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
   .settings(
+    PlayKeys.playDefaultPort := 9002,
     javaAgents += "com.datadoghq" % "dd-java-agent" % "1.8.0",
     routesImport += "io.apibuilder.generator.v0.Bindables.Core._",
     routesImport += "io.apibuilder.generator.v0.Bindables.Models._",
