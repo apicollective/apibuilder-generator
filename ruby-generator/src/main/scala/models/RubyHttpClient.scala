@@ -120,7 +120,8 @@ module HttpClient
       Preconditions.assert_class('auth', auth, HttpClient::Authorization)
       Preconditions.check_state(@auth.nil?, "auth previously set")
 
-      if auth.scheme.name == AuthScheme::BASIC.name
+      case auth.scheme.name
+      when AuthScheme::BASIC.name, AuthScheme::SESSION.name
         @auth = auth
       else
         raise "Auth Scheme[#{auth.scheme.name}] not supported"
@@ -180,8 +181,8 @@ module HttpClient
       Preconditions.assert_class('klass', klass, Class)
 
       uri = @full_uri.dup
-      if q = to_query(@params)
-        uri += "?%s" % q
+      if (q = to_query(@params))
+        uri += "?#{q}"
       end
 
       request = klass.send(:new, uri)
@@ -202,9 +203,14 @@ module HttpClient
         # DEBUG curl << "-u \"%s:%s\"" % [@auth.username, @auth.password]
         Preconditions.check_state(!@header_keys_lower_case.include?("authorization"),
                                   "Cannot specify both an Authorization header and an auth instance")
-        user_pass = "%s:%s" % [@auth.username, @auth.password]
-        encoded = Base64.encode64(user_pass).to_s.split("\n").map(&:strip).join
-        request.add_field("Authorization", "Basic %s" % encoded)
+        session_id = @auth.session_id.to_s.strip
+        if session_id.length > 0
+          request.add_field("Authorization", "Session #{session_id}")
+        else
+          user_pass = "#{@auth.username}:#{@auth.password}"
+          encoded = Base64.encode64(user_pass).to_s.split("\n").map(&:strip).join
+          request.add_field("Authorization", "Basic #{encoded}")
+        end
       end
 
       @headers.each { |key, value|
@@ -372,7 +378,6 @@ module HttpClient
   end
 
   class AuthScheme
-
     attr_reader :name
 
     def initialize(name)
@@ -380,17 +385,22 @@ module HttpClient
     end
 
     BASIC = AuthScheme.new("basic") unless defined?(BASIC)
-
+    SESSION = AuthScheme.new("session") unless defined?(SESSION)
   end
 
   class Authorization
+    attr_reader :scheme, :username, :password, :session_id
 
-    attr_reader :scheme, :username, :password
-
-    def initialize(scheme, username, opts={})
+    def initialize(scheme, username = nil, opts = {})
       @scheme = HttpClient::Preconditions.assert_class('schema', scheme, AuthScheme)
-      @username = HttpClient::Preconditions.check_not_blank('username', username, "username is required")
-      @password = HttpClient::Preconditions.assert_class_or_nil('password', opts.delete(:password), String)
+
+      if scheme.name == AuthScheme::BASIC.name
+        @username = HttpClient::Preconditions.check_not_blank('username', username, "username is required")
+        @password = HttpClient::Preconditions.assert_class_or_nil('password', opts.delete(:password), String)
+      elsif scheme.name == AuthScheme::SESSION.name
+        @session_id = HttpClient::Preconditions.assert_class_or_nil('session_id', opts.delete(:session_id), String)
+      end
+
       HttpClient::Preconditions.assert_empty_opts(opts)
     end
 
@@ -398,6 +408,9 @@ module HttpClient
       Authorization.new(AuthScheme::BASIC, username, :password => password)
     end
 
+    def Authorization.session(session_id)
+      Authorization.new(AuthScheme::SESSION, nil, :session_id => session_id)
+    end
   end
 
   module Helper
