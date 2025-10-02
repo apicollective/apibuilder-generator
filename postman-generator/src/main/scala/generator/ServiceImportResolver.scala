@@ -38,8 +38,8 @@ object ServiceImportResolver {
         case Some(importedService) =>
           val importedServiceNamespace = importedService.namespace
 
-          val enums = importedService.enums.map { enum =>
-            enum.copy(name = s"$importedServiceNamespace.enums.${enum.name}")
+          val enums = importedService.enums.map { enumDef =>
+            enumDef.copy(name = s"$importedServiceNamespace.enums.${enumDef.name}")
           }
 
           val models = importedService.models.map { model =>

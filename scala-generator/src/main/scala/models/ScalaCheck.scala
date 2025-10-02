@@ -37,8 +37,8 @@ object ScalaCheckGenerator extends CodeGenerator {
     """
   }
 
-  def `enum`(namespace: String, `enum`: ScalaEnum): String = {
-    val gens = enum.values.map(value => s"${namespace}.${enum.name}.${value.name}").toList
+  def enumDef(namespace: String, enumDef: ScalaEnum): String = {
+    val gens = enumDef.values.map(value => s"${namespace}.${enumDef.name}.${value.name}").toList
     val gen = gens match {
       case Nil => "???"
       case one :: Nil => one
@@ -46,8 +46,8 @@ object ScalaCheckGenerator extends CodeGenerator {
     }
 
     s"""
-      implicit def arbitrary${enum.name}: Arbitrary[${namespace}.${enum.name}] = Arbitrary(gen${enum.name})
-      def gen${enum.name}: Gen[${namespace}.${enum.name}] = ${gen}
+      implicit def arbitrary${enumDef.name}: Arbitrary[${namespace}.${enumDef.name}] = Arbitrary(gen${enumDef.name})
+      def gen${enumDef.name}: Gen[${namespace}.${enumDef.name}] = ${gen}
     """
   }
 

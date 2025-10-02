@@ -89,12 +89,12 @@ class ScalaService(
       u.types.find(_.model.map(_.fullName).contains(model.qualifiedName)).map(u -> _)
     }
 
-  def unionsForEnum(`enum`: ScalaEnum): Seq[ScalaUnion] =
+  def unionsForEnum(enumDef: ScalaEnum): Seq[ScalaUnion] =
     unionsAndTypesForEnum(enum).map { case (u, _) => u }
 
-  def unionsAndTypesForEnum(`enum`: ScalaEnum): Seq[(ScalaUnion, ScalaUnionType)] =
+  def unionsAndTypesForEnum(enumDef: ScalaEnum): Seq[(ScalaUnion, ScalaUnionType)] =
     unions.flatMap { u =>
-      u.types.find(_.enum.map(_.fullName).contains(enum.qualifiedName)).map(u -> _)
+      u.types.find(_.enumDef.map(_.fullName).contains(enumDef.qualifiedName)).map(u -> _)
     }
 
   def unionsForUnion(union: ScalaUnion): Seq[ScalaUnion] = {
@@ -191,7 +191,7 @@ case class ScalaUnionType(
   ssd: ScalaService,
   value: UnionType,
   datatype: ScalaDatatype,
-  `enum`: Option[ScalaPrimitive.Enum] = None,
+  enumDef: Option[ScalaPrimitive.Enum] = None,
   model: Option[ScalaPrimitive.Model] = None,
   union: Option[ScalaPrimitive.Union] = None
 ) {
@@ -342,9 +342,9 @@ class ScalaBody(ssd: ScalaService, val body: Body) {
 
 }
 
-class ScalaEnum(val ssd: ScalaService, val `enum`: Enum) {
+class ScalaEnum(val ssd: ScalaService, val enumDef: Enum) {
 
-  val originalName: String = enum.name
+  val originalName: String = enumDef.name
 
   val name: String = ScalaUtil.toClassName(originalName)
 
@@ -352,11 +352,11 @@ class ScalaEnum(val ssd: ScalaService, val `enum`: Enum) {
 
   val qualifiedName: String = ssd.enumClassName(name)
 
-  val description: Option[String] = enum.description
+  val description: Option[String] = enumDef.description
 
-  val values: Seq[ScalaEnumValue] = enum.values.map(new ScalaEnumValue(_))
+  val values: Seq[ScalaEnumValue] = enumDef.values.map(new ScalaEnumValue(_))
 
-  val deprecation: Option[Deprecation] = enum.deprecation
+  val deprecation: Option[Deprecation] = enumDef.deprecation
 
 }
 

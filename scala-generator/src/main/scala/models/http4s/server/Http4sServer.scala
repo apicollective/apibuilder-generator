@@ -18,8 +18,8 @@ object Http4sServer {
   def typeName(ssd: ScalaService, dataType: ScalaDatatype): String = dataType match {
     case model: ScalaPrimitive.Model if model.namespaces.base == ssd.service.namespace => model.shortName
     case model: ScalaPrimitive.Model => ScalaUtil.toClassName(model.name)
-    case enum: ScalaPrimitive.Enum if enum.namespaces.base == ssd.service.namespace => enum.shortName
-    case enum: ScalaPrimitive.Enum => ScalaUtil.toClassName(enum.name)
+    case enumDef: ScalaPrimitive.Enum if enumDef.namespaces.base == ssd.service.namespace => enumDef.shortName
+    case enumDef: ScalaPrimitive.Enum => ScalaUtil.toClassName(enumDef.name)
     case sp: ScalaPrimitive => sp.shortName
     case other => other.name
   }
@@ -122,14 +122,14 @@ case class Http4sServer(form: InvocationForm,
     }.mkString("\n")
 
     val enumDecoders = allRoutes.flatMap(_.op.queryParameters).map(_.datatype).collect {
-      case enum: ScalaPrimitive.Enum => enum
-      case ScalaDatatype.Option(enum: ScalaPrimitive.Enum) => enum
-      case ScalaDatatype.List(enum: ScalaPrimitive.Enum) => enum
-      case ScalaDatatype.Option(ScalaDatatype.List(enum: ScalaPrimitive.Enum)) => enum
-    }.distinct.map { enum =>
+      case enumDef: ScalaPrimitive.Enum => enumDef
+      case ScalaDatatype.Option(enumDef: ScalaPrimitive.Enum) => enumDef
+      case ScalaDatatype.List(enumDef: ScalaPrimitive.Enum) => enumDef
+      case ScalaDatatype.Option(ScalaDatatype.List(enumDef: ScalaPrimitive.Enum)) => enumDef
+    }.distinct.map { enumDef =>
       s"""
-         |implicit lazy val ${Text.initLowerCase(Http4sServer.typeName(ssd, enum))}QueryParamDecoder: org.http4s.QueryParamDecoder[${enum.fullName}] =
-         |  org.http4s.QueryParamDecoder.fromUnsafeCast[${enum.fullName}](p => ${enum.fullName}.fromString(p.value).get)("${enum.fullName}")""".stripMargin
+         |implicit lazy val ${Text.initLowerCase(Http4sServer.typeName(ssd, enumDef))}QueryParamDecoder: org.http4s.QueryParamDecoder[${enumDef.fullName}] =
+         |  org.http4s.QueryParamDecoder.fromUnsafeCast[${enumDef.fullName}](p => ${enumDef.fullName}.fromString(p.value).get)("${enumDef.fullName}")""".stripMargin
     }.mkString("\n")
 
     s"""package ${ssd.namespaces.base}.server
@@ -181,7 +181,7 @@ case class Http4sServer(form: InvocationForm,
         case ScalaPrimitive.Uuid => methodTry(ScalaPrimitive.Uuid.fromStringValue("s"))
         case dt: ScalaPrimitive.DateIso8601 => methodTry(dt.fromStringValue("s"))
         case dt: ScalaPrimitive.DateTimeIso8601 => methodTry(dt.fromStringValue("s"))
-        case enum: ScalaPrimitive.Enum => s"${enum.name}.fromString(s)"
+        case enumDef: ScalaPrimitive.Enum => s"${enumDef.name}.fromString(s)"
         case _: ScalaPrimitive.Model => notSupported
         case _: ScalaPrimitive.Union => notSupported
         case ScalaPrimitive.Unit => notSupported

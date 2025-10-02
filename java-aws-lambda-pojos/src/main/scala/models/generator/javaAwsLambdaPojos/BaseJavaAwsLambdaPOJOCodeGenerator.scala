@@ -69,16 +69,16 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
         generatedModels
     }
 
-    def generateEnum(`enum`: Enum): File = {
+    def generateEnum(enumDef: Enum): File = {
 
-      val className = toClassName(enum.name)
+      val className = toClassName(enumDef.name)
 
       val builder =
         TypeSpec.enumBuilder(className)
           .addModifiers(Modifier.PUBLIC)
           .addJavadoc(apiDocComments)
 
-      enum.attributes.foreach(attribute => {
+      enumDef.attributes.foreach(attribute => {
         attribute.name match {
           case "DynamoDBTypeConvertedEnum" =>{
             val jsonAnnotationBuilder: Builder = AnnotationSpec.builder(classOf[DynamoDBTypeConvertedEnum])
@@ -89,9 +89,9 @@ trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambd
 
       })
 
-      enum.description.map(builder.addJavadoc(_))
+      enumDef.description.map(builder.addJavadoc(_))
 
-      enum.values.foreach(value => {
+      enumDef.values.foreach(value => {
         builder.addEnumConstant(toEnumName(value.name))
       })
 

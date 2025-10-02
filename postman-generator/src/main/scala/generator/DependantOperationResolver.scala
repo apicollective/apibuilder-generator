@@ -134,7 +134,7 @@ object DependantOperationResolver extends Logging {
   private def findOperationThatEndsWithOrEquals(operations: Seq[Operation], method: Method, pathSuffix: String): Option[Operation] = {
     operations.find { o =>
       o.method == method &&
-        (o.path.toLowerCase.endsWith(pathSuffix.toLowerCase()) || o.path.equalsIgnoreCase(pathSuffix))
+        (o.path.toLowerCase.endsWith(pathSuffix.toLowerCase())  || o.path.equalsIgnoreCase(pathSuffix))
     }
   }
 
@@ -194,9 +194,9 @@ object DependantOperationResolver extends Logging {
         operation
       case Some(body) if !body.`type`.startsWith(referencedServiceNamespace) =>
         val typeToLookFor = body.`type`
-        val enumOpt = resolvedService.service.enums.find(o => o.name.startsWith(referencedServiceNamespace) && o.name.contains(typeToLookFor)).map(_.name)
-        val modelOpt = resolvedService.service.models.find(o => o.name.startsWith(referencedServiceNamespace) && o.name.contains(typeToLookFor)).map(_.name)
-        val unionOpt = resolvedService.service.unions.find(o => o.name.startsWith(referencedServiceNamespace) && o.name.contains(typeToLookFor)).map(_.name)
+        val enumOpt = resolvedService.service.enums.find(o => o.name.startsWith(referencedServiceNamespace)  && o.name.contains(typeToLookFor)).map(_.name)
+        val modelOpt = resolvedService.service.models.find(o => o.name.startsWith(referencedServiceNamespace)  && o.name.contains(typeToLookFor)).map(_.name)
+        val unionOpt = resolvedService.service.unions.find(o => o.name.startsWith(referencedServiceNamespace)  && o.name.contains(typeToLookFor)).map(_.name)
         val newTypeSignature = unionOpt orElse modelOpt orElse enumOpt getOrElse {
           logger.warn(s"ResolvedService does not contain the type returned by the operation - $typeToLookFor")
           typeToLookFor

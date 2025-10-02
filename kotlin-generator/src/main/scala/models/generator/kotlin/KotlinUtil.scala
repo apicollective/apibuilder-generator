@@ -197,7 +197,7 @@ trait KotlinUtil {
         ParameterizedTypeName.get(new ClassName("kotlin.collections", "Map"), new ClassName("kotlin", "String"), dataTypeFromField(getMapType(`type`), serviceNameSpace, allEnums))
       }
       else {
-        val isLocalEnum = allEnums.exists(enum => enum.name == `type`)
+        val isLocalEnum = allEnums.exists(e => e.name == `type`)
         val nameSpace: String = if(isLocalEnum) toEnumsNameSpace(serviceNameSpace) else toModelsNameSpace(serviceNameSpace)
         new ClassName(nameSpace, name)
       }

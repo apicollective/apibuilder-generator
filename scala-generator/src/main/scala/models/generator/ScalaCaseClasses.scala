@@ -166,7 +166,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     ).flatten.mkString("\n")
   }
 
-  def generateEnum(ssd: ScalaService, `enum`: ScalaEnum): String = {
+  def generateEnum(ssd: ScalaService, enumDef: ScalaEnum): String = {
     ScalaEnums(ssd, enum).build()
   }
 

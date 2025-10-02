@@ -150,18 +150,18 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
       File(s"${sharedObjectMapperClassName}.java", Some(sharedJacksonDirectoryPath), JavaFile.builder(sharedJacksonSpace, builder.build).build.toString)
     }
 
-    def generateEnum(`enum`: Enum): File = {
+    def generateEnum(enumDef: Enum): File = {
 
-      val className = toClassName(`enum`.name)
+      val className = toClassName(enumDef.name)
 
       val builder =
         TypeSpec.enumBuilder(className)
           .addModifiers(Modifier.PUBLIC)
           .addJavadoc(apiDocComments)
 
-      `enum`.description.map(builder.addJavadoc(_))
+      enumDef.description.map(builder.addJavadoc(_))
 
-      `enum`.values.foreach(value => {
+      enumDef.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("value", "\"" + value.name + "\"")
         builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder("$S", value.name).addAnnotation(annotation.build()).build())
       })

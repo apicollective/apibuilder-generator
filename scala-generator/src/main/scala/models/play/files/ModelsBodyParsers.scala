@@ -18,7 +18,7 @@ object ModelsBodyParsers {
       parser.validate(_.validate[A].asEither.left.map(e => ${BadRequest}(${JsError}.toJson(e))))
 	"""
 
-	def bodyParser(`enum`: scala.generator.ScalaEnum): String = bodyParser(enum.name, enum.qualifiedName)
+	def bodyParser(enumDef: scala.generator.ScalaEnum): String = bodyParser(enumDef.name, enumDef.qualifiedName)
 	def bodyParser(model: scala.generator.ScalaModel): String = bodyParser(model.name, model.qualifiedName)
 	def bodyParser(union: scala.generator.ScalaUnion): String = bodyParser(union.name, union.qualifiedName)
 	def bodyParser(suffix: String, tpe: String): String = s"""

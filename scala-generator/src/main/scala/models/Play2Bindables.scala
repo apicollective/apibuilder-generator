@@ -166,14 +166,14 @@ case class Play2Bindables(ssd: ScalaService) {
 
   private def exampleEnumValue(enumName: String): ScalaEnumValue = {
     val fullyQualifiedName = ssd.enumClassName(enumName)
-    val `enum` = ssd.enums.find(_.qualifiedName == fullyQualifiedName).getOrElse {
+    val enumDef = ssd.enums.find(_.qualifiedName == fullyQualifiedName).getOrElse {
       sys.error(
         s"Failed to find enum[$fullyQualifiedName] in service[${ssd.service.name}]." +
           s"Available enums: ${ssd.enums.map(_.qualifiedName).mkString(", ")}"
       )
     }
 
-    enum.values.headOption.getOrElse {
+    enumDef.values.headOption.getOrElse {
       sys.error(s"Enum[$fullyQualifiedName] does not have any values")
     }
   }

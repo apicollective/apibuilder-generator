@@ -1,6 +1,6 @@
 package generator
 
-import akka.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.model.StatusCodes
 import examples.ExampleJson
 import io.apibuilder.spec.v0.models.{Operation, Parameter, ParameterLocation}
 import io.apibuilder.postman.collection.v21.v0.models.{Folder, Item}
@@ -54,7 +54,7 @@ object SetupCleanupFolderBuilder {
     val successfulStatusCodes = Set(StatusCodes.OK.intValue, StatusCodes.Created.intValue)
     val rootJsonObjIsArray = item.response.flatMap(_.collectFirst {
       case resp if resp.code.exists(successfulStatusCodes.contains) =>
-        resp.body.exists(t => t.trim.startsWith("[") && t.trim.endsWith("]"))
+        resp.body.exists(t => t.trim.startsWith("[")  && t.trim.endsWith("]"))
     }).getOrElse(false)
     val jsonBase = if (rootJsonObjIsArray) "jsonData[0]" else "jsonData"
 
@@ -114,7 +114,7 @@ object SetupCleanupFolderBuilder {
 
     val filledQueryParams = rawQueryParamMap.map {
       case (key, value) =>
-        val targetQueryParamOpt = queryParameters.find(_.name equalsIgnoreCase key)
+        val targetQueryParamOpt = queryParameters.find(_.name.equalsIgnoreCase(key))
         targetQueryParamOpt match {
           case Some(queryParam) =>
             queryParam.copy(

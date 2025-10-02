@@ -69,20 +69,20 @@ object JavaClasses extends CodeGenerator {
       datatypeResolver.parse(unionType.`type`, true).map(JavaDatatype(_)).toOption
     }
 
-    def generateEnum(`enum`: Enum): File = {
+    def generateEnum(enumDef: Enum): File = {
       def generateEnumValue(enumValue: EnumValue): String = {
         commentFromOpt(enumValue.description) +
           enumValue.name.toUpperCase
       }
 
-      val className = JavaUtil.toClassName(enum.name)
+      val className = JavaUtil.toClassName(enumDef.name)
 
       val enumDeclaration = {
         import lib.Text.*
 
-        commentFromOpt(enum.description) +
+        commentFromOpt(enumDef.description) +
           s"public enum $className {\n" +
-          enum.values.map { generateEnumValue }.mkString(",\n").indentString(4) + "\n" +
+          enumDef.values.map { generateEnumValue }.mkString(",\n").indentString(4) + "\n" +
           "}"
       }
 

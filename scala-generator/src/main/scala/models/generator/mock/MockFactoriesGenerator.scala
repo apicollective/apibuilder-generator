@@ -31,8 +31,8 @@ object MockFactoriesGenerator extends CodeGenerator {
     "}"
   ).mkString("\n\n")
 
-  private[mock] def makeEnum(`enum`: ScalaEnum): String = {
-    val name = enum.values.headOption match {
+  private[mock] def makeEnum(enumDef: ScalaEnum): String = {
+    val name = enumDef.values.headOption match {
       case None => {
         """UNDEFINED("other")"""
       }
@@ -40,7 +40,7 @@ object MockFactoriesGenerator extends CodeGenerator {
         value.name
       }
     }
-    s"def make${enum.name}(): ${enum.qualifiedName} = ${enum.qualifiedName}.$name"
+    s"def make${enumDef.name}(): ${enumDef.qualifiedName} = ${enumDef.qualifiedName}.$name"
   }
 
   private[mock] def makeModel(model: ScalaModel): String = {

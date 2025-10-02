@@ -63,17 +63,17 @@ case class Code(form: InvocationForm) {
     }
   }
 
-  private def generateEnum(`enum`: Enum): String = {
+  private def generateEnum(`enumDef`: Enum): String = {
     val strings = importBuilder.ensureImport("strings")
-    val enumName = importBuilder.publicName(enum.name)
+    val enumName = importBuilder.publicName(enumDef.name)
 
     Seq(
-      GoUtil.textToComment(enum.description) + s"type $enumName string",
+      GoUtil.textToComment(enumDef.description) + s"type $enumName string",
 
       Seq(
         "const (",
         (
-          enum.values.zipWithIndex.map { case (value, i) =>
+          enumDef.values.zipWithIndex.map { case (value, i) =>
             val comments = GoUtil.textToSingleLineComment(value.description).trim match {
               case "" => ""
               case text => s" $text"
@@ -97,7 +97,7 @@ case class Code(form: InvocationForm) {
         Seq(
           s"switch ${strings}.TrimSpace(${strings}.ToLower(value)) {",
           (
-            enum.values.map { value =>
+            enumDef.values.map { value =>
               val name = enumName + importBuilder.publicName(value.name)
               val key = GoUtil.wrapInQuotes(value.name.trim.toLowerCase)
               s"case $key:\n" + s"return $name".indentString(1)

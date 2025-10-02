@@ -153,12 +153,12 @@ case class Play2Json(
     ssd.enums.map(enumReadersAndWriters).mkString("\n\n")
   }
 
-  private[models] def enumReadersAndWriters(`enum`: ScalaEnum): String = {
-    val jsValueWriterMethodUnqualified = play2JsonCommon.implicitWriterNameUnqualified(enum.name)
-    val jsObjectWriterMethodUnqualified = play2JsonCommon.toJsonObjectMethodNameUnqualified(enum.name)
+  private[models] def enumReadersAndWriters(enumDef: ScalaEnum): String = {
+    val jsValueWriterMethodUnqualified = play2JsonCommon.implicitWriterNameUnqualified(enumDef.name)
+    val jsObjectWriterMethodUnqualified = play2JsonCommon.toJsonObjectMethodNameUnqualified(enumDef.name)
 
-    val jsValueWriterMethodQualified = play2JsonCommon.implicitWriterNameQualified(ssd.namespaces, enum.name)
-    val jsObjectWriterMethodQualified = play2JsonCommon.toJsonObjectMethodNameQualified(ssd.namespaces, enum.name)
+    val jsValueWriterMethodQualified = play2JsonCommon.implicitWriterNameQualified(ssd.namespaces, enumDef.name)
+    val jsObjectWriterMethodQualified = play2JsonCommon.toJsonObjectMethodNameQualified(ssd.namespaces, enumDef.name)
 
     val discriminator = getDiscriminator(enum)
     val jsObjectBody = wrapInObject("play.api.libs.json.JsString(obj.toString)", discriminator)
@@ -166,29 +166,29 @@ case class Play2Json(
     // if there is a discriminator, writes using the object version, otherwise use the value
     val implicitWriter = discriminator match {
       case Some(_) =>
-        play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsObjectWriterMethodQualified, model = None)
+        play2JsonCommon.implicitWriter(enumDef.name, enumDef.qualifiedName, jsObjectWriterMethodQualified, model = None)
       case None =>
-        play2JsonCommon.implicitWriter(enum.name, enum.qualifiedName, jsValueWriterMethodQualified, model = None)
+        play2JsonCommon.implicitWriter(enumDef.name, enumDef.qualifiedName, jsValueWriterMethodQualified, model = None)
     }
 
     Seq(
-      s"implicit val jsonReads${ssd.name}${enum.name}: play.api.libs.json.Reads[${enum.qualifiedName}] = new play.api.libs.json.Reads[${enum.qualifiedName}] {",
+      s"implicit val jsonReads${ssd.name}${enumDef.name}: play.api.libs.json.Reads[${enumDef.qualifiedName}] = new play.api.libs.json.Reads[${enumDef.qualifiedName}] {",
       Seq(
-        s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${enum.qualifiedName}] = {",
+        s"def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[${enumDef.qualifiedName}] = {",
         Seq(
           "js match {",
           Seq(
-            s"case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v.value))",
+            s"case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(${enumDef.qualifiedName}(v.value))",
             "case _ => {",
             Seq(
               """(js \ "value").validate[String] match {""",
               Seq(
-                s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
+                s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enumDef.qualifiedName}(v))",
                 "case _: play.api.libs.json.JsError =>",
                 Seq(
-                  s"""(js \\ "${enum.originalName}").validate[String] match {""",
+                  s"""(js \\ "${enumDef.originalName}").validate[String] match {""",
                   Seq(
-                    s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enum.qualifiedName}(v))",
+                    s"case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(${enumDef.qualifiedName}(v))",
                     "case err: play.api.libs.json.JsError => err",
                   ).mkString("\n").indentString(2),
                   "}"
@@ -204,11 +204,11 @@ case class Play2Json(
       ).mkString("\n").indentString(2),
       "}",
       "",
-      s"def $jsValueWriterMethodUnqualified(obj: ${enum.qualifiedName}) = {",
+      s"def $jsValueWriterMethodUnqualified(obj: ${enumDef.qualifiedName}) = {",
       s"""  play.api.libs.json.JsString(obj.toString)""",
       s"}",
       "",
-      s"def $jsObjectWriterMethodUnqualified(obj: ${enum.qualifiedName}) = {",
+      s"def $jsObjectWriterMethodUnqualified(obj: ${enumDef.qualifiedName}) = {",
       s"""  $jsObjectBody""",
       s"}",
       "",
@@ -530,8 +530,8 @@ case class Play2Json(
   private def getDiscriminator(model: ScalaModel): Option[Discriminator] =
     getDiscriminator("Model", model.qualifiedName, ssd.unionAndTypesForModel(model))
 
-  private def getDiscriminator(`enum`: ScalaEnum): Option[Discriminator] =
-    getDiscriminator("Enum", enum.qualifiedName, ssd.unionsAndTypesForEnum(enum))
+  private def getDiscriminator(enumDef: ScalaEnum): Option[Discriminator] =
+    getDiscriminator("Enum", enumDef.qualifiedName, ssd.unionsAndTypesForEnum(enum))
 
   private def getDiscriminator(
     name: String,

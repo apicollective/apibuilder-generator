@@ -56,7 +56,7 @@ class ServiceImportResolverSpec extends AnyWordSpec with Matchers {
         val resultObjs = serviceToObjs(resultService)
         val typeNamesWithFullNamespace = sourceObjs.forall { sourceEnum =>
           resultObjs.exists(resultEnum =>
-            resultEnum.name.contains(importedService.namespace) &&
+            resultEnum.name.contains(importedService.namespace)  &&
               resultEnum.name.contains(sourceEnum.name)
           )
         }

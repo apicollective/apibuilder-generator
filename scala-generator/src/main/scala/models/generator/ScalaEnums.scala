@@ -2,7 +2,7 @@ package scala.generator
 
 case class ScalaEnums(
   ssd: ScalaService,
-  `enum`: ScalaEnum
+  enumDef: ScalaEnum
 ) {
 
   private val unions = ssd.unionsForEnum(enum)
@@ -10,23 +10,23 @@ case class ScalaEnums(
   def build(): String = {
     import lib.Text.*
     Seq(
-      enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
-      s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(
-        className = enum.name,
+      enumDef.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
+      s"sealed trait ${enumDef.name}" + ScalaUtil.extendsClause(
+        className = enumDef.name,
         interfaces = Nil,
         unions = unions.map(_.name),
       ).getOrElse(" extends _root_.scala.Product with _root_.scala.Serializable"),
-      s"${ScalaUtil.deprecationString(enum.deprecation)}object ${enum.name} {",
+      s"${ScalaUtil.deprecationString(enumDef.deprecation)}object ${enumDef.name} {",
       buildValues().indentString(2),
       s"}"
     ).mkString("\n\n")
   }
   
   private def buildValues(): String = {
-    (enum.values.map { value =>
+    (enumDef.values.map { value =>
       CaseClassBuilder()
         .withName(value.name)
-        .withExtendsClasses(Seq(enum.name))
+        .withExtendsClasses(Seq(enumDef.name))
         .withDeprecation(value.deprecation)
         .withScaladoc(value.description.map(ScalaUtil.textToComment))
         .withBodyParts(Seq(
@@ -37,7 +37,7 @@ case class ScalaEnums(
     } ++ Seq(
       CaseClassBuilder()
         .withName("UNDEFINED")
-        .withExtendsClasses(Seq(enum.name))
+        .withExtendsClasses(Seq(enumDef.name))
         .withScaladoc(
           Some("\n" + """
            |/**
@@ -63,11 +63,11 @@ case class ScalaEnums(
  * above.
  */
     """.stripTrailing() + "\n" +
-    s"val all: scala.List[${enum.name}] = scala.List(" + enum.values.map(_.name).mkString(", ") + ")\n\n" +
+    s"val all: scala.List[${enumDef.name}] = scala.List(" + enumDef.values.map(_.name).mkString(", ") + ")\n\n" +
     s"private\n" +
-    s"val byName: Map[String, ${enum.name}] = all.map(x => x.toString.toLowerCase -> x).toMap\n\n" +
-    s"def apply(value: String): ${enum.name} = fromString(value).getOrElse(UNDEFINED(value))\n\n" +
-    s"def fromString(value: String): _root_.scala.Option[${enum.name}] = byName.get(value.toLowerCase)\n\n"
+    s"val byName: Map[String, ${enumDef.name}] = all.map(x => x.toString.toLowerCase -> x).toMap\n\n" +
+    s"def apply(value: String): ${enumDef.name} = fromString(value).getOrElse(UNDEFINED(value))\n\n" +
+    s"def fromString(value: String): _root_.scala.Option[${enumDef.name}] = byName.get(value.toLowerCase)\n\n"
   }
 
 }

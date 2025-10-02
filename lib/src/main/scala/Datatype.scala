@@ -115,15 +115,15 @@ case class DatatypeResolver(
       case "unit" => Success(Datatype.Primitive.Unit)
       case "uuid" => Success(Datatype.Primitive.Uuid)
 
-      case ListRx(inner) => parse(inner).map(Datatype.Container.List)
-      case MapRx(inner) => parse(inner).map(Datatype.Container.Map)
+      case ListRx(inner) => parse(inner).map(Datatype.Container.List.apply)
+      case MapRx(inner) => parse(inner).map(Datatype.Container.Map.apply)
       case MapDefaultRx() => Success(Datatype.Container.Map(Datatype.Primitive.String))
 
       case UserDefined(dt) => Success(dt)
       case other => Failure(new RuntimeException(s"Cannot map class[${value.getClass.getName}] with value [$other] to datatype"))
     }
 
-    if (makePrimitiveType) dt else dt.map(Datatype.Container.Option)
+    if (makePrimitiveType) dt else dt.map(Datatype.Container.Option.apply)
   }
 
 }

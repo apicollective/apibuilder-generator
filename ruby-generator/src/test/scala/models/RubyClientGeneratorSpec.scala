@@ -22,7 +22,7 @@ class RubyClientGeneratorSpec extends AnyFunSpec with Matchers {
   describe("generateEnumClass") {
 
     it("for enum with multiple values") {
-      val `enum` = Enum(
+      val enumDef = Enum(
         name = "age_group",
         plural = "age_groups",
         description = None,

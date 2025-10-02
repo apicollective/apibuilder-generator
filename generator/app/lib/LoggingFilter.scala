@@ -1,6 +1,6 @@
 package lib
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import javax.inject.Inject
 import play.api.Logging
 import play.api.mvc.*

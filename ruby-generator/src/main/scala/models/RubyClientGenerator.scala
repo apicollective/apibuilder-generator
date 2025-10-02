@@ -259,8 +259,8 @@ object RubyClientGenerator extends CodeGenerator with Logging {
     union.discriminator.getOrElse(RubyUtil.DefaultDiscriminatorName)
   }
 
-  def generateEnum(`enum`: Enum, union: Option[Union]): String = {
-    val className = RubyUtil.toClassName(enum.name)
+  def generateEnum(`enumDef`: Enum, union: Option[Union]): String = {
+    val className = RubyUtil.toClassName(enumDef.name)
 
     val lines = ListBuffer[String]()
     lines.append(classDeclaration(className, union.map { u => RubyUtil.toClassName(u.name) }))
@@ -272,7 +272,7 @@ object RubyClientGenerator extends CodeGenerator with Logging {
     lines.append("  def initialize(value)")
     union.foreach { u =>
       val discName = discriminatorName(u)
-      lines.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, enum.name)}, :$discName => '${enum.name}')")
+      lines.append(s"    super(:name => ${RubyUtil.toClassName(u.name)}::Types::${RubyUtil.toUnionConstant(u, enumDef.name)}, :$discName => '${enumDef.name}')")
     }
 
     lines.append("    @value = HttpClient::Preconditions.assert_class('value', value, String)")
@@ -297,11 +297,11 @@ object RubyClientGenerator extends CodeGenerator with Logging {
 
     lines.append("")
     lines.append(s"  def $className.ALL") // Upper case to avoid naming conflict
-    lines.append("    @@all ||= [" + enum.values.map(v => s"$className.${enumName(v.name)}").mkString(", ") + "]")
+    lines.append("    @@all ||= [" + enumDef.values.map(v => s"$className.${enumName(v.name)}").mkString(", ") + "]")
     lines.append("  end")
 
     lines.append("")
-    enum.values.foreach { value =>
+    enumDef.values.foreach { value =>
       val varName = enumName(value.name)
       value.description.foreach { desc =>
         lines.append(GeneratorUtil.formatComment(desc).indentString(2))
@@ -366,12 +366,12 @@ case class RubyClientGenerator(form: InvocationForm) extends Logging {
     }
   }
 
-  private def unionFor(`enum`: Enum): Option[Union] = {
-    service.unions.filter { u => u.types.map(_.`type`).contains(enum.name) }.toList match {
+  private def unionFor(`enumDef`: Enum): Option[Union] = {
+    service.unions.filter { u => u.types.map(_.`type`).contains(enumDef.name) }.toList match {
       case Nil => None
       case one :: Nil => Some(one)
       case multiple => {
-        logger.warn(s"Enum ${enum.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
+        logger.warn(s"Enum ${enumDef.name} belongs to multiple union types: ${multiple.map(_.name).mkString(", ")} - This is not supported in ruby client. Using first: ${multiple.head.name}")
         multiple.headOption
       }
     }

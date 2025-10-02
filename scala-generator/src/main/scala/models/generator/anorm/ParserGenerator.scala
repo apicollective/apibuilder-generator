@@ -285,15 +285,15 @@ trait ParserGenerator extends CodeGenerator {
       s"SqlParser.get[${datatype.fullName}]($fieldName)"
     }
 
-    private def generateEnum(`enum`: ScalaEnum): String = {
+    private def generateEnum(enumDef: ScalaEnum): String = {
       Seq(
-        s"object ${enum.name} {",
+        s"object ${enumDef.name} {",
         Seq(
-          s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${enum.qualifiedName}] = parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))""",
+          s"""def parserWithPrefix(prefix: String, sep: String = "_"): RowParser[${enumDef.qualifiedName}] = parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))""",
           Seq(
-            s"""def parser(name: String = "${enum.originalName}", prefixOpt: Option[String] = None): RowParser[${enum.qualifiedName}] = {""",
+            s"""def parser(name: String = "${enumDef.originalName}", prefixOpt: Option[String] = None): RowParser[${enumDef.qualifiedName}] = {""",
             s"""  SqlParser.str(prefixOpt.getOrElse("") + name) map {""",
-            s"    case value => ${enum.qualifiedName}(value)",
+            s"    case value => ${enumDef.qualifiedName}(value)",
             s"  }",
             s"}"
           ).mkString("\n")

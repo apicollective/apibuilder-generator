@@ -45,9 +45,9 @@ case class ExampleJson(
     }
   }
 
-  private def makeEnum(`enum`: Enum, parentUnion: Option[(Union, UnionType)], outerField: Option[Field]): JsValue = {
+  private def makeEnum(enumDef: Enum, parentUnion: Option[(Union, UnionType)], outerField: Option[Field]): JsValue = {
     def randomValue: JsValue = JsString(
-      Random.shuffle(enum.values)
+      Random.shuffle(enumDef.values)
         .headOption.map(ev => ev.value.getOrElse(ev.name)).getOrElse("undefined")
     )
     val value = outerField
@@ -57,7 +57,7 @@ case class ExampleJson(
 
     parentUnion.fold(value) { case (union, unionType) =>
       // strip any namespace prefix from model name
-      val name = enum.name.reverse.takeWhile(_ != '.').reverse
+      val name = enumDef.name.reverse.takeWhile(_ != '.').reverse
       val discrVal = unionType.discriminatorValue.getOrElse(name)
       union.discriminator.fold {
         Json.obj(discrVal -> value)

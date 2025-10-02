@@ -68,7 +68,7 @@ object ModelsGens {
     ns.map { ns => s"import ${ns.models}.gens._" }
   }
 
-	def arbitrary(`enum`: ScalaEnum): String = arbitrary(enum.ssd.namespaces, enum.name, enum.qualifiedName)
+	def arbitrary(enumDef: ScalaEnum): String = arbitrary(enumDef.ssd.namespaces, enumDef.name, enumDef.qualifiedName)
   def arbitrary(model: ScalaModel): String = arbitrary(model.ssd.namespaces, model.name, model.qualifiedName)
   def arbitrary(interface: ScalaInterface): String = arbitrary(interface.ssd.namespaces, interface.name, interface.qualifiedName)
 	def arbitrary(union: ScalaUnion): String = arbitrary(union.ssd.namespaces, union.name, union.qualifiedName)
@@ -102,9 +102,9 @@ object ModelsGens {
       """
   }
 
-  def gen(`enum`: ScalaEnum): String = {
-    val oneOf = enum.values.map(v => s"${Gen}.const(${enum.qualifiedName}.${v.name})").toList
-    genOneOf(enum.name, enum.qualifiedName, oneOf)
+  def gen(enumDef: ScalaEnum): String = {
+    val oneOf = enumDef.values.map(v => s"${Gen}.const(${enumDef.qualifiedName}.${v.name})").toList
+    genOneOf(enumDef.name, enumDef.qualifiedName, oneOf)
   }
 
   def gen(model: ScalaModel): String = {

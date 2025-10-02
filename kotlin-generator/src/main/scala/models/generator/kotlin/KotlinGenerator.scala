@@ -62,16 +62,16 @@ class KotlinGenerator
 
     def createDirectoryPath(namespace: String) = namespace.replace('.', '/')
 
-    def generateEnum(`enum`: io.apibuilder.spec.v0.models.Enum): File = {
-      val className = toClassName(enum.name)
+    def generateEnum(enumDef: io.apibuilder.spec.v0.models.Enum): File = {
+      val className = toClassName(enumDef.name)
 
       val builder = TypeSpec.enumBuilder(className)
         .addModifiers(KModifier.PUBLIC)
         .addKdoc(kdocClassMessage)
 
-      enum.description.map(builder.addKdoc(_))
+      enumDef.description.map(builder.addKdoc(_))
 
-      enum.values.foreach(value => {
+      enumDef.values.foreach(value => {
         val annotation = AnnotationSpec.builder(classOf[JsonProperty]).addMember("\"" + value.name + "\"")
         builder.addEnumConstant(toEnumName(value.name), TypeSpec.anonymousClassBuilder().addSuperclassConstructorParameter("%S", value.name).addAnnotation(annotation.build()).build())
       })

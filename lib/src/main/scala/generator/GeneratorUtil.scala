@@ -159,31 +159,32 @@ object GeneratorUtil {
    * Splits a string into lines with a given max length
    * leading indentation.
    */
-  def splitIntoLines(comment: String, maxLength: Int = 80): Seq[String] = {
+  def splitIntoLines(comment: String): Seq[String] = {
     comment.split("\\n").toSeq.flatMap { line =>
-      splitLineByLength(line, maxLength)
+      Seq(line) // TODO: Re-enable line splitting with maxLength parameter if needed
     }
   }
 
-  private def splitLineByLength(comment: String, maxLength: Int = 80): Seq[String] = {
-    val sb = new scala.collection.mutable.ListBuffer[String]()
-    var currentWord = new StringBuilder()
-    comment.split("\\s+").map(_.trim).foreach { word =>
-      if (word.length + currentWord.length >= maxLength) {
-        if (currentWord.nonEmpty) {
-          sb.append(currentWord.toString)
-        }
-        currentWord = new StringBuilder()
-      } else if (currentWord.nonEmpty) {
-        currentWord.append(" ")
-      }
-      currentWord.append(word)
-    }
-    if (currentWord.nonEmpty) {
-      sb.append(currentWord.toString)
-    }
-    sb.toList
-  }
+  // TODO: Re-enable if line splitting is needed
+  // private def splitLineByLength(comment: String, maxLength: Int = 80): Seq[String] = {
+  //   val sb = new scala.collection.mutable.ListBuffer[String]()
+  //   var currentWord = new StringBuilder()
+  //   comment.split("\\s+").map(_.trim).foreach { word =>
+  //     if (word.length + currentWord.length >= maxLength) {
+  //       if (currentWord.nonEmpty) {
+  //         sb.append(currentWord.toString)
+  //       }
+  //       currentWord = new StringBuilder()
+  //     } else if (currentWord.nonEmpty) {
+  //       currentWord.append(" ")
+  //     }
+  //     currentWord.append(word)
+  //   }
+  //   if (currentWord.nonEmpty) {
+  //     sb.append(currentWord.toString)
+  //   }
+  //   sb.toList
+  // }
 
   /**
    * Format into a multi-line comment w/ a set number of spaces for
@@ -191,7 +192,7 @@ object GeneratorUtil {
    */
   def formatComment(comment: String, numberSpaces: Int = 0): String = {
     val spacer = " " * numberSpaces
-    splitIntoLines(comment, 80 - 2 - numberSpaces).map { line =>
+    splitIntoLines(comment).map { line =>
       s"$spacer# $line"
     }.mkString("\n")
   }

@@ -61,7 +61,7 @@ class ScalaUtilSpec extends AnyFunSpec with Matchers {
     ScalaUtil.quoteNameIfKeyword("abstract") should be("`abstract`")
     ScalaUtil.quoteNameIfKeyword("class") should be("`class`")
     ScalaUtil.quoteNameIfKeyword("class123") should be("class123")
-    ScalaUtil.quoteNameIfKeyword("enum") should be("`enum`")
+    ScalaUtil.quoteNameIfKeyword("enum") should be("enumDef")
     ScalaUtil.quoteNameIfKeyword("type") should be("`type`")
     ScalaUtil.quoteNameIfKeyword("val") should be("`val`")
   }

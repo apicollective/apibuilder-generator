@@ -109,8 +109,8 @@ class MockClientGenerator(
     ).mkString("\n\n")
   }
 
-  def makeEnum(`enum`: ScalaEnum): String = {
-    val name = enum.values.headOption match {
+  def makeEnum(enumDef: ScalaEnum): String = {
+    val name = enumDef.values.headOption match {
       case None => {
         """UNDEFINED("other")"""
       }
@@ -118,7 +118,7 @@ class MockClientGenerator(
         value.name
       }
     }
-    s"def make${enum.name}(): ${enum.qualifiedName} = ${enum.qualifiedName}.$name"
+    s"def make${enumDef.name}(): ${enumDef.qualifiedName} = ${enumDef.qualifiedName}.$name"
   }
 
 

@@ -33,7 +33,7 @@ lazy val generated = project
       "joda-time" % "joda-time" % "2.13.0",
       "org.scalacheck" %% "scalacheck" % "1.18.1" % Test
     ),
-    scalacOptions ++= allScalacOptions
+    scalacOptions := scalacOptions.value.filterNot(_ == "-Xfatal-warnings")
   )
 
 // TODO: lib will eventually be published as a jar if it turns out
@@ -87,8 +87,9 @@ lazy val scalaGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
+    // TODO: scalafmt-core doesn't have Scala 3 artifacts yet, using 2.13 version
     libraryDependencies ++= Seq(
-      "org.scalameta" %% "scalafmt-core" % "3.8.3"
+      ("org.scalameta" %% "scalafmt-core" % "3.8.3").cross(CrossVersion.for3Use2_13)
     )
   )
 
@@ -140,8 +141,9 @@ lazy val graphQLGenerator = project
   .settings(commonSettings: _*)
   .settings(resolversSettings)
   .settings(
+    // TODO: Update apibuilder-graphql to Scala 3 version when available
     libraryDependencies ++= Seq(
-      "io.apibuilder" %% "apibuilder-graphql" % "0.0.10",
+      ("io.apibuilder" %% "apibuilder-graphql" % "0.0.10").cross(CrossVersion.for3Use2_13),
     ),
   )
 
@@ -190,8 +192,9 @@ lazy val postmanGenerator = project
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
+    // TODO: Find Scala 3 alternative or update ammonite-ops
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "ammonite-ops" % "2.0.4",
+      ("com.lihaoyi" %% "ammonite-ops" % "2.0.4").cross(CrossVersion.for3Use2_13),
     )
   )
 

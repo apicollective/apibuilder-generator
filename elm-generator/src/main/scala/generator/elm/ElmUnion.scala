@@ -33,9 +33,10 @@ case class ElmUnion(args: GenArgs) {
     }
   }
 
-  private def decoderByDiscriminatorName(u: Union, disc: String): String = {
-    elmJson.decoderName(u.name) + "By" + Names.pascalCase(disc)
-  }
+  // TODO: Re-enable if needed for discriminator-based decoding
+  // private def decoderByDiscriminatorName(u: Union, disc: String): String = {
+  //   elmJson.decoderName(u.name) + "By" + Names.pascalCase(disc)
+  // }
 
   private def genDecoderType(u: Union, disc: String): ElmFunction = {
     args.imports.addAs("Json.Decode", "Decode")

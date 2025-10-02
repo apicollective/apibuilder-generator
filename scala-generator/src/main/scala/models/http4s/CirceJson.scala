@@ -64,14 +64,14 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     ssd.enums.flatMap(enumDecodersAndEncoders).mkString("\n\n")
   }
 
-  private def enumDecodersAndEncoders(`enum`: ScalaEnum): Option[String] = {
-    enum.values.headOption.map { _ =>
+  private def enumDecodersAndEncoders(enumDef: ScalaEnum): Option[String] = {
+    enumDef.values.headOption.map { _ =>
       Seq(
-        s"""implicit val jsonDecoder${ssd.name}${enum.name}: Decoder[${enum.qualifiedName}] =""",
-        s"""  Decoder.decodeString.map(${enum.qualifiedName}(_))""",
+        s"""implicit val jsonDecoder${ssd.name}${enumDef.name}: Decoder[${enumDef.qualifiedName}] =""",
+        s"""  Decoder.decodeString.map(${enumDef.qualifiedName}(_))""",
         "",
-        s"""implicit val jsonEncoder${ssd.name}${enum.name}: Encoder[${enum.qualifiedName}] =""",
-        s"""  Encoder.encodeString.contramap[${enum.qualifiedName}](_.toString)"""
+        s"""implicit val jsonEncoder${ssd.name}${enumDef.name}: Encoder[${enumDef.qualifiedName}] =""",
+        s"""  Encoder.encodeString.contramap[${enumDef.qualifiedName}](_.toString)"""
       ).mkString("\n")
     }
   }

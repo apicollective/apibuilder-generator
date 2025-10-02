@@ -79,7 +79,7 @@ class ParserGenerator26Spec extends AnyFunSpec with Matchers {
       )
     }
 
-    def addEnum(`enum`: String): ServiceBuilder = {
+    def addEnum(enumDef: String): ServiceBuilder = {
       ServiceBuilder(
         unions = this.unions,
         models = this.models,
@@ -217,7 +217,7 @@ class ParserGenerator26Spec extends AnyFunSpec with Matchers {
       case Right(files) => {
         files.map(_.name) should be(fileNames)
         models.TestHelper.assertEqualsFile("/generator/anorm/enum-conversions-26.txt", files.head.contents)
-        models.TestHelper.assertEqualsFile("/generator/anorm/enum.txt", files.last.contents)
+        models.TestHelper.assertEqualsFile("/generator/anorm/enumDef.txt", files.last.contents)
       }
     }
   }
