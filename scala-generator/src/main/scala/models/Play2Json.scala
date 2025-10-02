@@ -1,6 +1,6 @@
 package scala.models
 
-import lib.Text._
+import lib.Text.*
 
 import scala.annotation.nowarn
 import scala.generator.ScalaPrimitive.{Model, Union}

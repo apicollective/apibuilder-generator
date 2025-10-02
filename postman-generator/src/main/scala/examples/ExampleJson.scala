@@ -2,14 +2,14 @@ package examples
 
 import java.util.UUID
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import io.postman.generator.attributes.v0.models.json.{jsonReadsPostmanGeneratorAttributesObjectReference, jsonReadsPostmanGeneratorAttributesValueSubstitute}
 import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference, ValueSubstitute}
 import models.AttributeValueReader
 import models.attributes.PostmanAttributes.ObjectReferenceExtend
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{DateTime, LocalDate}
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import scala.util.Random
 

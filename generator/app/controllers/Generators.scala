@@ -1,9 +1,9 @@
 package controllers
 
 import io.apibuilder.generator.v0.models.Generator
-import io.apibuilder.generator.v0.models.json._
-import play.api.mvc._
-import play.api.libs.json._
+import io.apibuilder.generator.v0.models.json.*
+import play.api.mvc.*
+import play.api.libs.json.*
 import lib.generator.{CodeGenTarget, CodeGenerator}
 
 class Generators extends InjectedController {

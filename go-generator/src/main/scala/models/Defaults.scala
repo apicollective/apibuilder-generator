@@ -2,7 +2,7 @@ package go.models
 
 import io.apibuilder.spec.v0.models.Service
 import lib.Datatype
-import play.api.libs.json._
+import play.api.libs.json.*
 
 object Defaults {
 

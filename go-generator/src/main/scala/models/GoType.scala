@@ -1,8 +1,8 @@
 package go.models
 
 import lib.{Datatype, Text}
-import Formatter._
-import play.api.libs.json._
+import Formatter.*
+import play.api.libs.json.*
 
 import scala.annotation.tailrec
 

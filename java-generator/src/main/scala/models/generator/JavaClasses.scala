@@ -78,7 +78,7 @@ object JavaClasses extends CodeGenerator {
       val className = JavaUtil.toClassName(enum.name)
 
       val enumDeclaration = {
-        import lib.Text._
+        import lib.Text.*
 
         commentFromOpt(enum.description) +
           s"public enum $className {\n" +
@@ -168,7 +168,7 @@ object JavaClasses extends CodeGenerator {
       val className = JavaUtil.toClassName(model.name)
 
       val classDeclaration = {
-        import lib.Text._
+        import lib.Text.*
 
         val noArgsConstructor = s"public $className() {}"
 

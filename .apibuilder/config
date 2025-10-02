@@ -3,21 +3,22 @@ code:
     apibuilder-common:
       version: latest
       generators:
-        play_2_x_json: generated/app
+        play_2_9_scala_3_client: generated/app
     apibuilder-spec:
       version: latest
       generators:
-        play_2_8_client: generated/app
+        play_2_9_scala_3_client: generated/app
     apibuilder-generator:
       version: latest
       generators:
-        play_2_8_client: generated/app
+        play_2_9_scala_3_client: generated/app
+        play_2_9_scala_3_controllers: generated/app
         play_2_x_routes: generator/conf/routes
     apibuilder-postman-collection-v2-1:
       version: latest
       generators:
-        play_2_x_json: generated/app
+        play_2_9_scala_3_client: generated/app
     postman-generator-attributes:
       version: latest
       generators:
-        play_2_x_json: generated/app
+        play_2_9_scala_3_client: generated/app

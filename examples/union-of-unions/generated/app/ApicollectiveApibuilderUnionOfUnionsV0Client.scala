@@ -101,8 +101,8 @@ package io.apibuilder.union.of.unions.v0.models {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
-    import play.api.libs.functional.syntax._
-    import io.apibuilder.union.of.unions.v0.models.json._
+    import play.api.libs.functional.syntax.*
+    import io.apibuilder.union.of.unions.v0.models.json.*
 
     private[v0] implicit val jsonReadsUUID = __.read[String].map { str =>
       _root_.java.util.UUID.fromString(str)
@@ -248,7 +248,7 @@ package io.apibuilder.union.of.unions.v0 {
     import play.api.mvc.{PathBindable, QueryStringBindable}
 
     // import models directly for backwards compatibility with prior versions of the generator
-    import Core._
+    import Core.*
 
     object Core {
       implicit def pathBindableDateTimeIso8601(implicit stringBinder: QueryStringBindable[String]): PathBindable[_root_.org.joda.time.DateTime] = ApibuilderPathBindable(ApibuilderTypes.dateTimeIso8601)
@@ -357,7 +357,7 @@ package io.apibuilder.union.of.unions.v0 {
     auth: scala.Option[io.apibuilder.union.of.unions.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {
-    import io.apibuilder.union.of.unions.v0.models.json._
+    import io.apibuilder.union.of.unions.v0.models.json.*
 
     private val logger = play.api.Logger("io.apibuilder.union.of.unions.v0.Client")
 

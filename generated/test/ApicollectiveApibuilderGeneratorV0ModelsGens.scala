@@ -64,7 +64,7 @@ package object gens {
       )
     }
 
-  import io.apibuilder.spec.v0.models.gens._
+  import io.apibuilder.spec.v0.models.gens.*
 
   implicit lazy val arbitraryIoApibuilderGeneratorV0ModelsFileFlag
     : _root_.org.scalacheck.Arbitrary[

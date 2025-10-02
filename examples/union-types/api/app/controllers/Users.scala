@@ -1,9 +1,9 @@
 package controllers
 
-import io.apibuilder.example.union.types.v0.models._
-import io.apibuilder.example.union.types.v0.models.json._
-import play.api.mvc._
-import play.api.libs.json._
+import io.apibuilder.example.union.types.v0.models.*
+import io.apibuilder.example.union.types.v0.models.json.*
+import play.api.mvc.*
+import play.api.libs.json.*
 import java.util.UUID
 
 object Users extends Controller {

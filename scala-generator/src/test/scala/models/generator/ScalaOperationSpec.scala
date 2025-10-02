@@ -1,6 +1,6 @@
 package scala.generator
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

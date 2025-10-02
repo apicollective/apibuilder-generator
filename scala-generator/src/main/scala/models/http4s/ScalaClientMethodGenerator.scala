@@ -2,13 +2,13 @@ package scala.models.http4s
 
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
 
-import scala.generator._
+import scala.generator.*
 
 class ScalaClientMethodGenerator (
   config: ScalaClientMethodConfig,
   ssd: ScalaService
 )  extends scala.generator.ScalaClientMethodGenerator(config, ssd) {
-  import lib.Text._
+  import lib.Text.*
 
   val http4sConfig: ScalaClientMethodConfigs.Http4s = Http4sScalaClientCommon.mustGetHttp4sConfig(config)
 
@@ -192,7 +192,7 @@ class ScalaClientMethod(
   response: String,
   implicitArgs: Option[String],
 ) extends scala.generator.ScalaClientMethod(operation, returnType, methodCall, response, implicitArgs, responseEnvelopeName = None) {
-  import lib.Text._
+  import lib.Text.*
 
   override val interface: String = {
     Seq(

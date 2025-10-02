@@ -1,11 +1,11 @@
 package models.generator.android
 
-import com.fasterxml.jackson.annotation._
+import com.fasterxml.jackson.annotation.*
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, JsonProcessingException, Version}
-import com.fasterxml.jackson.databind._
+import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.squareup.javapoet.AnnotationSpec.Builder
-import com.squareup.javapoet._
+import com.squareup.javapoet.*
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.{Enum, Method, Model, ParameterLocation, Resource, ResponseCodeInt, Service, Union}
 import lib.Text
@@ -15,7 +15,7 @@ import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 
 import java.io.IOException
 import javax.lang.model.element.Modifier
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
 
@@ -347,7 +347,7 @@ trait BaseAndroidCodeGenerator extends CodeGenerator with AndroidJavaUtil {
           case _ => None
         }
 
-        import RetrofitUtil._
+        import RetrofitUtil.*
 
         val retrofitPath = toRetrofitPath(operation.path)
 

@@ -1,6 +1,6 @@
 package go.models
 
-import go.models.Formatter._
+import go.models.Formatter.*
 import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.{Enum, Model, Parameter, ParameterLocation, Resource, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType, Union}
 import lib.Datatype

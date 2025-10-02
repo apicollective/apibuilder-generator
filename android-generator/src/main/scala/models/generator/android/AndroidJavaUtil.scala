@@ -1,7 +1,7 @@
 package models.generator.android
 
 import lib.Text
-import com.squareup.javapoet._
+import com.squareup.javapoet.*
 
 /**
  *

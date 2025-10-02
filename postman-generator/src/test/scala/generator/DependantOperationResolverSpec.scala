@@ -1,9 +1,9 @@
 package generator
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
-import io.postman.generator.attributes.v0.models.json._
-import models.attributes.PostmanAttributes._
+import io.postman.generator.attributes.v0.models.json.*
+import models.attributes.PostmanAttributes.*
 import models.operation.DependantOperations
 import play.api.libs.json.{JsObject, Json}
 import org.scalatest.matchers.should.Matchers

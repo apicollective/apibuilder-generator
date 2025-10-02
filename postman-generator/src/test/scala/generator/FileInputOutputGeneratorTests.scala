@@ -1,9 +1,9 @@
 package generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import models.TestHelper._
+import models.TestHelper.*
 import org.scalatest.Assertion
-import play.api.libs.json._
+import play.api.libs.json.*
 import testUtils.TestPostmanCollectionGenerator
 
 import scala.io.Source

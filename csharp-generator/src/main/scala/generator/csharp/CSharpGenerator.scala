@@ -1,9 +1,9 @@
 package generator.csharp
 
-import cats.implicits._
+import cats.implicits.*
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.ValidatedNec
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
 

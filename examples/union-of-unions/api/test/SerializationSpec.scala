@@ -1,8 +1,8 @@
-import io.apibuilder.union.of.unions.v0.models._
-import io.apibuilder.union.of.unions.v0.models.json._
+import io.apibuilder.union.of.unions.v0.models.*
+import io.apibuilder.union.of.unions.v0.models.json.*
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import java.util.UUID
 

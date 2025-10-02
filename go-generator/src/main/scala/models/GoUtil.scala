@@ -2,7 +2,7 @@ package go.models
 
 import io.apibuilder.spec.v0.models.Resource
 import lib.generator.GeneratorUtil
-import lib.Text._
+import lib.Text.*
 
 object GoUtil {
 

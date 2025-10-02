@@ -19,8 +19,8 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class PostmanCollectionGeneratorSpec extends AnyWordSpec with Matchers {
 
-  import TestFixtures._
-  import models.TestHelper._
+  import TestFixtures.*
+  import models.TestHelper.*
 
   "PostmanCollectionGenerator" should {
 

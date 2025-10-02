@@ -33,7 +33,7 @@ case class ElmTypeAliasBuilder(
   private def singleRequiredProperty: Option[ElmParameter] = {
     properties.toList match {
       case (name, typ) :: Nil => {
-        import ElmType._
+        import ElmType.*
         typ match {
           case ElmString | ElmInt | ElmBool | ElmDate | ElmFloat | ElmPosix | ElmDict(_) | ElmList(_) | ElmEnumLocal(_) | _: ElmEnumImported | ElmUserDefinedLocal(_) | _: ElmUserDefinedImported => Some(
             ElmParameter(name, typ.declaration)

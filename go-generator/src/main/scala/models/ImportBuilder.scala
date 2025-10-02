@@ -1,6 +1,6 @@
 package go.models
 
-import go.models.Formatter._
+import go.models.Formatter.*
 
 import scala.collection.mutable
 

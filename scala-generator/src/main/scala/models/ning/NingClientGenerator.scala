@@ -1,9 +1,9 @@
 package scala.models.ning
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import scala.generator._
-import scala.models._
-import lib.Text._
+import scala.generator.*
+import scala.models.*
+import lib.Text.*
 import lib.generator.CodeGenerator
 import generator.ServiceFileNames
 

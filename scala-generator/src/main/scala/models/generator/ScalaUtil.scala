@@ -1,6 +1,6 @@
 package scala.generator
 
-import lib.Text._
+import lib.Text.*
 import lib.generator.GeneratorUtil
 
 import io.apibuilder.spec.v0.models.Deprecation

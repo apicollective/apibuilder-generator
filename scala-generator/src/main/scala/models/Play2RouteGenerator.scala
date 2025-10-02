@@ -2,7 +2,7 @@ package scala.models
 
 import lib.generator.{CodeGenerator, GeneratorUtil}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import scala.generator.{ScalaDatatype, ScalaPrimitive, ScalaOperation, ScalaParameter, ScalaResource, ScalaService, ScalaUtil}
 
 object Play2RouteGenerator extends CodeGenerator {

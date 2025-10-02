@@ -3,9 +3,9 @@ package models
 import java.nio.file.{Files, Paths}
 import java.nio.charset.StandardCharsets
 import java.io.{File => JFile}
-import play.api.libs.json._
+import play.api.libs.json.*
 import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import io.apibuilder.spec.v0.models.json._
+import io.apibuilder.spec.v0.models.json.*
 import io.apibuilder.spec.v0.models.Service
 import io.apibuilder.generator.v0.models.File
 import lib.Text
@@ -108,7 +108,7 @@ object TestHelper extends Matchers {
     * generated code.
     */
   private def resolvePath(filename: String): String = {
-    import sys.process._
+    import sys.process.*
 
     val targetPath = Option(getClass.getResource(filename)).map(r => new JFile(r.getPath)).getOrElse {
       sys.error(s"Could not find file named[$filename]")
@@ -142,7 +142,7 @@ object TestHelper extends Matchers {
   }
 
   def assertValidScalaSourceCode(scalaSourceCode: String, filename: Option[String] = None): Unit = {
-    import scala.meta._
+    import scala.meta.*
 
     val virtualFile = Input.VirtualFile(filename.getOrElse("filename.scala"), scalaSourceCode)
     val parseResult = virtualFile.parse[Source]
@@ -163,7 +163,7 @@ object TestHelper extends Matchers {
     val actualPath = resolvePath(filename)
     val current = readFile(actualPath).trim
     if (current != contents.trim) {
-      import sys.process._
+      import sys.process.*
 
       val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
       TestHelper.writeToFile(expectedPath, contents.trim)

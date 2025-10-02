@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 import com.github.javaparser.JavaParser
 import io.apibuilder.generator.v0.models.InvocationForm
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import models.generator.JavaClasses.Generator
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

@@ -2,13 +2,13 @@ package controllers
 
 import io.apibuilder.example.union.types.discriminator.v0.Client
 import io.apibuilder.example.union.types.discriminator.v0.errors.UnitResponse
-import io.apibuilder.example.union.types.discriminator.v0.models._
-import io.apibuilder.example.union.types.discriminator.v0.models.json._
+import io.apibuilder.example.union.types.discriminator.v0.models.*
+import io.apibuilder.example.union.types.discriminator.v0.models.json.*
 
 import java.util.UUID
 import scala.util.{Failure, Success, Try}
-import play.api.libs.ws._
-import play.api.test._
+import play.api.libs.ws.*
+import play.api.test.*
 
 class UsersSpec extends PlaySpecification {
 

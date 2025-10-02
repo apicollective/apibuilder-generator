@@ -1,6 +1,6 @@
 package models.generator.android
 
-import RetrofitUtil._
+import RetrofitUtil.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

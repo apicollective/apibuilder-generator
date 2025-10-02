@@ -2,12 +2,12 @@ package controllers
 
 import io.apibuilder.example.union.types.v0.errors.UnitResponse
 import io.apibuilder.example.union.types.v0.models.{Foo, GuestUser, RegisteredUser, User, UserUndefinedType, UserUuid}
-import io.apibuilder.example.union.types.v0.models.json._
+import io.apibuilder.example.union.types.v0.models.json.*
 import java.util.UUID
 
-import play.api.test._
-import play.api.test.Helpers._
-import org.scalatestplus.play._
+import play.api.test.*
+import play.api.test.Helpers.*
+import org.scalatestplus.play.*
 
 class UsersSpec extends PlaySpec with OneServerPerSuite {
 

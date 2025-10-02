@@ -2,7 +2,7 @@ package scala.models
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Service
-import models.TestHelper._
+import models.TestHelper.*
 import scala.util.matching.Regex
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

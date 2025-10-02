@@ -1,11 +1,11 @@
 package scala.models
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import lib.Datatype
 import lib.generator.CodeGenerator
 
-import scala.generator._
+import scala.generator.*
 
 
 object Play26Controllers extends PlayControllers(scalaVersion = ScalaVersion(2))
@@ -21,7 +21,7 @@ abstract class PlayControllers(scalaVersion: ScalaVersion) extends CodeGenerator
 
   private def imports(ssd: ScalaService): String = {
     s"""
-      import ${ssd.namespaces.json}._
+      import ${ssd.namespaces.json}.*
       ${ssd.service.imports.map(importJson).mkString("\n")}
     """
   }

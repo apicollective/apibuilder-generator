@@ -1,7 +1,7 @@
 package scala.generator.anorm
 
 import scala.annotation.nowarn
-import lib.Text._
+import lib.Text.*
 
 import scala.generator.{ScalaPrimitive, ScalaService}
 import scala.models.ScalaVersion

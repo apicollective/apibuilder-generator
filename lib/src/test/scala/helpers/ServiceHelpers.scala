@@ -2,7 +2,7 @@ package helpers
 
 import java.util.UUID
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import play.api.libs.json.{JsObject, Json}
 
 trait ServiceHelpers {

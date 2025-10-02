@@ -1,6 +1,6 @@
 package generator
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
 import io.postman.generator.attributes.v0.models.json.jsonWritesPostmanGeneratorAttributesObjectReference
 import lib.Datatype.Primitive

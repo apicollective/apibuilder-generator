@@ -3,15 +3,15 @@ package generator
 import examples.{ExampleJson, RandomStringGenerator, UuidRandomStringGenerator, Selection}
 import generator.Heuristics.PathVariable
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import lib.generator.CodeGenerator
-import io.postman.generator.attributes.v0.models._
+import io.postman.generator.attributes.v0.models.*
 import io.postman.generator.attributes.v0.models.json.jsonReadsPostmanGeneratorAttributesBasicAuth
 import io.apibuilder.postman.collection.v21.v0.{models => postman}
-import io.apibuilder.postman.collection.v21.v0.models.json._
+import io.apibuilder.postman.collection.v21.v0.models.json.*
 import models.service.ResolvedService
 import play.api.libs.json.Json
-import Utils._
+import Utils.*
 import io.apibuilder.postman.collection.v21.v0.models.{Folder, Item}
 import lib.Datatype.Primitive
 

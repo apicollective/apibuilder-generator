@@ -19,16 +19,16 @@ class ModelsJsonSpec extends AnyFunSpec with Matchers {
         | package object json {
         |
         | import play.api.libs.json.{__, JsString, Writes}
-        | import play.api.libs.functional.syntax._
+        | import play.api.libs.functional.syntax.*
         |
-        | import play.api.libs.json.Writes._
-        |import play.api.libs.json.Reads._
+        | import play.api.libs.json.Writes.*
+        |import play.api.libs.json.Reads.*
         |import play.api.libs.json.JodaReads.DefaultJodaDateTimeReads
         |import play.api.libs.json.JodaWrites.JodaDateTimeWrites
         |import play.api.libs.json.JodaReads.DefaultJodaLocalDateReads
         |import play.api.libs.json.JodaWrites.DefaultJodaLocalDateWrites
         |
-        | import x.models.json._
+        | import x.models.json.*
         |
         |
         |
@@ -47,12 +47,12 @@ class ModelsJsonSpec extends AnyFunSpec with Matchers {
         | package object json {
         |
         | import play.api.libs.json.{__, JsString, Writes}
-        | import play.api.libs.functional.syntax._
+        | import play.api.libs.functional.syntax.*
         |
-        | import play.api.libs.json.Writes._
-        |import play.api.libs.json.Reads._
+        | import play.api.libs.json.Writes.*
+        |import play.api.libs.json.Reads.*
         |
-        | import x.models.json._
+        | import x.models.json.*
         |
         |
         |

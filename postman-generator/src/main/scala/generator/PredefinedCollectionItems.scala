@@ -1,13 +1,13 @@
 package generator
 
 import generator.Heuristics.PathVariable
-import io.apibuilder.postman.collection.v21.v0.models._
+import io.apibuilder.postman.collection.v21.v0.models.*
 import io.apibuilder.postman.collection.v21.v0.{models => postman}
 
 object PredefinedCollectionItems {
 
   def addItemTests(item: postman.Item): postman.Item = {
-    import Method._
+    import Method.*
 
     val methodsToCoverWithTests = Seq(Get, Put, Post)
     val itemMethod = item.request.method.getOrElse(UNDEFINED)

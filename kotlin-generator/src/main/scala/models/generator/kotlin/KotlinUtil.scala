@@ -1,6 +1,6 @@
 package models.generator.kotlin
 
-import com.squareup.kotlinpoet._
+import com.squareup.kotlinpoet.*
 import io.apibuilder.spec.v0.models.{Enum, Service}
 import lib.Text
 

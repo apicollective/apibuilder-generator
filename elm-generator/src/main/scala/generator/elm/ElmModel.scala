@@ -1,6 +1,6 @@
 package generator.elm
 
-import cats.implicits._
+import cats.implicits.*
 import cats.data.ValidatedNec
 import io.apibuilder.spec.v0.models.{Field, Model}
 import lib.Datatype
@@ -109,7 +109,7 @@ case class ElmModel(args: GenArgs) {
 
   private def primitiveEncoder(p: Primitive): String = {
     args.imports.addAs("Json.Encode", "Encode")
-    import Datatype.Primitive._
+    import Datatype.Primitive.*
     p match {
       case Boolean => "Encode.bool"
       case Double => "Encode.float"
@@ -192,7 +192,7 @@ case class ElmModel(args: GenArgs) {
 
   private def primitiveDecoder(p: Primitive): String = {
     args.imports.addAs("Json.Decode", "Decode")
-    import Datatype.Primitive._
+    import Datatype.Primitive.*
     p match {
       case Boolean => "Decode.bool"
       case Double => "Decode.float"

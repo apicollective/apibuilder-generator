@@ -1,8 +1,8 @@
 package generator.elm
 
 import cats.data.ValidatedNec
-import cats.implicits._
-import io.apibuilder.spec.v0.models._
+import cats.implicits.*
+import io.apibuilder.spec.v0.models.*
 
 import scala.annotation.tailrec
 
@@ -39,7 +39,7 @@ case class ElmResource(args: GenArgs) {
     private val propsType = Names.pascalCase(name) + "Props"
 
     private def handlePossibleToString(params: Seq[ValidatedParameter], variable: String, code: String): String = {
-      import ElmType._
+      import ElmType.*
 
       def wrap(fun: String): String = Util.wrapInParens(fun, Names.maybeQuote(code))
 
@@ -134,7 +134,7 @@ case class ElmResource(args: GenArgs) {
     }
 
     private def queryParameter(p: ValidatedParameter, functions: Seq[String] = Nil, depth: Int = 0)(currentVar: String): String = {
-      import ElmType._
+      import ElmType.*
       lazy val nextVar = variableIndex.next()
       def innerType(inner: ElmType): String = {
         Util.maybeWrapInParens(queryParameter(p.copy(typ = inner), functions, depth = depth + 1)(nextVar))

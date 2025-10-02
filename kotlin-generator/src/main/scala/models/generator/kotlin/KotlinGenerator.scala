@@ -2,21 +2,21 @@ package models.generator.kotlin
 
 import java.io.StringWriter
 
-import com.fasterxml.jackson.annotation._
+import com.fasterxml.jackson.annotation.*
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, Version}
-import com.fasterxml.jackson.databind._
+import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
-import com.squareup.kotlinpoet._
+import com.squareup.kotlinpoet.*
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import io.reactivex.Single
 import lib.Datatype
 import lib.generator.CodeGenerator
 import org.threeten.bp.{Instant, LocalDate}
 
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class KotlinGenerator
   extends CodeGenerator
@@ -276,7 +276,7 @@ class KotlinGenerator
           case _ => None
         }
 
-        import RetrofitUtil._
+        import RetrofitUtil.*
 
         val retrofitPath = toRetrofitPath(operation.path)
 

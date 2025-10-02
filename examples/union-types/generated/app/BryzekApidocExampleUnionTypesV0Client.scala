@@ -120,8 +120,8 @@ package io.apibuilder.example.union.types.v0.models {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
-    import play.api.libs.functional.syntax._
-    import io.apibuilder.example.union.types.v0.models.json._
+    import play.api.libs.functional.syntax.*
+    import io.apibuilder.example.union.types.v0.models.json.*
 
     private[v0] implicit val jsonReadsUUID = __.read[String].map(java.util.UUID.fromString)
 
@@ -300,7 +300,7 @@ package io.apibuilder.example.union.types.v0 {
     import play.api.mvc.{PathBindable, QueryStringBindable}
     import org.joda.time.{DateTime, LocalDate}
     import org.joda.time.format.ISODateTimeFormat
-    import io.apibuilder.example.union.types.v0.models._
+    import io.apibuilder.example.union.types.v0.models.*
 
     // Type: date-time-iso8601
     implicit val pathBindableTypeDateTimeIso8601 = new PathBindable.Parsing[org.joda.time.DateTime](
@@ -363,7 +363,7 @@ package io.apibuilder.example.union.types.v0 {
     auth: scala.Option[io.apibuilder.example.union.types.v0.Authorization] = None,
     defaultHeaders: Seq[(String, String)] = Nil
   ) extends interfaces.Client {
-    import io.apibuilder.example.union.types.v0.models.json._
+    import io.apibuilder.example.union.types.v0.models.json.*
 
     private val logger = play.api.Logger("io.apibuilder.example.union.types.v0.Client")
 
@@ -520,7 +520,7 @@ package io.apibuilder.example.union.types.v0 {
 
   package errors {
 
-    import io.apibuilder.example.union.types.v0.models.json._
+    import io.apibuilder.example.union.types.v0.models.json.*
 
     case class UnitResponse(status: Int) extends Exception(s"HTTP $status")
 

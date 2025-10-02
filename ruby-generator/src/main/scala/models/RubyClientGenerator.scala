@@ -4,14 +4,14 @@ import java.util.UUID
 import scala.util.Failure
 import scala.util.Success
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import lib.{Datatype, Methods, Text}
-import lib.Text._
+import lib.Text.*
 import lib.generator.{CodeGenerator, GeneratorUtil}
 
 import scala.collection.mutable.ListBuffer
 import play.api.Logging
-import play.api.libs.json._
+import play.api.libs.json.*
 import generator.ServiceFileNames
 
 import scala.annotation.tailrec
@@ -165,7 +165,7 @@ object RubyUtil {
 
   // TODO should be encapsulated in the RubyDatatype model
   def rubyDefault(value: String, datatype: Datatype): String = try {
-    import Datatype._
+    import Datatype.*
     datatype match {
       case Primitive.String |
         Primitive.Decimal |
@@ -186,7 +186,7 @@ object RubyUtil {
 
   // TODO should be encapsulated in the RubyDatatype model
   def rubyDefault(json: JsValue, datatype: Datatype): String = {
-    import Datatype._
+    import Datatype.*
     datatype match {
       case Container.Option(_) =>
         sys.error(s"parsing default `${json}` for datatype ${datatype}")
@@ -898,7 +898,7 @@ ${headers.rubyModuleConstants.indentString(2)}
     default: Option[String],
     enumAsString: Boolean
   ): String = {
-    import Datatype._
+    import Datatype.*
     def expr = default.fold(rawExpr)(d => s"(x = $rawExpr; x.nil? ? $d : x)")
     dt match {
       case Primitive.Boolean =>
@@ -1155,7 +1155,7 @@ ${headers.rubyModuleConstants.indentString(2)}
 
   // TODO should be encapsulated in the RubyDatatype model
   private def generateResponse(dt: Datatype, varName: String): String = {
-    import Datatype._
+    import Datatype.*
     dt match {
       case p: Primitive => {
         p match {

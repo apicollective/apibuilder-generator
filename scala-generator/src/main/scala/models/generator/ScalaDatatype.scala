@@ -3,7 +3,7 @@ package scala.generator
 import io.apibuilder.spec.v0.models.Deprecation
 import lib.Datatype
 import lib.Text.{appendSpace, initLowerCase}
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import java.util.UUID
 import scala.util.{Failure, Success, Try}

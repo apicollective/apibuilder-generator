@@ -3,10 +3,10 @@ package scala.generator.mock
 import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.Text
-import lib.Text._
+import lib.Text.*
 import lib.generator.CodeGenerator
 
-import scala.generator._
+import scala.generator.*
 import scala.models.{ApiBuilderComments, Attributes}
 
 object MockFactoriesGenerator extends CodeGenerator {
@@ -140,7 +140,7 @@ private[mock] class MockFactoriesGenerator(
   ssd: ScalaService,
   userAgent: Option[String],
 ) {
-  import MockFactoriesGenerator._
+  import MockFactoriesGenerator.*
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     val header = ApiBuilderComments(ssd.service.version, userAgent).toJavaString + "\n"

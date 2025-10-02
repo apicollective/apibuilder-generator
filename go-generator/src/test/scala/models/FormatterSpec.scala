@@ -1,6 +1,6 @@
 package go.models
 
-import Formatter._
+import Formatter.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

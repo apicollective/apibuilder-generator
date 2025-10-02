@@ -281,7 +281,7 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     def asyncTypeImport: String = ""
     def routeExtends: Option[String] = None
     def matchersExtends: Option[String] = None
-    def clientImports: String = """import org.http4s.client.blaze._
+    def clientImports: String = """import org.http4s.client.blaze.*
                                   |import io.circe.syntax._""".stripMargin
     def closeClient: Option[String] = Some("""
                                              |def closeAsyncHttpClient(): Unit = {
@@ -349,8 +349,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
          |import org.http4s.circe.decodeUri
          |import org.http4s.circe.encodeUri
          |import org.http4s.dsl.{io => _, _}
-         |import cats.effect._
-         |import cats.implicits._
+         |import cats.effect.*
+         |import cats.implicits.*
          |import scala.language.higherKinds""".stripMargin
 
 
@@ -358,9 +358,9 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override def wrappedAsyncType(instance: String = "") = Some(s"$instance[$asyncType]")
     override val routeExtends: Option[String] = Some(s" extends Matchers[$asyncType]")
     override val matchersExtends = Some(s" extends Http4sDsl[$asyncType]")
-    override val clientImports: String = """import cats.effect._
-                                           |import cats.implicits._
-                                           |import io.circe.syntax._
+    override val clientImports: String = """import cats.effect.*
+                                           |import cats.implicits.*
+                                           |import io.circe.syntax.*
                                            |import scala.language.higherKinds""".stripMargin
 
     override val closeClient = None
@@ -399,8 +399,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
          |import org.http4s.circe.decodeUri
          |import org.http4s.circe.encodeUri
          |import org.http4s.dsl.{io => _, _}
-         |import org.http4s.implicits._
-         |import cats.effect._
+         |import org.http4s.implicits.*
+         |import cats.effect.*
          |import cats.implicits._""".stripMargin
 
 
@@ -408,8 +408,8 @@ private lazy val defaultAsyncHttpClient = PooledHttp1Client()
     override def wrappedAsyncType(instance: String = "") = Some(s"$instance[$asyncType]")
     override val routeExtends: Option[String] = Some(s" extends Matchers[$asyncType]")
     override val matchersExtends = Some(s" extends Http4sDsl[$asyncType]")
-    override val clientImports: String = """import cats.effect._
-                                           |import cats.implicits._
+    override val clientImports: String = """import cats.effect.*
+                                           |import cats.implicits.*
                                            |import io.circe.syntax._""".stripMargin
 
     override val closeClient = None

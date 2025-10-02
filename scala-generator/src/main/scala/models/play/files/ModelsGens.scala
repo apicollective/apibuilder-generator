@@ -3,7 +3,7 @@ package scala.models.play.files
 import scala.annotation.nowarn
 import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.generator._
+import scala.generator.*
 import scala.models.Attributes
 
 object ModelsGens {

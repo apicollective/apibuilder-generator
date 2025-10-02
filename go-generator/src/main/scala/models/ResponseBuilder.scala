@@ -1,6 +1,6 @@
 package go.models
 
-import Formatter._
+import Formatter.*
 import lib.{Datatype, DatatypeResolver}
 
 object ResponseBuilder {

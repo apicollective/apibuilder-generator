@@ -1,12 +1,12 @@
 package scala.generator.anorm
 
-import scala.generator._
+import scala.generator.*
 import scala.models.{ApiBuilderComments, Attributes, DateTimeTypeConfig, DateTypeConfig, ScalaVersion}
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import lib.Text
-import lib.Text._
+import lib.Text.*
 
 import scala.annotation.tailrec
 
@@ -315,7 +315,7 @@ trait ParserGenerator extends CodeGenerator {
     }
 
     private def generateUnion(union: ScalaUnion): String = {
-      import PrimitiveWrapper._
+      import PrimitiveWrapper.*
       Seq(
         s"object ${union.name} {",
 

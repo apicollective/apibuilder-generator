@@ -1,7 +1,7 @@
 package scala.models.http4s
 
 import io.apibuilder.spec.v0.models.ParameterLocation
-import lib.Text._
+import lib.Text.*
 
 import scala.generator.{ScalaClientMethodConfig, ScalaDatatype, ScalaOperation, ScalaPrimitive}
 

@@ -42,7 +42,7 @@ object PostmanAttributes {
   }
 
   def postmanVariableNameFrom(objReference: ObjectReference): PostmanVariableName = {
-    import objReference._
+    import objReference.*
     val name = s"$resourceType#$identifierField"
     PostmanVariableName(name)
   }

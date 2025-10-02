@@ -8,7 +8,7 @@ case class ScalaEnums(
   private val unions = ssd.unionsForEnum(enum)
 
   def build(): String = {
-    import lib.Text._
+    import lib.Text.*
     Seq(
       enum.description.map { desc => ScalaUtil.textToComment(desc) + "\n" }.getOrElse("") +
       s"sealed trait ${enum.name}" + ScalaUtil.extendsClause(

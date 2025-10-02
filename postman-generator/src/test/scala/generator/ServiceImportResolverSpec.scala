@@ -8,7 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class ServiceImportResolverSpec extends AnyWordSpec with Matchers {
 
-  import TestFixtures._
+  import TestFixtures.*
   import scala.language.reflectiveCalls
 
   "ServiceImportResolver" should {

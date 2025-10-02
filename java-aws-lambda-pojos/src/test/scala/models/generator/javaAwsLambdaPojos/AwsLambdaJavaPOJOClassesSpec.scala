@@ -9,7 +9,7 @@ import models.TestHelper.assertJodaTimeNotPresent
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class AwsLambdaJavaPOJOClassesSpec
   extends AnyFunSpec

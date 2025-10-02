@@ -1,7 +1,7 @@
 package scala.models
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import lib.Text._
+import lib.Text.*
 import lib.generator.CodeGenerator
 
 import scala.generator.{ScalaCaseClasses, ScalaService}
@@ -14,7 +14,7 @@ object Play2ModelsScala3 extends Play2Models(ScalaVersion(3))
 
 object Play2ModelImplicits {
   val play: String = {
-    s"""import play.api.libs.json.Writes._
+    s"""import play.api.libs.json.Writes.*
        |import play.api.libs.json.Reads._""".stripMargin
 
   }
@@ -98,7 +98,7 @@ package ${ssd.namespaces.models} {
     import play.api.libs.json.__
     import play.api.libs.json.JsString
     import play.api.libs.json.Writes
-    import play.api.libs.functional.syntax._
+    import play.api.libs.functional.syntax.*
 ${JsonImports(form.service).mkString("\n").indentString(4)}
 ${serDes.distinct.mkString("\n").indentString(4)}
 

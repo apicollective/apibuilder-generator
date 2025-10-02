@@ -1,7 +1,7 @@
 package models.generator.kotlin
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import models.generator.kotlin.KotlinTestHelper._
+import models.generator.kotlin.KotlinTestHelper.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -9,7 +9,7 @@ class KotlinGeneratorTest
   extends AnyFunSpec
     with Matchers {
 
-  import models.TestHelper._
+  import models.TestHelper.*
 
   private val serviceDefs = Seq(builtInTypesService,
                                 // dateTimeService,

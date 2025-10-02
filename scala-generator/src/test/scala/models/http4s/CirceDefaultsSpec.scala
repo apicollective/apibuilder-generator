@@ -1,7 +1,7 @@
 package models.http4s
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import models.FieldDefaultHelper._
+import models.FieldDefaultHelper.*
 
 import scala.models.http4s.Http4s018Generator
 import org.scalatest.funspec.AnyFunSpec

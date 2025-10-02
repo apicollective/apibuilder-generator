@@ -1,6 +1,6 @@
 package scala.models.http4s
 
-import lib.Text._
+import lib.Text.*
 
 import scala.generator.ScalaPrimitive.Uuid
 import scala.generator.{PrimitiveWrapper, ScalaDatatype, ScalaEnum, ScalaModel, ScalaPrimitive, ScalaUnion, ScalaUnionType}
@@ -13,12 +13,12 @@ case class CirceJson(
     s"""package ${ssd.namespaces.models} {
 
   package object json {
-    import io.circe.Decoder._
-    import io.circe.Encoder._
+    import io.circe.Decoder.*
+    import io.circe.Encoder.*
     import scala.language.implicitConversions // See below - Make Scala 2.11 Either monadic
     import scala.util.Try
     import io.circe.{Json, JsonObject, Encoder, Decoder, DecodingFailure}
-    import io.circe.syntax._
+    import io.circe.syntax.*
 ${JsonImports(ssd.service).mkString("\n").indentString(4)}
 
     // Make Scala 2.11 Either monadic

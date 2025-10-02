@@ -2,10 +2,10 @@ package scala.models
 
 import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import lib.Text._
+import lib.Text.*
 import lib.generator.CodeGenerator
 
-import scala.generator._
+import scala.generator.*
 
 case class ScalaVersion(major: Int) {
   val splat: String = if (major >= 3) { "*" } else { ": _*" }

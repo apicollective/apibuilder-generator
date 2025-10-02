@@ -4,7 +4,7 @@ import scala.annotation.nowarn
 
 import scala.models.JsonImports
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import lib.Text._
+import lib.Text.*
 
 class ScalaClientMethodGenerator(
   config: ScalaClientMethodConfig,

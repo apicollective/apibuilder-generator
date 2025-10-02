@@ -9,7 +9,7 @@ import scala.generator.ScalaField.Limitation
 import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig}
 
 class MockFactoriesGeneratorSpec extends AnyFunSpec with Matchers {
-  import scala.generator.mock.MockFactoriesGenerator._
+  import scala.generator.mock.MockFactoriesGenerator.*
 
   it("should generate the right desired length for string given a field limitation") {
     calculateStringLength(Limitation(None, None)) should be(24)

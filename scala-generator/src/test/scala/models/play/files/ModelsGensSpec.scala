@@ -9,7 +9,7 @@ import scala.generator.{ScalaEnum, ScalaModel, ScalaService, ScalaUnion}
 import scala.models.Attributes
 import scala.models.play.Helpers
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
-import scala.models.play.gens._
+import scala.models.play.gens.*
 
 class ModelsGensSpec extends AnyFunSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 

@@ -2,7 +2,7 @@ package scala.generator
 
 import io.apibuilder.spec.v0.models.ParameterLocation
 import lib.Datatype
-import lib.Text._
+import lib.Text.*
 import lib.generator.GeneratorUtil
 
 import scala.annotation.tailrec

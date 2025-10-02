@@ -27,7 +27,7 @@ object ModelsJson {
       package object json {
 
         import play.api.libs.json.{__, JsString, Writes}
-        import play.api.libs.functional.syntax._
+        import play.api.libs.functional.syntax.*
 
         ${implicits(scalaService).mkString("\n")}
 

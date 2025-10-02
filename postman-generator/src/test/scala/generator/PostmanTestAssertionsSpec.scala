@@ -1,7 +1,7 @@
 package generator
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.postman.collection.v21.v0.models._
+import io.apibuilder.postman.collection.v21.v0.models.*
 import io.apibuilder.postman.collection.v21.v0.models.json.jsonReadsApiBuilderPostmanCollectionV21Collection
 import play.api.libs.json.Json
 import testUtils.TestPostmanCollectionGenerator

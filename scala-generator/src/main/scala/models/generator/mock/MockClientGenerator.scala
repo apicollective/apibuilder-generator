@@ -3,10 +3,10 @@ package scala.generator.mock
 import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.{ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import lib.Text._
+import lib.Text.*
 import lib.generator.CodeGenerator
 
-import scala.generator._
+import scala.generator.*
 import scala.models.{ApiBuilderComments, Attributes}
 
 object MockClientGenerator {

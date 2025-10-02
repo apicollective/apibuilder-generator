@@ -2,7 +2,7 @@ package scala.generator
 
 import generator.ServiceFileNames
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import lib.Text._
+import lib.Text.*
 import lib.generator.CodeGenerator
 
 import scala.models.{ApiBuilderComments, Attributes}

@@ -1,6 +1,6 @@
 package go.models
 
-import Formatter._
+import Formatter.*
 import io.apibuilder.spec.v0.models.Parameter
 import lib.{Datatype, DatatypeResolver}
 

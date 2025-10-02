@@ -1,6 +1,6 @@
 package scala.models.play
 
-import cats.implicits._
+import cats.implicits.*
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import lib.generator.CodeGenerator
 

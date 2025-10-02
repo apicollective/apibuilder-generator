@@ -1,6 +1,6 @@
 package lib
 
-import io.apibuilder.generator.v0.models.json._
+import io.apibuilder.generator.v0.models.json.*
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.{BadRequest, InternalServerError}

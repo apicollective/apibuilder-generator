@@ -4,7 +4,7 @@ import io.apibuilder.generator.v0.models.InvocationForm
 import scala.generator.{ScalaClientMethodConfigs, ScalaUtil}
 import scala.models.{Headers, JsonImports}
 
-import lib.Text._
+import lib.Text.*
 
 
 case class Http4sClient(
@@ -54,7 +54,7 @@ ${headerString.indentString(6)}
       formBody : Option[org.http4s.UrlForm] = None
     )(handler: ${config.responseClass} => ${config.asyncType}[U]
     )(implicit encoder: io.circe.Encoder[T]): ${config.asyncType}[U] = {
-      import org.http4s.QueryParamEncoder._
+      import org.http4s.QueryParamEncoder.*
 
       val m = org.http4s.Method.fromString(method) match {
         case ${config.rightType}(m) => m

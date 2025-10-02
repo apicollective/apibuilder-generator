@@ -2,7 +2,7 @@ package models.generator
 
 import lib.{Datatype, Text}
 import org.joda.time.format.ISODateTimeFormat.dateTimeParser
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import java.util.UUID
 
@@ -184,7 +184,7 @@ object JavaDatatypes {
     override val shortName = s"Map<String, ${inner.name}>"
 
     override def valueFromJson(json: JsValue) = {
-      import Text._
+      import Text.*
       val initBlockStatements = json.as[scala.collection.immutable.Map[String, JsValue]].map {
         case (key, value) => s"""put("$key", ${inner.valueFromJson(value)});""".indentString(4)
       }

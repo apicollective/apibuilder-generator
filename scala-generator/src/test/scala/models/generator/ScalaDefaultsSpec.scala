@@ -1,6 +1,6 @@
 package models.generator
 import io.apibuilder.generator.v0.models.InvocationForm
-import models.FieldDefaultHelper._
+import models.FieldDefaultHelper.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

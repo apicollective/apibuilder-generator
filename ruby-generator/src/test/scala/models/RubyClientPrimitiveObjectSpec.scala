@@ -1,6 +1,6 @@
 package ruby.models
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import io.apibuilder.generator.v0.models.InvocationForm
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

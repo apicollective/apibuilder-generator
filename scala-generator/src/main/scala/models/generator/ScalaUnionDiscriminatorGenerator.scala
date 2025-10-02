@@ -1,6 +1,6 @@
 package scala.generator
 
-import lib.Text._
+import lib.Text.*
 
 case class ScalaUnionDiscriminatorGenerator(
   union: ScalaUnion

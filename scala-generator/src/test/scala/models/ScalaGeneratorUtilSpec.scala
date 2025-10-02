@@ -1,7 +1,7 @@
 package scala.models
 
 import io.apibuilder.spec.v0.models.{Method, Model, Parameter, ParameterLocation, Operation, Resource}
-import scala.generator._
+import scala.generator.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

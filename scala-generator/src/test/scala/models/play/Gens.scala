@@ -1,7 +1,7 @@
 package scala.models.play
 
-import io.apibuilder.spec.v0.models._
-import io.apibuilder.spec.v0.models.gens._
+import io.apibuilder.spec.v0.models.*
+import io.apibuilder.spec.v0.models.gens.*
 import org.scalacheck.{Arbitrary, Gen}
 import scala.generator.{ScalaEnum, ScalaModel, ScalaService, ScalaUnion}
 

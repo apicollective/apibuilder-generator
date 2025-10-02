@@ -2,7 +2,7 @@ package ruby.models
 
 import io.apibuilder.generator.v0.models.InvocationForm
 import lib.VersionTag
-import lib.Text._
+import lib.Text.*
 
 case class Headers(
   form: InvocationForm

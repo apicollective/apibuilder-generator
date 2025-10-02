@@ -1,10 +1,10 @@
 package scala.models
 
-import cats.implicits._
+import cats.implicits.*
 import lib.generator.CodeGenerator
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.Import
-import scala.generator._
+import scala.generator.*
 
 object ScalaCheckGenerator extends CodeGenerator {
 

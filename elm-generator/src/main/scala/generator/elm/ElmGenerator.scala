@@ -2,9 +2,9 @@ package generator.elm
 
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.ValidatedNec
-import cats.implicits._
+import cats.implicits.*
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import lib.DatatypeResolver
 import lib.generator.{CodeGenerator, GeneratorUtil}
 

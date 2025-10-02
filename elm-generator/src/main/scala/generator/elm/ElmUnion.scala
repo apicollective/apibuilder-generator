@@ -1,7 +1,7 @@
 package generator.elm
 
 import cats.data.ValidatedNec
-import cats.implicits._
+import cats.implicits.*
 import io.apibuilder.spec.v0.models.Union
 
 case class ElmUnion(args: GenArgs) {

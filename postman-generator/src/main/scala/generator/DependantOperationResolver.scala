@@ -1,12 +1,12 @@
 package generator
 
-import io.apibuilder.spec.v0.models._
-import io.postman.generator.attributes.v0.models.json._
+import io.apibuilder.spec.v0.models.*
+import io.postman.generator.attributes.v0.models.json.*
 import io.postman.generator.attributes.v0.models.{AttributeName, ObjectReference}
 import lib.Datatype.Primitive
 import models.AttributeValueReader
 import models.service.ResolvedService
-import models.attributes.PostmanAttributes._
+import models.attributes.PostmanAttributes.*
 import models.operation.DependantOperations
 import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}

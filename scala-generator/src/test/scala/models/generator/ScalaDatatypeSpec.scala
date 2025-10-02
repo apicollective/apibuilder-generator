@@ -2,8 +2,8 @@ package scala.generator
 
 import scala.annotation.tailrec
 
-import ScalaPrimitive._
-import ScalaDatatype._
+import ScalaPrimitive.*
+import ScalaDatatype.*
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

@@ -1,6 +1,6 @@
 package models.http4s.mock
 
-import lib.Text._
+import lib.Text.*
 
 import scala.generator.mock.MockClientGenerator
 import scala.generator.{ScalaClientMethodConfig, ScalaResource, ScalaService}

@@ -1,10 +1,10 @@
 package generator.elm
 
 import cats.data.Validated.{Invalid, Valid}
-import cats.implicits._
+import cats.implicits.*
 import cats.data.ValidatedNec
 import lib.Datatype
-import lib.Datatype._
+import lib.Datatype.*
 
 import scala.util.{Failure, Success}
 
@@ -84,11 +84,11 @@ case class ElmTypeLookup(args: GenArgs) {
   }
 
   private def lookup(t: Datatype): ValidatedNec[String, ElmType] = {
-    import ElmType._
+    import ElmType.*
 
     t match {
       case p: Primitive => {
-        import lib.Datatype.Primitive._
+        import lib.Datatype.Primitive.*
 
         p match {
           case Boolean => ElmBool.validNec

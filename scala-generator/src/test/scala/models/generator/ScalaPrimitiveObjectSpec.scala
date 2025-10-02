@@ -1,7 +1,7 @@
 package scala.generator
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 
 import scala.models.Attributes
 import org.scalatest.funspec.AnyFunSpec

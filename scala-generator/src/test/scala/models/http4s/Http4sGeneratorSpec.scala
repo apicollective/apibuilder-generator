@@ -5,7 +5,7 @@ import models.TestHelper.{assertJodaTimeNotPresent, assertValidScalaSourceCode}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.models.http4s._
+import scala.models.http4s.*
 
 class Http4sGeneratorSpec extends AnyFunSpec with Matchers {
   describe("apidoc-api") {

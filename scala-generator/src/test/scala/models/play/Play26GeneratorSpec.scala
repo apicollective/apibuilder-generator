@@ -1,7 +1,7 @@
 package scala.models.play
 
 import io.apibuilder.generator.v0.models.InvocationForm
-import io.apibuilder.generator.v0.models.gens._
+import io.apibuilder.generator.v0.models.gens.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks

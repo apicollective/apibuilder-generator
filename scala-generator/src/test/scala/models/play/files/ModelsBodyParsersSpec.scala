@@ -6,7 +6,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.generator.{ScalaEnum, ScalaModel, ScalaUnion}
 import scala.models.play.Helpers.compareWithoutWhiteSpaces
-import scala.models.play.gens._
+import scala.models.play.gens.*
 
 class ModelsBodyParsersSpec extends AnyFunSpec with Matchers with ScalaCheckPropertyChecks {
 

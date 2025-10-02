@@ -1,6 +1,6 @@
 package ruby.models
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 
 object Util {
 

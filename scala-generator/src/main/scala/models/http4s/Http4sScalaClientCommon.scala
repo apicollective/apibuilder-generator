@@ -1,7 +1,7 @@
 package scala.models.http4s
 
 import scala.generator.{Namespaces, ScalaClientCommon, ScalaClientMethodConfig, ScalaClientMethodConfigs}
-import lib.Text._
+import lib.Text.*
 
 object Http4sScalaClientCommon extends ScalaClientCommon {
 

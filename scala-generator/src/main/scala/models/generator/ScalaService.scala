@@ -1,6 +1,6 @@
 package scala.generator
 
-import io.apibuilder.spec.v0.models._
+import io.apibuilder.spec.v0.models.*
 import lib.Text.underscoreToInitCap
 
 import scala.models.{Attributes, Util}

@@ -3,16 +3,16 @@ package models.generator.javaAwsLambdaPojos
 import com.amazonaws.services.dynamodbv2.datamodeling.{DynamoDBTypeConvertedEnum, _}
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.squareup.javapoet.AnnotationSpec.Builder
-import com.squareup.javapoet._
+import com.squareup.javapoet.*
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.{Enum, Model, Service, Union}
 import javax.lang.model.element.Modifier
 import lib.Text
 import lib.generator.CodeGenerator
 import lombok.Data
-import me.geso.tinyvalidator.constraints._
+import me.geso.tinyvalidator.constraints.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait BaseJavaAwsLambdaPOJOCodeGenerator extends CodeGenerator with JavaAwsLambdaPOJOUtil {

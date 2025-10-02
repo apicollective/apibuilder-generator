@@ -6,7 +6,7 @@ import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaParameter,
 import scala.models.JsonImports
 import scala.models.http4s.{ScalaGeneratorUtil, ScalaService}
 import lib.Text
-import lib.Text._
+import lib.Text.*
 import lib.VersionTag
 
 import scala.generator.ScalaPrimitive.{Uuid, Decimal}
