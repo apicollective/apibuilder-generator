@@ -17,7 +17,7 @@ case class ElmResource(args: GenArgs) {
 
   case class Generator(resource: Resource, op: Operation) {
     private val variableIndex = VariableIndex()
-    private val elmJson = ElmJson(args.imports)
+    // private val elmJson = ElmJson(args.imports) // TODO: Re-enable if needed
 
     private val name: String = {
       val (variables, words) = op.path.drop(resource.path.map(_.length).getOrElse(0)).split("/").partition(_.startsWith(":"))

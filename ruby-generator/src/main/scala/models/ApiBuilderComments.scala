@@ -1,6 +1,6 @@
 package ruby.models
 
-import lib.{AbstractApiBuilderComments, Constants}
+import lib.AbstractApiBuilderComments
 
 /**
   * @param version e.g. 1.2.3 Used to inject headers on the full version and the major version number

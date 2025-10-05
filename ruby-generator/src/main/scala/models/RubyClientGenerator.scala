@@ -598,7 +598,6 @@ ${headers.rubyModuleConstants.indentString(2)}
               case dt => requestBuilder.append(s".with_json(${asJson(ti.varName, dt)})")
             }
           }
-          case _ => sys.error(s"Invalid body [${op.body}]")
         }
       }
       requestBuilder.append(s".${op.method.toString.toLowerCase}")
@@ -782,7 +781,7 @@ ${headers.rubyModuleConstants.indentString(2)}
 
         Seq(
           "def initialize(incoming={})",
-	  s"  super(:${discriminatorName(union)} => 'undefined_type')",
+          s"  super(:${discriminatorName(union)} => 'undefined_type')",
           s"  opts = HttpClient::Helper.symbolize_keys(incoming)",
           s"  @name = HttpClient::Preconditions.assert_class('name', opts.delete(:${discriminatorName(union)}), String)",
           "end"
@@ -1091,7 +1090,6 @@ ${headers.rubyModuleConstants.indentString(2)}
     fieldName: Option[String] = None
   ): RubyTypeInfo = {
     val dt = datatypeResolver.parse(`type`, makePrimitiveType = true).get
-    var required = true
 
     val klass = {
       @tailrec
@@ -1100,7 +1098,6 @@ ${headers.rubyModuleConstants.indentString(2)}
         case u: Datatype.Generated => qualifiedClassName(u.name)
         case u: Datatype.UserDefined => qualifiedClassName(u.name)
         case Datatype.Container.Option(inner) => {
-          required = false
           iter(inner)
         }
         case _: Datatype.Container.Map => "Hash"

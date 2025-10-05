@@ -37,7 +37,7 @@ case class ElmGenerator() {
           contents = generate(
             service,
             args,
-            contents: _*
+            contents*
           )
         ))
       }

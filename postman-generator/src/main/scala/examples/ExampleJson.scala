@@ -52,7 +52,7 @@ case class ExampleJson(
     )
     val value = outerField
       .flatMap(field => field.example orElse field.default)
-      .map(JsString)
+      .map(JsString.apply)
       .getOrElse(randomValue)
 
     parentUnion.fold(value) { case (union, unionType) =>
@@ -99,7 +99,7 @@ case class ExampleJson(
             }
 
             field.name -> value
-          }: _*
+          }*
       )
     )
 

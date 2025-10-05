@@ -94,7 +94,7 @@ object ServiceImportResolver {
     }
   }
 
-  def prefixModelFields(field: Field) = fixType(field.`type`, typ => field.copy(`type` = typ)) _
+  def prefixModelFields(field: Field) = fixType(field.`type`, typ => field.copy(`type` = typ))
 
-  def prefixUnionType(unionType: UnionType) = fixType(unionType.`type`, typ => unionType.copy(`type` = typ)) _
+  def prefixUnionType(unionType: UnionType) = fixType(unionType.`type`, typ => unionType.copy(`type` = typ))
 }
