@@ -24,7 +24,7 @@ object NamespaceParser {
   private def isTypeIndicator(value: String): Boolean = TypeIndicators.contains(value)
 
   def parse(name: String): ParsedName = {
-    name.split("\\.").filterNot(isVersion).filterNot(isTypeIndicator).toList match {
+    name.split("\\.").filterNot(isTypeIndicator).toList match {
       case Nil => sys.error("Failed to parse name")
       case name :: Nil => ParsedName.Local(name = name)
       case multiple => {
