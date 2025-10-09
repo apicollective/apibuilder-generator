@@ -10,6 +10,7 @@ import scala.models.Play29Scala3ClientGenerator
 class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with ServiceHelpers with TestHelpers {
 
   private lazy val eventService = makeService(
+    namespace = "test",
     interfaces = Seq(makeInterface(
       name = "event",
       fields = Seq(makeField(name = "timestamp"))
@@ -20,7 +21,7 @@ class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with Servi
     imports = Seq(makeImport(eventService)),
     unions = Seq(makeUnion(
       name = "example",
-      interfaces = Seq(s"${eventService.namespace}.interfaces.event")
+      interfaces = Seq("test.interfaces.event")
     ))
   )
 
