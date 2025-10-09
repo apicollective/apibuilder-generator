@@ -6,7 +6,6 @@ package ns.models {
 
   sealed trait Example extends TestInterfacesEvent {
     def timestamp: String
-
   }
 
   /**
