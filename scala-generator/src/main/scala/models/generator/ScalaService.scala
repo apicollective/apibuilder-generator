@@ -153,7 +153,11 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val qualifiedName: String = ssd.unionClassName(name)
 
-  val interfaces: Seq[String] = union.interfaces.map(ScalaUtil.toClassName)
+  val interfaces: Seq[String] = {
+    println(s"unions: ${union.interfaces}")
+    println(s"mapped: ${union.interfaces.map(ScalaUtil.toClassName)}")
+    union.interfaces.map(ScalaUtil.toClassName)
+  }
 
   val discriminator: Option[String] = union.discriminator
 

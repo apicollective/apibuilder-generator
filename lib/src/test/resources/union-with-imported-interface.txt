@@ -4,7 +4,7 @@
  */
 package ns.models {
 
-  sealed trait Example extends TestInterfacesEvent {
+  sealed trait Example extends test.interfaces.Event {
     def timestamp: String
   }
 
