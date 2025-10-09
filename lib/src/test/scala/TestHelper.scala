@@ -167,7 +167,7 @@ object TestHelper extends Matchers {
     if (current != contents.trim) {
       import sys.process._
 
-      val expectedPath = "/tmp/apidoc.tmp.expected." + Text.safeName(filename)
+      val expectedPath = "/tmp/apibuilder.tmp.expected." + Text.safeName(filename)
       TestHelper.writeToFile(expectedPath, contents.trim)
       if (Files.exists(OverwriteTestsFile)) {
         println(s"Overwriting test output as File $OverwriteTestsFile exists")
