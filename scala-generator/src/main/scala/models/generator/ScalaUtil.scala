@@ -118,9 +118,10 @@ object ScalaUtil {
   }
 
   def toClassName2(name: String): ScalaClassName = {
+    println(s"toClassName2: $name")
     NamespaceParser.parse(name) match {
       case ParsedName.Local(n) => ScalaClassName.Local(toClassName(n))
-      case ParsedName.Imported(ns, n) => ScalaClassName.Imported(ns, toClassName(n))
+      case ParsedName.Imported(ns, n) => ScalaClassName.Imported(Namespaces(ns).base, toClassName(n))
     }
   }
 

@@ -29,7 +29,7 @@ object NamespaceParser {
       case name :: Nil => ParsedName.Local(name = name)
       case multiple => {
         ParsedName.Imported(
-          namespace = multiple.dropRight(1).mkString("_"),
+          namespace = multiple.dropRight(1).mkString("."),
           name = multiple.last
         )
       }
