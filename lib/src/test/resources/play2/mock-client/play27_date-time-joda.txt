@@ -1,6 +1,6 @@
 package io.gregor.time.types.v0.mock {
 
-  trait Client extends io.gregor.time.types.v0.interfaces.Client {
+  trait Client extends io.gregor.time.types.v0.models.Client {
 
     val baseUrl: String = "http://mock.localhost"
 
