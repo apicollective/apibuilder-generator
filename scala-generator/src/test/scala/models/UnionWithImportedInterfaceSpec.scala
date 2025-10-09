@@ -11,6 +11,7 @@ class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with Servi
 
   private lazy val eventService = makeService(
     namespace = "test",
+    version = "1",
     interfaces = Seq(makeInterface(
       name = "event",
       fields = Seq(makeField(name = "timestamp"))
@@ -19,6 +20,7 @@ class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with Servi
 
   private lazy val service = makeService(
     namespace = "sse",
+    version = "1",
     imports = Seq(makeImport(eventService)),
     unions = Seq(makeUnion(
       name = "example",
