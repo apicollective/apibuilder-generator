@@ -1,6 +1,7 @@
 package generator.elm
 
 import lib.Text
+import lib.generator.{NamespaceParser, ParsedName}
 
 object Names {
 

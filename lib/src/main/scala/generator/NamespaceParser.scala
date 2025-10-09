@@ -1,4 +1,4 @@
-package generator.elm
+package lib.generator
 
 sealed trait ParsedName
 
@@ -20,7 +20,7 @@ object NamespaceParser {
     }
   }
 
-  private val TypeIndicators = Seq("enums", "models", "unions")
+  private val TypeIndicators = Seq("enums", "models", "unions", "interfaces")
   private def isTypeIndicator(value: String): Boolean = TypeIndicators.contains(value)
 
   def parse(name: String): ParsedName = {
@@ -36,6 +36,3 @@ object NamespaceParser {
     }
   }
 }
-
-
-

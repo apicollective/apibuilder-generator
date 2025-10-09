@@ -6,7 +6,7 @@ import cats.implicits._
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models._
 import lib.DatatypeResolver
-import lib.generator.{CodeGenerator, GeneratorUtil}
+import lib.generator.{CodeGenerator, GeneratorUtil, NamespaceParser}
 
 object ElmGenerator extends CodeGenerator {
 

@@ -1,8 +1,7 @@
 package scala.generator
 
 import lib.Text._
-import lib.generator.GeneratorUtil
-
+import lib.generator.{GeneratorUtil, NamespaceParser, ParsedName}
 import io.apibuilder.spec.v0.models.Deprecation
 
 sealed trait ScalaClassName {
@@ -14,7 +13,7 @@ object ScalaClassName {
     override def qualifiedName: String = className
   }
   case class Imported(ns: String, override val className: String) extends ScalaClassName {
-    override def qualifiedName: String = s"$ns.$className"
+    override def qualifiedName: String = s"$ns.models.$className"
   }
 }
 
@@ -119,14 +118,9 @@ object ScalaUtil {
   }
 
   def toClassName2(name: String): ScalaClassName = {
-    val i = name.lastIndexOf(".")
-    if (i < 0) {
-      ScalaClassName.Local(toClassName(name))
-    } else {
-      val ns = name.take(i)
-      val klass = name.drop(i)
-      println(s"ns[$ns] klass[$klass]")
-      ScalaClassName.Imported(ns, toClassName(klass))
+    NamespaceParser.parse(name) match {
+      case ParsedName.Local(n) => ScalaClassName.Local(toClassName(n))
+      case ParsedName.Imported(ns, n) => ScalaClassName.Imported(ns, toClassName(n))
     }
   }
 

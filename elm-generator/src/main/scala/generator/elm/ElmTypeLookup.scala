@@ -5,6 +5,7 @@ import cats.implicits._
 import cats.data.ValidatedNec
 import lib.Datatype
 import lib.Datatype._
+import lib.generator.{NamespaceParser, ParsedName}
 
 import scala.util.{Failure, Success}
 
