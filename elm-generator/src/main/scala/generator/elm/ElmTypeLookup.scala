@@ -121,7 +121,7 @@ case class ElmTypeLookup(args: GenArgs) {
               case _: UserDefined.Model | _: UserDefined.Union => ElmUserDefinedLocal(name).validNec
             }
           }
-          case ParsedName.Imported(ns, n) => {
+          case ParsedName.Imported(ns, _, n) => {
             val namespace = s"Generated.${Names.pascalCase(ns)}"
             val name = Names.pascalCase(n)
             args.imports.addExposingAll(namespace)

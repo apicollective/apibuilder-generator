@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.generator.{ScalaCaseClasses, ScalaService}
 
-class ScalaCaseClassesInterfacesSpec extends AnyFunSpec with Matchers with helpers.ServiceHelpers {
+class   ScalaCaseClassesInterfacesSpec extends AnyFunSpec with Matchers with helpers.ServiceHelpers {
 
   private def build(interfaces: Seq[Interface]): ScalaService = {
     ScalaService(

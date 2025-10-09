@@ -3,22 +3,21 @@ package lib.generator
 import io.apibuilder.spec.v0.models.{Method, Service}
 import lib.DatatypeResolver
 
-object GeneratorUtil {
+sealed trait ObjectType
+object ObjectType {
+  case object Enum extends ObjectType { override def toString = "enums" }
+  case object Union extends ObjectType { override def toString = "unions" }
+  case object Model extends ObjectType { override def toString = "models" }
+  case object Interface extends ObjectType { override def toString = "interfaces" }
 
-  sealed trait ObjectType
-  object ObjectType {
-    case object Enum extends ObjectType { override def toString = "enums" }
-    case object Union extends ObjectType { override def toString = "unions" }
-    case object Model extends ObjectType { override def toString = "models" }
-    case object Interface extends ObjectType { override def toString = "interfaces" }
+  private val all: Seq[ObjectType] = Seq(Enum, Union, Model)
 
-    private val all: Seq[ObjectType] = Seq(Enum, Union, Model)
-
-    def fromString(value: String): Option[ObjectType] = {
-      all.find(_.toString == value)
-    }
+  def fromString(value: String): Option[ObjectType] = {
+    all.find(_.toString == value)
   }
+}
 
+object GeneratorUtil {
 
   /**
     * For convenience to the users of the clients, all generated

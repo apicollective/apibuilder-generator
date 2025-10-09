@@ -1,6 +1,6 @@
 package scala.generator
 
-import lib.generator.GeneratorUtil
+import lib.generator.{GeneratorUtil, ObjectType}
 
 object Namespaces {
 
@@ -33,12 +33,12 @@ case class Namespaces(original: String) {
 
   val last: String = base.split("\\.").last
 
-  def get(objectType: GeneratorUtil.ObjectType): String = {
+  def get(objectType: ObjectType): String = {
     objectType match {
-      case GeneratorUtil.ObjectType.Enum => enums
-      case GeneratorUtil.ObjectType.Model => models
-      case GeneratorUtil.ObjectType.Union => unions
-      case GeneratorUtil.ObjectType.Interface => interfaces
+      case ObjectType.Enum => enums
+      case ObjectType.Model => models
+      case ObjectType.Union => unions
+      case ObjectType.Interface => interfaces
     }
   }
 
