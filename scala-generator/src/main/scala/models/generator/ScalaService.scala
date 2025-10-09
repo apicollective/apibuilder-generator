@@ -1,5 +1,6 @@
 package scala.generator
 
+import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models._
 import lib.Text.underscoreToInitCap
 
@@ -11,12 +12,21 @@ import play.api.libs.json.JsString
 import scala.generator.ScalaPrimitive.{DateIso8601, DateTimeIso8601, JsonObject, JsonValue}
 
 object ScalaService {
-  def apply(service: Service, config: Attributes = Attributes.PlayDefaultConfig) = new ScalaService(service, config)
+  def apply(service: Service): ScalaService = new ScalaService(service, Attributes.PlayDefaultConfig, Nil)
+
+  def apply(form: InvocationForm, defaultAttributes: Attributes): ScalaService = {
+    new ScalaService(
+      service = form.service,
+      attributes = defaultAttributes.withAttributes(form.attributes),
+      importedServices = form.importedServices.getOrElse(Nil),
+    )
+  }
 }
 
 class ScalaService(
   val service: Service,
-  val attributes: Attributes = Attributes.PlayDefaultConfig,
+  val attributes: Attributes,
+  val importedServices: Seq[Service]
 ) {
 
   val namespaces: Namespaces = Namespaces(service.namespace)
@@ -454,11 +464,6 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
 
   val isSuccess: Boolean = response.code match {
     case ResponseCodeInt(value) => value >= 200 && value < 400
-    case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
-  }
-
-  val isNotFound: Boolean = response.code match {
-    case ResponseCodeInt(value) => value == 404
     case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
   }
 

@@ -12,7 +12,7 @@ import scala.models.{ApiBuilderComments, Attributes}
 object MockFactoriesGenerator extends CodeGenerator {
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+    val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
     new MockFactoriesGenerator(ssd, form.userAgent).invoke()
   }
 

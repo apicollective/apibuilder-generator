@@ -9,7 +9,7 @@ import scala.models.ning.{AsyncHttpClientGenerator, Ning18ClientGenerator}
 
 class CollectionJsonDefaultsSpec extends AnyFunSpec with Matchers {
 
-  private lazy val ssd: ScalaService = new ScalaService(models.TestHelper.collectionJsonDefaultsService)
+  private lazy val ssd: ScalaService = ScalaService(models.TestHelper.collectionJsonDefaultsService)
 
   it("user case classes") {
     val model = ssd.models.find(_.name == "User").get
@@ -54,5 +54,3 @@ class CollectionJsonDefaultsSpec extends AnyFunSpec with Matchers {
     }
   }
 }
-
-

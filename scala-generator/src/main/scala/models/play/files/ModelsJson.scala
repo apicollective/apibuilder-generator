@@ -17,7 +17,7 @@ object ModelsJson {
     })
 
   def contents(form: InvocationForm, scala3Support: Boolean): String = {
-    val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
+    val scalaService = scala.generator.ScalaService(form, Attributes.PlayGen2DefaultConfig)
     val imports = scala.models.JsonImports(form.service)
     val gen = scala.models.Play2Json(scalaService, scala3Support = scala3Support)
 

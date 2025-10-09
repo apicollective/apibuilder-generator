@@ -76,7 +76,7 @@ trait ParserGenerator extends CodeGenerator {
   def attributes(ssd: ScalaService): ParserGeneratorPlayVersionSpecificAttributes
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+    val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
 
     val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
 

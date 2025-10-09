@@ -15,7 +15,7 @@ class Play2ClientGeneratorSpec extends AnyFunSpec with Matchers {
 
   it("errorTypeClass") {
     val service = models.TestHelper.generatorApiService
-    val ssd = new ScalaService(service)
+    val ssd = ScalaService(service)
     val resource = ssd.resources.find(_.plural == "Invocations").getOrElse {
       sys.error("could not find resource with name[Invocations]")
     }

@@ -7,9 +7,9 @@ import scala.models.Attributes
 object Models {
 
   def contents(form: InvocationForm): String = {
-    val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
+    val scalaService = scala.generator.ScalaService(form, Attributes.PlayGen2DefaultConfig)
     scala.generator.ScalaCaseClasses
-      .generateCode(scalaService, form.userAgent, false)
+      .generateCode(scalaService, form.userAgent, addHeader = false)
       .headOption
       .fold("")(_.contents)
   }

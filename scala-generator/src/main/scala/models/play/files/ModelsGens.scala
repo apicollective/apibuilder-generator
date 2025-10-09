@@ -87,7 +87,7 @@ object ModelsGens {
     """
   }
 
-  def genFor(name: String, tpe: String, properties: List[(String, String)]) = properties match {
+  def genFor(name: String, tpe: String, properties: List[(String, String)]): String = properties match {
     case Nil => ""
     case properties =>
       val arguments = properties.unzip._1
@@ -127,7 +127,7 @@ object ModelsGens {
   }
 
 	def contents(form: InvocationForm): String = {
-    val scalaService = ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
+    val scalaService = ScalaService(form, Attributes.PlayGen2DefaultConfig)
     val wrappers = PrimitiveWrapper(scalaService).wrappers
 
     val imports = scalaService.models.flatMap(this.imports)

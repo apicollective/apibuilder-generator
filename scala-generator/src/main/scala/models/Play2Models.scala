@@ -45,7 +45,7 @@ case class Play2Models(version: ScalaVersion) extends CodeGenerator {
     addHeader: Boolean,
     useBuiltInImplicits: Boolean,
   ): Seq[File] = {
-    val ssd = ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+    val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
 
     val caseClasses = ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
     val play2json = Play2Json(ssd, scala3Support)

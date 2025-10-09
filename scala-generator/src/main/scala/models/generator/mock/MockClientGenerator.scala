@@ -14,7 +14,7 @@ object MockClientGenerator {
   object Play24 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play24(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
     }
 
@@ -23,7 +23,7 @@ object MockClientGenerator {
   object Play25 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play25(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
     }
 
@@ -32,7 +32,7 @@ object MockClientGenerator {
   object Play26 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play26(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
     }
 
@@ -41,7 +41,7 @@ object MockClientGenerator {
   object Play28 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Play28(ssd.namespaces.base, Attributes.PlayDefaultConfig.withAttributes(form.attributes), None)).invoke()
     }
 
@@ -50,7 +50,7 @@ object MockClientGenerator {
   object Ning19 extends CodeGenerator {
 
     override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-      val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+      val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
       new MockClientGenerator(ssd, form.userAgent, ScalaClientMethodConfigs.Ning19(ssd.namespaces.base, Attributes.PlayDefaultConfig, None)).invoke()
     }
   }

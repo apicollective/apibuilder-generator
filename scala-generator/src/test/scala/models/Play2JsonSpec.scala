@@ -173,7 +173,7 @@ class Play2JsonSpec extends AnyFunSpec with Matchers {
 
   describe("quality schema") {
 
-    lazy val quality = new ScalaService(models.TestHelper.parseFile("/examples/quality.json"))
+    lazy val quality = ScalaService(models.TestHelper.parseFile("/examples/quality.json"))
     lazy val play2Json = Play2Json(quality, scala3Support = false)
 
     describe("plan") {
