@@ -153,11 +153,7 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val qualifiedName: String = ssd.unionClassName(name)
 
-  val interfaces: Seq[String] = {
-    println(s"unions: ${union.interfaces}")
-    println(s"mapped: ${union.interfaces.map(ScalaUtil.toClassName)}")
-    union.interfaces.map(ScalaUtil.toClassName)
-  }
+  val interfaces: Seq[ScalaClassName] = union.interfaces.map(ScalaUtil.toClassName2)
 
   val discriminator: Option[String] = union.discriminator
 
@@ -307,7 +303,7 @@ abstract class ScalaModelAndInterface(
 
   val deprecation: Option[Deprecation] = model.deprecation
 
-  val interfaces: Seq[String] = model.interfaces.map(ScalaUtil.toClassName)
+  val interfaces: Seq[ScalaClassName] = model.interfaces.map(ScalaUtil.toClassName2)
 }
 
 class ScalaInterface(val ssd: ScalaService, val interface: Interface) extends ScalaModelAndInterface(

@@ -5,6 +5,19 @@ import lib.generator.GeneratorUtil
 
 import io.apibuilder.spec.v0.models.Deprecation
 
+sealed trait ScalaClassName {
+  def className: String
+  def qualifiedName: String
+}
+object ScalaClassName {
+  case class Local(override val className: String) extends ScalaClassName {
+    override def qualifiedName: String = className
+  }
+  case class Imported(ns: String, override val className: String) extends ScalaClassName {
+    override def qualifiedName: String = s"$ns.$className"
+  }
+}
+
 object ScalaUtil {
 
   private val ReservedWords = Seq(
@@ -45,7 +58,7 @@ object ScalaUtil {
 
   def extendsClause(
     className: String,
-    interfaces: Seq[String],
+    interfaces: Seq[ScalaClassName],
     unions: Seq[String],
   ): Option[String] = {
     extendsTypes(className, interfaces, unions).toList match {
@@ -56,10 +69,13 @@ object ScalaUtil {
 
   def extendsTypes(
     className: String,
-    interfaces: Seq[String],
+    interfaces: Seq[ScalaClassName],
     unions: Seq[String],
   ): Seq[String] = {
-    (interfaces ++ unions).toList.filterNot(_ == className).distinct.sorted
+    (interfaces ++ unions.map(ScalaClassName.Local)).toList
+      .filterNot(_.qualifiedName == className)
+      .map(_.qualifiedName)
+      .distinct.sorted
   }
 
   private def trimTrailingWhitespace(text: String): String = {
@@ -102,6 +118,18 @@ object ScalaUtil {
     name.indexOf("[") >= 0
   }
 
+  def toClassName2(name: String): ScalaClassName = {
+    val i = name.lastIndexOf(".")
+    if (i < 0) {
+      ScalaClassName.Local(toClassName(name))
+    } else {
+      val ns = name.take(i)
+      val klass = name.drop(i)
+      println(s"ns[$ns] klass[$klass]")
+      ScalaClassName.Imported(ns, toClassName(klass))
+    }
+  }
+
   def toClassName(name: String): String = {
     val baseName = lib.Text.safeName(
       if (name == name.toUpperCase) {
@@ -110,7 +138,6 @@ object ScalaUtil {
         lib.Text.initCap(snakeToCamelCase(name))
       }
     )
-
     ScalaUtil.quoteNameIfKeyword(baseName)
   }
 
@@ -142,4 +169,3 @@ object ScalaUtil {
   }
 
 }
-

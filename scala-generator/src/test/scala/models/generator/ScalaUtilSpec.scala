@@ -5,22 +5,33 @@ import org.scalatest.matchers.should.Matchers
 
 class ScalaUtilSpec extends AnyFunSpec with Matchers {
 
+  private def localExtendsClause(
+    interfaces: Seq[String],
+    unions: Seq[String],
+  ): Option[String] = {
+    ScalaUtil.extendsClause(
+      className = "TestClass",
+      interfaces = interfaces.map(ScalaClassName.Local),
+      unions = unions
+    )
+  }
+
   it("extendsClause") {
-    ScalaUtil.extendsClause("TestClass", Nil, Nil) should be(None)
-    ScalaUtil.extendsClause("TestClass", Seq("Foo"), Nil).get should be(" extends Foo")
-    ScalaUtil.extendsClause("TestClass", Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
-    ScalaUtil.extendsClause("TestClass", Seq("Foo", "Bar", "Baz"), Nil).get should be(" extends Bar with Baz with Foo")
-    ScalaUtil.extendsClause("TestClass", Seq("Foo"), Seq("Bar", "Baz")).get should be(" extends Bar with Baz with Foo")
+    localExtendsClause(Nil, Nil) should be(None)
+    localExtendsClause(Seq("Foo"), Nil).get should be(" extends Foo")
+    localExtendsClause(Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
+    localExtendsClause(Seq("Foo", "Bar", "Baz"), Nil).get should be(" extends Bar with Baz with Foo")
+    localExtendsClause(Seq("Foo"), Seq("Bar", "Baz")).get should be(" extends Bar with Baz with Foo")
   }
 
   it("extendsClause excluded className") {
-    ScalaUtil.extendsClause("TestClass", Seq("TestClass"), Nil) should be(None)
-    ScalaUtil.extendsClause("TestClass", Seq("TestClass", "Foo"), Nil).get should be(" extends Foo")
+    localExtendsClause(Seq("TestClass"), Nil) should be(None)
+    localExtendsClause(Seq("TestClass", "Foo"), Nil).get should be(" extends Foo")
   }
 
   it("extendsClause sorts") {
-    ScalaUtil.extendsClause("TestClass", Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
-    ScalaUtil.extendsClause("TestClass", Seq("Bar", "Foo"), Nil).get should be(" extends Bar with Foo")
+    localExtendsClause(Seq("Foo", "Bar"), Nil).get should be(" extends Bar with Foo")
+    localExtendsClause(Seq("Bar", "Foo"), Nil).get should be(" extends Bar with Foo")
   }
 
   it("toClassName") {
