@@ -34,7 +34,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
 }"""
   }
 
-  def generateTimeSerde(): String = {
+  private def generateTimeSerde(): String = {
     Seq(ssd.attributes.dateTimeType.dataType, ssd.attributes.dateType.dataType).map { dt =>
       s"""
          |private[${ssd.namespaces.last}] implicit val decode${dt.shortName}: Decoder[${dt.fullName}] =
@@ -45,14 +45,14 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
     }.mkString("\n")
   }
 
-  def generateModels(): String = {
+  private def generateModels(): String = {
     (ssd.models ++ PrimitiveWrapper(ssd).wrappers.map(_.model))
       .flatMap(decodersAndEncoders)
       .filter(_.trim.nonEmpty)
       .mkString("\n\n")
   }
 
-  def generateUnions(): String = {
+  private def generateUnions(): String = {
     ssd.unions.map(decodersAndEncoders).mkString("\n\n")
   }
 
@@ -101,7 +101,7 @@ ${Seq(generateTimeSerde(), generateEnums(), generateModels(), generateUnions()).
 
   private def decodersWithDiscriminator(union: ScalaUnion, discriminator: String): String = {
     val typesWithNames = unionTypesWithNames(union)
-    val defaultClause = typesWithNames.filter(_._1.isDefault).headOption match {
+    val defaultClause = typesWithNames.find(_._1.isDefault) match {
       case Some((_, typeName)) => s"""c.as[$typeName]"""
       case None => s"""Left(DecodingFailure("Union[${union.name}] requires a discriminator named '$discriminator' - this field was not found in the Json", c.history))"""
     }

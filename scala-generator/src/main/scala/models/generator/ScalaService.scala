@@ -41,8 +41,16 @@ class ScalaService(
   def modelClassName(name: String): String = namespaces.models + "." + ScalaUtil.toClassName(name)
   def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
 
-  val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }.sortBy(_.name)
-  private val interfacesByName = interfaces.groupBy(_.interface.name)
+  private val imports: Seq[Service] = service.imports.flatMap { i =>
+    importedServices.find(_.namespace == i.namespace)
+  }
+
+  private val localInterfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }
+  private val importedInterfaces: Seq[ScalaInterface] = imports.flatMap { s =>
+    s.interfaces.map { new ScalaInterface(ScalaService(s), _) }
+  }
+  val interfaces: Seq[ScalaInterface] = (localInterfaces ++ importedInterfaces).sortBy(_.qualifiedName)
+  private val interfacesByName = interfaces.groupBy(_.qualifiedName)
 
   val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
@@ -57,7 +65,13 @@ class ScalaService(
    */
   private def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
     interfaceNames.distinct.map { i =>
-      interfacesByName.getOrElse(i, Nil).toList match {
+      val qualified = if (i.indexOf('.') < 0) {
+        service.namespace + ".enums." + i
+      } else {
+        i
+      }
+      println(s"i[$i] => $qualified")
+      interfacesByName.getOrElse(qualified, Nil).toList match {
         case Nil => sys.error(s"Cannot find interface named: $i")
         case one :: Nil => one
         case _ => sys.error(s"Multiple interfaces found with the name: $i")
