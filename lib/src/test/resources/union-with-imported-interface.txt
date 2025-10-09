@@ -58,12 +58,12 @@ package sse.models {
       play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.date.print(x))
     }
 
-    implicit def jsonReads01c0df0e49134dbdAf04028dc5e5c468Example[T <: sse.models.Example]: play.api.libs.json.Reads[T] = (json: play.api.libs.json.JsValue) => play.api.libs.json.JsError("Union has no declared types")
+    implicit def jsonReads8276b8ed7fa0411b96d844511e5ef8edExample[T <: sse.models.Example]: play.api.libs.json.Reads[T] = (json: play.api.libs.json.JsValue) => play.api.libs.json.JsError("Union has no declared types")
 
 
-    implicit def jsonReads01c0df0e49134dbdAf04028dc5e5c468ExampleSeq[T <: sse.models.Example]: play.api.libs.json.Reads[Seq[T]] = {
+    implicit def jsonReads8276b8ed7fa0411b96d844511e5ef8edExampleSeq[T <: sse.models.Example]: play.api.libs.json.Reads[Seq[T]] = {
       case a: play.api.libs.json.JsArray => {
-        val all: Seq[play.api.libs.json.JsResult[sse.models.Example]] = a.value.map(jsonReads01c0df0e49134dbdAf04028dc5e5c468Example.reads).toSeq
+        val all: Seq[play.api.libs.json.JsResult[sse.models.Example]] = a.value.map(jsonReads8276b8ed7fa0411b96d844511e5ef8edExample.reads).toSeq
 
         all.collect { case e: play.api.libs.json.JsError => e }.toList match {
           case Nil => play.api.libs.json.JsSuccess(all.collect { case play.api.libs.json.JsSuccess(v, _) => v.asInstanceOf[T] })
@@ -90,7 +90,7 @@ package sse.models {
       }
     }
 
-    implicit def jsonWrites01c0df0e49134dbdAf04028dc5e5c468Example[T <: sse.models.Example]: play.api.libs.json.Writes[T] = {
+    implicit def jsonWrites8276b8ed7fa0411b96d844511e5ef8edExample[T <: sse.models.Example]: play.api.libs.json.Writes[T] = {
       (obj: sse.models.Example) => {
         sse.models.json.jsObjectExample(obj)
       }

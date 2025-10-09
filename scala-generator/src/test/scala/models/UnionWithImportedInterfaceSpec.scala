@@ -14,6 +14,7 @@ class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with Servi
     version = "1",
     interfaces = Seq(makeInterface(
       name = "event",
+      plural = "events",
       fields = Seq(makeField(name = "timestamp"))
     ))
   )
@@ -24,6 +25,7 @@ class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with Servi
     imports = Seq(makeImport(eventService)),
     unions = Seq(makeUnion(
       name = "example",
+      plural = "examples",
       interfaces = Seq("test.interfaces.event")
     ))
   )
