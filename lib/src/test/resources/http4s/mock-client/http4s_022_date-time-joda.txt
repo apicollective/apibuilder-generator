@@ -1,6 +1,6 @@
 package io.gregor.time.types.v0.mock {
 
-  class Client[F[_]: cats.Applicative] extends io.gregor.time.types.v0.interfaces.Client[F] {
+  class Client[F[_]: cats.Applicative] extends io.gregor.time.types.v0.models.Client[F] {
 
     val baseUrl: org.http4s.Uri = org.http4s.Uri.unsafeFromString("http://mock.localhost")
 

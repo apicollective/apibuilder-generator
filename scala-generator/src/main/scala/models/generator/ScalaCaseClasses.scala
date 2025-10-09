@@ -108,7 +108,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       s"def ${f.name}: ${f.datatype.name}"
     } match {
       case Nil => body
-      case parts => println(s"parts: $parts");Seq(
+      case parts => Seq(
         s"$body {",
         "  " + parts.mkString("\n").indent(2).trim,
         "}",
