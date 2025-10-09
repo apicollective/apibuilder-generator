@@ -45,12 +45,13 @@ class ScalaService(
     importedServices.find(_.namespace == i.namespace)
   }
 
-  private val localInterfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }
+  val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }
   private val importedInterfaces: Seq[ScalaInterface] = imports.flatMap { s =>
     s.interfaces.map { new ScalaInterface(ScalaService(s), _) }
   }
-  val interfaces: Seq[ScalaInterface] = (localInterfaces ++ importedInterfaces).sortBy(_.qualifiedName)
-  private val interfacesByName = interfaces.groupBy(_.qualifiedName)
+  private val interfacesByName = (interfaces ++ importedInterfaces).groupBy { i =>
+    i.ssd.service.namespace + ".interfaces." + i.interface.name
+  }
 
   val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
@@ -70,6 +71,7 @@ class ScalaService(
       } else {
         i
       }
+      println(s"inByName: ${interfacesByName.keys.mkString(", ")}")
       println(s"i[$i] => $qualified")
       interfacesByName.getOrElse(qualified, Nil).toList match {
         case Nil => sys.error(s"Cannot find interface named: $i")

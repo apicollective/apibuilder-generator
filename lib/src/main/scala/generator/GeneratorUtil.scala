@@ -2,7 +2,6 @@ package lib.generator
 
 import io.apibuilder.spec.v0.models.{Method, Service}
 import lib.DatatypeResolver
-import scala.annotation.nowarn
 
 object GeneratorUtil {
 
@@ -11,6 +10,7 @@ object GeneratorUtil {
     case object Enum extends ObjectType { override def toString = "enums" }
     case object Union extends ObjectType { override def toString = "unions" }
     case object Model extends ObjectType { override def toString = "models" }
+    case object Interface extends ObjectType { override def toString = "interfaces" }
 
     private val all: Seq[ObjectType] = Seq(Enum, Union, Model)
 
@@ -27,13 +27,7 @@ object GeneratorUtil {
     * for models, 1 for unions, 1 for enums) when using the generated
     * clients.
     */
-  def fullyQualifiedInternalName(
-    namespace: String,
-    @nowarn objectType: ObjectType
-  ): String = {
-    // API accepts object type parameter, but currently not used as we
-    // place all internal names into the models namespace for
-    // convenience.
+  def fullyQualifiedImportName(namespace: String): String = {
     fullyQualifiedExternalName(namespace, ObjectType.Model)
   }
 

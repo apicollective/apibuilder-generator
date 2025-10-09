@@ -17,6 +17,7 @@ class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with Servi
   )
 
   private lazy val service = makeService(
+    imports = Seq(makeImport(eventService)),
     unions = Seq(makeUnion(
       name = "example",
       interfaces = Seq(s"${eventService.namespace}.interfaces.event")
@@ -28,7 +29,7 @@ class UnionWithImportedInterfaceSpec extends AnyFunSpec with Matchers with Servi
       Play29Scala3ClientGenerator.invoke(InvocationForm(service = service, importedServices = Some(Seq(eventService))))
     }
     sourceFiles.size shouldBe 1
-    models.TestHelper.assertEqualsFile("/example-union-types-play-29-scala-3.txt", sourceFiles.head.contents)
+    models.TestHelper.assertEqualsFile("/union-with-imported-interface.txt", sourceFiles.head.contents)
   }
 
 }

@@ -4,7 +4,7 @@ import lib.generator.GeneratorUtil
 
 object Namespaces {
 
-  val Parsers = "parsers"
+  private[generator] val Parsers = "parsers"
   val Conversions = "conversions"
 
   def quote(ns: String): String = {
@@ -17,9 +17,10 @@ case class Namespaces(original: String) {
 
   val base: String = Namespaces.quote(original)
 
-  val models: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Model)
-  val enums: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Enum)
-  val unions: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Union)
+  val models: String = GeneratorUtil.fullyQualifiedImportName(base)
+  val enums: String = GeneratorUtil.fullyQualifiedImportName(base)
+  val unions: String = GeneratorUtil.fullyQualifiedImportName(base)
+  val interfaces: String = GeneratorUtil.fullyQualifiedImportName(base)
 
   val json: String = Seq(models, "json").mkString(".")
 
@@ -29,7 +30,6 @@ case class Namespaces(original: String) {
   val errors: String = Seq(base, "errors").mkString(".")
 
   val mock: String = Seq(base, "mock").mkString(".")
-  val interfaces: String = Seq(base, "interfaces").mkString(".")
 
   val last: String = base.split("\\.").last
 
@@ -38,6 +38,7 @@ case class Namespaces(original: String) {
       case GeneratorUtil.ObjectType.Enum => enums
       case GeneratorUtil.ObjectType.Model => models
       case GeneratorUtil.ObjectType.Union => unions
+      case GeneratorUtil.ObjectType.Interface => interfaces
     }
   }
 

@@ -1,17 +1,16 @@
 package models
 
-import java.nio.file.{Files, Paths}
-import java.nio.charset.StandardCharsets
-import java.io.{File => JFile}
-import play.api.libs.json._
-import io.apibuilder.spec.v0.models.{ResponseCode, ResponseCodeInt, ResponseCodeOption, ResponseCodeUndefinedType}
-import io.apibuilder.spec.v0.models.json._
-import io.apibuilder.spec.v0.models.Service
 import io.apibuilder.generator.v0.models.File
+import io.apibuilder.spec.v0.models.json._
+import io.apibuilder.spec.v0.models._
 import lib.Text
 import org.scalatest.matchers.should.Matchers
+import play.api.libs.json._
 
-import scala.util.{Try, Failure, Success}
+import java.io.{File => JFile}
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
+import scala.util.{Failure, Success, Try}
 
 object TestHelper extends Matchers {
 
@@ -110,15 +109,18 @@ object TestHelper extends Matchers {
   private def resolvePath(filename: String): String = {
     import sys.process._
 
-    val targetPath = Option(getClass.getResource(filename)).map(r => new JFile(r.getPath)).getOrElse {
-      sys.error(s"Could not find file named[$filename]")
-    }
-    val cmd = s"find . -type f -name ${targetPath.getName}"
+    Option(getClass.getResource(filename)).map(r => new JFile(r.getPath)) match {
+      case None if Files.exists(OverwriteTestsFile) => ""
+      case None => sys.error("Cannot find file: " + filename)
+      case Some(targetPath) => {
+        val cmd = s"find . -type f -name ${targetPath.getName}"
 
-    cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).filter(_.endsWith(filename)).toList match {
-      case Nil => sys.error(s"Could not find source file named[$filename]")
-      case one :: Nil => one
-      case multiple => sys.error(s"Multiple source files named[$filename]: " + multiple.mkString(", "))
+        cmd.!!.trim.split("\\s+").toSeq.filter(_.indexOf("/target") < 0).filter(_.endsWith(filename)).toList match {
+          case Nil => sys.error(s"Could not find source file named[$filename]")
+          case one :: Nil => one
+          case multiple => sys.error(s"Multiple source files named[$filename]: " + multiple.mkString(", "))
+        }
+      }
     }
   }
 
