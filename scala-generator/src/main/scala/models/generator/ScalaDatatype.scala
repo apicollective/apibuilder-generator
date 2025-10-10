@@ -221,7 +221,7 @@ object ScalaPrimitive {
   }
 
   case class Model(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
-    override def namespace: Option[String] = Some(namespaces.models)
+    override def namespace: Option[String] = Some(namespaces.codeGenModels)
     def apiBuilderType: String = shortName
     override def toVariableName: String = initLowerCase(shortName)
   }
@@ -233,15 +233,15 @@ object ScalaPrimitive {
   }
 
   case class Enum(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
-    override def namespace: Option[String] = Some(namespaces.enums)
+    override def namespace: Option[String] = Some(namespaces.codeGenEnums)
     def apiBuilderType: String = shortName
-    override def default(value: String): String = fullName + "." + ScalaUtil.toClassName(value)
+    override def default(value: String): String = fullName + "." + ScalaUtil.toLocalClassName(value)
     override protected def default(json: JsValue): String = default(json.as[String])
     override def toVariableName: String = initLowerCase(shortName)
   }
 
   case class Union(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
-    override def namespace: Option[String] = Some(namespaces.unions)
+    override def namespace: Option[String] = Some(namespaces.codeGenUnions)
     def apiBuilderType: String = shortName
     override def toVariableName: String = initLowerCase(shortName)
   }
@@ -307,11 +307,11 @@ object ScalaTypeResolver {
    */
   private def parseQualifiedName(defaultNamespaces: Namespaces, name: String): (Namespaces, String) = {
     name.split("\\.").toList match {
-      case _ :: Nil => (defaultNamespaces, ScalaUtil.toClassName(name))
+      case _ :: Nil => (defaultNamespaces, ScalaUtil.toLocalClassName(name))
       case multiple =>
         val n = multiple.last
         val baseNamespace = multiple.reverse.drop(2).reverse.mkString(".")
-        (Namespaces(baseNamespace), ScalaUtil.toClassName(n))
+        (Namespaces(baseNamespace), ScalaUtil.toLocalClassName(n))
     }
   }
 
@@ -343,7 +343,7 @@ case class ScalaTypeResolver(
       case Datatype.Generated.Model(name) => ScalaPrimitive.GeneratedModel(name)
       case Datatype.UserDefined.Model(name) => {
         name.split("\\.").toList match {
-          case n :: Nil => ScalaPrimitive.Model(namespaces, ScalaUtil.toClassName(n))
+          case n :: Nil => ScalaPrimitive.Model(namespaces, ScalaUtil.toLocalClassName(n))
           case _ => {
             val (ns, n) = ScalaTypeResolver.parseQualifiedName(namespaces, name)
             ScalaPrimitive.Model(ns, n)

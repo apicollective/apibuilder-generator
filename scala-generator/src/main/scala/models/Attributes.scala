@@ -8,12 +8,13 @@ sealed trait TimeConfig {
   def dateType: DateTypeConfig
   def dateTimeType: DateTimeTypeConfig
 }
+
 object TimeConfig {
-  case object JodaTime extends TimeConfig {
+  private case object JodaTime extends TimeConfig {
     override val dateType: DateTypeConfig = DateTypeConfig.JodaLocalDate
     override val dateTimeType: DateTimeTypeConfig = DateTimeTypeConfig.JodaDateTime
   }
-  case object JavaTime extends TimeConfig {
+  private case object JavaTime extends TimeConfig {
     override val dateType: DateTypeConfig = DateTypeConfig.JavaLocalDate
     override val dateTimeType: DateTimeTypeConfig = DateTimeTypeConfig.JavaInstant
   }

@@ -17,7 +17,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
 
   def getScalaMethod(ssd: ScalaService, resourcePlural: String, method: Method, path: String): ScalaOperation = {
     val resource = getScalaResource(ssd, resourcePlural)
-    resource.operations.filter { op => op.method == method && op.path == path }.headOption.getOrElse {
+    resource.operations.find { op => op.method == method && op.path == path }.getOrElse {
       val errorMsg = s"Operations found for $resourcePlural\n" + resource.operations.map { op =>
         "%s %s".format(op.method, op.path)
       }.mkString("\n")
@@ -48,7 +48,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
 
   describe("with reference-api service") {
     lazy val service = models.TestHelper.referenceApiService
-    lazy val ssd = new ScalaService(service)
+    lazy val ssd = ScalaService(service)
 
     it("normalizes explicit paths that match resource name") {
       val resource = getScalaResource(ssd, "Organizations")
@@ -79,7 +79,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
           models.TestHelper.assertEqualsFile(
             "/generators/play-2-route-reference-api.routes",
             sourceFiles.head.contents
-         ) 
+         )
         }
       }
     }
@@ -107,7 +107,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
 
   describe("with apidoc service") {
     lazy val service = models.TestHelper.apidocApiService
-    lazy val ssd = new ScalaService(service)
+    lazy val ssd = ScalaService(service)
 
     describe("users resource") {
       lazy val userResource = getScalaResource(ssd, "Users")
@@ -182,7 +182,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
       val files = result.getOrElse(sys.error("got Left"))
 
       files.size shouldBe 1
-      val route = files(0).contents
+      val route = files.head.contents
       models.TestHelper.assertEqualsFile(s"/play2/route/date-time-joda.txt", route)
     }
 
@@ -195,7 +195,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
       val files = result.getOrElse(sys.error("got Left"))
 
       files.size shouldBe 1
-      val route = files(0).contents
+      val route = files.head.contents
       models.TestHelper.assertEqualsFile(s"/play2/route/date-time-instant.txt", route)
     }
 
@@ -208,7 +208,7 @@ class Play2RouteGeneratorSpec extends AnyFunSpec with Matchers {
       val files = result.getOrElse(sys.error("got Left"))
 
       files.size shouldBe 1
-      val route = files(0).contents
+      val route = files.head.contents
       models.TestHelper.assertEqualsFile(s"/play2/route/date-time-offsetdatetime.txt", route)
     }
   }

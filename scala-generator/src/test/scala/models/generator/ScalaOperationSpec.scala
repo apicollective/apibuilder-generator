@@ -7,9 +7,9 @@ import org.scalatest.matchers.should.Matchers
 class ScalaOperationSpec extends AnyFunSpec with Matchers {
 
   private lazy val service = models.TestHelper.referenceApiService
-  private lazy val ssd = new ScalaService(service)
+  private lazy val ssd = ScalaService(service)
 
-  val q1 = new Parameter(
+  val q1 = Parameter(
     "q1",
     "double",
     ParameterLocation.Query,
@@ -17,9 +17,9 @@ class ScalaOperationSpec extends AnyFunSpec with Matchers {
 
   it("models as a parameter in the body should use capitalize") {
     val body = Body("user")
-    val model = new Model("user", "users", None, None, Nil)
-    val operation = new Operation(Method.Get, "/users", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, Some("/users"), None, None, Seq(operation))
+    val model = Model("user", "users", None, None, Nil)
+    val operation = Operation(Method.Get, "/users", None, None, Some(body), Seq(q1), Nil)
+    val resource = Resource(model.name, model.plural, Some("/users"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
@@ -35,9 +35,9 @@ class ScalaOperationSpec extends AnyFunSpec with Matchers {
 
   it("array of models as a parameter in the body should pluralize model name") {
     val body = Body("[user]", None)
-    val model = new Model("user", "users", None, None, Nil)
-    val operation = new Operation(Method.Get, "/users", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, Some("/users"), None, None, Seq(operation))
+    val model = Model("user", "users", None, None, Nil)
+    val operation = Operation(Method.Get, "/users", None, None, Some(body), Seq(q1), Nil)
+    val resource = Resource(model.name, model.plural, Some("/users"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
@@ -50,9 +50,9 @@ class ScalaOperationSpec extends AnyFunSpec with Matchers {
 
   it("primitive type as a parameter in the body should not use capitalize") {
     val body = Body("integer", None)
-    val model = new Model("model", "models", None, None, Nil)
-    val operation = new Operation(Method.Get, "/models", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
+    val model = Model("model", "models", None, None, Nil)
+    val operation = Operation(Method.Get, "/models", None, None, Some(body), Seq(q1), Nil)
+    val resource = Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,
@@ -65,9 +65,9 @@ class ScalaOperationSpec extends AnyFunSpec with Matchers {
 
   it("array of primitive types as a parameter in the body should not use capitalize") {
     val body = Body("[integer]", None)
-    val model = new Model("model", "models", None, None, Nil)
-    val operation = new Operation(Method.Get, "/models", None, None, Some(body), Seq(q1), Nil)
-    val resource = new Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
+    val model = Model("model", "models", None, None, Nil)
+    val operation = Operation(Method.Get, "/models", None, None, Some(body), Seq(q1), Nil)
+    val resource = Resource(model.name, model.plural, Some("/models"), None, None, Seq(operation))
 
     val scalaOperation = new ScalaOperation(
       ssd,

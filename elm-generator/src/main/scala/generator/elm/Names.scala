@@ -1,13 +1,14 @@
 package generator.elm
 
 import lib.Text
+import lib.generator.{NamespaceParser, ParsedName}
 
 object Names {
 
   private def withNamespace(imports: Imports, name: String)(f: String => String): String = {
     NamespaceParser.parse(name) match {
       case ParsedName.Local(name) => f(name)
-      case ParsedName.Imported(namespace, name) => {
+      case ParsedName.Imported(namespace, _, name) => {
         imports.addExposingAll(s"Generated.${Names.pascalCase(namespace)}")
         f(name)
       }

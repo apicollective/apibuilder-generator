@@ -22,7 +22,7 @@ case class Play2RouteGenerator(form: InvocationForm, configDefault: Attributes =
   private val GlobalPad = 5
 
   private val service = form.service
-  private val scalaService = ScalaService(service, configDefault.withAttributes(form.attributes))
+  private val scalaService = ScalaService(form, configDefault)
 
   def invoke(): Either[Seq[String], Seq[File]] = {
     scalaService.resources.flatMap { resource =>
@@ -36,8 +36,8 @@ case class Play2RouteGenerator(form: InvocationForm, configDefault: Attributes =
         )
       }
       case all => {
-        val maxVerbLength = all.map(_.verb.toString.length).toSeq.sorted.last
-        val maxUrlLength = all.map(_.url.length).toSeq.sorted.last
+        val maxVerbLength = all.map(_.verb.toString.length).max
+        val maxUrlLength = all.map(_.url.length).max
         val (paramStart, pathStart) = all.partition(_.url.startsWith("/:"))
 
         Right(
@@ -70,9 +70,9 @@ private[models] case class Play2Route(
   resource: ScalaResource
 ) {
 
-  val verb = op.method
-  val url = op.path
-  val params = parametersWithTypesAndDefaults(
+  val verb: Method = op.method
+  val url: String = op.path
+  val params: Iterable[String] = parametersWithTypesAndDefaults(
     op.parameters.
       filter { param =>
         param.location match {
@@ -85,14 +85,14 @@ private[models] case class Play2Route(
       }.
       filter { param =>
         param.datatype match {
-          case (_: ScalaPrimitive) | ScalaDatatype.List(_) => true
+          case _: ScalaPrimitive | ScalaDatatype.List(_) => true
           case ScalaDatatype.Map(_) => false
           case ScalaDatatype.Option(_) => true
         }
       }
   )
 
-  val method = "%s.%s".format(
+  val method: String = "%s.%s".format(
     "controllers." + lib.Text.underscoreAndDashToInitCap(resource.plural),
     GeneratorUtil.urlToMethodName(resource.path, resource.operations.map(_.path), op.method, url)
   )
@@ -160,4 +160,3 @@ private[models] case class Play2Route(
     }
   }
 }
-

@@ -1,9 +1,21 @@
 package scala.generator
 
 import lib.Text._
-import lib.generator.GeneratorUtil
-
+import lib.generator.{GeneratorUtil, NamespaceParser, ParsedName}
 import io.apibuilder.spec.v0.models.Deprecation
+
+sealed trait ScalaClassName {
+  def className: String
+  def qualifiedName: String
+}
+object ScalaClassName {
+  case class Local(override val className: String) extends ScalaClassName {
+    override def qualifiedName: String = className
+  }
+  case class Imported(ns: String, override val className: String) extends ScalaClassName {
+    override def qualifiedName: String = s"$ns.models.$className"
+  }
+}
 
 object ScalaUtil {
 
@@ -45,7 +57,7 @@ object ScalaUtil {
 
   def extendsClause(
     className: String,
-    interfaces: Seq[String],
+    interfaces: Seq[ScalaClassName],
     unions: Seq[String],
   ): Option[String] = {
     extendsTypes(className, interfaces, unions).toList match {
@@ -56,10 +68,16 @@ object ScalaUtil {
 
   def extendsTypes(
     className: String,
-    interfaces: Seq[String],
+    interfaces: Seq[ScalaClassName],
     unions: Seq[String],
   ): Seq[String] = {
-    (interfaces ++ unions).toList.filterNot(_ == className).distinct.sorted
+    (interfaces ++ unions.map(ScalaClassName.Local)).toList
+      .filterNot(_.qualifiedName == className)
+      .map {
+        case n: ScalaClassName.Local => n.className
+        case n: ScalaClassName.Imported => n.qualifiedName
+      }
+      .distinct.sorted
   }
 
   private def trimTrailingWhitespace(text: String): String = {
@@ -102,7 +120,15 @@ object ScalaUtil {
     name.indexOf("[") >= 0
   }
 
-  def toClassName(name: String): String = {
+  def toClassName(name: String): ScalaClassName = {
+    println(s"toClassName2: $name")
+    NamespaceParser.parse(name) match {
+      case ParsedName.Local(n) => ScalaClassName.Local(toLocalClassName(n))
+      case ParsedName.Imported(ns, _, n) => ScalaClassName.Imported(Namespaces(ns).base, toLocalClassName(n))
+    }
+  }
+
+  def toLocalClassName(name: String): String = {
     val baseName = lib.Text.safeName(
       if (name == name.toUpperCase) {
         lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")
@@ -110,7 +136,6 @@ object ScalaUtil {
         lib.Text.initCap(snakeToCamelCase(name))
       }
     )
-
     ScalaUtil.quoteNameIfKeyword(baseName)
   }
 
@@ -142,4 +167,3 @@ object ScalaUtil {
   }
 
 }
-

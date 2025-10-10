@@ -4,9 +4,9 @@ import models.TestHelper.assertValidScalaSourceCode
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.generator.{ScalaClientMethodConfigs, ScalaService}
 import scala.generator.ScalaField.Limitation
-import scala.models.{Attributes, DateTimeTypeConfig, DateTypeConfig}
+import scala.generator.ScalaService
+import scala.models.Attributes
 
 class MockFactoriesGeneratorSpec extends AnyFunSpec with Matchers {
   import scala.generator.mock.MockFactoriesGenerator._
@@ -40,7 +40,7 @@ class MockFactoriesGeneratorSpec extends AnyFunSpec with Matchers {
 
   it("creates factory methods for the models ") {
     val service = models.TestHelper.referenceApiService
-    val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig)
+    val ssd = new ScalaService(service, Attributes.Http4sDefaultConfig, Nil)
 
     val sourceCode = new MockFactoriesGenerator(ssd, None).generateCode()
 

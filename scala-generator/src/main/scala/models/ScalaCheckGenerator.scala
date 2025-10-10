@@ -10,12 +10,12 @@ object ScalaCheckGenerator extends CodeGenerator {
 
   def fileName(str: String): String = s"${objectName(str)}.scala"
   def packageName(str: String): String = s"${str}.models.scalacheck"
-  def objectName(str: String): String = s"${str.split('-').map(_.capitalize).mkString}ScalaCheck"
-  def traitName(str: String): String = objectName(str)
+  private def objectName(str: String): String = s"${str.split('-').map(_.capitalize).mkString}ScalaCheck"
+  private def traitName(str: String): String = objectName(str)
 
-  def header(form: InvocationForm) = ApiBuilderComments(form.service.version, form.userAgent).toJavaString
+  def header(form: InvocationForm): String = ApiBuilderComments(form.service.version, form.userAgent).toJavaString
 
-  def extendsWith(imports: Seq[Import]): String = {
+  private def extendsWith(imports: Seq[Import]): String = {
     val traits = imports.map(i => s"${packageName(i.namespace)}.${traitName(i.application.key)}").toList
     traits match {
       case Nil => ""
@@ -65,12 +65,12 @@ object ScalaCheckGenerator extends CodeGenerator {
     """
   }
 
-  def abstractArbitrary(): String = s"""
+  private def abstractArbitrary(): String = s"""
     implicit def arbitraryJodaDateTime: Arbitrary[_root_.org.joda.time.DateTime]
     implicit def arbitraryPlayJsObject: Arbitrary[_root_.play.api.libs.json.JsObject]
   """
 
-  def abstractArbitraryImplementation(): String = s"""
+  private def abstractArbitraryImplementation(): String = s"""
     implicit def arbitraryJodaDateTime: Arbitrary[_root_.org.joda.time.DateTime] = Arbitrary(genJodaDateTime)
     def genJodaDateTime: Gen[_root_.org.joda.time.DateTime] = Gen.posNum[Long].map(instant => new _root_.org.joda.time.DateTime(instant))
 
@@ -93,17 +93,17 @@ object ScalaCheckGenerator extends CodeGenerator {
 
         ${abstractArbitrary()}
 
-        ${ssd.models.map(model(ssd.namespaces.models, _)).mkString("\n\n")}
+        ${ssd.models.map(model(ssd.namespaces.codeGenModels, _)).mkString("\n\n")}
 
-        ${ssd.enums.map(enum(ssd.namespaces.models,_)).mkString("\n\n")}
+        ${ssd.enums.map(enum(ssd.namespaces.codeGenModels,_)).mkString("\n\n")}
 
-        ${ssd.unions.map(union(ssd.namespaces.models, _)).mkString("\n\n")}
+        ${ssd.unions.map(union(ssd.namespaces.codeGenModels, _)).mkString("\n\n")}
 
       }
     """
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = ScalaService(form.service)
+    val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
     val name = fileName(ssd.name)
     val contents = fileContents(form, ssd)
 

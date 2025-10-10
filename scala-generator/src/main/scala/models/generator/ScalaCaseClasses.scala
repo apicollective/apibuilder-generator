@@ -17,7 +17,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     form: InvocationForm,
     addHeader: Boolean = true
   ): Either[Seq[String], Seq[File]] = {
-    val ssd = new ScalaService(form.service, Attributes.PlayDefaultConfig.withAttributes(form.attributes))
+    val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
     Right(generateCode(ssd, form.userAgent, addHeader))
   }
 
@@ -56,7 +56,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     }
 
     val unionNames = ssd.unions.map(_.name)
-    val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
+    val source = s"${header}package ${ssd.namespaces.codeGenModels} {\n\n  " +
     Seq(
       additionalImports.mkString("\n").indentString(2),
       ssd.interfaces
@@ -73,7 +73,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     Seq(ServiceFileNames.toFile(ssd.service.namespace, ssd.service.organization.key, ssd.service.application.key, ssd.service.version, "Models", source, Some("Scala")))
   }
 
-  def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
+  private def generateUnionTypeUndefined(wrapper: UnionTypeUndefinedModelWrapper): String = {
     generateCaseClassWithDoc(wrapper.model, Seq(wrapper.union)).withBodyParts(
       wrapper.interfaceFields.map { f =>
         s"override def ${f.name}: ${f.datatype.name} = ???"
@@ -81,7 +81,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     ).build
   }
 
-  def generateUnionTraitWithDocAndDiscriminator(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
+  private def generateUnionTraitWithDocAndDiscriminator(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
     val disc = generateUnionDiscriminatorTrait(union) match {
       case None => ""
       case Some(code) => s"\n\n$code"
@@ -90,7 +90,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     ScalaGeneratorUtil.scaladoc(union.description, Nil) + generateUnionTrait(ssd, union, unions) + disc
   }
 
-  def generateUnionTrait(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
+  private def generateUnionTrait(ssd: ScalaService, union: ScalaUnion, unions: Seq[ScalaUnion]): String = {
     // TODO: handle primitive types
     val body = Seq(
       ScalaUtil.deprecationString(union.deprecation).trim match {
@@ -110,7 +110,7 @@ trait ScalaCaseClasses extends CodeGenerator {
       case Nil => body
       case parts => Seq(
         s"$body {",
-        parts.mkString("\n").indent(2),
+        "  " + parts.mkString("\n").indent(2).trim,
         "}",
       ).mkString("\n")
     }
@@ -120,13 +120,13 @@ trait ScalaCaseClasses extends CodeGenerator {
     ssd.findAllInterfaceFields(union.union.interfaces)
   }
 
-  def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {
+  private def generateUnionDiscriminatorTrait(union: ScalaUnion): Option[String] = {
     union.discriminator.map { _ =>
       ScalaUnionDiscriminatorGenerator(union).build()
     }
   }
 
-  def generateTraitWithDoc(interface: ScalaInterface): String = {
+  private def generateTraitWithDoc(interface: ScalaInterface): String = {
     ScalaGeneratorUtil.scaladoc(interface.description, interface.fields.map(f => (f.name, f.description))) +
       generateTrait(interface)
   }

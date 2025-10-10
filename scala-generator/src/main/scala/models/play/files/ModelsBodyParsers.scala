@@ -27,14 +27,14 @@ object ModelsBodyParsers {
 	"""
 
 	def contents(form: InvocationForm): String = {
-		val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
+		val scalaService = scala.generator.ScalaService(form, Attributes.PlayGen2DefaultConfig)
 		val bodyParsers =
 			scalaService.enums.map(bodyParser) ++
 			scalaService.models.map(bodyParser) ++
 			scalaService.unions.map(bodyParser)
 
 		s"""
-			package ${scalaService.namespaces.models}
+			package ${scalaService.namespaces.codeGenModels}
 
 			package object bodyparsers {
 

@@ -9,7 +9,6 @@ package test.models {
   }
   sealed trait Person extends Foo {
     def id: String
-
   }
   final case class User(
     override val id: String

@@ -9,7 +9,6 @@ package io.apibuilder.api.v0.models {
    */
   sealed trait Diff extends _root_.scala.Product with _root_.scala.Serializable {
     def diffType: DiffType
-
   }
 
   /**
@@ -39,7 +38,6 @@ package io.apibuilder.api.v0.models {
    */
   sealed trait ItemDetail extends _root_.scala.Product with _root_.scala.Serializable {
     def itemDetailType: ItemDetailType
-
   }
 
   /**

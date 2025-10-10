@@ -7,7 +7,7 @@ import scala.models.Attributes
 object ModelsBindables {
 
   def contents(form: InvocationForm): String = {
-    val scalaService = scala.generator.ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
+    val scalaService = scala.generator.ScalaService(form, Attributes.PlayGen2DefaultConfig)
     val bindables = scala.models.Play2Bindables(scalaService)
       .build()
       .split("\n")
@@ -16,7 +16,7 @@ object ModelsBindables {
       .mkString("\n")
 
     s"""
-      package ${scalaService.namespaces.models}
+      package ${scalaService.namespaces.codeGenModels}
 
       package object bindables {
 

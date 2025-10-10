@@ -1,22 +1,32 @@
 package scala.generator
 
+import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models._
 import lib.Text.underscoreToInitCap
 
 import scala.models.{Attributes, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
-import lib.generator.GeneratorUtil
+import lib.generator.{GeneratorUtil, NamespaceParser, ParsedName}
 import play.api.libs.json.JsString
 
 import scala.generator.ScalaPrimitive.{DateIso8601, DateTimeIso8601, JsonObject, JsonValue}
 
 object ScalaService {
-  def apply(service: Service, config: Attributes = Attributes.PlayDefaultConfig) = new ScalaService(service, config)
+  def apply(service: Service): ScalaService = new ScalaService(service, Attributes.PlayDefaultConfig, Nil)
+
+  def apply(form: InvocationForm, defaultAttributes: Attributes): ScalaService = {
+    new ScalaService(
+      service = form.service,
+      attributes = defaultAttributes.withAttributes(form.attributes),
+      importedServices = form.importedServices.getOrElse(Nil),
+    )
+  }
 }
 
 class ScalaService(
   val service: Service,
-  val attributes: Attributes = Attributes.PlayDefaultConfig,
+  val attributes: Attributes,
+  val importedServices: Seq[Service]
 ) {
 
   val namespaces: Namespaces = Namespaces(service.namespace)
@@ -25,14 +35,23 @@ class ScalaService(
 
   val datatypeResolver: DatatypeResolver = GeneratorUtil.datatypeResolver(service)
 
-  val name: String = ScalaUtil.toClassName(service.name)
+  val name: String = ScalaUtil.toLocalClassName(service.name)
 
-  def unionClassName(name: String): String = namespaces.unions + "." + ScalaUtil.toClassName(name)
-  def modelClassName(name: String): String = namespaces.models + "." + ScalaUtil.toClassName(name)
-  def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
+  def unionClassName(name: String): String = namespaces.codeGenUnions + "." + ScalaUtil.toLocalClassName(name)
+  def modelClassName(name: String): String = namespaces.codeGenModels + "." + ScalaUtil.toLocalClassName(name)
+  def enumClassName(name: String): String = namespaces.codeGenEnums + "." + ScalaUtil.toLocalClassName(name)
 
-  val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }.sortBy(_.name)
-  private val interfacesByName = interfaces.groupBy(_.interface.name)
+  private val imports: Seq[Service] = service.imports.flatMap { i =>
+    importedServices.find(_.namespace == i.namespace)
+  }
+
+  val interfaces: Seq[ScalaInterface] = service.interfaces.map { new ScalaInterface(this, _) }
+  private val importedInterfaces: Seq[ScalaInterface] = imports.flatMap { s =>
+    s.interfaces.map { new ScalaInterface(ScalaService(s), _) }
+  }
+  private val interfacesByName = (interfaces ++ importedInterfaces).groupBy { i =>
+    i.ssd.service.namespace + ".interfaces." + i.interface.name
+  }
 
   val models: Seq[ScalaModel] = service.models.map { new ScalaModel(this, _) }.sortBy(_.name)
 
@@ -46,11 +65,15 @@ class ScalaService(
    * @param interfaceNames The API Builder names of the interfaces
    */
   private def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
-    interfaceNames.distinct.map { i =>
-      interfacesByName.getOrElse(i, Nil).toList match {
-        case Nil => sys.error(s"Cannot find interface named: $i")
+    interfaceNames.distinct.map { impName =>
+      val pn = NamespaceParser.parse(impName) match {
+        case n: ParsedName.Local => n.toImported(service.namespace)
+        case i: ParsedName.Imported => i
+      }
+      interfacesByName.getOrElse(pn.qualifiedName, Nil).toList match {
+        case Nil => sys.error(s"Cannot find interface named: $impName")
         case one :: Nil => one
-        case _ => sys.error(s"Multiple interfaces found with the name: $i")
+        case _ => sys.error(s"Multiple interfaces found with the name: $impName")
       }
     }
   }
@@ -123,11 +146,11 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val originalName: String = union.name
 
-  val name: String = ScalaUtil.toClassName(union.name)
+  val name: String = ScalaUtil.toLocalClassName(union.name)
 
   val qualifiedName: String = ssd.unionClassName(name)
 
-  val interfaces: Seq[String] = union.interfaces.map(ScalaUtil.toClassName)
+  val interfaces: Seq[ScalaClassName] = union.interfaces.map(ScalaUtil.toClassName)
 
   val discriminator: Option[String] = union.discriminator
 
@@ -196,7 +219,7 @@ case class ScalaUnionType(
   union: Option[ScalaPrimitive.Union] = None
 ) {
 
-  val name: String = ScalaUtil.toClassName(value.`type`)
+  val name: String = ScalaUtil.toLocalClassName(value.`type`)
 
   val isDefault: Boolean = value.default.getOrElse(false)
 
@@ -265,11 +288,11 @@ abstract class ScalaModelAndInterface(
 
   val originalName: String = model.name
 
-  val name: String = ScalaUtil.toClassName(model.name)
+  val name: String = ScalaUtil.toLocalClassName(model.name)
 
   val qualifiedName: String = ssd.modelClassName(name)
 
-  val plural: String = ScalaUtil.toClassName(model.plural)
+  val plural: String = ScalaUtil.toLocalClassName(model.plural)
 
   val description: Option[String] = model.description
 
@@ -277,7 +300,7 @@ abstract class ScalaModelAndInterface(
 
   val deprecation: Option[Deprecation] = model.deprecation
 
-  val interfaces: Seq[String] = model.interfaces.map(ScalaUtil.toClassName)
+  val interfaces: Seq[ScalaClassName] = model.interfaces.map(ScalaUtil.toClassName)
 }
 
 class ScalaInterface(val ssd: ScalaService, val interface: Interface) extends ScalaModelAndInterface(
@@ -346,7 +369,7 @@ class ScalaEnum(val ssd: ScalaService, val `enum`: Enum) {
 
   val originalName: String = enum.name
 
-  val name: String = ScalaUtil.toClassName(originalName)
+  val name: String = ScalaUtil.toLocalClassName(originalName)
 
   def datatype: ScalaPrimitive.Enum = ScalaPrimitive.Enum(ssd.namespaces, name)
 
@@ -362,7 +385,7 @@ class ScalaEnum(val ssd: ScalaService, val `enum`: Enum) {
 
 class ScalaEnumValue(value: EnumValue) {
 
-  val name: String = ScalaUtil.toClassName(value.name)
+  val name: String = ScalaUtil.toLocalClassName(value.name)
 
   val serializedValue: String = value.value.getOrElse(value.name)
 
@@ -376,7 +399,7 @@ class ScalaResource(ssd: ScalaService, val resource: Resource) {
 
   val path: Option[String] = resource.path
 
-  val plural: String = ScalaUtil.toClassName(resource.plural)
+  val plural: String = ScalaUtil.toLocalClassName(resource.plural)
 
   val namespaces: Namespaces = ssd.namespaces
 
@@ -454,11 +477,6 @@ class ScalaResponse(ssd: ScalaService, method: Method, response: Response) {
 
   val isSuccess: Boolean = response.code match {
     case ResponseCodeInt(value) => value >= 200 && value < 400
-    case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
-  }
-
-  val isNotFound: Boolean = response.code match {
-    case ResponseCodeInt(value) => value == 404
     case ResponseCodeOption.Default | ResponseCodeOption.UNDEFINED(_) | ResponseCodeUndefinedType(_) => false
   }
 

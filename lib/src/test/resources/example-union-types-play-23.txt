@@ -9,7 +9,6 @@ package io.apibuilder.example.union.types.v0.models {
   @deprecated("to be removed")
   sealed trait User extends _root_.scala.Product with _root_.scala.Serializable {
     def userDiscriminator: UserDiscriminator
-
   }
 
   /**

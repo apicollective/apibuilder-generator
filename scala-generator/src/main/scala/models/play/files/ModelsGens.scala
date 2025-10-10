@@ -65,7 +65,7 @@ object ModelsGens {
       case _ => None
     }
 
-    ns.map { ns => s"import ${ns.models}.gens._" }
+    ns.map { ns => s"import ${ns.codeGenModels}.gens._" }
   }
 
 	def arbitrary(`enum`: ScalaEnum): String = arbitrary(enum.ssd.namespaces, enum.name, enum.qualifiedName)
@@ -87,7 +87,7 @@ object ModelsGens {
     """
   }
 
-  def genFor(name: String, tpe: String, properties: List[(String, String)]) = properties match {
+  def genFor(name: String, tpe: String, properties: List[(String, String)]): String = properties match {
     case Nil => ""
     case properties =>
       val arguments = properties.unzip._1
@@ -127,7 +127,7 @@ object ModelsGens {
   }
 
 	def contents(form: InvocationForm): String = {
-    val scalaService = ScalaService(form.service, Attributes.PlayGen2DefaultConfig.withAttributes(form.attributes))
+    val scalaService = ScalaService(form, Attributes.PlayGen2DefaultConfig)
     val wrappers = PrimitiveWrapper(scalaService).wrappers
 
     val imports = scalaService.models.flatMap(this.imports)
@@ -148,7 +148,7 @@ object ModelsGens {
       wrappers.map(w => gen(w.model))
 
     s"""
-      package ${scalaService.namespaces.models}
+      package ${scalaService.namespaces.codeGenModels}
 
       package object gens {
 

@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers
 class ScalaGeneratorUtilSpec extends AnyFunSpec with Matchers {
 
   private lazy val service = models.TestHelper.referenceApiService
-  private lazy val ssd = new ScalaService(service)
+  private lazy val ssd = ScalaService(service)
 
   private val play2Util = new ScalaGeneratorUtil(
     ScalaClientMethodConfigs.Play22("test.apidoc", Attributes.PlayDefaultConfig, None)

@@ -2,23 +2,22 @@ package lib.generator
 
 import io.apibuilder.spec.v0.models.{Method, Service}
 import lib.DatatypeResolver
-import scala.annotation.nowarn
+
+sealed trait ObjectType
+object ObjectType {
+  case object Enum extends ObjectType { override def toString = "enums" }
+  case object Union extends ObjectType { override def toString = "unions" }
+  case object Model extends ObjectType { override def toString = "models" }
+  case object Interface extends ObjectType { override def toString = "interfaces" }
+
+  private val all: Seq[ObjectType] = Seq(Enum, Union, Model, Interface)
+
+  def fromString(value: String): Option[ObjectType] = {
+    all.find(_.toString == value)
+  }
+}
 
 object GeneratorUtil {
-
-  sealed trait ObjectType
-  object ObjectType {
-    case object Enum extends ObjectType { override def toString = "enums" }
-    case object Union extends ObjectType { override def toString = "unions" }
-    case object Model extends ObjectType { override def toString = "models" }
-
-    private val all: Seq[ObjectType] = Seq(Enum, Union, Model)
-
-    def fromString(value: String): Option[ObjectType] = {
-      all.find(_.toString == value)
-    }
-  }
-
 
   /**
     * For convenience to the users of the clients, all generated
@@ -27,20 +26,11 @@ object GeneratorUtil {
     * for models, 1 for unions, 1 for enums) when using the generated
     * clients.
     */
-  def fullyQualifiedInternalName(
-    namespace: String,
-    @nowarn objectType: ObjectType
-  ): String = {
-    // API accepts object type parameter, but currently not used as we
-    // place all internal names into the models namespace for
-    // convenience.
+  def fullyQualifiedImportName(namespace: String): String = {
     fullyQualifiedExternalName(namespace, ObjectType.Model)
   }
 
-  /**
-    * The external name is used to import these elements via the specified.
-    */
-  private def fullyQualifiedExternalName(
+  def fullyQualifiedExternalName(
     namespace: String,
     objectType: ObjectType,
     name: Option[String] = None

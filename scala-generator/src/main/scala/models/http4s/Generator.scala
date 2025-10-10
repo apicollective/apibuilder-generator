@@ -50,29 +50,27 @@ object Http4s023Generator extends Generator {
 trait Generator extends CodeGenerator {
   def mkConfig(namespace: String, baseUrl: Option[String]): ScalaClientMethodConfigs.Http4s
 
-  override def invoke(form: InvocationForm) = Right(generateCode(form))
+  override def invoke(form: InvocationForm): Right[Nothing, Seq[File]] = Right(generateCode(form))
 
   def mkMockClient(userAgent: Option[String], ssd: ScalaService, config: ScalaClientMethodConfig): String =
     new MockClientGenerator(ssd, userAgent, config).generateCode()
 
-  def mkHeader(form: InvocationForm): String =
+  private def mkHeader(form: InvocationForm): String =
     ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
 
-  def mkCaseClasses(ssd: ScalaService, form: InvocationForm): String =
+  private def mkCaseClasses(ssd: ScalaService, form: InvocationForm): String =
     ScalaCaseClasses.generateCode(ssd, form.userAgent, addHeader = false).map(_.contents).mkString("\n\n")
 
-  def mkJsonCodecs(ssd: ScalaService): String =
+  private def mkJsonCodecs(ssd: ScalaService): String =
     CirceJson(ssd).generate()
 
-  def mkClient(ssd: ScalaService, form: InvocationForm, config: ScalaClientMethodConfigs.Http4s): String =
+  private def mkClient(ssd: ScalaService, form: InvocationForm, config: ScalaClientMethodConfigs.Http4s): String =
     Http4sClient(form, ssd, config).generate()
 
-  def mkServer(ssd: ScalaService, form: InvocationForm, config: ScalaClientMethodConfigs.Http4s): String =
+  private def mkServer(ssd: ScalaService, form: InvocationForm, config: ScalaClientMethodConfigs.Http4s): String =
     Http4sServer(form, ssd, config).generate()
 
-  def generateCode(
-                    form: InvocationForm
-                  ): Seq[File] = {
+  def generateCode(form: InvocationForm): Seq[File] = {
     val ssd = new ScalaService(form.service, Attributes.Http4sDefaultConfig.withAttributes(form.attributes))
     val config = mkConfig(Namespaces.quote(form.service.namespace), form.service.baseUrl)
 

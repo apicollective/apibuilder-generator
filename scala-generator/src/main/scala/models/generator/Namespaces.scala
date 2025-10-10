@@ -1,10 +1,11 @@
 package scala.generator
 
-import lib.generator.GeneratorUtil
+
+import lib.generator.{GeneratorUtil, ObjectType}
 
 object Namespaces {
 
-  val Parsers = "parsers"
+  private[generator] val Parsers = "parsers"
   val Conversions = "conversions"
 
   def quote(ns: String): String = {
@@ -17,11 +18,14 @@ case class Namespaces(original: String) {
 
   val base: String = Namespaces.quote(original)
 
-  val models: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Model)
-  val enums: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Enum)
-  val unions: String = GeneratorUtil.fullyQualifiedInternalName(base, GeneratorUtil.ObjectType.Union)
+  private val default: String = GeneratorUtil.fullyQualifiedImportName(base)
+  val codeGenModels: String = default
+  val codeGenEnums: String = default
+  val codeGenUnions: String = default
+  val codeGenInterfaces: String = default
+  val originalInterfaces: String = GeneratorUtil.fullyQualifiedExternalName(base, ObjectType.Interface)
 
-  val json: String = Seq(models, "json").mkString(".")
+  val json: String = Seq(codeGenModels, "json").mkString(".")
 
   val anorm: String = Seq(base, "anorm").mkString(".")
   val anormParsers: String = Seq(anorm, Namespaces.Parsers).mkString(".")
@@ -29,20 +33,20 @@ case class Namespaces(original: String) {
   val errors: String = Seq(base, "errors").mkString(".")
 
   val mock: String = Seq(base, "mock").mkString(".")
-  val interfaces: String = Seq(base, "interfaces").mkString(".")
 
   val last: String = base.split("\\.").last
 
-  def get(objectType: GeneratorUtil.ObjectType): String = {
+  def getCodeGen(objectType: ObjectType): String = {
     objectType match {
-      case GeneratorUtil.ObjectType.Enum => enums
-      case GeneratorUtil.ObjectType.Model => models
-      case GeneratorUtil.ObjectType.Union => unions
+      case ObjectType.Enum => codeGenEnums
+      case ObjectType.Model => codeGenModels
+      case ObjectType.Union => codeGenUnions
+      case ObjectType.Interface => codeGenInterfaces
     }
   }
 
   def importStatements(): Seq[String] = {
-    Seq(s"import $models._")
+    Seq(s"import $codeGenModels._")
   }
 
 }

@@ -235,7 +235,7 @@ abstract class PlayControllers(scalaVersion: ScalaVersion) extends CodeGenerator
   }
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = ScalaService(form.service)
+    val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
     val name = s"${ssd.name.split('-').map(_.capitalize).mkString}Controllers.scala"
     val contents = fileContents(form, ssd)
 
