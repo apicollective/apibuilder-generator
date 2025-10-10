@@ -10,7 +10,7 @@ object ObjectType {
   case object Model extends ObjectType { override def toString = "models" }
   case object Interface extends ObjectType { override def toString = "interfaces" }
 
-  private val all: Seq[ObjectType] = Seq(Enum, Union, Model)
+  private val all: Seq[ObjectType] = Seq(Enum, Union, Model, Interface)
 
   def fromString(value: String): Option[ObjectType] = {
     all.find(_.toString == value)
