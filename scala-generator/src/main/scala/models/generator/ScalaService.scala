@@ -67,13 +67,9 @@ class ScalaService(
   private def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
     interfaceNames.distinct.map { impName =>
       val pn = NamespaceParser.parse(impName) match {
-        case ParsedName.Local(name) => {
-          println(s"DEBUG $impName => $name")
-          ParsedName.Imported(service.namespace, ObjectType.Interface, name)
-        }
+        case n: ParsedName.Local => n.toImported(service.namespace)
         case i: ParsedName.Imported => i
       }
-      println(s"findInterfaces($impName => ${pn.qualifiedName}) from: $interfacesByName")
       interfacesByName.getOrElse(pn.qualifiedName, Nil).toList match {
         case Nil => sys.error(s"Cannot find interface named: $impName")
         case one :: Nil => one

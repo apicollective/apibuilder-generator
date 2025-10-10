@@ -2,15 +2,16 @@ package lib.generator
 
 sealed trait ParsedName {
   def name: String
-  def qualifiedName: String
 }
 
 object ParsedName {
   case class Local(name: String) extends ParsedName {
-    override def qualifiedName: String = name
+    def toImported(namespace: String): Imported = {
+      ParsedName.Imported(namespace, ObjectType.Interface, name)
+    }
   }
   case class Imported(namespace: String, typ: ObjectType, name: String) extends ParsedName {
-    override def qualifiedName: String = s"$namespace.$typ.$name"
+    def qualifiedName: String = s"$namespace.$typ.$name"
   }
 }
 
