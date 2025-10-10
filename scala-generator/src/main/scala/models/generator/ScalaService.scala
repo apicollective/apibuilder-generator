@@ -35,11 +35,11 @@ class ScalaService(
 
   val datatypeResolver: DatatypeResolver = GeneratorUtil.datatypeResolver(service)
 
-  val name: String = ScalaUtil.toClassName(service.name)
+  val name: String = ScalaUtil.toLocalClassName(service.name)
 
-  def unionClassName(name: String): String = namespaces.codeGenUnions + "." + ScalaUtil.toClassName(name)
-  def modelClassName(name: String): String = namespaces.codeGenModels + "." + ScalaUtil.toClassName(name)
-  def enumClassName(name: String): String = namespaces.codeGenEnums + "." + ScalaUtil.toClassName(name)
+  def unionClassName(name: String): String = namespaces.codeGenUnions + "." + ScalaUtil.toLocalClassName(name)
+  def modelClassName(name: String): String = namespaces.codeGenModels + "." + ScalaUtil.toLocalClassName(name)
+  def enumClassName(name: String): String = namespaces.codeGenEnums + "." + ScalaUtil.toLocalClassName(name)
 
   private val imports: Seq[Service] = service.imports.flatMap { i =>
     importedServices.find(_.namespace == i.namespace)
@@ -146,11 +146,11 @@ class ScalaUnion(val ssd: ScalaService, val union: Union) {
 
   val originalName: String = union.name
 
-  val name: String = ScalaUtil.toClassName(union.name)
+  val name: String = ScalaUtil.toLocalClassName(union.name)
 
   val qualifiedName: String = ssd.unionClassName(name)
 
-  val interfaces: Seq[ScalaClassName] = union.interfaces.map(ScalaUtil.toClassName2)
+  val interfaces: Seq[ScalaClassName] = union.interfaces.map(ScalaUtil.toClassName)
 
   val discriminator: Option[String] = union.discriminator
 
@@ -219,7 +219,7 @@ case class ScalaUnionType(
   union: Option[ScalaPrimitive.Union] = None
 ) {
 
-  val name: String = ScalaUtil.toClassName(value.`type`)
+  val name: String = ScalaUtil.toLocalClassName(value.`type`)
 
   val isDefault: Boolean = value.default.getOrElse(false)
 
@@ -288,11 +288,11 @@ abstract class ScalaModelAndInterface(
 
   val originalName: String = model.name
 
-  val name: String = ScalaUtil.toClassName(model.name)
+  val name: String = ScalaUtil.toLocalClassName(model.name)
 
   val qualifiedName: String = ssd.modelClassName(name)
 
-  val plural: String = ScalaUtil.toClassName(model.plural)
+  val plural: String = ScalaUtil.toLocalClassName(model.plural)
 
   val description: Option[String] = model.description
 
@@ -300,7 +300,7 @@ abstract class ScalaModelAndInterface(
 
   val deprecation: Option[Deprecation] = model.deprecation
 
-  val interfaces: Seq[ScalaClassName] = model.interfaces.map(ScalaUtil.toClassName2)
+  val interfaces: Seq[ScalaClassName] = model.interfaces.map(ScalaUtil.toClassName)
 }
 
 class ScalaInterface(val ssd: ScalaService, val interface: Interface) extends ScalaModelAndInterface(
@@ -369,7 +369,7 @@ class ScalaEnum(val ssd: ScalaService, val `enum`: Enum) {
 
   val originalName: String = enum.name
 
-  val name: String = ScalaUtil.toClassName(originalName)
+  val name: String = ScalaUtil.toLocalClassName(originalName)
 
   def datatype: ScalaPrimitive.Enum = ScalaPrimitive.Enum(ssd.namespaces, name)
 
@@ -385,7 +385,7 @@ class ScalaEnum(val ssd: ScalaService, val `enum`: Enum) {
 
 class ScalaEnumValue(value: EnumValue) {
 
-  val name: String = ScalaUtil.toClassName(value.name)
+  val name: String = ScalaUtil.toLocalClassName(value.name)
 
   val serializedValue: String = value.value.getOrElse(value.name)
 
@@ -399,7 +399,7 @@ class ScalaResource(ssd: ScalaService, val resource: Resource) {
 
   val path: Option[String] = resource.path
 
-  val plural: String = ScalaUtil.toClassName(resource.plural)
+  val plural: String = ScalaUtil.toLocalClassName(resource.plural)
 
   val namespaces: Namespaces = ssd.namespaces
 

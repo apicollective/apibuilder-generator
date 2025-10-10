@@ -9,10 +9,10 @@ object PrimitiveWrapper {
   def className(union: ScalaUnion, primitive: ScalaPrimitive): String = {
     primitive match {
       case _ @ (ScalaPrimitive.Boolean | ScalaPrimitive.Double | ScalaPrimitive.Integer | ScalaPrimitive.Long | _: ScalaPrimitive.DateIso8601 | _: ScalaPrimitive.DateTimeIso8601 | ScalaPrimitive.Decimal | _: ScalaPrimitive.JsonObject | _: ScalaPrimitive.JsonValue | ScalaPrimitive.String | ScalaPrimitive.Unit | ScalaPrimitive.Uuid) => {
-        ScalaUtil.toClassName(union.name) + ScalaUtil.toClassName(primitive.shortName)
+        ScalaUtil.toLocalClassName(union.name) + ScalaUtil.toLocalClassName(primitive.shortName)
       }
       case _: ScalaPrimitive.GeneratedModel | _: ScalaPrimitive.Model | _: ScalaPrimitive.Enum | _: ScalaPrimitive.Union => {
-        ScalaUtil.toClassName(union.name)
+        ScalaUtil.toLocalClassName(union.name)
       }
     }
   }

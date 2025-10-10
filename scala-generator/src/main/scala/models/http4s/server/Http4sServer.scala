@@ -2,14 +2,14 @@ package scala.models.http4s.server
 
 import io.apibuilder.generator.v0.models.InvocationForm
 
-import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaParameter, ScalaPrimitive, ScalaUtil}
+import scala.generator.{ScalaClientMethodConfigs, ScalaDatatype, ScalaParameter, ScalaPrimitive, ScalaResource, ScalaUtil}
 import scala.models.JsonImports
 import scala.models.http4s.{ScalaGeneratorUtil, ScalaService}
 import lib.Text
 import lib.Text._
 import lib.VersionTag
 
-import scala.generator.ScalaPrimitive.{Uuid, Decimal}
+import scala.generator.ScalaPrimitive.{Decimal, Uuid}
 
 case class PathExtractor(name: String, filter: Option[String])
 case class QueryExtractor(name: String, handler: String)
@@ -17,9 +17,9 @@ case class QueryExtractor(name: String, handler: String)
 object Http4sServer {
   def typeName(ssd: ScalaService, dataType: ScalaDatatype): String = dataType match {
     case model: ScalaPrimitive.Model if model.namespaces.base == ssd.service.namespace => model.shortName
-    case model: ScalaPrimitive.Model => ScalaUtil.toClassName(model.name)
+    case model: ScalaPrimitive.Model => ScalaUtil.toLocalClassName(model.name)
     case enum: ScalaPrimitive.Enum if enum.namespaces.base == ssd.service.namespace => enum.shortName
-    case enum: ScalaPrimitive.Enum => ScalaUtil.toClassName(enum.name)
+    case enum: ScalaPrimitive.Enum => ScalaUtil.toLocalClassName(enum.name)
     case sp: ScalaPrimitive => sp.shortName
     case other => other.name
   }
@@ -47,20 +47,20 @@ object Http4sServer {
         case sp: ScalaPrimitive if withMinMaxDef =>
           val minPart = param.param.minimum.fold("")(v => s"$v")
           val maxPart = param.param.maximum.fold("")(v => s"To$v")
-          val defPart = param.param.default.fold("")(v => s"Def${ScalaUtil.toClassName(v)}")
+          val defPart = param.param.default.fold("")(v => s"Def${ScalaUtil.toLocalClassName(v)}")
           QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}$minPart$maxPart${defPart}Matcher", param.asScalaVal)
         case sp: ScalaPrimitive =>
           QueryExtractor(s"${param.name.capitalize}$collPart${typeName(ssd, sp)}Matcher", param.asScalaVal)
         case ScalaDatatype.List(nested) =>
-          val extractor = recurse(nested, "List", false)
+          val extractor = recurse(nested, "List", withMinMaxDef = false)
           QueryExtractor(extractor.name, s"cats.data.Validated.Valid(${extractor.handler})")
         case ScalaDatatype.Option(nested) =>
-          recurse(nested, "Opt", true)
+          recurse(nested, "Opt", withMinMaxDef = true)
         case ScalaDatatype.Map(nested) =>
-          recurse(nested, "Map", true)
+          recurse(nested, "Map", withMinMaxDef = true)
       }
     }
-    recurse(param.datatype, "", true)
+    recurse(param.datatype, "", withMinMaxDef = true)
   }
 
 }
@@ -71,7 +71,7 @@ case class Http4sServer(form: InvocationForm,
 
   val generatorUtil = new ScalaGeneratorUtil(config)
 
-  val sortedResources = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
+  val sortedResources: Seq[ScalaResource] = ssd.resources.sortWith { _.plural.toLowerCase < _.plural.toLowerCase }
 
   val version: Option[Int] = VersionTag(form.service.version).major
 
@@ -103,7 +103,7 @@ case class Http4sServer(form: InvocationForm,
 
     val resources = resourcesAndRoutes.map { case (resource, routes) =>
 
-      val name = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(ScalaUtil.toClassName(resource.resource.`type`)).toLowerCase + "_routes").capitalize
+      val name = lib.Text.snakeToCamelCase(lib.Text.camelCaseToUnderscore(ScalaUtil.toLocalClassName(resource.resource.`type`)).toLowerCase + "_routes").capitalize
 
       s"""${config.routeKind} $name${config.asyncTypeParam().map(p => s"[$p]").getOrElse("")}${config.routeExtends.getOrElse("")} {
          |${config.matchersImport}
@@ -159,7 +159,7 @@ case class Http4sServer(form: InvocationForm,
      """.stripMargin
   }
 
-  def genPathExtractors(routes: List[Route]): Seq[String] = {
+  private def genPathExtractors(routes: List[Route]): Seq[String] = {
     val distinctParams: Seq[(PathExtractor, ScalaParameter)] = routes.flatMap(_.pathSegments).collect {
       case Extracted(param) => Http4sServer.pathExtractor(ssd, param) -> param
     }.toMap.toList.sortBy(_._1.name)
@@ -202,7 +202,7 @@ case class Http4sServer(form: InvocationForm,
     }
   }
 
-  def genQueryExtractors(routes: List[Route]): Seq[String] = {
+  private def genQueryExtractors(routes: List[Route]): Seq[String] = {
     val distinctParams = routes.flatMap(_.op.queryParameters).map { param =>
       Http4sServer.queryExtractor(ssd, param) -> param
     }.toMap.toList.sortBy(_._1.name)
@@ -232,7 +232,7 @@ case class Http4sServer(form: InvocationForm,
         case sp: ScalaPrimitive =>
           val defPart = param.default.map { d =>
             val default = sp match {
-              case ScalaPrimitive.Long if d.toLowerCase.lastOption != Some('l') => s"${d}L"
+              case ScalaPrimitive.Long if !d.toLowerCase.lastOption.contains('l') => s"${d}L"
               case _ => d
             }
             s".orElse(Some($default))"
@@ -263,4 +263,3 @@ case class Http4sServer(form: InvocationForm,
     }.map("\n" + _)
   }
 }
-

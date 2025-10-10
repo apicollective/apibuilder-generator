@@ -120,15 +120,15 @@ object ScalaUtil {
     name.indexOf("[") >= 0
   }
 
-  def toClassName2(name: String): ScalaClassName = {
+  def toClassName(name: String): ScalaClassName = {
     println(s"toClassName2: $name")
     NamespaceParser.parse(name) match {
-      case ParsedName.Local(n) => ScalaClassName.Local(toClassName(n))
-      case ParsedName.Imported(ns, _, n) => ScalaClassName.Imported(Namespaces(ns).base, toClassName(n))
+      case ParsedName.Local(n) => ScalaClassName.Local(toLocalClassName(n))
+      case ParsedName.Imported(ns, _, n) => ScalaClassName.Imported(Namespaces(ns).base, toLocalClassName(n))
     }
   }
 
-  def toClassName(name: String): String = {
+  def toLocalClassName(name: String): String = {
     val baseName = lib.Text.safeName(
       if (name == name.toUpperCase) {
         lib.Text.initCap(lib.Text.splitIntoWords(name).map(_.toLowerCase)).mkString("")
