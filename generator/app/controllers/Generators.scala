@@ -598,15 +598,5 @@ object Generators {
       status = lib.generator.Status.InDevelopment,
       codeGenerator = Some(generator.csharp.CSharpGenerator)
     ),
-    CodeGenTarget(
-      metaData = Generator(
-        key = "elm",
-        name = "Elm Json Generator",
-        description = None,
-        language = Some("elm")
-      ),
-      status = lib.generator.Status.InDevelopment,
-      codeGenerator = Some(generator.elm.ElmGenerator)
-    )
   ).sortBy(_.metaData.key)
 }
