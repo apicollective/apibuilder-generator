@@ -48,8 +48,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
-  .aggregate(elmGenerator, csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .dependsOn(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .aggregate(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
@@ -96,16 +96,6 @@ lazy val scalaGenerator = project
 
 lazy val csharpGenerator = project
   .in(file("csharp-generator"))
-  .dependsOn(lib, lib % "test->test")
-  .settings(commonSettings: _*)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.10.0"
-    )
-  )
-
-lazy val elmGenerator = project
-  .in(file("elm-generator"))
   .dependsOn(lib, lib % "test->test")
   .settings(commonSettings: _*)
   .settings(
