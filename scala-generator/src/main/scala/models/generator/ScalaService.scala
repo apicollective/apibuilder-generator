@@ -6,7 +6,7 @@ import lib.Text.underscoreToInitCap
 
 import scala.models.{Attributes, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
-import lib.generator.{GeneratorUtil, NamespaceParser, ObjectType, ParsedName}
+import lib.generator.{GeneratorUtil, NamespaceParser, ParsedName}
 import play.api.libs.json.JsString
 
 import scala.generator.ScalaPrimitive.{DateIso8601, DateTimeIso8601, JsonObject, JsonValue}
