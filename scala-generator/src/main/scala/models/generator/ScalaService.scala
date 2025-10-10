@@ -6,7 +6,7 @@ import lib.Text.underscoreToInitCap
 
 import scala.models.{Attributes, Util}
 import lib.{Datatype, DatatypeResolver, Methods, Text}
-import lib.generator.{GeneratorUtil, NamespaceParser}
+import lib.generator.{GeneratorUtil, NamespaceParser, ObjectType, ParsedName}
 import play.api.libs.json.JsString
 
 import scala.generator.ScalaPrimitive.{DateIso8601, DateTimeIso8601, JsonObject, JsonValue}
@@ -66,9 +66,15 @@ class ScalaService(
    */
   private def findInterfaces(interfaceNames: Seq[String]): Seq[ScalaInterface] = {
     interfaceNames.distinct.map { impName =>
-      val qualified = NamespaceParser.parse(impName).qualifiedName
-      println(s"import $impName => $qualified")
-      interfacesByName.getOrElse(qualified, Nil).toList match {
+      val pn = NamespaceParser.parse(impName) match {
+        case ParsedName.Local(name) => {
+          println(s"DEBUG $impName => $name")
+          ParsedName.Imported(service.namespace, ObjectType.Interface, name)
+        }
+        case i: ParsedName.Imported => i
+      }
+      println(s"findInterfaces($impName => ${pn.qualifiedName}) from: $interfacesByName")
+      interfacesByName.getOrElse(pn.qualifiedName, Nil).toList match {
         case Nil => sys.error(s"Cannot find interface named: $impName")
         case one :: Nil => one
         case _ => sys.error(s"Multiple interfaces found with the name: $impName")

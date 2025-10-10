@@ -10,7 +10,7 @@ object ParsedName {
     override def qualifiedName: String = name
   }
   case class Imported(namespace: String, typ: ObjectType, name: String) extends ParsedName {
-    override def qualifiedName: String = s"$namespace.$typ.name"
+    override def qualifiedName: String = s"$namespace.$typ.$name"
   }
 }
 
