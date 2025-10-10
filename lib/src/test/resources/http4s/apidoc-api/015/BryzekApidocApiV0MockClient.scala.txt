@@ -4,7 +4,7 @@
  */
 package io.apibuilder.api.v0.mock {
 
-  trait Client extends io.apibuilder.api.v0.interfaces.Client {
+  trait Client extends io.apibuilder.api.v0.models.Client {
 
     val baseUrl: org.http4s.Uri = org.http4s.Uri.unsafeFromString("http://mock.localhost")
 
