@@ -34,7 +34,7 @@ object ModelsBodyParsers {
 			scalaService.unions.map(bodyParser)
 
 		s"""
-			package ${scalaService.namespaces.models}
+			package ${scalaService.namespaces.codeGenModels}
 
 			package object bodyparsers {
 

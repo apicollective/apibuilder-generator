@@ -56,7 +56,7 @@ trait ScalaCaseClasses extends CodeGenerator {
     }
 
     val unionNames = ssd.unions.map(_.name)
-    val source = s"${header}package ${ssd.namespaces.models} {\n\n  " +
+    val source = s"${header}package ${ssd.namespaces.codeGenModels} {\n\n  " +
     Seq(
       additionalImports.mkString("\n").indentString(2),
       ssd.interfaces

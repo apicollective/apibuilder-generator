@@ -221,7 +221,7 @@ object ScalaPrimitive {
   }
 
   case class Model(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
-    override def namespace: Option[String] = Some(namespaces.models)
+    override def namespace: Option[String] = Some(namespaces.codeGenModels)
     def apiBuilderType: String = shortName
     override def toVariableName: String = initLowerCase(shortName)
   }
@@ -233,7 +233,7 @@ object ScalaPrimitive {
   }
 
   case class Enum(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
-    override def namespace: Option[String] = Some(namespaces.enums)
+    override def namespace: Option[String] = Some(namespaces.codeGenEnums)
     def apiBuilderType: String = shortName
     override def default(value: String): String = fullName + "." + ScalaUtil.toClassName(value)
     override protected def default(json: JsValue): String = default(json.as[String])
@@ -241,7 +241,7 @@ object ScalaPrimitive {
   }
 
   case class Union(namespaces: Namespaces, shortName: String) extends ScalaPrimitive {
-    override def namespace: Option[String] = Some(namespaces.unions)
+    override def namespace: Option[String] = Some(namespaces.codeGenUnions)
     def apiBuilderType: String = shortName
     override def toVariableName: String = initLowerCase(shortName)
   }

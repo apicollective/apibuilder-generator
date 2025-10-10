@@ -92,7 +92,7 @@ case class Play2Models(version: ScalaVersion) extends CodeGenerator {
 
     val source = s"""$header$caseClasses
 
-package ${ssd.namespaces.models} {
+package ${ssd.namespaces.codeGenModels} {
 
   package object json {
     import play.api.libs.json.__

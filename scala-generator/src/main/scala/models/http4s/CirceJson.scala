@@ -10,7 +10,7 @@ case class CirceJson(
   ssd: ScalaService
 ) {
   def generate(): String = {
-    s"""package ${ssd.namespaces.models} {
+    s"""package ${ssd.namespaces.codeGenModels} {
 
   package object json {
     import io.circe.Decoder._

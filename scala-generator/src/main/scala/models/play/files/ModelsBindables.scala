@@ -16,7 +16,7 @@ object ModelsBindables {
       .mkString("\n")
 
     s"""
-      package ${scalaService.namespaces.models}
+      package ${scalaService.namespaces.codeGenModels}
 
       package object bindables {
 

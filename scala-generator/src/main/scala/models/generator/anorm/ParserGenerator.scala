@@ -324,7 +324,7 @@ trait ParserGenerator extends CodeGenerator {
           union.types.map { t =>
             t.datatype match {
               case _: ScalaPrimitive.Enum => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser("${union.originalName}", Some(s"""" + "$prefix$sep" + """"))"""
-              case p: ScalaPrimitive if isBasicType(p) => generateRowParser("""s"$prefix${sep}""" + s"""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.models}.${className(union, p)}.apply)"""
+              case p: ScalaPrimitive if isBasicType(p) => generateRowParser("""s"$prefix${sep}""" + s"""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.codeGenModels}.${className(union, p)}.apply)"""
               case _ => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser(prefixOpt = Some(s"""" + "$prefix$sep" + """"))"""
             }
           }.mkString(" |\n").indentString(2),
@@ -336,7 +336,7 @@ trait ParserGenerator extends CodeGenerator {
           union.types.map { t =>
             t.datatype match {
               case _: ScalaPrimitive.Enum => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser("${union.originalName}")"""
-              case p: ScalaPrimitive if isBasicType(p) => generateRowParser(s""""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.models}.${className(union, p)}.apply)"""
+              case p: ScalaPrimitive if isBasicType(p) => generateRowParser(s""""${union.originalName}"""", t.datatype, union.originalName) + s""".map(${t.ssd.namespaces.codeGenModels}.${className(union, p)}.apply)"""
               case _ => s"""${t.ssd.namespaces.anormParsers}.${t.name}.parser()"""
             }
           }.mkString(" |\n").indentString(2),

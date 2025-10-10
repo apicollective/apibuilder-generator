@@ -22,7 +22,7 @@ object ModelsJson {
     val gen = scala.models.Play2Json(scalaService, scala3Support = scala3Support)
 
     s"""
-      package ${scalaService.namespaces.models}
+      package ${scalaService.namespaces.codeGenModels}
 
       package object json {
 

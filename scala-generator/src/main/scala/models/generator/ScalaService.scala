@@ -37,9 +37,9 @@ class ScalaService(
 
   val name: String = ScalaUtil.toClassName(service.name)
 
-  def unionClassName(name: String): String = namespaces.unions + "." + ScalaUtil.toClassName(name)
-  def modelClassName(name: String): String = namespaces.models + "." + ScalaUtil.toClassName(name)
-  def enumClassName(name: String): String = namespaces.enums + "." + ScalaUtil.toClassName(name)
+  def unionClassName(name: String): String = namespaces.codeGenUnions + "." + ScalaUtil.toClassName(name)
+  def modelClassName(name: String): String = namespaces.codeGenModels + "." + ScalaUtil.toClassName(name)
+  def enumClassName(name: String): String = namespaces.codeGenEnums + "." + ScalaUtil.toClassName(name)
 
   private val imports: Seq[Service] = service.imports.flatMap { i =>
     importedServices.find(_.namespace == i.namespace)

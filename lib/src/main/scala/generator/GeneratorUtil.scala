@@ -30,10 +30,7 @@ object GeneratorUtil {
     fullyQualifiedExternalName(namespace, ObjectType.Model)
   }
 
-  /**
-    * The external name is used to import these elements via the specified.
-    */
-  private def fullyQualifiedExternalName(
+  def fullyQualifiedExternalName(
     namespace: String,
     objectType: ObjectType,
     name: Option[String] = None

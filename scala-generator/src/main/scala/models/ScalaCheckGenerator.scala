@@ -93,11 +93,11 @@ object ScalaCheckGenerator extends CodeGenerator {
 
         ${abstractArbitrary()}
 
-        ${ssd.models.map(model(ssd.namespaces.models, _)).mkString("\n\n")}
+        ${ssd.models.map(model(ssd.namespaces.codeGenModels, _)).mkString("\n\n")}
 
-        ${ssd.enums.map(enum(ssd.namespaces.models,_)).mkString("\n\n")}
+        ${ssd.enums.map(enum(ssd.namespaces.codeGenModels,_)).mkString("\n\n")}
 
-        ${ssd.unions.map(union(ssd.namespaces.models, _)).mkString("\n\n")}
+        ${ssd.unions.map(union(ssd.namespaces.codeGenModels, _)).mkString("\n\n")}
 
       }
     """

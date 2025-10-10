@@ -65,7 +65,7 @@ object ModelsGens {
       case _ => None
     }
 
-    ns.map { ns => s"import ${ns.models}.gens._" }
+    ns.map { ns => s"import ${ns.codeGenModels}.gens._" }
   }
 
 	def arbitrary(`enum`: ScalaEnum): String = arbitrary(enum.ssd.namespaces, enum.name, enum.qualifiedName)
@@ -148,7 +148,7 @@ object ModelsGens {
       wrappers.map(w => gen(w.model))
 
     s"""
-      package ${scalaService.namespaces.models}
+      package ${scalaService.namespaces.codeGenModels}
 
       package object gens {
 

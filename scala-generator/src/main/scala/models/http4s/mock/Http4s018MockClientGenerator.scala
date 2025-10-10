@@ -12,7 +12,7 @@ class Http4s018MockClientGenerator(
 
   override def clientCode: String = {
     Seq(
-      s"class Client[F[_]: cats.Applicative] extends ${ssd.namespaces.interfaces}.Client[F] {",
+      s"class Client[F[_]: cats.Applicative] extends ${ssd.namespaces.originalInterfaces}.Client[F] {",
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
       ssd.resources.map { resource =>
         s"override def ${generator.methodName(resource)}: ${ssd.namespaces.base}.${resource.plural}[F] = new Mock${resource.plural}[F]"

@@ -11,9 +11,9 @@ object JsonImports {
 
   def apply(service: Service): Seq[String] = {
     (
-      Seq(s"import ${Namespaces(service.namespace).models}.json._") ++
+      Seq(s"import ${Namespaces(service.namespace).codeGenModels}.json._") ++
       service.imports.map { imp =>
-        s"import ${Namespaces(imp.namespace).models}.json._"
+        s"import ${Namespaces(imp.namespace).codeGenModels}.json._"
       }
     ).sorted
   }

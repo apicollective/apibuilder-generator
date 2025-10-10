@@ -17,12 +17,14 @@ case class Namespaces(original: String) {
 
   val base: String = Namespaces.quote(original)
 
-  val models: String = GeneratorUtil.fullyQualifiedImportName(base)
-  val enums: String = GeneratorUtil.fullyQualifiedImportName(base)
-  val unions: String = GeneratorUtil.fullyQualifiedImportName(base)
-  val interfaces: String = GeneratorUtil.fullyQualifiedImportName(base)
+  private val default: String = GeneratorUtil.fullyQualifiedImportName(base)
+  val codeGenModels: String = default
+  val codeGenEnums: String = default
+  val codeGenUnions: String = default
+  private val codeGenInterfaces: String = default
+  val originalInterfaces: String = GeneratorUtil.fullyQualifiedExternalName(base, ObjectType.Interface)
 
-  val json: String = Seq(models, "json").mkString(".")
+  val json: String = Seq(codeGenModels, "json").mkString(".")
 
   val anorm: String = Seq(base, "anorm").mkString(".")
   val anormParsers: String = Seq(anorm, Namespaces.Parsers).mkString(".")
@@ -33,17 +35,17 @@ case class Namespaces(original: String) {
 
   val last: String = base.split("\\.").last
 
-  def get(objectType: ObjectType): String = {
+  def getCodeGen(objectType: ObjectType): String = {
     objectType match {
-      case ObjectType.Enum => enums
-      case ObjectType.Model => models
-      case ObjectType.Union => unions
-      case ObjectType.Interface => interfaces
+      case ObjectType.Enum => codeGenEnums
+      case ObjectType.Model => codeGenModels
+      case ObjectType.Union => codeGenUnions
+      case ObjectType.Interface => codeGenInterfaces
     }
   }
 
   def importStatements(): Seq[String] = {
-    Seq(s"import $models._")
+    Seq(s"import $codeGenModels._")
   }
 
 }
