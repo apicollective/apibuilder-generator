@@ -73,7 +73,10 @@ object ScalaUtil {
   ): Seq[String] = {
     (interfaces ++ unions.map(ScalaClassName.Local)).toList
       .filterNot(_.qualifiedName == className)
-      .map(_.qualifiedName)
+      .map {
+        case n: ScalaClassName.Local => n.className
+        case n: ScalaClassName.Imported => n.qualifiedName
+      }
       .distinct.sorted
   }
 
