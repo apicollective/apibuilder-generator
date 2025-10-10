@@ -1,5 +1,6 @@
 package scala.generator
 
+
 import lib.generator.{GeneratorUtil, ObjectType}
 
 object Namespaces {

@@ -1,6 +1,6 @@
 package me.gheine.status.codes.v0.mock {
 
-  trait Client extends me.gheine.status.codes.v0.models.Client {
+  trait Client extends me.gheine.status.codes.v0.interfaces.Client {
 
     val baseUrl: String = "http://mock.localhost"
 
