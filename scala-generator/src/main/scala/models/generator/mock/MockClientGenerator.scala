@@ -84,7 +84,7 @@ class MockClientGenerator(
 
   def clientCode: String =
     Seq(
-      s"trait Client extends ${ssd.namespaces.originalInterfaces}.Client {",
+      s"trait Client extends ${ssd.namespaces.codeGenInterfaces}.Client {",
       s"""  ${config.formatBaseUrl(Some("http://mock.localhost"))}""",
       ssd.resources.map { resource =>
         s"override def ${generator.methodName(resource)}: ${ssd.namespaces.base}.${resource.plural} = Mock${resource.plural}Impl"

@@ -21,7 +21,7 @@ case class Namespaces(original: String) {
   val codeGenModels: String = default
   val codeGenEnums: String = default
   val codeGenUnions: String = default
-  private val codeGenInterfaces: String = default
+  val codeGenInterfaces: String = default
   val originalInterfaces: String = GeneratorUtil.fullyQualifiedExternalName(base, ObjectType.Interface)
 
   val json: String = Seq(codeGenModels, "json").mkString(".")
