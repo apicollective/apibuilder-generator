@@ -34,21 +34,21 @@ class ScalaUtilSpec extends AnyFunSpec with Matchers {
     localExtendsClause(Seq("Bar", "Foo"), Nil).get should be(" extends Bar with Foo")
   }
 
-  it("toClassName") {
-    ScalaUtil.toClassName("UnableToFulfill") should be("UnableToFulfill")
-    ScalaUtil.toClassName("UNABLE_TO_FULFILL") should be("UnableToFulfill")
+  it("toLocalClassName") {
+    ScalaUtil.toLocalClassName("UnableToFulfill") should be("UnableToFulfill")
+    ScalaUtil.toLocalClassName("UNABLE_TO_FULFILL") should be("UnableToFulfill")
 
-    ScalaUtil.toClassName("error") should be("Error")
+    ScalaUtil.toLocalClassName("error") should be("Error")
 
-    ScalaUtil.toClassName("error_message") should be("ErrorMessage")
+    ScalaUtil.toLocalClassName("error_message") should be("ErrorMessage")
 
-    ScalaUtil.toClassName("incidents_create") should be("IncidentsCreate")
-    ScalaUtil.toClassName("incidents-create") should be("IncidentsCreate")
-    ScalaUtil.toClassName("incidents.create") should be("IncidentsCreate")
-    ScalaUtil.toClassName("incident.create") should be("IncidentCreate")
-    ScalaUtil.toClassName("incidents:create") should be("IncidentsCreate")
-    ScalaUtil.toClassName("incident:create") should be("IncidentCreate")
-    ScalaUtil.toClassName("incidents/create") should be("IncidentsCreate")
+    ScalaUtil.toLocalClassName("incidents_create") should be("IncidentsCreate")
+    ScalaUtil.toLocalClassName("incidents-create") should be("IncidentsCreate")
+    ScalaUtil.toLocalClassName("incidents.create") should be("IncidentsCreate")
+    ScalaUtil.toLocalClassName("incident.create") should be("IncidentCreate")
+    ScalaUtil.toLocalClassName("incidents:create") should be("IncidentsCreate")
+    ScalaUtil.toLocalClassName("incident:create") should be("IncidentCreate")
+    ScalaUtil.toLocalClassName("incidents/create") should be("IncidentsCreate")
   }
 
   it("toVariable") {
