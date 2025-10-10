@@ -13,7 +13,6 @@ package apibuilder.models {
     def fuelType: apibuilder.models.FuelType
     def weight: Double
     def maxSpeed: Double
-
   }
   final case class Apple(
     @deprecated("unused") colour: String
