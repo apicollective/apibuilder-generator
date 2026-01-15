@@ -36,10 +36,6 @@ spec:
     - .spec.subsets[].labels["rollouts-pod-template-hash"]
     ###################################
   sources:
-  - repoURL: 'git@github.com:apicollective/apibuilder-generator.git'
-    targetRevision: main
-    ref: values
-
   - repoURL: 'git@github.com:flowcommerce/generic-charts.git'
     path: charts/flow-generic
     targetRevision: v2.0.0
@@ -49,6 +45,10 @@ spec:
         value: "0.10.48"
       valueFiles:
       - $values/deploy/apibuilder-generator/values.yaml
+  - repoURL: 'git@github.com:apicollective/apibuilder-generator.git'
+    targetRevision: main
+    ref: values
+
   project: production
 
   ## Keep it commenting out during the transition process to avoid auto
