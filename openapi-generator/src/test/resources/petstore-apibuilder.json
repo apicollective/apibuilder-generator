@@ -1,0 +1,172 @@
+{
+  "apidoc": {
+    "version": "0.16.53"
+  },
+  "name": "petstore",
+  "organization": {
+    "key": "test"
+  },
+  "application": {
+    "key": "petstore"
+  },
+  "namespace": "test.petstore.v0",
+  "version": "1.0.0",
+  "description": "A sample API that uses a petstore",
+  "info": {},
+  "base_url": "https://petstore.example.com/v1",
+  "headers": [
+    {
+      "name": "Authorization",
+      "type": "string",
+      "required": true,
+      "attributes": []
+    }
+  ],
+  "imports": [],
+  "enums": [
+    {
+      "name": "pet_status",
+      "plural": "pet_statuses",
+      "values": [
+        { "name": "available", "attributes": [] },
+        { "name": "pending", "attributes": [] },
+        { "name": "sold", "attributes": [] }
+      ],
+      "attributes": []
+    }
+  ],
+  "interfaces": [],
+  "unions": [
+    {
+      "name": "pet_or_error",
+      "plural": "pet_or_errors",
+      "discriminator": "type",
+      "types": [
+        { "type": "pet", "attributes": [], "discriminator_value": "pet" },
+        { "type": "error", "attributes": [], "discriminator_value": "error" }
+      ],
+      "attributes": [],
+      "interfaces": []
+    }
+  ],
+  "models": [
+    {
+      "name": "pet",
+      "plural": "pets",
+      "fields": [
+        { "name": "id", "type": "long", "required": true, "attributes": [], "annotations": [] },
+        { "name": "name", "type": "string", "required": true, "attributes": [], "annotations": [] },
+        { "name": "tag", "type": "string", "required": false, "attributes": [], "annotations": [] },
+        { "name": "status", "type": "pet_status", "required": true, "attributes": [], "annotations": [] }
+      ],
+      "attributes": [],
+      "interfaces": []
+    },
+    {
+      "name": "pet_form",
+      "plural": "pet_forms",
+      "fields": [
+        { "name": "name", "type": "string", "required": true, "minimum": 1, "maximum": 100, "attributes": [], "annotations": [] },
+        { "name": "tag", "type": "string", "required": false, "attributes": [], "annotations": [] },
+        { "name": "status", "type": "pet_status", "required": true, "attributes": [], "annotations": [] }
+      ],
+      "attributes": [],
+      "interfaces": []
+    },
+    {
+      "name": "error",
+      "plural": "errors",
+      "fields": [
+        { "name": "code", "type": "integer", "required": true, "attributes": [], "annotations": [] },
+        { "name": "message", "type": "string", "required": true, "attributes": [], "annotations": [] }
+      ],
+      "attributes": [],
+      "interfaces": []
+    }
+  ],
+  "resources": [
+    {
+      "type": "pet",
+      "plural": "pets",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/pets",
+          "parameters": [
+            {
+              "name": "limit",
+              "type": "integer",
+              "location": "Query",
+              "required": false,
+              "maximum": 100,
+              "description": "Maximum number of pets to return"
+            },
+            {
+              "name": "status",
+              "type": "pet_status",
+              "location": "Query",
+              "required": false,
+              "description": "Filter by status"
+            }
+          ],
+          "responses": [
+            { "code": { "integer": { "value": 200 } }, "type": "[pet]" },
+            { "code": { "integer": { "value": 401 } }, "type": "unit" },
+            { "code": { "integer": { "value": 500 } }, "type": "error" }
+          ],
+          "attributes": [],
+          "description": "List all pets"
+        },
+        {
+          "method": "POST",
+          "path": "/pets",
+          "body": { "type": "pet_form", "attributes": [] },
+          "parameters": [],
+          "responses": [
+            { "code": { "integer": { "value": 201 } }, "type": "pet" },
+            { "code": { "integer": { "value": 422 } }, "type": "error" }
+          ],
+          "attributes": [],
+          "description": "Create a pet"
+        },
+        {
+          "method": "GET",
+          "path": "/pets/:id",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "long",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            { "code": { "integer": { "value": 200 } }, "type": "pet" },
+            { "code": { "integer": { "value": 404 } }, "type": "unit" }
+          ],
+          "attributes": [],
+          "description": "Get a pet by ID"
+        },
+        {
+          "method": "DELETE",
+          "path": "/pets/:id",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "long",
+              "location": "Path",
+              "required": true
+            }
+          ],
+          "responses": [
+            { "code": { "integer": { "value": 204 } }, "type": "unit" }
+          ],
+          "attributes": []
+        }
+      ],
+      "attributes": []
+    }
+  ],
+  "annotations": [],
+  "attributes": []
+}

@@ -598,5 +598,27 @@ object Generators {
       status = lib.generator.Status.InDevelopment,
       codeGenerator = Some(generator.csharp.CSharpGenerator)
     ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "openapi_json",
+        name = "OpenAPI JSON",
+        description = Some("Generates OpenAPI 3.0.3 specification in JSON format from an API Builder service. Imported models are inlined into the output."),
+        language = Some("json"),
+        attributes = Seq("aws_api_gateway"),
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(generator.openapi.OpenApiJsonGenerator),
+    ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "openapi_yaml",
+        name = "OpenAPI YAML",
+        description = Some("Generates OpenAPI 3.0.3 specification in YAML format from an API Builder service. Imported models are inlined into the output."),
+        language = Some("yaml"),
+        attributes = Seq("aws_api_gateway"),
+      ),
+      status = lib.generator.Status.Alpha,
+      codeGenerator = Some(generator.openapi.OpenApiYamlGenerator),
+    ),
   ).sortBy(_.metaData.key)
 }

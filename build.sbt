@@ -6,6 +6,10 @@ ThisBuild / scalaVersion := "2.13.11"
 
 ThisBuild / javacOptions ++= Seq("-source", "17", "-target", "17")
 
+ThisBuild / libraryDependencySchemes ++= Seq(
+  "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always,
+)
+
 lazy val allScalacOptions = Seq(
   "-deprecation",
   "-feature",
@@ -48,8 +52,8 @@ lazy val lib = project
 
 lazy val generator = project
   .in(file("generator"))
-  .dependsOn(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
-  .aggregate(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator)
+  .dependsOn(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator, openapiGenerator)
+  .aggregate(csharpGenerator, scalaGenerator, rubyGenerator, javaGenerator, goGenerator, androidGenerator, kotlinGenerator, graphQLGenerator, javaAwsLambdaPojos, postmanGenerator, csvGenerator, openapiGenerator)
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAgent)
   .settings(commonSettings: _*)
@@ -185,6 +189,22 @@ lazy val postmanGenerator = project
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "ammonite-ops" % "2.0.4",
     )
+  )
+
+lazy val openapiGenerator = project
+  .in(file("openapi-generator"))
+  .dependsOn(lib, lib % "test->test")
+  .settings(commonSettings: _*)
+  .settings(resolversSettings)
+  .settings(
+    resolvers += "jitpack" at "https://jitpack.io",
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.apispec" %% "openapi-model" % "0.11.10",
+      "com.softwaremill.sttp.apispec" %% "openapi-circe" % "0.11.10",
+      "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml" % "0.11.10",
+      "io.circe" %% "circe-generic-extras" % "0.14.4",
+      "com.github.apicollective" %% "apibuilder-validation" % "0.5.8",
+    ),
   )
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
