@@ -24,5 +24,7 @@ jobs:
         distribution: 'zulu'
     - name: print Java version
       run: java -version
+    - name: Set up sbt
+      uses: sbt/setup-sbt@v1
     - name: Build
       run: sbt ++${{ matrix.scala }} clean test
