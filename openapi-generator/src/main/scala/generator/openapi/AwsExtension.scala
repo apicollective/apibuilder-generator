@@ -5,7 +5,7 @@ import io.apibuilder.generator.v0.models.InvocationForm
 import io.apibuilder.spec.v0.models.Service
 import sttp.apispec.openapi.OpenAPI
 
-object AwsEnrichment {
+object AwsExtension {
 
   private val AttributeName = "aws_api_gateway"
 

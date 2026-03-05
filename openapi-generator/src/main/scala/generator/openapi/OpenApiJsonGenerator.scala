@@ -11,7 +11,7 @@ object OpenApiJsonGenerator extends CodeGenerator {
     val importedServices = form.importedServices.getOrElse(Nil)
     val openApi = OpenApiConverter.convert(service, importedServices)
 
-    AwsEnrichment.maybeEnrich(openApi, form, service).map { enrichedOpenApi =>
+    AwsExtension.maybeEnrich(openApi, form, service).map { enrichedOpenApi =>
       val json = OutputWriter.toJson(enrichedOpenApi, pretty = true)
       Seq(
         ServiceFileNames.toFile(
