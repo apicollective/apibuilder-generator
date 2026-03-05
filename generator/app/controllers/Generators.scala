@@ -570,26 +570,6 @@ object Generators {
     ),
     CodeGenTarget(
       metaData = Generator(
-        key = "graphql",
-        name = "GraphQL Schema Generator. See https://github.com/apicollective/apibuilder-examples/tree/main/graphql/users",
-        description = Some("Generates GraphQL Schema"),
-        language = Some("graphql")
-      ),
-      status = lib.generator.Status.Beta,
-      codeGenerator = Some(generator.graphql.GraphQLSchemaGenerator)
-    ),
-    CodeGenTarget(
-      metaData = Generator(
-        key = "graphql_apollo",
-        name = "GraphQL Apollo Server Generator. See https://github.com/apicollective/apibuilder-examples/tree/main/graphql/users",
-        description = Some("Generates GraphQL Schema and Apollo Server Adapters"),
-        language = Some("graphql, typescript")
-      ),
-      status = lib.generator.Status.Beta,
-      codeGenerator = Some(generator.graphql.GraphQLApolloGenerator)
-    ),
-    CodeGenTarget(
-      metaData = Generator(
         key = "csharp",
         name = "C# Generator",
         description = None,
