@@ -5,7 +5,7 @@ import io.apibuilder.generator.v0.models.{Attribute, InvocationForm}
 import io.apibuilder.spec.v0.models.{Service, UnionType}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import play.api.libs.json.{JsArray, JsString}
+import play.api.libs.json.{JsArray, JsString, Json}
 import scala.generator.flow.erm.FlowErmSchemaGenerator
 
 class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHelpers with TestHelpers {
@@ -44,7 +44,7 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
   )
 
   private def typesAttribute(names: String*): Attribute =
-    Attribute(name = "types", value = JsArray(names.map(JsString(_))))
+    Attribute(name = "types", value = Json.stringify(JsArray(names.map(JsString(_)))))
 
   // ---------------------------------------------------------------------------
 

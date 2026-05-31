@@ -4,9 +4,9 @@ import io.apibuilder.generator.v0.models.{File, InvocationForm}
 import io.apibuilder.spec.v0.models.{Model, Service, Union}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
-import scala.generator.{Attributes, ScalaService, ScalaUtil}
+import scala.generator.{Namespaces, ScalaUtil}
 import scala.models.ApiBuilderComments
-import play.api.libs.json.{JsArray, JsString}
+import play.api.libs.json.{JsArray, JsString, Json}
 
 /** Generates ErmSpec[T] implicits for all (or a named subset of) models and unions in an
   * apibuilder service spec.  The generated object is imported at DSL call sites to provide
@@ -37,57 +37,60 @@ object FlowErmSchemaGenerator extends CodeGenerator {
   }
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
-    val ssd = ScalaService(form, Attributes.PlayDefaultConfig)
-    val allServices: Seq[Service] = form.service +: form.importedServices.getOrElse(Nil)
+    val allServices = form.service +: form.importedServices.getOrElse(Nil)
+    val typeFilter  = parseTypeFilter(form)
 
-    val typeFilter: Option[Set[String]] = form.attributes
+    resolveSeedTypes(form, allServices, typeFilter).map { case (seedModels, seedUnions) =>
+      val unionMemberModels =
+        seedUnions.flatMap(ru => ru.union.types.flatMap(ut => findModel(ut.`type`, allServices)))
+      val allModels =
+        collectTransitive((seedModels ++ unionMemberModels).distinctBy(_.qualifiedName), allServices)
+      val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
+
+      Seq(
+        ServiceFileNames.toFile(
+          form.service.namespace,
+          form.service.organization.key,
+          form.service.application.key,
+          form.service.version,
+          "ErmSchema",
+          header + generateContent(form.service, allModels, seedUnions),
+          Some("Scala"),
+        )
+      )
+    }
+  }
+
+  private def parseTypeFilter(form: InvocationForm): Option[Set[String]] =
+    form.attributes
       .find(_.name == "types")
-      .flatMap(attr => attr.value match {
-        case arr: JsArray => Some(arr.value.collect { case JsString(s) => s }.toSet)
-        case _ => None
+      .flatMap(attr => scala.util.Try(Json.parse(attr.value)).toOption.collect {
+        case arr: JsArray => arr.value.collect { case JsString(s) => s }.toSet
       })
 
-    val errors = scala.collection.mutable.ArrayBuffer[String]()
+  private def resolveSeedTypes(
+    form: InvocationForm,
+    allServices: Seq[Service],
+    typeFilter: Option[Set[String]],
+  ): Either[Seq[String], (Seq[ResolvedModel], Seq[ResolvedUnion])] = typeFilter match {
+    case None =>
+      Right((
+        form.service.models.map(ResolvedModel(form.service, _)),
+        form.service.unions.map(ResolvedUnion(form.service, _)),
+      ))
 
-    val (seedModels, seedUnions): (Seq[ResolvedModel], Seq[ResolvedUnion]) = typeFilter match {
-      case None =>
-        val models = form.service.models.map(ResolvedModel(form.service, _))
-        val unions = form.service.unions.map(ResolvedUnion(form.service, _))
-        (models, unions)
-
-      case Some(names) =>
-        val models = names.toSeq.flatMap { name =>
-          findModel(name, allServices).orElse {
-            if (findUnion(name, allServices).isEmpty)
-              errors += s"Type '$name' not found as a model or union in the spec or its imports"
-            None
-          }
-        }
-        val unions = names.toSeq.flatMap(findUnion(_, allServices))
-        (models, unions)
-    }
-
-    if (errors.nonEmpty) return Left(errors.toSeq)
-
-    val unionMemberModels: Seq[ResolvedModel] =
-      seedUnions.flatMap(ru => ru.union.types.flatMap(ut => findModel(ut.`type`, allServices)))
-
-    val allModels: Seq[ResolvedModel] =
-      collectTransitive((seedModels ++ unionMemberModels).distinctBy(_.qualifiedName), allServices)
-
-    val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
-
-    Right(Seq(
-      ServiceFileNames.toFile(
-        ssd.service.namespace,
-        ssd.service.organization.key,
-        ssd.service.application.key,
-        ssd.service.version,
-        "ErmSchema",
-        header + generateContent(ssd, allModels, seedUnions),
-        Some("Scala"),
-      )
-    ))
+    case Some(names) =>
+      val errors = names.toSeq.collect {
+        case name if findModel(name, allServices).isEmpty && findUnion(name, allServices).isEmpty =>
+          s"Type '$name' not found as a model or union in the spec or its imports"
+      }
+      if (errors.nonEmpty)
+        Left(errors)
+      else
+        Right((
+          names.toSeq.flatMap(findModel(_, allServices)),
+          names.toSeq.flatMap(findUnion(_, allServices)),
+        ))
   }
 
   // ---------------------------------------------------------------------------
@@ -142,12 +145,13 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     val stack  = scala.collection.mutable.Set[String]()
 
     def visit(rm: ResolvedModel): Unit = {
-      if (done(rm.qualifiedName) || stack(rm.qualifiedName)) return
-      stack += rm.qualifiedName
-      directModelDeps(rm, services).flatMap(d => byKey.get(d.qualifiedName)).foreach(visit)
-      stack -= rm.qualifiedName
-      done  += rm.qualifiedName
-      result += rm
+      if (!done(rm.qualifiedName) && !stack(rm.qualifiedName)) {
+        stack += rm.qualifiedName
+        directModelDeps(rm, services).flatMap(d => byKey.get(d.qualifiedName)).foreach(visit)
+        stack -= rm.qualifiedName
+        done  += rm.qualifiedName
+        result += rm
+      }
     }
 
     models.foreach(visit)
@@ -158,11 +162,11 @@ object FlowErmSchemaGenerator extends CodeGenerator {
   // Code generation
 
   private def generateContent(
-    ssd: ScalaService,
+    service: Service,
     models: Seq[ResolvedModel],
     unions: Seq[ResolvedUnion],
   ): String = {
-    val ermPackage = ssd.namespaces.base + ".erm"
+    val ermPackage = Namespaces(service.namespace).base + ".erm"
     val sb = new StringBuilder
 
     sb.append(s"package $ermPackage\n\n")
