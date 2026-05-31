@@ -66,7 +66,7 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     val form = InvocationForm(service = domainService)
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
     c should include("import io.flow.event.relation.mapper.schema.ErmSpec")
-    c should include("import io.apibuilder.spec.v0.models.{Field, Model, Union, UnionType}")
+    c should include("import io.apibuilder.spec.v0.models.{Enum, EnumValue, Field, Model, Union, UnionType}")
   }
 
   it("generates implicits for all primary-service models when no type filter is given") {
@@ -168,6 +168,48 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     val form = InvocationForm(service = domainService)
     val files = rightOrErrors(FlowErmSchemaGenerator.invoke(form))
     models.TestHelper.assertValidScalaSourceFiles(files)
+  }
+
+  it("emits ErmSpec.enum implicits for enum-typed fields") {
+    val serviceWithEnum = makeService(
+      name = "widget_service",
+      namespace = "io.flow.widget.v0",
+      organization = makeOrganization(key = "flow"),
+      application = makeApplication(key = "widget"),
+      version = "0.0.1",
+      enums = Seq(
+        makeEnum(
+          name = "widget_status",
+          plural = "widget_statuses",
+          values = Seq(makeEnumValue(name = "active"), makeEnumValue(name = "inactive")),
+        ),
+      ),
+      models = Seq(
+        makeModel(
+          name = "widget",
+          plural = "widgets",
+          fields = Seq(
+            makeField(name = "id", `type` = "string"),
+            makeField(name = "status", `type` = "widget_status"),
+          ),
+        ),
+      ),
+    )
+    val form = InvocationForm(service = serviceWithEnum)
+    val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
+    c should include("implicit val ermSpecWidgetStatus: ErmSpec[WidgetStatus]")
+    c should include("ErmSpec.`enum`(")
+    c should include("""qualifiedName = "io.flow.widget.v0.enums.widget_status"""")
+    c should include("""EnumValue(name = "active")""")
+  }
+
+  it("emits a `val all: Seq[ErmSpec[_]]` accessor listing every generated spec") {
+    val form = InvocationForm(service = domainService)
+    val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
+    c should include("val all: Seq[ErmSpec[_]] = Seq(")
+    c should include("ermSpecWidget")
+    c should include("ermSpecLabel")
+    c should include("ermSpecWidgetKind")
   }
 
   it("preserves custom discriminator value from spec") {

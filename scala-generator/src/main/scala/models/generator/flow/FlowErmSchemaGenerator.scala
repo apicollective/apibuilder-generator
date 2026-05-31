@@ -1,7 +1,7 @@
 package scala.generator.flow.erm
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-import io.apibuilder.spec.v0.models.{Model, Service, Union}
+import io.apibuilder.spec.v0.models.{Enum, Model, Service, Union}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
 import scala.generator.{Namespaces, ScalaUtil}
@@ -35,6 +35,12 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     val scalaImport: String = s"${service.namespace}.models.$scalaClassName"
   }
 
+  private case class ResolvedEnum(service: Service, `enum`: Enum) {
+    val qualifiedName: String = s"${service.namespace}.enums.${`enum`.name}"
+    val scalaClassName: String = ScalaUtil.toLocalClassName(`enum`.name)
+    val scalaImport: String = s"${service.namespace}.models.$scalaClassName"
+  }
+
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
     val allServices = form.service +: form.importedServices.getOrElse(Nil)
     val typeFilter  = parseTypeFilter(form)
@@ -44,6 +50,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
         seedUnions.flatMap(ru => ru.union.types.flatMap(ut => findModel(ut.`type`, allServices)))
       val allModels =
         collectTransitive((seedModels ++ unionMemberModels).distinctBy(_.qualifiedName), allServices)
+      val allEnums = collectEnums(allModels, allServices)
       val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
 
       Seq(
@@ -53,7 +60,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
           form.service.application.key,
           form.service.version,
           "ErmSchema",
-          header + generateContent(form.service, allModels, seedUnions),
+          header + generateContent(form.service, allModels, seedUnions, allEnums),
           Some("Scala"),
         )
       )
@@ -109,6 +116,13 @@ object FlowErmSchemaGenerator extends CodeGenerator {
         .map(ResolvedUnion(svc, _))
     }.nextOption()
 
+  private def findEnum(name: String, services: Seq[Service]): Option[ResolvedEnum] =
+    services.iterator.flatMap { svc =>
+      svc.enums
+        .find(e => e.name == name || s"${svc.namespace}.enums.${e.name}" == name)
+        .map(ResolvedEnum(svc, _))
+    }.nextOption()
+
   private def directModelDeps(rm: ResolvedModel, services: Seq[Service]): Seq[ResolvedModel] =
     rm.model.fields.flatMap(f => extractModelTypeName(f.`type`).flatMap(findModel(_, services)))
 
@@ -157,6 +171,18 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     result.toSeq
   }
 
+  private def collectEnums(models: Seq[ResolvedModel], services: Seq[Service]): Seq[ResolvedEnum] = {
+    val visited = scala.collection.mutable.LinkedHashMap[String, ResolvedEnum]()
+    models.foreach { rm =>
+      rm.model.fields.foreach { f =>
+        extractModelTypeName(f.`type`).flatMap(findEnum(_, services)).foreach { re =>
+          if (!visited.contains(re.qualifiedName)) visited(re.qualifiedName) = re
+        }
+      }
+    }
+    visited.values.toSeq
+  }
+
   // ---------------------------------------------------------------------------
   // Code generation
 
@@ -164,15 +190,16 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     service: Service,
     models: Seq[ResolvedModel],
     unions: Seq[ResolvedUnion],
+    enums: Seq[ResolvedEnum],
   ): String = {
     val ermPackage = Namespaces(service.namespace).base + ".erm"
     val sb = new StringBuilder
 
     sb.append(s"package $ermPackage\n\n")
     sb.append("import io.flow.event.relation.mapper.schema.ErmSpec\n")
-    sb.append("import io.apibuilder.spec.v0.models.{Field, Model, Union, UnionType}\n")
+    sb.append("import io.apibuilder.spec.v0.models.{Enum, EnumValue, Field, Model, Union, UnionType}\n")
 
-    val imports = (models.map(_.scalaImport) ++ unions.map(_.scalaImport)).distinct.sorted
+    val imports = (models.map(_.scalaImport) ++ unions.map(_.scalaImport) ++ enums.map(_.scalaImport)).distinct.sorted
     imports.foreach(i => sb.append(s"import $i\n"))
 
     sb.append(s"\nobject GeneratedErmSchema {\n\n")
@@ -204,6 +231,26 @@ object FlowErmSchemaGenerator extends CodeGenerator {
       }
       sb.append("      )),\n    )\n\n")
     }
+
+    enums.foreach { re =>
+      val valName = s"ermSpec${re.scalaClassName}"
+      sb.append(s"  implicit val $valName: ErmSpec[${re.scalaClassName}] =\n")
+      sb.append(s"    ErmSpec.`enum`(\n")
+      sb.append(s"""      qualifiedName = "${re.qualifiedName}",\n""")
+      sb.append(s"""      spec = Enum(name = "${re.`enum`.name}", plural = "${re.`enum`.plural}", values = Seq(\n""")
+      re.`enum`.values.foreach { ev =>
+        sb.append(s"""        EnumValue(name = "${ev.name}"),\n""")
+      }
+      sb.append("      )),\n    )\n\n")
+    }
+
+    val allNames =
+      models.map(rm => s"ermSpec${rm.scalaClassName}") ++
+        unions.map(ru => s"ermSpec${ru.scalaClassName}") ++
+        enums.map(re => s"ermSpec${re.scalaClassName}")
+    sb.append("  val all: Seq[ErmSpec[_]] = Seq(\n")
+    allNames.foreach(n => sb.append(s"    $n,\n"))
+    sb.append("  )\n")
 
     sb.append("}\n")
     sb.toString.stripTrailing()
