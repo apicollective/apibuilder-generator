@@ -600,5 +600,15 @@ object Generators {
       status = lib.generator.Status.Alpha,
       codeGenerator = Some(generator.openapi.OpenApiYamlGenerator),
     ),
+    CodeGenTarget(
+      metaData = Generator(
+        key = "flow_erm_schema",
+        name = "Flow ERM Schema",
+        description = Some("Generates ErmSpec[T] implicits for all (or a named subset of) models and unions in a service spec. The generated object is imported at DSL call sites to provide compile-time schema binding for lib-event-relation-mapper, replacing the runtime lib-apibuilder spec fetch."),
+        language = Some("Scala"),
+      ),
+      status = lib.generator.Status.InDevelopment,
+      codeGenerator = Some(scala.generator.flow.erm.FlowErmSchemaGenerator),
+    ),
   ).sortBy(_.metaData.key)
 }
