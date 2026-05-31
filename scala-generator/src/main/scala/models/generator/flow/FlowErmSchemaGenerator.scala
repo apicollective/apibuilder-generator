@@ -33,7 +33,6 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     val qualifiedName: String = s"${service.namespace}.unions.${union.name}"
     val scalaClassName: String = ScalaUtil.toLocalClassName(union.name)
     val scalaImport: String = s"${service.namespace}.models.$scalaClassName"
-    val discriminator: String = union.discriminator.getOrElse("discriminator")
   }
 
   override def invoke(form: InvocationForm): Either[Seq[String], Seq[File]] = {
@@ -170,10 +169,8 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     val sb = new StringBuilder
 
     sb.append(s"package $ermPackage\n\n")
-    sb.append(
-      "import io.flow.event.relation.mapper.schema." +
-        "{ErmSpec, ErmModelSpec, ErmFieldSpec, ErmUnionSpec, ErmUnionMemberSpec}\n",
-    )
+    sb.append("import io.flow.event.relation.mapper.schema.ErmSpec\n")
+    sb.append("import io.apibuilder.spec.v0.models.{Field, Model, Union, UnionType}\n")
 
     val imports = (models.map(_.scalaImport) ++ unions.map(_.scalaImport)).distinct.sorted
     imports.foreach(i => sb.append(s"import $i\n"))
@@ -185,24 +182,25 @@ object FlowErmSchemaGenerator extends CodeGenerator {
       sb.append(s"  implicit val $valName: ErmSpec[${rm.scalaClassName}] =\n")
       sb.append(s"    ErmSpec.model(\n")
       sb.append(s"""      qualifiedName = "${rm.qualifiedName}",\n""")
-      sb.append(s"""      spec = ErmModelSpec("${rm.model.name}", Seq(\n""")
+      sb.append(s"""      spec = Model(name = "${rm.model.name}", plural = "${rm.model.plural}", fields = Seq(\n""")
       rm.model.fields.foreach { f =>
-        sb.append(s"""        ErmFieldSpec("${f.name}", "${f.`type`}", required = ${f.required}),\n""")
+        sb.append(s"""        Field(name = "${f.name}", `type` = "${f.`type`}", required = ${f.required}),\n""")
       }
       sb.append("      )),\n    )\n\n")
     }
 
     unions.foreach { ru =>
       val valName = s"ermSpec${ru.scalaClassName}"
+      val discriminatorExpr = ru.union.discriminator.fold("None")(d => s"""Some("$d")""")
       sb.append(s"  implicit val $valName: ErmSpec[${ru.scalaClassName}] =\n")
       sb.append(s"    ErmSpec.union(\n")
       sb.append(s"""      qualifiedName = "${ru.qualifiedName}",\n""")
       sb.append(
-        s"""      spec = ErmUnionSpec("${ru.union.name}", discriminator = "${ru.discriminator}", members = Seq(\n""",
+        s"""      spec = Union(name = "${ru.union.name}", plural = "${ru.union.plural}", discriminator = $discriminatorExpr, types = Seq(\n""",
       )
       ru.union.types.foreach { ut =>
         val dv = ut.discriminatorValue.getOrElse(ut.`type`)
-        sb.append(s"""        ErmUnionMemberSpec("${ut.`type`}", "$dv"),\n""")
+        sb.append(s"""        UnionType(`type` = "${ut.`type`}", discriminatorValue = Some("$dv")),\n""")
       }
       sb.append("      )),\n    )\n\n")
     }

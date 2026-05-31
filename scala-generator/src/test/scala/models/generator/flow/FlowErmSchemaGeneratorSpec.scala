@@ -62,10 +62,11 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     c should include("object GeneratedErmSchema")
   }
 
-  it("emits ErmSpec imports") {
+  it("emits ErmSpec and apibuilder spec imports") {
     val form = InvocationForm(service = domainService)
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("import io.flow.event.relation.mapper.schema.")
+    c should include("import io.flow.event.relation.mapper.schema.ErmSpec")
+    c should include("import io.apibuilder.spec.v0.models.{Field, Model, Union, UnionType}")
   }
 
   it("generates implicits for all primary-service models when no type filter is given") {
@@ -93,7 +94,7 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
   it("embeds field name, type, and required flag") {
     val form = InvocationForm(service = domainService)
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("""ErmFieldSpec("id", "string", required = true)""")
+    c should include("""Field(name = "id", `type` = "string", required = true)""")
   }
 
   it("respects the types attribute filter") {
@@ -181,6 +182,6 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     )
     val form = InvocationForm(service = serviceWithDiscriminator, attributes = Seq(typesAttribute("widget_kind")))
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("""discriminator = "kind"""")
+    c should include("""discriminator = Some("kind")""")
   }
 }
