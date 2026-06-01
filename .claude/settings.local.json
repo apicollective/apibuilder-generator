@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sbt:*)",
+      "Bash(git stash:*)",
+      "Bash(grep:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(gh api:*)",
+      "Bash(gh run view:*)",
+      "WebFetch(domain:repo1.maven.org)",
+      "WebFetch(domain:jitpack.io)",
+      "Bash(gh run list:*)",
+      "Bash(apibuilder:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(bundle install:*)",
+      "Bash(ruby -Itest -Isrc:*)",
+      "Bash(ruby -e:*)",
+      "Bash(xargs:*)",
+      "Bash(gh release list:*)"
+    ]
+  }
+}
