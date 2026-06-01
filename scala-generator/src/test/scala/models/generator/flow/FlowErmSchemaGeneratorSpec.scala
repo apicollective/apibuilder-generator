@@ -212,6 +212,45 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     c should include("ermSpecWidgetKind")
   }
 
+  it("emits GeneratedAllErmSpecs aggregator when emit_aggregator=true") {
+    val form = InvocationForm(
+      service = domainService,
+      attributes = Seq(Attribute(name = "emit_aggregator", value = "true")),
+    )
+    val files = rightOrErrors(FlowErmSchemaGenerator.invoke(form))
+    files.map(_.name) should contain("GeneratedAllErmSpecs.scala")
+    val agg = files.find(_.name == "GeneratedAllErmSpecs.scala").get.contents
+    agg should include("package io.flow.erm")
+    agg should include("object GeneratedAllErmSpecs")
+    agg should include("io.flow.widget.v0.erm.GeneratedErmSchema.all")
+    agg should include("final class GeneratedSynthesizedMultiServiceProvider")
+    agg should include("class GeneratedErmModule extends Module")
+  }
+
+  it("includes imported services in the aggregator") {
+    val otherService: Service = makeService(
+      name = "other_service",
+      namespace = "io.flow.other.v0",
+      organization = makeOrganization(key = "flow"),
+      application = makeApplication(key = "other"),
+      version = "0.0.1",
+    )
+    val form = InvocationForm(
+      service = domainService,
+      importedServices = Some(Seq(otherService)),
+      attributes = Seq(Attribute(name = "emit_aggregator", value = "true")),
+    )
+    val agg = rightOrErrors(FlowErmSchemaGenerator.invoke(form))
+      .find(_.name == "GeneratedAllErmSpecs.scala").get.contents
+    agg should include("io.flow.widget.v0.erm.GeneratedErmSchema.all")
+    agg should include("io.flow.other.v0.erm.GeneratedErmSchema.all")
+  }
+
+  it("does not emit aggregator unless emit_aggregator=true") {
+    val files = rightOrErrors(FlowErmSchemaGenerator.invoke(InvocationForm(service = domainService)))
+    files.map(_.name) should not contain "GeneratedAllErmSpecs.scala"
+  }
+
   it("preserves custom discriminator value from spec") {
     val serviceWithDiscriminator = domainService.copy(
       unions = Seq(

@@ -53,18 +53,70 @@ object FlowErmSchemaGenerator extends CodeGenerator {
       val allEnums = collectEnums(allModels, allServices)
       val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
 
-      Seq(
-        ServiceFileNames.toFile(
-          form.service.namespace,
-          form.service.organization.key,
-          form.service.application.key,
-          form.service.version,
-          "ErmSchema",
-          header + generateContent(form.service, allModels, seedUnions, allEnums),
-          Some("Scala"),
-        )
+      val schemaFile = ServiceFileNames.toFile(
+        form.service.namespace,
+        form.service.organization.key,
+        form.service.application.key,
+        form.service.version,
+        "ErmSchema",
+        header + generateContent(form.service, allModels, seedUnions, allEnums),
+        Some("Scala"),
       )
+
+      // When `emit_aggregator=true`, also emit a single `io.flow.erm.GeneratedAllErmSpecs`
+      // object aggregating every `<ns>.erm.GeneratedErmSchema.all` reachable from the primary
+      // service + its imported services. The service module then just imports that one symbol —
+      // no hand-written list.
+      val aggregatorFile = if (aggregatorEnabled(form)) {
+        val namespaces = (form.service.namespace +: form.importedServices.getOrElse(Nil).map(_.namespace)).distinct.sorted
+        Some(
+          File(
+            name = "GeneratedAllErmSpecs.scala",
+            dir = Some("io/flow/erm"),
+            contents = header + generateAggregator(namespaces),
+          )
+        )
+      } else None
+
+      Seq(schemaFile) ++ aggregatorFile.toSeq
     }
+  }
+
+  private def aggregatorEnabled(form: InvocationForm): Boolean =
+    form.attributes.find(_.name == "emit_aggregator").exists(_.value.trim.toLowerCase == "true")
+
+  private def generateAggregator(namespaces: Seq[String]): String = {
+    val refs = namespaces.map(ns => s"$ns.erm.GeneratedErmSchema.all")
+    val body = refs.map(r => s"      $r").mkString(" ++\n")
+    s"""package io.flow.erm
+       |
+       |import io.flow.apibuilder.MultiServiceProvider
+       |import io.flow.event.relation.mapper.builder.SynthesizedMultiServiceProvider
+       |import io.flow.event.relation.mapper.schema.ErmSpec
+       |import play.api.inject.Module
+       |import play.api.{Configuration, Environment}
+       |
+       |import javax.inject.Singleton
+       |
+       |/** Aggregates every per-apibuilder-service `GeneratedErmSchema.all` reachable from the
+       |  * primary service that emitted this file (plus its imported services). The service ERM
+       |  * module then just enables `io.flow.erm.GeneratedErmModule` — no hand-written list,
+       |  * no service-side SynthesizedMultiServiceProvider construction.
+       |  */
+       |object GeneratedAllErmSpecs {
+       |  val all: Seq[ErmSpec[_]] =
+       |$body
+       |}
+       |
+       |@Singleton
+       |final class GeneratedSynthesizedMultiServiceProvider
+       |  extends SynthesizedMultiServiceProvider(GeneratedAllErmSpecs.all)
+       |
+       |class GeneratedErmModule extends Module {
+       |  def bindings(env: Environment, conf: Configuration) =
+       |    Seq(bind[MultiServiceProvider].to[GeneratedSynthesizedMultiServiceProvider])
+       |}
+       |""".stripMargin
   }
 
   private def parseTypeFilter(form: InvocationForm): Option[Set[String]] =
