@@ -59,7 +59,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
         form.service.application.key,
         form.service.version,
         "ErmSchema",
-        header + generateContent(form.service, allModels, seedUnions, allEnums),
+        header + generateContent(form.service, allModels, seedUnions, allEnums, allServices),
         Some("Scala"),
       )
 
@@ -254,11 +254,42 @@ object FlowErmSchemaGenerator extends CodeGenerator {
   // ---------------------------------------------------------------------------
   // Code generation
 
+  /** Direct references for a model: every model/union/enum any field's type points at, that's also in the emitted set. */
+  private def directRefsForModel(
+    rm: ResolvedModel,
+    allValByQName: Map[String, String],
+  ): Seq[(String, String)] = {
+    rm.model.fields
+      .flatMap(f => extractModelTypeName(f.`type`))
+      .distinct
+      .flatMap { tn =>
+        // tn may be unqualified (e.g. "organization_reference") OR already namespaced.
+        // We don't know which without service context; match by suffix against the val table.
+        allValByQName.keys.find(qn => qn == tn || qn.endsWith(s".$tn")).map(qn => (qn, allValByQName(qn)))
+      }
+      .distinct
+  }
+
+  /** Direct references for a union: each member type (a model). */
+  private def directRefsForUnion(
+    ru: ResolvedUnion,
+    allValByQName: Map[String, String],
+  ): Seq[(String, String)] = {
+    ru.union.types
+      .map(_.`type`)
+      .distinct
+      .flatMap { tn =>
+        allValByQName.keys.find(qn => qn == tn || qn.endsWith(s".$tn")).map(qn => (qn, allValByQName(qn)))
+      }
+      .distinct
+  }
+
   private def generateContent(
     service: Service,
     models: Seq[ResolvedModel],
     unions: Seq[ResolvedUnion],
     enums: Seq[ResolvedEnum],
+    @scala.annotation.unused allServices: Seq[Service],
   ): String = {
     val ermPackage = Namespaces(service.namespace).base + ".erm"
     val sb = new StringBuilder
@@ -272,8 +303,23 @@ object FlowErmSchemaGenerator extends CodeGenerator {
 
     sb.append(s"\nobject GeneratedErmSchema {\n\n")
 
+    // Build a lookup from qualifiedName -> local ermSpec val name for every emitted spec, so each ErmSpec's
+    // `resolved` map can reference its direct dependencies by their compile-time val identifier.
+    val modelValByQName: Map[String, String] = models.map(rm => rm.qualifiedName -> s"ermSpec${rm.scalaClassName}").toMap
+    val unionValByQName: Map[String, String] = unions.map(ru => ru.qualifiedName -> s"ermSpec${ru.scalaClassName}").toMap
+    val enumValByQName: Map[String, String] = enums.map(re => re.qualifiedName -> s"ermSpec${re.scalaClassName}").toMap
+    val allValByQName: Map[String, String] = modelValByQName ++ unionValByQName ++ enumValByQName
+
+    def resolvedExpr(refs: Seq[(String, String)]): String =
+      if (refs.isEmpty) ""
+      else {
+        val entries = refs.map { case (q, v) => s"""        "$q" -> $v""" }.mkString(",\n")
+        s"\n      resolved = Map[String, ErmSpec[_]](\n$entries,\n      ),"
+      }
+
     models.foreach { rm =>
       val valName = s"ermSpec${rm.scalaClassName}"
+      val refs = directRefsForModel(rm, allValByQName)
       sb.append(s"  implicit lazy val $valName: ErmSpec[${rm.scalaClassName}] =\n")
       sb.append(s"    ErmSpec.model(\n")
       sb.append(s"""      qualifiedName = "${rm.qualifiedName}",\n""")
@@ -281,12 +327,15 @@ object FlowErmSchemaGenerator extends CodeGenerator {
       rm.model.fields.foreach { f =>
         sb.append(s"""        Field(name = "${f.name}", `type` = "${f.`type`}", required = ${f.required}),\n""")
       }
-      sb.append("      )),\n    )\n\n")
+      sb.append("      )),")
+      sb.append(resolvedExpr(refs))
+      sb.append("\n    )\n\n")
     }
 
     unions.foreach { ru =>
       val valName = s"ermSpec${ru.scalaClassName}"
       val discriminatorExpr = ru.union.discriminator.fold("None")(d => s"""Some("$d")""")
+      val refs = directRefsForUnion(ru, allValByQName)
       sb.append(s"  implicit lazy val $valName: ErmSpec[${ru.scalaClassName}] =\n")
       sb.append(s"    ErmSpec.union(\n")
       sb.append(s"""      qualifiedName = "${ru.qualifiedName}",\n""")
@@ -297,7 +346,9 @@ object FlowErmSchemaGenerator extends CodeGenerator {
         val dv = ut.discriminatorValue.getOrElse(ut.`type`)
         sb.append(s"""        UnionType(`type` = "${ut.`type`}", discriminatorValue = Some("$dv")),\n""")
       }
-      sb.append("      )),\n    )\n\n")
+      sb.append("      )),")
+      sb.append(resolvedExpr(refs))
+      sb.append("\n    )\n\n")
     }
 
     enums.foreach { re =>

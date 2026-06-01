@@ -124,6 +124,17 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     c.indexOf("ermSpecLabel") should be < c.indexOf("ermSpecWidget")
   }
 
+  it("emits a `resolved` map pointing each spec at its direct nested ErmSpec dependencies") {
+    val form = InvocationForm(
+      service = domainService,
+      attributes = Seq(typesAttribute("widget")),
+    )
+    val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
+    // widget references label by qualified name; resolved should map that qualifiedName to the local ermSpecLabel val.
+    c should include regex """resolved = Map\[String, ErmSpec\[_\]\]\("""
+    c should include("\"io.flow.widget.v0.models.label\" -> ermSpecLabel")
+  }
+
   it("resolves types from imported services when listed in the filter") {
     val eventService: Service = makeService(
       name = "widget_event_service",
