@@ -72,14 +72,14 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
   it("generates implicits for all primary-service models when no type filter is given") {
     val form = InvocationForm(service = domainService)
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("implicit val ermSpecWidget: ErmSpec[Widget]")
-    c should include("implicit val ermSpecLabel: ErmSpec[Label]")
+    c should include("implicit lazy val ermSpecWidget: ErmSpec[Widget]")
+    c should include("implicit lazy val ermSpecLabel: ErmSpec[Label]")
   }
 
   it("generates implicits for unions") {
     val form = InvocationForm(service = domainService)
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("implicit val ermSpecWidgetKind: ErmSpec[WidgetKind]")
+    c should include("implicit lazy val ermSpecWidgetKind: ErmSpec[WidgetKind]")
     c should include("""ErmSpec.union(""")
     c should include("""qualifiedName = "io.flow.widget.v0.unions.widget_kind"""")
   }
@@ -100,7 +100,7 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
   it("respects the types attribute filter") {
     val form = InvocationForm(service = domainService, attributes = Seq(typesAttribute("widget")))
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("implicit val ermSpecWidget: ErmSpec[Widget]")
+    c should include("implicit lazy val ermSpecWidget: ErmSpec[Widget]")
     c should not include "ermSpecWidgetKind"
   }
 
@@ -119,7 +119,7 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     )
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
     // label is a dep of widget — must appear
-    c should include("implicit val ermSpecLabel: ErmSpec[Label]")
+    c should include("implicit lazy val ermSpecLabel: ErmSpec[Label]")
     // label must appear before widget
     c.indexOf("ermSpecLabel") should be < c.indexOf("ermSpecWidget")
   }
@@ -150,8 +150,8 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
       attributes = Seq(typesAttribute("widget_upserted", "io.flow.widget.v0.models.widget")),
     )
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("implicit val ermSpecWidgetUpserted")
-    c should include("implicit val ermSpecWidget")
+    c should include("implicit lazy val ermSpecWidgetUpserted")
+    c should include("implicit lazy val ermSpecWidget")
   }
 
   it("includes union member models automatically without explicit listing") {
@@ -160,8 +160,8 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
       attributes = Seq(typesAttribute("widget_kind")),
     )
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("implicit val ermSpecWidgetKind: ErmSpec[WidgetKind]")
-    c should include("implicit val ermSpecWidget: ErmSpec[Widget]")
+    c should include("implicit lazy val ermSpecWidgetKind: ErmSpec[WidgetKind]")
+    c should include("implicit lazy val ermSpecWidget: ErmSpec[Widget]")
   }
 
   it("generates valid Scala source code") {
@@ -197,7 +197,7 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
     )
     val form = InvocationForm(service = serviceWithEnum)
     val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
-    c should include("implicit val ermSpecWidgetStatus: ErmSpec[WidgetStatus]")
+    c should include("implicit lazy val ermSpecWidgetStatus: ErmSpec[WidgetStatus]")
     c should include("ErmSpec.`enum`(")
     c should include("""qualifiedName = "io.flow.widget.v0.enums.widget_status"""")
     c should include("""EnumValue(name = "active")""")

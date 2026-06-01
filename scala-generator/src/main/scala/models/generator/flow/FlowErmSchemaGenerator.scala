@@ -274,7 +274,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
 
     models.foreach { rm =>
       val valName = s"ermSpec${rm.scalaClassName}"
-      sb.append(s"  implicit val $valName: ErmSpec[${rm.scalaClassName}] =\n")
+      sb.append(s"  implicit lazy val $valName: ErmSpec[${rm.scalaClassName}] =\n")
       sb.append(s"    ErmSpec.model(\n")
       sb.append(s"""      qualifiedName = "${rm.qualifiedName}",\n""")
       sb.append(s"""      spec = Model(name = "${rm.model.name}", plural = "${rm.model.plural}", fields = Seq(\n""")
@@ -287,7 +287,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     unions.foreach { ru =>
       val valName = s"ermSpec${ru.scalaClassName}"
       val discriminatorExpr = ru.union.discriminator.fold("None")(d => s"""Some("$d")""")
-      sb.append(s"  implicit val $valName: ErmSpec[${ru.scalaClassName}] =\n")
+      sb.append(s"  implicit lazy val $valName: ErmSpec[${ru.scalaClassName}] =\n")
       sb.append(s"    ErmSpec.union(\n")
       sb.append(s"""      qualifiedName = "${ru.qualifiedName}",\n""")
       sb.append(
@@ -302,7 +302,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
 
     enums.foreach { re =>
       val valName = s"ermSpec${re.scalaClassName}"
-      sb.append(s"  implicit val $valName: ErmSpec[${re.scalaClassName}] =\n")
+      sb.append(s"  implicit lazy val $valName: ErmSpec[${re.scalaClassName}] =\n")
       sb.append(s"    ErmSpec.`enum`(\n")
       sb.append(s"""      qualifiedName = "${re.qualifiedName}",\n""")
       sb.append(s"""      spec = Enum(name = "${re.`enum`.name}", plural = "${re.`enum`.plural}", values = Seq(\n""")
