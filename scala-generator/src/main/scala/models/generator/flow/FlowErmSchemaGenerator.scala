@@ -50,7 +50,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
         seedUnions.flatMap(ru => ru.union.types.flatMap(ut => findModel(ut.`type`, allServices)))
       val allModels =
         collectTransitive((seedModels ++ unionMemberModels).distinctBy(_.qualifiedName), allServices)
-      val allEnums = collectEnums(allModels, allServices)
+      val allEnums = collectEnums(form.service.namespace, allModels, allServices)
       val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
 
       val schemaFile = ServiceFileNames.toFile(
@@ -223,12 +223,28 @@ object FlowErmSchemaGenerator extends CodeGenerator {
     result.toSeq
   }
 
-  private def collectEnums(models: Seq[ResolvedModel], services: Seq[Service]): Seq[ResolvedEnum] = {
+  /** Collect every enum reference visible to the primary service's namespace.
+    *
+    * Walks both the transitively-collected primary-namespace models AND every model in every
+    * imported service. From all those field references, returns each enum whose namespace is the
+    * primary service's. This way an enum like `io.flow.common.v0.enums.day_of_week`, referenced
+    * only by a model in some OTHER service, still gets emitted into common's ErmSchema when common
+    * is generated with that other service supplied as an import.
+    */
+  private def collectEnums(
+    primaryNamespace: String,
+    primaryModels: Seq[ResolvedModel],
+    services: Seq[Service],
+  ): Seq[ResolvedEnum] = {
     val visited = scala.collection.mutable.LinkedHashMap[String, ResolvedEnum]()
-    models.foreach { rm =>
+    val sourceModels: Seq[ResolvedModel] =
+      primaryModels ++ services.flatMap(svc => svc.models.map(ResolvedModel(svc, _)))
+    sourceModels.foreach { rm =>
       rm.model.fields.foreach { f =>
         extractModelTypeName(f.`type`).flatMap(findEnum(_, services)).foreach { re =>
-          if (!visited.contains(re.qualifiedName)) visited(re.qualifiedName) = re
+          if (re.service.namespace == primaryNamespace && !visited.contains(re.qualifiedName)) {
+            visited(re.qualifiedName) = re
+          }
         }
       }
     }
