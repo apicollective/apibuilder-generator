@@ -48,50 +48,23 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
 
   // ---------------------------------------------------------------------------
 
-  // Returns the contents of the primary ErmSchema scala file.
-  private def schemaContents(form: InvocationForm): String =
-    rightOrErrors(FlowErmSchemaGenerator.invoke(form)).find(_.name.endsWith("ErmSchema.scala")).get.contents
-
-  // Returns the contents of the ErmSpecProvider scala file.
-  private def providerContents(form: InvocationForm): String =
-    rightOrErrors(FlowErmSchemaGenerator.invoke(form)).find(_.name.endsWith("ErmSpecProvider.scala")).get.contents
-
-  // Returns the META-INF/services entry contents.
-  private def serviceLoaderEntry(form: InvocationForm): String =
-    rightOrErrors(FlowErmSchemaGenerator.invoke(form))
-      .find(_.dir.exists(_.contains("META-INF/services")))
-      .get
-      .contents
-
-  it("generates one ErmSchema, one ErmSpecProvider, and one ServiceLoader registration file") {
-    val files = rightOrErrors(FlowErmSchemaGenerator.invoke(InvocationForm(service = domainService)))
-    files.map(_.name).sorted shouldBe Seq(
-      "FlowWidgetV0ErmSchema.scala",
-      "FlowWidgetV0ErmSpecProvider.scala",
-      "io.flow.event.relation.mapper.schema.ErmSpecProvider",
-    )
-  }
-
-  it("ServiceLoader entry names the GeneratedErmSpecProvider class") {
-    val entry = serviceLoaderEntry(InvocationForm(service = domainService))
-    entry.trim shouldBe "io.flow.widget.v0.erm.GeneratedErmSpecProvider"
-  }
-
-  it("GeneratedErmSpecProvider class wires ServiceLoader to GeneratedErmSchema.all") {
-    val c = providerContents(InvocationForm(service = domainService))
-    c should include("package io.flow.widget.v0.erm")
-    c should include("class GeneratedErmSpecProvider extends ErmSpecProvider")
-    c should include("override def specs: Seq[ErmSpec[_]] = GeneratedErmSchema.all")
+  it("generates a single file") {
+    val form = InvocationForm(service = domainService)
+    val files = rightOrErrors(FlowErmSchemaGenerator.invoke(form))
+    files should have size 1
+    files.head.name should endWith(".scala")
   }
 
   it("generates a GeneratedErmSchema object in the erm package") {
-    val c = schemaContents(InvocationForm(service = domainService))
+    val form = InvocationForm(service = domainService)
+    val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
     c should include("package io.flow.widget.v0.erm")
     c should include("object GeneratedErmSchema")
   }
 
   it("emits ErmSpec and apibuilder spec imports") {
-    val c = schemaContents(InvocationForm(service = domainService))
+    val form = InvocationForm(service = domainService)
+    val c = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).head.contents
     c should include("import io.flow.event.relation.mapper.schema.ErmSpec")
     c should include("import io.apibuilder.spec.v0.models.{Enum, EnumValue, Field, Model, Union, UnionType}")
   }
@@ -193,7 +166,7 @@ class FlowErmSchemaGeneratorSpec extends AnyFunSpec with Matchers with ServiceHe
 
   it("generates valid Scala source code") {
     val form = InvocationForm(service = domainService)
-    val files = rightOrErrors(FlowErmSchemaGenerator.invoke(form)).filter(_.name.endsWith(".scala"))
+    val files = rightOrErrors(FlowErmSchemaGenerator.invoke(form))
     models.TestHelper.assertValidScalaSourceFiles(files)
   }
 

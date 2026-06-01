@@ -1,7 +1,6 @@
 package scala.generator.flow.erm
 
 import io.apibuilder.generator.v0.models.{File, InvocationForm}
-
 import io.apibuilder.spec.v0.models.{Enum, Model, Service, Union}
 import generator.ServiceFileNames
 import lib.generator.CodeGenerator
@@ -53,8 +52,6 @@ object FlowErmSchemaGenerator extends CodeGenerator {
         collectTransitive((seedModels ++ unionMemberModels).distinctBy(_.qualifiedName), allServices)
       val allEnums = collectEnums(allModels, allServices)
       val header = ApiBuilderComments(form.service.version, form.userAgent).toJavaString + "\n"
-      val ermPackage = Namespaces(form.service.namespace).base + ".erm"
-      val providerClass = s"$ermPackage.GeneratedErmSpecProvider"
 
       Seq(
         ServiceFileNames.toFile(
@@ -65,23 +62,7 @@ object FlowErmSchemaGenerator extends CodeGenerator {
           "ErmSchema",
           header + generateContent(form.service, allModels, seedUnions, allEnums),
           Some("Scala"),
-        ),
-        ServiceFileNames.toFile(
-          form.service.namespace,
-          form.service.organization.key,
-          form.service.application.key,
-          form.service.version,
-          "ErmSpecProvider",
-          header + generateProvider(ermPackage),
-          Some("Scala"),
-        ),
-        // ServiceLoader registry entry — loaded at runtime via
-        // ServiceLoader.load(classOf[ErmSpecProvider]); no service-side enumeration needed.
-        File(
-          name = "io.flow.event.relation.mapper.schema.ErmSpecProvider",
-          dir = Some("../resources/META-INF/services"),
-          contents = providerClass + "\n",
-        ),
+        )
       )
     }
   }
@@ -204,20 +185,6 @@ object FlowErmSchemaGenerator extends CodeGenerator {
 
   // ---------------------------------------------------------------------------
   // Code generation
-
-  /** Emits a tiny Scala class that the JDK ServiceLoader will instantiate at startup to gather
-    * the service's contributions to the typed ERM runtime — paired with a META-INF/services entry
-    * naming this class. Implementations are summed in lib-event-relation-mapper.
-    */
-  private def generateProvider(ermPackage: String): String =
-    s"""package $ermPackage
-       |
-       |import io.flow.event.relation.mapper.schema.{ErmSpec, ErmSpecProvider}
-       |
-       |final class GeneratedErmSpecProvider extends ErmSpecProvider {
-       |  override def specs: Seq[ErmSpec[_]] = GeneratedErmSchema.all
-       |}
-       |""".stripMargin
 
   private def generateContent(
     service: Service,
