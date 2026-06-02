@@ -130,17 +130,6 @@ lazy val androidGenerator = project
     commonSettings: _*
   )
 
-lazy val graphQLGenerator = project
-  .in(file("graphql-generator"))
-  .dependsOn(lib, lib % "test->test")
-  .settings(commonSettings: _*)
-  .settings(resolversSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "io.apibuilder" %% "apibuilder-graphql" % "0.0.10",
-    ),
-  )
-
 val kotlinLangVersion = "1.3.72"
 val mockitoVersion = "4.5.1"
 val scalatestVersion = "3.2.12"
